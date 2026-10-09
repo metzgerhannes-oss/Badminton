@@ -37,13 +37,13 @@ function renderFiveScores(entry){
  const raw=Array.isArray(entry.topFive)?entry.topFive:[];
  const valid=raw.length>0&&raw.length<=5&&raw.every(x=>x&&typeof x.name==="string"&&x.name.trim()
    &&Number.isFinite(x.points)&&x.points>=0&&typeof x.date==="string"
-   &&/^\\d{4}-\\d\\d-\\d\\d$/.test(x.date));
+   &&/^\d{4}-\d\d-\d\d$/.test(x.date));
  const reconciled=valid&&Math.abs(raw.reduce((sum,x)=>sum+x.points,0)-entry.points)<0.011;
  const items=reconciled?raw:[];
  const rows=Array.from({length:5},(_,i)=>{
   const result=items[i];
   if(result){
-   const href=/^https:\/\/(?:dbv\\.turnier\\.de|www\\.turnier\\.de|turnier\\.de)\/tournament\/[a-f0-9-]+\/?$/i.test(result.url||"")?result.url:null;
+   const href=/^https:\/\/(?:dbv\.turnier\.de|www\.turnier\.de|turnier\.de)\/tournament\/[a-f0-9-]+\/?$/i.test(result.url||"")?result.url:null;
    const title=escape(result.name);
    return '<div class="ranking-score-row"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><strong>'+title+'</strong><small>'+escape(result.date)+'</small></span><strong class="ranking-score-value">'+num(result.points)+'</strong>'+(href?'<a class="ranking-score-link" href="'+escape(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Turnier öffnen">↗</a>':'')+'</div>';
   }
