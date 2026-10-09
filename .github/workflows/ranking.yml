@@ -35,6 +35,7 @@ jobs:
       - name: Load latest official DBV week archives
         env:
           BADMINTON_PLAYER_IDS: '05-070879'
+          DEBUG_RANKING_SCHEMA: '1'
         run: python scripts/update-ranking.py
       - name: Commit refreshed snapshot
         run: |
