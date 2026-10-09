@@ -4,31 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0c2244">
-<meta name="description" content="Die Turniererfolge der Schmetterlinge: Trophäenschrank, Historie und Turnierlinks.">
+<meta name="description" content="Schmetterlinge: Wochenrangliste des Geburtsjahrgangs, Turniere und Trophäenschrank.">
 <title>Schmetterlinge · Badminton Jugend</title>
 <link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <script defer src="./app.js"></script>
 <script type="module" src="./history.js"></script>
+<script type="module" src="./dashboard.js"></script>
 </head>
 <body>
 <div class="app">
  <header class="topbar">
-  <a class="brand" href="#historie" aria-label="Schmetterlinge Start"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
+  <a class="brand" href="#start" aria-label="Schmetterlinge Start"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
  </header>
  <main>
-  <section class="hero">
-   <img class="hero-crest" src="./assets/spvgg-schmetterlinge.svg" alt="" aria-hidden="true">
-   <div class="eyebrow">SPVGG MÖSSINGEN · SCHMETTERLINGE</div>
-   <h1>Eure Erfolge.<br><em>Eure Geschichte.</em></h1>
-   <p>Turniere, Platzierungen und Auszeichnungen unserer Schmetterlinge – übersichtlich an einem Ort.</p>
-  </section>
   <section class="player-bar" aria-label="Spielerfilter">
    <div class="section-heading"><h2>Unsere Spieler</h2><button id="add-player" class="subtle-button" type="button">+ Spieler hinzufügen</button></div>
    <div id="player-pills" class="player-pills"></div>
   </section>
-  <section class="page active" id="view-historie" aria-labelledby="heading-historie">
+  <section class="page active" id="view-start" aria-labelledby="heading-start">
+   <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">DBV-Rangliste wird geladen</span></div>
+   <div id="dashboard-rank-source" class="dashboard-source"></div>
+   <div id="dashboard-rankings" class="dashboard-ranking-grid" aria-label="Rangliste nach Geburtsjahr und Disziplin"></div>
+   <div id="dashboard-kpis" class="dashboard-kpi-grid" aria-label="Turniere und Auszeichnungen"></div>
+   <div id="dashboard-next" class="dashboard-next"></div>
+  </section>
+  <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Erfasste Ergebnisse</span></div>
    <p class="supporting">Platzierungen aus Vereins- und Verbandsberichten, nach Spieler, Jahr und Disziplin filterbar. Die Sammlung wird ergänzt, wenn weitere Ergebnisse belegt sind.</p>
    <div id="history-source" class="notice"></div>
@@ -64,7 +66,8 @@
   </section>
  </main>
  <nav class="bottom-nav" aria-label="Hauptnavigation">
-  <a href="#historie" data-page="historie" aria-current="page"><span aria-hidden="true">★</span><small>Historie</small></a>
+  <a href="#start" data-page="start" aria-current="page"><span aria-hidden="true">⌂</span><small>Start</small></a>
+  <a href="#historie" data-page="historie"><span aria-hidden="true">★</span><small>Historie</small></a>
   <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
   <a href="#profil" data-page="profil"><span aria-hidden="true">◯</span><small>Profile</small></a>
  </nav>
