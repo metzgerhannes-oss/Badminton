@@ -184,6 +184,19 @@ def main():
         print("No official Excel export was obtainable; existing snapshot left unchanged.")
         return
     result=summarize(releases[0], releases[1] if len(releases)>1 else None, allow, checked)
+    # Independent audit against raw official Excel rows, protecting year/gender/disc filters.
+    latest=releases[0][3]
+    for pid,player in result["players"].items():
+        for disc,rank in player["disciplines"].items():
+            own=next((row for row in latest if row["id"]==pid and row["discipline"]==disc),None)
+            if own is None:raise ValueError("Selected player vanished from ranking input")
+            higher={row["id"] for row in latest
+                    if row["discipline"]==disc and row["gender"]==own["gender"]
+                    and row["birthYear"]==own["birthYear"] and row["points"]>own["points"]}
+            audit=1+len(higher)
+            if audit!=rank["yearRank"]:
+                raise ValueError(f"Cohort rank audit failed: {pid} {disc} got {rank['yearRank']}, expected {audit}")
+            print(f"VERIFIED {pid} {disc}: {rank['yearRank']} in birth year {own['birthYear']}; points {own['points']}; previous {rank['previousYearRank']}; audited higher-point players {len(higher)}")
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
     old=json.loads(OUTPUT.read_text()) if OUTPUT.exists() else None
     if old and old.get("current")==result.get("current") and old.get("previous")==result.get("previous") and old.get("players")==result.get("players"):
