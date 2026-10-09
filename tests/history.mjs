@@ -1,0 +1,34 @@
+import {readFile} from "node:fs/promises";
+import assert from "node:assert/strict";
+const history=JSON.parse(await readFile("data/history.json","utf8"));
+assert.equal(history.schemaVersion,1);
+assert.equal(history.curation,"public-club-reports");
+assert.ok(history.results.length>=10,"Expected seeded historic results");
+const ids=new Set();
+const players=new Set();
+for(const r of history.results){
+ assert.ok(typeof r.id==="string"&&r.id);
+ assert.ok(!ids.has(r.id),"History entry IDs must be unique");
+ ids.add(r.id);
+ assert.match(r.date,/^20\d{2}-\d{2}-\d{2}$/);
+ assert.ok(Number.isInteger(r.place)&&r.place>0);
+ assert.ok(["Einzel","Doppel","Mixed"].includes(r.discipline));
+ assert.ok(r.playerId&&r.playerName);
+ assert.equal(r.verified,true,"Only source-verified data may be published");
+ assert.equal(new URL(r.source.url).protocol,"https:");
+ assert.ok(r.source.url.includes("spvgg.org"),"Curated historical entry should cite its club report");
+ assert.ok(!("score" in r),"Do not invent individual match scores");
+ players.add(r.playerName);
+}
+assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+const linked=await readFile("index.html","utf8");
+assert.ok(linked.includes('id="view-historie"'));
+assert.ok(linked.includes('src="./history.js"'));
+const script=await readFile("history.js","utf8");
+assert.ok(script.includes("plotTrends"));
+assert.ok(script.includes("playerMatch"));
+const app=await readFile("app.js","utf8");
+assert.ok(app.includes("window.renderHistory?.(state.chosen,state.players)"));
+const sw=await readFile("sw.js","utf8");
+assert.ok(sw.includes("./data/history.json")&&sw.includes("./history.js"));
+console.log("Verified history valid: "+history.results.length+" sourced results for "+players.size+" players.");
