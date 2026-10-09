@@ -15,6 +15,7 @@ jobs:
       - name: Validate scripts
         run: |
           node --check app.js
+          node --check history.js
           node --check sw.js
           node --check scripts/normalize-feed.mjs
           node --check scripts/sync-feed.mjs
@@ -22,3 +23,4 @@ jobs:
         run: |
           node tests/validate.mjs
           node tests/adapter.mjs
+          node tests/history.mjs
