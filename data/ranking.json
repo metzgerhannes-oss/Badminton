@@ -25,7 +25,7 @@
         "HE": {
           "ageClass": "U11",
           "birthYear": 2016,
-          "points": 2670.0,
+          "points": 2670,
           "ageClassRank": 43,
           "bwAgeClassRank": 4,
           "bwAgeClassSize": 71,
@@ -34,7 +34,7 @@
           "overallRank": 1952,
           "ageClassSize": 701,
           "previousAgeClassRank": 46,
-          "previousPoints": 2515.0,
+          "previousPoints": 2515,
           "ageClassChange": 3,
           "tournaments": 13,
           "countedLimit": 5,
@@ -44,7 +44,7 @@
         "HD": {
           "ageClass": "U11",
           "birthYear": 2016,
-          "points": 1322.0,
+          "points": 1322,
           "ageClassRank": 118,
           "bwAgeClassRank": 9,
           "bwAgeClassSize": 22,
@@ -53,7 +53,7 @@
           "overallRank": 2398,
           "ageClassSize": 380,
           "previousAgeClassRank": 165,
-          "previousPoints": 790.0,
+          "previousPoints": 790,
           "ageClassChange": 47,
           "tournaments": 3,
           "countedLimit": 5,
@@ -63,7 +63,7 @@
         "HM": {
           "ageClass": "U11",
           "birthYear": 2016,
-          "points": 1469.0,
+          "points": 1469,
           "ageClassRank": 21,
           "bwAgeClassRank": 1,
           "bwAgeClassSize": 5,
@@ -72,7 +72,7 @@
           "overallRank": 1282,
           "ageClassSize": 123,
           "previousAgeClassRank": 20,
-          "previousPoints": 1469.0,
+          "previousPoints": 1469,
           "ageClassChange": -1,
           "tournaments": 2,
           "countedLimit": 5,
@@ -83,5 +83,11 @@
     }
   },
   "method": "DE: Rang in DBV-Altersklasse AKL2 (U11 umfasst mehrere Geburtsjahrgänge), Geschlecht und Disziplin; BW: gleiche Altersklasse für LVName=BAW-Baden-Württemberg. Gleichstand ergibt gleichen Rang.",
-  "notes": "Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag."
+  "notes": "Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag. Die Rangliste veröffentlicht nur Gesamtpunkte und Turnieranzahl; die fünf Einzelwertungen stehen im offiziellen Excel-Export nicht zur Verfügung und werden nicht geschätzt.",
+  "scoringRule": {
+    "bestResults": 5,
+    "validMonths": 12,
+    "sourceUrl": "https://www.badminton.de/der-dbv/jugend-wettkampf/faq/",
+    "status": "verified-dbv-regulation"
+  }
 }
