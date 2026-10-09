@@ -265,3 +265,19 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 .ranking-dialog form button{width:100%}
 @media(max-width:370px){.ranking-tile.ranking-compact{padding:11px 8px 9px;min-height:146px}.ranking-compact .ranking-top{font-size:12px}.ranking-bw-title{font-size:9px}.ranking-de-row{font-size:10px}.ranking-de-row strong{font-size:14px}.ranking-bw-row strong{letter-spacing:-1.4px}.ranking-compact-footer{font-size:8.5px}}
 @media(max-width:320px){.dashboard-ranking-grid{gap:6px}.ranking-tile.ranking-compact{padding:10px 6px}.ranking-bw-row strong{font-size:24px}}
+
+
+/* One-time lightweight profile choice, no login wall on later launches */
+.first-run-dialog{width:calc(100% - 30px);max-width:425px;padding:21px;background:linear-gradient(145deg,#142e4c,#0b1d32);color:#f1f8ff;border:1px solid #4d7aa0;border-radius:23px;box-shadow:0 25px 100px #020b1bcc}
+.first-run-dialog::backdrop{background:#051023ca}
+.first-run-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:19px}
+.first-run-header img{border-radius:50%;object-fit:cover;flex:none}
+.first-run-header h2{font-size:19px;margin:1px 0 6px;letter-spacing:-.3px;line-height:1.2}
+.first-run-header p{font-size:12px;line-height:1.6;color:#b6cce0;margin:0}
+.first-run-choices{display:grid;gap:9px}
+.first-run-choice{display:flex;align-items:center;gap:11px;min-height:58px;text-align:left;background:#203e5b;border:1px solid #446f91;border-radius:14px;color:#f2f9ff;padding:10px 12px}
+.first-run-choice>span:first-child{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#90d6fa;color:#184263;font-weight:850}
+.first-run-choice strong{flex:1;font-size:14px}
+.first-run-choice>span:last-child{color:#a2dbfb;font-size:22px}
+.first-run-new{width:100%;margin-top:12px;padding:12px;background:transparent;border:1px dashed #6488a4;border-radius:12px;color:#bde7ff;font-size:12px;font-weight:800}
+.first-run-choice:focus-visible,.first-run-new:focus-visible{outline:3px solid #addfff;outline-offset:2px}
