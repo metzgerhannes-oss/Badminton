@@ -72,7 +72,7 @@ function renderFocusHeader(){
  }
  wrap.innerHTML='<div class="focus-profile-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</div>'+
  '<div class="focus-profile-copy"><small>'+(isFriend?"Du folgst":"Mein aktives Spielerprofil")+'</small><strong>'+esc(p.name)+'</strong>'+
- '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\\d{2}-\\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+
+ '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+
  (isFriend?'<button type="button" class="focus-settings" id="back-own">Zu mir zurück</button>':'<a class="focus-settings" href="#einstellungen">Wechseln <span aria-hidden="true">↗</span></a>');
  el("back-own")?.addEventListener("click",()=>{state.viewingFriendId=null;state.chosen=state.activeProfileId;save();location.hash="#start";render()});
 }
@@ -105,14 +105,14 @@ function renderProfiles(){
  list.innerHTML=state.players.length?state.players.map(p=>{
  const active=state.activeProfileId===p.id;
  const birth=p.birthYear?" · Jg. "+esc(p.birthYear):"";
- return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\\d{2}-\\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
+ return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
  }).join(""):'<div class="empty">Noch kein eigenes Spielerprofil hinterlegt.</div>';
  list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
   state.activeProfileId=b.dataset.setActive;state.viewingFriendId=null;state.chosen=state.activeProfileId;save();render();toast("Startprofil geändert");
  }));
  list.querySelectorAll("[data-edit-own]").forEach(b=>b.addEventListener("click",()=>{
   const p=state.players.find(x=>x.id===b.dataset.editOwn);
-  if(p)openPlayerForm(p);
+  if(p)window.openPlayerForm?.(p);
  }));
  list.querySelectorAll("[data-remove-profile]").forEach(b=>b.addEventListener("click",()=>{
   const id=b.dataset.removeProfile;
@@ -186,7 +186,7 @@ function setup(){
   editingPlayerId=p?.id||null;
   playerForm.reset();
   playerForm.elements.namedItem("name").value=p?.name||"";
-  playerForm.elements.namedItem("id").value=(p&&/^\\d{2}-\\d{6}$/.test(p.id))?p.id:"";
+  playerForm.elements.namedItem("id").value=(p&&/^\d{2}-\d{6}$/.test(p.id))?p.id:"";
   playerForm.elements.namedItem("id").readOnly=Boolean(p);
   playerForm.elements.namedItem("birthYear").value=p?.birthYear||"";
   playerForm.elements.namedItem("url").value=p?.url||"";
@@ -221,7 +221,7 @@ function setup(){
   const name=String(data.get("name")||"").trim().slice(0,80);
   const id=String(data.get("id")||"").trim();
   const birth=Number(data.get("birthYear"));
-  if(!name||!/^\\d{2}-\\d{6}$/.test(id)){toast("Name und gültige DBV-ID erforderlich");return}
+  if(!name||!/^\d{2}-\d{6}$/.test(id)){toast("Name und gültige DBV-ID erforderlich");return}
   if(state.friends.some(p=>p.id===id)||state.players.some(p=>p.id===id)){toast("Dieser Spieler ist bereits gespeichert");return}
   if(state.friends.length>=30){toast("Maximal 30 Freunde");return}
   const profileUrl=safeUrl(data.get("url")||"");
