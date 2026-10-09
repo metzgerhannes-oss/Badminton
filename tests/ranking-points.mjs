@@ -27,9 +27,10 @@ for(const [key,total] of [["HE",2670],["HD",1322],["HM",1469]]){
  assert.deepEqual(row.topFive,[],"Do not fill ranking valuations with guessed results");
  assert.equal(row.topFiveStatus,"not-in-public-export");
  const html=format(row);
- assert.equal((html.match(/class="ranking-score-row ranking-score-pending"/g)||[]).length,5);
- assert.ok(html.includes("nicht zuverlässig ausgelesen"));
- assert.ok(!html.includes(">0<"),"Don't invent zeros");
+ assert.equal((html.match(/class="ranking-score-row/g)||[]).length,0,"No five empty placeholder rows");
+ assert.ok(html.includes("nicht zuverlässig"));
+ assert.ok(html.includes("dbv.turnier.de/ranking/ranking.aspx?rid=238"),"Official per-player source shown");
+ assert.ok(!html.includes(">0<"),"Do not invent zeros");
 }
 const verified=[
  {name:"Turnier Alpha",date:"2026-08-15",points:800,url:"https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2"},
