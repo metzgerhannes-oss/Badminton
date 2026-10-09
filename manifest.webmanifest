@@ -1,8 +1,8 @@
 {
   "name": "Schmetterlinge – Badminton Jugend Mössingen",
   "short_name": "Schmetterlinge",
-  "description": "Trophäenschrank, historische Turniererfolge und offizielle Turnierfavoriten",
-  "start_url": "./",
+  "description": "Jahrgangsrangliste und Wochenvergleich, Turniererfolge und Trophäenschrank",
+  "start_url": "./#start",
   "scope": "./",
   "display": "standalone",
   "background_color": "#08152c",
