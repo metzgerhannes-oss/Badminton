@@ -97,15 +97,18 @@ function renderPending(){
 function render(){
   const source=$("history-source"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
-  if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
-  if(!loaded){source.textContent="Verifizierte Platzierungen werden geladen …";return;}
-  source.textContent="Ausgewählte Ergebnisse aus Vereins- und Verbandsberichten. Zwei Meisterschaftsplatzierungen stammen aus einer Familienbestätigung und sind bis zur offiziellen Detailprüfung ausdrücklich gekennzeichnet. Noch keine vollständige DBV-Historie.";
+  if(error){source.hidden=false;source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
+  // The history opens directly with the trophies. Show a notice only if loading fails.
+  source.hidden=true;
+  source.textContent="";
+  if(!loaded)return;
   const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
+  // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
+  renderTrophies(playerRecords);
   const friendWithoutHistory=viewMode==="friend"&&playerRecords.length===0;
   const trophySection=$("trophy-shelf")?.closest(".trophy-section");
   if(trophySection)trophySection.hidden=friendWithoutHistory;
   if(friendWithoutHistory){
-   source.textContent="Für diesen Freund sind in unserer kuratierten Turnierhistorie noch keine Ergebnisse hinterlegt. Das bedeutet nicht, dass der Spieler keine Turniere oder Auszeichnungen hat.";
    summary.innerHTML="";$("history-trends").innerHTML="";$("history-pending").innerHTML="";
    timeline.innerHTML='<div class="empty"><h3>Historische Daten noch nicht verfügbar</h3><p>Die offizielle DBV-Spielerseite enthält gegebenenfalls weitere Ergebnisse. Der Freundesfavorit führt nicht automatisch zum Import.</p></div>';
    return;
@@ -118,7 +121,6 @@ function render(){
   const chosen=playerRecords.filter(r=>(year==="all"||r.date.startsWith(year))&&(discipline==="all"||r.discipline===discipline))
     .slice().sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));
   const events=new Set(chosen.map(r=>r.event+"|"+r.date));
-  renderTrophies(chosen);
   plotTrends(chosen);
   const podium=chosen.filter(r=>r.place<=3).length;
   const playerCount=new Set(chosen.map(r=>r.playerId)).size;
