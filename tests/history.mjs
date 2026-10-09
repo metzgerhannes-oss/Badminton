@@ -40,7 +40,7 @@ const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
 assert.ok(script.includes("playerMatch"));
 const app=await readFile("app.js","utf8");
-assert.ok(app.includes("window.renderHistory?.(state.chosen,state.players)"));
+assert.ok(app.includes("window.renderHistory?.(state.chosen,viewedProfiles)"));
 const sw=await readFile("sw.js","utf8");
 assert.ok(sw.includes("./data/history.json")&&sw.includes("./history.js"));
 console.log("Verified history valid: "+history.results.length+" sourced results for "+players.size+" players.");
