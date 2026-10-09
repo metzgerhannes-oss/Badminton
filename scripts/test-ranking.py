@@ -3,6 +3,7 @@ import unittest
 import importlib.util
 from pathlib import Path
 from datetime import datetime,timezone
+from unittest.mock import patch
 from openpyxl import Workbook
 spec=importlib.util.spec_from_file_location("ranking_update",Path(__file__).with_name("update-ranking.py"))
 module=importlib.util.module_from_spec(spec)
@@ -83,6 +84,29 @@ class RankingTests(unittest.TestCase):
         output=summarize((2027,1,"https://example.invalid/a",rows),(2026,52,"https://example.invalid/b",prev),["05-070879"],"2027-01-09T00:00:00Z")
         self.assertIsNone(output["players"]["05-070879"]["disciplines"]["HE"]["previousAgeClassRank"])
         self.assertIsNone(output["players"]["05-070879"]["disciplines"]["HE"]["previousBwAgeClassRank"])
+    def test_current_official_excel_download(self):
+        class Response:
+            status=200
+            def __init__(self,content):self.content=content
+            def __enter__(self):return self
+            def __exit__(self,*args):return False
+            def read(self,*args):return self.content
+        html=b'<html><a>Rangliste KW 41</a><div>zuletzt aktualisiert: <a>07.10.2026 12:00:00</a></div></html>'
+        with patch.object(module,"urlopen",side_effect=[Response(html),Response(make_xlsx(real=True))]):
+            latest=module.current_public_export()
+        self.assertEqual(latest[:2],(2026,41))
+        self.assertEqual(latest[2],"https://turniere.badminton.de/ranking/download")
+        self.assertEqual(next(r for r in latest[3] if r["id"]=="05-070879")["points"],2670)
+        self.assertEqual(latest[4],"2026-10-07T12:00:00+02:00")
+    def test_never_downgrade_current_source_to_old_archive(self):
+        current={"schemaVersion":2,"status":"available","current":{"year":2026,"week":41,"kind":"current-export","sourceUpdatedAt":"2026-10-07T12:00:00+02:00"}}
+        older={"schemaVersion":2,"status":"available","current":{"year":2026,"week":40,"kind":"weekly-archive"}}
+        same_week_archive={"schemaVersion":2,"status":"available","current":{"year":2026,"week":41,"kind":"weekly-archive"}}
+        newer={"schemaVersion":2,"status":"available","current":{"year":2026,"week":42,"kind":"current-export"}}
+        self.assertFalse(module.should_publish(current,older))
+        self.assertFalse(module.should_publish(current,same_week_archive))
+        self.assertTrue(module.should_publish(current,newer))
+        self.assertTrue(module.should_publish(None,current))
     def test_year_boundary(self):
         self.assertEqual(iso_week(datetime(2026,1,1,tzinfo=timezone.utc)),(2026,1))
 if __name__=="__main__":
