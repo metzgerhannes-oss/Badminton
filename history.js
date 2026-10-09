@@ -3,7 +3,7 @@ import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
  const feedUrl="./data/history.json";
- let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all";
+ let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own";
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -101,6 +101,15 @@ function render(){
   if(!loaded){source.textContent="Verifizierte Platzierungen werden geladen …";return;}
   source.textContent="Ausgewählte Ergebnisse aus Vereins- und Verbandsberichten. Zwei Meisterschaftsplatzierungen stammen aus einer Familienbestätigung und sind bis zur offiziellen Detailprüfung ausdrücklich gekennzeichnet. Noch keine vollständige DBV-Historie.";
   const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
+  const friendWithoutHistory=viewMode==="friend"&&playerRecords.length===0;
+  const trophySection=$("trophy-shelf")?.closest(".trophy-section");
+  if(trophySection)trophySection.hidden=friendWithoutHistory;
+  if(friendWithoutHistory){
+   source.textContent="Für diesen Freund sind in unserer kuratierten Turnierhistorie noch keine Ergebnisse hinterlegt. Das bedeutet nicht, dass der Spieler keine Turniere oder Auszeichnungen hat.";
+   summary.innerHTML="";$("history-trends").innerHTML="";$("history-pending").innerHTML="";
+   timeline.innerHTML='<div class="empty"><h3>Historische Daten noch nicht verfügbar</h3><p>Die offizielle DBV-Spielerseite enthält gegebenenfalls weitere Ergebnisse. Der Freundesfavorit führt nicht automatisch zum Import.</p></div>';
+   return;
+  }
   const years=[...new Set(playerRecords.map(r=>r.date.slice(0,4)))].sort((a,b)=>b.localeCompare(a));
   const old=year;
   yearSelect.innerHTML='<option value="all">Alle Jahre</option>'+years.map(v=>'<option value="'+escape(v)+'">'+escape(v)+'</option>').join("");
@@ -129,8 +138,8 @@ function render(){
     return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(t.items.some(i=>i.confirmation==="family-confirmed")?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">Originalbericht ansehen ↗</a>':"")+'</div></article>';
   }).join("");
  }
- window.renderHistory=(selected,profiles)=>{
-   lastPlayer=selected||"all";lastProfiles=Array.isArray(profiles)?profiles:[];
+ window.renderHistory=(selected,profiles,options={})=>{
+   lastPlayer=selected||"";lastProfiles=Array.isArray(profiles)?profiles:[];viewMode=options.mode==="friend"?"friend":"own";
    render();
  };
  async function load(){
