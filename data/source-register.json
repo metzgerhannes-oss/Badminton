@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-09",
+  "context": "DBV-U19-Jugendrangliste und Schmetterlinge-Spielerdashboard",
+  "purpose": "Wiederverwendbare, qualitätsgeprüfte Referenzliste für Ranglistenpunkte, Einzelwertungen, Turnierresultate und Wertungsregeln.",
+  "tiers": [
+    {
+      "tier": "A",
+      "label": "Originalquelle DBV / amtliche Regel",
+      "trust": "primaer",
+      "rule": "Für offizielle Ranglisten und exakt ausgewiesene Einzelwertungen zuerst verwenden."
+    },
+    {
+      "tier": "B",
+      "label": "Verbandsquelle und offizieller Turnierdatensatz",
+      "trust": "hoch",
+      "rule": "Für Turnieridentität, Platzierungen, Kategorie und Datierung; Punkte nur bei expliziter Wertungsangabe."
+    },
+    {
+      "tier": "C",
+      "label": "Vereinsbericht oder dokumentierte Drittanbieter-Übernahme",
+      "trust": "mittel",
+      "rule": "Für Ergebnisnachweis und Quervergleich, niemals automatisch als offizielle Einzelpunkte umdeuten."
+    },
+    {
+      "tier": "D",
+      "label": "Nutzerangabe, Screenshot oder unvollständige Metadaten",
+      "trust": "ungeprüft",
+      "rule": "Als Suchhinweis speichern, nicht als geprüfte DBV-Punkte darstellen."
+    }
+  ],
+  "references": [
+    {
+      "id": "dbv-u19-individual",
+      "tier": "A",
+      "priority": 1,
+      "title": "DBV turnier.de U19-Rangliste mit Spieler- und Turnierdetails",
+      "url": "https://dbv.turnier.de/ranking/ranking.aspx?rid=238",
+      "data": [
+        "spielerbezogene Turnierliste",
+        "potenzielle Einzelwertungen pro Turnier",
+        "Ranglistenverlauf"
+      ],
+      "observed": "Vom DBV als Zugang für Einzelergebnisse aller Spieler benannt; programmgesteuerter Abruf 09.10.2026 führt auf Cookiewall.",
+      "state": "public-interface-not-programmatically-verified",
+      "automatedAccess": "cookie-wall",
+      "maySupplyOfficialFive": true
+    },
+    {
+      "id": "dbv-current-excel",
+      "tier": "A",
+      "priority": 2,
+      "title": "Aktuelle DBV-U19-Rangliste inkl. Excel-Download",
+      "url": "https://turniere.badminton.de/ranking",
+      "downloadUrl": "https://turniere.badminton.de/ranking/download",
+      "data": [
+        "SpielerID",
+        "Geburtsjahr",
+        "AKL2",
+        "Disziplin",
+        "LVName",
+        "Gesamtpunkte",
+        "Turnieranzahl",
+        "offizieller Gesamtrang"
+      ],
+      "observed": "Der vom Projekt validierte Excel-Export KW41 vom 07.10.2026 enthält für Philipp HE 2670, HD 1322, HM 1469; Charlotte DE 611. Keine benannten Turnier-Einzelwertungen.",
+      "state": "verified",
+      "automatedAccess": "works",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "dbv-weekly-archive",
+      "tier": "A",
+      "priority": 3,
+      "title": "Offizielle DBV-Wochenarchive als Excel",
+      "url": "https://turniere.badminton.de/ranking/history",
+      "exampleUrl": "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW40.xlsx",
+      "data": [
+        "Punktestand vorherige KW",
+        "Vorwochenvergleich",
+        "Disziplin",
+        "AKL2"
+      ],
+      "observed": "KW40 archiviert; keine namentlichen Einzelwertungen der fünf besten Turniere.",
+      "state": "verified",
+      "automatedAccess": "works",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "dbv-regulations",
+      "tier": "A",
+      "priority": 4,
+      "title": "DBV-Jugendspielordnung Ranglistenbestimmungen",
+      "url": "https://www.badminton.de/fileadmin/user_upload/jugendspielordnung_anlage_i_ranglistenbestimmungen.pdf",
+      "data": [
+        "12-Monats-Regel",
+        "fünf beste Wertungen",
+        "Wertung/Platzierungslogik",
+        "Donnerstag"
+      ],
+      "observed": "Legt Ranglistenlogik fest, enthält keine konkreten Spielerturniere.",
+      "state": "verified",
+      "automatedAccess": "public-pdf",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "dbv-faq",
+      "tier": "A",
+      "priority": 5,
+      "title": "DBV-FAQ Jugendwettkampfsystem",
+      "url": "https://www.badminton.de/der-dbv/jugend-wettkampf/faq/",
+      "data": [
+        "offizielle Datenzugänge",
+        "12 Monate",
+        "besten fünf",
+        "wöchentliche Aktualisierung"
+      ],
+      "observed": "Expliziter Hinweis: turnier.de/ranking zeigt Einzelergebnisse aller Spieler.",
+      "state": "verified",
+      "automatedAccess": "works",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "dbv-point-table",
+      "tier": "A",
+      "priority": 6,
+      "title": "DBV-Jugend-Punktetabelle gültig ab 01.01.2024",
+      "url": "https://www.badminton.de/fileadmin/dateien_upload/dateien_august_2025/drlrl_u19_punktetabelle_20231108_u09-bis-o19.pdf",
+      "data": [
+        "Punkte je Altersklasse",
+        "Turnierkategorie",
+        "Platzierung"
+      ],
+      "observed": "Wert nur nach Prüfung von exakter Kategorie, Altersklasse, Turnierart und Gültigkeit ableitbar, nicht automatisch ein amtlicher Spielerwert.",
+      "state": "verified",
+      "automatedAccess": "public-pdf",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "dbv-tournament-district",
+      "tier": "B",
+      "priority": 7,
+      "title": "35. Bezirksmeisterschaft BAW Südwürttemberg 2026, offizielles Turnier",
+      "url": "https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2",
+      "data": [
+        "Turnieridentität",
+        "Altersklasse",
+        "Disziplin",
+        "Platzierung",
+        "Spieler/Partner"
+      ],
+      "observed": "Offizieller Turnierdatensatz vom Landesverband verlinkt; Einzelscore für die DBV-Wertung noch nicht nachgewiesen.",
+      "state": "verified-reference",
+      "automatedAccess": "cookie-wall",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "bwbv-report-district",
+      "tier": "B",
+      "priority": 8,
+      "title": "BWBV-Bericht 35. Bezirksmeisterschaft Südwürttemberg 2026",
+      "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/",
+      "data": [
+        "Turnierzuordnung",
+        "offizieller DBV-Ergebnislink"
+      ],
+      "observed": "Verbandsseite wird als Quellennachweis für das Turnier verwendet; individuelle Punktwertung nicht daraus ableiten.",
+      "state": "known-reference",
+      "automatedAccess": "not-checked-now",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "club-results-spvgg",
+      "tier": "C",
+      "priority": 9,
+      "title": "SpVgg Mössingen – Badminton-Turnierberichte",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles",
+      "data": [
+        "Turnierdatum",
+        "Altersklasse",
+        "Platzierungen",
+        "Partner",
+        "Verein"
+      ],
+      "observed": "Öffentlich zugängliche Ergebnisberichte, etwa 1./2./3. C-Rangliste und 4. E-Rangliste 2026; dokumentieren keine fünf aktuellen DBV-Einzelwertungen.",
+      "state": "verified",
+      "automatedAccess": "public-html",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "badhub-player-philipp",
+      "tier": "C",
+      "priority": 10,
+      "title": "Badhub – Philipp Metzger (übernommene Turnierergebnisse)",
+      "url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier",
+      "data": [
+        "SpielerID",
+        "Turnierhistorie",
+        "Disziplin",
+        "Platzierung",
+        "Partner",
+        "aggregierte DBV-Ranglistenpunkte"
+      ],
+      "observed": "Am 09.10.2026 programmgesteuert öffentlich lesbar; HE/HD/HM-Gesamtpunkte und Turnierhistorie nachweisbar, jedoch keine eindeutig belegten Wertungspunkte je Turnier.",
+      "state": "verified-for-results",
+      "automatedAccess": "works",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "badhub-player-charlotte",
+      "tier": "C",
+      "priority": 11,
+      "title": "Badhub – Charlotte Metzger Turnierhistorie",
+      "url": "https://badhub.de/spieler/05-071969?saison=2026&src=turnier",
+      "data": [
+        "SpielerID",
+        "Turnierhistorie",
+        "Disziplin",
+        "Platzierung"
+      ],
+      "observed": "Plausible Sekundärquelle für Einzelergebnisse; Einzelpunkte nicht geprüft.",
+      "state": "candidate",
+      "automatedAccess": "not-checked-now",
+      "maySupplyOfficialFive": false
+    },
+    {
+      "id": "family-input",
+      "tier": "D",
+      "priority": 12,
+      "title": "Eigene Turnierlinks, Screenshots und Familienangaben",
+      "url": null,
+      "data": [
+        "Suchhinweise",
+        "manuell gespeicherte DBV-Turnier-IDs",
+        "Bestätigung durch Nutzer"
+      ],
+      "observed": "Als Hinweis nutzbar; erst nach Abgleich mit DBV oder Originalverband Quelle höher stufen.",
+      "state": "user-provided",
+      "automatedAccess": "local",
+      "maySupplyOfficialFive": false
+    }
+  ],
+  "validation": {
+    "requiredForOfficialTopFive": [
+      "DBV-Spieler-ID",
+      "Disziplin",
+      "Stichtag/KW",
+      "konkrete Turnierbezeichnung",
+      "Turnierbeginn",
+      "Altersklasse",
+      "einzelner Ranglistenwert in Punkten",
+      "direkter nachprüfbarer Herkunftslink"
+    ],
+    "maxResults": 5,
+    "timeWindowMonths": 12,
+    "exactAggregateReconciliation": true,
+    "prohibit": [
+      "Turnierplatz als Punkte interpretieren",
+      "Punktzahl aus Tabellen ohne eindeutig gesicherte Kategorie als offiziellen Wert ausgeben",
+      "Daten verschiedener Kalenderwochen mischen",
+      "Turnieranzahl mit Anzahl gewerteter Einzelergebnisse verwechseln",
+      "unbestätigte Werte in leeren Slots schätzen"
+    ],
+    "firstNextStep": "DBV-U19-Spielerrangliste nach ordentlicher Browser-Cookie-Zustimmung aufrufen und die namentlichen fünf Einzelwertungen inklusive Links erfassen; danach gegen offiziellen aktuellen Excel-Gesamtscore abstimmen.",
+    "notes": "Die A-Einstufung bewertet die Zuverlässigkeit der Datenquelle, nicht ihre technische Abrufbarkeit. Nur Felder mit belegtem Wert dürfen angezeigt werden."
+  }
+}
