@@ -28,6 +28,7 @@ HEADERS = {"dis":"discipline", "rang":"overall_rank", "spielerid":"player_id",
            "punkte":"points","turniere":"tournaments","gs":"gender",
            "nachname":"last_name","vorname":"first_name"}
 MAX_BYTES = 48 * 1024 * 1024
+BW_ASSOCIATION = "BAW-Baden-Württemberg"
 
 def iso_week(d: datetime) -> tuple[int,int]:
     i = d.isocalendar()
@@ -96,10 +97,7 @@ def parse_excel(contents: bytes) -> list[dict]:
                 "lastName":str(val("nachname") or "").strip()})
     wb.close()
     if not found:raise ValueError("No usable ranking table in official Excel")
-    if os.environ.get("DEBUG_RANKING_SCHEMA")=="1":
-        print("Federation field for selected player:",[(r["id"],r["discipline"],r["association"]) for r in found if r["id"]=="05-070879"])
-        print("Federation labels (sample):",sorted({r["association"] for r in found if r["association"]})[:35])
-    return found
+     return found
 
 def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
     groups=defaultdict(list)
@@ -149,6 +147,8 @@ def summarize(now, before, id_list:list[str], checked:str):
     earlier=(before[0],before[1]) if before else None
     current=cohort_ranks(now[3])
     prior=cohort_ranks(before[3]) if before else {}
+    current_bw=cohort_ranks([r for r in now[3] if r.get("association")==BW_ASSOCIATION])
+    prior_bw=cohort_ranks([r for r in before[3] if r.get("association")==BW_ASSOCIATION]) if before else {}
     players={}
     for pid in id_list:
         disciplines={}
@@ -157,9 +157,16 @@ def summarize(now, before, id_list:list[str], checked:str):
             if not r:continue
             p=prior.get((pid,dis))
             comparable=bool(p and p["birthYear"]==r["birthYear"])
+            bw=current_bw.get((pid,dis))
+            before_bw=prior_bw.get((pid,dis))
+            comparable_bw=bool(bw and before_bw and before_bw["birthYear"]==bw["birthYear"])
             disciplines[dis]={
                 "ageClass":r["ageClass"],"birthYear":r["birthYear"],
                 "points":r["points"],"yearRank":r["yearRank"],
+                "bwRank":bw["yearRank"] if bw else None,
+                "bwCohortSize":bw["cohortSize"] if bw else None,
+                "previousBwRank":before_bw["yearRank"] if comparable_bw else None,
+                "bwChange":(before_bw["yearRank"]-bw["yearRank"]) if comparable_bw else None,
                 "overallRank":r["overallRank"],"cohortSize":r["cohortSize"],
                 "previousYearRank":p["yearRank"] if comparable else None,
                 "previousPoints":p["points"] if comparable else None,
@@ -171,8 +178,8 @@ def summarize(now, before, id_list:list[str], checked:str):
       "checkedAt":checked,
       "current":{"year":newest[0],"week":newest[1],"url":now[2]},
       "previous":{"year":earlier[0],"week":earlier[1],"url":before[2]} if before else None,
-      "sourceUrl":HISTORY,"players":players,
-      "method":"Rang im Geburtsjahr und der Disziplin = 1 + Zahl der punktstärkeren Spieler desselben Geburtsjahrs/Geschlechts. Nicht der offizielle Gesamt-Rang.",
+      "sourceUrl":HISTORY,"region":BW_ASSOCIATION,"players":players,
+      "method":"DE: Rang im Geburtsjahr/Geschlecht/Disziplin nach DBV-Punkten; BW: derselbe Vergleich nur für Landesverband BAW-Baden-Württemberg (Spalte LVName). Bei Gleichstand gleicher Rang; kein offizieller Gesamtrang.",
       "notes":"Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag."}
 
 def main():
@@ -200,7 +207,15 @@ def main():
             audit=1+len(higher)
             if audit!=rank["yearRank"]:
                 raise ValueError(f"Cohort rank audit failed: {pid} {disc} got {rank['yearRank']}, expected {audit}")
-            print(f"VERIFIED {pid} {disc}: {rank['yearRank']} in birth year {own['birthYear']}; points {own['points']}; previous {rank['previousYearRank']}; audited higher-point players {len(higher)}")
+            if own["association"]==BW_ASSOCIATION:
+                higher_bw={row["id"] for row in latest
+                    if row["discipline"]==disc and row["gender"]==own["gender"]
+                    and row["birthYear"]==own["birthYear"]
+                    and row.get("association")==BW_ASSOCIATION and row["points"]>own["points"]}
+                audit_bw=1+len(higher_bw)
+                if rank["bwRank"]!=audit_bw:
+                    raise ValueError(f"BW cohort audit failed: {pid} {disc} got {rank['bwRank']}, expected {audit_bw}")
+            print(f"VERIFIED {pid} {disc}: BW={rank['bwRank']} DE={rank['yearRank']} birthyear={own['birthYear']} points={own['points']} previous BW={rank['previousBwRank']}")
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
     old=json.loads(OUTPUT.read_text()) if OUTPUT.exists() else None
     if old and old.get("current")==result.get("current") and old.get("previous")==result.get("previous") and old.get("players")==result.get("players"):
