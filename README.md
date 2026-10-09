@@ -1,3 +1,11 @@
+## Persönliche Startseite, Spielerprofile und Freunde
+
+**Ein aktives Spielerprofil statt Familien-Sammelansicht:** Die Startseite zeigt jeweils nur die Haupt-KPIs des ausgewählten eigenen Spielerprofils. Das persönliche Startprofil lässt sich unter **Einstellungen → Meine Spielerprofile** festlegen. Voreingestellt ist Philipp (DBV-ID `05-070879`); vorhandene lokale Einstellungen und selbst gespeicherte Turnierlinks werden übernommen. Weitere eigene Profile mit Name, optionaler DBV-ID, Geburtsjahr und DBV-Profillink lassen sich anlegen, bearbeiten und entfernen.
+
+Unter **Einstellungen → Freunden folgen** lassen sich Freunde über eine konkrete **DBV-Spieler-ID** hinzufügen, bearbeiten oder wieder entfernen. Mit **„Haupt-KPIs ansehen“** öffnet sich ihre eigene Ansicht. Ein **„Zu mir zurück“**-Knopf bringt den Nutzer zum eigenen Startprofil; Freunde werden nicht zum neuen Standardprofil. Zur Vermeidung falscher Zuordnungen erfolgt die Datenfilterung über DBV-IDs, nicht nur über gleichlautende Namen.
+
+**Wichtige Begrenzung:** Das Projekt ist derzeit eine statische GitHub-Pages-PWA. Es gibt **noch keinen echten Benutzerlogin, keine Cloud-Synchronisierung, keine Freundschaftsanfrage und keine serverseitige Abonnementverwaltung**. Die Bezeichnung „Startprofil“ steht für eine lokale Auswahl, nicht für ein authentifiziertes Nutzerkonto. Die Freundesliste wird nur im Browser gespeichert. Der aktuelle wöchentliche DBV-Ranglistenimport enthält zunächst nur die ausdrücklich freigegebene DBV-ID von Philipp. Daher kann ein hinzugefügter Freund zwar unmittelbar ausgewählt werden; **Ranglisten-KPIs sind für ihn nur sichtbar, wenn seine ID bereits in der öffentlichen App-Datenbasis enthalten ist**. Sonst erscheint „noch nicht verfügbar“ und nach Möglichkeit ein Link zum offiziellen Spielerprofil. Null Auszeichnungen werden bei unvollständiger Freundes-Historie ausdrücklich nicht behauptet. Für eine echte, geräteübergreifende Anmeldung und dynamische Freundesdaten wäre ein separater Auth-/Backend-Dienst erforderlich.
+
 ## Startseite: KPI-Dashboard
 
 Die App startet unter [Start](https://metzgerhannes-oss.github.io/Badminton/#start) mit kompakten Kacheln für **DBV-Jahrgangsrang im Einzel, Doppel und Mixed**, **Trophäenschrank**, **erfasste Turniere** und **nächstes selbst angelegtes Turnier**. Der Spielerfilter gilt für alle Kacheln.
