@@ -1,18 +1,18 @@
 {
-  "name": "Shuttleboard – Badminton für die Familie",
-  "short_name": "Shuttleboard",
+  "name": "Schmetterlinge – Badminton Jugend Mössingen",
+  "short_name": "Schmetterlinge",
   "description": "Spielzeiten, Felder und Ergebnisse für die Familie",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#081126",
-  "theme_color": "#0b1630",
+  "background_color": "#08152c",
+  "theme_color": "#0c2244",
   "icons": [
     {
-      "src": "./icon.svg",
+      "src": "./assets/spvgg-schmetterlinge.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
