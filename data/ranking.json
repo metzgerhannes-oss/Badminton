@@ -1,12 +1,62 @@
 {
   "schemaVersion": 1,
-  "status": "pending",
+  "status": "available",
   "type": "dbv-published-excel-derived-birthyear-rank",
-  "checkedAt": null,
-  "current": null,
-  "previous": null,
+  "checkedAt": "2026-10-09T17:02:21Z",
+  "current": {
+    "year": 2026,
+    "week": 40,
+    "url": "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW40.xlsx"
+  },
+  "previous": {
+    "year": 2026,
+    "week": 39,
+    "url": "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW39.xlsx"
+  },
   "sourceUrl": "https://turniere.badminton.de/ranking/history",
-  "players": {},
-  "method": "Rang innerhalb des Geburtsjahrgangs aus der DBV-Punktetabelle abgeleitet; nicht der offizielle Gesamtrang.",
-  "notes": "Bis zum erfolgreichen Import der Original-Excel-Rangliste zeigt die App bewusst keine errechneten Platzierungen."
+  "players": {
+    "05-070879": {
+      "name": "Philipp Metzger",
+      "disciplines": {
+        "HE": {
+          "ageClass": "U11",
+          "birthYear": 2016,
+          "points": 2515.0,
+          "yearRank": 37,
+          "overallRank": 2025,
+          "cohortSize": 440,
+          "previousYearRank": 37,
+          "previousPoints": 2515.0,
+          "change": 0,
+          "tournaments": 12
+        },
+        "HD": {
+          "ageClass": "U11",
+          "birthYear": 2016,
+          "points": 790.0,
+          "yearRank": 113,
+          "overallRank": 2749,
+          "cohortSize": 256,
+          "previousYearRank": 112,
+          "previousPoints": 790.0,
+          "change": -1,
+          "tournaments": 2
+        },
+        "HM": {
+          "ageClass": "U11",
+          "birthYear": 2016,
+          "points": 1469.0,
+          "yearRank": 18,
+          "overallRank": 1281,
+          "cohortSize": 81,
+          "previousYearRank": 18,
+          "previousPoints": 1469.0,
+          "change": 0,
+          "tournaments": 2
+        }
+      }
+    }
+  },
+  "method": "Rang im Geburtsjahr und der Disziplin = 1 + Zahl der punktstärkeren Spieler desselben Geburtsjahrs/Geschlechts. Nicht der offizielle Gesamt-Rang.",
+  "notes": "Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag."
 }
