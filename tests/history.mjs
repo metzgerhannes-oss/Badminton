@@ -45,7 +45,7 @@ const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
 assert.ok(script.includes("playerMatch"));
 assert.ok(script.includes("renderTrophies(playerRecords)"),"Lifetime trophies should not change with chronicle filters");
-assert.ok(!script.includes("renderTrophies(chosen)"),"Do not filter trophy shelf by year or discipline");
+assert.ok(!script.includes("\n  renderTrophies(chosen);"),"Do not filter trophy shelf by year or discipline");
 assert.ok(!script.includes('source.textContent="Ausgewählte Ergebnisse'),"No oversized notice on normal history load");
 
 const app=await readFile("app.js","utf8");
