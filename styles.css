@@ -404,3 +404,5 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 .ranking-score-unavailable .ranking-score-note{margin:11px 0 14px;line-height:1.65}
 .ranking-score-source-link{display:block;width:100%;padding:11px 13px;background:#357fa7;color:#f4fcff;border:1px solid #8bd0f3;border-radius:11px;font-size:12px;line-height:1.5;font-weight:850;text-align:center}
 .ranking-score-source-link:focus-visible{outline:3px solid #fff;outline-offset:2px}
+
+.sources-reference-link{display:block;margin-top:9px;color:#b9eaff;font-size:12px;font-weight:800;line-height:1.55;text-decoration:underline;text-underline-offset:3px}
