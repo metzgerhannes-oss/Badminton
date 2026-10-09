@@ -281,3 +281,23 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 .first-run-choice>span:last-child{color:#a2dbfb;font-size:22px}
 .first-run-new{width:100%;margin-top:12px;padding:12px;background:transparent;border:1px dashed #6488a4;border-radius:12px;color:#bde7ff;font-size:12px;font-weight:800}
 .first-run-choice:focus-visible,.first-run-new:focus-visible{outline:3px solid #addfff;outline-offset:2px}
+
+
+/* Compact top profile switcher: visible only with 2+ own player profiles */
+.focused-profile{position:relative;z-index:4;overflow:visible}
+.focus-switcher{position:relative;flex:none;align-self:center;z-index:10}
+.focus-switcher>summary{list-style:none;display:flex;align-items:center;gap:7px;min-height:38px;padding:9px 11px;border:1px solid #5884a4;border-radius:10px;background:#284968;color:#c7eaff;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;user-select:none;-webkit-user-select:none}
+.focus-switcher>summary::-webkit-details-marker{display:none}
+.focus-switcher>summary::marker{content:""}
+.focus-switcher[open]>summary{background:#356187;border-color:#92d9fc}
+.focus-switcher>summary:focus-visible{outline:3px solid #a7e4ff;outline-offset:3px}
+.focus-switcher>summary span{font-size:18px;line-height:9px}
+.focus-switcher-options{position:absolute;right:0;top:calc(100% + 9px);width:min(75vw,300px);min-width:200px;max-height:min(47vh,380px);overflow-y:auto;padding:6px;border:1px solid #5b83a8;border-radius:14px;background:#122a46;box-shadow:0 16px 45px #020a1bc9;z-index:12}
+.focus-switcher-options button{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:10px;background:transparent;color:#e7f5ff;text-align:left;font:inherit;min-height:45px}
+.focus-switcher-options button+button{margin-top:3px}
+.focus-switcher-options button:hover,.focus-switcher-options button[aria-current="true"]{background:#255074}
+.focus-switcher-options button:focus-visible{outline:2px solid #9fe3ff;outline-offset:-2px}
+.switcher-avatar{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:#9edcfa;color:#154465;font-size:12px;font-weight:850}
+.switcher-name{flex:1;min-width:0;overflow-wrap:anywhere;font-size:12px;font-weight:750}
+.switcher-check{color:#a5e6ff;font-size:17px;font-weight:850}
+@media(max-width:365px){.focus-switcher>summary{font-size:10px;padding:8px;gap:4px}.focus-switcher-options{min-width:180px}.focus-profile-copy strong{font-size:14px}}
