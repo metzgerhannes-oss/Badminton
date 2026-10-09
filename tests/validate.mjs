@@ -1,0 +1,11 @@
+import {readFile,access} from "node:fs/promises";
+import assert from "node:assert/strict";
+for(const file of ["index.html","styles.css","app.js","sw.js","manifest.webmanifest","icon.svg","data/live.json","scripts/sync-feed.mjs"])await access(file);
+const data=JSON.parse(await readFile("data/live.json","utf8"));
+assert.equal(data.schemaVersion,1);
+assert.ok(["unconfigured","connected"].includes(data.connection));
+assert.ok(Array.isArray(data.matches)&&Array.isArray(data.tournaments));
+if(data.connection==="unconfigured")assert.equal(data.matches.length,0,"Do not ship invented live matches");
+const page=await readFile("index.html","utf8");
+for(const id of ["match-list","player-pills","profile-list","player-dialog","demo-toggle","next-match"])assert.ok(page.includes('id="'+id+'"'));
+console.log("Starter snapshot and app structure valid.");
