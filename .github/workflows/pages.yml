@@ -1,0 +1,56 @@
+name: Shuttleboard Pages
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: shuttleboard-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Validate JavaScript
+        run: |
+          node --check app.js
+          node --check sw.js
+          node --check scripts/sync-feed.mjs
+          node tests/validate.mjs
+      - name: Sync authorized tournament feed
+        env:
+          BADMINTON_FEED_URL: ${{ vars.BADMINTON_FEED_URL }}
+          BADMINTON_FEED_TOKEN: ${{ secrets.BADMINTON_FEED_TOKEN }}
+        run: node scripts/sync-feed.mjs
+      - name: Save refreshed feed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: refresh authorized tournament feed"
+            git push
+          fi
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
