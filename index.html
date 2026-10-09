@@ -19,10 +19,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Start"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
  </header>
  <main>
-  <section class="player-bar" aria-label="Spielerfilter">
-   <div class="section-heading"><h2>Unsere Spieler</h2><button id="add-player" class="subtle-button" type="button">+ Spieler hinzufügen</button></div>
-   <div id="player-pills" class="player-pills"></div>
-  </section>
+  <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">DBV-Rangliste wird geladen</span></div>
    <div id="dashboard-rank-source" class="dashboard-source"></div>
@@ -58,29 +55,55 @@
    <div id="official-tournament-list" class="tournament-list"></div>
    <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierportal<small>Offizielle Turnierinformationen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
   </section>
-  <section class="page" id="view-profil" aria-labelledby="heading-profil">
-   <div class="section-heading"><h2 id="heading-profil">Spielerprofile</h2></div>
-   <div id="profile-list" class="profiles"></div>
-   <button id="add-profile" class="primary-button" type="button">+ Weiteren Spieler hinzufügen</button>
-   <div class="settings-card"><h3>Datenstand</h3><p>Die Historie wird aus ausgewählten veröffentlichten Turnierergebnissen zusammengestellt und ist nicht vollständig. Private Spielerfavoriten und Turnierlinks bleiben ausschließlich auf diesem Gerät gespeichert.</p></div>
+  <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
+   <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
+   <div class="settings-card account-notice">
+    <h3>Mein Bereich auf diesem Gerät</h3>
+    <p>Das ausgewählte Spielerprofil ist dein Startprofil. Ein persönlicher Online-Login und die Synchronisierung zwischen Geräten sind noch nicht eingerichtet.</p>
+    <p id="current-account-label" class="current-account-label"></p>
+   </div>
+   <div class="settings-section">
+    <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
+    <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
+    <div id="profile-list" class="profiles"></div>
+   </div>
+   <div class="settings-section">
+    <div class="section-heading"><h3>Freunden folgen</h3><button id="add-friend" class="subtle-button" type="button">+ Freund</button></div>
+    <p class="settings-hint">Speichere einen Freund mit seiner öffentlichen DBV-Spieler-ID. Tippe ihn an, um zu seinen Haupt-KPIs zu wechseln. Nicht verfügbare Ranglistenwerte bleiben leer.</p>
+    <div id="friend-list" class="friends-list"></div>
+   </div>
+   <div class="settings-card"><h3>Daten & Datenschutz</h3>
+    <p>Spielerprofile, Freunde und Turnierfavoriten werden nur in diesem Browser gespeichert. Die öffentlichen DBV-Ranglisten und unsere kuratierte Turnierhistorie enthalten derzeit nicht jeden befreundeten Spieler.</p>
+   </div>
   </section>
  </main>
  <nav class="bottom-nav" aria-label="Hauptnavigation">
   <a href="#start" data-page="start" aria-current="page"><span aria-hidden="true">⌂</span><small>Start</small></a>
   <a href="#historie" data-page="historie"><span aria-hidden="true">★</span><small>Historie</small></a>
   <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
-  <a href="#profil" data-page="profil"><span aria-hidden="true">◯</span><small>Profile</small></a>
+  <a href="#einstellungen" data-page="einstellungen"><span aria-hidden="true">⚙</span><small>Einstellungen</small></a>
  </nav>
 </div>
 <dialog id="player-dialog">
  <form id="player-form" class="modal">
-  <div class="section-heading"><h2>Spieler hinzufügen</h2><button id="cancel-dialog" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <div class="section-heading"><h2>Eigenes Spielerprofil hinzufügen</h2><button id="cancel-dialog" type="button" class="icon-button" aria-label="Schließen">×</button></div>
   <label>Vorname oder Anzeigename<input name="name" placeholder="z. B. Charlotte" required maxlength="80"></label>
   <label>DBV-Spieler-ID <span class="muted">(optional)</span><input name="id" placeholder="05-123456" maxlength="30"></label>
   <label>Geburtsjahr <span class="muted">(optional)</span><input name="birthYear" inputmode="numeric" type="number" min="2000" max="2035" placeholder="z. B. 2016"></label>
   <label>DBV-Profil-Link <span class="muted">(optional)</span><input name="url" placeholder="https://dbv.turnier.de/player-profile/…" type="url"></label>
   <p class="small muted">Diese Angaben werden nur auf diesem Gerät gespeichert.</p>
   <button class="primary-button" type="submit">Spieler speichern</button>
+ </form>
+</dialog>
+<dialog id="friend-dialog">
+ <form id="friend-form" class="modal">
+  <div class="section-heading"><h2>Freund hinzufügen</h2><button id="cancel-friend" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <label>Name / Spitzname<input name="name" required maxlength="80" placeholder="z. B. Max Mustermann"></label>
+  <label>DBV-Spieler-ID<input name="id" required maxlength="9" placeholder="05-123456" pattern="[0-9]{2}-[0-9]{6}" title="Format 05-123456"></label>
+  <label>Geburtsjahr <span class="muted">(optional)</span><input name="birthYear" type="number" min="2000" max="2035" placeholder="z. B. 2016"></label>
+  <label>Offizieller Spielerprofil-Link <span class="muted">(optional)</span><input name="url" type="url" placeholder="https://dbv.turnier.de/player-profile/…"></label>
+  <p class="small muted">Du folgst hier einer öffentlichen Spieler-ID auf deinem Gerät – es wird keine Einladung gesendet und kein Konto des Freundes verknüpft.</p>
+  <button class="primary-button" type="submit">Freund speichern</button>
  </form>
 </dialog>
 <dialog id="tournament-dialog">
