@@ -2,19 +2,16 @@ name: Schmetterlinge Pages
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 concurrency:
-  group: shuttleboard-pages
+  group: schmetterlinge-pages
   cancel-in-progress: false
 jobs:
   publish:
-    if: github.event_name != 'schedule' || vars.BADMINTON_FEED_URL != ''
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -22,43 +19,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - name: Validate JavaScript
+      - name: Validate
         run: |
           node --check app.js
           node --check history.js
           node --check scripts/trophy-stats.mjs
           node --check sw.js
-          node --check scripts/sync-feed.mjs
-          node --check scripts/normalize-feed.mjs
           node tests/validate.mjs
-          node tests/adapter.mjs
           node tests/history.mjs
           node tests/trophies.mjs
-      - name: Sync authorized tournament feed
-        env:
-          BADMINTON_FEED_URL: ${{ vars.BADMINTON_FEED_URL }}
-          BADMINTON_FEED_TOKEN: ${{ secrets.BADMINTON_FEED_TOKEN }}
-          BADMINTON_FEED_AUTHORIZED: ${{ vars.BADMINTON_FEED_AUTHORIZED }}
-          BADMINTON_FEED_FORMAT: ${{ vars.BADMINTON_FEED_FORMAT }}
-          BADMINTON_PLAYER_IDS: ${{ vars.BADMINTON_PLAYER_IDS }}
-          BADMINTON_PUBLIC_SOURCE_URL: ${{ vars.BADMINTON_PUBLIC_SOURCE_URL }}
-        run: node scripts/sync-feed.mjs
-      - name: Save refreshed feed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/live.json
-          if ! git diff --cached --quiet; then
-            git commit -m "data: refresh authorized tournament feed"
-            git push
-          fi
+          node tests/bookmarks.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Upload site
+      - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
