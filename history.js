@@ -80,7 +80,7 @@ import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
     const conf=trophyLevels[r.place];
     const source=safeUrl(r.source?.url);
     const person=lastPlayer==="all"?'<span>'+escape(r.playerName)+'</span>':"";
-    return '<article class="trophy-award"><div class="trophy-award-icon trophy-'+conf.tone+'" aria-hidden="true">'+(r.place===4?'4':'★')+'</div><div class="trophy-award-info"><div class="trophy-award-top"><strong>'+conf.caption+'</strong><span>'+escape(niceDate(r.date))+'</span></div><div class="trophy-award-title">'+escape(r.event)+'</div><div class="trophy-award-meta">'+person+'<span>'+escape(r.discipline)+' · '+escape(r.ageGroup)+'</span>'+(r.partner?'<span>mit '+escape(r.partner)+'</span>':'')+'</div>'+(source?'<a target="_blank" rel="noopener noreferrer" href="'+escape(source)+'">Turnierbericht ansehen ↗</a>':'')+'</div></article>';
+    return '<article class="trophy-award"><div class="trophy-award-icon trophy-'+conf.tone+'" aria-hidden="true">'+(r.place===4?'4':'★')+'</div><div class="trophy-award-info"><div class="trophy-award-top"><strong>'+conf.caption+'</strong><span>'+escape(niceDate(r.date))+'</span></div><div class="trophy-award-title">'+escape(r.event)+'</div><div class="trophy-award-meta">'+person+'<span>'+escape(r.discipline)+' · '+escape(r.ageGroup)+'</span>'+(r.partner?'<span>mit '+escape(r.partner)+'</span>':'')+'</div>'+(r.confirmation==="family-confirmed"?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(source?'<a target="_blank" rel="noopener noreferrer" href="'+escape(source)+'">Turnierbericht ansehen ↗</a>':'')+'</div></article>';
   }).join("");
  }
 
@@ -89,7 +89,7 @@ function render(){
   if(!source||!summary||!timeline||!yearSelect)return;
   if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
   if(!loaded){source.textContent="Verifizierte Platzierungen werden geladen …";return;}
-  source.textContent="Ausgewählte, belegte Turnierergebnisse aus Vereinsberichten (2025–2026). Keine vollständige DBV-Matchhistorie; Satzergebnisse nur mit Quelle.";
+  source.textContent="Ausgewählte Ergebnisse aus Vereins- und Verbandsberichten. Zwei Meisterschaftsplatzierungen stammen aus einer Familienbestätigung und sind bis zur offiziellen Detailprüfung ausdrücklich gekennzeichnet. Noch keine vollständige DBV-Historie.";
   const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
   const years=[...new Set(playerRecords.map(r=>r.date.slice(0,4)))].sort((a,b)=>b.localeCompare(a));
   const old=year;
@@ -115,7 +115,7 @@ function render(){
   timeline.innerHTML=[...grouped.values()].map(t=>{
     const sourceUrl=safeUrl(t.source?.url);
     const entries=t.items.map(r=>'<div class="history-result"><div class="history-place '+rank(r.place)+'"><b>'+escape(r.place)+'.</b><small>Platz</small></div><div class="history-result-copy"><strong>'+escape(r.discipline)+" "+escape(r.ageGroup)+'</strong>'+(r.partner?'<small>mit '+escape(r.partner)+'</small>':"")+'</div></div>').join("");
-    return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">Originalbericht ansehen ↗</a>':"")+'</div></article>';
+    return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(t.items.some(i=>i.confirmation==="family-confirmed")?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">Originalbericht ansehen ↗</a>':"")+'</div></article>';
   }).join("");
  }
  window.renderHistory=(selected,profiles)=>{
