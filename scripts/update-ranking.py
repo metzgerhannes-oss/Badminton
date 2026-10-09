@@ -61,7 +61,15 @@ def parse_excel(contents: bytes) -> list[dict]:
                 header=fields
                 break
             if index >= 45:break
-        if header is None:continue
+        if header is None:
+            if os.environ.get("DEBUG_RANKING_SCHEMA")=="1":
+                samples=[]
+                for n,sample in enumerate(ws.iter_rows(values_only=True)):
+                    if any(x is not None for x in sample):
+                        samples.append([str(x)[:65] if x is not None else "" for x in sample[:18]])
+                    if len(samples)>=8 or n>=35:break
+                print("Ranking schema mismatch:",ws.title,"samples:",repr(samples),file=sys.stderr)
+            continue
         for row in iterator:
             def val(key):
                 idx=header.get(key)
