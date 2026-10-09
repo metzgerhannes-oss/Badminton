@@ -15,6 +15,7 @@ jobs:
       - name: Validate scripts
         run: |
           node --check app.js
+          node --check dashboard.js
           node --check history.js
           node --check scripts/trophy-stats.mjs
           node --check sw.js
@@ -24,3 +25,4 @@ jobs:
           node tests/history.mjs
           node tests/trophies.mjs
           node tests/bookmarks.mjs
+          node tests/dashboard.mjs
