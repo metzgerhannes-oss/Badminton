@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b1630">
+<meta name="theme-color" content="#0c2244">
 <meta name="description" content="Dein Badminton-Turniertag: nächste Spiele, Felder und Ergebnisse auf einen Blick.">
-<title>Shuttleboard · Badminton für die Familie</title>
-<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<title>Schmetterlinge · Badminton-Turnierbegleiter</title>
+<link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <script defer src="./app.js"></script>
@@ -14,14 +14,15 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="#heute" aria-label="Shuttleboard Start"><span class="brand-icon">◈</span><span>shuttleboard<small>BADMINTON FÜR DIE FAMILIE</small></span></a>
+    <a class="brand" href="#heute" aria-label="Schmetterlinge Start"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="SpVgg Mössingen Schmetterlingslogo"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
     <button class="icon-button" id="refresh" title="Ergebnisse neu laden" aria-label="Ergebnisse aktualisieren">↻</button>
   </header>
   <main>
     <section class="hero">
-      <div class="eyebrow"><span class="status-dot"></span> DEIN TURNIERBEGLEITER</div>
-      <h1 id="greeting">Alles im Blick.<br><em>Jedes Match.</em></h1>
-      <p>Spielzeiten, Spielfelder und Ergebnisse deiner Kinder – ohne Suchen durch Turnierseiten.</p>
+      <img class="hero-crest" src="./assets/spvgg-schmetterlinge.svg" alt="" aria-hidden="true">
+      <div class="eyebrow"><span class="status-dot"></span> SPVGG MÖSSINGEN · SCHMETTERLINGE</div>
+      <h1 id="greeting">Dein Spieltag.<br><em>Jedes Match.</em></h1>
+      <p>Die Spiele unserer Schmetterlinge: Zeiten, Felder und Ergebnisse auf einen Blick.</p>
       <div class="hero-bottom"><span id="feed-badge" class="source-badge">Quelle wird geprüft</span><span id="last-update" class="last-update"></span></div>
     </section>
     <section class="player-bar" aria-label="Spielerfilter">
