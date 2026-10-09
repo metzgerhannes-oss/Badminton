@@ -1,0 +1,38 @@
+name: Inspect current DBV ranking export
+on:
+  push:
+    paths:
+      - .github/workflows/probe-ranking-current.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect public ranking download URL
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen,Request
+          from html.parser import HTMLParser
+          import re
+          url="https://turniere.badminton.de/ranking"
+          page=urlopen(Request(url,headers={"User-Agent":"Mozilla/5.0 Schmetterlinge (ranking export check)"}),timeout=25).read().decode("utf-8","replace")
+          class Parser(HTMLParser):
+              def __init__(self): super().__init__();self.a=[];self.active=None
+              def handle_starttag(self,tag,attrs):
+                  if tag.lower()=="a":self.active={"attrs":dict(attrs),"label":""}
+                  if tag.lower()=="form":print("FORM",dict(attrs))
+              def handle_data(self,data):
+                  if self.active:self.active["label"]+=data
+              def handle_endtag(self,tag):
+                  if tag.lower()=="a" and self.active:
+                      self.a.append(self.active);self.active=None
+          p=Parser();p.feed(page)
+          print("Page length",len(page))
+          for a in p.a:
+              if any(w in str(a).lower() for w in ["download","excel","xlsx","export","rangliste"]):
+                  print("ANCHOR",str(a)[:1500])
+          for term in ["Download Rangliste", "xlsx", "/download","lastUpdated","zuletzt aktualisiert"]:
+              for m in list(re.finditer(re.escape(term),page,re.I))[:3]:
+                  print("AROUND",term,repr(page[max(0,m.start()-350):m.end()+500])[:2000])
+          PY
