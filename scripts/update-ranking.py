@@ -90,11 +90,15 @@ def parse_excel(contents: bytes) -> list[dict]:
                 "overallRank":overall_rank,"ageClass":str(val("akl2") or ""),
                 "ageDetail":str(val("akl1") or ""),
                 "gender":str(val("gs") or "").strip().upper(),
+                "association":str(val("lvname") or "").strip(),
                 "tournaments":int(val("turniere") or 0),
                 "firstName":str(val("vorname") or "").strip(),
                 "lastName":str(val("nachname") or "").strip()})
     wb.close()
     if not found:raise ValueError("No usable ranking table in official Excel")
+    if os.environ.get("DEBUG_RANKING_SCHEMA")=="1":
+        print("Federation field for selected player:",[(r["id"],r["discipline"],r["association"]) for r in found if r["id"]=="05-070879"])
+        print("Federation labels (sample):",sorted({r["association"] for r in found if r["association"]})[:35])
     return found
 
 def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
