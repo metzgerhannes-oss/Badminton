@@ -1,6 +1,8 @@
+> **Korrektur 09.10.2026:** Frühere BW- und Deutschlandwerte wurden irrtümlich ausschließlich gegen Geburtsjahr 2016 berechnet. Die App verwendet jetzt **AKL2=U11**, inklusive aller in dieser DBV-Altersklasse gemeldeten Geburtsjahre, für Einzel, Doppel und Mixed sowie den Vorwochenvergleich. Die alte Schema-Version 1 wird vom Dashboard nicht mehr angenommen. **KW40/2026** aus dem offiziellen Excel-Archiv: Philipp HE BW 4/DE 46, HD BW 10/DE 165, HM BW 1/DE 20. Sein Screenshot der neueren Online-Liste nennt HE DE Platz 43 mit 2670 Punkten; das ist ein anderer Datenstand als das KW40-Archiv (2515 Punkte), kein Anlass zur Vermischung. Der Donnerstag-Workflow verarbeitet jeweils die neuesten bereitgestellten Wochenarchive.
+
 ## Vereinfachte Startseite: BW-Rang groß, Deutschland darunter
 
-Die Startseite zeigt je Disziplin (Einzel, Doppel, Mixed) **genau eine kompakte Kachel**: **BW-Jahrgangsrang groß**, Deutschland-Jahrgangsrang darunter und einen Pfeil für die Veränderung des **BW-Rangs zur Vorwoche**. Die Ranglistenwerte kommen aus den offiziellen DBV-Wochenarchiven; BW wird anhand des expliziten Felds `LVName = BAW-Baden-Württemberg` gefiltert, jeweils nach gleichem Jahrgang, Geschlecht und Disziplin. Der Vergleich ist eine eigene Kohortenberechnung, keine offizielle separate BW-Rangliste. Die Vergleichsgröße ist beim Antippen sichtbar, etwa beim Mixed mit wenigen gewerteten Spielern.
+Die Startseite zeigt je Disziplin (Einzel, Doppel, Mixed) **genau eine kompakte Kachel**: **BW-Altersklassenrang groß**, Deutschland-Altersklassenrang darunter und einen Pfeil für die Veränderung des **BW-Rangs zur Vorwoche**. Die Ranglistenwerte kommen aus den offiziellen DBV-Wochenarchiven; BW wird anhand `LVName = BAW-Baden-Württemberg` gefiltert, jeweils nach **derselben DBV-Altersklasse AKL2**, Geschlecht und Disziplin. **U11 umfasst mehrere Geburtsjahrgänge – 2026 beispielsweise 2016 und 2017 –, nicht nur 2016.** Der Vergleich ist eine eigene Kohortenberechnung, keine offizielle separate BW-Rangliste. Die Vergleichsgröße ist beim Antippen sichtbar, etwa beim Mixed mit wenigen gewerteten Spielern.
 
 **Kacheldetails** öffnen auf Fingertipp Punkte, BW-/Deutschland-Vorwoche, Größe der Vergleichsgruppen und Link zum Wochenarchiv. Darunter stehen nur der historische Trophäenschrank, die nächste selbst angelegte Turnierverknüpfung und die kompakte **Freunde-Leiste**. Ein Freund wird dort durch Antippen als aktive **Ansicht**, nicht als eigenes Standardprofil geöffnet; „Zu mir zurück“ führt zum eigenen Profil.
 
@@ -18,15 +20,15 @@ Unter **Einstellungen → Freunden folgen** lassen sich Freunde über eine konkr
 
 ## Startseite: KPI-Dashboard
 
-Die App startet unter [Start](https://metzgerhannes-oss.github.io/Badminton/#start) mit kompakten Kacheln für **DBV-Jahrgangsrang im Einzel, Doppel und Mixed**, **Trophäenschrank**, **erfasste Turniere** und **nächstes selbst angelegtes Turnier**. Der Spielerfilter gilt für alle Kacheln.
+Die App startet unter [Start](https://metzgerhannes-oss.github.io/Badminton/#start) mit kompakten Kacheln für **DBV-Altersklassenrang im Einzel, Doppel und Mixed**, **Trophäenschrank**, **erfasste Turniere** und **nächstes selbst angelegtes Turnier**. Der Spielerfilter gilt für alle Kacheln.
 
-### DBV-Jahrgangsplatz und Vorwochenvergleich
+### DBV-Altersklassenplatz und Vorwochenvergleich
 
 Die öffentlich herunterladbaren wöchentlichen Excel-Archive der [DBV-Rangliste](https://turniere.badminton.de/ranking/history) werden in einem eigenen GitHub-Workflow unter `.github/workflows/ranking.yml` **jeden Donnerstag 15:00 UTC** geprüft (17:00 MESZ / 16:00 MEZ). GitHub-Schedules können verzögert laufen. Das heißt nicht, dass die DBV jeweils donnerstags veröffentlicht. Es werden die letzten beiden tatsächlich vorhandenen Kalenderwochen verwendet.
 
-Die Kacheln zeigen den **Rang innerhalb desselben Geburtsjahres, Geschlechts und derselben Disziplin**, berechnet aus den offiziell veröffentlichten Punkten: Rang = 1 + Anzahl höher bewerteter Spieler derselben Gruppe. Punktegleichstand = gleicher Rang. Das ist ein **berechneter Jahrgangsrang**, ausdrücklich **nicht** der bundesweite DBV-Gesamtrang.
+Die Kacheln zeigen den **Rang innerhalb der offiziellen DBV-Altersklasse (Spalte AKL2, z. B. U11 mit mehreren Geburtsjahren), desselben Geschlechts und derselben Disziplin**, berechnet aus den offiziell veröffentlichten Punkten: Rang = 1 + Anzahl höher bewerteter Spieler derselben Gruppe. Punktegleichstand = gleicher Rang. Das ist ein **berechneter Altersklassenrang**, ausdrücklich **nicht** der bundesweite DBV-Gesamtrang.
 
-Mit zwei echten Kalenderwochenständen zeigt die App `↑` bei besserem Jahrgangsrang, `↓` bei schlechterem und `→` bei Gleichstand. Ohne verlässlichen Vergleich wird **kein** Pfeil behauptet. Der Altersklassenwechsel zum neuen Jahr und unbekannte Werte werden neutral dargestellt.
+Mit zwei echten Kalenderwochenständen zeigt die App `↑` bei besserem Altersklassenrang, `↓` bei schlechterem und `→` bei Gleichstand. Ohne verlässlichen Vergleich wird **kein** Pfeil behauptet. Ein Altersklassenwechsel zum neuen Jahr verhindert irreführende Vorwochenvergleiche; unbekannte Werte bleiben leer.
 
 Philipp hat die DBV-Spieler-ID `05-070879` und Jahrgang **2016 / U11 (2026)**. Charlotte hat noch keine gesicherte DBV-Spieler-ID; es werden keine Werte erfunden. Nur Ranglisten-Kennzahlen hinterlegter IDs werden in `data/ranking.json` veröffentlicht, nicht die vollständige Ranglistendatei. Bei Quellefehlern bleibt die letzte erfolgreiche Datei bestehen, vor dem ersten erfolgreichen Abruf steht „Noch keine Daten“. Öffentliche Download-Verfügbarkeit garantiert weder eine API noch den rechtlich uneingeschränkten automatischen Betrieb.
 
