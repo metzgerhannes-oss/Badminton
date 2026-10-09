@@ -97,7 +97,7 @@ def parse_excel(contents: bytes) -> list[dict]:
                 "lastName":str(val("nachname") or "").strip()})
     wb.close()
     if not found:raise ValueError("No usable ranking table in official Excel")
-     return found
+    return found
 
 def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
     groups=defaultdict(list)
