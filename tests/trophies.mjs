@@ -8,6 +8,7 @@ const p=summarizeTrophies(philipp);
 assert.deepEqual(TROPHY_PLACES,[1,2,3,4]);
 assert.deepEqual(p.counts,{1:2,2:1,3:2,4:2});
 assert.equal(p.total,7);
+assert.equal(p.results.filter(r=>r.event.includes("Bezirksmeisterschaft")&&r.discipline==="Einzel"&&r.place===1).length,1);
 assert.equal(p.results.filter(r=>r.confirmation==="family-confirmed").length,2);
 assert.ok(p.results.some(r=>r.id.includes("gaertringen")));
 const c=summarizeTrophies(charlotte);
