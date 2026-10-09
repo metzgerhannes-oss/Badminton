@@ -15,3 +15,38 @@
 .local-shortcut-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px}
 .local-shortcut-actions a{color:#8bd8ff;font-size:12px;font-weight:750}
 .modal select{width:100%;border:1px solid #415475;border-radius:11px;background:#0a1529;color:#fff;padding:13px}
+
+/* Historically verified badminton performances – responsive timeline */
+.history-filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.history-filters label{display:grid;gap:6px;font-size:11px;color:#a6bad5;font-weight:750}
+.history-filters select{width:100%;padding:12px;background:#121f37;border:1px solid #3c5474;border-radius:11px;color:#f5f9ff;font-size:13px}
+.history-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:15px 0}
+.history-stat{border:1px solid #39516c;border-radius:14px;background:#142b48;padding:14px 11px;display:grid;gap:8px;min-width:0}
+.history-stat span{color:#a2b9d4;font-size:11px}
+.history-stat strong{font-size:27px;font-weight:850;color:#edf7ff;line-height:1;font-variant-numeric:tabular-nums}
+.history-timeline{display:grid;gap:0;padding:4px 0 8px}
+.history-event{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px}
+.history-stem{position:relative;border-left:2px solid #406b94;left:7px;min-height:100%}
+.history-stem:before{content:"";position:absolute;left:-7px;top:21px;width:12px;height:12px;border-radius:50%;background:#8bd8ff;border:2px solid #183a60}
+.history-event:last-child .history-stem{border-image:linear-gradient(#406b94 0%,transparent 100%) 1}
+.history-content{margin:0 0 16px;border:1px solid #304961;background:#111e36;border-radius:17px;padding:15px;min-width:0}
+.history-date{color:#8bd8ff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+.history-content h3{margin:8px 0 5px;font-size:15px;line-height:1.35;letter-spacing:-.25px}
+.history-location{font-size:11px;color:#9aafc8;line-height:1.5;margin-bottom:13px}
+.history-results{display:grid;gap:8px}
+.history-result{display:flex;align-items:center;gap:12px;border-radius:12px;padding:11px;background:#192d49}
+.history-place{display:grid;place-items:center;flex-shrink:0;width:48px;height:48px;border-radius:12px;background:#28415f;color:#e9f3ff}
+.history-place b{font-size:20px;line-height:1;font-variant-numeric:tabular-nums}
+.history-place small{font-size:9px}
+.history-place.gold{background:#6d5723;color:#ffe7a4}
+.history-place.silver{background:#4d5c70;color:#eff6ff}
+.history-place.bronze{background:#624633;color:#fbd4b2}
+.history-result-copy{display:grid;gap:4px;font-size:13px;line-height:1.4}
+.history-result-copy small{font-size:11px;color:#aabbd0}
+.history-source-link{display:inline-block;color:#8bd8ff;font-size:11px;font-weight:750;margin-top:14px}
+.history-ranking-note{margin:16px 0 30px;border:1px solid #38516b;background:#10243e;border-radius:16px;padding:16px}
+.history-ranking-note h3{margin:0 0 8px;font-size:15px}
+.history-ranking-note p{font-size:12px;color:#b0c1d6;line-height:1.6}
+.history-ranking-note a{font-size:12px;font-weight:750;color:#8bd8ff}
+.bottom-nav a{width:25%}
+@media(max-width:375px){.history-content{padding:12px}.history-stat{padding:12px 9px}.history-stat span{font-size:10px}.history-content h3{font-size:14px}}
