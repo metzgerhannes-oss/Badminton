@@ -13,7 +13,7 @@ import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
  const playerMatch=(r,selected)=>{
   if(selected==="all")return true;
   const profile=lastProfiles.find(p=>p.id===selected);
-  return r.playerId===selected || (!!profile && r.playerName===profile.name) || (!!profile && r.playerId===profile.name);
+  return r.playerId===selected || (!!profile && selected.startsWith("local-") && r.playerId===profile.name && r.playerName===profile.name);
  };
  function plotTrends(chosen){
  const root=$("history-trends");if(!root)return;
