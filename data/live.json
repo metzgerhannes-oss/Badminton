@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "connection": "unconfigured",
+  "updatedAt": null,
+  "source": {
+    "name": "Noch keine autorisierte Live-Datenquelle angebunden",
+    "url": "https://dbv.turnier.de/"
+  },
+  "matches": [],
+  "tournaments": []
+}
