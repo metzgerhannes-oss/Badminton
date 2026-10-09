@@ -106,3 +106,5 @@
 @media(min-width:600px){.trophy-shelf{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.trophy-slot{min-height:183px}.trophy-section{padding:22px 18px}}
 @media(max-width:350px){.trophy-section{padding:13px 9px}.trophy-shelf{padding:9px 7px 16px;gap:7px}.trophy-slot{min-height:164px}.trophy-illustration{height:92px}.trophy-illustration svg{height:88px}.trophy-label{font-size:11px}}
 @media(prefers-reduced-motion:no-preference){.trophy-slot{transition:box-shadow .16s,border-color .16s,background .16s}.trophy-slot:hover{border-color:#86c6e5}}
+
+.history-family-flag{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;margin-top:10px;border-radius:9px;border:1px solid #8f7c4e;color:#ffe1a2;background:#55462342;font-size:10px;line-height:1.35;font-weight:750}
