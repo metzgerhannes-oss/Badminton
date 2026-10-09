@@ -2,10 +2,10 @@
 /** Schmetterlinge: historical results and official tournament bookmarks. No live-result polling. */
 const STORE="shuttleboard-v1"; // Preserve existing device favourites.
 const DEFAULT_PLAYERS=[
- {id:"05-070879",name:"Philipp Metzger",url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
+ {id:"05-070879",name:"Philipp Metzger",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
  {id:"local-charlotte",name:"Charlotte Metzger",url:""}
 ];
-const state={players:DEFAULT_PLAYERS.map(p=>({...p})),officialLinks:[],chosen:"all",page:"historie"};
+const state={players:DEFAULT_PLAYERS.map(p=>({...p})),officialLinks:[],chosen:"05-070879",page:"start"};
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -33,6 +33,7 @@ function restore(){
   const saved=JSON.parse(localStorage.getItem(STORE)||"null");
   if(saved&&typeof saved==="object"){
    if(Array.isArray(saved.players))state.players=saved.players.filter(p=>p&&typeof p.name==="string"&&typeof p.id==="string").slice(0,12);
+   const philipp=state.players.find(p=>p.id==="05-070879"); if(philipp&&!philipp.birthYear)philipp.birthYear=2016;
    if(Array.isArray(saved.officialLinks))state.officialLinks=saved.officialLinks.map(normalizeBookmark).filter(Boolean).slice(0,40);
    if(typeof saved.chosen==="string")state.chosen=saved.chosen;
    if(!saved.historyProfilesInitialized&&!state.players.some(p=>p.name==="Charlotte Metzger"))
@@ -99,8 +100,9 @@ function render(){
  renderPlayers();
  renderTournaments();
  renderProfiles();
+ window.renderDashboard?.(state.chosen,state.players,state.officialLinks);
  window.renderHistory?.(state.chosen,state.players);
- const page=["historie","turniere","profil"].includes(state.page)?state.page:"historie";
+ const page=["start","historie","turniere","profil"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
   if(a.dataset.page===page)a.setAttribute("aria-current","page");
@@ -126,8 +128,8 @@ function openTournamentForm(item=null){
 }
 function setup(){
  restore();save();
- state.page=(location.hash||"#historie").slice(1);
- window.addEventListener("hashchange",()=>{state.page=(location.hash||"#historie").slice(1);render()});
+ state.page=(location.hash||"#start").slice(1);
+ window.addEventListener("hashchange",()=>{state.page=(location.hash||"#start").slice(1);render()});
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
  for(const id of ["add-player","add-profile"])el(id).addEventListener("click",()=>playerDialog.showModal());
  el("cancel-dialog").addEventListener("click",()=>playerDialog.close());
@@ -137,7 +139,7 @@ function setup(){
   const name=String(data.get("name")||"").trim().slice(0,80);
   const id=String(data.get("id")||"").trim()||"local-"+Date.now();
   if(!name||state.players.some(p=>p.id===id)){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
-  state.players.push({id,name,url:safeUrl(data.get("url")||"")});
+  state.players.push({id,name,birthYear:Number(data.get("birthYear"))||undefined,url:safeUrl(data.get("url")||"")});
   save();render();playerDialog.close();playerForm.reset();toast("Spieler gespeichert");
  });
  const tournamentDialog=el("tournament-dialog");
