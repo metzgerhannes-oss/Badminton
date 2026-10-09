@@ -167,3 +167,46 @@
 .bottom-nav a{width:25%}
 @media(min-width:600px){.dashboard-ranking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ranking-tile{min-height:186px}}
 @media(max-width:350px){.ranking-tile{padding:12px 10px}.ranking-place{font-size:30px}.dashboard-heading h1{font-size:22px}.ranking-top{font-size:12px}}
+
+
+/* Profile-first navigation and friends (local favourites; not online authentication) */
+.focused-profile{display:flex;align-items:center;gap:13px;margin:4px 0 23px;padding:12px 13px;border:1px solid #467195;border-radius:17px;background:linear-gradient(126deg,#173a61,#112640);min-height:76px}
+.focus-profile-avatar,.profile-initial,.friend-avatar{display:grid;place-items:center;flex:none;border-radius:50%;font-weight:850;background:linear-gradient(140deg,#93d8fa,#3374ab);color:#123555;box-shadow:0 2px 0 #ffffff22 inset}
+.focus-profile-avatar{width:47px;height:47px;font-size:21px}
+.focus-profile-copy{display:grid;gap:3px;min-width:0;flex:1}
+.focus-profile-copy small{font-size:10px;font-weight:750;color:#98c9e8}
+.focus-profile-copy strong{font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+.focus-profile-copy>span{font-size:10px;color:#adc1d6}
+.focus-settings{border:1px solid #5884a4;border-radius:10px;background:#284968;color:#c7eaff;font-size:10px;line-height:1.4;font-weight:800;padding:9px 10px;flex-shrink:0}
+button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions button:focus-visible{outline:3px solid #9bdfff;outline-offset:2px}
+#view-einstellungen>.section-heading{margin:8px 0 14px}
+#view-einstellungen>.section-heading h2{font-size:23px}
+.account-notice{margin-bottom:20px}
+.account-notice p{margin:7px 0;line-height:1.6}
+.current-account-label{color:#acdfff!important;font-size:12px;font-weight:800}
+.settings-section{margin:17px 0 25px}
+.settings-section .section-heading{margin-bottom:4px}
+.settings-section h3{font-size:17px;margin:0;letter-spacing:-.3px}
+.settings-hint{color:#aabfd4;font-size:12px;line-height:1.55;margin:7px 0 12px}
+#profile-list,.friends-list{display:grid;gap:10px}
+.own-profile,.friend-card{display:flex;flex-direction:column;gap:12px;border:1px solid #314d6e;background:linear-gradient(130deg,#162b46,#101e35);border-radius:15px;padding:13px}
+.own-profile.profile-active{border-color:#6ab4e1;background:linear-gradient(130deg,#20486c,#10253e)}
+.profile-main{display:flex;gap:12px;align-items:center}
+.profile-main>div{min-width:0;flex:1}
+.profile-main h3{font-size:14px;margin:0 0 5px}
+.profile-main p{color:#9db5cf;font-size:11px;margin:0 0 7px}
+.profile-main a{font-size:11px;color:#8bd8ff}
+.profile-initial,.friend-avatar{width:39px;height:39px;font-size:16px}
+.active-profile-chip{font-size:10px;background:#3e7299;color:#effaff;border-radius:999px;padding:4px 8px;display:inline-block;font-weight:750}
+.profile-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap}
+.profile-actions button{font-size:11px;min-height:34px;padding:7px 10px}
+.friend-card{flex-direction:row;align-items:center;gap:7px}
+.friend-card.friend-selected{border-color:#82c7e9}
+.friend-open{display:flex;gap:11px;align-items:center;min-width:0;flex:1;padding:3px 0;border:0;background:none;color:inherit;text-align:left}
+.friend-details{display:grid;gap:4px;min-width:0}
+.friend-details strong{font-size:13px;line-height:1.4}
+.friend-details small{font-size:10px;color:#a6bcd3}
+.friend-details em{font-size:11px;font-style:normal;color:#8bd8ff;font-weight:750}
+.friend-remove{align-self:center;font-size:11px}
+.friends-empty{border:1px dashed #465e7b;border-radius:14px;padding:18px;font-size:12px;color:#a9c6db}
+@media(max-width:370px){.focused-profile{gap:9px;padding:10px}.focus-profile-avatar{width:40px;height:40px}.focus-profile-copy strong{font-size:14px}.focus-settings{padding:8px 7px}.friend-card{gap:5px;padding:10px}.friend-avatar{width:32px;height:32px}}
