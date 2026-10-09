@@ -1,0 +1,53 @@
+name: Probe DBV individual valuation source
+on:
+  push:
+    paths:
+      - .github/workflows/probe-dbv-scores.yml
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect official public ranking details
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen,Request
+          from urllib.error import HTTPError,URLError
+          from html.parser import HTMLParser
+          from urllib.parse import urljoin
+          import re
+          class Links(HTMLParser):
+            def __init__(self):super().__init__();self.links=[];self.current=None
+            def handle_starttag(self,t,a):
+              if t=="a":self.current=[dict(a).get("href",""),""]
+            def handle_endtag(self,t):
+              if t=="a" and self.current:self.links.append(self.current);self.current=None
+            def handle_data(self,d):
+              if self.current:self.current[1]+=d
+          urls=[
+            "https://dbv.turnier.de/ranking/ranking.aspx?rid=238",
+            "https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153",
+            "https://dbv.turnier.de/ranking/player.aspx?id=53108&player=3423349",
+            "https://badhub.de/spieler/05-070879?saison=2026&src=turnier"
+          ]
+          for url in urls:
+            print("SOURCE",url,flush=True)
+            try:
+              with urlopen(Request(url,headers={"User-Agent":"Mozilla/5.0","Accept":"text/html"}),timeout=24) as resp:
+                raw=resp.read(300000)
+                ct=resp.headers.get("Content-Type","")
+                final=resp.url
+                print("HTTP",resp.status,"TYPE",ct,"FINAL",final,"BYTES",len(raw),flush=True)
+              page=raw.decode("utf-8","replace")
+              parser=Links();parser.feed(page)
+              for link,label in parser.links:
+                if any(word in (link+" "+label).lower() for word in ("turnier","ranglist","ranking","philipp","spieler","point")):
+                  print("LINK",urljoin(final,link)[:190],label.strip()[:80],flush=True)
+              text=re.sub(r"(?is)<(?:script|style).*?</(?:script|style)>","",page)
+              text=" ".join(re.sub("<[^>]+>"," ",text).split())
+              for term in ["Philipp Metzger","Ranglisten","Wertung","Turniere","Punkte","2026","Ranglistenwertung"]:
+                pos=text.lower().find(term.lower())
+                if pos>=0:print("CONTEXT",term,repr(text[max(0,pos-75):pos+380]),flush=True)
+            except (HTTPError,URLError,TimeoutError,ValueError) as e:print("ERROR",str(e)[:250],flush=True)
+          PY
