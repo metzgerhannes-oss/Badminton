@@ -33,7 +33,7 @@ assert.equal(excel.downloadUrl,"https://turniere.badminton.de/ranking/download")
 assert.equal(register.validation.maxResults,5);
 assert.equal(register.validation.timeWindowMonths,12);
 assert.equal(register.validation.exactAggregateReconciliation,true);
-assert.ok(docs.includes("DBV-Einzelwertungen")&&docs.includes("Cookiewall")&&docs.includes("Top fünf"));
+assert.ok(docs.includes("DBV-Einzelwertungen")&&docs.includes("Cookie-Zustimmungsseite")&&docs.includes("Top fünf"));
 assert.ok(app.includes("Quellenliste mit Qualitätsstufen"));
 assert.ok(dashboard.includes("Einzelwertungen bei DBV prüfen"));
 for(const player of Object.values(snapshot.players)){
