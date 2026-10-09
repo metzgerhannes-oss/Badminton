@@ -1,0 +1,58 @@
+name: DBV Jahrgangs-Rangliste
+on:
+  schedule:
+    - cron: '0 15 * * 4'
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ranking.yml'
+      - 'scripts/update-ranking.py'
+      - 'scripts/test-ranking.py'
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: schmetterlinge-pages
+  cancel-in-progress: false
+jobs:
+  ranking:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Ranking parser dependency
+        run: python -m pip install --disable-pip-version-check 'openpyxl==3.1.5'
+      - name: Verify Excel parser and birthyear comparisons
+        run: python scripts/test-ranking.py
+      - name: Load latest official DBV week archives
+        env:
+          BADMINTON_PLAYER_IDS: '05-070879'
+        run: python scripts/update-ranking.py
+      - name: Commit refreshed snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/ranking.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: update public DBV birthyear-ranking snapshot [skip ci]'
+            git push
+          fi
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy ranking update
+        id: deployment
+        uses: actions/deploy-pages@v4
