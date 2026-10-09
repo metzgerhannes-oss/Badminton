@@ -39,6 +39,7 @@ jobs:
           BADMINTON_FEED_AUTHORIZED: ${{ vars.BADMINTON_FEED_AUTHORIZED }}
           BADMINTON_FEED_FORMAT: ${{ vars.BADMINTON_FEED_FORMAT }}
           BADMINTON_PLAYER_IDS: ${{ vars.BADMINTON_PLAYER_IDS }}
+          BADMINTON_PUBLIC_SOURCE_URL: ${{ vars.BADMINTON_PUBLIC_SOURCE_URL }}
         run: node scripts/sync-feed.mjs
       - name: Save refreshed feed
         run: |
