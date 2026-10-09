@@ -23,6 +23,8 @@ assert.deepEqual(summarizeTrophies([...philipp,{id:"made-up",place:1,verified:fa
 assert.deepEqual(summarizeTrophies(null).counts,{1:0,2:0,3:0,4:0});
 const html=await readFile("index.html","utf8");
 assert.ok(html.includes('id="trophy-shelf"')&&html.includes('id="trophy-awards"'));
+assert.ok(html.indexOf('id="trophy-shelf"')<html.indexOf('id="history-summary"'));
+
 assert.ok(html.includes('type="module" src="./history.js"'),"Browser must load ESM imports");
 const ui=await readFile("history.js","utf8");
 assert.ok(ui.includes("summarizeTrophies(chosen)")&&ui.includes("renderTrophies(chosen)"));
