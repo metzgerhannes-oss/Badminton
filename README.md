@@ -1,3 +1,16 @@
+## Trophäenschrank
+
+Die Registerkarte **Historie** zeigt jetzt einen virtuellen Trophäenschrank mit vier Auszeichnungen:
+
+- **Gold:** 1. Platz – Turniersieg
+- **Silber:** 2. Platz – Finalteilnahme
+- **Bronze:** 3. Platz – Podestplatz
+- **Blauer Ehrenorden:** 4. Platz – Top-4-Ergebnis (bewusst nicht als Podestmedaille dargestellt)
+
+Die Pokale lassen sich antippen; darunter erscheinen die belegten Turnierleistungen mit Datum, Disziplin, Altersklasse und Link zum Originalbericht. Der Schrank reagiert auf den Spielerfilter, den Jahresfilter und die Disziplin-Auswahl der historischen Ansicht. Die vollständige Turnierchronik bleibt darunter erhalten.
+
+**Datenregel:** Ausschließlich verifizierte Datensätze mit Platz 1 bis 4 zählen. Gleiche Ergebnis-IDs werden nicht doppelt gezählt. Platz 5 oder schlechter wird weiterhin in der Chronik gezeigt, erzeugt aber keine Trophäe. Solange die DBV-Ergebnisdaten nicht vollständig verfügbar sind, ist auch die Sammlung ausdrücklich **nicht vollständig**. Die reine Statistik steckt in `scripts/trophy-stats.mjs`, Regressionstests in `tests/trophies.mjs`.
+
 ## Historische Ergebnisse (seit Oktober 2026)
 
 Die App hat jetzt eine eigene Registerkarte **Historie** mit nachgewiesenen Platzierungen 2025–2026 aus öffentlichen Turnierberichten der SpVgg Mössingen. Die Datenbasis `data/history.json` enthält zurzeit zehn belegte Platzierungen von Philipp Metzger und Charlottes erstes dokumentiertes Turnierergebnis. Es gibt Jahres-, Disziplin- und Spielerfilter sowie einen Platzierungsverlauf, der Altersklassen getrennt vergleicht. Jede Turnierkarte führt zum zugehörigen Originalbericht.
