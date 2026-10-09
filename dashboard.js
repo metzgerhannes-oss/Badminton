@@ -30,9 +30,17 @@ function renderRank(){
  const current=ranking?.current;
  const prior=ranking?.previous;
  const working=ranking?.status==="available"&&current?.week&&current?.year;
- label.textContent=working?"DBV KW "+current.week+" / "+current.year:"DBV-Rangliste";
- source.innerHTML=working?'<span>Jahrgangsplatz · Deutschland</span><span>'+escape("KW "+current.week+(prior?" vs. KW "+prior.week:" · Vergleich folgt"))+'</span>':
+ const today=new Date();
+ const isoDate=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate()));
+ isoDate.setUTCDate(isoDate.getUTCDate()+4-(isoDate.getUTCDay()||7));
+ const isoYear=isoDate.getUTCFullYear();
+ const yearStart=new Date(Date.UTC(isoYear,0,1));
+ const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
+ const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
+ label.textContent=working?"Archiv KW "+current.week+" / "+current.year:"DBV-Rangliste";
+ source.innerHTML=working?'<span>Jahrgangsrang · Deutschland · offizielles Wochenarchiv</span><span>'+escape("KW "+current.week+(prior?" vs. KW "+prior.week:" · Vergleich folgt"))+'</span>':
  '<span>Ranglistenwerte noch nicht importiert</span>';
+ if(archiveBehind)source.innerHTML+='<a class="ranking-stale-link" href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Neuere DBV-Webwerte möglich · Aktuelle Rangliste prüfen ↗</a>';
  const chosen=profiles.filter(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
  if(!chosen.length){
   root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Bitte die DBV-Spieler-ID im Profil hinterlegen. Nur so kann die Rangliste passend zum Geburtsjahr geladen werden.</small><span>Zu den Einstellungen ↗</span></a>';
