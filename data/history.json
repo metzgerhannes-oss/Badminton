@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "curation": "club-association-and-family-confirmed",
   "asOf": "2026-10-09",
-  "notes": "Ausgewählte historische Ergebnisse aus Vereins- und Verbandsberichten sowie zwei ausdrücklich als Familienbestätigung markierte Meisterschaftsplatzierungen. Keine vollständige DBV-Matchhistorie. Für familienbestätigte Einträge bleibt eine unabhängige Prüfung von Disziplin und weiteren Meisterschaftsergebnissen offen. Gärtringen 2026: Gold im Einzel U11 durch BWBV ausdrücklich bestätigt.",
+  "notes": "Ausgewählte historische Ergebnisse aus Vereins- und Verbandsberichten sowie zwei ausdrücklich als Familienbestätigung markierte Meisterschaftsplatzierungen. Keine vollständige DBV-Matchhistorie. Für familienbestätigte Einträge bleibt eine unabhängige Prüfung von Disziplin und weiteren Meisterschaftsergebnissen offen. Gärtringen 2026: Gold im Einzel U11 durch BWBV ausdrücklich bestätigt. Bezirksmeisterschaft 11.07.2026: Einzel-Gold von Familie eindeutig bestätigt. Doppel-Bronze nur vermutet und ausschließlich als unbestätigter Kandidat geführt, nicht als Trophäe gezählt.",
   "players": {
     "05-070879": "Philipp Metzger",
     "Charlotte Metzger": "Charlotte Metzger"
@@ -72,7 +72,7 @@
       "event": "35. Bezirksmeisterschaft Südwürttemberg U11–U19",
       "location": "Mössingen",
       "level": "Bezirksmeisterschaft",
-      "discipline": "noch offen",
+      "discipline": "Einzel",
       "ageGroup": "noch offen",
       "place": 1,
       "partner": null,
@@ -82,7 +82,7 @@
       },
       "verified": true,
       "confirmation": "family-confirmed",
-      "verificationNote": "Platz 1 laut Familienangabe; Disziplin/Altersklasse noch anhand der namentlichen offiziellen Ergebnistabelle prüfen."
+      "verificationNote": "1. Platz im Einzel durch die Familie ausdrücklich bestätigt. Altersklasse noch nicht unabhängig abgeglichen; der Verbandsbericht führt zum offiziellen Turnier."
     },
     {
       "id": "pm-2026-04-24-jd",
@@ -264,6 +264,27 @@
       },
       "verified": true,
       "playerName": "Philipp Metzger"
+    }
+  ],
+  "pendingResults": [
+    {
+      "id": "pm-2026-07-11-district-double-possible-bronze",
+      "playerId": "05-070879",
+      "playerName": "Philipp Metzger",
+      "date": "2026-07-11",
+      "event": "35. Bezirksmeisterschaft Südwürttemberg U11–U19",
+      "location": "Mössingen",
+      "discipline": "Doppel",
+      "ageGroup": "noch offen",
+      "place": 3,
+      "partner": null,
+      "verificationStatus": "unverified-family-recollection",
+      "verified": false,
+      "note": "3. Platz im Doppel laut Familienerinnerung möglich, nicht bestätigt. Keine Bronzetrophäe bis zum Ergebnisnachweis.",
+      "source": {
+        "name": "BWBV: Turnierbericht mit Link zur offiziellen Ergebnisliste",
+        "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/"
+      }
     }
   ]
 }
