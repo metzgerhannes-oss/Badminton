@@ -22,9 +22,20 @@ for(const r of history.results){
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+assert.ok(Array.isArray(history.pendingResults));
+const pending=history.pendingResults.find(r=>r.id==="pm-2026-07-11-district-double-possible-bronze");
+assert.equal(pending.discipline,"Doppel");
+assert.equal(pending.place,3);
+assert.equal(pending.verified,false);
+const singles=history.results.find(r=>r.id==="pm-2026-07-11-bezirksmeisterschaft-sw-gold");
+assert.equal(singles.discipline,"Einzel");
+assert.equal(singles.place,1);
+assert.ok(!history.results.some(r=>r.id===pending.id),"Unverified doubles must not appear in trophy-counting history");
+
 const linked=await readFile("index.html","utf8");
 assert.ok(linked.includes('id="view-historie"'));
 assert.ok(linked.includes('src="./history.js"'));
+assert.ok(linked.includes('id="history-pending"'));
 const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
 assert.ok(script.includes("playerMatch"));
