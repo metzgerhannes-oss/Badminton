@@ -1,3 +1,5 @@
+> **DBV-Live-Status (09.10.2026):** Die App ist veröffentlicht und unterstützt jetzt autorisierte JSON-/CSV-Imports und offizielle Turnierlinks pro Spieler. **Direktes DBV-Live ist mangels freigegebenem Datenzugang noch nicht angeschlossen.** Einrichtung und Datenanforderung: [docs/DBV_LIVE.md](docs/DBV_LIVE.md).
+
 # Shuttleboard – Badminton für die Familie
 
 Mobile, installierbare Web-App (PWA) für Badminton-Turniertage. **Startprofil: Philipp Metzger, DBV-Spieler-ID `05-070879`**.
@@ -23,7 +25,7 @@ Danach: `https://metzgerhannes-oss.github.io/Badminton/`.
 
 ## Echte Ergebnisse anbinden
 
-Repository-Variable **`BADMINTON_FEED_URL`** (unter Settings → Secrets and variables → Actions → Variables) auf eine **erlaubt verwendbare HTTPS-URL** setzen, die ein JSON-Dokument im untenstehenden Format zurückgibt. Optional ist das Secret `BADMINTON_FEED_TOKEN` als Bearer-Token möglich. Der GitHub-Workflow holt die Daten planmäßig ca. alle fünf Minuten und stellt den öffentlichen Snapshot unter `data/live.json` bereit. GitHub Actions kann geplante Läufe verzögern. Der Browser lädt den Snapshot alle 60 Sekunden. **Es ist somit keine garantierte Echtzeitübertragung.**
+Repository-Variable **`BADMINTON_FEED_URL`** **zusammen mit** `BADMINTON_FEED_AUTHORIZED=true` (nur nach Freigabe) und optional `BADMINTON_FEED_FORMAT=csv` (unter Settings → Secrets and variables → Actions → Variables) auf eine **erlaubt verwendbare HTTPS-URL** setzen, die ein JSON-Dokument im untenstehenden Format zurückgibt. Optional ist das Secret `BADMINTON_FEED_TOKEN` als Bearer-Token möglich. Der GitHub-Workflow holt freigegebene Daten planmäßig ca. alle fünf Minuten und stellt den öffentlichen Snapshot unter `data/live.json` bereit. GitHub Actions kann geplante Läufe verzögern. Der Browser lädt den Snapshot alle 60 Sekunden. **Es ist somit keine garantierte Echtzeitübertragung.**
 
 ```json
 {
