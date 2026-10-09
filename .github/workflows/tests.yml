@@ -1,0 +1,24 @@
+name: Schmetterlinge Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate scripts
+        run: |
+          node --check app.js
+          node --check sw.js
+          node --check scripts/normalize-feed.mjs
+          node --check scripts/sync-feed.mjs
+      - name: Run tests
+        run: |
+          node tests/validate.mjs
+          node tests/adapter.mjs
