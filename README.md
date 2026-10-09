@@ -70,3 +70,7 @@ Es gibt keine Benutzeranmeldung, keine personenbezogene Cloud-Datenbank und kein
 - Keine garantierte DBV-Live-Anbindung ohne eine zulässige strukturierte Datenquelle.
 - Keine Push-Nachrichten bei geschlossener App.
 - Keine direkten Änderungen von Turnier-Ergebnissen oder Match-Aufrufen.
+
+## Schmetterlinge-Vereinsdesign
+
+Visuelle Grundlage ist das ursprünglich erstellte und in der ChatGPT-Bibliothek unter `/Badminton/Spvgg_Moessingen_Badminton_Jugend_Logo.png` aufbewahrte Schmetterlingslogo der SpVgg Mössingen Badminton Jugend. Für die PWA wurde dieses Motiv ohne Änderung seiner Bildbestandteile als kompaktes, eingebettetes WebP in `assets/spvgg-schmetterlinge.svg` übernommen. Das Quelloriginal bleibt unverändert in der Bibliothek; die App nutzt Vereinsfarben Dunkelblau, Hellblau und Weiß. Logo als Markenzeichen der Vereinsjugend verwenden, nicht mit offiziellen DBV-Angeboten verwechseln.
