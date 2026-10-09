@@ -12,6 +12,7 @@ import re
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -125,6 +126,53 @@ def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
                 ranked[k]=record
     return ranked
 
+def current_public_export():
+    """Read the actual *current* official DBV Excel download (not only old week archives).
+
+    Source HTML provides the authoritative publication KW and timestamp, while
+    /ranking/download provides the corresponding complete official XLSX.
+    """
+    page_url=OFFICIAL+"/ranking"
+    export_url=OFFICIAL+"/ranking/download"
+    try:
+        req=Request(page_url,headers={"User-Agent":"Schmetterlinge-Ranking/1.1 (weekly public export)","Accept":"text/html"})
+        with urlopen(req,timeout=25) as resp:
+            raw=resp.read(5_000_001)
+        if len(raw)>5_000_000:raise ValueError("Ranking page exceeds maximum size")
+        html=raw.decode("utf-8","replace")
+        # Exact navigation label from the official page, e.g. "Rangliste KW 41".
+        match=re.search(r"Rangliste\s+KW\s*(\d{1,2})\b",html,re.I)
+        # Published timestamp is needed to determine the correct ISO week year.
+        updated_anchor=html.find("zuletzt aktualisiert:")
+        updated_match=re.search(r"(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2}:\d{2})",
+            html[updated_anchor:updated_anchor+14000]) if updated_anchor>=0 else None
+        if not match or not updated_match:
+            raise ValueError("Current ranking week or publication timestamp missing; do not guess")
+        source_dt=datetime.strptime(updated_match.group(1)+" "+updated_match.group(2),
+            "%d.%m.%Y %H:%M:%S").replace(tzinfo=ZoneInfo("Europe/Berlin"))
+        iso_year,published_week=iso_week(source_dt)
+        listed_week=int(match.group(1))
+        if published_week!=listed_week:
+            raise ValueError(f"Ranking label KW {listed_week} conflicts with published date KW {published_week}")
+        headers={"User-Agent":"Schmetterlinge-Ranking/1.1 (weekly public export)",
+                 "Accept":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream;q=0.9"}
+        with urlopen(Request(export_url,headers=headers),timeout=50) as resp:
+            if resp.status!=200:raise ValueError("Current export request did not succeed")
+            binary=resp.read(MAX_BYTES+1)
+            if len(binary)>MAX_BYTES:raise ValueError("Current ranking Excel exceeds size limit")
+            if not binary.startswith(b"PK"):raise ValueError("Current ranking download is not XLSX")
+        rows=parse_excel(binary)
+        print(f"CURRENT DBV RANKING: KW {published_week}/{iso_year}, published {source_dt.isoformat()}, {len(rows)} rows")
+        return (iso_year,published_week,export_url,rows,source_dt.isoformat())
+    except HTTPError as e:
+        if e.code in (401,403,429):
+            print(f"Current official DBV export denies automated access: HTTP {e.code}; fall back to archives",file=sys.stderr)
+        else:
+            print(f"Current DBV export unavailable: HTTP {e.code}; fall back to archives",file=sys.stderr)
+    except (URLError,ValueError,OSError,TimeoutError) as e:
+        print(f"Current DBV export unavailable: {type(e).__name__}: {e}; fall back to archives",file=sys.stderr)
+    return None
+
 def published_export(when:datetime, max_lookback=6):
     for ago in range(max_lookback):
         year,week=iso_week(when-timedelta(weeks=ago))
@@ -193,16 +241,33 @@ def main():
     if not allow:raise SystemExit("No valid player IDs")
     now=datetime.now(timezone.utc)
     checked=now.isoformat(timespec="seconds").replace("+00:00","Z")
-    releases=[]
-    for release in published_export(now):
-        releases.append(release)
-        if len(releases)==2:break
-    if not releases:
-        print("No official Excel export was obtainable; existing snapshot left unchanged.")
-        return
-    result=summarize(releases[0], releases[1] if len(releases)>1 else None, allow, checked)
+    live=current_public_export()
+    archives=[]
+    if live:
+        # For current KW41, compare to most recent *older* published weekly archive (KW40).
+        for archive in published_export(now):
+            if (archive[0],archive[1])<(live[0],live[1]):
+                archives.append(archive)
+                break
+        latest=live
+        previous=archives[0] if archives else None
+    else:
+        for archive in published_export(now):
+            archives.append(archive)
+            if len(archives)==2:break
+        if not archives:
+            print("No official Excel export was obtainable; existing snapshot left unchanged.")
+            return
+        latest=archives[0]
+        previous=archives[1] if len(archives)>1 else None
+    result=summarize(latest,previous,allow,checked)
+    result["current"]["kind"]="current-export" if live else "weekly-archive"
+    if live:
+        result["current"]["sourceUpdatedAt"]=live[4]
+        result["current"]["pageUrl"]=OFFICIAL+"/ranking"
+        result["sourceUrl"]=OFFICIAL+"/ranking"
     # Independent audit against raw official Excel rows, protecting year/gender/disc filters.
-    latest=releases[0][3]
+    latest=latest[3]
     for pid,player in result["players"].items():
         for disc,rank in player["disciplines"].items():
             own=next((row for row in latest if row["id"]==pid and row["discipline"]==disc),None)
