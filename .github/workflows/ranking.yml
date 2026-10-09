@@ -13,7 +13,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: schmetterlinge-pages
+  group: schmetterlinge-ranking
   cancel-in-progress: false
 jobs:
   ranking:
