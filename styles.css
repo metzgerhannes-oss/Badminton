@@ -301,3 +301,24 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 .switcher-name{flex:1;min-width:0;overflow-wrap:anywhere;font-size:12px;font-weight:750}
 .switcher-check{color:#a5e6ff;font-size:17px;font-weight:850}
 @media(max-width:365px){.focus-switcher>summary{font-size:10px;padding:8px;gap:4px}.focus-switcher-options{min-width:180px}.focus-profile-copy strong{font-size:14px}}
+
+
+/* Compact three-event preview on the personal start page */
+.upcoming-tournaments-section{margin:12px 0 6px;padding:15px 14px 7px;border:1px solid #3b5f83;border-radius:18px;background:linear-gradient(137deg,#163452,#101f36)}
+.upcoming-tournaments-header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:9px}
+.upcoming-tournaments-header h2{font-size:16px;font-weight:850;letter-spacing:-.3px;line-height:1.3;margin:0;color:#eef8ff}
+.upcoming-tournaments-header>a{white-space:nowrap;color:#98deff;font-size:11px;font-weight:750}
+.upcoming-tournaments-list{display:grid}
+.upcoming-tournament-row{display:flex;align-items:center;gap:12px;min-width:0;min-height:68px;padding:10px 1px;color:#edf7ff;text-decoration:none}
+.upcoming-tournament-row+.upcoming-tournament-row{border-top:1px solid #58718b5c}
+.upcoming-tournament-row:focus-visible{outline:3px solid #98dfff;outline-offset:-2px;border-radius:9px}
+.upcoming-tournament-date{display:grid;align-content:center;gap:4px;flex:none;min-width:78px;color:#a8ddfb;font-size:11px;font-weight:850;line-height:1.4}
+.upcoming-tournament-date time{font-variant-numeric:tabular-nums}
+.upcoming-tournament-date small{display:inline-block;width:fit-content;border-radius:6px;padding:3px 5px;background:#335b73;color:#c8f3ff;font-size:9px;line-height:1.3}
+.upcoming-tournament-info{display:grid;flex:1;min-width:0;gap:5px}
+.upcoming-tournament-info strong{font-size:13px;font-weight:750;line-height:1.35;overflow-wrap:anywhere}
+.upcoming-tournament-info small{color:#aac1d6;font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+.upcoming-tournament-arrow{flex:none;font-size:17px;color:#92dfff;padding-right:4px}
+.upcoming-tournaments-empty{color:#b4c9db;font-size:12px;line-height:1.65;padding:13px 0 16px}
+.upcoming-tournaments-empty>a{color:#9adfff;font-size:12px;font-weight:800;display:block;margin-top:8px}
+@media(max-width:370px){.upcoming-tournaments-section{padding:12px 10px 5px}.upcoming-tournament-row{gap:8px}.upcoming-tournament-date{min-width:68px;font-size:10px}.upcoming-tournament-info strong{font-size:12px}.upcoming-tournament-info small{font-size:9.5px}}
