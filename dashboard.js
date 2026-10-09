@@ -80,7 +80,7 @@ function renderRank(){
   '<span class="ranking-top"><span>'+escape(title)+'</span></span>'+
   '<span class="ranking-bw-title">BW · Jahrgang</span>'+
   '<span class="ranking-bw-row"><strong>'+bw+'</strong>'+movement+'</span>'+
-  '<span class="ranking-de-row">Deutschland <strong>'+de+'</strong></span>'+
+  '<span class="ranking-de-row"><span title="Deutschland">DE</span><strong>'+de+'</strong></span>'+
   '<span class="ranking-compact-footer">'+escape(cohort)+' <span aria-hidden="true">›</span></span></button>';
  }).join("");
  const sourceUrl=current?.url||"https://turniere.badminton.de/ranking/history";
