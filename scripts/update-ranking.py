@@ -236,6 +236,23 @@ def summarize(now, before, id_list:list[str], checked:str):
       "method":"DE: Rang in DBV-Altersklasse AKL2 (U11 umfasst mehrere Geburtsjahrgänge), Geschlecht und Disziplin; BW: gleiche Altersklasse für LVName=BAW-Baden-Württemberg. Gleichstand ergibt gleichen Rang.",
       "notes":"Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag."}
 
+def should_publish(old:dict|None,new:dict) -> bool:
+    """Do not regress a deployed ranking to an older, archived or stale snapshot."""
+    if not old or old.get("status")!="available" or old.get("schemaVersion")!=2:
+        return True
+    previous=old.get("current") or {}
+    current=new.get("current") or {}
+    old_week=(int(previous.get("year") or 0),int(previous.get("week") or 0))
+    new_week=(int(current.get("year") or 0),int(current.get("week") or 0))
+    if new_week<old_week:
+        return False
+    if new_week==old_week:
+        if previous.get("kind")=="current-export" and current.get("kind")!="current-export":
+            return False
+        if previous.get("sourceUpdatedAt") and current.get("sourceUpdatedAt") and current["sourceUpdatedAt"]<previous["sourceUpdatedAt"]:
+            return False
+    return True
+
 def main():
     allow=[s.strip() for s in os.environ.get("BADMINTON_PLAYER_IDS","05-070879").split(",") if re.fullmatch(r"\d\d-\d{6}",s.strip())]
     if not allow:raise SystemExit("No valid player IDs")
@@ -290,6 +307,9 @@ def main():
             print(f"VERIFIED {pid} {disc}: BW={rank['bwAgeClassRank']} DE={rank['ageClassRank']} ageClass={own['ageClass']} birthyear={own['birthYear']} points={own['points']} previous BW={rank['previousBwAgeClassRank']}")
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
     old=json.loads(OUTPUT.read_text()) if OUTPUT.exists() else None
+    if not should_publish(old,result):
+        print("Refusing to replace newer DBV ranking with an older or less reliable source; existing snapshot retained.")
+        return
     if old and old.get("schemaVersion")==2 and old.get("current")==result.get("current") and old.get("previous")==result.get("previous") and old.get("players")==result.get("players"):
         print("Same official calendar-week exports; no change in KPI snapshot.")
         return
