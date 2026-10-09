@@ -12,8 +12,13 @@ assert.ok(page.includes('id="dashboard-next"'));
 assert.ok(page.includes('src="./dashboard.js"'));
 assert.ok(page.includes('href="#start" data-page="start"'));
 assert.ok(!page.includes('class="hero"'),"No verbose hero on landing page");
-assert.ok(app.includes('window.renderDashboard?.(state.chosen,state.players,state.officialLinks)'));
+assert.ok(app.includes('window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks'));
 assert.ok(app.includes('page:"start"'));
+assert.ok(app.includes('activeProfileId'));
+assert.ok(app.includes('viewingFriendId'));
+assert.ok(page.includes('data-page="einstellungen"'));
+assert.ok(js.includes('friendNoHistory')&&js.includes('ranking'));
+
 assert.ok(js.includes("entry.change")&&js.includes("entry.previousYearRank"),"Weekly delta must come from two DBV reports");
 assert.ok(js.includes('Jahrgang ')&&js.includes('cohortSize'),"Cohort rather than overall rank required");
 assert.ok(js.includes('movement-up')&&js.includes('movement-down')&&js.includes('movement-unknown'));
