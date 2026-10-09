@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "curation": "club-association-and-family-confirmed",
   "asOf": "2026-10-09",
-  "notes": "Ausgewählte historische Ergebnisse aus Vereins- und Verbandsberichten sowie zwei ausdrücklich als Familienbestätigung markierte Meisterschaftsplatzierungen. Keine vollständige DBV-Matchhistorie. Für familienbestätigte Einträge bleibt eine unabhängige Prüfung von Disziplin und weiteren Meisterschaftsergebnissen offen. Gärtringen 2026: Gold im Einzel U11 durch BWBV ausdrücklich bestätigt. Bezirksmeisterschaft 11.07.2026: Einzel-Gold von Familie eindeutig bestätigt. Doppel-Bronze nur vermutet und ausschließlich als unbestätigter Kandidat geführt, nicht als Trophäe gezählt.",
+  "notes": "Kuratierte historische Turnierergebnisse aus Vereins-, Verbands- und namentlichen DBV-Ergebnisübernahmen. 35. Bezirksmeisterschaft Südwürttemberg (11.07.2026): Einzel U11 Platz 1, Doppel U11 Platz 3 mit Philipp Landhäußer und Mixed U13 Platz 2 mit Anneliese Zhu. Offizieller DBV-Turnierlink vom BWBV veröffentlicht; namentliche Platzierungen auf Badhub als Übernahme von dbv.turnier.de einsehbar. Keine vollständige Karrierehistorie.",
   "players": {
     "05-070879": "Philipp Metzger",
     "Charlotte Metzger": "Charlotte Metzger"
@@ -65,24 +65,76 @@
       "playerName": "Philipp Metzger"
     },
     {
+      "playerId": "05-070879",
+      "playerName": "Philipp Metzger",
+      "date": "2026-07-11",
+      "event": "35. Bezirksmeisterschaft BAW Südwürttemberg U11–U19",
+      "location": "Mössingen",
+      "level": "Bezirksmeisterschaft",
+      "source": {
+        "name": "DBV · Offizielle Turnierergebnisse",
+        "url": "https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2"
+      },
+      "verification": {
+        "name": "Badhub · namentliche DBV-Ergebnisübernahme",
+        "url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier"
+      },
+      "verified": true,
+      "confirmation": "player-results-crosschecked",
+      "id": "pm-2026-07-11-bezirksmeisterschaft-sw-doppel-bronze",
+      "discipline": "Doppel",
+      "ageGroup": "U11",
+      "place": 3,
+      "partner": "Philipp Landhäußer",
+      "verificationNote": "JD U11 Platz 3 mit Philipp Landhäußer laut namentlicher DBV-Ergebnisübernahme auf Badhub."
+    },
+    {
       "id": "pm-2026-07-11-bezirksmeisterschaft-sw-gold",
       "playerId": "05-070879",
       "playerName": "Philipp Metzger",
       "date": "2026-07-11",
-      "event": "35. Bezirksmeisterschaft Südwürttemberg U11–U19",
+      "event": "35. Bezirksmeisterschaft BAW Südwürttemberg U11–U19",
       "location": "Mössingen",
       "level": "Bezirksmeisterschaft",
       "discipline": "Einzel",
-      "ageGroup": "noch offen",
+      "ageGroup": "U11",
       "place": 1,
       "partner": null,
       "source": {
-        "name": "BWBV · Offizieller Turnierbericht",
-        "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/"
+        "name": "DBV · Offizielle Turnierergebnisse",
+        "url": "https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2"
       },
       "verified": true,
-      "confirmation": "family-confirmed",
-      "verificationNote": "1. Platz im Einzel durch die Familie ausdrücklich bestätigt. Altersklasse noch nicht unabhängig abgeglichen; der Verbandsbericht führt zum offiziellen Turnier."
+      "confirmation": "player-results-crosschecked",
+      "verificationNote": "JE U11 Platz 1 anhand der namentlichen, von dbv.turnier.de übernommenen Spielergebnisse bei Badhub nachvollzogen; der BWBV verlinkt direkt auf das offizielle DBV-Turnier.",
+      "verification": {
+        "name": "Badhub · namentliche DBV-Ergebnisübernahme",
+        "url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier"
+      }
+    },
+    {
+      "playerId": "05-070879",
+      "playerName": "Philipp Metzger",
+      "date": "2026-07-11",
+      "event": "35. Bezirksmeisterschaft BAW Südwürttemberg U11–U19",
+      "location": "Mössingen",
+      "level": "Bezirksmeisterschaft",
+      "source": {
+        "name": "DBV · Offizielle Turnierergebnisse",
+        "url": "https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2"
+      },
+      "verification": {
+        "name": "Badhub · namentliche DBV-Ergebnisübernahme",
+        "url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier"
+      },
+      "verified": true,
+      "confirmation": "player-results-crosschecked",
+      "id": "pm-2026-07-11-bezirksmeisterschaft-sw-mixed-silver",
+      "discipline": "Mixed",
+      "ageGroup": "U13",
+      "place": 2,
+      "partner": "Anneliese Zhu",
+      "verificationNote": "MxD U13 Platz 2 mit Anneliese Zhu laut namentlicher DBV-Ergebnisübernahme auf Badhub."
     },
     {
       "id": "pm-2026-04-24-jd",
@@ -266,25 +318,5 @@
       "playerName": "Philipp Metzger"
     }
   ],
-  "pendingResults": [
-    {
-      "id": "pm-2026-07-11-district-double-possible-bronze",
-      "playerId": "05-070879",
-      "playerName": "Philipp Metzger",
-      "date": "2026-07-11",
-      "event": "35. Bezirksmeisterschaft Südwürttemberg U11–U19",
-      "location": "Mössingen",
-      "discipline": "Doppel",
-      "ageGroup": "noch offen",
-      "place": 3,
-      "partner": null,
-      "verificationStatus": "unverified-family-recollection",
-      "verified": false,
-      "note": "3. Platz im Doppel laut Familienerinnerung möglich, nicht bestätigt. Keine Bronzetrophäe bis zum Ergebnisnachweis.",
-      "source": {
-        "name": "BWBV: Turnierbericht mit Link zur offiziellen Ergebnisliste",
-        "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/"
-      }
-    }
-  ]
+  "pendingResults": []
 }
