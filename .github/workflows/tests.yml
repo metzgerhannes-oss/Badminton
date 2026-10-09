@@ -29,5 +29,6 @@ jobs:
           node tests/upcoming-tournaments.mjs
           node tests/friends.mjs
           node tests/profile-switch.mjs
+          node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
