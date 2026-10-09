@@ -1,3 +1,9 @@
+## Historische Ergebnisse (seit Oktober 2026)
+
+Die App hat jetzt eine eigene Registerkarte **Historie** mit nachgewiesenen Platzierungen 2025–2026 aus öffentlichen Turnierberichten der SpVgg Mössingen. Die Datenbasis `data/history.json` enthält zurzeit zehn belegte Platzierungen von Philipp Metzger und Charlottes erstes dokumentiertes Turnierergebnis. Es gibt Jahres-, Disziplin- und Spielerfilter sowie einen Platzierungsverlauf, der Altersklassen getrennt vergleicht. Jede Turnierkarte führt zum zugehörigen Originalbericht.
+
+**Achtung:** Das ist eine kuratierte **Auswahl**, keine vollständige individuelle DBV-Spielhistorie. Satzergebnisse, die nicht belegt sind, werden nicht ergänzt. Eine mehrjährige Ranglistenentwicklung kann erst aus mehreren datierten DBV-Ranglistenständen erstellt werden. Die direkte automatische DBV-Abfrage steht unabhängig davon noch aus.
+
 > **DBV-Live-Status (09.10.2026):** Die App ist veröffentlicht und unterstützt jetzt autorisierte JSON-/CSV-Imports und offizielle Turnierlinks pro Spieler. **Direktes DBV-Live ist mangels freigegebenem Datenzugang noch nicht angeschlossen.** Einrichtung und Datenanforderung: [docs/DBV_LIVE.md](docs/DBV_LIVE.md).
 
 # Shuttleboard – Badminton für die Familie
