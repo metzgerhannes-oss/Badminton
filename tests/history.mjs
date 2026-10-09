@@ -36,9 +36,18 @@ const linked=await readFile("index.html","utf8");
 assert.ok(linked.includes('id="view-historie"'));
 assert.ok(linked.includes('src="./history.js"'));
 assert.ok(linked.includes('id="history-pending"'));
+assert.ok(linked.indexOf('id="trophy-shelf"')<linked.indexOf('id="history-summary"'),"Trophy cabinet must be above the KPIs");
+assert.ok(linked.indexOf('id="trophy-shelf"')<linked.indexOf('id="history-filters"'),"Trophy cabinet must be before chronology filters");
+assert.ok(linked.includes('id="history-source" class="notice" role="status" hidden'),"Routine source box must be hidden");
+assert.ok(!linked.includes("Platzierungen aus Vereins- und Verbandsberichten, nach Spieler"),"Remove verbose intro marked in screenshot");
+
 const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
 assert.ok(script.includes("playerMatch"));
+assert.ok(script.includes("renderTrophies(playerRecords)"),"Lifetime trophies should not change with chronicle filters");
+assert.ok(!script.includes("renderTrophies(chosen)"),"Do not filter trophy shelf by year or discipline");
+assert.ok(!script.includes('source.textContent="Ausgewählte Ergebnisse'),"No oversized notice on normal history load");
+
 const app=await readFile("app.js","utf8");
 assert.ok(app.includes("window.renderHistory?.(state.chosen,viewedProfiles,{mode:"));
 const sw=await readFile("sw.js","utf8");
