@@ -1,3 +1,17 @@
+## Startseite: KPI-Dashboard
+
+Die App startet unter [Start](https://metzgerhannes-oss.github.io/Badminton/#start) mit kompakten Kacheln für **DBV-Jahrgangsrang im Einzel, Doppel und Mixed**, **Trophäenschrank**, **erfasste Turniere** und **nächstes selbst angelegtes Turnier**. Der Spielerfilter gilt für alle Kacheln.
+
+### DBV-Jahrgangsplatz und Vorwochenvergleich
+
+Die öffentlich herunterladbaren wöchentlichen Excel-Archive der [DBV-Rangliste](https://turniere.badminton.de/ranking/history) werden in einem eigenen GitHub-Workflow unter `.github/workflows/ranking.yml` **jeden Donnerstag 15:00 UTC** geprüft (17:00 MESZ / 16:00 MEZ). GitHub-Schedules können verzögert laufen. Das heißt nicht, dass die DBV jeweils donnerstags veröffentlicht. Es werden die letzten beiden tatsächlich vorhandenen Kalenderwochen verwendet.
+
+Die Kacheln zeigen den **Rang innerhalb desselben Geburtsjahres, Geschlechts und derselben Disziplin**, berechnet aus den offiziell veröffentlichten Punkten: Rang = 1 + Anzahl höher bewerteter Spieler derselben Gruppe. Punktegleichstand = gleicher Rang. Das ist ein **berechneter Jahrgangsrang**, ausdrücklich **nicht** der bundesweite DBV-Gesamtrang.
+
+Mit zwei echten Kalenderwochenständen zeigt die App `↑` bei besserem Jahrgangsrang, `↓` bei schlechterem und `→` bei Gleichstand. Ohne verlässlichen Vergleich wird **kein** Pfeil behauptet. Der Altersklassenwechsel zum neuen Jahr und unbekannte Werte werden neutral dargestellt.
+
+Philipp hat die DBV-Spieler-ID `05-070879` und Jahrgang **2016 / U11 (2026)**. Charlotte hat noch keine gesicherte DBV-Spieler-ID; es werden keine Werte erfunden. Nur Ranglisten-Kennzahlen hinterlegter IDs werden in `data/ranking.json` veröffentlicht, nicht die vollständige Ranglistendatei. Bei Quellefehlern bleibt die letzte erfolgreiche Datei bestehen, vor dem ersten erfolgreichen Abruf steht „Noch keine Daten“. Öffentliche Download-Verfügbarkeit garantiert weder eine API noch den rechtlich uneingeschränkten automatischen Betrieb.
+
 # Schmetterlinge · Badminton Jugend Mössingen
 
 Die mobile Web-App für die Familie mit **historischen Turnierergebnissen**, **Trophäenschrank** und **gespeicherten offiziellen DBV-Turnierlinks**.
