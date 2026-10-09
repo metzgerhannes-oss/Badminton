@@ -74,11 +74,11 @@ function renderRank(){
  const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:chosen.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
  root.innerHTML=keys.map(key=>{
   const e=discs[key],title=rankNames[key],cohort=birth?(e?.ageClass||ageLabel(birth))+" · Jg. "+birth:"Jahrgang offen";
-  const bw=e?.bwRank!=null?'#'+num(e.bwAgeClassRank):"–",de=e?.yearRank!=null?'#'+num(e.ageClassRank):"–";
+  const bw=e?.bwAgeClassRank!=null?'#'+num(e.bwAgeClassRank):"–",de=e?.ageClassRank!=null?'#'+num(e.ageClassRank):"–";
   const movement=e?shortMovement(e.bwAgeClassChange,e.previousBwAgeClassRank,"BW-Plätze"):'<span class="movement movement-unknown">–</span>';
   return '<button class="ranking-tile ranking-compact" type="button" data-rank-discipline="'+escape(key)+'" '+(e?'':'disabled')+' aria-label="'+escape(title)+': BW '+bw+', Deutschland '+de+'">'+
   '<span class="ranking-top"><span>'+escape(title)+'</span></span>'+
-  '<span class="ranking-bw-title">BW · Altersklasse</span>'+
+  '<span class="ranking-bw-title">BW · '+escape(e?.ageClass||"AK")+'</span>'+
   '<span class="ranking-bw-row"><strong>'+bw+'</strong>'+movement+'</span>'+
   '<span class="ranking-de-row"><span title="Deutschland">DE</span><strong>'+de+'</strong></span>'+
   '<span class="ranking-compact-footer">'+escape(cohort)+' <span aria-hidden="true">›</span></span></button>';
