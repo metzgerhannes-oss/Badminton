@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "status": "available",
   "type": "dbv-published-excel-derived-ageclass-rank",
-  "checkedAt": "2026-10-09T18:11:08Z",
+  "checkedAt": "2026-10-09T18:55:05Z",
   "current": {
     "year": 2026,
     "week": 41,
@@ -36,7 +36,10 @@
           "previousAgeClassRank": 46,
           "previousPoints": 2515.0,
           "ageClassChange": 3,
-          "tournaments": 13
+          "tournaments": 13,
+          "countedLimit": 5,
+          "topFive": [],
+          "topFiveStatus": "not-in-public-export"
         },
         "HD": {
           "ageClass": "U11",
@@ -52,7 +55,10 @@
           "previousAgeClassRank": 165,
           "previousPoints": 790.0,
           "ageClassChange": 47,
-          "tournaments": 3
+          "tournaments": 3,
+          "countedLimit": 5,
+          "topFive": [],
+          "topFiveStatus": "not-in-public-export"
         },
         "HM": {
           "ageClass": "U11",
@@ -68,7 +74,10 @@
           "previousAgeClassRank": 20,
           "previousPoints": 1469.0,
           "ageClassChange": -1,
-          "tournaments": 2
+          "tournaments": 2,
+          "countedLimit": 5,
+          "topFive": [],
+          "topFiveStatus": "not-in-public-export"
         }
       }
     }
