@@ -1,75 +1,167 @@
 "use strict";
-const STORE="shuttleboard-v1";
-const PROFILE_URL="https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153";
-const DEFAULT_PLAYERS=[{id:"05-070879",name:"Philipp Metzger",url:PROFILE_URL},{id:"local-charlotte",name:"Charlotte Metzger",url:""}];
-const FEED_URL="./data/live.json";
-const STATUSES={scheduled:"Geplant",ready:"Spielbereit",called:"Aufgerufen",live:"Läuft",finished:"Beendet",delayed:"Verspätet",cancelled:"Abgesagt"};
-const state={players:DEFAULT_PLAYERS,officialLinks:[],chosen:"all",filter:"all",page:"heute",demo:false,feed:null,error:null,seen:new Map(),initialized:false,loading:false};
+/** Schmetterlinge: historical results and official tournament bookmarks. No live-result polling. */
+const STORE="shuttleboard-v1"; // Preserve existing device favourites.
+const DEFAULT_PLAYERS=[
+ {id:"05-070879",name:"Philipp Metzger",url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
+ {id:"local-charlotte",name:"Charlotte Metzger",url:""}
+];
+const state={players:DEFAULT_PLAYERS.map(p=>({...p})),officialLinks:[],chosen:"all",page:"historie"};
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"?u.href:""}catch{return ""}};
-const isDbvTournamentUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"&&["dbv.turnier.de","www.turnier.de","turnier.de"].includes(u.hostname)&&u.pathname.toLowerCase().startsWith("/tournament/")&&u.pathname.length>12}catch{return false}};
-
-const todayISO=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-const dateFmt=new Intl.DateTimeFormat("de-DE",{timeZone:"Europe/Berlin",weekday:"short",day:"2-digit",month:"2-digit"});
-const timeFmt=new Intl.DateTimeFormat("de-DE",{timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"});
-function clock(iso){if(!iso||Number.isNaN(Date.parse(iso)))return "Zeit offen";return timeFmt.format(new Date(iso))}
-function day(iso){if(!iso||Number.isNaN(Date.parse(iso)))return "Termin offen";return dateFmt.format(new Date(iso))}
-function storage(){try{const p=JSON.parse(localStorage.getItem(STORE));if(!p||typeof p!=="object")return;if(Array.isArray(p.players))state.players=p.players.filter(x=>x&&typeof x.name==="string"&&typeof x.id==="string").slice(0,12);if(Array.isArray(p.officialLinks))state.officialLinks=p.officialLinks.filter(x=>x&&typeof x.url==="string"&&isDbvTournamentUrl(x.url)).slice(0,25);if(!p.historyProfilesInitialized&&!state.players.some(x=>x.name==="Charlotte Metzger"))state.players.push({id:"local-charlotte",name:"Charlotte Metzger",url:""});if(typeof p.chosen==="string")state.chosen=p.chosen;if(typeof p.demo==="boolean")state.demo=p.demo}catch{}}
-function save(){try{localStorage.setItem(STORE,JSON.stringify({players:state.players,officialLinks:state.officialLinks,chosen:state.chosen,demo:state.demo,historyProfilesInitialized:true}))}catch{}}
-function toast(t){const x=el("toast");x.textContent=t;x.classList.add("visible");clearTimeout(toast.t);toast.t=setTimeout(()=>x.classList.remove("visible"),2900)}
-function demoFeed(){const at=(h,m)=>{const d=new Date();d.setHours(h,m,0,0);return d.toISOString()};return {schemaVersion:1,connection:"demo",updatedAt:new Date().toISOString(),source:{name:"Beispieldaten (keine DBV-Ergebnisse)",url:""},tournaments:[{id:"demo-u11",name:"DEMO · Jugend-Ranglistenturnier",location:"Musterstadt",startDate:todayISO(),url:""}],matches:[
-{id:"demo-1",tournamentId:"demo-u11",discipline:"Jungeneinzel U11",scheduledAt:at(11,0),court:"2",status:"finished",players:["Philipp Metzger","Beispielgegner A"],playerIds:["05-070879"],score:"21:15 · 21:18"},
-{id:"demo-2",tournamentId:"demo-u11",discipline:"Jungeneinzel U11",scheduledAt:at(14,30),court:"4",status:"scheduled",players:["Philipp Metzger","Beispielgegner B"],playerIds:["05-070879"],score:""},
-{id:"demo-3",tournamentId:"demo-u11",discipline:"Jungendoppel U11",scheduledAt:at(16,0),court:"",status:"scheduled",players:["Philipp / Partner","Beispielteam"],playerIds:["05-070879"],score:""}
-]}}
-function validFeed(data){if(!data||!Array.isArray(data.matches)||!Array.isArray(data.tournaments))throw Error("Ungültiges Datenformat");return {schemaVersion:1,connection:typeof data.connection==="string"?data.connection:"connected",updatedAt:typeof data.updatedAt==="string"?data.updatedAt:null,source:data.source&&typeof data.source==="object"?data.source:{name:"Datenquelle",url:""},matches:data.matches.slice(0,2000).filter(x=>x&&typeof x.id==="string"&&typeof x.status==="string").map(x=>({id:x.id,tournamentId:String(x.tournamentId??""),discipline:String(x.discipline??""),scheduledAt:String(x.scheduledAt??""),court:String(x.court??""),status:STATUSES[x.status]?x.status:"scheduled",players:Array.isArray(x.players)?x.players.slice(0,4).map(String):[],playerIds:Array.isArray(x.playerIds)?x.playerIds.map(String):[],score:String(x.score??""),url:safeUrl(x.url??"")})),tournaments:data.tournaments.slice(0,300).filter(x=>x&&typeof x.id==="string").map(x=>({id:x.id,name:String(x.name??""),location:String(x.location??""),startDate:String(x.startDate??""),url:safeUrl(x.url??"")}))}}
-async function refresh(silent=false){if(state.loading)return;state.loading=true;el("refresh").disabled=true;try{const r=await fetch(FEED_URL+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const feed=validFeed(await r.json());const previous=state.feed;state.feed=feed;state.error=null;if(previous&&feed.connection==="connected"&&previous.connection==="connected")notifyChanges(previous,feed);if(!silent)toast(feed.connection==="unconfigured"?"Live-Quelle noch nicht verbunden":"Daten aktualisiert")}catch(err){state.error="Die Ergebnisquelle konnte nicht geladen werden.";if(!silent)toast(state.error)}finally{state.loading=false;el("refresh").disabled=false;render()}}
-function matches(){const feed=state.demo?demoFeed():state.feed;let list=feed?.matches??[];if(state.chosen!=="all")list=list.filter(m=>m.playerIds.includes(state.chosen));return list.slice().sort((a,b)=>(Date.parse(a.scheduledAt)||0)-(Date.parse(b.scheduledAt)||0))}
-function tournaments(){return (state.demo?demoFeed():state.feed)?.tournaments??[]}
-function renderPlayers(){const parts=[{id:"all",name:"Alle Spieler"},...state.players];el("player-pills").innerHTML=parts.map(p=>'<button class="pill '+(state.chosen===p.id?"selected":"")+'" data-player="'+esc(p.id)+'" aria-pressed="'+(state.chosen===p.id)+'">'+(p.id==="all"?"":'<span>'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>')+esc(p.name)+'</button>').join("");document.querySelectorAll("[data-player]").forEach(b=>b.addEventListener("click",()=>{state.chosen=b.dataset.player;save();render()}))}
-function renderSource(){const f=state.demo?demoFeed():state.feed;const badge=el("feed-badge");const configured=f?.connection==="connected";const stale=configured&&(!f.updatedAt||Date.now()-Date.parse(f.updatedAt)>15*60*1000);badge.className="source-badge "+(state.demo?"warn":configured&&!stale?"ok":"warn");badge.textContent=state.demo?"DEMO · keine echten Daten":configured?(stale?"Quelle veraltet":"Datenquelle verbunden"):"Live-Quelle nicht verbunden";el("last-update").textContent=f?.updatedAt?"Stand: "+day(f.updatedAt)+", "+clock(f.updatedAt):"";el("feed-detail").textContent="Feed: "+FEED_URL+" · "+(f?.source?.name??"nicht verbunden");const n=el("source-notice");n.textContent=state.demo?"DEMO: Alle Namen, Spielzeiten, Felder und Ergebnisse unten sind erfunden und dienen nur zum Testen.":state.error?state.error:!configured?"Noch kein automatischer DBV-Live-Feed eingerichtet. Offizielle Spielerprofile und Turniere bleiben verlinkt; die App erfindet keine Ansetzungen.":stale?"Die letzten Daten sind älter als 15 Minuten. Spielzeiten und Felder unbedingt beim Veranstalter prüfen.":"Spielzeiten können sich kurzfristig ändern. Maßgeblich ist stets der offizielle Aufruf vor Ort.";el("demo-toggle").textContent=state.demo?"Demo-Modus beenden":"Demo-Modus starten"}
-function topMatchCard(m){const tr=tournaments().find(t=>t.id===m.tournamentId);return '<div class="next-card"><div class="match-overline"><span>◉ NÄCHSTES MATCH</span><span>'+esc(m.discipline||"Badminton")+'</span></div><div class="next-head"><strong>'+esc(clock(m.scheduledAt))+'</strong><span class="court-tag">'+esc(m.court?"Feld "+m.court:"Feld offen")+'</span></div><div class="versus">'+esc(m.players[0]||"Spieler offen")+'<small>gegen</small>'+esc(m.players[1]||"Gegner noch offen")+'</div><div class="note">'+esc(tr?.name??"Turnier offen")+' · '+esc(day(m.scheduledAt))+' · '+esc(STATUSES[m.status])+' · geplante Zeit, kein garantierter Aufruf</div></div>'}
-function matchCard(m){const tr=tournaments().find(t=>t.id===m.tournamentId);const url=safeUrl(m.url||tr?.url||"");return '<article class="match-card"><div class="match-top"><span class="match-state '+esc(m.status)+'">'+esc(STATUSES[m.status])+'</span><span class="muted">'+esc(m.discipline||"Disziplin offen")+'</span></div><div class="match-detail"><div class="match-players">'+esc(m.players[0]||"Spieler offen")+'<small>vs.</small>'+esc(m.players[1]||"Gegner offen")+'</div><div class="match-time">'+esc(m.status==="finished"?m.score||"Ergebnis offen":clock(m.scheduledAt))+'<small>'+esc(m.court?"Feld "+m.court:day(m.scheduledAt))+'</small></div></div><div class="match-foot"><span>'+esc(tr?.name||"Turnier")+'</span>'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Original ↗</a>':"")+'</div></article>'}
-function empty(title,desc){return '<div class="empty"><div class="empty-icon">◈</div><h3>'+esc(title)+'</h3><p>'+esc(desc)+'</p></div>'}
-function renderToday(){const all=matches();const upcoming=all.filter(m=>["scheduled","ready","called","live","delayed"].includes(m.status)).sort((a,b)=>(a.status==="live"?-1:0)-(b.status==="live"?-1:0)||(Date.parse(a.scheduledAt)||0)-(Date.parse(b.scheduledAt)||0));el("today-label").textContent=dateFmt.format(new Date());el("next-match").innerHTML=upcoming.length?topMatchCard(upcoming[0]):empty("Kein nächstes Match gemeldet",state.demo?"In diesen Beispieldaten sind keine weiteren Begegnungen geplant.":"Die Live-Datenquelle hat aktuell keine anstehenden Spiele für die Auswahl.");let chosen=state.filter==="finished"?all.filter(m=>m.status==="finished"):state.filter==="upcoming"?upcoming:all;el("matches-count").textContent=chosen.length+" Spiele";el("match-list").innerHTML=chosen.length?chosen.map(matchCard).join(""):empty("Keine Spiele vorhanden",state.demo?"Für diesen Filter gibt es keine Beispielspiele.":"Sobald die Quelle ein Spiel veröffentlicht, erscheint es hier.");document.querySelectorAll(".segment").forEach(b=>{const selected=b.dataset.filter===state.filter;b.classList.toggle("selected",selected);b.setAttribute("aria-pressed",selected)})}
-function officialForSelection(){return state.officialLinks.filter(x=>state.chosen==="all"||x.playerId===state.chosen)}
-function renderOfficialLive(){
- const entries=officialForSelection();
- const selected=state.players.find(p=>p.id===state.chosen);
- const first=entries[0];
- const url=first?.url||safeUrl(selected?.url)||"https://dbv.turnier.de/";
- const label=first?"Offiziellen Live-Spielplan öffnen":selected?.url?"Offizielles Spielerprofil öffnen":"DBV-Turnierportal öffnen";
- el("official-live-link").innerHTML='<a class="official-live-card" href="'+esc(url)+'" rel="noopener noreferrer" target="_blank"><span class="official-symbol" aria-hidden="true">↗</span><span class="official-copy"><strong>'+esc(label)+'</strong><small>'+(first?esc(first.name)+" · Direkt bei DBV/Tournament Software":"Echte Spielansetzungen beim DBV prüfen")+'</small></span><span class="official-arrow" aria-hidden="true">›</span></a>';
+function parseDbvTournamentLink(value){
+ try{
+  const u=new URL(String(value).trim());
+  if(u.protocol!=="https:"||!["dbv.turnier.de","turnier.de","www.turnier.de"].includes(u.hostname))return null;
+  const m=u.pathname.match(/^\/tournament\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
+  if(!m)return null;
+  const id=m[1].toUpperCase();
+  return {id,url:"https://dbv.turnier.de/tournament/"+id};
+ }catch{return null}
 }
-function renderTournaments(){const used=state.chosen==="all"?tournaments():tournaments().filter(t=>matches().some(m=>m.tournamentId===t.id));el("tournament-list").innerHTML=used.length?used.map(t=>'<div class="tournament-card"><h3>'+esc(t.name)+'</h3><p>'+esc(t.location||"Ort offen")+'</p><span class="muted">'+esc(t.startDate?day(t.startDate):"Termin offen")+'</span>'+(safeUrl(t.url)?'<p style="margin-top:12px"><a href="'+esc(safeUrl(t.url))+'" target="_blank" rel="noopener noreferrer">Turnier öffnen ↗</a></p>':"")+'</div>').join(""):empty("Noch keine Turniere geladen","Turniere erscheinen hier, sobald eine Datenquelle verbunden ist.")}
-function renderSavedTournaments(){
- const items=officialForSelection();
- el("official-tournament-list").innerHTML=items.map((t,i)=>'<div class="tournament-card"><h3>'+esc(t.name)+'</h3><p>Offizieller DBV-Spielplan · direkt beim Anbieter</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">Spielplan öffnen ↗</a><button class="remove-button" data-remove-link="'+esc(t.url)+'">Entfernen</button></div></div>').join("");
- document.querySelectorAll("[data-remove-link]").forEach(b=>b.addEventListener("click",()=>{state.officialLinks=state.officialLinks.filter(t=>t.url!==b.dataset.removeLink);save();render()}));
+function normalizeBookmark(x){
+ const p=parseDbvTournamentLink(x?.url);
+ if(!p)return null;
+ const title=String(x.name||"").trim().slice(0,100)||"DBV-Turnier "+p.id.slice(0,8);
+ const validDate=d=>typeof d==="string"&&/^\d{4}-\d\d-\d\d$/.test(d)&&!Number.isNaN(Date.parse(d))?d:"";
+ return {id:p.id,url:p.url,name:title,playerId:String(x.playerId||"all"),startDate:validDate(x.startDate),endDate:validDate(x.endDate)};
 }
-function renderProfiles(){el("profile-list").innerHTML=state.players.map(p=>'<article class="profile-card"><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+'</p>'+(safeUrl(p.url)?'<a target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(p.url))+'">Offizielles DBV-Profil ↗</a>':"")+'</div><button class="remove-button" data-remove="'+esc(p.id)+'" aria-label="Spieler entfernen">Entfernen</button></article>').join("");document.querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>{if(!confirm("Spieler aus dieser App entfernen?"))return;state.players=state.players.filter(p=>p.id!==b.dataset.remove);state.officialLinks=state.officialLinks.filter(t=>t.playerId!==b.dataset.remove);if(state.chosen===b.dataset.remove)state.chosen="all";save();render()}))}
-function render(){renderPlayers();renderSource();renderToday();renderOfficialLive();renderTournaments();renderSavedTournaments();renderProfiles();window.renderHistory?.(state.chosen,state.players);const page=["heute","turniere","historie","profil"].includes(state.page)?state.page:"heute";document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="view-"+page));document.querySelectorAll(".bottom-nav a").forEach(a=>{if(a.dataset.page===page)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")})}
-function notifyChanges(prev,now){if(typeof Notification==="undefined"||Notification.permission!=="granted")return;const old=new Map(prev.matches.map(m=>[m.id,m]));for(const m of now.matches){if(state.chosen!=="all"&&!m.playerIds.includes(state.chosen))continue;const p=old.get(m.id);if(!p)continue;if(p.status!==m.status&&["called","live","finished"].includes(m.status)){new Notification("Schmetterlinge · "+STATUSES[m.status],{body:(m.players.join(" – ")||"Badminton")+" · "+(m.court?"Feld "+m.court:"Feld offen"),icon:"./assets/spvgg-schmetterlinge.svg",tag:"match-"+m.id})}}}
-function setup(){storage();save();el("greeting").innerHTML="Dein Spieltag.<br><em>Jedes Match.</em>";state.page=(location.hash||"#heute").slice(1);el("refresh").addEventListener("click",()=>refresh());document.querySelectorAll(".segment").forEach(b=>b.addEventListener("click",()=>{state.filter=b.dataset.filter;renderToday()}));window.addEventListener("hashchange",()=>{state.page=(location.hash||"#heute").slice(1);render()});const dialog=el("player-dialog");for(const id of ["add-player","add-profile"])el(id).addEventListener("click",()=>dialog.showModal());el("cancel-dialog").addEventListener("click",()=>dialog.close());
- const tDialog=el("tournament-dialog");
- el("add-live-link").addEventListener("click",()=>{
-  const select=el("tournament-player");
-  select.innerHTML=state.players.map(p=>'<option value="'+esc(p.id)+'"'+(state.chosen===p.id?' selected':'')+'>'+esc(p.name)+'</option>').join("");
-  if(!state.players.length){toast("Bitte erst einen Spieler hinzufügen");return}
-  tDialog.showModal();
+const localDay=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+const niceDay=x=>x?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(x+"T12:00:00Z")):"";
+function restore(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(STORE)||"null");
+  if(saved&&typeof saved==="object"){
+   if(Array.isArray(saved.players))state.players=saved.players.filter(p=>p&&typeof p.name==="string"&&typeof p.id==="string").slice(0,12);
+   if(Array.isArray(saved.officialLinks))state.officialLinks=saved.officialLinks.map(normalizeBookmark).filter(Boolean).slice(0,40);
+   if(typeof saved.chosen==="string")state.chosen=saved.chosen;
+   if(!saved.historyProfilesInitialized&&!state.players.some(p=>p.name==="Charlotte Metzger"))
+    state.players.push({id:"local-charlotte",name:"Charlotte Metzger",url:""});
+  }
+ }catch{}
+ if(state.chosen!=="all"&&!state.players.some(p=>p.id===state.chosen))state.chosen="all";
+}
+function save(){
+ try{localStorage.setItem(STORE,JSON.stringify({players:state.players,officialLinks:state.officialLinks,chosen:state.chosen,historyProfilesInitialized:true}))}catch{}
+}
+let toastTimer;
+function toast(message){const node=el("toast");node.textContent=message;node.classList.add("visible");clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove("visible"),2800)}
+function selectedLinks(){return state.officialLinks.filter(t=>state.chosen==="all"||t.playerId==="all"||t.playerId===state.chosen)}
+function bookmarkPhase(t){
+ if(!t.startDate)return ["Termin offen","unknown"];
+ const today=localDay();
+ if(today<t.startDate)return ["Bevorstehend","future"];
+ const end=t.endDate&&t.endDate>=t.startDate?t.endDate:t.startDate;
+ if(today>end)return ["Vergangen","past"];
+ return ["Turniertag","today"];
+}
+function renderPlayers(){
+ const profiles=[{id:"all",name:"Alle Spieler"},...state.players];
+ el("player-pills").innerHTML=profiles.map(p=>'<button class="pill '+(p.id===state.chosen?"selected":"")+'" data-player="'+esc(p.id)+'" aria-pressed="'+(p.id===state.chosen)+'" type="button">'+(p.id==="all"?"":'<span>'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>')+esc(p.name)+'</button>').join("");
+ document.querySelectorAll("[data-player]").forEach(button=>button.addEventListener("click",()=>{state.chosen=button.dataset.player;save();render()}));
+}
+function renderTournaments(){
+ const sorted=selectedLinks().slice().sort((a,b)=>{
+  const order={today:0,future:1,unknown:2,past:3};
+  const aKind=bookmarkPhase(a)[1],bKind=bookmarkPhase(b)[1];
+  return order[aKind]-order[bKind]||(aKind==="past"?(b.startDate||"").localeCompare(a.startDate||""):(a.startDate||"").localeCompare(b.startDate||""))||a.name.localeCompare(b.name,"de");
  });
- el("cancel-tournament").addEventListener("click",()=>tDialog.close());
- el("tournament-form").addEventListener("submit",e=>{
-  e.preventDefault();
-  const values=new FormData(e.currentTarget);
-  const url=String(values.get("url")||"").trim();
-  if(!isDbvTournamentUrl(url)){toast("Bitte einen offiziellen DBV-Turnierlink eingeben");return}
-  const name=String(values.get("name")||"DBV-Turnier").trim().slice(0,100);
-  const playerId=String(values.get("playerId")||"");
-  if(!state.players.some(p=>p.id===playerId)){toast("Spieler nicht vorhanden");return}
-  if(state.officialLinks.some(t=>t.url===url&&t.playerId===playerId)){toast("Turnier bereits gespeichert");return}
-  state.officialLinks.unshift({playerId,name,url});
-  state.officialLinks=state.officialLinks.slice(0,25);save();tDialog.close();e.currentTarget.reset();render();toast("Offizieller Spielplan verlinkt");
- });el("player-form").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget);const name=String(f.get("name")||"").trim().slice(0,80);const id=String(f.get("id")||"").trim()||"local-"+Date.now();const url=safeUrl(f.get("url")||"");if(!name)return;if(state.players.some(x=>x.id===id)){toast("Spieler-ID bereits vorhanden");return}state.players.push({name,id,url});save();dialog.close();e.currentTarget.reset();render();toast("Spieler hinzugefügt")});el("demo-toggle").addEventListener("click",()=>{state.demo=!state.demo;save();render();toast(state.demo?"Demo-Daten aktiviert":"Demo beendet")});el("notify").addEventListener("click",async()=>{if(!("Notification" in window)){toast("Dieser Browser unterstützt keine Benachrichtigungen");return}const permission=await Notification.requestPermission();toast(permission==="granted"?"Hinweise aktiviert, solange die App offen ist":"Benachrichtigungen nicht erlaubt")});render();refresh(true);setInterval(()=>{if(document.visibilityState==="visible")refresh(true)},60000);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refresh(true)});if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{})}
+ const section=el("official-tournament-list");
+ if(!sorted.length){section.innerHTML='<div class="empty"><h3>Noch keine Turniere gespeichert</h3><p>Füge einen DBV-Turnierlink hinzu, den du nach der Anmeldung erhalten hast.</p></div>';return}
+ section.innerHTML=sorted.map(t=>{
+  const profile=t.playerId==="all"?"Alle Spieler":(state.players.find(p=>p.id===t.playerId)?.name||"Spieler");
+  const [phase,tone]=bookmarkPhase(t);
+  const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
+  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-id">Turnier-ID: '+esc(t.id)+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">Offizielle Turnierseite ↗</a><button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button><button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+ }).join("");
+ section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
+  const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
+  if(item)openTournamentForm(item);
+ }));
+ section.querySelectorAll("[data-remove-id]").forEach(button=>button.addEventListener("click",()=>{
+  const id=button.dataset.removeId,player=button.dataset.removePlayer;
+  state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
+  save();render();toast("Turnierlink entfernt");
+ }));
+}
+function renderProfiles(){
+ el("profile-list").innerHTML=state.players.map(p=>'<article class="profile-card"><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+'</p>'+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" rel="noopener noreferrer" target="_blank">Offizielles Spielerprofil ↗</a>':"")+'</div><button class="remove-button" data-remove-profile="'+esc(p.id)+'" type="button">Entfernen</button></article>').join("");
+ document.querySelectorAll("[data-remove-profile]").forEach(button=>button.addEventListener("click",()=>{
+  if(!confirm("Spieler aus dieser App entfernen?"))return;
+  const id=button.dataset.removeProfile;
+  state.players=state.players.filter(p=>p.id!==id);
+  state.officialLinks=state.officialLinks.filter(t=>t.playerId!==id);
+  if(state.chosen===id)state.chosen="all";
+  save();render();
+ }));
+}
+function render(){
+ renderPlayers();
+ renderTournaments();
+ renderProfiles();
+ window.renderHistory?.(state.chosen,state.players);
+ const page=["historie","turniere","profil"].includes(state.page)?state.page:"historie";
+ document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
+ document.querySelectorAll(".bottom-nav a").forEach(a=>{
+  if(a.dataset.page===page)a.setAttribute("aria-current","page");
+  else a.removeAttribute("aria-current");
+ });
+}
+let editing=null;
+function openTournamentForm(item=null){
+ const dialog=el("tournament-dialog");
+ const form=el("tournament-form");form.reset();
+ editing=item?{id:item.id,playerId:item.playerId}:null;
+ const chooser=el("tournament-player");
+ chooser.innerHTML='<option value="all">Alle Spieler</option>'+state.players.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join("");
+ const defaultPlayer=state.chosen==="all"?"all":state.chosen;
+ chooser.value=item?.playerId||defaultPlayer;
+ form.elements.name.value=item?.name||"";
+ form.elements.url.value=item?.url||"";
+ form.elements.startDate.value=item?.startDate||"";
+ form.elements.endDate.value=item?.endDate||"";
+ el("tournament-dialog-heading").textContent=item?"Turnier bearbeiten":"Turnier anlegen";
+ el("tournament-save").textContent=item?"Änderungen speichern":"Turnier speichern";
+ dialog.showModal();
+}
+function setup(){
+ restore();save();
+ state.page=(location.hash||"#historie").slice(1);
+ window.addEventListener("hashchange",()=>{state.page=(location.hash||"#historie").slice(1);render()});
+ const playerDialog=el("player-dialog"),playerForm=el("player-form");
+ for(const id of ["add-player","add-profile"])el(id).addEventListener("click",()=>playerDialog.showModal());
+ el("cancel-dialog").addEventListener("click",()=>playerDialog.close());
+ playerForm.addEventListener("submit",event=>{
+  event.preventDefault();
+  const data=new FormData(playerForm);
+  const name=String(data.get("name")||"").trim().slice(0,80);
+  const id=String(data.get("id")||"").trim()||"local-"+Date.now();
+  if(!name||state.players.some(p=>p.id===id)){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
+  state.players.push({id,name,url:safeUrl(data.get("url")||"")});
+  save();render();playerDialog.close();playerForm.reset();toast("Spieler gespeichert");
+ });
+ const tournamentDialog=el("tournament-dialog");
+ el("add-tournament").addEventListener("click",()=>openTournamentForm());
+ el("cancel-tournament").addEventListener("click",()=>tournamentDialog.close());
+ el("tournament-form").addEventListener("submit",event=>{
+  event.preventDefault();
+  const data=new FormData(event.currentTarget);
+  const parsed=parseDbvTournamentLink(data.get("url"));
+  if(!parsed){toast("Bitte eine gültige DBV-Turnier-URL mit Turnier-ID verwenden");return}
+  const playerId=String(data.get("playerId")||"all");
+  if(playerId!=="all"&&!state.players.some(p=>p.id===playerId)){toast("Spieler nicht gefunden");return}
+  const start=String(data.get("startDate")||"");
+  const end=String(data.get("endDate")||"");
+  if(start&&end&&end<start){toast("Das Enddatum liegt vor dem Beginn");return}
+  const bookmark=normalizeBookmark({url:parsed.url,playerId,name:data.get("name"),startDate:start,endDate:end});
+  const duplicate=state.officialLinks.some(t=>t.id===bookmark.id&&t.playerId===bookmark.playerId&&(!editing||t.id!==editing.id||t.playerId!==editing.playerId));
+  if(duplicate){toast("Das Turnier ist für diesen Spieler bereits gespeichert");return}
+  if(editing)state.officialLinks=state.officialLinks.filter(t=>!(t.id===editing.id&&t.playerId===editing.playerId));
+  state.officialLinks.unshift(bookmark);
+  state.officialLinks=state.officialLinks.slice(0,40);
+  editing=null;save();render();tournamentDialog.close();event.currentTarget.reset();toast("Turnier gespeichert");
+ });
+ render();
+ if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
+}
 document.addEventListener("DOMContentLoaded",setup);
