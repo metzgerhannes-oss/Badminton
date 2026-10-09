@@ -194,11 +194,13 @@ function openTournamentForm(item=null){
  dialog.showModal();
 }
 function setup(){
+ let freshDevice=false;
+ try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();
  state.page=(location.hash||"#start").slice(1);
  window.addEventListener("hashchange",()=>{state.page=(location.hash||"#start").slice(1);render()});
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
- let editingPlayerId=null;
+ let editingPlayerId=null,activatingNewProfile=false;
  function openPlayerForm(p=null){
   editingPlayerId=p?.id||null;
   playerForm.reset();
@@ -211,7 +213,10 @@ function setup(){
  }
  window.openPlayerForm=openPlayerForm;
  el("add-player").addEventListener("click",()=>openPlayerForm());
- el("cancel-dialog").addEventListener("click",()=>playerDialog.close());
+ el("cancel-dialog").addEventListener("click",()=>{
+  playerDialog.close();
+  if(activatingNewProfile){activatingNewProfile=false;el("first-run-dialog").showModal();}
+ });
  playerForm.addEventListener("submit",event=>{
   event.preventDefault();
   const data=new FormData(playerForm);
@@ -224,7 +229,9 @@ function setup(){
   else{
    if(state.friends.some(p=>p.id===id)){toast("Diese Spieler-ID ist bereits ein Freund");return}
    state.players.push(record);
-   if(!state.activeProfileId)state.activeProfileId=id;
+   if(activatingNewProfile||!state.activeProfileId)state.activeProfileId=id;
+   if(activatingNewProfile){state.viewingFriendId=null;state.chosen=id;location.hash="#start";}
+   activatingNewProfile=false;
   }
   editingPlayerId=null;
   save();render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
@@ -282,6 +289,20 @@ function setup(){
   editing=null;save();render();tournamentDialog.close();event.currentTarget.reset();toast("Turnier gespeichert");
  });
  render();
+ if(freshDevice){
+  const welcome=el("first-run-dialog");
+  const chooser=el("first-run-choices");
+  chooser.innerHTML=state.players.map(p=>'<button class="first-run-choice" type="button" data-initial-player="'+esc(p.id)+'"><span>'+esc(p.name.charAt(0).toUpperCase())+'</span><strong>'+esc(p.name)+'</strong><span aria-hidden="true">›</span></button>').join("");
+  chooser.querySelectorAll("[data-initial-player]").forEach(b=>b.addEventListener("click",()=>{
+   state.activeProfileId=b.dataset.initialPlayer;
+   state.viewingFriendId=null;state.chosen=state.activeProfileId;save();
+   welcome.close();location.hash="#start";render();
+  }));
+  el("first-run-new").addEventListener("click",()=>{
+   welcome.close();activatingNewProfile=true;openPlayerForm();
+  });
+  welcome.showModal();
+ }
  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 document.addEventListener("DOMContentLoaded",setup);
