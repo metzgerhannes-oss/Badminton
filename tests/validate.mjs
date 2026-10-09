@@ -9,4 +9,9 @@ if(data.connection==="unconfigured")assert.equal(data.matches.length,0,"Do not s
 const page=await readFile("index.html","utf8");
 for(const id of ["match-list","player-pills","profile-list","player-dialog","demo-toggle","next-match"])assert.ok(page.includes('id="'+id+'"'));
 assert.ok(page.includes("assets/spvgg-schmetterlinge.svg"),"Missing approved Schmetterlinge emblem");
-console.log("Starter snapshot, branding and app structure valid.");
+const {createHash}=await import("node:crypto");
+const crest=await readFile("assets/spvgg-schmetterlinge.svg","utf8");
+const embedded=crest.match(/data:image\/webp;base64,([^"]+)/)?.[1];
+assert.ok(embedded,"Original Schmetterlinge crest must be embedded");
+assert.equal(createHash("sha256").update(Buffer.from(embedded,"base64")).digest("hex"),"8aced9ebd1eb23035fd59a18d2ddb332ac6c754da11328011f9e3613a32d1fb3","Use only the approved logo supplied on 9 October 2026");
+console.log("Starter snapshot, original crest and app structure valid.");
