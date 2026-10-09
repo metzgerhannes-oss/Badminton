@@ -10,7 +10,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <script defer src="./app.js"></script>
-<script defer src="./history.js"></script>
+<script type="module" src="./history.js"></script>
 </head>
 <body>
 <div class="app">
@@ -59,6 +59,14 @@
         <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
         <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
       </div>
+      <section class="trophy-section" aria-labelledby="trophy-heading">
+        <div class="section-heading"><h3 id="trophy-heading">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
+        <p class="trophy-description">Deine gesammelten Turniererfolge – jeder Platz erzählt eine Geschichte.</p>
+        <div id="trophy-shelf" class="trophy-shelf" role="group" aria-label="Auszeichnungen nach Platzierung"></div>
+        <div class="trophy-awards-heading"><h3 id="trophy-awards-heading">Auszeichnungen</h3><button id="trophy-show-all" class="subtle-button" type="button">Alle anzeigen</button></div>
+        <div id="trophy-awards" class="trophy-awards" aria-live="polite"></div>
+      </section>
+      <div class="section-heading history-chronicle-title"><h3>Turnierchronik</h3><span class="muted">Alle Platzierungen</span></div>
       <div id="history-trends" class="history-trends"></div>
       <div id="history-timeline" class="history-timeline"></div>
       <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine seriöse Verlaufsgrafik folgt, sobald mehrere datierte Ranglistenstände vorhanden sind. Einzelne Platzierungen unterschiedlicher Altersklassen werden nicht zu einer künstlichen Leistungskurve verbunden.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuelle DBV-Rangliste ↗</a></div>
