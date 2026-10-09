@@ -9,7 +9,7 @@ const feed={updatedAt:sourceTime,tournaments:[tournament],matches:[
 ]};
 const json=normalizeAuthorizedFeed(JSON.stringify(feed),{allowedIds:playerIds});
 assert.equal(json.connection,"connected");
-assert.equal(json.updatedAt,sourceTime);
+assert.equal(json.updatedAt,"2026-10-09T12:00:00.000Z");
 assert.deepEqual(json.tournaments.map(t=>t.id),["event-1"]);
 assert.deepEqual(json.matches.map(m=>m.id),["match-1"],"No unrelated youth matches may be published");
 assert.equal(json.matches[0].scheduledAt,"2026-10-09T12:30:00.000Z");
