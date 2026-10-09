@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "curation": "public-club-reports",
+  "asOf": "2026-10-09",
+  "notes": "Verifizierte ausgewählte Platzierungen aus öffentlich zugänglichen Vereinsberichten, keine vollständige DBV-Matchdatenbank. Datumsangaben bei mehrtägigen Turnieren entsprechen dem Veranstaltungsbeginn. Einzelne Matches, Ranglistenverläufe und Oktober-Meisterschaftsergebnisse nicht erfunden.",
+  "players": {
+    "05-070879": "Philipp Metzger",
+    "Charlotte Metzger": "Charlotte Metzger"
+  },
+  "results": [
+    {
+      "id": "cm-2026-09-26-me",
+      "playerId": "Charlotte Metzger",
+      "date": "2026-09-26",
+      "event": "4. E-Rangliste Südwürttemberg U11–U19",
+      "location": "Ehingen",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 5,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-09-26-je",
+      "playerId": "05-070879",
+      "date": "2026-09-26",
+      "event": "4. E-Rangliste Südwürttemberg U11–U19",
+      "location": "Ehingen",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 4,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-04-24-jd",
+      "playerId": "05-070879",
+      "date": "2026-04-24",
+      "event": "3. C-Rangliste BW U11–U19",
+      "location": "Mössingen",
+      "level": "C",
+      "discipline": "Doppel",
+      "ageGroup": "U11",
+      "place": 2,
+      "partner": "Dimitri Kempe",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-04-24-je",
+      "playerId": "05-070879",
+      "date": "2026-04-24",
+      "event": "3. C-Rangliste BW U11–U19",
+      "location": "Mössingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 13,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-04-19-je",
+      "playerId": "05-070879",
+      "date": "2026-04-19",
+      "event": "3. E-Rangliste BW Südwürttemberg U11–U19",
+      "location": "Gomaringen",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 6,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/3-e-rangliste-bw-suedwuerttemberg-u11-u19-am-19-april-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-02-28-je",
+      "playerId": "05-070879",
+      "date": "2026-02-28",
+      "event": "2. C-Rangliste BW U11–U19",
+      "location": "Friedrichshafen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 6,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-02-28-mx",
+      "playerId": "05-070879",
+      "date": "2026-02-28",
+      "event": "2. C-Rangliste BW U11–U19",
+      "location": "Friedrichshafen",
+      "level": "C",
+      "discipline": "Mixed",
+      "ageGroup": "U13",
+      "place": 6,
+      "partner": "Anneliese Zhu",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-02-08-je",
+      "playerId": "05-070879",
+      "date": "2026-02-08",
+      "event": "2. E-Rangliste BW Südwürttemberg U11–U19",
+      "location": "Dornstadt",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 5,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-e-rangliste-bw-suedwuerttemberg-u11-u19-am-08-februar-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2026-01-17-je",
+      "playerId": "05-070879",
+      "date": "2026-01-17",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 5,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2025-07-12-je",
+      "playerId": "05-070879",
+      "date": "2025-07-12",
+      "event": "34. Südwürttembergische Meisterschaft U11–U19",
+      "location": "Mössingen",
+      "level": "Meisterschaft",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 3,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"
+      },
+      "verified": true
+    },
+    {
+      "id": "pm-2025-05-24-je",
+      "playerId": "05-070879",
+      "date": "2025-05-24",
+      "event": "2. D-Rangliste BW Nordwürttemberg U11–U19",
+      "location": "Neuhausen auf den Fildern",
+      "level": "D",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 4,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025"
+      },
+      "verified": true
+    }
+  ]
+}
