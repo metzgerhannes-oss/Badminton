@@ -116,10 +116,10 @@ function openTournamentForm(item=null){
  chooser.innerHTML='<option value="all">Alle Spieler</option>'+state.players.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join("");
  const defaultPlayer=state.chosen==="all"?"all":state.chosen;
  chooser.value=item?.playerId||defaultPlayer;
- form.elements.name.value=item?.name||"";
- form.elements.url.value=item?.url||"";
- form.elements.startDate.value=item?.startDate||"";
- form.elements.endDate.value=item?.endDate||"";
+ form.elements.namedItem("name").value=item?.name||"";
+ form.elements.namedItem("url").value=item?.url||"";
+ form.elements.namedItem("startDate").value=item?.startDate||"";
+ form.elements.namedItem("endDate").value=item?.endDate||"";
  el("tournament-dialog-heading").textContent=item?"Turnier bearbeiten":"Turnier anlegen";
  el("tournament-save").textContent=item?"Änderungen speichern":"Turnier speichern";
  dialog.showModal();
