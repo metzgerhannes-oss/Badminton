@@ -32,6 +32,7 @@
     <div class="notice" id="source-notice" role="status"></div>
     <section class="page active" id="view-heute" aria-labelledby="heading-heute">
       <div class="section-heading"><h2 id="heading-heute">Turniertag</h2><span id="today-label" class="muted"></span></div>
+      <div id="official-live-link"></div>
       <div id="next-match"></div>
       <div class="section-heading extra"><h2>Alle Spiele</h2><span id="matches-count" class="muted"></span></div>
       <div class="segmented" role="group" aria-label="Spiele filtern">
@@ -42,9 +43,10 @@
       <div id="match-list" class="match-list"></div>
     </section>
     <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
-      <div class="section-heading"><h2 id="heading-turniere">Turniere</h2></div>
+      <div class="section-heading"><h2 id="heading-turniere">Turniere</h2><button class="subtle-button" id="add-live-link">+ DBV-Turnier verlinken</button></div>
       <p class="supporting">Turniere aus der angebundenen Datenquelle werden automatisch angezeigt. Du kannst auch direkt zum offiziellen DBV-Portal wechseln.</p>
       <div id="tournament-list" class="tournament-list"></div>
+      <div id="official-tournament-list" class="tournament-list"></div>
       <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierkalender öffnen<small>Offizielle Ausschreibungen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
     </section>
     <section class="page" id="view-profil" aria-labelledby="heading-profil">
@@ -74,6 +76,16 @@
     <label>DBV-Profil-Link <span class="muted">(optional)</span><input name="url" placeholder="https://dbv.turnier.de/player-profile/…" type="url"></label>
     <p class="small muted">Die Angaben bleiben auf diesem Gerät gespeichert. Für Live-Daten muss die ID von der angeschlossenen Quelle geliefert werden.</p>
     <button class="primary-button" type="submit">Spieler speichern</button>
+  </form>
+</dialog>
+<dialog id="tournament-dialog">
+  <form id="tournament-form" class="modal">
+    <div class="section-heading"><h2>Offiziellen Spielplan verlinken</h2><button id="cancel-tournament" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+    <label>Spieler<select name="playerId" id="tournament-player" required></select></label>
+    <label>Turniername<input name="name" maxlength="100" placeholder="z. B. Jugend-RLT Mössingen" required></label>
+    <label>DBV-Turnierlink<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>
+    <p class="small muted">Der Link öffnet den echten Live-Spielplan direkt bei DBV/Tournament Software. Shuttleboard erhält dadurch noch keinen automatischen Ergebniszugang. Der Favorit bleibt nur auf diesem Gerät.</p>
+    <button class="primary-button" type="submit">Live-Spielplan speichern</button>
   </form>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
