@@ -125,6 +125,21 @@ function renderProfiles(){
  }));
  el("current-account-label").textContent="Aktives Startprofil: "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"noch keines");
 }
+function renderFriendQuick(){
+ const root=el("dashboard-friends"); if(!root)return;
+ if(!state.friends.length){
+  root.innerHTML='<a class="friend-quick-add" href="#einstellungen"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Freund hinzufügen</span><span aria-hidden="true">↗</span></a>';
+  return;
+ }
+ const own=state.players.find(p=>p.id===state.activeProfileId);
+ const links=(state.viewingFriendId&&own?[{...own,isOwn:true}]:[]).concat(state.friends.map(p=>({...p,isOwn:false})));
+ root.innerHTML=links.map(p=>'<button type="button" class="friend-quick '+(state.viewingFriendId===p.id?'is-current':'')+'" data-friend-quick="'+esc(p.id)+'" data-is-own="'+(p.isOwn?'true':'false')+'" aria-label="'+esc(p.isOwn?'Zurück zu meinem Startprofil '+p.name:'KPIs von '+p.name)+'"><span class="friend-quick-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-quick-name">'+esc(p.isOwn?'Zu mir':p.name.split(" ")[0])+'</span></button>').join("");
+ root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.isOwn==="true"){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
+  else if(state.friends.some(p=>p.id===b.dataset.friendQuick)){state.viewingFriendId=b.dataset.friendQuick;state.chosen=b.dataset.friendQuick;}
+  location.hash="#start";render();
+ }));
+}
 function renderFriends(){
  const root=el("friend-list");
  root.innerHTML=state.friends.length?state.friends.map(p=>{
@@ -149,6 +164,7 @@ function render(){
  renderTournaments();
  renderProfiles();
  renderFriends();
+ renderFriendQuick();
  state.chosen=state.viewingFriendId||state.activeProfileId;
  const viewedProfiles=[...state.players,...state.friends];
  window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks,{mode:state.viewingFriendId?"friend":"own"});
