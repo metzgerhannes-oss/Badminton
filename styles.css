@@ -331,3 +331,69 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 #history-source[hidden]{display:none!important}
 
 .history-verification-link{display:inline-block;margin-left:12px;color:#a7e5ff!important;font-size:11px;font-weight:750}
+
+
+/* 2026 refresh: lighter club blue with clear, content-first surfaces.
+   Make the approved crest readable instead of the previous fading circular mask. */
+:root{background:#123758;color:#f2f9ff;color-scheme:dark}
+body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transparent 70%),linear-gradient(165deg,#204e73 0%,#153d62 45%,#102e50 100%);color:#f2f9ff}
+.topbar{height:88px}
+.brand{font-size:21px;gap:13px;letter-spacing:-.7px;line-height:1.07}
+.brand-logo{width:76px;height:76px;flex:none;background:#f9fcff;object-fit:contain;border:2px solid #d4eafa;border-radius:50%;padding:3px;box-shadow:0 4px 13px #05182f50;mask-image:none;-webkit-mask-image:none}
+.brand small{color:#c5dcf0;font-size:8px;letter-spacing:1.15px;line-height:1.45;margin-top:5px}
+.focused-profile{background:linear-gradient(128deg,#2b5c82,#1a466e);border-color:#7299bc;box-shadow:0 5px 19px #071c3040}
+.focus-profile-copy small,.focus-profile-copy>span{color:#d0e5f6}
+.focus-settings,.focus-switcher>summary{background:#376a8e;border-color:#83b3d2;color:#effbff}
+.focus-switcher-options{background:#245475;border-color:#90bcd6}
+.focus-switcher-options button:hover,.focus-switcher-options button[aria-current="true"]{background:#367ca5}
+.dashboard-heading h1{color:#f9fdff}
+.muted,.supporting,.dashboard-source{color:#bfd4e8}
+.ranking-tile.ranking-compact{background:linear-gradient(149deg,#30678d 0%,#214f78 60%,#1b456c 100%);border-color:#7ca7c7;box-shadow:0 5px 18px #09233b3d}
+.ranking-compact .ranking-top{color:#f8fdff}
+.ranking-bw-title{color:#c9e7f9}
+.ranking-de-row{border-color:#d0e7f050;color:#c5deef}
+.ranking-compact-footer{color:#b8d3e8}
+.ranking-compact-points{display:block;margin-top:9px;font-size:15px;line-height:1.2;font-weight:900;font-variant-numeric:tabular-nums;color:#f0faff;white-space:nowrap}
+.ranking-compact-points small{font-size:10px;font-weight:650;color:#c4e3f7}
+.kpi-tile,.kpi-wide,.dashboard-empty-tile{background:linear-gradient(145deg,#285879,#1b466d);border-color:#6f9fbe;box-shadow:0 5px 18px #0b24413a}
+.kpi-label,.kpi-sub,.kpi-wide small{color:#c6dfef}
+.upcoming-tournaments-section,.trophy-section{background:linear-gradient(147deg,#265778,#1a4369);border-color:#6399bc}
+.upcoming-tournament-row+.upcoming-tournament-row{border-top-color:#bbdbed42}
+.upcoming-tournament-info small{color:#c5ddee}
+.own-profile,.friend-card,.settings-card,.profile-card,.tournament-card,.link-tile,.notice,.pending-medal{background:linear-gradient(145deg,#265475,#1b4265);border-color:#5b8aaf}
+.ranking-dialog{background:linear-gradient(150deg,#285a7b,#183f63);border-color:#91bed9;color:#f9fdff}
+.ranking-dialog-stats>div{background:#2d6285;border-color:#70a0bf}
+.ranking-dialog-lead,.ranking-dialog-small{color:#d4e6f3}
+.ranking-score-total{display:grid;gap:4px;background:linear-gradient(120deg,#3b7aa2,#265879);border:1px solid #99c4df;border-radius:13px;padding:13px 15px;margin-top:12px}
+.ranking-score-total>span{font-size:11px;font-weight:800;color:#d2efff}
+.ranking-score-total strong{font-size:33px;line-height:1.12;font-weight:900;font-variant-numeric:tabular-nums}
+.ranking-score-total small{font-size:10px;color:#daebf8;line-height:1.55}
+.ranking-score-section{margin-top:18px}
+.ranking-score-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:9px}
+.ranking-score-head h3{font-size:14px;letter-spacing:-.2px;font-weight:850;margin:0}
+.ranking-score-head span{font-size:10px;color:#d1e7f4;white-space:nowrap}
+.ranking-score-list{border:1px solid #77a5c1;border-radius:12px;overflow:hidden}
+.ranking-score-row{display:flex;gap:10px;align-items:center;min-height:49px;padding:9px 12px;background:#285b7d}
+.ranking-score-row+.ranking-score-row{border-top:1px solid #d7eeff25}
+.ranking-score-position{width:22px;height:22px;display:grid;place-items:center;flex:none;border-radius:50%;font-size:11px;font-weight:850;background:#458db3;color:#fff}
+.ranking-score-event{min-width:0;flex:1;font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+.ranking-score-event strong{display:block;font-size:11px}
+.ranking-score-event small{display:block;color:#c4e0f1}
+.ranking-score-pending .ranking-score-event{color:#d0e3f0}
+.ranking-score-value{font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
+.ranking-score-link{color:#d2edff;font-weight:900}
+.ranking-score-note{margin:10px 2px;color:#cde1ed;font-size:11px;line-height:1.6}
+.bottom-nav{background:#194366f5;border-top:1px solid #77a3c1;box-shadow:0 -4px 25px #09243b4a}
+.bottom-nav a{color:#c4daec}
+.bottom-nav a[aria-current=page]{color:#b4ebff}
+@media(max-width:420px){
+ .topbar{height:83px}
+ .brand{font-size:18px;gap:11px}
+ .brand-logo{width:69px;height:69px}
+ .brand small{font-size:7px;letter-spacing:.78px}
+}
+@media(max-width:355px){
+ .brand{font-size:16px}
+ .brand-logo{width:61px;height:61px}
+ .brand small{font-size:6.5px}
+}
