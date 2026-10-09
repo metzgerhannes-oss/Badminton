@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1630">
+<meta name="description" content="Dein Badminton-Turniertag: nächste Spiele, Felder und Ergebnisse auf einen Blick.">
+<title>Shuttleboard · Badminton für die Familie</title>
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<script defer src="./app.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="#heute" aria-label="Shuttleboard Start"><span class="brand-icon">◈</span><span>shuttleboard<small>BADMINTON FÜR DIE FAMILIE</small></span></a>
+    <button class="icon-button" id="refresh" title="Ergebnisse neu laden" aria-label="Ergebnisse aktualisieren">↻</button>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span class="status-dot"></span> DEIN TURNIERBEGLEITER</div>
+      <h1 id="greeting">Alles im Blick.<br><em>Jedes Match.</em></h1>
+      <p>Spielzeiten, Spielfelder und Ergebnisse deiner Kinder – ohne Suchen durch Turnierseiten.</p>
+      <div class="hero-bottom"><span id="feed-badge" class="source-badge">Quelle wird geprüft</span><span id="last-update" class="last-update"></span></div>
+    </section>
+    <section class="player-bar" aria-label="Spielerfilter">
+      <div class="section-heading"><h2>Unsere Spieler</h2><button id="add-player" class="subtle-button">+ Spieler hinzufügen</button></div>
+      <div id="player-pills" class="player-pills"></div>
+    </section>
+    <div class="notice" id="source-notice" role="status"></div>
+    <section class="page active" id="view-heute" aria-labelledby="heading-heute">
+      <div class="section-heading"><h2 id="heading-heute">Turniertag</h2><span id="today-label" class="muted"></span></div>
+      <div id="next-match"></div>
+      <div class="section-heading extra"><h2>Alle Spiele</h2><span id="matches-count" class="muted"></span></div>
+      <div class="segmented" role="group" aria-label="Spiele filtern">
+        <button class="segment selected" data-filter="all" aria-pressed="true">Alle</button>
+        <button class="segment" data-filter="upcoming" aria-pressed="false">Anstehend</button>
+        <button class="segment" data-filter="finished" aria-pressed="false">Ergebnisse</button>
+      </div>
+      <div id="match-list" class="match-list"></div>
+    </section>
+    <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
+      <div class="section-heading"><h2 id="heading-turniere">Turniere</h2></div>
+      <p class="supporting">Turniere aus der angebundenen Datenquelle werden automatisch angezeigt. Du kannst auch direkt zum offiziellen DBV-Portal wechseln.</p>
+      <div id="tournament-list" class="tournament-list"></div>
+      <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierkalender öffnen<small>Offizielle Ausschreibungen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
+    </section>
+    <section class="page" id="view-profil" aria-labelledby="heading-profil">
+      <div class="section-heading"><h2 id="heading-profil">Spielerprofile</h2></div>
+      <div id="profile-list" class="profiles"></div>
+      <button id="add-profile" class="primary-button">+ Weiteren Spieler hinzufügen</button>
+      <div class="settings-card">
+        <h3>Live-Daten & Benachrichtigungen</h3>
+        <p>Bei einer freigegebenen JSON-Datenquelle aktualisiert sich die App automatisch alle 60 Sekunden. Benachrichtigungen funktionieren nur, solange die Seite geöffnet ist.</p>
+        <button id="notify" class="outline-button">Benachrichtigungen einschalten</button>
+        <button id="demo-toggle" class="outline-button">Demo-Modus starten</button>
+        <p id="feed-detail" class="small muted"></p>
+      </div>
+    </section>
+  </main>
+  <nav class="bottom-nav" aria-label="Hauptnavigation">
+    <a href="#heute" data-page="heute" aria-current="page"><span aria-hidden="true">⌂</span><small>Heute</small></a>
+    <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
+    <a href="#profil" data-page="profil"><span aria-hidden="true">◯</span><small>Profile</small></a>
+  </nav>
+</div>
+<dialog id="player-dialog">
+  <form id="player-form" class="modal">
+    <div class="section-heading"><h2>Spieler hinzufügen</h2><button id="cancel-dialog" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+    <label>Vorname oder Anzeigename<input name="name" placeholder="z. B. Charlotte" required maxlength="80"></label>
+    <label>DBV-Spieler-ID <span class="muted">(optional)</span><input name="id" placeholder="05-123456" maxlength="30" inputmode="text"></label>
+    <label>DBV-Profil-Link <span class="muted">(optional)</span><input name="url" placeholder="https://dbv.turnier.de/player-profile/…" type="url"></label>
+    <p class="small muted">Die Angaben bleiben auf diesem Gerät gespeichert. Für Live-Daten muss die ID von der angeschlossenen Quelle geliefert werden.</p>
+    <button class="primary-button" type="submit">Spieler speichern</button>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
