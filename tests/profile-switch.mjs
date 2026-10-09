@@ -17,14 +17,14 @@ const run=q=>vm.runInContext(q,context);
 run("renderFocusHeader()");
 assert.match(header.innerHTML,/class="focus-switcher"/,"Two own profiles should show a top switcher");
 assert.match(header.innerHTML,/data-switch-profile="05-070879"/);
-assert.match(header.innerHTML,/data-switch-profile="local-charlotte"/);
+assert.match(header.innerHTML,/data-switch-profile="05-071969"/);
 assert.match(header.innerHTML,/aria-current="true"/,"Selected player identified accessibly");
 assert.ok(!header.innerHTML.includes('href="#einstellungen">Wechseln'),"Should not redirect to settings to change players");
 
-assert.equal(run('setActiveProfile("local-charlotte")'),true);
-assert.equal(run("state.activeProfileId"),"local-charlotte");
-assert.equal(run("state.chosen"),"local-charlotte");
-assert.equal(JSON.parse(store.get("shuttleboard-v1")).activeProfileId,"local-charlotte");
+assert.equal(run('setActiveProfile("05-071969")'),true);
+assert.equal(run("state.activeProfileId"),"05-071969");
+assert.equal(run("state.chosen"),"05-071969");
+assert.equal(JSON.parse(store.get("shuttleboard-v1")).activeProfileId,"05-071969");
 run("renderFocusHeader()");
 assert.match(header.innerHTML,/Charlotte Metzger/);
 assert.match(header.innerHTML,/class="focus-switcher"/);
@@ -33,7 +33,7 @@ run('state.viewingFriendId="05-123456"');
 run("renderFocusHeader()"); // Friend not saved: safe missing-profile fallback.
 assert.doesNotMatch(header.innerHTML,/class="focus-switcher"/);
 run('state.viewingFriendId=null');
-run('state.players=state.players.filter(p=>p.id==="local-charlotte")');
+run('state.players=state.players.filter(p=>p.id==="05-071969")');
 run("renderFocusHeader()");
 assert.doesNotMatch(header.innerHTML,/class="focus-switcher"/,"One own profile must have no switcher");
 assert.doesNotMatch(header.innerHTML,/>Wechseln</,"One profile must not show a switch button");
