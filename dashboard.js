@@ -24,11 +24,28 @@ function ageLabel(y){
  const age=ranking?.current?.year&&y?ranking.current.year-y:undefined;
  return age==null?"Jahrgang "+y:age<=10?"U11":age<=12?"U13":age<=14?"U15":age<=16?"U17":age<=18?"U19":"U"+String(age+1);
 }
+function shortMovement(change,previous,label){
+ if(previous==null || change==null)return '<span class="movement movement-unknown" aria-label="Kein Vorwochenvergleich">–</span>';
+ if(change>0)return '<span class="movement movement-up" aria-label="'+change+' '+label+' verbessert">↑'+num(change)+'</span>';
+ if(change<0)return '<span class="movement movement-down" aria-label="'+Math.abs(change)+' '+label+' gefallen">↓'+num(Math.abs(change))+'</span>';
+ return '<span class="movement movement-same" aria-label="Unverändert zum letzten Wochenstand">→</span>';
+}
+function renderRankDetails(entry,discipline,cohort,url){
+ const modal=$("ranking-dialog"),body=$("ranking-detail-content");
+ if(!modal||!body)return;
+ const move=shortMovement(entry.bwChange,entry.previousBwRank,"BW-Plätze");
+ body.innerHTML='<h2>'+escape(discipline)+' · '+escape(cohort)+'</h2>'+
+  '<p class="ranking-dialog-lead">Jahrgangsplätze, aus der offiziellen DBV-Punkteliste errechnet.</p>'+
+  '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwRank!=null?'#'+num(entry.bwRank):'–')+'</strong><small>Vorwoche '+(entry.previousBwRank!=null?'#'+num(entry.previousBwRank):'–')+' · '+move+'</small></div>'+
+  '<div><span>Deutschland</span><strong>'+(entry.yearRank!=null?'#'+num(entry.yearRank):'–')+'</strong><small>Vorwoche '+(entry.previousYearRank!=null?'#'+num(entry.previousYearRank):'–')+'</small></div></div>'+
+  '<p class="ranking-dialog-small">'+num(entry.points)+' Punkte · BW-Vergleichsgruppe: '+num(entry.bwCohortSize)+' · Deutschland: '+num(entry.cohortSize)+'</p>'+
+  '<a class="ranking-dialog-link" href="'+escape(url)+'" rel="noopener noreferrer" target="_blank">Offizielle Excel-Rangliste ansehen ↗</a>';
+ modal.showModal();
+}
 function renderRank(){
  const root=$("dashboard-rankings"),source=$("dashboard-rank-source"),label=$("dashboard-week");
  if(!root||!source||!label)return;
- const current=ranking?.current;
- const prior=ranking?.previous;
+ const current=ranking?.current,prior=ranking?.previous;
  const working=ranking?.status==="available"&&current?.week&&current?.year;
  const today=new Date();
  const isoDate=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate()));
@@ -37,39 +54,41 @@ function renderRank(){
  const yearStart=new Date(Date.UTC(isoYear,0,1));
  const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
  const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
- label.textContent=working?"Archiv KW "+current.week+" / "+current.year:"DBV-Rangliste";
- source.innerHTML=working?'<span>Jahrgangsrang · Deutschland · offizielles Wochenarchiv</span><span>'+escape("KW "+current.week+(prior?" vs. KW "+prior.week:" · Vergleich folgt"))+'</span>':
+ label.textContent=working?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
+ source.innerHTML=working?'<span>Jahrgangsrang · BW & Deutschland</span><span>'+escape(prior?"Vergleich KW "+prior.week:"Vergleich folgt")+'</span>':
  '<span>Ranglistenwerte noch nicht importiert</span>';
- if(archiveBehind)source.innerHTML+='<a class="ranking-stale-link" href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Neuere DBV-Webwerte möglich · Aktuelle Rangliste prüfen ↗</a>';
- const chosen=profiles.filter(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
- if(!chosen.length){
-  root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Bitte die DBV-Spieler-ID im Profil hinterlegen. Nur so kann die Rangliste passend zum Geburtsjahr geladen werden.</small><span>Zu den Einstellungen ↗</span></a>';
+ if(archiveBehind)source.innerHTML+='<a class="ranking-stale-link" href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuellere Webwerte möglich · DBV ansehen ↗</a>';
+ const chosen=profiles.find(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
+ if(!chosen){
+  root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Für deine Jahrgangsränge bitte die DBV-Spieler-ID in den Einstellungen hinterlegen.</small><span>Einrichten ↗</span></a>';
   return;
  }
- const out=[];
- for(const p of chosen){
-  const player=ranking?.players?.[p.id];
-  const discs=player?.disciplines??{};
-  const known=Object.values(discs)[0];
-  const birth=known?.birthYear??p.birthYear;
-  if(!known && viewMode==="friend"){
-   const profileLink=p.url&&/^https:\/\//.test(p.url)?'<a class="friend-ranking-official" rel="noopener noreferrer" target="_blank" href="'+escape(p.url)+'">Offizielles Profil öffnen ↗</a>':"";
-   out.push('<div class="dashboard-empty-tile friend-ranking-empty"><strong>Rangliste noch nicht verfügbar</strong><small>Für '+escape(p.name)+' (DBV '+escape(p.id)+') liegen in der veröffentlichten wöchentlichen Datenauswahl noch keine Jahrgangsränge vor. Ein Freundes-Favorit allein löst noch keinen DBV-Import aus.</small>'+profileLink+'</div>');
-   continue;
-  }
-  const cohort=birth?"Jg. "+birth+" · "+ageLabel(birth):"Jahrgang noch offen";
-  const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:p.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
-  if(chosen.length>1)out.push('<div class="dashboard-group-name">'+escape(p.name)+' · '+escape(cohort)+'</div>');
-  for(const key of keys){
-   const entry=discs[key];
-   const title=rankNames[key];
-   const sub=entry?'Jahrgang '+entry.birthYear+' · '+escape(entry.ageClass||ageLabel(entry.birthYear)):(birth?cohort:"Jahrgang aus DBV noch nicht geladen");
-   out.push('<article class="ranking-tile"><div class="ranking-top"><span>'+escape(title)+'</span><span class="ranking-disc">'+escape(key)+'</span></div><div class="ranking-place">'+(entry?'#'+num(entry.yearRank):'–')+'</div><div class="ranking-desc">'+sub+'</div><div class="ranking-bottom">'+(entry?displayMovement(entry.change,entry.previousYearRank):'<span class="movement movement-unknown">Noch keine Daten</span>')+'</div>'+(entry?'<div class="ranking-points">'+num(entry.points)+' Punkte · '+num(entry.cohortSize)+' im Jahrgang</div>':'')+'</article>');
-  }
+ const player=ranking?.players?.[chosen.id],discs=player?.disciplines??{};
+ const known=Object.values(discs)[0];
+ const birth=known?.birthYear??chosen.birthYear;
+ if(!known&&viewMode==="friend"){
+  const profileLink=chosen.url&&/^https:\/\//.test(chosen.url)?'<a class="friend-ranking-official" rel="noopener noreferrer" target="_blank" href="'+escape(chosen.url)+'">Offizielles Spielerprofil ↗</a>':"";
+  root.innerHTML='<div class="dashboard-empty-tile friend-ranking-empty"><strong>Ranglisten-KPIs noch nicht verfügbar</strong><small>Für '+escape(chosen.name)+' wurde bisher kein offizieller Wochenstand in unsere Familien-Datenbasis übernommen.</small>'+profileLink+'</div>';
+  return;
  }
- root.innerHTML=out.join("");
- if(!working)source.innerHTML+='<a href="https://turniere.badminton.de/ranking/history" rel="noopener noreferrer" target="_blank">DBV-Quelle ↗</a>';
- else source.innerHTML+='<a href="'+escape(current.url||"https://turniere.badminton.de/ranking/history")+'" rel="noopener noreferrer" target="_blank">Originaldaten ↗</a>';
+ const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:chosen.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
+ root.innerHTML=keys.map(key=>{
+  const e=discs[key],title=rankNames[key],cohort=birth?"Jg. "+birth+" · "+(e?.ageClass||ageLabel(birth)):"Jahrgang offen";
+  const bw=e?.bwRank!=null?'#'+num(e.bwRank):"–",de=e?.yearRank!=null?'#'+num(e.yearRank):"–";
+  const movement=e?shortMovement(e.bwChange,e.previousBwRank,"BW-Plätze"):'<span class="movement movement-unknown">–</span>';
+  return '<button class="ranking-tile ranking-compact" type="button" data-rank-discipline="'+escape(key)+'" '+(e?'':'disabled')+' aria-label="'+escape(title)+': BW '+bw+', Deutschland '+de+'">'+
+  '<span class="ranking-top"><span>'+escape(title)+'</span></span>'+
+  '<span class="ranking-bw-title">BW · Jahrgang</span>'+
+  '<span class="ranking-bw-row"><strong>'+bw+'</strong>'+movement+'</span>'+
+  '<span class="ranking-de-row">Deutschland <strong>'+de+'</strong></span>'+
+  '<span class="ranking-compact-footer">'+escape(cohort)+' <span aria-hidden="true">›</span></span></button>';
+ }).join("");
+ const sourceUrl=current?.url||"https://turniere.badminton.de/ranking/history";
+ root.querySelectorAll("[data-rank-discipline]").forEach(button=>button.addEventListener("click",()=>{
+  const key=button.dataset.rankDiscipline,e=discs[key];
+  if(e)renderRankDetails(e,rankNames[key],"Jg. "+e.birthYear+" · "+(e.ageClass||ageLabel(e.birthYear)),sourceUrl);
+ }));
+ source.innerHTML+='<a href="'+escape(sourceUrl)+'" rel="noopener noreferrer" target="_blank">DBV-Quelle ↗</a>';
 }
 function renderOtherKpis(){
  const root=$("dashboard-kpis"),next=$("dashboard-next");
