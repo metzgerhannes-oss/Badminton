@@ -57,6 +57,8 @@ def parse_excel(contents: bytes) -> list[dict]:
         header=None
         for index,row in enumerate(iterator):
             fields={clean(cell):j for j,cell in enumerate(row) if cell is not None}
+            if "ranglistenplatz" in fields and "rang" not in fields: fields["rang"]=fields["ranglistenplatz"]
+            if "points" in fields and "punkte" not in fields: fields["punkte"]=fields["points"]
             if all(x in fields for x in ("dis","spielerid","gjahr","punkte")):
                 header=fields
                 break
