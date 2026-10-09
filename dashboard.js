@@ -31,6 +31,31 @@ function shortMovement(change,previous,label){
  if(change<0)return '<span class="movement movement-down" aria-label="'+Math.abs(change)+' '+label+' gefallen">↓'+num(Math.abs(change))+'</span>';
  return '<span class="movement movement-same" aria-label="Unverändert zum letzten Wochenstand">→</span>';
 }
+function renderFiveScores(entry){
+ // Five best official tournament valuations from the last 12 months.
+ // Rankings Excel contains only the aggregate, not individual valuations.
+ const raw=Array.isArray(entry.topFive)?entry.topFive:[];
+ const valid=raw.length>0&&raw.length<=5&&raw.every(x=>x&&typeof x.name==="string"&&x.name.trim()
+   &&Number.isFinite(x.points)&&x.points>=0&&typeof x.date==="string"
+   &&/^\\d{4}-\\d\\d-\\d\\d$/.test(x.date));
+ const reconciled=valid&&Math.abs(raw.reduce((sum,x)=>sum+x.points,0)-entry.points)<0.011;
+ const items=reconciled?raw:[];
+ const rows=Array.from({length:5},(_,i)=>{
+  const result=items[i];
+  if(result){
+   const href=/^https:\/\/(?:dbv\\.turnier\\.de|www\\.turnier\\.de|turnier\\.de)\/tournament\/[a-f0-9-]+\/?$/i.test(result.url||"")?result.url:null;
+   const title=escape(result.name);
+   return '<div class="ranking-score-row"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><strong>'+title+'</strong><small>'+escape(result.date)+'</small></span><strong class="ranking-score-value">'+num(result.points)+'</strong>'+(href?'<a class="ranking-score-link" href="'+escape(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Turnier öffnen">↗</a>':'')+'</div>';
+  }
+  return '<div class="ranking-score-row ranking-score-pending"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><span>Einzelwertung nicht verfügbar</span></span><span class="ranking-score-value" aria-label="Noch kein Punktwert">–</span></div>';
+ }).join("");
+ return '<section class="ranking-score-section" aria-label="Fünf beste Ranglistenwertungen">'+
+  '<div class="ranking-score-head"><h3>Die 5 besten Wertungen</h3><span>letzte 12 Monate</span></div>'+
+  '<div class="ranking-score-list">'+rows+'</div>'+
+  (reconciled?'<p class="ranking-score-note">Die fünf Wertungen entsprechen den offiziellen Gesamtpunkten.</p>':
+  '<p class="ranking-score-note">Der DBV veröffentlicht in der Excel-Rangliste nur die Gesamtpunkte und die Turnieranzahl. Die Punkte einzelner Turniere konnten noch nicht zuverlässig ausgelesen werden.</p>')+
+  '</section>';
+}
 function renderRankDetails(entry,discipline,cohort,url){
  const modal=$("ranking-dialog"),body=$("ranking-detail-content");
  if(!modal||!body)return;
@@ -39,7 +64,9 @@ function renderRankDetails(entry,discipline,cohort,url){
   '<p class="ranking-dialog-lead">Altersklassenplätze (z. B. U11 mit mehreren Geburtsjahrgängen), aus den offiziellen DBV-Punkten errechnet.</p>'+
   '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwAgeClassRank!=null?'#'+num(entry.bwAgeClassRank):'–')+'</strong><small>Vorwoche '+(entry.previousBwAgeClassRank!=null?'#'+num(entry.previousBwAgeClassRank):'–')+' · '+move+'</small></div>'+
   '<div><span>Deutschland</span><strong>'+(entry.ageClassRank!=null?'#'+num(entry.ageClassRank):'–')+'</strong><small>Vorwoche '+(entry.previousAgeClassRank!=null?'#'+num(entry.previousAgeClassRank):'–')+'</small></div></div>'+
-  '<p class="ranking-dialog-small">'+num(entry.points)+' Punkte · BW-Vergleichsgruppe: '+num(entry.bwAgeClassSize)+' · Deutschland: '+num(entry.ageClassSize)+'</p>'+
+  '<div class="ranking-score-total"><span>Gesamtpunkte</span><strong>'+num(entry.points)+'</strong><small>DBV · '+num(entry.tournaments)+' Turniere erfasst · beste 5 zählen</small></div>'+
+  '<p class="ranking-dialog-small">BW-Vergleichsgruppe: '+num(entry.bwAgeClassSize)+' · Deutschland: '+num(entry.ageClassSize)+'</p>'+
+  renderFiveScores(entry)+
   '<a class="ranking-dialog-link" href="'+escape(url)+'" rel="noopener noreferrer" target="_blank">Offizielle Excel-Rangliste ansehen ↗</a>';
  modal.showModal();
 }
@@ -82,6 +109,7 @@ function renderRank(){
   '<span class="ranking-bw-title">BW · '+escape(e?.ageClass||"AK")+'</span>'+
   '<span class="ranking-bw-row"><strong>'+bw+'</strong>'+movement+'</span>'+
   '<span class="ranking-de-row"><span title="Deutschland">DE</span><strong>'+de+'</strong></span>'+
+  '<span class="ranking-compact-points">'+(e&&Number.isFinite(e.points)?num(e.points)+' <small>Pts.</small>':'– <small>Pts.</small>')+'</span>'+
   '<span class="ranking-compact-footer">'+escape(cohort)+' <span aria-hidden="true">›</span></span></button>';
  }).join("");
  const sourceUrl=current?.url||"https://turniere.badminton.de/ranking/history";
