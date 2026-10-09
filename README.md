@@ -1,3 +1,13 @@
+## Vereinfachte Startseite: BW-Rang groß, Deutschland darunter
+
+Die Startseite zeigt je Disziplin (Einzel, Doppel, Mixed) **genau eine kompakte Kachel**: **BW-Jahrgangsrang groß**, Deutschland-Jahrgangsrang darunter und einen Pfeil für die Veränderung des **BW-Rangs zur Vorwoche**. Die Ranglistenwerte kommen aus den offiziellen DBV-Wochenarchiven; BW wird anhand des expliziten Felds `LVName = BAW-Baden-Württemberg` gefiltert, jeweils nach gleichem Jahrgang, Geschlecht und Disziplin. Der Vergleich ist eine eigene Kohortenberechnung, keine offizielle separate BW-Rangliste. Die Vergleichsgröße ist beim Antippen sichtbar, etwa beim Mixed mit wenigen gewerteten Spielern.
+
+**Kacheldetails** öffnen auf Fingertipp Punkte, BW-/Deutschland-Vorwoche, Größe der Vergleichsgruppen und Link zum Wochenarchiv. Darunter stehen nur der historische Trophäenschrank, die nächste selbst angelegte Turnierverknüpfung und die kompakte **Freunde-Leiste**. Ein Freund wird dort durch Antippen als aktive **Ansicht**, nicht als eigenes Standardprofil geöffnet; „Zu mir zurück“ führt zum eigenen Profil.
+
+**Kein Login beim Start:** Beim ersten Besuch auf einem neuen Gerät erscheint lediglich eine einmalige, kleine Auswahl des eigenen Spielerprofils bzw. „Anderen Spieler einrichten“ (kein Passwort, keine E-Mail). Auf dem Gerät wird die Auswahl lokal gespeichert; spätere Aufrufe öffnen direkt die persönliche Übersicht. Bestehende lokale Profildaten werden bei Updates nicht zurückgesetzt.
+
+**Grenze bei Freunden:** Ein Name und die DBV-ID auf der Freundesliste genügen für einen Schnellzugriff, noch nicht automatisch für den Import seiner offiziellen Wochenwerte. Wenn seine Rangliste nicht in der freigegebenen statischen Datenauswahl liegt, erscheint eine neutrale Meldung und gegebenenfalls der Link zum offiziellen Profil. Kein Ergebnis wird erfunden. Für echten, geräteübergreifenden automatischen Freundesimport ist später ein kontrollierter Backend-Prozess nötig; das statische Projekt veröffentlicht bewusst nicht die gesamte Kinder-Rangliste.
+
 ## Persönliche Startseite, Spielerprofile und Freunde
 
 **Ein aktives Spielerprofil statt Familien-Sammelansicht:** Die Startseite zeigt jeweils nur die Haupt-KPIs des ausgewählten eigenen Spielerprofils. Das persönliche Startprofil lässt sich unter **Einstellungen → Meine Spielerprofile** festlegen. Voreingestellt ist Philipp (DBV-ID `05-070879`); vorhandene lokale Einstellungen und selbst gespeicherte Turnierlinks werden übernommen. Weitere eigene Profile mit Name, optionaler DBV-ID, Geburtsjahr und DBV-Profillink lassen sich anlegen, bearbeiten und entfernen.
