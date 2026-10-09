@@ -32,29 +32,29 @@ function shortMovement(change,previous,label){
  return '<span class="movement movement-same" aria-label="Unverändert zum letzten Wochenstand">→</span>';
 }
 function renderFiveScores(entry){
- // Five best official tournament valuations from the last 12 months.
- // Rankings Excel contains only the aggregate, not individual valuations.
+ // Only explicitly verified individual DBV tournament valuations can be shown.
+ // The published Excel feed contains aggregate total and tournament count, not these items.
  const raw=Array.isArray(entry.topFive)?entry.topFive:[];
  const valid=raw.length>0&&raw.length<=5&&raw.every(x=>x&&typeof x.name==="string"&&x.name.trim()
    &&Number.isFinite(x.points)&&x.points>=0&&typeof x.date==="string"
    &&/^\d{4}-\d\d-\d\d$/.test(x.date));
  const reconciled=valid&&Math.abs(raw.reduce((sum,x)=>sum+x.points,0)-entry.points)<0.011;
- const items=reconciled?raw:[];
- const rows=Array.from({length:5},(_,i)=>{
-  const result=items[i];
-  if(result){
-   const href=/^https:\/\/(?:dbv\.turnier\.de|www\.turnier\.de|turnier\.de)\/tournament\/[a-f0-9-]+\/?$/i.test(result.url||"")?result.url:null;
-   const title=escape(result.name);
-   return '<div class="ranking-score-row"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><strong>'+title+'</strong><small>'+escape(result.date)+'</small></span><strong class="ranking-score-value">'+num(result.points)+'</strong>'+(href?'<a class="ranking-score-link" href="'+escape(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Turnier öffnen">↗</a>':'')+'</div>';
-  }
-  return '<div class="ranking-score-row ranking-score-pending"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><span>Einzelwertung nicht verfügbar</span></span><span class="ranking-score-value" aria-label="Noch kein Punktwert">–</span></div>';
+ const reference='https://dbv.turnier.de/ranking/ranking.aspx?rid=238';
+ if(!reconciled){
+  return '<section class="ranking-score-section ranking-score-unavailable" aria-label="Einzelwertungen ausstehend">'+
+   '<div class="ranking-score-head"><h3>Die besten 5 Wertungen</h3><span>letzte 12 Monate</span></div>'+
+   '<p class="ranking-score-note">Die Gesamtpunkte sind amtlich bestätigt. Die einzelnen Turnierwertungen stehen nicht im Excel-Export und wurden bisher nicht zuverlässig aus der DBV-Spielerrangliste übernommen. Es werden keine Punkte geschätzt.</p>'+
+   '<a class="ranking-score-source-link" href="'+reference+'" target="_blank" rel="noopener noreferrer">Einzelwertungen bei DBV prüfen ↗</a></section>';
+ }
+ const rows=raw.map((result,i)=>{
+  const href=/^https:\/\/(?:dbv\.turnier\.de|www\.turnier\.de|turnier\.de)\/tournament\/[a-f0-9-]+\/?$/i.test(result.url||"")?result.url:null;
+  return '<div class="ranking-score-row"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><strong>'+escape(result.name)+'</strong><small>'+escape(result.date)+'</small></span><strong class="ranking-score-value">'+num(result.points)+'</strong>'+(href?'<a class="ranking-score-link" href="'+escape(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Turnier öffnen">↗</a>':'')+'</div>';
  }).join("");
- return '<section class="ranking-score-section" aria-label="Fünf beste Ranglistenwertungen">'+
-  '<div class="ranking-score-head"><h3>Die 5 besten Wertungen</h3><span>letzte 12 Monate</span></div>'+
+ return '<section class="ranking-score-section" aria-label="Verifizierte Ranglistenwertungen">'+
+  '<div class="ranking-score-head"><h3>Die besten '+raw.length+' Wertungen</h3><span>letzte 12 Monate</span></div>'+
   '<div class="ranking-score-list">'+rows+'</div>'+
-  (reconciled?'<p class="ranking-score-note">Die fünf Wertungen entsprechen den offiziellen Gesamtpunkten.</p>':
-  '<p class="ranking-score-note">Der DBV veröffentlicht in der Excel-Rangliste nur die Gesamtpunkte und die Turnieranzahl. Die Punkte einzelner Turniere konnten noch nicht zuverlässig ausgelesen werden.</p>')+
-  '</section>';
+  '<p class="ranking-score-note">Die belegten Einzelwertungen ergeben zusammen die offiziellen Gesamtpunkte.</p>'+
+  '<a class="ranking-score-source-link" href="'+reference+'" target="_blank" rel="noopener noreferrer">DBV-Spielerrangliste öffnen ↗</a></section>';
 }
 function renderRankDetails(entry,discipline,cohort,url){
  const modal=$("ranking-dialog"),body=$("ranking-detail-content");
