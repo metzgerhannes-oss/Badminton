@@ -39,6 +39,10 @@ assert.ok(html.includes('id="friend-dialog"')&&html.includes('id="friend-list"')
 assert.ok(html.includes('id="profile-list"')&&html.includes('id="current-account-label"'));
 assert.ok(!html.includes('id="player-pills"'));
 assert.ok(html.includes('data-page="einstellungen"'));
+assert.ok(html.includes('id="first-run-dialog"')&&html.includes('id="first-run-new"'));
+assert.ok(html.includes('id="dashboard-friends"'));
+assert.ok(code.includes('freshDevice')&&code.includes('first-run-choices')&&code.includes('first-run-new'));
+assert.ok(code.includes('data-friend-quick')&&code.includes('renderFriendQuick()'));
 assert.ok(code.includes("data-view-friend")&&code.includes("data-unfollow")&&code.includes("data-edit-friend"));
 assert.ok(code.includes("window.renderDashboard?.(state.chosen,viewedProfiles"));
 assert.ok(dashboard.includes('viewMode==="friend"')&&dashboard.includes('friendNoHistory'));
