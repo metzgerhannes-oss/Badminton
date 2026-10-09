@@ -16,21 +16,33 @@ for(const r of history.results){
  assert.ok(r.playerId&&r.playerName);
  assert.equal(r.verified,true,"Only source-verified data may be published");
  assert.equal(new URL(r.source.url).protocol,"https:");
- assert.ok(["spvgg.org","bwbv.de"].some(d=>r.source.url.includes(d)),"Historical entry must cite club/association");
+ assert.ok(["spvgg.org","bwbv.de","dbv.turnier.de"].some(d=>r.source.url.includes(d)),"Historical entry must cite club/association/official DBV");
+ if(r.confirmation==="player-results-crosschecked"){
+  assert.equal(new URL(r.source.url).hostname,"dbv.turnier.de");
+  assert.equal(new URL(r.verification?.url).hostname,"badhub.de");
+  assert.ok(r.verificationNote,"Individual published player result must be documented");
+ }
  if(r.confirmation==="family-confirmed") assert.ok(r.verificationNote,"Family confirmation needs verification label");
  assert.ok(!("score" in r),"Do not invent individual match scores");
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
 assert.ok(Array.isArray(history.pendingResults));
-const pending=history.pendingResults.find(r=>r.id==="pm-2026-07-11-district-double-possible-bronze");
-assert.equal(pending.discipline,"Doppel");
-assert.equal(pending.place,3);
-assert.equal(pending.verified,false);
-const singles=history.results.find(r=>r.id==="pm-2026-07-11-bezirksmeisterschaft-sw-gold");
-assert.equal(singles.discipline,"Einzel");
-assert.equal(singles.place,1);
-assert.ok(!history.results.some(r=>r.id===pending.id),"Unverified doubles must not appear in trophy-counting history");
+assert.ok(!history.pendingResults.some(r=>r.id==="pm-2026-07-11-district-double-possible-bronze"),"Resolved double result must not remain pending");
+const district=history.results.filter(r=>r.date==="2026-07-11"&&r.playerId==="05-070879");
+assert.equal(district.length,3,"Three district event results: singles, doubles and mixed");
+for(const [discipline,group,place,partner] of [
+ ["Einzel","U11",1,null],["Doppel","U11",3,"Philipp Landhäußer"],["Mixed","U13",2,"Anneliese Zhu"]
+]){
+ const r=district.find(r=>r.discipline===discipline);
+ assert.ok(r,"Missing "+discipline);
+ assert.equal(r.ageGroup,group);
+ assert.equal(r.place,place);
+ assert.equal(r.partner,partner);
+ assert.equal(r.confirmation,"player-results-crosschecked");
+ assert.equal(r.source.url,"https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2");
+ assert.ok(r.verification?.url.includes("/spieler/05-070879"));
+}
 
 const linked=await readFile("index.html","utf8");
 assert.ok(linked.includes('id="view-historie"'));
@@ -44,6 +56,7 @@ assert.ok(!linked.includes("Platzierungen aus Vereins- und Verbandsberichten, na
 const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
 assert.ok(script.includes("playerMatch"));
+assert.ok(script.includes("Namentlichen Ergebnisbeleg")&&script.includes("DBV-Turnierergebnisse"));
 assert.ok(script.includes("renderTrophies(playerRecords)"),"Lifetime trophies should not change with chronicle filters");
 assert.ok(!script.includes("\n  renderTrophies(chosen);"),"Do not filter trophy shelf by year or discipline");
 assert.ok(!script.includes('source.textContent="Ausgewählte Ergebnisse'),"No oversized notice on normal history load");
