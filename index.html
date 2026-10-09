@@ -51,7 +51,7 @@
    <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine belastbare Verlaufsgrafik benötigt mehrere datierte Ranglistenstände. Platzierungen unterschiedlicher Altersklassen werden nicht miteinander vermischt.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Offizielle DBV-Rangliste öffnen ↗</a></div>
   </section>
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
-   <div class="section-heading"><h2 id="heading-turniere">Meine Turnierlinks</h2><button class="subtle-button" id="add-tournament" type="button">+ Turnier speichern</button></div>
+   <div class="section-heading"><h2 id="heading-turniere">Meine Turnierlinks</h2><button class="subtle-button" id="add-tournament" type="button">+ Turnier anlegen</button></div>
    <p class="supporting">Offizielle Turniere als Favoriten für die ganze Familie. Spielpläne und Ergebnisse werden direkt auf der Veranstalterseite geöffnet; hier findet keine Live-Abfrage statt.</p>
    <div id="official-tournament-list" class="tournament-list"></div>
    <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierportal<small>Offizielle Turnierinformationen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
@@ -81,12 +81,13 @@
 </dialog>
 <dialog id="tournament-dialog">
  <form id="tournament-form" class="modal">
-  <div class="section-heading"><h2>Turnier speichern</h2><button id="cancel-tournament" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <div class="section-heading"><h2 id="tournament-dialog-heading">Turnier anlegen</h2><button id="cancel-tournament" type="button" class="icon-button" aria-label="Schließen">×</button></div>
   <label>Spieler<select name="playerId" id="tournament-player" required></select></label>
-  <label>Turniername<input name="name" maxlength="100" placeholder="z. B. Jugend-RLT Mössingen" required></label>
-  <label>Offizieller DBV-Turnierlink<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>
-  <p class="small muted">Der Link öffnet die offizielle Turnierseite. Es werden keine Ergebnisse automatisch übernommen.</p>
-  <button class="primary-button" type="submit">Turnier speichern</button>
+  <label>DBV-Turnierlink (Pflicht)<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>
+  <label>Turniername <span class="muted">(optional)</span><input name="name" maxlength="100" placeholder="z. B. Jugend-RLT Mössingen"></label>
+  <div class="tournament-dates"><label>Beginn <span class="muted">(optional)</span><input name="startDate" type="date"></label><label>Ende <span class="muted">(optional)</span><input name="endDate" type="date"></label></div>
+  <p class="small muted">Die Turnier-ID wird automatisch aus dem Link erkannt. Du kannst Namen und Datum später bearbeiten. Keine automatische Ergebnisübertragung.</p>
+  <button class="primary-button" id="tournament-save" type="submit">Turnier speichern</button>
  </form>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
