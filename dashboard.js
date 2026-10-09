@@ -1,4 +1,5 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
+import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
 "use strict";
 const rankUrl="./data/ranking.json";
 const historyUrl="./data/history.json";
@@ -100,19 +101,29 @@ function renderOtherKpis(){
  const medals=trophies.counts;
  root.innerHTML='<a class="kpi-tile" href="#historie"><span class="kpi-label">Trophäenschrank</span><span class="kpi-value">'+(friendNoHistory?'–':num(trophies.total))+'</span><span class="kpi-sub">'+(friendNoHistory?'Für diesen Freund noch keine historischen Daten erfasst':'1. Platz '+medals[1]+' · 2. Platz '+medals[2]+' · 3. Platz '+medals[3]+' · 4. Platz '+medals[4])+'</span><span class="kpi-link">Zur Historie ↗</span></a>'+
  '<a class="kpi-tile" href="#historie"><span class="kpi-label">Erfasste Turniere</span><span class="kpi-value">'+(friendNoHistory?'–':num(years.size))+'</span><span class="kpi-sub">'+(friendNoHistory?'Keine öffentlichen Turnierdaten für diesen Freund in unserer Sammlung':'Auswahl: '+results.length+' belegte Platzierungen')+'</span><span class="kpi-link">Zur Historie ↗</span></a>';
- const now=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- const entries=bookmarks.filter(t=>selection==="all"||t.playerId===selection||t.playerId==="all");
- const upcoming=entries.filter(t=>t.startDate&&(!t.endDate||t.endDate>=now)&&t.startDate>=now||t.startDate&&t.endDate>=now)
- .sort((a,b)=>a.startDate.localeCompare(b.startDate));
- const t=upcoming[0];
+ const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  if(viewMode==="friend"){
   const p=profiles.find(x=>x.id===selection);
   const official=p?.url&&/^https:\/\//.test(p.url)?p.url:null;
   next.innerHTML='<a class="kpi-wide" href="'+escape(official||"#einstellungen")+'"'+(official?' target="_blank" rel="noopener noreferrer"':"")+'><span><strong>Offizielles Spielerprofil</strong><small>'+(official?'Spielerdaten beim DBV ansehen':'Bitte in den Freundeseinstellungen einen offiziellen Profil-Link ergänzen')+'</small></span><span class="kpi-next-date">'+(official?'Profil ↗':'Einstellungen ↗')+'</span></a>';
   return;
  }
- const href=t?escape(t.url):"#turniere";
- next.innerHTML='<a class="kpi-wide" href="'+href+'"'+(t?' target="_blank" rel="noopener noreferrer"':'')+'><span><strong>Nächstes Turnier</strong><small>'+(t?escape(t.name):"Noch kein bevorstehendes Turnier mit Datum gespeichert")+'</small></span><span class="kpi-next-date">'+(t?escape(date(t.startDate)):"Turnier anlegen ↗")+'</span></a>';
+ const upcoming=upcomingTournaments(bookmarks,selection,today);
+ const undated=bookmarks.some(t=>(t.playerId==="all"||t.playerId===selection)&&!t.startDate);
+ const list=upcoming.length?upcoming.map(t=>{
+  const end=t.endDate&&t.endDate>=t.startDate?t.endDate:t.startDate;
+  const active=t.startDate<=today&&end>=today;
+  const range=t.endDate&&t.endDate!==t.startDate?date(t.startDate)+" – "+date(t.endDate):date(t.startDate);
+  const owner=t.playerId==="all"?"Alle Spieler":(profiles.find(p=>p.id===t.playerId)?.name||"Mein Profil");
+  return '<a class="upcoming-tournament-row" href="'+escape(t.url)+'" rel="noopener noreferrer" target="_blank" aria-label="'+escape(t.name)+', '+escape(range)+', offizielle DBV-Turnierseite öffnen">'+
+   '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'">'+escape(date(t.startDate))+'</time>'+(active?'<small>Im Zeitraum</small>':'')+'</span>'+
+   '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+escape(range)+' · '+escape(owner)+'</small></span>'+
+   '<span class="upcoming-tournament-arrow" aria-hidden="true">↗</span></a>';
+ }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Noch keine bevorstehenden Turniere gespeichert.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
+ next.innerHTML='<section class="upcoming-tournaments-section" aria-labelledby="upcoming-tournaments-heading">'+
+  '<div class="upcoming-tournaments-header"><h2 id="upcoming-tournaments-heading">Die nächsten Turniere</h2><a href="#turniere">Alle Turniere ↗</a></div>'+
+  '<div class="upcoming-tournaments-list">'+list+'</div></section>';
+
 }
 function renderDashboard(){
  renderRank();renderOtherKpis();
