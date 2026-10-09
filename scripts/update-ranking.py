@@ -264,7 +264,8 @@ def main():
     result["current"]["kind"]="current-export" if live else "weekly-archive"
     if live:
         result["current"]["sourceUpdatedAt"]=live[4]
-        result["current"]["pageUrl"]=OFFICIAL+"/ranking"
+        result["current"]["downloadUrl"]=live[2]
+        result["current"]["url"]=OFFICIAL+"/ranking"
         result["sourceUrl"]=OFFICIAL+"/ranking"
     # Independent audit against raw official Excel rows, protecting year/gender/disc filters.
     latest=latest[3]
