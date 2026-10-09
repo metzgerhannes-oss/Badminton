@@ -27,7 +27,7 @@ assert.ok(html.indexOf('id="trophy-shelf"')<html.indexOf('id="history-summary"')
 
 assert.ok(html.includes('type="module" src="./history.js"'),"Browser must load ESM imports");
 const ui=await readFile("history.js","utf8");
-assert.ok(ui.includes("summarizeTrophies(chosen)")&&ui.includes("renderTrophies(chosen)"));
+assert.ok(ui.includes("summarizeTrophies(chosen)")&&ui.includes("renderTrophies(playerRecords)"));
 assert.ok(ui.includes("trophyPlace")&&ui.includes("Turnierbericht ansehen"));
 const css=await readFile("styles.css","utf8");
 assert.ok(css.includes(".trophy-slot")&&css.includes(".trophy-award"));
