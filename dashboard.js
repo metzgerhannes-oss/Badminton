@@ -12,7 +12,7 @@ function relevantResults(){
  const rows=history?.results??[];
  if(!selection)return [];
  const p=profiles.find(x=>x.id===selection);
- return rows.filter(x=>x.playerId===selection||(p&&x.playerName===p.name));
+ return rows.filter(x=>x.playerId===selection||(p&&selection.startsWith("local-")&&x.playerId===p.name&&x.playerName===p.name));
 }
 function displayMovement(change,previous){
  if(previous==null)return '<span class="movement movement-unknown"><span aria-hidden="true">–</span> Kein Vorwochenwert</span>';
