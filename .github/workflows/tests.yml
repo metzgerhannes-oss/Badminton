@@ -18,6 +18,7 @@ jobs:
           node --check dashboard.js
           node --check history.js
           node --check scripts/trophy-stats.mjs
+          node --check scripts/upcoming-tournaments.mjs
           node --check sw.js
       - name: Run tests
         run: |
@@ -25,6 +26,7 @@ jobs:
           node tests/history.mjs
           node tests/trophies.mjs
           node tests/bookmarks.mjs
+          node tests/upcoming-tournaments.mjs
           node tests/friends.mjs
           node tests/profile-switch.mjs
           node tests/dashboard.mjs
