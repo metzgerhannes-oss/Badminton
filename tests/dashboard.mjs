@@ -20,6 +20,7 @@ assert.ok(page.includes('data-page="einstellungen"'));
 assert.ok(js.includes('friendNoHistory')&&js.includes('ranking'));
 
 assert.ok(js.includes("entry.change")&&js.includes("entry.previousYearRank"),"Weekly delta must come from two DBV reports");
+assert.ok(js.includes("Archiv KW ")&&js.includes("archiveBehind"),"Archived weeks must be labeled and stale data flagged");
 assert.ok(js.includes('Jahrgang ')&&js.includes('cohortSize'),"Cohort rather than overall rank required");
 assert.ok(js.includes('movement-up')&&js.includes('movement-down')&&js.includes('movement-unknown'));
 assert.ok(sw.includes("./dashboard.js"));
