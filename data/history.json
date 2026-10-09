@@ -1,13 +1,33 @@
 {
   "schemaVersion": 1,
-  "curation": "public-club-reports",
+  "curation": "club-association-and-family-confirmed",
   "asOf": "2026-10-09",
-  "notes": "Verifizierte ausgewählte Platzierungen aus öffentlich zugänglichen Vereinsberichten, keine vollständige DBV-Matchdatenbank. Datumsangaben bei mehrtägigen Turnieren entsprechen dem Veranstaltungsbeginn. Einzelne Matches, Ranglistenverläufe und Oktober-Meisterschaftsergebnisse nicht erfunden. Beim Turnier Ehingen September 2026 nennt der Vereinsbericht für Philipp keine ausdrückliche Altersklasse, weshalb sie nicht zugewiesen wird.",
+  "notes": "Ausgewählte historische Ergebnisse aus Vereins- und Verbandsberichten sowie zwei ausdrücklich als Familienbestätigung markierte Meisterschaftsplatzierungen. Keine vollständige DBV-Matchhistorie. Für familienbestätigte Einträge bleibt eine unabhängige Prüfung von Disziplin und weiteren Meisterschaftsergebnissen offen. Gärtringen 2026: Gold im Einzel U11 durch BWBV ausdrücklich bestätigt.",
   "players": {
     "05-070879": "Philipp Metzger",
     "Charlotte Metzger": "Charlotte Metzger"
   },
   "results": [
+    {
+      "id": "pm-2026-10-03-landesmeisterschaft-je-u11-bronze",
+      "playerId": "05-070879",
+      "playerName": "Philipp Metzger",
+      "date": "2026-10-03",
+      "event": "55. Baden-Württembergische Meisterschaft U11–U19",
+      "location": "Friedrichshafen",
+      "level": "Landesmeisterschaft",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 3,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Meisterschaftsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/55-bwbv-meisterschaft-u11-u19-am-03-04-oktober-2026"
+      },
+      "verified": true,
+      "confirmation": "family-confirmed",
+      "verificationNote": "Platz 3 von Familie bestätigt und zuvor anhand von Einzelmatches nachvollzogen; aktuelle namentliche Verbands-Resultatliste noch nicht abrufbar."
+    },
     {
       "id": "cm-2026-09-26-me",
       "playerId": "Charlotte Metzger",
@@ -43,6 +63,26 @@
       },
       "verified": true,
       "playerName": "Philipp Metzger"
+    },
+    {
+      "id": "pm-2026-07-11-bezirksmeisterschaft-sw-gold",
+      "playerId": "05-070879",
+      "playerName": "Philipp Metzger",
+      "date": "2026-07-11",
+      "event": "35. Bezirksmeisterschaft Südwürttemberg U11–U19",
+      "location": "Mössingen",
+      "level": "Bezirksmeisterschaft",
+      "discipline": "noch offen",
+      "ageGroup": "noch offen",
+      "place": 1,
+      "partner": null,
+      "source": {
+        "name": "BWBV · Offizieller Turnierbericht",
+        "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/"
+      },
+      "verified": true,
+      "confirmation": "family-confirmed",
+      "verificationNote": "Platz 1 laut Familienangabe; Disziplin/Altersklasse noch anhand der namentlichen offiziellen Ergebnistabelle prüfen."
     },
     {
       "id": "pm-2026-04-24-jd",
@@ -151,6 +191,25 @@
       },
       "verified": true,
       "playerName": "Philipp Metzger"
+    },
+    {
+      "id": "pm-2026-01-25-e-gaertringen-je-u11",
+      "playerId": "05-070879",
+      "playerName": "Philipp Metzger",
+      "date": "2026-01-25",
+      "event": "1. E-Rangliste BWBV-Circuit Gärtringen 2026",
+      "location": "Gärtringen",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 1,
+      "partner": null,
+      "source": {
+        "name": "Baden-Württembergischer Badminton-Verband · Ergebnisbericht",
+        "url": "https://bwbv.de/2026/01/26/yang-yang-bwbv-circuit-1-e-rangliste-in-gaertringen/"
+      },
+      "verified": true,
+      "confirmation": "association-published"
     },
     {
       "id": "pm-2026-01-17-je",
