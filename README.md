@@ -1,3 +1,5 @@
+> **Korrektur Historie (09.10.2026):** Die erste kuratierte Turnierliste war unvollständig. Nachträge: **Gold U11-Einzel, Gärtringen (BWBV-Ergebnis bestätigt)**; **1. Platz Bezirksmeisterschaft Südwürttemberg, 11.07.2026 (Familienbestätigung, Disziplin offen)**; **Bronze Landesmeisterschaft Friedrichshafen, 03./04.10.2026, JE U11 (Familienbestätigung, offizieller Einzelnachweis noch zu prüfen)**. Der Trophäenschrank zählt diese mit einer klaren Kennzeichnung. Aktuell erfasste Philipp-Medaillen: 2× Gold, 1× Silber, 2× Bronze, 2× 4. Platz. Die Historie bleibt unvollständig und sollte nicht als automatisiert vollständige DBV-Datenbank beschrieben werden.
+
 ## Trophäenschrank
 
 Die Registerkarte **Historie** zeigt jetzt einen virtuellen Trophäenschrank mit vier Auszeichnungen:
