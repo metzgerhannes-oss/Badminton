@@ -37,6 +37,7 @@ jobs:
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
+          node tests/source-register.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
