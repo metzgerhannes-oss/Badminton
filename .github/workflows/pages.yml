@@ -31,6 +31,7 @@ jobs:
           node tests/trophies.mjs
           node tests/bookmarks.mjs
           node tests/friends.mjs
+          node tests/profile-switch.mjs
           node tests/dashboard.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
