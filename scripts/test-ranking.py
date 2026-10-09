@@ -28,6 +28,8 @@ def make_xlsx(real=False):
       ["DE",1905,1905,"Female","Player","W","05-000115",2017,"U11-1","U11",99999,10,"BAW-Baden-Württemberg"],
       ["HD",2398,2398,"Metzger","Philipp","M","05-070879",2016,"U11-2","U11",1322,3,"BAW-Baden-Württemberg"],
       ["HD",2397,2397,"Younger","Partner","M","05-000116",2017,"U11-1","U11",2000,3,"BAY-Bayern"],
+      ["DE",2771,2773,"Metzger","Charlotte","F","05-071969",2014,"U13-2","U13",611,2,"BAW-Baden-Württemberg"],
+      ["DE",2000,2000,"Andere","Spielerin","F","05-000118",2015,"U13-1","U13",900,3,"BAW-Baden-Württemberg"],
     ]
     for r in fixtures:ws.append(r)
     out=io.BytesIO();wb.save(out);return out.getvalue()
@@ -54,6 +56,23 @@ class RankingTests(unittest.TestCase):
         self.assertEqual(philipp["association"],"BAW-Baden-Württemberg")
         # Older U13 and female DE cannot affect the male U11 HE rank.
         self.assertNotIn("05-000114",[x["id"] for x in rows if x["ageClass"]=="U11"])
+    def test_charlotte_verified_dbv_id_and_u13_competition(self):
+        rows=parse_excel(make_xlsx(real=True))
+        charlotte=next(r for r in rows if r["id"]=="05-071969")
+        self.assertEqual(charlotte["firstName"],"Charlotte")
+        self.assertEqual(charlotte["lastName"],"Metzger")
+        self.assertEqual(charlotte["birthYear"],2014)
+        self.assertEqual(charlotte["ageClass"],"U13")
+        self.assertEqual(charlotte["gender"],"F")
+        self.assertEqual(charlotte["points"],611)
+        self.assertEqual(charlotte["association"],"BAW-Baden-Württemberg")
+        ranks=cohort_ranks(rows)
+        self.assertEqual(ranks[("05-071969","DE")]["ageClassRank"],2)
+        snap=summarize((2026,41,"https://example.invalid/current",rows),None,
+                       ["05-070879","05-071969"],"2026-10-09T20:00:00Z")
+        self.assertIn("05-071969",snap["players"])
+        self.assertEqual(snap["players"]["05-071969"]["disciplines"]["DE"]["bwAgeClassRank"],2)
+        self.assertNotIn("HD",snap["players"]["05-071969"]["disciplines"])
     def test_bw_and_germany_age_class_week_comparison(self):
         rows=parse_excel(make_xlsx())
         now=(2026,40,"https://example.invalid/KW40.xlsx",rows)
