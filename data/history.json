@@ -23,7 +23,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Charlotte Metzger"
     },
     {
       "id": "pm-2026-09-26-je",
@@ -40,7 +41,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-04-24-jd",
@@ -57,7 +59,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-04-24-je",
@@ -74,7 +77,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-04-19-je",
@@ -91,7 +95,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/3-e-rangliste-bw-suedwuerttemberg-u11-u19-am-19-april-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-02-28-je",
@@ -108,7 +113,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-02-28-mx",
@@ -125,7 +131,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-02-08-je",
@@ -142,7 +149,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-e-rangliste-bw-suedwuerttemberg-u11-u19-am-08-februar-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2026-01-17-je",
@@ -159,7 +167,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2025-07-12-je",
@@ -176,7 +185,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     },
     {
       "id": "pm-2025-05-24-je",
@@ -193,7 +203,8 @@
         "name": "SpVgg Mössingen · Turnierbericht",
         "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025"
       },
-      "verified": true
+      "verified": true,
+      "playerName": "Philipp Metzger"
     }
   ]
 }
