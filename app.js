@@ -5,7 +5,7 @@ const DEFAULT_PLAYERS=[
  {id:"05-070879",name:"Philipp Metzger",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
  {id:"local-charlotte",name:"Charlotte Metzger",url:""}
 ];
-const state={players:DEFAULT_PLAYERS.map(p=>({...p})),officialLinks:[],chosen:"05-070879",page:"start"};
+const state={players:DEFAULT_PLAYERS.map(p=>({...p})),friends:[],officialLinks:[],activeProfileId:"05-070879",viewingFriendId:null,chosen:"05-070879",page:"start"};
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -35,19 +35,23 @@ function restore(){
    if(Array.isArray(saved.players))state.players=saved.players.filter(p=>p&&typeof p.name==="string"&&typeof p.id==="string").slice(0,12);
    const philipp=state.players.find(p=>p.id==="05-070879"); if(philipp&&!philipp.birthYear)philipp.birthYear=2016;
    if(Array.isArray(saved.officialLinks))state.officialLinks=saved.officialLinks.map(normalizeBookmark).filter(Boolean).slice(0,40);
-   if(typeof saved.chosen==="string")state.chosen=saved.chosen;
+   if(Array.isArray(saved.friends))state.friends=saved.friends.filter(p=>p&&/^\d{2}-\d{6}$/.test(p.id)&&typeof p.name==="string"&&p.name.trim()).slice(0,30);
+   const preferred=typeof saved.activeProfileId==="string"?saved.activeProfileId:(typeof saved.chosen==="string"?saved.chosen:"");
+   if(preferred!=="all"&&state.players.some(p=>p.id===preferred))state.activeProfileId=preferred;
    if(!saved.historyProfilesInitialized&&!state.players.some(p=>p.name==="Charlotte Metzger"))
     state.players.push({id:"local-charlotte",name:"Charlotte Metzger",url:""});
   }
  }catch{}
- if(state.chosen!=="all"&&!state.players.some(p=>p.id===state.chosen))state.chosen="all";
+ if(!state.players.some(p=>p.id===state.activeProfileId))state.activeProfileId=state.players[0]?.id||"";
+ state.friends=state.friends.filter(p=>!state.players.some(own=>own.id===p.id));
+ state.chosen=state.activeProfileId;
 }
 function save(){
- try{localStorage.setItem(STORE,JSON.stringify({players:state.players,officialLinks:state.officialLinks,chosen:state.chosen,historyProfilesInitialized:true}))}catch{}
+ try{localStorage.setItem(STORE,JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,activeProfileId:state.activeProfileId,chosen:state.activeProfileId,historyProfilesInitialized:true}))}catch{}
 }
 let toastTimer;
 function toast(message){const node=el("toast");node.textContent=message;node.classList.add("visible");clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove("visible"),2800)}
-function selectedLinks(){return state.officialLinks.filter(t=>state.chosen==="all"||t.playerId==="all"||t.playerId===state.chosen)}
+function selectedLinks(){if(state.viewingFriendId)return [];return state.officialLinks.filter(t=>t.playerId==="all"||t.playerId===state.activeProfileId)}
 function bookmarkPhase(t){
  if(!t.startDate)return ["Termin offen","unknown"];
  const today=localDay();
@@ -56,10 +60,21 @@ function bookmarkPhase(t){
  if(today>end)return ["Vergangen","past"];
  return ["Turniertag","today"];
 }
-function renderPlayers(){
- const profiles=[{id:"all",name:"Alle Spieler"},...state.players];
- el("player-pills").innerHTML=profiles.map(p=>'<button class="pill '+(p.id===state.chosen?"selected":"")+'" data-player="'+esc(p.id)+'" aria-pressed="'+(p.id===state.chosen)+'" type="button">'+(p.id==="all"?"":'<span>'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>')+esc(p.name)+'</button>').join("");
- document.querySelectorAll("[data-player]").forEach(button=>button.addEventListener("click",()=>{state.chosen=button.dataset.player;save();render()}));
+function currentProfile(){
+ return state.viewingFriendId?state.friends.find(p=>p.id===state.viewingFriendId):state.players.find(p=>p.id===state.activeProfileId);
+}
+function renderFocusHeader(){
+ const p=currentProfile();
+ const isFriend=Boolean(state.viewingFriendId);
+ const wrap=el("focused-profile");
+ if(!p){
+  wrap.innerHTML='<span class="focus-profile-avatar">+</span><span class="focus-profile-label">Noch kein Spielerprofil angelegt</span><a href="#einstellungen" class="focus-settings">Einrichten ↗</a>';return;
+ }
+ wrap.innerHTML='<div class="focus-profile-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</div>'+
+ '<div class="focus-profile-copy"><small>'+(isFriend?"Du folgst":"Mein aktives Spielerprofil")+'</small><strong>'+esc(p.name)+'</strong>'+
+ '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\\d{2}-\\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+
+ (isFriend?'<button type="button" class="focus-settings" id="back-own">Zu mir zurück</button>':'<a class="focus-settings" href="#einstellungen">Wechseln <span aria-hidden="true">↗</span></a>');
+ el("back-own")?.addEventListener("click",()=>{state.viewingFriendId=null;state.chosen=state.activeProfileId;save();location.hash="#start";render()});
 }
 function renderTournaments(){
  const sorted=selectedLinks().slice().sort((a,b)=>{
@@ -86,23 +101,58 @@ function renderTournaments(){
  }));
 }
 function renderProfiles(){
- el("profile-list").innerHTML=state.players.map(p=>'<article class="profile-card"><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+'</p>'+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" rel="noopener noreferrer" target="_blank">Offizielles Spielerprofil ↗</a>':"")+'</div><button class="remove-button" data-remove-profile="'+esc(p.id)+'" type="button">Entfernen</button></article>').join("");
- document.querySelectorAll("[data-remove-profile]").forEach(button=>button.addEventListener("click",()=>{
-  if(!confirm("Spieler aus dieser App entfernen?"))return;
-  const id=button.dataset.removeProfile;
+ const list=el("profile-list");
+ list.innerHTML=state.players.length?state.players.map(p=>{
+ const active=state.activeProfileId===p.id;
+ const birth=p.birthYear?" · Jg. "+esc(p.birthYear):"";
+ return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\\d{2}-\\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
+ }).join(""):'<div class="empty">Noch kein eigenes Spielerprofil hinterlegt.</div>';
+ list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
+  state.activeProfileId=b.dataset.setActive;state.viewingFriendId=null;state.chosen=state.activeProfileId;save();render();toast("Startprofil geändert");
+ }));
+ list.querySelectorAll("[data-edit-own]").forEach(b=>b.addEventListener("click",()=>{
+  const p=state.players.find(x=>x.id===b.dataset.editOwn);
+  if(p)openPlayerForm(p);
+ }));
+ list.querySelectorAll("[data-remove-profile]").forEach(b=>b.addEventListener("click",()=>{
+  const id=b.dataset.removeProfile;
+  if(!confirm("Dieses eigene Spielerprofil auf diesem Gerät entfernen?"))return;
   state.players=state.players.filter(p=>p.id!==id);
   state.officialLinks=state.officialLinks.filter(t=>t.playerId!==id);
-  if(state.chosen===id)state.chosen="all";
+  if(state.activeProfileId===id)state.activeProfileId=state.players[0]?.id||"";
+  if(!state.viewingFriendId)state.chosen=state.activeProfileId;
   save();render();
+ }));
+ el("current-account-label").textContent="Aktives Startprofil: "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"noch keines");
+}
+function renderFriends(){
+ const root=el("friend-list");
+ root.innerHTML=state.friends.length?state.friends.map(p=>{
+  const selected=state.viewingFriendId===p.id;
+  return '<article class="friend-card '+(selected?'friend-selected':'')+'"><button type="button" class="friend-open" data-view-friend="'+esc(p.id)+'"><span class="friend-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.birthYear?' · Jahrgang '+esc(p.birthYear):'')+'</small><em>Haupt-KPIs ansehen ↗</em></span></button><button type="button" class="remove-button friend-remove" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></article>';
+ }).join(""):'<div class="empty friends-empty">Du folgst noch niemandem. Füge einen Freund über seine DBV-ID hinzu.</div>';
+ root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>{
+  const friend=state.friends.find(p=>p.id===b.dataset.viewFriend);
+  if(!friend)return;
+  state.viewingFriendId=friend.id;state.chosen=friend.id;
+  location.hash="#start";render();
+ }));
+ root.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>{
+  state.friends=state.friends.filter(p=>p.id!==b.dataset.unfollow);
+  if(state.viewingFriendId===b.dataset.unfollow){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
+  save();render();toast("Freund entfernt");
  }));
 }
 function render(){
- renderPlayers();
+ renderFocusHeader();
  renderTournaments();
  renderProfiles();
- window.renderDashboard?.(state.chosen,state.players,state.officialLinks);
- window.renderHistory?.(state.chosen,state.players);
- const page=["start","historie","turniere","profil"].includes(state.page)?state.page:"start";
+ renderFriends();
+ state.chosen=state.viewingFriendId||state.activeProfileId;
+ const viewedProfiles=[...state.players,...state.friends];
+ window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks);
+ window.renderHistory?.(state.chosen,viewedProfiles);
+ const page=["start","historie","turniere","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
   if(a.dataset.page===page)a.setAttribute("aria-current","page");
@@ -116,7 +166,7 @@ function openTournamentForm(item=null){
  editing=item?{id:item.id,playerId:item.playerId}:null;
  const chooser=el("tournament-player");
  chooser.innerHTML='<option value="all">Alle Spieler</option>'+state.players.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join("");
- const defaultPlayer=state.chosen==="all"?"all":state.chosen;
+ const defaultPlayer=state.activeProfileId||"all";
  chooser.value=item?.playerId||defaultPlayer;
  form.elements.namedItem("name").value=item?.name||"";
  form.elements.namedItem("url").value=item?.url||"";
@@ -131,16 +181,52 @@ function setup(){
  state.page=(location.hash||"#start").slice(1);
  window.addEventListener("hashchange",()=>{state.page=(location.hash||"#start").slice(1);render()});
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
- for(const id of ["add-player","add-profile"])el(id).addEventListener("click",()=>playerDialog.showModal());
+ let editingPlayerId=null;
+ function openPlayerForm(p=null){
+  editingPlayerId=p?.id||null;
+  playerForm.reset();
+  playerForm.elements.namedItem("name").value=p?.name||"";
+  playerForm.elements.namedItem("id").value=(p&&/^\\d{2}-\\d{6}$/.test(p.id))?p.id:"";
+  playerForm.elements.namedItem("id").readOnly=Boolean(p);
+  playerForm.elements.namedItem("birthYear").value=p?.birthYear||"";
+  playerForm.elements.namedItem("url").value=p?.url||"";
+  playerDialog.showModal();
+ }
+ window.openPlayerForm=openPlayerForm;
+ el("add-player").addEventListener("click",()=>openPlayerForm());
  el("cancel-dialog").addEventListener("click",()=>playerDialog.close());
  playerForm.addEventListener("submit",event=>{
   event.preventDefault();
   const data=new FormData(playerForm);
   const name=String(data.get("name")||"").trim().slice(0,80);
-  const id=String(data.get("id")||"").trim()||"local-"+Date.now();
-  if(!name||state.players.some(p=>p.id===id)){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
-  state.players.push({id,name,birthYear:Number(data.get("birthYear"))||undefined,url:safeUrl(data.get("url")||"")});
-  save();render();playerDialog.close();playerForm.reset();toast("Spieler gespeichert");
+  const id=editingPlayerId||String(data.get("id")||"").trim()||"local-"+Date.now();
+  const birth=Number(data.get("birthYear"));
+  if(!name||(!editingPlayerId&&state.players.some(p=>p.id===id))){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
+  const record={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,url:safeUrl(data.get("url")||"")};
+  if(editingPlayerId)state.players=state.players.map(p=>p.id===editingPlayerId?record:p);
+  else{
+   if(state.friends.some(p=>p.id===id)){toast("Diese Spieler-ID ist bereits ein Freund");return}
+   state.players.push(record);
+   if(!state.activeProfileId)state.activeProfileId=id;
+  }
+  editingPlayerId=null;
+  save();render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
+ });
+ const friendDialog=el("friend-dialog"),friendForm=el("friend-form");
+ el("add-friend").addEventListener("click",()=>{friendForm.reset();friendDialog.showModal()});
+ el("cancel-friend").addEventListener("click",()=>friendDialog.close());
+ friendForm.addEventListener("submit",event=>{
+  event.preventDefault();
+  const data=new FormData(friendForm);
+  const name=String(data.get("name")||"").trim().slice(0,80);
+  const id=String(data.get("id")||"").trim();
+  const birth=Number(data.get("birthYear"));
+  if(!name||!/^\\d{2}-\\d{6}$/.test(id)){toast("Name und gültige DBV-ID erforderlich");return}
+  if(state.friends.some(p=>p.id===id)||state.players.some(p=>p.id===id)){toast("Dieser Spieler ist bereits gespeichert");return}
+  if(state.friends.length>=30){toast("Maximal 30 Freunde");return}
+  const profileUrl=safeUrl(data.get("url")||"");
+  state.friends.push({id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,url:profileUrl});
+  save();render();friendDialog.close();friendForm.reset();toast("Freund hinzugefügt");
  });
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());
