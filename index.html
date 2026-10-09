@@ -49,6 +49,18 @@
       <div id="official-tournament-list" class="tournament-list"></div>
       <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierkalender öffnen<small>Offizielle Ausschreibungen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
     </section>
+    <section class="page" id="view-historie" aria-labelledby="heading-historie">
+      <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Veröffentlichte Ergebnisse</span></div>
+      <p class="supporting">Platzierungen aus belegten Vereinsberichten, nach Spieler, Jahr und Disziplin filterbar. Die Sammlung ist noch nicht vollständig und enthält keine geschätzten Spielergebnisse.</p>
+      <div id="history-source" class="notice"></div>
+      <div id="history-summary" class="history-summary"></div>
+      <div class="history-filters" aria-label="Historie filtern">
+        <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
+        <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
+      </div>
+      <div id="history-timeline" class="history-timeline"></div>
+      <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine seriöse Verlaufsgrafik folgt, sobald mehrere datierte Ranglistenstände vorhanden sind. Einzelne Platzierungen unterschiedlicher Altersklassen werden nicht zu einer künstlichen Leistungskurve verbunden.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuelle DBV-Rangliste ↗</a></div>
+    </section>
     <section class="page" id="view-profil" aria-labelledby="heading-profil">
       <div class="section-heading"><h2 id="heading-profil">Spielerprofile</h2></div>
       <div id="profile-list" class="profiles"></div>
@@ -65,6 +77,7 @@
   <nav class="bottom-nav" aria-label="Hauptnavigation">
     <a href="#heute" data-page="heute" aria-current="page"><span aria-hidden="true">⌂</span><small>Heute</small></a>
     <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
+    <a href="#historie" data-page="historie"><span aria-hidden="true">◷</span><small>Historie</small></a>
     <a href="#profil" data-page="profil"><span aria-hidden="true">◯</span><small>Profile</small></a>
   </nav>
 </div>
