@@ -14,7 +14,32 @@
   const profile=lastProfiles.find(p=>p.id===selected);
   return r.playerId===selected || (!!profile && r.playerName===profile.name) || (!!profile && r.playerId===profile.name);
  };
- function render(){
+ function plotTrends(chosen){
+ const root=$("history-trends");if(!root)return;
+ const groups=new Map();
+ for(const r of chosen.filter(x=>x.discipline==="Einzel")){
+   const group=r.playerName+"|"+r.ageGroup;
+   if(!groups.has(group))groups.set(group,[]);
+   groups.get(group).push(r);
+ }
+ const eligible=[...groups.entries()].filter(([,items])=>items.length>=2).sort((a,b)=>a[0].localeCompare(b[0],"de"));
+ if(!eligible.length){root.innerHTML="";return}
+ const diagrams=eligible.map(([label,items])=>{
+   const data=items.slice().sort((a,b)=>a.date.localeCompare(b.date));
+   const w=340,left=35,right=19,top=24,bottom=20,lowest=1,highest=Math.max(8,...data.map(x=>x.place)),graphH=90;
+   const x=i=>left+(data.length===1?0:i*(w-left-right)/(data.length-1));
+   const y=p=>top+(p-lowest)/(highest-lowest)*graphH;
+   const points=data.map((p,i)=>({x:x(i),y:y(p.place),place:p.place,date:p.date}));
+   const path=points.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
+   const circles=points.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4.3" fill="#9de5ff" stroke="#17395c" stroke-width="2"/><text x="'+p.x.toFixed(1)+'" y="'+Math.max(p.y-9,11).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#e8f6ff">'+p.place+'.</text>').join("");
+   const ticks=points.map((p,i)=>'<text x="'+p.x.toFixed(1)+'" y="'+(top+graphH+18)+'" text-anchor="middle" font-size="9" fill="#adbfda">'+escape(data[i].date.slice(2,7))+'</text>').join("");
+   const svg='<svg class="history-spark" viewBox="0 0 340 142" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+escape(label)+': '+data.map(p=>p.place+". Platz am "+p.date).join(", ")+'"><path d="M35 114 H321" stroke="#476581" stroke-dasharray="4 4" fill="none"/><path d="'+path+'" stroke="#8bd8ff" stroke-width="2.6" stroke-linejoin="round" fill="none"/>'+circles+ticks+'</svg>';
+   return '<div class="history-trend-card"><div class="history-trend-title">'+escape(label.replace("|"," · "))+'</div>'+svg+'</div>';
+ });
+ root.innerHTML='<h3>Platzierungsverlauf</h3><p>Vergleich nur innerhalb derselben Altersklasse und Disziplin. Niedrigere Platznummer = bessere Platzierung; keine Ranglistenpunkte.</p>'+diagrams.join("");
+}
+
+function render(){
   const source=$("history-source"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
   if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";return;}
@@ -28,6 +53,7 @@
   const chosen=playerRecords.filter(r=>(year==="all"||r.date.startsWith(year))&&(discipline==="all"||r.discipline===discipline))
     .slice().sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));
   const events=new Set(chosen.map(r=>r.event+"|"+r.date));
+  plotTrends(chosen);
   const podium=chosen.filter(r=>r.place<=3).length;
   const playerCount=new Set(chosen.map(r=>r.playerId)).size;
   summary.innerHTML=[
