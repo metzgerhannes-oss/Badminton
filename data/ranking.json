@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "status": "pending",
+  "type": "dbv-published-excel-derived-birthyear-rank",
+  "checkedAt": null,
+  "current": null,
+  "previous": null,
+  "sourceUrl": "https://turniere.badminton.de/ranking/history",
+  "players": {},
+  "method": "Rang innerhalb des Geburtsjahrgangs aus der DBV-Punktetabelle abgeleitet; nicht der offizielle Gesamtrang.",
+  "notes": "Bis zum erfolgreichen Import der Original-Excel-Rangliste zeigt die App bewusst keine errechneten Platzierungen."
+}
