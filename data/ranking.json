@@ -2,18 +2,21 @@
   "schemaVersion": 2,
   "status": "available",
   "type": "dbv-published-excel-derived-ageclass-rank",
-  "checkedAt": "2026-10-09T17:56:31Z",
+  "checkedAt": "2026-10-09T18:10:25Z",
   "current": {
+    "year": 2026,
+    "week": 41,
+    "url": "https://turniere.badminton.de/ranking/download",
+    "kind": "current-export",
+    "sourceUpdatedAt": "2026-10-07T12:00:00+02:00",
+    "pageUrl": "https://turniere.badminton.de/ranking"
+  },
+  "previous": {
     "year": 2026,
     "week": 40,
     "url": "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW40.xlsx"
   },
-  "previous": {
-    "year": 2026,
-    "week": 39,
-    "url": "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW39.xlsx"
-  },
-  "sourceUrl": "https://turniere.badminton.de/ranking/history",
+  "sourceUrl": "https://turniere.badminton.de/ranking",
   "region": "BAW-Baden-Württemberg",
   "players": {
     "05-070879": {
@@ -22,49 +25,49 @@
         "HE": {
           "ageClass": "U11",
           "birthYear": 2016,
-          "points": 2515.0,
-          "ageClassRank": 46,
+          "points": 2670.0,
+          "ageClassRank": 43,
           "bwAgeClassRank": 4,
           "bwAgeClassSize": 71,
           "previousBwAgeClassRank": 4,
           "bwAgeClassChange": 0,
-          "overallRank": 2025,
-          "ageClassSize": 704,
+          "overallRank": 1952,
+          "ageClassSize": 701,
           "previousAgeClassRank": 46,
           "previousPoints": 2515.0,
-          "ageClassChange": 0,
-          "tournaments": 12
+          "ageClassChange": 3,
+          "tournaments": 13
         },
         "HD": {
           "ageClass": "U11",
           "birthYear": 2016,
-          "points": 790.0,
-          "ageClassRank": 165,
-          "bwAgeClassRank": 10,
-          "bwAgeClassSize": 21,
+          "points": 1322.0,
+          "ageClassRank": 118,
+          "bwAgeClassRank": 9,
+          "bwAgeClassSize": 22,
           "previousBwAgeClassRank": 10,
-          "bwAgeClassChange": 0,
-          "overallRank": 2749,
-          "ageClassSize": 379,
-          "previousAgeClassRank": 166,
+          "bwAgeClassChange": 1,
+          "overallRank": 2398,
+          "ageClassSize": 380,
+          "previousAgeClassRank": 165,
           "previousPoints": 790.0,
-          "ageClassChange": 1,
-          "tournaments": 2
+          "ageClassChange": 47,
+          "tournaments": 3
         },
         "HM": {
           "ageClass": "U11",
           "birthYear": 2016,
           "points": 1469.0,
-          "ageClassRank": 20,
+          "ageClassRank": 21,
           "bwAgeClassRank": 1,
           "bwAgeClassSize": 5,
           "previousBwAgeClassRank": 1,
           "bwAgeClassChange": 0,
-          "overallRank": 1281,
+          "overallRank": 1282,
           "ageClassSize": 123,
           "previousAgeClassRank": 20,
           "previousPoints": 1469.0,
-          "ageClassChange": 0,
+          "ageClassChange": -1,
           "tournaments": 2
         }
       }
