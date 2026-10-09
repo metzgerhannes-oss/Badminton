@@ -225,7 +225,12 @@ def summarize(now, before, id_list:list[str], checked:str):
                 "previousAgeClassRank":p["ageClassRank"] if comparable else None,
                 "previousPoints":p["points"] if comparable else None,
                 "ageClassChange":(p["ageClassRank"]-r["ageClassRank"]) if comparable else None,
-                "tournaments":r["tournaments"]
+                "tournaments":r["tournaments"],
+                # The official /ranking/download Excel contains aggregate points
+                # and tournament count only. Never fabricate five individual scores.
+                "countedLimit":5,
+                "topFive":[],
+                "topFiveStatus":"not-in-public-export"
             }
         if disciplines: players[pid]={"name":(next((r["firstName"]+" "+r["lastName"] for r in current.values() if r["id"]==pid),"")).strip(),"disciplines":disciplines}
     return {"schemaVersion":2,"status":"available","type":"dbv-published-excel-derived-ageclass-rank",
