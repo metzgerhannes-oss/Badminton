@@ -101,7 +101,8 @@ function renderOtherKpis(){
  const medals=trophies.counts;
  root.innerHTML='<a class="kpi-tile" href="#historie"><span class="kpi-label">Trophäenschrank</span><span class="kpi-value">'+(friendNoHistory?'–':num(trophies.total))+'</span><span class="kpi-sub">'+(friendNoHistory?'Für diesen Freund noch keine historischen Daten erfasst':'1. Platz '+medals[1]+' · 2. Platz '+medals[2]+' · 3. Platz '+medals[3]+' · 4. Platz '+medals[4])+'</span><span class="kpi-link">Zur Historie ↗</span></a>'+
  '<a class="kpi-tile" href="#historie"><span class="kpi-label">Erfasste Turniere</span><span class="kpi-value">'+(friendNoHistory?'–':num(years.size))+'</span><span class="kpi-sub">'+(friendNoHistory?'Keine öffentlichen Turnierdaten für diesen Freund in unserer Sammlung':'Auswahl: '+results.length+' belegte Platzierungen')+'</span><span class="kpi-link">Zur Historie ↗</span></a>';
- const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+ const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
+ const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){
   const p=profiles.find(x=>x.id===selection);
   const official=p?.url&&/^https:\/\//.test(p.url)?p.url:null;
