@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "status": "available",
   "type": "dbv-published-excel-derived-birthyear-rank",
-  "checkedAt": "2026-10-09T17:02:21Z",
+  "checkedAt": "2026-10-09T17:42:40Z",
   "current": {
     "year": 2026,
     "week": 40,
@@ -14,6 +14,7 @@
     "url": "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW39.xlsx"
   },
   "sourceUrl": "https://turniere.badminton.de/ranking/history",
+  "region": "BAW-Baden-Württemberg",
   "players": {
     "05-070879": {
       "name": "Philipp Metzger",
@@ -23,6 +24,10 @@
           "birthYear": 2016,
           "points": 2515.0,
           "yearRank": 37,
+          "bwRank": 4,
+          "bwCohortSize": 46,
+          "previousBwRank": 4,
+          "bwChange": 0,
           "overallRank": 2025,
           "cohortSize": 440,
           "previousYearRank": 37,
@@ -35,6 +40,10 @@
           "birthYear": 2016,
           "points": 790.0,
           "yearRank": 113,
+          "bwRank": 6,
+          "bwCohortSize": 15,
+          "previousBwRank": 6,
+          "bwChange": 0,
           "overallRank": 2749,
           "cohortSize": 256,
           "previousYearRank": 112,
@@ -47,6 +56,10 @@
           "birthYear": 2016,
           "points": 1469.0,
           "yearRank": 18,
+          "bwRank": 1,
+          "bwCohortSize": 3,
+          "previousBwRank": 1,
+          "bwChange": 0,
           "overallRank": 1281,
           "cohortSize": 81,
           "previousYearRank": 18,
@@ -57,6 +70,6 @@
       }
     }
   },
-  "method": "Rang im Geburtsjahr und der Disziplin = 1 + Zahl der punktstärkeren Spieler desselben Geburtsjahrs/Geschlechts. Nicht der offizielle Gesamt-Rang.",
+  "method": "DE: Rang im Geburtsjahr/Geschlecht/Disziplin nach DBV-Punkten; BW: derselbe Vergleich nur für Landesverband BAW-Baden-Württemberg (Spalte LVName). Bei Gleichstand gleicher Rang; kein offizieller Gesamtrang.",
   "notes": "Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag."
 }
