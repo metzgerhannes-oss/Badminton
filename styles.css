@@ -322,3 +322,10 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 .upcoming-tournaments-empty{color:#b4c9db;font-size:12px;line-height:1.65;padding:13px 0 16px}
 .upcoming-tournaments-empty>a{color:#9adfff;font-size:12px;font-weight:800;display:block;margin-top:8px}
 @media(max-width:370px){.upcoming-tournaments-section{padding:12px 10px 5px}.upcoming-tournament-row{gap:8px}.upcoming-tournament-date{min-width:68px;font-size:10px}.upcoming-tournament-info strong{font-size:12px}.upcoming-tournament-info small{font-size:9.5px}}
+
+
+/* History opens immediately with the trophies; routine provenance banner is hidden. */
+#view-historie>.section-heading{margin-bottom:8px}
+#view-historie>.trophy-section{margin-top:0;margin-bottom:16px}
+#view-historie .trophy-section .section-heading{margin-bottom:12px}
+#history-source[hidden]{display:none!important}
