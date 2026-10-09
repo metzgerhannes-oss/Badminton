@@ -50,3 +50,12 @@
 .history-ranking-note a{font-size:12px;font-weight:750;color:#8bd8ff}
 .bottom-nav a{width:25%}
 @media(max-width:375px){.history-content{padding:12px}.history-stat{padding:12px 9px}.history-stat span{font-size:10px}.history-content h3{font-size:14px}}
+
+
+.history-trends{display:grid;gap:11px;margin:10px 0 19px}
+.history-trends:empty{display:none}
+.history-trends>h3{font-size:16px;margin:5px 0 0}
+.history-trends>p{font-size:11px;color:#b1bfd2;line-height:1.55;margin:0 0 2px}
+.history-trend-card{padding:11px 13px 5px;border-radius:15px;border:1px solid #37516d;background:linear-gradient(120deg,#142844,#11203b)}
+.history-trend-title{font-weight:800;font-size:12px;color:#d7edff;margin:0 0 6px}
+.history-spark{width:100%;height:auto;max-height:165px;display:block}
