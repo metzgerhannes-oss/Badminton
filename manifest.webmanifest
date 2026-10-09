@@ -1,12 +1,12 @@
 {
   "name": "Schmetterlinge – Badminton Jugend Mössingen",
   "short_name": "Schmetterlinge",
-  "description": "Jahrgangsrangliste und Wochenvergleich, Turniererfolge und Trophäenschrank",
+  "description": "U11-Altersklassenrangliste mit Gesamtpunkten, Turniererfolgen und Freunden",
   "start_url": "./#start",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#08152c",
-  "theme_color": "#0c2244",
+  "background_color": "#123758",
+  "theme_color": "#204d73",
   "icons": [
     {
       "src": "./assets/spvgg-schmetterlinge.svg",
