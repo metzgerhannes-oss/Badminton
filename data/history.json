@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "curation": "public-club-reports",
   "asOf": "2026-10-09",
-  "notes": "Verifizierte ausgewählte Platzierungen aus öffentlich zugänglichen Vereinsberichten, keine vollständige DBV-Matchdatenbank. Datumsangaben bei mehrtägigen Turnieren entsprechen dem Veranstaltungsbeginn. Einzelne Matches, Ranglistenverläufe und Oktober-Meisterschaftsergebnisse nicht erfunden.",
+  "notes": "Verifizierte ausgewählte Platzierungen aus öffentlich zugänglichen Vereinsberichten, keine vollständige DBV-Matchdatenbank. Datumsangaben bei mehrtägigen Turnieren entsprechen dem Veranstaltungsbeginn. Einzelne Matches, Ranglistenverläufe und Oktober-Meisterschaftsergebnisse nicht erfunden. Beim Turnier Ehingen September 2026 nennt der Vereinsbericht für Philipp keine ausdrückliche Altersklasse, weshalb sie nicht zugewiesen wird.",
   "players": {
     "05-070879": "Philipp Metzger",
     "Charlotte Metzger": "Charlotte Metzger"
@@ -34,7 +34,7 @@
       "location": "Ehingen",
       "level": "E",
       "discipline": "Einzel",
-      "ageGroup": "U11",
+      "ageGroup": "nicht belegt",
       "place": 4,
       "partner": null,
       "source": {
