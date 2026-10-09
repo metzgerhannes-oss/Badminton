@@ -29,7 +29,7 @@ const dateHeader=response.headers.get("last-modified");
 let modifiedAt=null;
 if(dateHeader){const d=new Date(dateHeader);if(!Number.isNaN(d.getTime()))modifiedAt=d.toISOString()}
 const normalized=normalizeAuthorizedFeed(raw,{
- format,updatedAt:modifiedAt,sourceName:"Autorisierter Turnierfeed",sourceUrl:url,allowedIds:ids
+ format,updatedAt:modifiedAt,sourceName:"Autorisierter Turnierfeed",sourceUrl:process.env.BADMINTON_PUBLIC_SOURCE_URL||"https://dbv.turnier.de/",allowedIds:ids
 });
 await mkdir("data",{recursive:true});
 await writeFile("data/live.json",JSON.stringify(normalized,null,2)+"\n","utf8");
