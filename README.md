@@ -1,3 +1,11 @@
+## Verbindliche Quellenhierarchie (09.10.2026)
+
+Die dauerhafte, nach **A–D** priorisierte und maschinenlesbare Referenzliste liegt unter **[`data/source-register.json`](data/source-register.json)**. Lesbare Übersicht und Qualitäts-/Prüfregeln: **[`docs/DATENQUELLEN_PRIORITAET.md`](docs/DATENQUELLEN_PRIORITAET.md)**. Die Liste ist auch unter Einstellungen in der App verlinkt.
+
+**Warum noch keine fünf Einzelpunktwerte?** Der verwendete offizielle `turniere.badminton.de/ranking/download`-Export enthält nur den **amtlichen Gesamtscore** und die Anzahl Turniere; die DBV-Seite `dbv.turnier.de/ranking/ranking.aspx?rid=238` ist laut DBV die zuständige Quelle für spielerbezogene Einzelergebnisse, liefert dem unbeaufsichtigten Abruf am 09.10.2026 aber nur die Cookie-Zustimmungsseite. Badhub dokumentiert Ergebnisse, aber bislang keine nachgewiesenen Einzelwertungen, die in derselben KW zum DBV-Gesamtscore passen. Deshalb kein automatisches „Top 5“-Ausfüllen oder Schätzen aus Ergebnistabellen.
+
+Die Detailansicht zeigt bei nicht nachgewiesenen Einzelwertungen **keine fünf leeren Felder mehr**, sondern eine kurze Erklärung und einen Link zur offiziellen DBV-Spielerrangliste. Bei verfügbaren überprüften Wertungen erscheinen bis zu fünf nach Punktzahl sortierte Turniere, nur wenn deren Summe zum Gesamtwert derselben Kalenderwoche passt.
+
 > **Charlotte im DBV verifiziert (09.10.2026):** Charlotte Metzger, SpVgg Mössingen, Jahrgang 2014, Spieler-ID **`05-071969`**, ist in der [offiziellen DBV-Rangliste](https://turniere.badminton.de/ranking) für DE U13 mit **611 Gesamtpunkten aus zwei Turnieren** erfasst (KW41). Der U13-BW- und Deutschlandrang wird wie bei Philipp aus der vollständigen offiziellen Altersklassentabelle berechnet (nicht aus der Gesamt-Rangspalte!). Das frühere lokale Profil `local-charlotte` wird beim Laden automatisch migriert, samt Startprofilwahl und selbst gespeicherten Turnierlinks. Das verifizierte Einzel-Ergebnis, **5. Platz U13 bei der 4. E-Rangliste Südwürttemberg in Ehingen vom 26.09.2026**, bleibt in der Historie erhalten, zählt aber nicht als Top-4-Trophäe. Im Wochenimport sind nun beide Spieler-IDs hinterlegt.
 
 ## Ranglistenpunkte und helleres Vereinsdesign (Oktober 2026)
