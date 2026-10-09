@@ -3,7 +3,7 @@ import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
  const feedUrl="./data/history.json";
- let records=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all";
+ let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all";
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -84,10 +84,20 @@ import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
   }).join("");
  }
 
+function renderPending(){
+  const panel=$("history-pending"); if(!panel)return;
+  const filtered=pendingResults.filter(r=>playerMatch(r,lastPlayer)&&
+    (year==="all"||r.date.startsWith(year))&&
+    (discipline==="all"||r.discipline===discipline));
+  panel.innerHTML=filtered.map(r=>{
+    const link=safeUrl(r.source?.url);
+    return '<div class="pending-medal"><strong>Zur Prüfung: möglicherweise '+escape(r.place)+'. Platz im '+escape(r.discipline)+'</strong><span>'+escape(r.event)+' · '+escape(niceDate(r.date))+'</span><p>Von der Familie vermutet, noch nicht anhand der offiziellen Ergebnisse bestätigt. Zählt derzeit nicht als Trophäe.</p>'+(link?'<a href="'+escape(link)+'" rel="noopener noreferrer" target="_blank">Offiziellen Turnierbericht öffnen ↗</a>':'')+'</div>';
+  }).join("");
+}
 function render(){
   const source=$("history-source"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
-  if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
+  if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
   if(!loaded){source.textContent="Verifizierte Platzierungen werden geladen …";return;}
   source.textContent="Ausgewählte Ergebnisse aus Vereins- und Verbandsberichten. Zwei Meisterschaftsplatzierungen stammen aus einer Familienbestätigung und sind bis zur offiziellen Detailprüfung ausdrücklich gekennzeichnet. Noch keine vollständige DBV-Historie.";
   const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
@@ -95,6 +105,7 @@ function render(){
   const old=year;
   yearSelect.innerHTML='<option value="all">Alle Jahre</option>'+years.map(v=>'<option value="'+escape(v)+'">'+escape(v)+'</option>').join("");
   year=years.includes(old)?old:"all";yearSelect.value=year;
+  renderPending();
   const chosen=playerRecords.filter(r=>(year==="all"||r.date.startsWith(year))&&(discipline==="all"||r.discipline===discipline))
     .slice().sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));
   const events=new Set(chosen.map(r=>r.event+"|"+r.date));
@@ -131,6 +142,7 @@ function render(){
    records=data.results.filter(r=>r&&typeof r.id==="string"&&typeof r.playerId==="string"&&
     /^\d{4}-\d\d-\d\d$/.test(r.date)&&typeof r.place==="number"&&r.place>0&&
     typeof r.playerName==="string"&&safeUrl(r.source?.url)&&r.verified===true);
+   pendingResults=Array.isArray(data.pendingResults)?data.pendingResults.filter(r=>r&&r.verified===false&&r.verificationStatus==="unverified-family-recollection"&&typeof r.date==="string"&&typeof r.discipline==="string"&&Number.isInteger(r.place)&&safeUrl(r.source?.url)):[];
    loaded=true;
   }catch(e){error="Quelle derzeit nicht verfügbar.";}
   render();
