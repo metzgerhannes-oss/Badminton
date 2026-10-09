@@ -13,10 +13,10 @@ iso_week=module.iso_week
 points=module.points
 from datetime import datetime,timezone
 
-def make_xlsx():
+def make_xlsx(real=False):
     wb=Workbook()
     ws=wb.active
-    ws.append(["DIS","Rang","FRang","Nachname","Vorname","GS","SpielerID","GJahr","AKL1","AKL2","Punkte","Turniere"])
+    ws.append(["DIS","Ranglistenplatz" if real else "Rang","FRang","Nachname","Vorname","GS","SpielerID","GJahr","AKL1","AKL2","Points" if real else "Punkte","Turniere"])
     ws.append(["HE",1900,1900,"Metzger","Philipp","M","05-070879",2016,"U11-2","U11",2670,10])
     ws.append(["HE",1901,1901,"Andere","Spieler","M","05-000111",2016,"U11-2","U11",3000,10])
     ws.append(["HE",1902,1902,"Dritter","Spieler","M","05-000112",2016,"U11-2","U11",2670,10])
@@ -32,6 +32,10 @@ class RankingTests(unittest.TestCase):
         self.assertEqual(points(2670),2670)
     def test_headers_and_cohorts(self):
         rows=parse_excel(make_xlsx())
+        rows_real=parse_excel(make_xlsx(real=True))
+        self.assertEqual(len(rows_real),len(rows))
+        self.assertEqual(rows_real[0]["overallRank"],rows[0]["overallRank"])
+        self.assertEqual(rows_real[0]["points"],2670)
         ranks=cohort_ranks(rows)
         p=ranks[("05-070879","HE")]
         self.assertEqual(p["birthYear"],2016)
