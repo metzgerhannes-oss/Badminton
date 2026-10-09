@@ -28,12 +28,14 @@ jobs:
         run: |
           node --check app.js
           node --check history.js
+          node --check scripts/trophy-stats.mjs
           node --check sw.js
           node --check scripts/sync-feed.mjs
           node --check scripts/normalize-feed.mjs
           node tests/validate.mjs
           node tests/adapter.mjs
           node tests/history.mjs
+          node tests/trophies.mjs
       - name: Sync authorized tournament feed
         env:
           BADMINTON_FEED_URL: ${{ vars.BADMINTON_FEED_URL }}
