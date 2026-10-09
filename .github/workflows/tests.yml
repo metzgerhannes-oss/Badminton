@@ -16,6 +16,7 @@ jobs:
         run: |
           node --check app.js
           node --check history.js
+          node --check scripts/trophy-stats.mjs
           node --check sw.js
           node --check scripts/normalize-feed.mjs
           node --check scripts/sync-feed.mjs
@@ -24,3 +25,4 @@ jobs:
           node tests/validate.mjs
           node tests/adapter.mjs
           node tests/history.mjs
+          node tests/trophies.mjs
