@@ -217,3 +217,5 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 .friend-ranking-empty{margin:0 0 8px}
 .friend-ranking-official{display:inline-flex;align-items:center;color:#8bd8ff;font-size:12px;font-weight:850;margin-top:5px}
 @media(max-width:360px){.friend-actions button{padding:5px}.friend-details em{font-size:10px}}
+
+.ranking-stale-link{flex:1 0 100%;display:block;margin-top:5px;padding:9px 11px;border:1px solid #8f7645;border-radius:10px;background:#604a2630;color:#ffe0a1!important;font-weight:750;font-size:11px}
