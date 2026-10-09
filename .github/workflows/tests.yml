@@ -26,4 +26,5 @@ jobs:
           node tests/trophies.mjs
           node tests/bookmarks.mjs
           node tests/friends.mjs
+          node tests/profile-switch.mjs
           node tests/dashboard.mjs
