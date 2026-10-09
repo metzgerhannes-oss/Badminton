@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Weekly DBV *published Excel* ranking snapshots. No tournament scraping.
 
-A birth-year cohort rank is DERIVED from the official published points table,
+An age-class rank is DERIVED from the official AKL2 field (U11 contains multiple birth years),
 and deliberately not confused with the DBV overall Rank column.
 """
 from __future__ import annotations
@@ -100,22 +100,28 @@ def parse_excel(contents: bytes) -> list[dict]:
     return found
 
 def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
-    groups=defaultdict(list)
+    """Rank by official AKL2 age class (U11 includes 2016, 2017, etc.)."""
+    groups=defaultdict(dict)
     for row in rows:
-        groups[(row["discipline"],row["gender"],row["birthYear"])].append(row)
+        age_class=str(row.get("ageClass") or "").strip().upper()
+        if not re.fullmatch(r"U(?:11|13|15|17|19|22)",age_class):
+            continue
+        key=(row["discipline"],row["gender"],age_class)
+        existing=groups[key].get(row["id"])
+        if existing is None or row["points"]>existing["points"]:
+            groups[key][row["id"]]=row
     ranked={}
-    for (discipline,gender,year),items in groups.items():
-        # Tie policy: same points = same cohort rank, equal to 1 + players above.
-        order=sorted(items,key=lambda r:-r["points"])
+    for (_,_,age_class),members in groups.items():
+        order=sorted(members.values(),key=lambda r:-r["points"])
         first_at_points={}
         for index,item in enumerate(order,1):
             first_at_points.setdefault(item["points"],index)
             record=dict(item)
-            record["yearRank"]=first_at_points[item["points"]]
-            record["cohortSize"]=len(order)
-            # Duplicate player entries should not move a better rank.
-            k=(item["id"],discipline)
-            if k not in ranked or ranked[k]["yearRank"]>record["yearRank"]:
+            record["ageClassRank"]=first_at_points[item["points"]]
+            record["ageClassSize"]=len(order)
+            record["ageClass"]=age_class
+            k=(item["id"],item["discipline"])
+            if k not in ranked or ranked[k]["ageClassRank"]>record["ageClassRank"]:
                 ranked[k]=record
     return ranked
 
@@ -156,30 +162,30 @@ def summarize(now, before, id_list:list[str], checked:str):
             r=current.get((pid,dis))
             if not r:continue
             p=prior.get((pid,dis))
-            comparable=bool(p and p["birthYear"]==r["birthYear"])
+            comparable=bool(p and p["ageClass"]==r["ageClass"])
             bw=current_bw.get((pid,dis))
             before_bw=prior_bw.get((pid,dis))
-            comparable_bw=bool(bw and before_bw and before_bw["birthYear"]==bw["birthYear"])
+            comparable_bw=bool(bw and before_bw and before_bw["ageClass"]==bw["ageClass"])
             disciplines[dis]={
                 "ageClass":r["ageClass"],"birthYear":r["birthYear"],
-                "points":r["points"],"yearRank":r["yearRank"],
-                "bwRank":bw["yearRank"] if bw else None,
-                "bwCohortSize":bw["cohortSize"] if bw else None,
-                "previousBwRank":before_bw["yearRank"] if comparable_bw else None,
-                "bwChange":(before_bw["yearRank"]-bw["yearRank"]) if comparable_bw else None,
-                "overallRank":r["overallRank"],"cohortSize":r["cohortSize"],
-                "previousYearRank":p["yearRank"] if comparable else None,
+                "points":r["points"],"ageClassRank":r["ageClassRank"],
+                "bwAgeClassRank":bw["ageClassRank"] if bw else None,
+                "bwAgeClassSize":bw["ageClassSize"] if bw else None,
+                "previousBwAgeClassRank":before_bw["ageClassRank"] if comparable_bw else None,
+                "bwAgeClassChange":(before_bw["ageClassRank"]-bw["ageClassRank"]) if comparable_bw else None,
+                "overallRank":r["overallRank"],"ageClassSize":r["ageClassSize"],
+                "previousAgeClassRank":p["ageClassRank"] if comparable else None,
                 "previousPoints":p["points"] if comparable else None,
-                "change":(p["yearRank"]-r["yearRank"]) if comparable else None,
+                "ageClassChange":(p["ageClassRank"]-r["ageClassRank"]) if comparable else None,
                 "tournaments":r["tournaments"]
             }
         if disciplines: players[pid]={"name":(next((r["firstName"]+" "+r["lastName"] for r in current.values() if r["id"]==pid),"")).strip(),"disciplines":disciplines}
-    return {"schemaVersion":1,"status":"available","type":"dbv-published-excel-derived-birthyear-rank",
+    return {"schemaVersion":2,"status":"available","type":"dbv-published-excel-derived-ageclass-rank",
       "checkedAt":checked,
       "current":{"year":newest[0],"week":newest[1],"url":now[2]},
       "previous":{"year":earlier[0],"week":earlier[1],"url":before[2]} if before else None,
       "sourceUrl":HISTORY,"region":BW_ASSOCIATION,"players":players,
-      "method":"DE: Rang im Geburtsjahr/Geschlecht/Disziplin nach DBV-Punkten; BW: derselbe Vergleich nur für Landesverband BAW-Baden-Württemberg (Spalte LVName). Bei Gleichstand gleicher Rang; kein offizieller Gesamtrang.",
+      "method":"DE: Rang in DBV-Altersklasse AKL2 (U11 umfasst mehrere Geburtsjahrgänge), Geschlecht und Disziplin; BW: gleiche Altersklasse für LVName=BAW-Baden-Württemberg. Gleichstand ergibt gleichen Rang.",
       "notes":"Offizielle veröffentlichte Excel-Ranglisten. Nur öffentliche Spieler-IDs aus der konfigurierten Familien-Auswahl werden gespeichert. Veröffentlichungszeitpunkt ist nicht notwendig Donnerstag."}
 
 def main():
@@ -203,22 +209,22 @@ def main():
             if own is None:raise ValueError("Selected player vanished from ranking input")
             higher={row["id"] for row in latest
                     if row["discipline"]==disc and row["gender"]==own["gender"]
-                    and row["birthYear"]==own["birthYear"] and row["points"]>own["points"]}
+                    and row["ageClass"]==own["ageClass"] and row["points"]>own["points"]}
             audit=1+len(higher)
-            if audit!=rank["yearRank"]:
-                raise ValueError(f"Cohort rank audit failed: {pid} {disc} got {rank['yearRank']}, expected {audit}")
+            if audit!=rank["ageClassRank"]:
+                raise ValueError(f"Cohort rank audit failed: {pid} {disc} got {rank['ageClassRank']}, expected {audit}")
             if own["association"]==BW_ASSOCIATION:
                 higher_bw={row["id"] for row in latest
                     if row["discipline"]==disc and row["gender"]==own["gender"]
-                    and row["birthYear"]==own["birthYear"]
+                    and row["ageClass"]==own["ageClass"]
                     and row.get("association")==BW_ASSOCIATION and row["points"]>own["points"]}
                 audit_bw=1+len(higher_bw)
-                if rank["bwRank"]!=audit_bw:
-                    raise ValueError(f"BW cohort audit failed: {pid} {disc} got {rank['bwRank']}, expected {audit_bw}")
-            print(f"VERIFIED {pid} {disc}: BW={rank['bwRank']} DE={rank['yearRank']} birthyear={own['birthYear']} points={own['points']} previous BW={rank['previousBwRank']}")
+                if rank["bwAgeClassRank"]!=audit_bw:
+                    raise ValueError(f"BW cohort audit failed: {pid} {disc} got {rank['bwAgeClassRank']}, expected {audit_bw}")
+            print(f"VERIFIED {pid} {disc}: BW={rank['bwAgeClassRank']} DE={rank['ageClassRank']} ageClass={own['ageClass']} birthyear={own['birthYear']} points={own['points']} previous BW={rank['previousBwAgeClassRank']}")
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
     old=json.loads(OUTPUT.read_text()) if OUTPUT.exists() else None
-    if old and old.get("current")==result.get("current") and old.get("previous")==result.get("previous") and old.get("players")==result.get("players"):
+    if old and old.get("schemaVersion")==2 and old.get("current")==result.get("current") and old.get("previous")==result.get("previous") and old.get("players")==result.get("players"):
         print("Same official calendar-week exports; no change in KPI snapshot.")
         return
     OUTPUT.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n")
