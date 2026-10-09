@@ -76,6 +76,11 @@ class RankingTests(unittest.TestCase):
         self.assertEqual(r["bwAgeClassChange"],-1)
         self.assertEqual(result["current"]["week"],40)
         self.assertEqual(result["region"],"BAW-Baden-Württemberg")
+        self.assertEqual(r["points"],2670)
+        self.assertEqual(r["countedLimit"],5)
+        self.assertEqual(r["topFive"],[])
+        self.assertEqual(r["topFiveStatus"],"not-in-public-export")
+        self.assertEqual(result["players"]["05-070879"]["disciplines"]["HD"]["countedLimit"],5)
     def test_age_group_transition_suppresses_week_comparison(self):
         rows=parse_excel(make_xlsx())
         prev=[dict(r) for r in rows]
