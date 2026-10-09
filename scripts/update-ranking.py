@@ -107,7 +107,7 @@ def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
                 ranked[k]=record
     return ranked
 
-def published_export(when:datetime, max_lookback=8):
+def published_export(when:datetime, max_lookback=6):
     for ago in range(max_lookback):
         year,week=iso_week(when-timedelta(weeks=ago))
         url=RELEASES.format(year=year,week=week)
@@ -123,6 +123,9 @@ def published_export(when:datetime, max_lookback=8):
             yield year,week,url,parse_excel(binary)
         except HTTPError as e:
             if e.code in (404,410):continue
+            if e.code in (401,403,429):
+                print(f"Official archive denied automated access: HTTP {e.code}; skipping instead of retrying.",file=sys.stderr)
+                return
             print(f"HTTP {e.code} from official archive",file=sys.stderr)
         except (URLError,ValueError,OSError,TimeoutError) as e:
             print(f"Archive unavailable: {type(e).__name__}: {e}",file=sys.stderr)
