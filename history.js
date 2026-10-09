@@ -1,8 +1,9 @@
+import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
 "use strict";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
  const feedUrl="./data/history.json";
- let records=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[];
+ let records=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all";
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -39,10 +40,54 @@
  root.innerHTML='<h3>Platzierungsverlauf</h3><p>Vergleich nur innerhalb derselben Altersklasse und Disziplin. Niedrigere Platznummer = bessere Platzierung; keine Ranglistenpunkte.</p>'+diagrams.join("");
 }
 
+
+ const trophyLevels={
+  1:{title:"Gold",caption:"1. Platz",detail:"Turniersiege",tone:"gold"},
+  2:{title:"Silber",caption:"2. Platz",detail:"Finalteilnahmen",tone:"silver"},
+  3:{title:"Bronze",caption:"3. Platz",detail:"Podestplätze",tone:"bronze"},
+  4:{title:"Vierter Platz",caption:"4. Platz",detail:"Top-4-Ergebnisse",tone:"fourth"}
+ };
+ function trophyIcon(place){
+  if(place===4){
+   return '<svg viewBox="0 0 94 104" width="94" height="104" aria-hidden="true" focusable="false"><path d="M32 12l15 13 15-13 7 35-22 13-22-13z" fill="#6294ca"/><path d="M32 12l15 13-6 27-16-5z" fill="#9bc7f0"/><path d="M62 12L47 25l6 27 16-5z" fill="#386da8"/><circle cx="47" cy="59" r="28" fill="#2c5b92" stroke="#a8d9ff" stroke-width="3"/><circle cx="47" cy="59" r="20" fill="#80bff2" stroke="#d3ecff" stroke-width="2"/><text x="47" y="72" font-size="34" text-anchor="middle" font-weight="900" fill="#133960">4</text></svg>';
+  }
+  const color=place===1?["#FFF0AF","#E7AC38","#A66A1B"]:place===2?["#F6FAFF","#B3C5DB","#70859D"]:["#FFE4C2","#C48455","#7D4A32"];
+  const gradient="metal-"+place;
+  return '<svg viewBox="0 0 94 104" width="94" height="104" aria-hidden="true" focusable="false"><defs><linearGradient id="'+gradient+'" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="'+color[0]+'"/><stop offset="55%" stop-color="'+color[1]+'"/><stop offset="100%" stop-color="'+color[2]+'"/></linearGradient></defs><path d="M25 20H69V38C69 57 60 67 47 67S25 57 25 38Z" fill="url(#'+gradient+')" stroke="'+color[2]+'" stroke-width="2"/><path d="M25 28H13v9c0 14 10 20 21 20M69 28h12v9c0 14-10 20-21 20" fill="none" stroke="'+color[1]+'" stroke-width="8" stroke-linecap="round"/><path d="M38 66h18v12H38zM29 79h36v10H29z" fill="url(#'+gradient+')" stroke="'+color[2]+'" stroke-width="1.4"/><path d="M37 23v15c0 14 3 19 8 22" fill="none" stroke="#fff" stroke-opacity=".52" stroke-width="3" stroke-linecap="round"/><circle cx="47" cy="40" r="11" fill="'+color[2]+'" fill-opacity=".18"/><text x="47" y="46" font-size="16" font-weight="900" text-anchor="middle" fill="'+color[2]+'">'+place+'</text></svg>';
+ }
+ function renderTrophies(chosen){
+  const shelf=$("trophy-shelf"),awards=$("trophy-awards"),title=$("trophy-awards-heading"),showAll=$("trophy-show-all");
+  if(!shelf||!awards||!title||!showAll)return;
+  const {counts,results,total}=summarizeTrophies(chosen);
+  shelf.innerHTML=TROPHY_PLACES.map(place=>{
+    const conf=trophyLevels[place];
+    const active=String(place)===String(trophyPlace);
+    const value=counts[place];
+    return '<button type="button" class="trophy-slot trophy-'+conf.tone+(active?' active':'')+(value===0?' not-yet':'')+'" data-place="'+place+'" aria-pressed="'+active+'" aria-label="'+conf.caption+': '+value+' Auszeichnungen anzeigen"><span class="trophy-glow" aria-hidden="true"></span><span class="trophy-illustration">'+trophyIcon(place)+'</span><span class="trophy-count">'+value+'</span><strong class="trophy-label">'+conf.title+'</strong><small class="trophy-rank">'+conf.caption+'</small></button>';
+  }).join("");
+  shelf.querySelectorAll("[data-place]").forEach(button=>button.addEventListener("click",()=>{
+    trophyPlace=String(button.dataset.place);
+    renderTrophies(chosen);
+  }));
+  showAll.hidden=trophyPlace==="all";
+  const selected=results.filter(r=>trophyPlace==="all"||r.place===Number(trophyPlace));
+  title.textContent=trophyPlace==="all"?"Alle Auszeichnungen ("+total+")":trophyLevels[Number(trophyPlace)].caption+" ("+selected.length+")";
+  if(!selected.length){
+    awards.innerHTML='<div class="trophy-empty"><span aria-hidden="true">✦</span><p>'+(total===0?'Für diese Auswahl sind bisher keine Platzierungen von 1 bis 4 belegt.':'Für diese Platzierung gibt es in der aktuellen Auswahl noch keinen belegten Eintrag.')+'</p></div>';
+    return;
+  }
+  awards.innerHTML=selected.map(r=>{
+    const conf=trophyLevels[r.place];
+    const source=safeUrl(r.source?.url);
+    const person=lastPlayer==="all"?'<span>'+escape(r.playerName)+'</span>':"";
+    return '<article class="trophy-award"><div class="trophy-award-icon trophy-'+conf.tone+'" aria-hidden="true">'+(r.place===4?'4':'★')+'</div><div class="trophy-award-info"><div class="trophy-award-top"><strong>'+conf.caption+'</strong><span>'+escape(niceDate(r.date))+'</span></div><div class="trophy-award-title">'+escape(r.event)+'</div><div class="trophy-award-meta">'+person+'<span>'+escape(r.discipline)+' · '+escape(r.ageGroup)+'</span>'+(r.partner?'<span>mit '+escape(r.partner)+'</span>':'')+'</div>'+(source?'<a target="_blank" rel="noopener noreferrer" href="'+escape(source)+'">Turnierbericht ansehen ↗</a>':'')+'</div></article>';
+  }).join("");
+ }
+
 function render(){
   const source=$("history-source"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
-  if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";return;}
+  if(error){source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
   if(!loaded){source.textContent="Verifizierte Platzierungen werden geladen …";return;}
   source.textContent="Ausgewählte, belegte Turnierergebnisse aus Vereinsberichten (2025–2026). Keine vollständige DBV-Matchhistorie; Satzergebnisse nur mit Quelle.";
   const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
@@ -53,6 +98,7 @@ function render(){
   const chosen=playerRecords.filter(r=>(year==="all"||r.date.startsWith(year))&&(discipline==="all"||r.discipline===discipline))
     .slice().sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));
   const events=new Set(chosen.map(r=>r.event+"|"+r.date));
+  renderTrophies(chosen);
   plotTrends(chosen);
   const podium=chosen.filter(r=>r.place<=3).length;
   const playerCount=new Set(chosen.map(r=>r.playerId)).size;
@@ -92,6 +138,7 @@ function render(){
  document.addEventListener("DOMContentLoaded",()=>{
   $("history-year")?.addEventListener("change",e=>{year=e.target.value;render()});
   $("history-discipline")?.addEventListener("change",e=>{discipline=e.target.value;render()});
+  $("trophy-show-all")?.addEventListener("click",()=>{trophyPlace="all";render();});
   load();
  });
 })();
