@@ -152,7 +152,7 @@ function render(){
  state.chosen=state.viewingFriendId||state.activeProfileId;
  const viewedProfiles=[...state.players,...state.friends];
  window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks,{mode:state.viewingFriendId?"friend":"own"});
- window.renderHistory?.(state.chosen,viewedProfiles);
+ window.renderHistory?.(state.chosen,viewedProfiles,{mode:state.viewingFriendId?"friend":"own"});
  const page=["start","historie","turniere","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
