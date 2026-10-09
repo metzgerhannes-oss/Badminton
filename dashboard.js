@@ -3,14 +3,14 @@ import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
 const rankUrl="./data/ranking.json";
 const historyUrl="./data/history.json";
 const rankNames={HE:"Einzel",DE:"Einzel",HD:"Doppel",DD:"Doppel",HM:"Mixed",DM:"Mixed"};
-let ranking=null,history=null,rankError=false,historyError=false,selection="all",profiles=[],bookmarks=[];
+let ranking=null,history=null,rankError=false,historyError=false,selection="",profiles=[],bookmarks=[],viewMode="own";
 const $=id=>document.getElementById(id);
 const escape=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=x=>typeof x==="number"&&Number.isFinite(x)?new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(x):"–";
 const date=x=>x&&/^\d{4}-\d\d-\d\d$/.test(x)?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(x+"T12:00:00Z")):"";
 function relevantResults(){
  const rows=history?.results??[];
- if(selection==="all")return rows;
+ if(!selection)return [];
  const p=profiles.find(x=>x.id===selection);
  return rows.filter(x=>x.playerId===selection||(p&&x.playerName===p.name));
 }
@@ -33,9 +33,9 @@ function renderRank(){
  label.textContent=working?"DBV KW "+current.week+" / "+current.year:"DBV-Rangliste";
  source.innerHTML=working?'<span>Jahrgangsplatz · Deutschland</span><span>'+escape("KW "+current.week+(prior?" vs. KW "+prior.week:" · Vergleich folgt"))+'</span>':
  '<span>Ranglistenwerte noch nicht importiert</span>';
- const chosen=profiles.filter(p=>(selection==="all"||p.id===selection)&&/^\d{2}-\d{6}$/.test(p.id));
+ const chosen=profiles.filter(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
  if(!chosen.length){
-  root.innerHTML='<a class="dashboard-empty-tile" href="#profil"><strong>Rangliste einrichten</strong><small>Bitte die DBV-Spieler-ID im Profil hinterlegen. Nur so kann die Rangliste passend zum Geburtsjahr geladen werden.</small><span>Zu den Profilen ↗</span></a>';
+  root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Bitte die DBV-Spieler-ID im Profil hinterlegen. Nur so kann die Rangliste passend zum Geburtsjahr geladen werden.</small><span>Zu den Einstellungen ↗</span></a>';
   return;
  }
  const out=[];
@@ -44,9 +44,14 @@ function renderRank(){
   const discs=player?.disciplines??{};
   const known=Object.values(discs)[0];
   const birth=known?.birthYear??p.birthYear;
+  if(!known && viewMode==="friend"){
+   const profileLink=p.url&&/^https:\/\//.test(p.url)?'<a class="friend-ranking-official" rel="noopener noreferrer" target="_blank" href="'+escape(p.url)+'">Offizielles Profil öffnen ↗</a>':"";
+   out.push('<div class="dashboard-empty-tile friend-ranking-empty"><strong>Rangliste noch nicht verfügbar</strong><small>Für '+escape(p.name)+' (DBV '+escape(p.id)+') liegen in der veröffentlichten wöchentlichen Datenauswahl noch keine Jahrgangsränge vor. Ein Freundes-Favorit allein löst noch keinen DBV-Import aus.</small>'+profileLink+'</div>');
+   continue;
+  }
   const cohort=birth?"Jg. "+birth+" · "+ageLabel(birth):"Jahrgang noch offen";
   const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:p.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
-  if(selection==="all"&&chosen.length>1)out.push('<div class="dashboard-group-name">'+escape(p.name)+' · '+escape(cohort)+'</div>');
+  if(chosen.length>1)out.push('<div class="dashboard-group-name">'+escape(p.name)+' · '+escape(cohort)+'</div>');
   for(const key of keys){
    const entry=discs[key];
    const title=rankNames[key];
@@ -63,23 +68,30 @@ function renderOtherKpis(){
  if(!root||!next)return;
  const results=relevantResults();
  const trophies=summarizeTrophies(results);
+ const friendNoHistory=viewMode==="friend"&&results.length===0;
  const years=new Set(results.map(r=>r.date+"|"+r.event));
  const medals=trophies.counts;
- root.innerHTML='<a class="kpi-tile" href="#historie"><span class="kpi-label">Trophäenschrank</span><span class="kpi-value">'+num(trophies.total)+'</span><span class="kpi-sub">1. Platz '+medals[1]+' · 2. Platz '+medals[2]+' · 3. Platz '+medals[3]+' · 4. Platz '+medals[4]+'</span><span class="kpi-link">Auszeichnungen ansehen ↗</span></a>'+
- '<a class="kpi-tile" href="#historie"><span class="kpi-label">Erfasste Turniere</span><span class="kpi-value">'+num(years.size)+'</span><span class="kpi-sub">'+results.length+' belegte Platzierungen · historische Auswahl</span><span class="kpi-link">Zur Historie ↗</span></a>';
+ root.innerHTML='<a class="kpi-tile" href="#historie"><span class="kpi-label">Trophäenschrank</span><span class="kpi-value">'+(friendNoHistory?'–':num(trophies.total))+'</span><span class="kpi-sub">'+(friendNoHistory?'Für diesen Freund noch keine historischen Daten erfasst':'1. Platz '+medals[1]+' · 2. Platz '+medals[2]+' · 3. Platz '+medals[3]+' · 4. Platz '+medals[4])+'</span><span class="kpi-link">Zur Historie ↗</span></a>'+
+ '<a class="kpi-tile" href="#historie"><span class="kpi-label">Erfasste Turniere</span><span class="kpi-value">'+(friendNoHistory?'–':num(years.size))+'</span><span class="kpi-sub">'+(friendNoHistory?'Keine öffentlichen Turnierdaten für diesen Freund in unserer Sammlung':'Auswahl: '+results.length+' belegte Platzierungen')+'</span><span class="kpi-link">Zur Historie ↗</span></a>';
  const now=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  const entries=bookmarks.filter(t=>selection==="all"||t.playerId===selection||t.playerId==="all");
  const upcoming=entries.filter(t=>t.startDate&&(!t.endDate||t.endDate>=now)&&t.startDate>=now||t.startDate&&t.endDate>=now)
  .sort((a,b)=>a.startDate.localeCompare(b.startDate));
  const t=upcoming[0];
+ if(viewMode==="friend"){
+  const p=profiles.find(x=>x.id===selection);
+  const official=p?.url&&/^https:\/\//.test(p.url)?p.url:null;
+  next.innerHTML='<a class="kpi-wide" href="'+escape(official||"#einstellungen")+'"'+(official?' target="_blank" rel="noopener noreferrer"':"")+'><span><strong>Offizielles Spielerprofil</strong><small>'+(official?'Spielerdaten beim DBV ansehen':'Bitte in den Freundeseinstellungen einen offiziellen Profil-Link ergänzen')+'</small></span><span class="kpi-next-date">'+(official?'Profil ↗':'Einstellungen ↗')+'</span></a>';
+  return;
+ }
  const href=t?escape(t.url):"#turniere";
  next.innerHTML='<a class="kpi-wide" href="'+href+'"'+(t?' target="_blank" rel="noopener noreferrer"':'')+'><span><strong>Nächstes Turnier</strong><small>'+(t?escape(t.name):"Noch kein bevorstehendes Turnier mit Datum gespeichert")+'</small></span><span class="kpi-next-date">'+(t?escape(date(t.startDate)):"Turnier anlegen ↗")+'</span></a>';
 }
 function renderDashboard(){
  renderRank();renderOtherKpis();
 }
-window.renderDashboard=(selected,ps,links)=>{
- selection=selected||"all";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];
+window.renderDashboard=(selected,ps,links,options={})=>{
+ selection=selected||"";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
  renderDashboard();
 };
 async function load(){
