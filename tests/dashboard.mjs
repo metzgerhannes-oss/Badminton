@@ -26,6 +26,12 @@ assert.ok(js.includes('Jg. ')&&js.includes('bwCohortSize'),"Birthyear and BW coh
 assert.ok(js.includes('movement-up')&&js.includes('movement-down')&&js.includes('movement-unknown'));
 assert.ok(sw.includes("./dashboard.js"));
 assert.ok(page.includes('id="ranking-dialog"'));
+assert.ok(page.includes('id="first-run-dialog"'));
+assert.ok(page.includes('id="first-run-choices"'));
+assert.ok(app.includes('freshDevice')&&app.includes('window.renderDashboard'));
+assert.ok(js.includes('BW · Jahrgang'));
+assert.ok(js.includes('ranking-bw-row'));
+assert.ok(js.includes('ranking-de-row'));
 assert.ok(page.includes('id="dashboard-friends"'));
 assert.ok(app.includes("renderFriendQuick()"));
 assert.ok(js.includes("function renderRankDetails"));
@@ -33,6 +39,14 @@ assert.ok(js.includes("ranking-compact"));
 assert.ok(snapshot.schemaVersion===1);
 assert.ok(["pending","available"].includes(snapshot.status));
 if(snapshot.status==="pending")assert.deepEqual(snapshot.players,{},"Never seed fictional rankings");
+if(snapshot.status==="available"&&snapshot.players?.["05-070879"]?.disciplines?.HE?.bwRank!=null){
+ const ranks=snapshot.players["05-070879"].disciplines;
+ for(const key of ["HE","HD","HM"]){
+   assert.ok(ranks[key].bwRank>=1,"BW rank positive");
+   assert.ok(ranks[key].yearRank>=ranks[key].bwRank,"BW position cannot be below German position");
+   assert.equal(ranks[key].birthYear,2016);
+ }
+}
 const workflow=await readFile(".github/workflows/ranking.yml","utf8");
 assert.ok(workflow.includes("cron: '0 15 * * 4'"),"Schedule Thursday only");
 assert.ok(workflow.includes("scripts/update-ranking.py"));
