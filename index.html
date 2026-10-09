@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0c2244">
-<meta name="description" content="Dein Badminton-Turniertag: nächste Spiele, Felder und Ergebnisse auf einen Blick.">
-<title>Schmetterlinge · Badminton-Turnierbegleiter</title>
+<meta name="description" content="Die Turniererfolge der Schmetterlinge: Trophäenschrank, Historie und Turnierlinks.">
+<title>Schmetterlinge · Badminton Jugend</title>
 <link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
@@ -14,103 +14,80 @@
 </head>
 <body>
 <div class="app">
-  <header class="topbar">
-    <a class="brand" href="#heute" aria-label="Schmetterlinge Start"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="SpVgg Mössingen Schmetterlingslogo"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
-    <button class="icon-button" id="refresh" title="Ergebnisse neu laden" aria-label="Ergebnisse aktualisieren">↻</button>
-  </header>
-  <main>
-    <section class="hero">
-      <img class="hero-crest" src="./assets/spvgg-schmetterlinge.svg" alt="" aria-hidden="true">
-      <div class="eyebrow"><span class="status-dot"></span> SPVGG MÖSSINGEN · SCHMETTERLINGE</div>
-      <h1 id="greeting">Dein Spieltag.<br><em>Jedes Match.</em></h1>
-      <p>Die Spiele unserer Schmetterlinge: Zeiten, Felder und Ergebnisse auf einen Blick.</p>
-      <div class="hero-bottom"><span id="feed-badge" class="source-badge">Quelle wird geprüft</span><span id="last-update" class="last-update"></span></div>
-    </section>
-    <section class="player-bar" aria-label="Spielerfilter">
-      <div class="section-heading"><h2>Unsere Spieler</h2><button id="add-player" class="subtle-button">+ Spieler hinzufügen</button></div>
-      <div id="player-pills" class="player-pills"></div>
-    </section>
-    <div class="notice" id="source-notice" role="status"></div>
-    <section class="page active" id="view-heute" aria-labelledby="heading-heute">
-      <div class="section-heading"><h2 id="heading-heute">Turniertag</h2><span id="today-label" class="muted"></span></div>
-      <div id="official-live-link"></div>
-      <div id="next-match"></div>
-      <div class="section-heading extra"><h2>Alle Spiele</h2><span id="matches-count" class="muted"></span></div>
-      <div class="segmented" role="group" aria-label="Spiele filtern">
-        <button class="segment selected" data-filter="all" aria-pressed="true">Alle</button>
-        <button class="segment" data-filter="upcoming" aria-pressed="false">Anstehend</button>
-        <button class="segment" data-filter="finished" aria-pressed="false">Ergebnisse</button>
-      </div>
-      <div id="match-list" class="match-list"></div>
-    </section>
-    <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
-      <div class="section-heading"><h2 id="heading-turniere">Turniere</h2><button class="subtle-button" id="add-live-link">+ DBV-Turnier verlinken</button></div>
-      <p class="supporting">Turniere aus der angebundenen Datenquelle werden automatisch angezeigt. Du kannst auch direkt zum offiziellen DBV-Portal wechseln.</p>
-      <div id="tournament-list" class="tournament-list"></div>
-      <div id="official-tournament-list" class="tournament-list"></div>
-      <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierkalender öffnen<small>Offizielle Ausschreibungen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
-    </section>
-    <section class="page" id="view-historie" aria-labelledby="heading-historie">
-      <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Veröffentlichte Ergebnisse</span></div>
-      <p class="supporting">Platzierungen aus belegten Vereinsberichten, nach Spieler, Jahr und Disziplin filterbar. Die Sammlung ist noch nicht vollständig und enthält keine geschätzten Spielergebnisse.</p>
-      <div id="history-source" class="notice"></div>
-      <div id="history-summary" class="history-summary"></div>
-      <div id="history-pending" class="history-pending" aria-live="polite"></div>
-      <div class="history-filters" aria-label="Historie filtern">
-        <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
-        <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
-      </div>
-      <section class="trophy-section" aria-labelledby="trophy-heading">
-        <div class="section-heading"><h3 id="trophy-heading">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
-        <p class="trophy-description">Deine gesammelten Turniererfolge – jeder Platz erzählt eine Geschichte.</p>
-        <div id="trophy-shelf" class="trophy-shelf" role="group" aria-label="Auszeichnungen nach Platzierung"></div>
-        <div class="trophy-awards-heading"><h3 id="trophy-awards-heading">Auszeichnungen</h3><button id="trophy-show-all" class="subtle-button" type="button">Alle anzeigen</button></div>
-        <div id="trophy-awards" class="trophy-awards" aria-live="polite"></div>
-      </section>
-      <div class="section-heading history-chronicle-title"><h3>Turnierchronik</h3><span class="muted">Alle Platzierungen</span></div>
-      <div id="history-trends" class="history-trends"></div>
-      <div id="history-timeline" class="history-timeline"></div>
-      <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine seriöse Verlaufsgrafik folgt, sobald mehrere datierte Ranglistenstände vorhanden sind. Einzelne Platzierungen unterschiedlicher Altersklassen werden nicht zu einer künstlichen Leistungskurve verbunden.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuelle DBV-Rangliste ↗</a></div>
-    </section>
-    <section class="page" id="view-profil" aria-labelledby="heading-profil">
-      <div class="section-heading"><h2 id="heading-profil">Spielerprofile</h2></div>
-      <div id="profile-list" class="profiles"></div>
-      <button id="add-profile" class="primary-button">+ Weiteren Spieler hinzufügen</button>
-      <div class="settings-card">
-        <h3>Live-Daten & Benachrichtigungen</h3>
-        <p>Bei einer freigegebenen JSON-Datenquelle aktualisiert sich die App automatisch alle 60 Sekunden. Benachrichtigungen funktionieren nur, solange die Seite geöffnet ist.</p>
-        <button id="notify" class="outline-button">Benachrichtigungen einschalten</button>
-        <button id="demo-toggle" class="outline-button">Demo-Modus starten</button>
-        <p id="feed-detail" class="small muted"></p>
-      </div>
-    </section>
-  </main>
-  <nav class="bottom-nav" aria-label="Hauptnavigation">
-    <a href="#heute" data-page="heute" aria-current="page"><span aria-hidden="true">⌂</span><small>Heute</small></a>
-    <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
-    <a href="#historie" data-page="historie"><span aria-hidden="true">◷</span><small>Historie</small></a>
-    <a href="#profil" data-page="profil"><span aria-hidden="true">◯</span><small>Profile</small></a>
-  </nav>
+ <header class="topbar">
+  <a class="brand" href="#historie" aria-label="Schmetterlinge Start"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
+ </header>
+ <main>
+  <section class="hero">
+   <img class="hero-crest" src="./assets/spvgg-schmetterlinge.svg" alt="" aria-hidden="true">
+   <div class="eyebrow">SPVGG MÖSSINGEN · SCHMETTERLINGE</div>
+   <h1>Eure Erfolge.<br><em>Eure Geschichte.</em></h1>
+   <p>Turniere, Platzierungen und Auszeichnungen unserer Schmetterlinge – übersichtlich an einem Ort.</p>
+  </section>
+  <section class="player-bar" aria-label="Spielerfilter">
+   <div class="section-heading"><h2>Unsere Spieler</h2><button id="add-player" class="subtle-button" type="button">+ Spieler hinzufügen</button></div>
+   <div id="player-pills" class="player-pills"></div>
+  </section>
+  <section class="page active" id="view-historie" aria-labelledby="heading-historie">
+   <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Erfasste Ergebnisse</span></div>
+   <p class="supporting">Platzierungen aus Vereins- und Verbandsberichten, nach Spieler, Jahr und Disziplin filterbar. Die Sammlung wird ergänzt, wenn weitere Ergebnisse belegt sind.</p>
+   <div id="history-source" class="notice"></div>
+   <div id="history-summary" class="history-summary"></div>
+   <div id="history-pending" class="history-pending" aria-live="polite"></div>
+   <div class="history-filters" aria-label="Historie filtern">
+    <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
+    <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
+   </div>
+   <section class="trophy-section" aria-labelledby="trophy-heading">
+    <div class="section-heading"><h3 id="trophy-heading">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
+    <p class="trophy-description">Deine gesammelten Turniererfolge – jeder Platz erzählt eine Geschichte.</p>
+    <div id="trophy-shelf" class="trophy-shelf" role="group" aria-label="Auszeichnungen nach Platzierung"></div>
+    <div class="trophy-awards-heading"><h3 id="trophy-awards-heading">Auszeichnungen</h3><button id="trophy-show-all" class="subtle-button" type="button">Alle anzeigen</button></div>
+    <div id="trophy-awards" class="trophy-awards" aria-live="polite"></div>
+   </section>
+   <div class="section-heading history-chronicle-title"><h3>Turnierchronik</h3><span class="muted">Alle Platzierungen</span></div>
+   <div id="history-trends" class="history-trends"></div>
+   <div id="history-timeline" class="history-timeline"></div>
+   <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine belastbare Verlaufsgrafik benötigt mehrere datierte Ranglistenstände. Platzierungen unterschiedlicher Altersklassen werden nicht miteinander vermischt.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Offizielle DBV-Rangliste öffnen ↗</a></div>
+  </section>
+  <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
+   <div class="section-heading"><h2 id="heading-turniere">Meine Turnierlinks</h2><button class="subtle-button" id="add-tournament" type="button">+ Turnier speichern</button></div>
+   <p class="supporting">Offizielle Turniere als Favoriten für die ganze Familie. Spielpläne und Ergebnisse werden direkt auf der Veranstalterseite geöffnet; hier findet keine Live-Abfrage statt.</p>
+   <div id="official-tournament-list" class="tournament-list"></div>
+   <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierportal<small>Offizielle Turnierinformationen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
+  </section>
+  <section class="page" id="view-profil" aria-labelledby="heading-profil">
+   <div class="section-heading"><h2 id="heading-profil">Spielerprofile</h2></div>
+   <div id="profile-list" class="profiles"></div>
+   <button id="add-profile" class="primary-button" type="button">+ Weiteren Spieler hinzufügen</button>
+   <div class="settings-card"><h3>Datenstand</h3><p>Die Historie wird aus ausgewählten veröffentlichten Turnierergebnissen zusammengestellt und ist nicht vollständig. Private Spielerfavoriten und Turnierlinks bleiben ausschließlich auf diesem Gerät gespeichert.</p></div>
+  </section>
+ </main>
+ <nav class="bottom-nav" aria-label="Hauptnavigation">
+  <a href="#historie" data-page="historie" aria-current="page"><span aria-hidden="true">★</span><small>Historie</small></a>
+  <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
+  <a href="#profil" data-page="profil"><span aria-hidden="true">◯</span><small>Profile</small></a>
+ </nav>
 </div>
 <dialog id="player-dialog">
-  <form id="player-form" class="modal">
-    <div class="section-heading"><h2>Spieler hinzufügen</h2><button id="cancel-dialog" type="button" class="icon-button" aria-label="Schließen">×</button></div>
-    <label>Vorname oder Anzeigename<input name="name" placeholder="z. B. Charlotte" required maxlength="80"></label>
-    <label>DBV-Spieler-ID <span class="muted">(optional)</span><input name="id" placeholder="05-123456" maxlength="30" inputmode="text"></label>
-    <label>DBV-Profil-Link <span class="muted">(optional)</span><input name="url" placeholder="https://dbv.turnier.de/player-profile/…" type="url"></label>
-    <p class="small muted">Die Angaben bleiben auf diesem Gerät gespeichert. Für Live-Daten muss die ID von der angeschlossenen Quelle geliefert werden.</p>
-    <button class="primary-button" type="submit">Spieler speichern</button>
-  </form>
+ <form id="player-form" class="modal">
+  <div class="section-heading"><h2>Spieler hinzufügen</h2><button id="cancel-dialog" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <label>Vorname oder Anzeigename<input name="name" placeholder="z. B. Charlotte" required maxlength="80"></label>
+  <label>DBV-Spieler-ID <span class="muted">(optional)</span><input name="id" placeholder="05-123456" maxlength="30"></label>
+  <label>DBV-Profil-Link <span class="muted">(optional)</span><input name="url" placeholder="https://dbv.turnier.de/player-profile/…" type="url"></label>
+  <p class="small muted">Diese Angaben werden nur auf diesem Gerät gespeichert.</p>
+  <button class="primary-button" type="submit">Spieler speichern</button>
+ </form>
 </dialog>
 <dialog id="tournament-dialog">
-  <form id="tournament-form" class="modal">
-    <div class="section-heading"><h2>Offiziellen Spielplan verlinken</h2><button id="cancel-tournament" type="button" class="icon-button" aria-label="Schließen">×</button></div>
-    <label>Spieler<select name="playerId" id="tournament-player" required></select></label>
-    <label>Turniername<input name="name" maxlength="100" placeholder="z. B. Jugend-RLT Mössingen" required></label>
-    <label>DBV-Turnierlink<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>
-    <p class="small muted">Der Link öffnet den echten Live-Spielplan direkt bei DBV/Tournament Software. Shuttleboard erhält dadurch noch keinen automatischen Ergebniszugang. Der Favorit bleibt nur auf diesem Gerät.</p>
-    <button class="primary-button" type="submit">Live-Spielplan speichern</button>
-  </form>
+ <form id="tournament-form" class="modal">
+  <div class="section-heading"><h2>Turnier speichern</h2><button id="cancel-tournament" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <label>Spieler<select name="playerId" id="tournament-player" required></select></label>
+  <label>Turniername<input name="name" maxlength="100" placeholder="z. B. Jugend-RLT Mössingen" required></label>
+  <label>Offizieller DBV-Turnierlink<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>
+  <p class="small muted">Der Link öffnet die offizielle Turnierseite. Es werden keine Ergebnisse automatisch übernommen.</p>
+  <button class="primary-button" type="submit">Turnier speichern</button>
+ </form>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
