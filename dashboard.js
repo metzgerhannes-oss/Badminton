@@ -33,12 +33,12 @@ function shortMovement(change,previous,label){
 function renderRankDetails(entry,discipline,cohort,url){
  const modal=$("ranking-dialog"),body=$("ranking-detail-content");
  if(!modal||!body)return;
- const move=shortMovement(entry.bwChange,entry.previousBwRank,"BW-Plätze");
+ const move=shortMovement(entry.bwAgeClassChange,entry.previousBwAgeClassRank,"BW-Plätze");
  body.innerHTML='<h2>'+escape(discipline)+' · '+escape(cohort)+'</h2>'+
-  '<p class="ranking-dialog-lead">Jahrgangsplätze, aus der offiziellen DBV-Punkteliste errechnet.</p>'+
-  '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwRank!=null?'#'+num(entry.bwRank):'–')+'</strong><small>Vorwoche '+(entry.previousBwRank!=null?'#'+num(entry.previousBwRank):'–')+' · '+move+'</small></div>'+
-  '<div><span>Deutschland</span><strong>'+(entry.yearRank!=null?'#'+num(entry.yearRank):'–')+'</strong><small>Vorwoche '+(entry.previousYearRank!=null?'#'+num(entry.previousYearRank):'–')+'</small></div></div>'+
-  '<p class="ranking-dialog-small">'+num(entry.points)+' Punkte · BW-Vergleichsgruppe: '+num(entry.bwCohortSize)+' · Deutschland: '+num(entry.cohortSize)+'</p>'+
+  '<p class="ranking-dialog-lead">Altersklassenplätze (z. B. U11 mit mehreren Geburtsjahrgängen), aus den offiziellen DBV-Punkten errechnet.</p>'+
+  '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwAgeClassRank!=null?'#'+num(entry.bwAgeClassRank):'–')+'</strong><small>Vorwoche '+(entry.previousBwAgeClassRank!=null?'#'+num(entry.previousBwAgeClassRank):'–')+' · '+move+'</small></div>'+
+  '<div><span>Deutschland</span><strong>'+(entry.ageClassRank!=null?'#'+num(entry.ageClassRank):'–')+'</strong><small>Vorwoche '+(entry.previousAgeClassRank!=null?'#'+num(entry.previousAgeClassRank):'–')+'</small></div></div>'+
+  '<p class="ranking-dialog-small">'+num(entry.points)+' Punkte · BW-Vergleichsgruppe: '+num(entry.bwAgeClassSize)+' · Deutschland: '+num(entry.ageClassSize)+'</p>'+
   '<a class="ranking-dialog-link" href="'+escape(url)+'" rel="noopener noreferrer" target="_blank">Offizielle Excel-Rangliste ansehen ↗</a>';
  modal.showModal();
 }
@@ -55,12 +55,12 @@ function renderRank(){
  const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
  const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
  label.textContent=working?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
- source.innerHTML=working?'<span>Jahrgangsrang · BW & Deutschland</span><span>'+escape(prior?"Vergleich KW "+prior.week:"Vergleich folgt")+'</span>':
+ source.innerHTML=working?'<span>Altersklasse · BW & Deutschland</span><span>'+escape(prior?"Vergleich KW "+prior.week:"Vergleich folgt")+'</span>':
  '<span>Ranglistenwerte noch nicht importiert</span>';
  if(archiveBehind)source.innerHTML+='<a class="ranking-stale-link" href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuellere Webwerte möglich · DBV ansehen ↗</a>';
  const chosen=profiles.find(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
  if(!chosen){
-  root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Für deine Jahrgangsränge bitte die DBV-Spieler-ID in den Einstellungen hinterlegen.</small><span>Einrichten ↗</span></a>';
+  root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Für deine Altersklassenränge bitte die DBV-Spieler-ID in den Einstellungen hinterlegen.</small><span>Einrichten ↗</span></a>';
   return;
  }
  const player=ranking?.players?.[chosen.id],discs=player?.disciplines??{};
@@ -73,12 +73,12 @@ function renderRank(){
  }
  const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:chosen.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
  root.innerHTML=keys.map(key=>{
-  const e=discs[key],title=rankNames[key],cohort=birth?"Jg. "+birth+" · "+(e?.ageClass||ageLabel(birth)):"Jahrgang offen";
-  const bw=e?.bwRank!=null?'#'+num(e.bwRank):"–",de=e?.yearRank!=null?'#'+num(e.yearRank):"–";
-  const movement=e?shortMovement(e.bwChange,e.previousBwRank,"BW-Plätze"):'<span class="movement movement-unknown">–</span>';
+  const e=discs[key],title=rankNames[key],cohort=birth?(e?.ageClass||ageLabel(birth))+" · Jg. "+birth:"Jahrgang offen";
+  const bw=e?.bwRank!=null?'#'+num(e.bwAgeClassRank):"–",de=e?.yearRank!=null?'#'+num(e.ageClassRank):"–";
+  const movement=e?shortMovement(e.bwAgeClassChange,e.previousBwAgeClassRank,"BW-Plätze"):'<span class="movement movement-unknown">–</span>';
   return '<button class="ranking-tile ranking-compact" type="button" data-rank-discipline="'+escape(key)+'" '+(e?'':'disabled')+' aria-label="'+escape(title)+': BW '+bw+', Deutschland '+de+'">'+
   '<span class="ranking-top"><span>'+escape(title)+'</span></span>'+
-  '<span class="ranking-bw-title">BW · Jahrgang</span>'+
+  '<span class="ranking-bw-title">BW · Altersklasse</span>'+
   '<span class="ranking-bw-row"><strong>'+bw+'</strong>'+movement+'</span>'+
   '<span class="ranking-de-row"><span title="Deutschland">DE</span><strong>'+de+'</strong></span>'+
   '<span class="ranking-compact-footer">'+escape(cohort)+' <span aria-hidden="true">›</span></span></button>';
@@ -86,7 +86,7 @@ function renderRank(){
  const sourceUrl=current?.url||"https://turniere.badminton.de/ranking/history";
  root.querySelectorAll("[data-rank-discipline]").forEach(button=>button.addEventListener("click",()=>{
   const key=button.dataset.rankDiscipline,e=discs[key];
-  if(e)renderRankDetails(e,rankNames[key],"Jg. "+e.birthYear+" · "+(e.ageClass||ageLabel(e.birthYear)),sourceUrl);
+  if(e)renderRankDetails(e,rankNames[key],(e.ageClass||ageLabel(e.birthYear))+" · Jg. "+e.birthYear,sourceUrl);
  }));
  source.innerHTML+='<a href="'+escape(sourceUrl)+'" rel="noopener noreferrer" target="_blank">DBV-Quelle ↗</a>';
 }
@@ -123,7 +123,7 @@ window.renderDashboard=(selected,ps,links,options={})=>{
 };
 async function load(){
  await Promise.all([
-  fetch(rankUrl+"?v=1",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("ranking unavailable"))).then(d=>{if(d?.schemaVersion===1)ranking=d;else rankError=true}).catch(()=>{rankError=true}),
+  fetch(rankUrl+"?v=2",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("ranking unavailable"))).then(d=>{if(d?.schemaVersion===2&&d?.type==="dbv-published-excel-derived-ageclass-rank")ranking=d;else rankError=true}).catch(()=>{rankError=true}),
   fetch(historyUrl+"?v=2",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("history unavailable"))).then(d=>{if(d?.schemaVersion===1)history=d;else historyError=true}).catch(()=>{historyError=true})
  ]);
  renderDashboard();
