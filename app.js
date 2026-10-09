@@ -63,6 +63,15 @@ function bookmarkPhase(t){
 function currentProfile(){
  return state.viewingFriendId?state.friends.find(p=>p.id===state.viewingFriendId):state.players.find(p=>p.id===state.activeProfileId);
 }
+function setActiveProfile(id){
+ // Switching to one's own player is a local choice, not an online account login.
+ if(!state.players.some(p=>p.id===id))return false;
+ state.activeProfileId=id;
+ state.viewingFriendId=null;
+ state.chosen=id;
+ save();
+ return true;
+}
 function renderFocusHeader(){
  const p=currentProfile();
  const isFriend=Boolean(state.viewingFriendId);
@@ -70,11 +79,25 @@ function renderFocusHeader(){
  if(!p){
   wrap.innerHTML='<span class="focus-profile-avatar">+</span><span class="focus-profile-label">Noch kein Spielerprofil angelegt</span><a href="#einstellungen" class="focus-settings">Einrichten ↗</a>';return;
  }
+ let action="";
+ if(isFriend){
+  action='<button type="button" class="focus-settings" id="back-own">Zu mir zurück</button>';
+ }else if(state.players.length>1){
+  // Only show the top switcher when there are actually multiple own profiles.
+  action='<details class="focus-switcher"><summary aria-label="Spielerprofil wechseln">Wechseln <span aria-hidden="true">⌄</span></summary>'+
+   '<div class="focus-switcher-options" aria-label="Eigenes Spielerprofil auswählen">'+
+   state.players.map(player=>'<button type="button" data-switch-profile="'+esc(player.id)+'" '+(player.id===state.activeProfileId?'aria-current="true"':'')+'><span class="switcher-avatar">'+esc(player.name.trim().charAt(0).toUpperCase())+'</span><span class="switcher-name">'+esc(player.name)+'</span>'+(player.id===state.activeProfileId?'<span class="switcher-check" aria-label="Aktiv">✓</span>':'')+'</button>').join("")+
+   '</div></details>';
+ }
  wrap.innerHTML='<div class="focus-profile-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</div>'+
  '<div class="focus-profile-copy"><small>'+(isFriend?"Du folgst":"Mein aktives Spielerprofil")+'</small><strong>'+esc(p.name)+'</strong>'+
- '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+
- (isFriend?'<button type="button" class="focus-settings" id="back-own">Zu mir zurück</button>':'<a class="focus-settings" href="#einstellungen">Wechseln <span aria-hidden="true">↗</span></a>');
+ '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+action;
  el("back-own")?.addEventListener("click",()=>{state.viewingFriendId=null;state.chosen=state.activeProfileId;save();location.hash="#start";render()});
+ wrap.querySelectorAll("[data-switch-profile]").forEach(button=>button.addEventListener("click",()=>{
+  if(!setActiveProfile(button.dataset.switchProfile))return;
+  location.hash="#start";
+  render();
+ }));
 }
 function renderTournaments(){
  const sorted=selectedLinks().slice().sort((a,b)=>{
@@ -108,7 +131,8 @@ function renderProfiles(){
  return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
  }).join(""):'<div class="empty">Noch kein eigenes Spielerprofil hinterlegt.</div>';
  list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
-  state.activeProfileId=b.dataset.setActive;state.viewingFriendId=null;state.chosen=state.activeProfileId;save();render();toast("Startprofil geändert");
+  if(!setActiveProfile(b.dataset.setActive))return;
+  render();toast("Startprofil geändert");
  }));
  list.querySelectorAll("[data-edit-own]").forEach(b=>b.addEventListener("click",()=>{
   const p=state.players.find(x=>x.id===b.dataset.editOwn);
