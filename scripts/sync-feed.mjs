@@ -1,36 +1,37 @@
 /**
- * Fetches a licensed/authorized normalized JSON feed.
- * Never scrapes TournamentSoftware or DBV pages.
- * GitHub Actions: repository variable BADMINTON_FEED_URL; optional secret BADMINTON_FEED_TOKEN.
+ * Scheduled import of an explicitly authorized tournament export.
+ * Supported: normalized JSON or tournament CSV schema (see docs/DBV_LIVE.md).
+ * IMPORTANT: This script never scrapes DBV or Tournament Software pages.
  */
 import {mkdir,writeFile} from "node:fs/promises";
+import {normalizeAuthorizedFeed} from "./normalize-feed.mjs";
 const url=process.env.BADMINTON_FEED_URL?.trim();
-if(!url){console.log("No authorized feed configured; keeping the unconfigured starter snapshot.");process.exit(0)}
+const authorized=process.env.BADMINTON_FEED_AUTHORIZED==="true";
+if(!url){
+ console.log("DBV Live: no authorized provider URL configured; not connected.");
+ process.exit(0);
+}
+if(!authorized)throw Error("BADMINTON_FEED_AUTHORIZED must be 'true' once redistribution permission is confirmed. No data fetched.");
 const parsed=new URL(url);
-if(parsed.protocol!=="https:")throw Error("BADMINTON_FEED_URL must be HTTPS");
-const headers={Accept:"application/json"};
+if(parsed.protocol!=="https:"||parsed.username||parsed.password)throw Error("Provider URL must be plain HTTPS without inline credentials.");
+const format=(process.env.BADMINTON_FEED_FORMAT||"json").toLowerCase();
+if(!["json","csv"].includes(format))throw Error("BADMINTON_FEED_FORMAT must be json or csv");
+const ids=(process.env.BADMINTON_PLAYER_IDS||"05-070879").split(",").map(x=>x.trim()).filter(Boolean);
+const headers={Accept:format==="csv"?"text/csv, text/plain;q=0.9":"application/json"};
 if(process.env.BADMINTON_FEED_TOKEN)headers.Authorization="Bearer "+process.env.BADMINTON_FEED_TOKEN;
 const response=await fetch(url,{headers,signal:AbortSignal.timeout(20000),redirect:"error"});
-if(!response.ok)throw Error("Feed request failed: HTTP "+response.status);
-const contentLength=Number(response.headers.get("content-length")||0);
-if(contentLength>5_000_000)throw Error("Feed too large");
+if(!response.ok)throw Error("Authorized provider responded with HTTP "+response.status);
+const length=Number(response.headers.get("content-length")||0);
+if(length>5_000_000)throw Error("Authorized feed too large");
 const raw=await response.text();
-if(raw.length>5_000_000)throw Error("Feed too large");
-const obj=JSON.parse(raw);
-if(!obj||!Array.isArray(obj.matches)||!Array.isArray(obj.tournaments))throw Error("Feed must contain matches[] and tournaments[]");
-if(obj.matches.length>2000||obj.tournaments.length>300)throw Error("Feed limit exceeded");
-const statuses=new Set(["scheduled","ready","called","live","finished","delayed","cancelled"]);
-const limit=(x,n=200)=>String(x??"").slice(0,n);
-const publicUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"?u.href:""}catch{return ""}};
-const iso=x=>{if(!x)return "";const d=new Date(x);return Number.isNaN(d.getTime())?"":d.toISOString()};
-const matches=obj.matches.map((m,i)=>{
- if(!m||!m.id||!statuses.has(m.status))throw Error("Invalid match entry #"+i);
- return {id:limit(m.id,100),tournamentId:limit(m.tournamentId,100),discipline:limit(m.discipline,120),scheduledAt:iso(m.scheduledAt),court:limit(m.court,50),status:m.status,players:Array.isArray(m.players)?m.players.slice(0,4).map(p=>limit(p,120)):[],playerIds:Array.isArray(m.playerIds)?m.playerIds.slice(0,8).map(p=>limit(p,40)):[],score:limit(m.score,150),url:publicUrl(m.url)};
+if(raw.length>5_000_000)throw Error("Authorized feed too large");
+const dateHeader=response.headers.get("last-modified");
+let modifiedAt=null;
+if(dateHeader){const d=new Date(dateHeader);if(!Number.isNaN(d.getTime()))modifiedAt=d.toISOString()}
+const normalized=normalizeAuthorizedFeed(raw,{
+ format,updatedAt:modifiedAt,sourceName:"Autorisierter Turnierfeed",sourceUrl:url,allowedIds:ids
 });
-const tournaments=obj.tournaments.map((t,i)=>{
- if(!t||!t.id)throw Error("Invalid tournament entry #"+i);
- return {id:limit(t.id,100),name:limit(t.name,200),location:limit(t.location,180),startDate:iso(t.startDate),url:publicUrl(t.url)};
-});
-const data={schemaVersion:1,connection:"connected",updatedAt:iso(obj.updatedAt)||new Date().toISOString(),source:{name:limit(obj.source?.name||"Autorisierter Turnierfeed",200),url:publicUrl(obj.source?.url)},matches,tournaments};
-await mkdir("data",{recursive:true});await writeFile("data/live.json",JSON.stringify(data,null,2)+"\n","utf8");
-console.log("Feed synced:",matches.length,"matches,",tournaments.length,"tournaments.");
+await mkdir("data",{recursive:true});
+await writeFile("data/live.json",JSON.stringify(normalized,null,2)+"\n","utf8");
+console.log("Import complete:",normalized.matches.length,"matches,",normalized.tournaments.length,"tournaments; player filter:",ids.join(", "));
+console.log("Feed source timestamp:",normalized.updatedAt||"not supplied (shown as stale in the app)");
