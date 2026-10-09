@@ -259,7 +259,7 @@ def should_publish(old:dict|None,new:dict) -> bool:
     return True
 
 def main():
-    allow=[s.strip() for s in os.environ.get("BADMINTON_PLAYER_IDS","05-070879").split(",") if re.fullmatch(r"\d\d-\d{6}",s.strip())]
+    allow=[s.strip() for s in os.environ.get("BADMINTON_PLAYER_IDS","05-070879,05-071969").split(",") if re.fullmatch(r"\d\d-\d{6}",s.strip())]
     if not allow:raise SystemExit("No valid player IDs")
     now=datetime.now(timezone.utc)
     checked=now.isoformat(timespec="seconds").replace("+00:00","Z")
