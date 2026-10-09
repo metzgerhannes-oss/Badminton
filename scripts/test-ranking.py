@@ -1,7 +1,16 @@
 import io
 import unittest
 from openpyxl import Workbook
-from update_ranking import parse_excel, cohort_ranks, summarize, iso_week,points
+import importlib.util
+from pathlib import Path
+spec=importlib.util.spec_from_file_location("ranking_update",Path(__file__).with_name("update-ranking.py"))
+module=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+parse_excel=module.parse_excel
+cohort_ranks=module.cohort_ranks
+summarize=module.summarize
+iso_week=module.iso_week
+points=module.points
 from datetime import datetime,timezone
 
 def make_xlsx():
