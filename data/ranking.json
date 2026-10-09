@@ -2,14 +2,14 @@
   "schemaVersion": 2,
   "status": "available",
   "type": "dbv-published-excel-derived-ageclass-rank",
-  "checkedAt": "2026-10-09T18:10:25Z",
+  "checkedAt": "2026-10-09T18:11:08Z",
   "current": {
     "year": 2026,
     "week": 41,
-    "url": "https://turniere.badminton.de/ranking/download",
+    "url": "https://turniere.badminton.de/ranking",
     "kind": "current-export",
     "sourceUpdatedAt": "2026-10-07T12:00:00+02:00",
-    "pageUrl": "https://turniere.badminton.de/ranking"
+    "downloadUrl": "https://turniere.badminton.de/ranking/download"
   },
   "previous": {
     "year": 2026,
