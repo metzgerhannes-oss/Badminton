@@ -2,3 +2,16 @@
 /* SpVgg Schmetterlinge visual identity */
 .brand{min-width:0;line-height:1.06}.brand>span{min-width:0}.brand small{font-size:7px;letter-spacing:1.15px;line-height:1.6}.hero h1{max-width:390px;text-shadow:0 2px 18px #061b3699}.hero .eyebrow{max-width:260px;font-size:9px;letter-spacing:1.35px}.hero .status-dot{box-shadow:0 0 14px #67c5ef}.next-card{background:linear-gradient(155deg,#1e4770,#0f2a49 78%);border-color:#4984b0}.pill.selected{background:#8bd8ff;border-color:#8bd8ff;color:#092642}.outline-button:hover,.icon-button:hover{border-color:#6dc7f7}.brand-logo{flex-shrink:0}
 @media(max-width:420px){.brand{font-size:16px}.brand-logo{width:47px;height:47px}.brand small{font-size:6.8px;letter-spacing:.75px}.hero-crest{right:-38px;top:26px;width:193px;height:193px;opacity:.19}.hero h1{font-size:37px}.hero p{max-width:245px}}
+
+
+/* Official tournament live schedule (opens the official provider, no mirror) */
+.official-live-card{display:flex;gap:12px;align-items:center;padding:15px 16px;margin-bottom:16px;border:1px solid #3978a7;border-radius:16px;background:linear-gradient(125deg,#173d68,#132a48);box-shadow:0 10px 20px #0002}
+.official-live-card:focus-visible{outline:3px solid #8bd8ff;outline-offset:2px}
+.official-symbol{display:grid;place-items:center;flex-shrink:0;width:38px;height:38px;background:#83d0f522;color:#9addff;border-radius:11px;font-size:25px;font-weight:700}
+.official-copy{display:grid;gap:4px;min-width:0;flex:1}
+.official-copy strong{font-size:13px;color:#eaf4ff;line-height:1.35}
+.official-copy small{color:#9fb8d4;font-size:11px;line-height:1.4}
+.official-arrow{font-size:26px;color:#8bd8ff}
+.local-shortcut-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px}
+.local-shortcut-actions a{color:#8bd8ff;font-size:12px;font-weight:750}
+.modal select{width:100%;border:1px solid #415475;border-radius:11px;background:#0a1529;color:#fff;padding:13px}
