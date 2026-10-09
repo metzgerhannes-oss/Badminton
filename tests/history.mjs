@@ -2,7 +2,7 @@ import {readFile} from "node:fs/promises";
 import assert from "node:assert/strict";
 const history=JSON.parse(await readFile("data/history.json","utf8"));
 assert.equal(history.schemaVersion,1);
-assert.equal(history.curation,"public-club-reports");
+assert.equal(history.curation,"club-association-and-family-confirmed");
 assert.ok(history.results.length>=10,"Expected seeded historic results");
 const ids=new Set();
 const players=new Set();
@@ -12,11 +12,12 @@ for(const r of history.results){
  ids.add(r.id);
  assert.match(r.date,/^20\d{2}-\d{2}-\d{2}$/);
  assert.ok(Number.isInteger(r.place)&&r.place>0);
- assert.ok(["Einzel","Doppel","Mixed"].includes(r.discipline));
+ assert.ok(["Einzel","Doppel","Mixed","noch offen"].includes(r.discipline));
  assert.ok(r.playerId&&r.playerName);
  assert.equal(r.verified,true,"Only source-verified data may be published");
  assert.equal(new URL(r.source.url).protocol,"https:");
- assert.ok(r.source.url.includes("spvgg.org"),"Curated historical entry should cite its club report");
+ assert.ok(["spvgg.org","bwbv.de"].some(d=>r.source.url.includes(d)),"Historical entry must cite club/association");
+ if(r.confirmation==="family-confirmed") assert.ok(r.verificationNote,"Family confirmation needs verification label");
  assert.ok(!("score" in r),"Do not invent individual match scores");
  players.add(r.playerName);
 }
