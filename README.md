@@ -1,3 +1,5 @@
+> **Charlotte im DBV verifiziert (09.10.2026):** Charlotte Metzger, SpVgg Mössingen, Jahrgang 2014, Spieler-ID **`05-071969`**, ist in der [offiziellen DBV-Rangliste](https://turniere.badminton.de/ranking) für DE U13 mit **611 Gesamtpunkten aus zwei Turnieren** erfasst (KW41). Der U13-BW- und Deutschlandrang wird wie bei Philipp aus der vollständigen offiziellen Altersklassentabelle berechnet (nicht aus der Gesamt-Rangspalte!). Das frühere lokale Profil `local-charlotte` wird beim Laden automatisch migriert, samt Startprofilwahl und selbst gespeicherten Turnierlinks. Das verifizierte Einzel-Ergebnis, **5. Platz U13 bei der 4. E-Rangliste Südwürttemberg in Ehingen vom 26.09.2026**, bleibt in der Historie erhalten, zählt aber nicht als Top-4-Trophäe. Im Wochenimport sind nun beide Spieler-IDs hinterlegt.
+
 ## Ranglistenpunkte und helleres Vereinsdesign (Oktober 2026)
 
 Die drei Hauptkacheln zeigen jetzt zusätzlich die **offiziellen Gesamtpunkte** der jeweiligen DBV-Disziplin. Stand KW 41/2026, Spieler-ID `05-070879`: HE **2.670**, HD **1.322**, HM **1.469** Punkte. Beim Antippen öffnet sich die Detailkarte mit großem Gesamtscore, BW-/Deutschland-Rang, Vergleich zur Vorwoche und einer Tabelle für die **fünf besten Ranglistenwertungen**.
@@ -44,7 +46,7 @@ Die Kacheln zeigen den **Rang innerhalb der offiziellen DBV-Altersklasse (Spalte
 
 Mit zwei echten Kalenderwochenständen zeigt die App `↑` bei besserem Altersklassenrang, `↓` bei schlechterem und `→` bei Gleichstand. Ohne verlässlichen Vergleich wird **kein** Pfeil behauptet. Ein Altersklassenwechsel zum neuen Jahr verhindert irreführende Vorwochenvergleiche; unbekannte Werte bleiben leer.
 
-Philipp hat die DBV-Spieler-ID `05-070879` und Jahrgang **2016 / U11 (2026)**. Charlotte hat noch keine gesicherte DBV-Spieler-ID; es werden keine Werte erfunden. Nur Ranglisten-Kennzahlen hinterlegter IDs werden in `data/ranking.json` veröffentlicht, nicht die vollständige Ranglistendatei. Bei Quellefehlern bleibt die letzte erfolgreiche Datei bestehen, vor dem ersten erfolgreichen Abruf steht „Noch keine Daten“. Öffentliche Download-Verfügbarkeit garantiert weder eine API noch den rechtlich uneingeschränkten automatischen Betrieb.
+Philipp hat die DBV-Spieler-ID `05-070879` und Jahrgang **2016 / U11 (2026)**. Charlotte hat jetzt die offiziell verifizierte DBV-Spieler-ID `05-071969`, Jahrgang **2014 / U13 (2026)**; sie ist wie Philipp in der wöchentlichen öffentlichen Rangliste hinterlegt. Nur Ranglisten-Kennzahlen hinterlegter IDs werden in `data/ranking.json` veröffentlicht, nicht die vollständige Ranglistendatei. Bei Quellefehlern bleibt die letzte erfolgreiche Datei bestehen, vor dem ersten erfolgreichen Abruf steht „Noch keine Daten“. Öffentliche Download-Verfügbarkeit garantiert weder eine API noch den rechtlich uneingeschränkten automatischen Betrieb.
 
 # Schmetterlinge · Badminton Jugend Mössingen
 
@@ -76,7 +78,7 @@ Für Philipp sind derzeit **2× Gold, 2× Silber, 3× Bronze und 2× Platz 4** e
 
 ## Spieler
 
-Philipp Metzger, Spieler-ID `05-070879`, und Charlotte Metzger (noch ohne bestätigte DBV-ID) sind voreingestellt. Du kannst Spieler lokal hinzufügen und den Familienfilter umschalten. **Spielerfavoriten und gespeicherte Turnierlinks liegen ausschließlich im lokalen Speicher des jeweiligen Browsers.** Sie werden nicht über mehrere Geräte synchronisiert; nach Löschen der Browserdaten gehen sie verloren.
+Philipp Metzger, Spieler-ID `05-070879`, und Charlotte Metzger (DBV-ID `05-071969`, Jahrgang 2014) sind voreingestellt. Du kannst Spieler lokal hinzufügen und den Familienfilter umschalten. **Spielerfavoriten und gespeicherte Turnierlinks liegen ausschließlich im lokalen Speicher des jeweiligen Browsers.** Sie werden nicht über mehrere Geräte synchronisiert; nach Löschen der Browserdaten gehen sie verloren.
 
 ## Bewusste Grenze: keine Live-Funktion
 
