@@ -49,7 +49,7 @@ assert.match(html,/id="match-stats-discipline"/);
 assert.match(html,/id="match-stats-year"/);
 assert.match(main,/player_match_observations/);
 assert.match(main,/Die detaillierte Spielhistorie wird noch ergänzt/);
-assert.match(main,/records\.length===0/);
+assert.match(main,/external\.length>0/);
 assert.match(sql,/security_invoker\s*=\s*true/);
 assert.match(sql,/m\.status\s*=\s*'finished'/);
 assert.match(sql,/source_match_id/);
