@@ -74,7 +74,7 @@ function render(){
  ].map(([name,value,key])=>'<div class="match-stat '+key+'"><span>'+escape(name)+'</span><strong>'+escape(value)+'</strong></div>').join("");
  const last=records.map(x=>x.last_synced_at).filter(Boolean).sort().at(-1);
  const published=last?" · letzte geprüfte Übernahme "+officialDate(last.slice(0,10)):"";
- note.textContent=(missing?"Noch keine belegten Spiele für diese Auswahl.":"Gezählt: "+stats.total+" eindeutig abgeschlossene Begegnungen.")+
+ note.textContent=(missing?"Noch keine einzeln importierten und geprüften DBV-Matches für diese Auswahl.":"Gezählt: "+stats.total+" eindeutig abgeschlossene Begegnungen.")+
   (stats.excluded?" · "+stats.excluded+" offene/unklare Begegnungen nicht berücksichtigt.":"")+
   (partial?" · Mehr als 10.000 Treffer: Anzeige ist unvollständig und nicht als Gesamtergebnis zu verstehen.":"")+
   published+". Turnierplatzierungen und Ranglistenpunkte sind keine einzelnen Spiele.";

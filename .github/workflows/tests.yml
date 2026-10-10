@@ -25,6 +25,8 @@ jobs:
           node --check library.js
           node --check stats.js
           node --check friend-search.js
+          node --check career-history.js
+          node --check scripts/external-history.mjs
           node --check scripts/friend-search.mjs
           node --check scripts/match-stats.mjs
           node --check scripts/library-utils.mjs
@@ -47,6 +49,7 @@ jobs:
           node tests/invitation.mjs
           node tests/player-library.mjs
           node tests/friend-search.mjs
+          node tests/external-history.mjs
           node tests/match-stats.mjs
           node tests/design-v2.mjs
           node tests/supabase-library.mjs

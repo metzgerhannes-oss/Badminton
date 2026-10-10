@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "dbvId": "05-061350",
+  "name": "Sarah Storz",
+  "source": {
+    "name": "Badhub",
+    "url": "https://badhub.de/spieler/05-061350?saison=all&src=gesamt",
+    "classification": "externes Ergebnisportal – aggregiert aus veröffentlichten Turnier- und Ligadaten"
+  },
+  "retrievedOn": "2026-10-10",
+  "sourceStatus": "third-party-aggregated",
+  "caveat": "Badhub-Aggregate und Jahresübersichten, keine 678 einzeln gegen DBV-Originalbelege importierten Matches. Stand 10.10.2026; Änderungen seitdem möglich. Keine doppelten Matches zu künftig verifizierten DBV-Matches addieren.",
+  "totals": {
+    "matches": 678,
+    "wins": 388,
+    "losses": 290,
+    "ratePercent": 57,
+    "tournament": {
+      "matches": 634,
+      "wins": 359
+    },
+    "league": {
+      "matches": 44,
+      "wins": 29
+    }
+  },
+  "years": [
+    {
+      "year": 2026,
+      "tournaments": 9,
+      "placements": 19,
+      "gold": 3,
+      "silver": 1,
+      "bronze": 2
+    },
+    {
+      "year": 2025,
+      "tournaments": 11,
+      "placements": 30,
+      "gold": 4,
+      "silver": 2,
+      "bronze": 4
+    },
+    {
+      "year": 2024,
+      "tournaments": 13,
+      "placements": 34,
+      "gold": 6,
+      "silver": 4,
+      "bronze": 6
+    },
+    {
+      "year": 2023,
+      "tournaments": 17,
+      "placements": 38,
+      "gold": 6,
+      "silver": 5,
+      "bronze": 3
+    },
+    {
+      "year": 2022,
+      "tournaments": 20,
+      "placements": 44,
+      "gold": 15,
+      "silver": 7,
+      "bronze": 6
+    },
+    {
+      "year": 2021,
+      "tournaments": 5,
+      "placements": 11,
+      "gold": 3,
+      "silver": 1,
+      "bronze": 1
+    },
+    {
+      "year": 2020,
+      "tournaments": 6,
+      "placements": 12,
+      "gold": 2,
+      "silver": 1,
+      "bronze": 2
+    },
+    {
+      "year": 2019,
+      "tournaments": 9,
+      "placements": 17,
+      "gold": 5,
+      "silver": 1,
+      "bronze": 2
+    }
+  ],
+  "earliestListedYear": 2018,
+  "highlights": [
+    {
+      "event": "Südostdeutsche Einzelmeisterschaft U13–U19 2024",
+      "startDate": "2024-10-26",
+      "endDate": "2024-10-27",
+      "discipline": "Doppel",
+      "ageGroup": "U15",
+      "place": 1,
+      "partner": "Anna Zirnwald",
+      "note": "Damendoppel U15 – 1. Platz"
+    },
+    {
+      "event": "Südostdeutsche Einzelmeisterschaft U13–U19 2024",
+      "startDate": "2024-10-26",
+      "endDate": "2024-10-27",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 2,
+      "partner": null,
+      "note": "Mädcheneinzel U15 – 2. Platz"
+    },
+    {
+      "event": "49. BWBV-Meisterschaften U11–U19 2020",
+      "startDate": "2020-09-26",
+      "endDate": "2020-09-27",
+      "discipline": "Einzel",
+      "ageGroup": "U11",
+      "place": 1,
+      "partner": null,
+      "note": "Mädcheneinzel U11 – 1. Platz"
+    },
+    {
+      "event": "49. BWBV-Meisterschaften U11–U19 2020",
+      "startDate": "2020-09-26",
+      "endDate": "2020-09-27",
+      "discipline": "Doppel",
+      "ageGroup": "U11",
+      "place": 1,
+      "partner": "Ylvie Zahn",
+      "note": "Mädchendoppel U11 – 1. Platz"
+    },
+    {
+      "event": "2. E-RLT BAW SW Region 1 U11–U19 Mössingen 2023",
+      "startDate": "2023-03-11",
+      "endDate": "2023-03-11",
+      "discipline": "Einzel",
+      "ageGroup": "U19",
+      "place": 1,
+      "partner": null,
+      "note": "Dameneinzel U19 – 1. Platz"
+    }
+  ]
+}

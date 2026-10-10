@@ -15,6 +15,7 @@
 <script type="module" src="./library.js"></script>
 <script type="module" src="./friend-search.js"></script>
 <script type="module" src="./stats.js"></script>
+<script type="module" src="./career-history.js"></script>
 <script defer src="./live.js"></script>
 <script defer src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
@@ -46,6 +47,7 @@
     </div>
     <div id="match-stats-values" class="match-stats-values" aria-live="polite"><p class="match-stats-empty">Belegte Spiele werden geladen …</p></div>
     <p id="match-stats-note" class="match-stats-note" role="status" aria-live="polite">Es zählen ausschließlich vollständig belegte, abgeschlossene Begegnungen.</p>
+    <div id="external-match-summary" class="external-match-summary" hidden></div>
     <details id="match-stats-details" class="match-stats-details">
       <summary>Einzelnachweise ansehen <span id="match-stats-detail-count"></span></summary>
       <div id="match-stats-list" class="match-stats-list"></div>
@@ -58,6 +60,17 @@
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Erfasste Ergebnisse</span></div>
+   <section id="career-history" class="career-history" aria-labelledby="career-heading" hidden>
+     <div class="section-heading"><h3 id="career-heading">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
+     <div id="career-summary" class="career-summary"></div>
+     <div class="career-history-filters">
+       <label>Jahr<select id="career-year"><option value="all">Alle Jahre</option></select></label>
+       <label>Disziplin der Beispiele<select id="career-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
+     </div>
+     <div id="career-years" class="career-years" aria-live="polite"></div>
+     <div id="career-highlights" class="career-highlights"></div>
+     <p id="career-citation" class="career-citation"></p>
+   </section>
    <section class="trophy-section" aria-labelledby="trophy-heading">
     <div class="section-heading"><h3 id="trophy-heading">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
     <div id="trophy-shelf" class="trophy-shelf" role="group" aria-label="Auszeichnungen nach Platzierung"></div>

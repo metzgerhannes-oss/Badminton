@@ -48,7 +48,7 @@ assert.match(html,/id="match-stats"/);
 assert.match(html,/id="match-stats-discipline"/);
 assert.match(html,/id="match-stats-year"/);
 assert.match(main,/player_match_observations/);
-assert.match(main,/Noch keine belegten Spiele/);
+assert.match(main,/Noch keine einzeln importierten und geprüften DBV-Matches/);
 assert.match(sql,/security_invoker\s*=\s*true/);
 assert.match(sql,/m\.status\s*=\s*'finished'/);
 assert.match(sql,/source_match_id/);
