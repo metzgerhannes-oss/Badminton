@@ -72,10 +72,12 @@ export function liveView(row,id,now=Date.now()){
  if(!age.fresh)return {status:"stale",age:age.ageMs};
  if(!p.tournament)return {status:"idle",age:age.ageMs,summary:"Kein laufendes Turnier laut Quelle"};
  return {
-  status:p.running?"playing":p.next?"next":"tournament",
+  // Queue position must be known: the source hides an unplaced match.
+  status:p.running?"playing":(Number.isInteger(p.next?.queue_position)?"next":"tournament"),
   age:age.ageMs,
   tournament:str(p.tournament.name,120),
-  running:object(p.running),next:object(p.next),
+  running:object(p.running),
+  next:Number.isInteger(p.next?.queue_position)?object(p.next):null,
   upcoming:p.upcoming.filter(object).slice(0,12),
   past:p.past.filter(object).slice(0,8),
   entries:p.entries.filter(object).slice(0,10)
@@ -83,8 +85,10 @@ export function liveView(row,id,now=Date.now()){
 }
 export function playerOutcome(match){
  const m=object(match);
- if(!m||typeof m.team1_won!=="boolean"||typeof m.is_team1!=="boolean")return null;
- return m.team1_won===m.is_team1?"win":"loss";
+ if(!m||typeof m.team1_won!=="boolean"||
+    ![true,false,1,0].includes(m.is_team1))return null;
+ // The source delivers is_team1 as boolean or 0/1. Never infer unknown sides.
+ return m.team1_won===Boolean(m.is_team1)?"win":"loss";
 }
 export function sourceTime(value){
  if(!value||!Number.isFinite(Number(value)))return "";
