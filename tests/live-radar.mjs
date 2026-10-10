@@ -29,6 +29,8 @@ const cold={...idle,checked_at:"2026-10-10T11:55:00Z"};
 assert.equal(radarSituation(cold,id,now).kind,"idle","A 5-minute-old no-tournament response must not be an alarm");
 assert.match(radarSituation(cold,id,now).detail,/Bei der letzten Prüfung/);
 assert.equal(radarSituation(null,id,now).kind,"pending");
+assert.equal(radarSituation({...idle,checked_at:"2026-10-10T11:00:00Z"},id,now).kind,"pending",
+ "Yesterday or a very old no-tournament report cannot be called current");
 
 const playing={...idle,payload:{
  tournament:{name:"Jugend-Turnier",key:"t1"},
