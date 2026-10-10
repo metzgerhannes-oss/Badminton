@@ -28,5 +28,5 @@ assert.match(style,/\.history-source-details\[open\]>summary/);
 assert.match(style,/border-left:0;background:transparent/,"No amber warning background");
 assert.match(importMessage({status:"awaiting_source"}).title,/Einzelmatches noch nicht importiert/);
 assert.match(importMessage({status:"awaiting_source"}).detail,/regelmäßig geprüft/);
-assert.match(sw,/schmetterlinge-shell-v49/);
+assert.match(sw,/schmetterlinge-shell-v50/);
 console.log("UX regression: Home stays calm, and imports are activated only by opening Historie.");
