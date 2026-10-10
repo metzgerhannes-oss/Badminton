@@ -21,11 +21,11 @@ assert.match(bridge,/badminton:own-profile-added/,"Own-player queue stays enable
 assert.match(bridge,/importStatusUrl/,"Live status still fetched");
 assert.match(worker,/badminton-history-demand-worker/,"Server worker unaffected");
 assert.match(stats,/officialCount\.total===0&&external\.length>0/,"Fallback uses real sourced matches");
-assert.match(stats,/Noch keine einzeln belegten Spiele verfügbar/);
+assert.match(await readFile("scripts/match-availability.mjs","utf8"),/Noch keine einzeln belegten Spiele verfügbar/);
 assert.match(stats,/Für diese Auswahl liegen keine einzeln geprüften Spiele vor/);
 assert.match(style,/\.history-source-details\[open\]>summary/);
 assert.match(style,/border-left:0;background:transparent/,"No amber warning background");
 assert.match(importMessage({status:"awaiting_source"}).title,/Einzelmatches noch nicht importiert/);
 assert.match(importMessage({status:"awaiting_source"}).detail,/regelmäßig geprüft/);
-assert.match(sw,/schmetterlinge-shell-v41/);
+assert.match(sw,/schmetterlinge-shell-v42/);
 console.log("UX regression: Home stays useful and calm, importer accessible under Historie, queue unchanged.");

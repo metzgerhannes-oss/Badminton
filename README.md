@@ -1,3 +1,7 @@
+## v42 – Spielerstatistik ohne falsche Leermeldungen
+
+Fehlerhafte Ergebnisabfragen werden nicht mehr als erfolgreich geprüfte leere Historie dargestellt. Ist nur eine Quelle (DBV oder Badhub-Einzelbelege) erreichbar, meldet Home **„Spielstatistik derzeit nur teilweise abrufbar“** mit erneutem Ladeversuch; bei Ausfall beider Quellen **„Spielstatistik gerade nicht erreichbar“**. Sichere Daten aus der verfügbaren Quelle bleiben sichtbar und werden nicht mit anderen Quellen addiert. Jede gültige DBV-Spieler-ID erhält einen klar gekennzeichneten Originalquellenlink „Öffentliche Ergebnisse bei Badhub nachsehen“. Das Vorhandensein des Links beweist keine Matches. Neue Unit- und reale mobile Browser-E2E-Prüfungen; keine Änderung an Supabase, Follow-Queue, Profilen oder Turnierdaten. Echte iPhone-/VoiceOver-Praxisabnahme bleibt #28.
+
 ## v41 – Routing und Navigation gekapselt (#29, Teilschritt 2)
 
 `router.js` übernimmt das bestehende Hash-Routing, Überschriftenfokus, Scroll-Reset, Seitenanzeige, Dokumenttitel und die aria-aktiven Navigationselemente. `app.js` besitzt nur noch kleine Delegationsfunktionen. Home/Logo führen weiterhin zum eigenen aktiven Profil, Historie bleibt Unterbereich von Turniere. Keine neue Navigation, Änderung an Profilen/Freunden/Favoriten, Online-Daten oder Auth. Neues Router-VM-Gate + mobile Chromium-/WebKit-Prüfung, PWA v41. Die echte iPhone-/VoiceOver-Abnahme bleibt #28.

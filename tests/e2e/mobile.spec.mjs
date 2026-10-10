@@ -91,6 +91,25 @@ test("Home shows individual sourced matches and fits the small viewport",async (
  }
 });
 
+test("Partial source outage never impersonates a verified empty history, and retry works",async ({page})=>{
+ let externalUnavailable=true;
+ await page.route("**/player_external_match_imports?*",route=>{
+  if(externalUnavailable)return route.fulfill({status:503,headers,body:'{"error":"temporary"}'});
+  return route.fallback();
+ });
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#match-stats-note")).toContainText("nur teilweise abrufbar");
+ await expect(page.locator("#match-stats-source")).toContainText("unvollständig");
+ await expect(page.locator("#match-stats-retry")).toBeVisible();
+ await expect(page.locator("#match-stats-source-link")).toHaveAttribute("href",
+  "https://badhub.de/spieler/"+PLAYER+"?saison=all&src=gesamt");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("–");
+ externalUnavailable=false;
+ await page.locator("#match-stats-retry").click();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await expect(page.locator("#match-stats-retry")).toBeHidden();
+});
+
 test("Friend viewing never changes which own profile Home returns to",async ({page})=>{
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#view-spieler")).toBeVisible();

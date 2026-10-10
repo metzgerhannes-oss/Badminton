@@ -41,6 +41,8 @@ assert.match(stats,/officialCount\.total===0&&external\.length>0/,
 assert.match(stats,/computeExternalStats/);
 assert.match(stats,/importCompleteness/);
 assert.match(stats,/Badhub · Einzelbelege/);
+assert.match(stats,/matchAvailability\(\{officialFailed:officialError,externalFailed:externalError\}\)/);
+assert.match(stats,/lookup\.hidden=!validId/);
 assert.match(stats,/Sätze aus Spielersicht/);
 assert.match(stats,/badminton:external-matches-updated/);
 assert.match(stats,/fetchProfile\(selected,true\)/);
@@ -54,5 +56,5 @@ assert.match(cron,/interval '7 days'/);
 assert.match(cron,/status='awaiting_source'/);
 assert.match(claim,/cursor_now:=0/,"Weekly refresh must revisit new matches at start of sorted source");
 assert.match(claim,/status_now in \('complete','partial'\)/);
-assert.match(sw,/schmetterlinge-shell-v41/);
+assert.match(sw,/schmetterlinge-shell-v42/);
 console.log("Real-source Home stats and existing followers registration: verified source separation, filters, no doubles and weekly refresh.");

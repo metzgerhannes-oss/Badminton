@@ -1,5 +1,6 @@
 import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
+import {matchAvailability} from "./scripts/match-availability.mjs";
 const ROOT="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
 const KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
 const $=id=>document.getElementById(id);
@@ -114,6 +115,14 @@ function render(){
   source=$("match-stats-source"),sourceDetails=$("match-stats-provenance-copy"),
   retry=$("match-stats-retry");
  if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry)return;
+ // The public original is an optional cross-check, never evidence of a match.
+ const lookup=$("match-stats-source-link");
+ if(lookup){
+  const validId=/^\d{2}-\d{6}$/.test(selected);
+  lookup.hidden=!validId;
+  if(validId)lookup.href="https://badhub.de/spieler/"+selected+"?saison=all&src=gesamt";
+  else lookup.removeAttribute("href");
+ }
  retry.hidden=true;
  if(status==="loading"||status==="idle"){
   source.textContent="Belegte Spiele";
@@ -142,7 +151,10 @@ function render(){
   computeExternalStats(rows,{year:selectedYear,discipline:selectedDiscipline}):
   computeMatchStats(rows,{year:selectedYear,discipline:selectedDiscipline});
  const missing=stats.total===0;
- source.textContent=sourced?"Badhub · Einzelbelege":"Offizielle Matches";
+ const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
+ retry.hidden=!availability.retry;
+ source.textContent=!sourced&&!official.length&&availability.retry
+  ?"Datenabgleich unvollständig":sourced?"Badhub · Einzelbelege":"Offizielle Matches";
  values.innerHTML=[
   ["Gesamtspiele",missing?"–":stats.total,"matches"],
   ["Siege",missing?"–":stats.wins,"wins"],
@@ -152,32 +164,28 @@ function render(){
  if(sourced){
   note.textContent=stats.total
    ? "Belegte Spiele aus Badhub · derzeit verfügbarer Teilbestand."
-   : "Für diese Auswahl liegen noch keine belegten Spiele vor.";
+   : availability.retry?availability.emptyNote:"Für diese Auswahl liegen noch keine belegten Spiele vor.";
   sourceDetails.textContent="Die Werte stammen aus einzelnen Badhub-Matchkarten, nicht aus einer vollständigen offiziellen DBV-Karriere. "+
    importCompleteness(progress,external.length)+
    (partialExternal?" Diese Liste ist derzeit unvollständig.":"")+
    (stats.excluded?" "+stats.excluded+" zusätzliche unklare Einträge wurden ausgeschlossen.":"")+
-   (officialError?" Der offizielle Datenabgleich war beim letzten Laden nicht erreichbar.":"")+
+   (availability.detail?" "+availability.detail:"")+
    " Ergebnisse aus verschiedenen Quellen werden nicht addiert.";
  }else if(official.length){
   const last=official.map(x=>x.last_synced_at).filter(Boolean).sort().at(-1);
   const published=last?" · letzte offizielle Übernahme "+dateLabel(last.slice(0,10)):"";
   note.textContent=missing
-   ?"Für diese Auswahl liegen keine einzeln geprüften Spiele vor."
+   ?availability.retry?availability.emptyNote:"Für diese Auswahl liegen keine einzeln geprüften Spiele vor."
    :"Einzeln geprüfte DBV-Spiele · Quelle: offizielle Matchbelege.";
   sourceDetails.textContent="Gezählt werden nur abgeschlossene, eindeutig belegte Begegnungen."+
     (stats.excluded?" "+stats.excluded+" unklare oder offene Begegnungen ausgeschlossen.":"")+
     (partialOfficial?" Der Datenbestand ist aktuell unvollständig.":"")+
-    published+" Externe Badhub-Spiele werden nicht zu diesen Werten addiert.";
+    published+(availability.detail?" "+availability.detail:"")+
+    " Externe Badhub-Spiele werden nicht zu diesen Werten addiert.";
  }else{
-  const unavailable=externalError&&officialError;
-  note.textContent=unavailable
-   ?"Spielstatistik gerade nicht erreichbar."
-   :"Noch keine einzeln belegten Spiele verfügbar.";
-  retry.hidden=!unavailable;
-  sourceDetails.textContent=unavailable
-   ?"Beide Ergebnisquellen waren bei dieser Abfrage nicht erreichbar. Ein erneuter Versuch lädt die Daten neu."
-   :"Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
+  note.textContent=availability.emptyNote;
+  sourceDetails.textContent=(availability.detail?availability.detail+" ":"")+
+   "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
  details.hidden=missing;
  counter.textContent="("+stats.total+")";
