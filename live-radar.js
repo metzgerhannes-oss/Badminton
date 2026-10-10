@@ -64,9 +64,10 @@ function matchList(label,items,params){
  return section;
 }
 function sourceShortcut(row,id){
- if(!validSource(row?.source_url,id))return null;
+ const url=row?.source_url||("https://badhub.de/spieler/"+id+"/live");
+ if(!validSource(url,id))return null;
  const link=element("a","radar-source-link","Bei Badhub prüfen ↗");
- link.href=row.source_url;
+ link.href=url;
  link.target="_blank";
  link.rel="noopener noreferrer";
  return link;
@@ -150,8 +151,12 @@ async function refresh(){
   if(signal.aborted||seq!==generation)return;
   console.warn("Sourced live radar unavailable",error.message);
   if(lastKnownRow&&id===currentId)render(lastKnownRow,id);
-  else message("Turnierdaten gerade nicht verfügbar",
-   "Die Quellenprüfung wird beim nächsten Abgleich erneut versucht. Alternativ kannst du den Turniertag direkt bei Badhub öffnen.","waiting");
+  else{
+   message("Turnierdaten gerade nicht verfügbar",
+    "Die Quellenprüfung wird automatisch erneut versucht.","waiting");
+   const shortcut=sourceShortcut(null,id);
+   if(shortcut)root()?.appendChild(shortcut);
+  }
  }finally{
   if(seq===generation){busy=false;if(btn)btn.disabled=false;}
  }
