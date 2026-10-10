@@ -19,7 +19,7 @@ assert.ok(app.includes('window.renderDashboard?.(state.chosen,viewedProfiles,sta
 assert.ok(app.includes('page:"start"'));
 assert.ok(app.includes('activeProfileId'));
 assert.ok(app.includes('viewingFriendId'));
-assert.ok(page.includes('data-page="einstellungen"'));
+assert.ok(page.includes('class="topbar-settings" href="#einstellungen"'));
 assert.ok(js.includes('friendNoHistory')&&js.includes('ranking'));
 
 assert.ok(js.includes("e.bwAgeClassChange")&&js.includes("e.previousBwAgeClassRank"),"BW weekly arrows must use two real official snapshots");

@@ -38,7 +38,7 @@ assert.equal(fresh.run("selectedLinks().length"),1);
 assert.ok(html.includes('id="friend-dialog"')&&html.includes('id="friend-list"'));
 assert.ok(html.includes('id="profile-list"')&&html.includes('id="current-account-label"'));
 assert.ok(!html.includes('id="player-pills"'));
-assert.ok(html.includes('data-page="einstellungen"'));
+assert.ok(html.includes('class="topbar-settings" href="#einstellungen"'));
 assert.ok(html.includes('id="first-run-dialog"')&&html.includes('id="first-run-new"'));
 assert.ok(html.includes('id="dashboard-friends"'));
 assert.ok(code.includes('freshDevice')&&code.includes('first-run-choices')&&code.includes('first-run-new'));

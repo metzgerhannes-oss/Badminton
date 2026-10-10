@@ -13,7 +13,6 @@
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
 <script type="module" src="./library.js"></script>
-<script type="module" src="./friend-search.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
 <script type="module" src="./career-history.js"></script>
@@ -30,6 +29,7 @@
 <div class="app">
  <header class="topbar">
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
+  <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
  </header>
  <main>
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
@@ -60,12 +60,12 @@
     </details>
    </section>
    <section class="dashboard-friends-section" aria-labelledby="dashboard-friends-heading">
-    <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-add-friend" href="#einstellungen">+ Freund</a><a class="dashboard-friends-manage" href="#einstellungen">Verwalten ↗</a></div></div>
+    <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-add-friend" href="#spieler">+ Freund</a><a class="dashboard-friends-manage" href="#spieler">Verwalten ↗</a></div></div>
     <div id="dashboard-friends" class="dashboard-friends" aria-label="Freunden folgen und KPIs anzeigen"></div>
    </section>
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
-   <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Erfasste Ergebnisse</span></div>
+   <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
    <details id="history-source-details" class="history-source-details">
     <summary>Datenstand und Quellen</summary>
     <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
@@ -115,6 +115,7 @@
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
    <div class="section-heading"><h2 id="heading-turniere">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
    <p class="live-hub-lead">Deine aktuelle Begegnung, nächste Spiele und Ergebnisse – mit belegtem Quellenstand.</p>
+    <a class="history-inline-link" href="#historie">Turnierhistorie und Auszeichnungen ansehen ↗</a>
    <section class="live-dbv" aria-labelledby="dbv-live-title">
     <div class="live-hub-toolbar">
      <label for="live-player-select">Wen möchtest du verfolgen?</label>
@@ -174,7 +175,8 @@
    </details>
   </section>
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
-   <div class="section-heading"><h2 id="heading-spieler">Spielerbibliothek</h2><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
+   <div class="section-heading"><h2 id="heading-spieler">Spieler</h2></div>
+    <div class="section-heading library-section-heading"><h3>Spieler finden</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
    <p class="supporting">Gemeinsames Verzeichnis öffentlich bestätigter DBV-Spielerinnen und Spieler. Gruppiert nach Verein, mit Filtern nach offizieller Altersklasse und Landesverband. Folge einem Spieler, um ihn in deiner persönlichen Liste wiederzufinden.</p>
    <div class="library-source" id="library-source" aria-live="polite">Offizielle DBV-Rangliste wird geladen.</div>
    <div class="library-filters">
@@ -183,18 +185,28 @@
     <label>Verein<input type="search" id="library-club" placeholder="Alle Vereine" autocomplete="off" list="library-club-suggestions"><datalist id="library-club-suggestions"></datalist></label>
     <label>Landesverband<select id="library-association"><option value="all">Alle Landesverbände</option></select></label>
    </div>
-   <div class="library-result-bar"><strong id="library-count">Spieler werden geladen</strong><span id="library-message" role="status" aria-live="polite"></span></div>
-   <div id="library-results" class="library-results" aria-live="polite"><div class="library-message">DBV-Spielerbibliothek wird geladen …</div></div>
+   <div class="library-result-bar"><strong id="library-count">Suche starten</strong><button id="library-reset" type="button" class="subtle-button" hidden>Filter zurücksetzen</button><span id="library-message" role="status" aria-live="polite"></span></div>
+   <div id="library-results" class="library-results" aria-live="polite"><div class="library-message library-idle"><strong>Spieler suchen</strong><span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div></div>
    <button id="library-more" type="button" class="outline-button library-more" hidden>Weitere Spieler anzeigen</button>
    <p class="library-data-note">Nur in der offiziellen DBV-Rangliste veröffentlichte Spieler werden zentral aufgenommen. Neu angelegte lokale Profile und private Favoritenlisten werden nicht automatisch veröffentlicht. Für andere Spieler können Ranglisten-KPIs noch fehlen.</p>
+   <section class="player-management" aria-label="Meine Spielerprofile und Freunde">
+    <div class="player-management-head"><h3>Mein Bereich</h3><p>Eigene Profile und Spieler, denen du folgst – nur auf diesem Gerät gespeichert.</p></div>
+    <div class="settings-section">
+    <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
+    <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
+    <div id="profile-list" class="profiles"></div>
+   </div>
+    <div class="settings-section">
+      <div class="section-heading"><h3>Freunde</h3><button id="add-friend" class="subtle-button" type="button">Spieler suchen</button></div>
+      <p class="settings-hint">Zum Folgen oben in der Bibliothek suchen. Bereits gespeicherte Freunde kannst du hier ansehen und bearbeiten.</p>
+      <div id="friend-list" class="friends-list"></div>
+      <button id="add-friend-manual" class="subtle-button friend-add-manual" type="button">Spieler mit DBV-ID manuell hinzufügen ↗</button>
+    </div>
+    <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
+   </section>
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <div class="settings-card account-notice">
-    <h3>Mein Bereich auf diesem Gerät</h3>
-    <p>Das ausgewählte Spielerprofil ist dein Startprofil. Ein persönlicher Online-Login und die Synchronisierung zwischen Geräten sind noch nicht eingerichtet.</p>
-    <p id="current-account-label" class="current-account-label"></p>
-   </div>
    <section class="settings-card invitation-card" aria-labelledby="invitation-title">
     <h3 id="invitation-title">Familie &amp; Freunde einladen</h3>
     <p>Teile den öffentlichen Einrichtungslink. Er führt auf eine Willkommensseite zum Anlegen des eigenen Spielers oder zum Eintragen einer DBV-Spieler-ID bzw. eines offiziellen Profil-Links.</p>
@@ -207,28 +219,6 @@
     <p class="invitation-status" id="invite-status" aria-live="polite"></p>
     <p class="small muted">Die Einladung ist frei teilbar und enthält keine privaten Daten. Sie überträgt keine bestehenden Profile oder Favoriten und ist keine Einladung in einen Cloud-Account.</p>
    </section>
-   <div class="settings-section">
-    <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
-    <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
-    <div id="profile-list" class="profiles"></div>
-   </div>
-   <div class="settings-section">
-    <div class="section-heading"><h3>Spielerbibliothek</h3><a href="#spieler" class="subtle-button">Alle Spieler finden ↗</a></div>
-    <p class="settings-hint">Durchsuche das gemeinsame DBV-Verzeichnis nach Verein, Altersklasse und Name. Mit „Folgen“ speicherst du den gewünschten Spieler nur in deinem persönlichen Bereich.</p>
-   </div>
-   <div class="settings-section">
-    <div class="section-heading"><h3>Freunde</h3><button id="add-friend" class="subtle-button" type="button">+ Freund suchen</button></div>
-    <p class="settings-hint">Finde Spielerinnen und Spieler über ihren Namen oder die DBV-ID. Der Verein und Jahrgang helfen dir, die richtige Person zu erkennen.</p>
-    <div class="friend-search-block">
-      <label for="friend-search" class="friend-search-label">Freund hinzufügen – Namen eingeben</label>
-      <input id="friend-search" class="friend-search-input" type="search" autocomplete="off" spellcheck="false" placeholder="z. B. Sarah Storz oder 05-061350" aria-controls="friend-search-results" aria-describedby="friend-search-status">
-      <div id="friend-search-status" class="friend-search-status" role="status" aria-live="polite">Mindestens zwei Zeichen eingeben, um im öffentlichen DBV-Verzeichnis zu suchen.</div>
-      <div id="friend-search-results" class="friend-search-results" aria-label="Passende DBV-Spieler" aria-live="polite"></div>
-      <div class="friend-search-manual"><span>Spieler nicht gefunden?</span><button id="add-friend-manual" class="subtle-button" type="button">Manuell mit DBV-ID hinzufügen ↗</button></div>
-    </div>
-    <h4 class="friend-saved-title">Meine gespeicherten Freunde</h4>
-    <div id="friend-list" class="friends-list"></div>
-   </div>
    <div class="settings-card"><h3>Datenquellen & Nachweise</h3>
     <p>Wir bewerten die Datenquellen nach Verlässlichkeit: offizieller DBV, Verband, Vereinsbericht und Drittanbieter. Die aktuelle DBV-Excel-Rangliste enthält nur Gesamtpunkte; die fünf Turnier-Einzelwertungen werden separat geprüft.</p>
     <a class="sources-reference-link" href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/DATENQUELLEN_PRIORITAET.md" target="_blank" rel="noopener noreferrer">Quellenliste mit Qualitätsstufen ansehen ↗</a>
@@ -240,11 +230,9 @@
  </main>
  <nav class="bottom-nav" aria-label="Hauptnavigation">
   <a href="#start" data-page="start" aria-current="page"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></a>
-  <a href="#historie" data-page="historie"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v6a5 5 0 0 1-10 0V4ZM7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/></svg></span><small>Historie</small></a>
   <a href="#turniere" data-page="turniere"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span><small>Turniere</small></a>
   <a href="#berichte" data-page="berichte"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></span><small>Berichte</small></a>
   <a href="#spieler" data-page="spieler"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><small>Spieler</small></a>
-  <a href="#einstellungen" data-page="einstellungen"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></span><small>Einstellungen</small></a>
  </nav>
 </div>
 <dialog id="first-run-dialog" class="first-run-dialog" aria-label="Startprofil auswählen">

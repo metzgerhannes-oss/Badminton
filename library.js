@@ -63,6 +63,27 @@ async function fetchJson(path){
 }
 function error(msg){const box=$("library-results");if(box)box.innerHTML='<div class="library-message">'+escape(msg)+'</div>'}
 function ageChoice(){return $("library-age")?.value||"all"}
+function hasCriteria(){
+ return Boolean(
+  String($("library-search")?.value||"").trim() ||
+  String($("library-club")?.value||"").trim() ||
+  ageChoice()!=="all" ||
+  ($("library-association")?.value||"all")!=="all"
+ );
+}
+// No public player cards or whole-roster request before an explicit filter.
+function showIdle(){
+ ++pending; // Ignore a search response that finished after filters were cleared.
+ entries=[];dbTotal=0;visible=40;loaded=true;
+ const count=$("library-count"),area=$("library-results"),more=$("library-more"),reset=$("library-reset");
+ if(count)count.textContent="Spieler suchen";
+ if(area)area.innerHTML='<div class="library-message library-idle"><strong>Spieler suchen</strong>'+
+  '<span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div>';
+ if(more)more.hidden=true;
+ if(reset)reset.hidden=true;
+ if($("library-message"))$("library-message").textContent="";
+ if($("library-source"))$("library-source").textContent="Öffentliches DBV-Verzeichnis · Ergebnisse erst nach Suche oder Filterauswahl";
+}
 function filtered(){
  return dbMode?entries:selectPlayers(entries,{
   query:$("library-search")?.value||"",
@@ -91,10 +112,12 @@ function localSelection(){
 }
 function render(){
  if(!loaded)return;
+ if(!hasCriteria()){showIdle();return;}
+ if($("library-reset"))$("library-reset").hidden=false;
  const own=new Set(localSelection().own),following=new Set(localSelection().following);
  const people=filtered(),count=$("library-count"),area=$("library-results");
  const shown=dbMode?people:people.slice(0,visible);
- if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+" Spieler · nach Verein gruppiert";
+ if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+" passende Spieler · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
   error("Keine passenden bestätigten DBV-Spieler gefunden. Andere Filter wählen oder bei einem neuen Profil die DBV-ID ergänzen.");
@@ -140,6 +163,7 @@ async function fetchAge(age){
  return records;
 }
 async function loadBackup(){
+ if(!hasCriteria()){showIdle();return;}
  const ticket=++pending;
  $("library-more").hidden=true;
  loaded=false;
@@ -168,6 +192,7 @@ async function loadBackup(){
  }
 }
 async function load(){
+ if(!hasCriteria()){showIdle();return;}
  const ticket=++pending;
  loaded=false;$("library-more").hidden=true;
  error("Die Spielerbibliothek wird aus Supabase geladen …");
@@ -186,6 +211,7 @@ async function load(){
  }
 }
 async function nextPage(){
+ if(!hasCriteria()){showIdle();return;}
  if(!dbMode){visible+=40;render();return}
  const ticket=++pending,offset=entries.length;
  try{
@@ -196,18 +222,31 @@ async function nextPage(){
 }
 function delayedFilter(){
  clearTimeout(filterTimer);
- filterTimer=setTimeout(()=>{visible=40;if(dbMode)load();else render()},280);
+ if(!hasCriteria()){showIdle();return;}
+ filterTimer=setTimeout(()=>{visible=40;load()},280);
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("library-results"))return;
+ showIdle();
+ // Small club metadata fetch may populate the Landesverband filter, never the 9,246-player list.
+ dbAssociations().catch(e=>console.warn("Landesverbände derzeit nicht abrufbar:",e?.message));
  $("library-age").addEventListener("change",load);
  for(const id of ["library-search","library-club"]){
   $(id).addEventListener("input",()=>{if(id==="library-club")updateClubSuggestions();delayedFilter();});
  }
- $("library-association").addEventListener("change",()=>{visible=40;if(dbMode)load();else render();});
+ $("library-association").addEventListener("change",()=>{visible=40;load();});
  $("library-more").addEventListener("click",nextPage);
+ $("library-reset").addEventListener("click",()=>{
+  $("library-search").value="";
+  $("library-club").value="";
+  $("library-age").value="all";
+  $("library-association").value="all";
+  $("library-club-suggestions").innerHTML="";
+  clearTimeout(filterTimer);showIdle();
+  $("library-search").focus();
+ });
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
- window.addEventListener("hashchange",()=>{if(location.hash==="#spieler"&&!loaded)load();});
+ window.addEventListener("hashchange",()=>{if(location.hash==="#spieler"&&hasCriteria()&&!loaded)load();});
  window.addEventListener("badminton:library-following",()=>render());
- if(location.hash==="#spieler")load();
+ // Initial page load deliberately does not fetch the full roster.
 });
