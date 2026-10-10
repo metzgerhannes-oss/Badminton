@@ -141,7 +141,7 @@ test("Club-confirmed win is displayed separately from scored matches",async ({pa
  await expect(note).toContainText("nicht in der Spielstatistik enthalten");
  await expect(page.locator("#history-timeline .history-event")).toHaveCount(1);
  await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
-  "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
+  "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026");
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
 });
@@ -180,8 +180,8 @@ test("Sourced friend tournament placements remain separate from individual match
  await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
  await expect(page.locator("#history-timeline")).toContainText("3.");
  await expect(page.locator("#history-timeline")).toContainText("Raphael Argast");
- await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute(
-  "href",/spvgg\\.org\\/abteilungen\\/badminton\\/aktuelles\\/2-c-rangliste/);
+ await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
+  "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
  await page.evaluate(profiles=>window.renderHistory("05-070006",profiles,{mode:"friend"}),profiles);
  await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
  await expect(page.locator("#history-timeline")).toContainText("19.");
