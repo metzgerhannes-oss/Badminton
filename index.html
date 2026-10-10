@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="./styles.css">
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
+<script type="module" src="./library.js"></script>
 <script defer src="./live.js"></script>
 <script defer src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
@@ -81,6 +82,21 @@
     <div id="report-source-list" class="report-source-list"></div>
    </details>
   </section>
+  <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
+   <div class="section-heading"><h2 id="heading-spieler">Spielerbibliothek</h2><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
+   <p class="supporting">Gemeinsames Verzeichnis öffentlich bestätigter DBV-Spielerinnen und Spieler. Gruppiert nach Verein, mit Filtern nach offizieller Altersklasse und Landesverband. Folge einem Spieler, um ihn in deiner persönlichen Liste wiederzufinden.</p>
+   <div class="library-source" id="library-source" aria-live="polite">Offizielle DBV-Rangliste wird geladen.</div>
+   <div class="library-filters">
+    <label>Spielerin / Spieler suchen<input type="search" id="library-search" placeholder="Name oder DBV-Spieler-ID" autocomplete="off"></label>
+    <label>Altersklasse<select id="library-age"><option value="all">Alle Altersklassen</option><option value="U11">U11</option><option value="U13">U13</option><option value="U15">U15</option><option value="U17">U17</option><option value="U19">U19</option><option value="U22">U22</option></select></label>
+    <label>Verein<input type="search" id="library-club" placeholder="Alle Vereine" autocomplete="off" list="library-club-suggestions"><datalist id="library-club-suggestions"></datalist></label>
+    <label>Landesverband<select id="library-association"><option value="all">Alle Landesverbände</option></select></label>
+   </div>
+   <div class="library-result-bar"><strong id="library-count">Spieler werden geladen</strong><span id="library-message" role="status" aria-live="polite"></span></div>
+   <div id="library-results" class="library-results" aria-live="polite"><div class="library-message">DBV-Spielerbibliothek wird geladen …</div></div>
+   <button id="library-more" type="button" class="outline-button library-more" hidden>Weitere Spieler anzeigen</button>
+   <p class="library-data-note">Nur in der offiziellen DBV-Rangliste veröffentlichte Spieler werden zentral aufgenommen. Neu angelegte lokale Profile und private Favoritenlisten werden nicht automatisch veröffentlicht. Für andere Spieler können Ranglisten-KPIs noch fehlen.</p>
+  </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
    <div class="settings-card account-notice">
@@ -106,6 +122,10 @@
     <div id="profile-list" class="profiles"></div>
    </div>
    <div class="settings-section">
+    <div class="section-heading"><h3>Spielerbibliothek</h3><a href="#spieler" class="subtle-button">Alle Spieler finden ↗</a></div>
+    <p class="settings-hint">Durchsuche das gemeinsame DBV-Verzeichnis nach Verein, Altersklasse und Name. Mit „Folgen“ speicherst du den gewünschten Spieler nur in deinem persönlichen Bereich.</p>
+   </div>
+   <div class="settings-section">
     <div class="section-heading"><h3>Freunden folgen</h3><button id="add-friend" class="subtle-button" type="button">+ Freund</button></div>
     <p class="settings-hint">Speichere einen Freund mit seiner öffentlichen DBV-Spieler-ID. Tippe ihn an, um zu seinen Haupt-KPIs zu wechseln. Nicht verfügbare Ranglistenwerte bleiben leer.</p>
     <div id="friend-list" class="friends-list"></div>
@@ -124,6 +144,7 @@
   <a href="#historie" data-page="historie"><span aria-hidden="true">★</span><small>Historie</small></a>
   <a href="#turniere" data-page="turniere"><span aria-hidden="true">▦</span><small>Turniere</small></a>
   <a href="#berichte" data-page="berichte"><span aria-hidden="true">☷</span><small>Berichte</small></a>
+  <a href="#spieler" data-page="spieler"><span aria-hidden="true">♧</span><small>Spieler</small></a>
   <a href="#einstellungen" data-page="einstellungen"><span aria-hidden="true">⚙</span><small>Einstellungen</small></a>
  </nav>
 </div>

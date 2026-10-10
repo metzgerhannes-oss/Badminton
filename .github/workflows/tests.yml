@@ -22,6 +22,8 @@ jobs:
           node --check sw.js
           node --check reports.js
           node --check invite.js
+          node --check library.js
+          node --check scripts/library-utils.mjs
           node --check welcome.js
           node --check scripts/invitation.mjs
           node --check live.js
@@ -39,4 +41,6 @@ jobs:
           node tests/ranking-points.mjs
           node tests/source-register.mjs
           node tests/invitation.mjs
+          node tests/player-library.mjs
+          python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v

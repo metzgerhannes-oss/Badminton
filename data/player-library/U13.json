@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "ageClass": "U13",
+  "players": [
+    {
+      "id": "05-071969",
+      "name": "Charlotte Metzger",
+      "birthYear": 2014,
+      "ageClass": "U13",
+      "club": "SpVgg Mössingen",
+      "clubId": "",
+      "association": "BAW-Baden-Württemberg",
+      "lastSeen": "2026-KW41"
+    }
+  ]
+}

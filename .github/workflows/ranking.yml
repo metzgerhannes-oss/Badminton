@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/ranking.yml'
       - 'scripts/update-ranking.py'
+      - 'scripts/player-library.py'
       - 'scripts/test-ranking.py'
 permissions:
   contents: write
@@ -31,7 +32,9 @@ jobs:
       - name: Ranking parser dependency
         run: python -m pip install --disable-pip-version-check 'openpyxl==3.1.5'
       - name: Verify Excel parser and age-class comparisons
-        run: python scripts/test-ranking.py
+        run: |
+          python scripts/test-ranking.py
+          python scripts/test-player-library.py
       - name: Load current official DBV ranking and latest archived week
         env:
           BADMINTON_PLAYER_IDS: '05-070879,05-071969'
@@ -41,7 +44,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/ranking.json
+          git add data/ranking.json data/player-library/
           if ! git diff --cached --quiet; then
             git commit -m 'data: update public DBV age-class ranking snapshot [skip ci]'
             # Other UI commits may land during this official Excel download.

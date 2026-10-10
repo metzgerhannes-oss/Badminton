@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "ageClass": "U11",
+  "players": [
+    {
+      "id": "05-070879",
+      "name": "Philipp Metzger",
+      "birthYear": 2016,
+      "ageClass": "U11",
+      "club": "SpVgg Mössingen",
+      "clubId": "",
+      "association": "BAW-Baden-Württemberg",
+      "lastSeen": "2026-KW41"
+    }
+  ]
+}

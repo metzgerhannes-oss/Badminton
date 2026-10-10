@@ -14,6 +14,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
+import importlib.util
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from openpyxl import load_workbook
@@ -95,7 +96,10 @@ def parse_excel(contents: bytes) -> list[dict]:
                 "association":str(val("lvname") or "").strip(),
                 "tournaments":int(val("turniere") or 0),
                 "firstName":str(val("vorname") or "").strip(),
-                "lastName":str(val("nachname") or "").strip()})
+                "lastName":str(val("nachname") or "").strip(),
+                # Official ranking supplies both club name and club ID.
+                "club":str(val("verein") or "").strip(),
+                "clubId":str(val("clubid") or "").strip()})
     wb.close()
     if not found:raise ValueError("No usable ranking table in official Excel")
     return found
@@ -315,8 +319,15 @@ def main():
     if not should_publish(old,result):
         print("Refusing to replace newer DBV ranking with an older or less reliable source; existing snapshot retained.")
         return
+    # Public DBV directory is updated even when the selected two-player KPI
+    # snapshot is unchanged. No manually entered profiles are ever imported.
+    spec=importlib.util.spec_from_file_location("player_library",ROOT/"scripts"/"player-library.py")
+    lib=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(lib)
+    lib.write_player_library(latest,result["current"]["year"],result["current"]["week"],
+                             ROOT/"data"/"player-library")
     if old and old.get("schemaVersion")==2 and old.get("current")==result.get("current") and old.get("previous")==result.get("previous") and old.get("players")==result.get("players"):
-        print("Same official calendar-week exports; no change in KPI snapshot.")
+        print("Same official calendar-week exports; selected KPI snapshot unchanged.")
         return
     OUTPUT.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n")
     print("Saved official weekly ranking cohort snapshot:",result["current"],"previous",result["previous"],"players:",list(result["players"]))
