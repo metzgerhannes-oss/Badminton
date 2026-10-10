@@ -490,3 +490,13 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 .report-source-status{font-size:10px;color:#d2e3ef}
 .report-source-entry small{font-size:10px;color:#9ebacc;line-height:1.5}
 @media(max-width:350px){.report-card-footer{flex-wrap:wrap}.report-card-footer a{white-space:normal}.report-filters{grid-template-columns:1fr}.report-search-label{grid-column:auto}}
+
+/* Shareable setup invitation: a compact card within existing settings. */
+.invitation-card{background:linear-gradient(135deg,#1f5078,#143753);border:1px solid #78afd1;border-radius:16px;padding:16px;margin:15px 0 22px}
+.invitation-card h3{margin:0 0 8px;font-size:16px}
+.invitation-card>p{margin:8px 0 14px;font-size:12px;line-height:1.55;color:#d2e9f7}
+.invitation-actions{display:flex;gap:10px;flex-wrap:wrap;margin:13px 0}
+.invitation-actions button{flex:1;min-width:125px;min-height:45px;text-align:center;justify-content:center;font-size:12px}
+.invitation-link,.invitation-guide{display:block;overflow-wrap:anywhere;color:#c0ebff;font-size:11px;line-height:1.6;margin-top:12px;text-decoration:underline;text-underline-offset:3px}
+.invitation-card .invitation-status{font-size:11px;margin:9px 0;min-height:0;color:#ceffee;font-weight:700}
+@media(max-width:350px){.invitation-actions{display:grid;grid-template-columns:1fr}}

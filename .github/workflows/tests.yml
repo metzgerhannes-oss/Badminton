@@ -21,6 +21,9 @@ jobs:
           node --check scripts/upcoming-tournaments.mjs
           node --check sw.js
           node --check reports.js
+          node --check invite.js
+          node --check welcome.js
+          node --check scripts/invitation.mjs
           node --check live.js
       - name: Run tests
         run: |
@@ -35,4 +38,5 @@ jobs:
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
           node tests/source-register.mjs
+          node tests/invitation.mjs
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#204d73">
+ <meta name="description" content="Willkommen bei Schmetterlinge: eigenes Badminton-Profil einrichten und als App zum Home-Bildschirm hinzufügen.">
+ <title>Willkommen · Schmetterlinge Badminton</title>
+ <link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
+ <link rel="manifest" href="./manifest.webmanifest">
+ <link rel="stylesheet" href="./welcome.css">
+ <script type="module" src="./welcome.js"></script>
+</head>
+<body>
+ <div class="welcome-shell">
+  <header class="welcome-header">
+   <img src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlinge Badminton" width="72" height="72">
+   <span>Schmetterlinge<small>BADMINTON JUGEND</small></span>
+   <a href="./#start" id="existing-app-link">Zur App ↗</a>
+  </header>
+  <main>
+   <section class="welcome-hero" aria-labelledby="welcome-title">
+    <span class="welcome-eyebrow">DEIN PERSÖNLICHER START</span>
+    <h1 id="welcome-title">Willkommen bei den <em>Schmetterlingen.</em></h1>
+    <p>Alle Ranglisten, Turniere und Berichte rund um deinen Badminton-Weg – bequem auf dem Handy.</p>
+    <div class="welcome-pills" aria-label="App-Vorteile"><span>Spielerprofile</span><span>DBV-Ranglisten</span><span>Turniere &amp; Berichte</span></div>
+   </section>
+   <div class="welcome-steps" aria-label="Einrichtungsschritte">
+    <span id="progress-profile" class="welcome-step current">1 · Spielerprofil</span>
+    <span id="progress-install" class="welcome-step">2 · Zum Home-Bildschirm</span>
+   </div>
+   <section id="onboard-profile" class="welcome-panel" aria-labelledby="setup-title">
+    <h2 id="setup-title">Wessen Badminton möchtest du verfolgen?</h2>
+    <p>Lege ein eigenes Spielerprofil an. Falls du schon eine DBV-Spieler-ID oder den Link zum offiziellen Spielerprofil hast, kannst du ihn direkt übernehmen.</p>
+    <div class="welcome-modes" role="group" aria-label="Art der Einrichtung">
+      <button id="mode-own" type="button" class="mode-card active" aria-pressed="true"><strong>Spielerprofil anlegen</strong><small>Mit Name, Jahrgang und Verein</small></button>
+      <button id="mode-dbv" type="button" class="mode-card" aria-pressed="false"><strong>Mit DBV-Profil starten</strong><small>ID oder offiziellen Link einfügen</small></button>
+    </div>
+    <form id="welcome-form" novalidate>
+      <label id="welcome-ref-group" hidden>DBV-Spieler-ID oder Profil-Link <span class="required">(Pflicht)</span>
+       <input id="welcome-reference" name="reference" type="text" autocomplete="off" inputmode="url" placeholder="05-123456 oder https://dbv.turnier.de/player-profile/…">
+      </label>
+      <label>Name des Spielers oder der Spielerin <span class="required">(Pflicht)</span>
+       <input name="name" id="welcome-name" type="text" autocomplete="name" maxlength="80" required placeholder="Vor- und Nachname">
+      </label>
+      <div class="welcome-form-row">
+       <label>Jahrgang <span>(optional)</span><input name="birthYear" type="number" min="1900" max="2100" placeholder="z. B. 2015"></label>
+       <label>Verein <span>(optional)</span><input name="club" maxlength="120" autocomplete="organization" placeholder="z. B. SpVgg Mössingen"></label>
+      </div>
+      <p id="dbv-reference-note" class="welcome-info">Eine DBV-Spieler-ID kannst du später jederzeit unter Einstellungen ergänzen.</p>
+      <p class="welcome-info" id="dbv-manual-note" hidden>Ein DBV-Profil-Link enthält häufig nur eine technische UUID, nicht die numerische DBV-ID. Deshalb brauchen wir den Namen zusätzlich. Die Werte werden nicht automatisch als verifiziert ausgegeben.</p>
+      <p id="welcome-error" class="welcome-error" role="alert" hidden></p>
+      <button class="welcome-primary" type="submit">Profil speichern &amp; weiter <span aria-hidden="true">→</span></button>
+    </form>
+    <p class="welcome-small">Noch keine DBV-ID? Du kannst auch zunächst ein eigenes Profil ohne DBV-ID anlegen. Öffentliche Ranglistenwerte erscheinen erst, wenn sie für deine DBV-ID verfügbar sind.</p>
+    <p id="welcome-existing" class="welcome-existing" hidden>Auf diesem Gerät sind bereits Profile gespeichert. Ein zusätzliches Profil wird hinzugefügt; deine bisherigen Daten bleiben erhalten.</p>
+    <a class="welcome-official" href="https://dbv.turnier.de/" rel="noopener noreferrer" target="_blank">DBV-Turnierportal öffnen ↗</a>
+   </section>
+   <section id="onboard-install" class="welcome-panel" aria-labelledby="install-title" hidden>
+     <span class="welcome-success">✓ Profil auf diesem Gerät gespeichert</span>
+     <h2 id="install-title">Schmetterlinge wie eine App öffnen</h2>
+     <p>Keine App-Store-Installation nötig: Füge die Seite einmal zum Home-Bildschirm hinzu. Danach öffnet sie sich über das Schmetterlinge-Symbol.</p>
+     <div class="platform-switch" role="group" aria-label="Gerät auswählen">
+      <button type="button" id="install-ios" aria-pressed="false">iPhone / iPad</button>
+      <button type="button" id="install-android" aria-pressed="false">Android</button>
+     </div>
+     <ol id="install-ios-steps" class="install-steps" hidden>
+      <li>Öffne die Schmetterlinge-Seite in <strong>Safari</strong>. In WhatsApp oder anderen In-App-Browsern ggf. zuerst „In Safari öffnen“ wählen.</li>
+      <li>Tippe auf das <strong>Teilen-Symbol</strong> (ggf. über das Seitenmenü „…“).</li>
+      <li>Wähle <strong>„Zu Home-Bildschirm hinzufügen“</strong>.</li>
+      <li>Falls angezeigt, <strong>„Als Web-App öffnen“</strong> aktivieren und <strong>„Hinzufügen“</strong> antippen.</li>
+     </ol>
+     <ol id="install-android-steps" class="install-steps" hidden>
+      <li>Öffne die Seite in <strong>Google Chrome</strong>.</li>
+      <li>Tippe rechts oben auf das Menü <strong>⋮</strong>.</li>
+      <li>Wähle <strong>„App installieren“</strong> oder <strong>„Zum Startbildschirm hinzufügen“</strong>.</li>
+      <li>Bestätige mit <strong>„Installieren“</strong> beziehungsweise <strong>„Hinzufügen“</strong>.</li>
+     </ol>
+     <div class="welcome-actions">
+      <a id="open-app" class="welcome-primary" href="./#start">Jetzt Schmetterlinge öffnen <span aria-hidden="true">→</span></a>
+      <button type="button" id="install-back" class="welcome-secondary">Weiteres Spielerprofil hinzufügen</button>
+     </div>
+     <p class="welcome-small">Deine Profile und Favoriten bleiben auf diesem Gerät gespeichert. Der Einladungslink erstellt <strong>keinen</strong> Online-Account und synchronisiert keine Daten zwischen Geräten.</p>
+   </section>
+  </main>
+  <footer class="welcome-footer">Schmetterlinge · Badminton Jugend <span>Eine kostenlose Web-App für Badminton-Familien</span></footer>
+ </div>
+</body>
+</html>

@@ -10,6 +10,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <script defer src="./app.js"></script>
+<script defer src="./invite.js"></script>
 <script defer src="./live.js"></script>
 <script defer src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
@@ -87,6 +88,18 @@
     <p>Das ausgewählte Spielerprofil ist dein Startprofil. Ein persönlicher Online-Login und die Synchronisierung zwischen Geräten sind noch nicht eingerichtet.</p>
     <p id="current-account-label" class="current-account-label"></p>
    </div>
+   <section class="settings-card invitation-card" aria-labelledby="invitation-title">
+    <h3 id="invitation-title">Familie &amp; Freunde einladen</h3>
+    <p>Teile den öffentlichen Einrichtungslink. Er führt auf eine Willkommensseite zum Anlegen des eigenen Spielers oder zum Eintragen einer DBV-Spieler-ID bzw. eines offiziellen Profil-Links.</p>
+    <div class="invitation-actions">
+     <button class="primary-button" id="invite-share" type="button">Einladungslink teilen</button>
+     <button class="outline-button" id="invite-copy" type="button">Link kopieren</button>
+    </div>
+    <a class="invitation-link" id="invite-link-preview" href="./welcome.html">Zur Willkommensseite ↗</a>
+    <a class="invitation-guide" href="./welcome.html#installation">Anleitung: App auf iPhone oder Android hinzufügen ↗</a>
+    <p class="invitation-status" id="invite-status" aria-live="polite"></p>
+    <p class="small muted">Die Einladung ist frei teilbar und enthält keine privaten Daten. Sie überträgt keine bestehenden Profile oder Favoriten und ist keine Einladung in einen Cloud-Account.</p>
+   </section>
    <div class="settings-section">
     <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
     <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>

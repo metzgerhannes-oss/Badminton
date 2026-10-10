@@ -1,3 +1,7 @@
+## Einladungslink und Willkommensseite (10.10.2026)
+
+Neues familienfreundliches Onboarding: Über **Einstellungen → Familie & Freunde einladen** gibt es einen teilbaren Link auf die [Willkommensseite](https://metzgerhannes-oss.github.io/Badminton/welcome.html). Empfänger erstellen dort ihr eigenes Profil oder übernehmen eine gültige DBV-Spieler-ID/einen offiziellen DBV-Profil-Link. Die App speichert die Einrichtung lokal, schützt frühere Profile/Favoriten vor Überschreiben und zeigt anschließend die kostenlose iPhone-/Android-Installationsanleitung. Ein Einladungslink ist **kein Benutzerkonto und keine Cloud-Synchronisierung**. [Ausführliche Anleitung und technische Regeln](docs/EINLADUNG_INSTALLATION.md).
+
 ## Automatischer Berichte-Abgleich (Oktober 2026)
 
 Täglicher GitHub-Actions-Workflow zur Recherche öffentlicher Berichte, mit unmittelbarem Prüfungslauf nach der Einrichtung. Es werden ausschließlich freigegebene Artikelübersichten (zunächst **SpVgg Mössingen** und **BWBV Jugend**) geprüft. Die übrigen Quellen bleiben als Recherchekandidaten hinterlegt, bis ein zulässiger Feed oder ein verifizierter Artikelindex vorliegt.
