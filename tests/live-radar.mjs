@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {DBV_ID,watchRequest,snapshotUrl,validSource,sourceSets,setText,opponents,matchLabel,
- freshness,validateSnapshot,liveView,playerOutcome,sourceTime} from "../scripts/live-radar.mjs";
+ freshness,validateSnapshot,liveView,radarSituation,playerOutcome,sourceTime} from "../scripts/live-radar.mjs";
 const id="05-061350";
 assert.ok(DBV_ID.test(id));
 assert.equal(watchRequest("local-123"),null);
@@ -24,6 +24,14 @@ assert.equal(liveView(idle,"05-070879",now).status,"unavailable");
 assert.equal(liveView({...idle,checked_at:"2026-10-10T11:55:00Z"},id,now).status,"stale");
 assert.equal(freshness(idle,now).ageMs,60000);
 assert.equal(freshness({...idle,checked_at:"invalid"},now).fresh,false);
+assert.equal(radarSituation(idle,id,now).kind,"idle","Fresh empty source means no reported tournament");
+const cold={...idle,checked_at:"2026-10-10T11:55:00Z"};
+assert.equal(radarSituation(cold,id,now).kind,"idle","A 5-minute-old no-tournament response must not be an alarm");
+assert.match(radarSituation(cold,id,now).detail,/Bei der letzten Prüfung/);
+assert.equal(radarSituation(null,id,now).kind,"pending");
+assert.equal(radarSituation({...idle,checked_at:"2026-10-10T11:00:00Z"},id,now).kind,"pending",
+ "Yesterday or a very old no-tournament report cannot be called current");
+
 const playing={...idle,payload:{
  tournament:{name:"Jugend-Turnier",key:"t1"},
  running:{class:"ME U17",opponent:"Spielerin A",is_team1:false,sets:[[21,17],[8,5]],court:"Feld 05"},
@@ -32,6 +40,13 @@ const playing={...idle,payload:{
  past:[],entries:[]
 }};
 assert.equal(liveView(playing,id,now).status,"playing");
+assert.equal(radarSituation(playing,id,now).kind,"current");
+const oldMatch={...playing,checked_at:"2026-10-10T11:55:00Z"};
+assert.equal(radarSituation(oldMatch,id,now).kind,"updating","Old match MUST NOT masquerade as live");
+assert.equal(radarSituation(oldMatch,id,now).showScore,false);
+assert.match(radarSituation(oldMatch,id,now).title,/Spielstand wird geprüft/);
+assert.equal(radarSituation({...playing,source_url:"https://evil.test/live"},id,now).kind,"pending");
+
 assert.equal(liveView({...playing,payload:{...playing.payload,running:null,next:{queue_position:0}}},id,now).status,"next");
 assert.equal(liveView({...playing,payload:{...playing.payload,running:null,next:{queue_position:null}}},id,now).status,"tournament","Unknown queue position is not next");
 assert.deepEqual(sourceSets(playing.payload.running),[[17,21],[5,8]],"Flip per player perspective");
@@ -59,7 +74,10 @@ assert.match(js,/badminton:profile-change/);
 assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
 assert.match(js,/Wartestand/);
-assert.match(js,/Live-Abgleich veraltet/);
+assert.match(js,/situation\.kind==="idle"|situation\.kind!=="current"/);
+assert.match(js,/Bei Badhub prüfen/);
+assert.doesNotMatch(js,/Live-Abgleich veraltet/,"Technical cache age must not be the headline");
+assert.match(css,/\.live-radar-content\[data-state="idle"\]/);
 assert.match(js,/sourceTime/);
 assert.match(sql,/enable row level security/g);
 assert.match(sql,/grant insert\(dbv_id\)/);
@@ -71,5 +89,5 @@ assert.ok(!sql.includes("insert into public.matches"),"Never infer confirmed mat
 assert.match(css,/\.live-radar-panel/);
 assert.match(sw,/live-radar\.js/);
 assert.match(sw,/scripts\/live-radar\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v32/);
+assert.match(sw,/schmetterlinge-shell-v33/);
 console.log("Live radar: matchday idle/active/stale, perspective-safe scores, idempotent watches, RLS controls and iPhone UI passed.");

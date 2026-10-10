@@ -493,3 +493,36 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  .home-live-peek{padding:11px 9px;gap:8px}
  .home-live-indicator{padding:8px 6px}
 }
+
+
+/* v33 – source freshness is secondary information, not a false alarm. */
+.live-radar-content[data-state="idle"] .radar-summary{
+ display:grid;gap:9px;align-items:start;padding:7px 0;
+}
+.live-radar-content[data-state="idle"] .radar-empty{
+ color:#0b4166;font-size:16px;line-height:1.35;
+}
+.live-radar-content[data-state="idle"] .radar-summary p{
+ color:#527791;font-size:12px;line-height:1.6;
+}
+.live-radar-content[data-state="updating"] .radar-summary{
+ display:grid;gap:9px;align-items:start;padding:7px 0;
+}
+.live-radar-content[data-state="updating"] .radar-empty{
+ color:#1a4c70;font-size:16px;line-height:1.35;
+}
+.live-radar-content[data-state="pending"] .radar-summary,
+.live-radar-content[data-state="waiting"] .radar-summary{
+ display:grid;gap:9px;align-items:start;padding:7px 0;
+}
+.live-radar-content[data-state="idle"],
+.live-radar-content[data-state="updating"],
+.live-radar-content[data-state="pending"],
+.live-radar-content[data-state="waiting"]{
+ border:0;padding:0;
+}
+.radar-source-link{display:inline-flex;align-items:center;justify-content:center;
+ color:#116f9f;background:#fff;border:1px solid #bbddec;border-radius:11px;
+ min-height:44px;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:800;
+ width:fit-content;max-width:100%}
+.radar-source-link:focus-visible{outline:3px solid #168dd2;outline-offset:2px}

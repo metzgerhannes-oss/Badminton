@@ -2,11 +2,11 @@
  * It never fetches Badhub directly from browsers and never guesses live scores. */
 import {
  DBV_ID,PUBLISHABLE,watchRequest,snapshotUrl,liveView,
- freshness,setText,opponents,matchLabel,playerOutcome,sourceTime
+ radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime
 } from "./scripts/live-radar.mjs";
 const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
-let currentId="",generation=0,controller,lastWatchAt=0;
+let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
 let busy=false,timer;
 const displayed=()=>location.hash==="#turniere"&&!document.hidden;
 function element(tag,cls,value){
@@ -63,26 +63,40 @@ function matchList(label,items,params){
  for(const m of items.slice(0,8))section.appendChild(fixture(m,params));
  return section;
 }
+function sourceShortcut(row,id){
+ const url=row?.source_url||("https://badhub.de/spieler/"+id+"/live");
+ if(!validSource(url,id))return null;
+ const link=element("a","radar-source-link","Bei Badhub prüfen ↗");
+ link.href=url;
+ link.target="_blank";
+ link.rel="noopener noreferrer";
+ return link;
+}
 function render(row,id){
  reset();const box=root();if(!box)return;
- box.dataset.state="ready";
- const view=liveView(row,id);
- if(view.status==="unavailable"){
-  message("Datenabgleich noch ausstehend","Supabase sammelt die Quellenantwort. Wenn gerade keine Daten vorliegen, öffne den offiziellen Turniertag-Link.","waiting");
-  return;
- }
- if(view.status==="stale"){
-  message("Live-Abgleich veraltet","Der letzte bestätigte Stand ist älter als zwei Minuten. Veraltete Satzstände werden nicht als live angezeigt.","stale");
-  return;
- }
+ const situation=radarSituation(row,id);
+ box.dataset.state=situation.kind;
+ // Source freshness is supporting metadata, never the main status message.
  const top=element("div","radar-summary");
- const freshLabel=element("span","radar-source","Badhub · Abgleich "+new Date(row.checked_at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"})+" Uhr");
- top.appendChild(freshLabel);
- if(view.status==="idle"){
-  top.appendChild(element("strong","radar-empty","Gerade kein laufendes Turnier"));
-  top.appendChild(element("p","","Laut der aktuellen öffentlichen Quelle stehen für dieses Profil heute keine Turniertag-Daten bereit."));
-  box.appendChild(top);return;
+ if(situation.checkedAt){
+  const t=new Date(situation.checkedAt);
+  const printed=t.toLocaleString("de-DE",{
+   day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"
+  });
+  top.appendChild(element("span","radar-source","Badhub · zuletzt geprüft "+printed+" Uhr"));
  }
+ if(situation.kind!=="current"){
+  top.appendChild(element("strong","radar-empty",situation.title));
+  top.appendChild(element("p","",situation.detail));
+  box.appendChild(top);
+  const shortcut=sourceShortcut(row,id);
+  if(situation.kind==="updating"&&situation.tournament){
+   box.appendChild(line("Bekanntes Turnier",situation.tournament));
+  }
+  if(shortcut)box.appendChild(shortcut);
+  return;
+ }
+ const view=liveView(row,id);
  top.appendChild(element("strong","radar-tournament",view.tournament||"Aktuelles Turnier"));
  if(view.status==="playing")top.appendChild(tag(setText(view.running)?"Live-Stand":"Spiel aufgerufen",setText(view.running)?"live":"called"));
  if(view.status==="next"&&!view.running)top.appendChild(tag("Als Nächstes","next"));
@@ -131,17 +145,24 @@ async function refresh(){
   if(seq!==generation||id!==currentId)return;
   const snapshot=await getSnapshot(id,signal);
   if(seq!==generation||id!==currentId)return;
+  lastKnownRow=snapshot;
   render(snapshot,id);
  }catch(error){
   if(signal.aborted||seq!==generation)return;
   console.warn("Sourced live radar unavailable",error.message);
-  message("Live-Radar vorübergehend nicht verfügbar","Die offiziellen Quellenlinks bleiben nutzbar.","stale");
+  if(lastKnownRow&&id===currentId)render(lastKnownRow,id);
+  else{
+   message("Turnierdaten gerade nicht verfügbar",
+    "Die Quellenprüfung wird automatisch erneut versucht.","waiting");
+   const shortcut=sourceShortcut(null,id);
+   if(shortcut)root()?.appendChild(shortcut);
+  }
  }finally{
   if(seq===generation){busy=false;if(btn)btn.disabled=false;}
  }
 }
 function switchPlayer(id){
- currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;
+ currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;lastKnownRow=null;
  if(!DBV_ID.test(currentId)){
   message("Keine offizielle DBV-ID","Wähle ein bestätigtes Spielerprofil mit DBV-ID.");
   return;
