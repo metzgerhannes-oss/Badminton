@@ -201,7 +201,7 @@ function renderFriends(){
  root.innerHTML=state.friends.length?state.friends.map(p=>{
   const selected=state.viewingFriendId===p.id;
   return '<article class="friend-card '+(selected?'friend-selected':'')+'"><button type="button" class="friend-open" data-view-friend="'+esc(p.id)+'"><span class="friend-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.birthYear?' · Jahrgang '+esc(p.birthYear):'')+'</small><em>Haupt-KPIs ansehen ↗</em></span></button><span class="friend-actions"><button type="button" class="remove-button" data-edit-friend="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button friend-remove" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></span></article>';
- }).join(""):'<div class="empty friends-empty">Du folgst noch niemandem. Füge einen Freund über seine DBV-ID hinzu.</div>';
+ }).join(""):'<div class="empty friends-empty">Du folgst noch niemandem. Suche oben nach einem Namen und tippe auf „+ Folgen“.</div>';
  root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>{
   const friend=state.friends.find(p=>p.id===b.dataset.viewFriend);
   if(!friend)return;
@@ -262,6 +262,7 @@ function render(){
  window.badmintonActivePlayerId=state.chosen;
  window.badmintonActiveClub=(currentProfile()?.club||"");
  window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
+ window.dispatchEvent(new CustomEvent("badminton:friends-changed"));
  const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
@@ -350,7 +351,13 @@ function setup(){
   friendDialog.showModal();
  }
  window.openFriendForm=openFriendForm;
- el("add-friend").addEventListener("click",()=>openFriendForm());
+ el("add-friend").addEventListener("click",()=>{
+  const input=el("friend-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});
+ });
+ el("add-friend-manual").addEventListener("click",()=>openFriendForm());
+ el("dashboard-add-friend").addEventListener("click",()=>{
+  setTimeout(()=>{const input=el("friend-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});},0);
+ });
  el("cancel-friend").addEventListener("click",()=>friendDialog.close());
  friendForm.addEventListener("submit",event=>{
   event.preventDefault();
