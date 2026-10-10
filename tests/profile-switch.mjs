@@ -5,7 +5,10 @@ import vm from "node:vm";
 const script=await readFile("app.js","utf8");
 const storageScript=await readFile("state-storage.js","utf8");
 const styles=await readFile("styles.css","utf8");
-const store=new Map();
+const store=new Map([["shuttleboard-v1",JSON.stringify({
+ players:[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"}],
+ friends:[],officialLinks:[],activeProfileId:"05-070879",historyProfilesInitialized:true
+})]]);
 const header={innerHTML:"",querySelectorAll:()=>[]};
 const context=vm.createContext({
  URL,Intl,Date,
@@ -15,6 +18,7 @@ const context=vm.createContext({
 vm.runInContext(storageScript,context,{filename:"state-storage.js"});
 vm.runInContext(script,context,{filename:"app.js"});
 const run=q=>vm.runInContext(q,context);
+run("restore()"); // Existing local profiles survive neutral default onboarding.
 
 run("renderFocusHeader()");
 assert.match(header.innerHTML,/class="focus-switcher"/,"Two own profiles should show a top switcher");
