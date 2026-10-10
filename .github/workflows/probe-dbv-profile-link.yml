@@ -9,6 +9,28 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - name: Inspect public link resolution alternatives
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen,Request
+          from html.parser import HTMLParser
+          from urllib.parse import urljoin
+          import re
+          urls=[
+            "https://badhub.de/spieler/05-070879?saison=2026&src=turnier",
+            "https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"
+          ]
+          for url in urls:
+            print("SOURCE",url,flush=True)
+            with urlopen(Request(url,headers={"User-Agent":"Mozilla/5.0","Origin":"https://metzgerhannes-oss.github.io"}),timeout=20) as response:
+              body=response.read(300000).decode("utf8","replace")
+              print("DEST",response.url,"CORS",response.headers.get("Access-Control-Allow-Origin"),flush=True)
+            for term in ["A7CCCDAE","player-profile/","cookie", "accept", "dataprotection","05-070879"]:
+              hits=list(re.finditer(re.escape(term),body,re.I))
+              print("FIND",term,len(hits),flush=True)
+              for m in hits[:3]:
+                print("CONTEXT",repr(body[max(0,m.start()-130):m.end()+220])[:450],flush=True)
+          PY
       - name: Inspect public DBV player profile and access headers
         run: |
           python - <<'PY'
