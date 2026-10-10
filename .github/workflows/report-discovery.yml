@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 concurrency:
   group: badminton-report-discovery
   cancel-in-progress: false
@@ -63,11 +64,25 @@ jobs:
           git push --force origin HEAD:refs/heads/automation/report-candidates
           existing="$(gh pr list --head automation/report-candidates --base main --state open --json number --jq '.[0].number // empty')"
           if test -z "$existing"; then
-            gh pr create \
+            if gh pr create \
               --base main \
               --head automation/report-candidates \
               --title "Berichte: neue mögliche Erwähnungen prüfen" \
-              --body "Automatisch entdeckte URLs, Titel und mögliche Namensnennungen aus freigegebenen Quellen. **Keine Kandidaten werden automatisch öffentlich angezeigt.** Bitte jede Originalquelle prüfen, bevor sie über scripts/approve-report.py in das geprüfte Artikelregister übernommen wird. Nach Bearbeitung kann dieser PR ohne Veröffentlichung offener Kandidaten gemergt werden."
+              --body "Automatisch entdeckte URLs, Titel und mögliche Namensnennungen aus freigegebenen Quellen. **Keine Kandidaten werden automatisch öffentlich angezeigt.** Bitte jede Originalquelle prüfen, bevor sie über scripts/approve-report.py in das geprüfte Artikelregister übernommen wird. Nach Bearbeitung kann dieser PR ohne Veröffentlichung offener Kandidaten gemergt werden."; then
+              echo "Created candidate review PR"
+            else
+              echo "::warning::PR creation by Actions disabled. Saving review branch and opening an issue instead."
+              review_link="https://github.com/$GITHUB_REPOSITORY/blob/automation/report-candidates/data/report-pending.json"
+              issue="$(gh issue list --state open --search 'Quellenmonitor: Funde zur Prüfung in:title' --json number,title --jq '.[] | select(.title=="Quellenmonitor: Funde zur Prüfung") | .number' | head -1 || true)"
+              if test -z "$issue"; then
+                gh issue create --title "Quellenmonitor: Funde zur Prüfung" \
+                  --body "Der automatische Bericht-Scan hat neue Kandidaten vorgemerkt: $review_link. GitHub Actions darf für dieses Repository derzeit keine Pull Requests erstellen. Bitte im GitHub-Dashboard prüfen und den Bot-Zweig in einen manuellen Pull Request übernehmen. Keine Funde werden automatisch veröffentlicht." \
+                  || echo "::warning::Issues also unavailable; review branch saved."
+              else
+                gh issue comment "$issue" --body "Weitere potenzielle Fundstellen auf dem Prüfzwei(g): $review_link" \
+                  || echo "::warning::Issue comment unavailable; review branch saved."
+              fi
+            fi
           else
             echo "Updated existing review PR"
           fi
