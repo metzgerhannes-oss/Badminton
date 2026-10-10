@@ -1,0 +1,32 @@
+name: Badminton Importbestand lesen
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/import-coverage-audit.mjs'
+      - '.github/workflows/import-coverage-audit.yml'
+permissions:
+  contents: read
+jobs:
+  import-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Auditlogik ohne Netzwerk testen
+        run: node scripts/import-coverage-audit.test.mjs
+      - name: Supabase-Datenbestand ausschließlich lesen
+        env:
+          AUDIT_OUTPUT: audit-report.json
+        run: node scripts/import-coverage-audit.mjs --live
+      - name: Prüfbericht als GitHub-Artefakt
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: import-coverage-report
+          path: audit-report.json
+          retention-days: 7
