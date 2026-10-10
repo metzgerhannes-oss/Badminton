@@ -1,3 +1,7 @@
+## Quellenmonitor für alle registrierten Spieler
+
+Der tägliche, weiterhin robots.txt-konforme und redaktionell freizugebende Quellenmonitor verwendet zusätzlich zu den beiden bisherigen Familienprofilen jetzt die öffentlichen Namen der höchstens 60 serverseitig registrierten Historienprofile. Zwei lesende Supabase-Abfragen, keine privaten Endgeräte-Follows, keine Suche über die gesamte DBV-Spielerbibliothek. Neue Vereins-/Verbandsberichte gelangen ausschließlich zur Prüfung in `data/report-pending.json`, nicht automatisch in die App. Im bereits freigegebenen BWBV-Vorbericht sind nun außerdem Sarah und Vinzent korrekt als gemeldet verknüpft (keine behaupteten Resultate).
+
 ## v46 – Vereinsbericht als nicht zählbaren Ergebnisnachweis in der Turnierchronik
 
 Charlotte Metzgers Turnierergebnis vom 26.09.2026 zeigt die vereinsseitig bestätigte Information über mindestens ein gewonnenes Spiel – ausdrücklich ohne Gegner-/Satzbeleg und daher **nicht** in der Einzelmatch-Statistik. Zusätzliche Quellen werden nach Evidenzgrad unterschieden (siehe `docs/EVIDENCE_LEVELS_V46.md`).

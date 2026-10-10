@@ -113,5 +113,56 @@ class ReportDiscoveryTests(unittest.TestCase):
             self.assertEqual(items[0]['status'],'verified')
             self.assertEqual(len(json.loads((root/'data/report-pending.json').read_text())['candidates']),0)
 
+
+    def test_followed_player_names_from_public_queue(self):
+        calls=[]
+        def api(path):
+            calls.append(path)
+            if path.startswith('player_history_imports?'):
+                return [{'dbv_id':'05-061350'},{'dbv_id':'05-070006'},
+                        {'dbv_id':'05-061350'},{'dbv_id':'invalid'}]
+            return [{'dbv_id':'05-061350','name':'Sarah Storz'},
+                    {'dbv_id':'05-070006','name':'Vinzent Pius Ott'},
+                    {'dbv_id':'05-999999','name':'Not Followed'}]
+        names=watcher.registered_patterns(api)
+        self.assertEqual(len(calls),2)
+        self.assertIn('dbv_id=in.(05-061350,05-070006)',calls[1])
+        self.assertEqual(set(names),
+                         {'05-070879','05-071969','05-061350','05-070006'})
+        html='<article><div class="entry-content"><h1>Meisterschaft 2026</h1><p>Sarah Storz und Vinzent Pius Ott sind in der Meldeliste. Der Bericht beschreibt nur das geplante Turnier und bestätigt keine Ergebnisse.</p></div></article>'
+        result=watcher.analyze(
+            'https://spvgg.org/abteilungen/badminton/aktuelles/neue-meisterschaft',
+            CFG,html,'2026-10-10',names=names)
+        self.assertEqual(result['players'],['05-061350','05-070006'])
+        self.assertFalse(names['05-061350'].search('Sarah Storzinger'))
+        self.assertFalse(names['05-070006'].search('Vinzent Pius Ottmann'))
+
+    def test_registry_outage_does_not_disable_known_profile_monitoring(self):
+        from urllib.error import URLError
+        def fail(_):
+            raise URLError('offline')
+        self.assertEqual(set(watcher.registered_patterns(fail)),set(watcher.NAMES))
+
+    def test_dynamic_patterns_reach_scanner_but_not_public_feed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            (root/'data').mkdir()
+            (root/'data/report-sources.json').write_text(json.dumps({'sources':[{
+                'id':'club-moessingen','verification_status':'verified',
+                'monitor':{'enabled':True,'index_url':CFG['index_url'],
+                           'article_path_regex':CFG['article_path_regex']}
+            }]}))
+            (root/'data/report-articles.json').write_text(json.dumps({'articles':[]}))
+            (root/'data/report-pending.json').write_text(json.dumps({'candidates':[]}))
+            import re
+            patterns={'05-061350':re.compile('Sarah Storz')}
+            def scanner(cfg,seen,day,*,names):
+                self.assertEqual(names,patterns)
+                return [{'source':'club-moessingen','url':
+                  'https://spvgg.org/abteilungen/badminton/aktuelles/sarah-storz',
+                  'players':['05-061350'],'status':'needs-review'}]
+            result=watcher.run(root,'2026-10-10',scanner=scanner,name_patterns=patterns)
+            self.assertEqual(result['candidates'][0]['status'],'needs-review')
+
 if __name__=='__main__':
     unittest.main()
