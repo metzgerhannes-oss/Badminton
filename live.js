@@ -83,7 +83,12 @@
   $("dbv-live-refresh")?.addEventListener("click",refresh);
   $("dbv-live-advanced")?.addEventListener("toggle",()=>{
    if(visible())refresh();
-   else requestId++;
+   else{
+    requestId++;
+    loading=false;
+    const button=$("dbv-live-refresh");
+    if(button)button.disabled=false;
+   }
   });
   currentId=String(window.badmintonActivePlayerId||"");
   if(visible())refresh();
