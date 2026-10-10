@@ -7,27 +7,27 @@
     {
       "age": "U11",
       "file": "U11.json",
-      "count": 1
+      "count": 1119
     },
     {
       "age": "U13",
       "file": "U13.json",
-      "count": 1
+      "count": 1967
     },
     {
       "age": "U15",
       "file": "U15.json",
-      "count": 0
+      "count": 2363
     },
     {
       "age": "U17",
       "file": "U17.json",
-      "count": 0
+      "count": 2277
     },
     {
       "age": "U19",
       "file": "U19.json",
-      "count": 0
+      "count": 1520
     },
     {
       "age": "U22",
@@ -35,5 +35,5 @@
       "count": 0
     }
   ],
-  "total": 2
+  "total": 9246
 }
