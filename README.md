@@ -1,3 +1,12 @@
+## v49 – Hybridarchitektur und Datenschutztransparenz (Frontend)
+
+- Neue Historienaufträge nur bei bewusst geöffneter Historie; kein stiller Upload der DBV-IDs beim App-Start, Folgen oder Einrichten. Bestehende serverseitige Cronjobs laufen unverändert.
+- Einstellungen erläutern die zentrale Speicherung von DBV-Stammdaten und Badhub-Nachweisen, ohne die privaten Listen als Cloud-Daten darzustellen.
+- **Produktive P0-Sicherheitsmigration bestätigt:** Projekt `yadexibmjmnjfmfabrug`, Version `20261010200831` entzieht `TRUNCATE` an `anon`/`authenticated`/`PUBLIC` auf bestehenden öffentlichen Tabellen. Danach: 0 von 21 mit effektiver TRUNCATE-Berechtigung; 21/21 weiterhin RLS, 18/21 anonym lesbar, 0 Security-Advisor-Befunde. Migration `harden_postgres_default_truncate_v49_20261010` entfernt diese Standardberechtigungen auch für neue, von `postgres` erstellte Tabellen. **Verbleibend:** ältere Default Grants von `supabase_admin` für neu erstellte Tabellen gesondert sichern; keine Änderungen an Gartenwelt.
+- Noch offen: vollständige Datenschutzkontaktangaben, Lösch-/Cache-Fristen, Entfernen persönlicher Standardprofile aus dem öffentlichen Frontend, rechtliche Quellenabnahme.
+
+Siehe [Hybrid-Datenschutz v49](docs/HYBRID_DATENSCHUTZ_V49.md) und [ausgeführte Rechtehärtung](database/hybrid-privileges-v49.sql).
+
 ## v48 – Zwölf belegte Platzierungen und fünf Einzelspiele aus Vereinsberichten
 
 Für Sarah und Vinzent wurden zwölf zusätzliche Platzierungen 2024/2025 quellengeprüft und in Supabase hinterlegt. Neu sind fünf Spiele mit Gegnern und Satzständen: drei bei Vinzents U13-Turnier Gomaringen 2024 und zwei bei Sarahs Deutscher Meisterschaft 2025. Sie erscheinen als separat gekennzeichnete Vereinsbelege in der Historie und werden nicht mit den Badhub-Sieg-/Niederlagenstatistiken summiert. Mehr dazu: docs/CLUB_SCORE_PROOFS_V48.md.

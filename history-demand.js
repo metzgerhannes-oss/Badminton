@@ -59,8 +59,9 @@ async function refresh(id,{enqueue=true}={}){
   if(!status&&enqueue){
    await requestNew(id,signal);
    status=await callStatus(id,signal);
-   void requestIndividualMatches(id);
   }
+  // Only opening the history screen can trigger an import.
+  if(enqueue&&seq===requestSeq)void requestIndividualMatches(id);
   if(seq!==requestSeq)return;
   show(status,id);
   if(status?.status==="queued"||status?.status==="checking"){
@@ -77,8 +78,12 @@ async function refresh(id,{enqueue=true}={}){
   }
  }
 }
+const sourceCheckAt=new Map();
 async function requestIndividualMatches(id){
  if(!allowed(id))return;
+ // One request per selected player per 15 minutes in this browser session.
+ if(Date.now()-(sourceCheckAt.get(id)||0)<15*60000)return;
+ sourceCheckAt.set(id,Date.now());
  try{
   const response=await fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
    method:"POST",headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
@@ -90,41 +95,11 @@ async function requestIndividualMatches(id){
   }
  }catch(error){console.warn("Source-backed match import temporarily unavailable",error?.message)}
 }
-async function enqueueQuietly(id){
- if(!allowed(id))return;
- try{
-  const prior=await callStatus(id);
-  if(!prior)await requestNew(id);
-  await requestIndividualMatches(id);
- }catch(error){
-  console.warn("History job could not be requested:",error?.message);
- }
-}
-/** Register ALL own and locally followed DBV profiles once on each app load.
- * Only an ID enters the shared queue, never which device/user follows it.
- * Bulk registration does NOT invoke the source crawler – the bounded server
- * worker schedules the actual data collection. */
-async function registerSavedProfiles(){
- const own=window.badmintonLibraryGetState?.();
- const ids=[...new Set([...(own?.own||[]),...(own?.following||[])])]
-  .filter(validHistoryId).slice(0,60);
- let next=0;
- async function run(){
-  while(next<ids.length){
-   const id=ids[next++];
-   try{
-    const known=await callStatus(id);
-    if(!known)await requestNew(id);
-   }catch(error){
-    console.warn("Unable to register followed DBV history",id,error?.message);
-   }
-  }
- }
- await Promise.all(Array.from({length:Math.min(3,ids.length)},run));
-}
+// Following, backup restoration and Home must not upload any DBV-ID.
+const historyOpen=()=>location.hash==="#historie";
 function select(id){
  clearTimeout(timeout);
- if(!allowed(id)){
+ if(!historyOpen()||!allowed(id)){
   shown="";requestSeq++;controller?.abort();
   for(const element of views())element.hidden=true;
   return;
@@ -136,19 +111,9 @@ function select(id){
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("history-import-status"))return;
  window.addEventListener("badminton:profile-change",e=>select(String(e.detail?.playerId||"")));
- window.addEventListener("badminton:friend-followed",e=>{
-  const id=String(e.detail?.playerId||"");
-  if(allowed(id))enqueueQuietly(id);
- });
- window.addEventListener("badminton:own-profile-added",e=>{
-  const id=String(e.detail?.playerId||"");
-  if(allowed(id)){refresh(id);enqueueQuietly(id);}
- });
+ window.addEventListener("hashchange",()=>select(String(window.badmintonActivePlayerId||"")));
  window.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState==="visible"&&shown&&allowed(shown))refresh(shown,{enqueue:false});
+  if(document.visibilityState==="visible"&&historyOpen()&&shown&&allowed(shown))refresh(shown,{enqueue:false});
  });
- setTimeout(()=>{
-  select(String(window.badmintonActivePlayerId||""));
-  void registerSavedProfiles();
- },0);
+ setTimeout(()=>{if(historyOpen())select(String(window.badmintonActivePlayerId||""));},0);
 });

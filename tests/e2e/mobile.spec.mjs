@@ -64,6 +64,21 @@ test.beforeEach(async ({page})=>{
  });
 });
 
+test("Following stays local; only Historie requests a new source import",async ({page})=>{
+ const imports=[];
+ page.on("request",request=>{
+  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/player_history_imports")
+   imports.push(JSON.parse(request.postData()||"{}"));
+ });
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>window.badmintonLibraryToggleFollow({id:"05-123456",name:"Testperson",club:"Testverein"}));
+ await page.waitForTimeout(250);
+ expect(imports).toHaveLength(0);
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect.poll(()=>imports.length,{timeout:10000}).toBeGreaterThan(0);
+ expect(imports.some(request=>request.dbv_id===PLAYER)).toBe(true);
+});
+
 test("Home shows individual sourced matches and fits the small viewport",async ({page})=>{
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#first-run-dialog")).not.toBeVisible();

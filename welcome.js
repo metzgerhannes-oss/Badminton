@@ -1,5 +1,4 @@
 import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scripts/invitation.mjs";
-import {importPost} from "./scripts/history-demand.mjs";
 const $=id=>document.getElementById(id);
 let mode="manual";
 function updateMode(next){
@@ -42,18 +41,8 @@ function saveProfile(e){
   });
   const result=addProfileToStore(readSaved(),profile);
   localStorage.setItem(STORE,JSON.stringify(result));
-  // An own profile with a confirmed numeric DBV ID requests the same shared
-  // queue used by followed players. Non-verifiable IDs are rejected server-side.
-  const historyRequest=importPost(profile.id);
-  if(historyRequest)fetch(historyRequest.url,{
-   method:"POST",headers:historyRequest.headers,body:historyRequest.body
-  }).then(response=>{
-   if(!response.ok)return;
-   return fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
-    method:"POST",headers:{apikey:historyRequest.headers.apikey,"Content-Type":"application/json"},
-    body:JSON.stringify({dbv_id:profile.id})
-   });
-  }).catch(()=>{ /* Deferred importer will retry through the central queue. */ });
+  // Profile creation and invitation remain entirely local.
+  // A source request occurs only when Historie is opened later.
   $("onboard-profile").hidden=true;
   $("onboard-install").hidden=false;
   $("progress-profile").classList.remove("current");
