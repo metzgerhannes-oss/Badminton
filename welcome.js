@@ -74,6 +74,14 @@ document.addEventListener("DOMContentLoaded",()=>{
  const known=readSaved()?.players;
  $("welcome-existing").hidden=!(Array.isArray(known)&&known.length);
  updateMode("manual");
+ if(location.hash==="#installation"){
+  $("onboard-profile").hidden=true;
+  $("onboard-install").hidden=false;
+  $("progress-profile").classList.remove("current");
+  $("progress-install").classList.add("current");
+  $("welcome-success").hidden=true;
+  showPlatform(preferredPlatform());
+ }
  if("serviceWorker" in navigator&&location.protocol==="https:"){
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
  }
