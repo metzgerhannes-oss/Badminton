@@ -207,6 +207,37 @@ function renderFriends(){
   save();render();toast("Freund entfernt");
  }));
 }
+// The verified shared DBV roster is public; following a player is only local.
+window.badmintonLibraryGetState=()=>({
+ own:state.players.map(p=>p.id),
+ following:state.friends.map(p=>p.id)
+});
+window.badmintonLibraryToggleFollow=player=>{
+ const id=String(player?.id||"");
+ if(!/^\d{2}-\d{6}$/.test(id)||!String(player?.name||"").trim())return {ok:false,message:"Kein bestätigtes DBV-Spielerprofil."};
+ if(state.players.some(p=>p.id===id))return {ok:false,message:"Dieser Spieler ist bereits dein eigenes Profil."};
+ const exists=state.friends.some(p=>p.id===id);
+ if(exists){
+  state.friends=state.friends.filter(p=>p.id!==id);
+  if(state.viewingFriendId===id){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
+  save();render();
+  return {ok:true,message:"Spieler entfolgt."};
+ }
+ if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
+ state.friends.push({
+  id,name:String(player.name).trim().slice(0,80),
+  birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
+  club:String(player.club||"").slice(0,120),url:""
+ });
+ save();render();
+ return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
+};
+window.badmintonLibraryView=id=>{
+ if(!state.friends.some(p=>p.id===id))return false;
+ state.viewingFriendId=id;state.chosen=id;
+ location.hash="#start";render();
+ return true;
+};
 function render(){
  renderFocusHeader();
  renderTournaments();
@@ -221,7 +252,7 @@ function render(){
  window.badmintonActivePlayerId=state.chosen;
  window.badmintonActiveClub=(currentProfile()?.club||"");
  window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
- const page=["start","historie","turniere","berichte","einstellungen"].includes(state.page)?state.page:"start";
+ const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
   if(a.dataset.page===page)a.setAttribute("aria-current","page");
