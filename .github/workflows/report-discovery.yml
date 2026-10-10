@@ -79,7 +79,7 @@ jobs:
                   --body "Der automatische Bericht-Scan hat neue Kandidaten vorgemerkt: $review_link. GitHub Actions darf für dieses Repository derzeit keine Pull Requests erstellen. Bitte im GitHub-Dashboard prüfen und den Bot-Zweig in einen manuellen Pull Request übernehmen. Keine Funde werden automatisch veröffentlicht." \
                   || echo "::warning::Issues also unavailable; review branch saved."
               else
-                gh issue comment "$issue" --body "Weitere potenzielle Fundstellen auf dem Prüfzwei(g): $review_link" \
+                gh issue comment "$issue" --body "Weitere potenzielle Fundstellen auf dem Prüfzweig: $review_link" \
                   || echo "::warning::Issue comment unavailable; review branch saved."
               fi
             fi
