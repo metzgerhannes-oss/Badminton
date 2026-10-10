@@ -1,3 +1,7 @@
+## Aus öffentlichen Originalberichten erschlossen: acht weitere Platzierungen 2025
+
+Für Sarah Storz wurden aus der 2. B-Rangliste (Zittau, Mai 2025) und 3. B-Rangliste (Herrenberg, Juli 2025) jeweils drei nachweisbare U17-Platzierungen aufgenommen: 5/3/1 und 4/1/5 (Einzel/Mixed/Doppel bzw. Einzel/Doppel/Mixed). Vinzent Pius Ott erreichte bei der 34. Südwürttembergischen Meisterschaft 2025 Platz 9 im Einzel U15 und Platz 2 im Doppel U15 mit Ruixiang Wang. Acht Turnierplatzierungen bereits in Supabase eingetragen; nun auch in der vorhandenen App-Historie und dem geprüften Berichtfeed. Datumsfelder dokumentieren Veranstaltungstage, keine einzelnen Matchdaten; **keine** Veränderung der Matchstatistiken oder Live-Quellen.
+
 ## Zehn weitere belegte Platzierungen für gefolgte Spieler (10.10.2026)
 
 B-, C- und D-Ranglisten aus vier veröffentlichten SpVgg-Mössingen-Vereinsberichten belegen zehn weitere Turnierplatzierungen von Sarah Storz und Vinzent Pius Ott aus 2025/2026. Drei davon waren bereits direkt in Supabase erfasst; die anderen sieben wurden sicher gegen Dubletten ergänzt. Die Turnierchronik und geprüften Spielerberichte werden synchronisiert. Familiäre Pokale bleiben separat, Freunde erhalten nur ihre eigenen belegten Ergebnisse. Keine neue Badhub-Matchzahl, kein künstlicher Karriereabschluss und keine neue API-/Service-Worker-Version.
