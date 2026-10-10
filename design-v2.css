@@ -657,3 +657,6 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
   .player-management{padding:12px}
 }
 @media(max-width:350px){.topbar .brand-logo{width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important}}
+
+/* Avoid repeating the large active-player banner above unrelated tools. */
+.app[data-current-view="spieler"] .focused-profile,.app[data-current-view="einstellungen"] .focused-profile,.app[data-current-view="berichte"] .focused-profile{display:none}
