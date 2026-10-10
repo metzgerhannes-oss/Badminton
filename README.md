@@ -1,3 +1,7 @@
+## Lokale Familiendaten sichern und wiederherstellen (v39)
+
+Unter **Einstellungen → Meine Daten sichern** können eigene Spielerprofile, gefolgte Spieler und Turnierfavoriten lokal als versionierte JSON-Sicherung exportiert werden. Beim Einlesen werden ungültige Dateien, doppelte Profile, problematische Links und beschädigte Turnierdaten zurückgewiesen. Erst nach einer klaren Vorschau und ausdrücklicher Bestätigung werden die bisherigen lokalen Daten auf diesem Gerät ersetzt. **Keine Cloud-Übertragung, kein neues Konto und keine Veränderung der offiziellen Spielstatistik.** PWA v39. [Datenschutz, Speichervertrag und Einschränkungen](docs/LOCAL_BACKUP_STORAGE_V39.md).
+
 ## v38 – UX-/Architektur-Paket A (10.10.2026)
 
 Die App baut auf der bereits eingeführten **Vierer-Navigation v37** auf (Home, Turniere, Spieler, Berichte; Einstellungen oben). Das erste priorisierte Qualitäts-Paket verbessert **bestehende** Aufgaben, statt neue Hauptmenüs zu erzeugen:
