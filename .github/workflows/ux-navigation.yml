@@ -1,0 +1,44 @@
+name: Fokus-Navigation und Spielerbibliothek
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app.js"
+      - "index.html"
+      - "library.js"
+      - "dashboard.js"
+      - "history.js"
+      - "design-v2.css"
+      - "sw.js"
+      - "scripts/ux-navigation.test.mjs"
+      - ".github/workflows/ux-navigation.yml"
+  pull_request:
+    paths:
+      - "app.js"
+      - "index.html"
+      - "library.js"
+      - "dashboard.js"
+      - "history.js"
+      - "design-v2.css"
+      - "sw.js"
+      - "scripts/ux-navigation.test.mjs"
+      - ".github/workflows/ux-navigation.yml"
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntaxcheck
+        run: |
+          node --check app.js
+          node --check library.js
+          node --check dashboard.js
+          node --check history.js
+          node --check stats.js
+      - name: Regressionstests
+        run: node --test scripts/ux-navigation.test.mjs
