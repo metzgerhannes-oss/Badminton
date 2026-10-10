@@ -283,6 +283,7 @@ function render(){
   window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
  }
  const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
+ document.querySelector(".app")?.setAttribute("data-current-view",page);
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  const activeTab=page==="historie"?"turniere":page;
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
