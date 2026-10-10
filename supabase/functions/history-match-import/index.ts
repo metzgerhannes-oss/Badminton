@@ -81,7 +81,13 @@ Deno.serve(async req=>{
    ||String(b.match_date||"").localeCompare(String(a.match_date||""))
    ||a.source_key.localeCompare(b.source_key));
   const cardCount=t.cards_seen+l.cards_seen;
-  if(!cardCount||(cardCount>0&&all.length<Math.floor(cardCount*0.55)))
+  if(cardCount===0){
+   await update(id,{status:"awaiting_source",lease_until:null,
+    last_finished_at:new Date().toISOString(),
+    detail:"Für dieses Spielerprofil sind derzeit keine einzelnen öffentlichen Matchkarten verfügbar"});
+   return respond(200,{queued:true,stored:0,eligible:0,reason:"no_source_matches"},origin);
+  }
+  if(all.length<Math.floor(cardCount*0.55))
    throw Error("Match parser rejected unexpected amount of source cards");
   const start=Math.min(Number(claim.cursor)||0,all.length);
   const selected=all.slice(start,start+120);
@@ -109,9 +115,12 @@ Deno.serve(async req=>{
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
  }catch(error){
-  if(claimed)try{await update(id,{status:"error",lease_until:null,
-   last_finished_at:new Date().toISOString(),
-   detail:"Quellenabgleich fehlgeschlagen; keine unbelegten Matches gespeichert"
+  if(claimed)try{await update(id,{
+   status:String(error).includes("Source unavailable")?"awaiting_source":"error",
+   lease_until:null,last_finished_at:new Date().toISOString(),
+   detail:String(error).includes("Source unavailable")
+     ?"Für diesen Spieler liefert Badhub noch keinen abrufbaren Matchdatensatz"
+     :"Quellenabgleich fehlgeschlagen; keine unbelegten Matches gespeichert"
   });}catch{}
   console.error("External source import failed",id,String(error).slice(0,250));
   return respond(502,{error:"source_import_unavailable"},origin);
