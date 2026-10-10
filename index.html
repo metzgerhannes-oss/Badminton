@@ -15,6 +15,7 @@
 <script type="module" src="./library.js"></script>
 <script type="module" src="./friend-search.js"></script>
 <script type="module" src="./stats.js"></script>
+<script type="module" src="./history-demand.js"></script>
 <script type="module" src="./career-history.js"></script>
 <script defer src="./live.js"></script>
 <script defer src="./reports.js"></script>
@@ -48,6 +49,7 @@
     <div id="match-stats-values" class="match-stats-values" aria-live="polite"><p class="match-stats-empty">Belegte Spiele werden geladen …</p></div>
     <p id="match-stats-note" class="match-stats-note" role="status" aria-live="polite">Es zählen ausschließlich vollständig belegte, abgeschlossene Begegnungen.</p>
     <div id="external-match-summary" class="external-match-summary" hidden></div>
+    <div id="home-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
     <details id="match-stats-details" class="match-stats-details">
       <summary>Einzelnachweise ansehen <span id="match-stats-detail-count"></span></summary>
       <div id="match-stats-list" class="match-stats-list"></div>
@@ -60,6 +62,7 @@
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><span class="muted">Erfasste Ergebnisse</span></div>
+   <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
    <section id="career-history" class="career-history" aria-labelledby="career-heading" hidden>
      <div class="section-heading"><h3 id="career-heading">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
      <div id="career-summary" class="career-summary"></div>

@@ -1,5 +1,6 @@
 /** Source-marked career snapshots; never merge aggregate wins into official DBV match rows. */
 import {validateExternalCareer,seasonYears,chooseHistory,lifetimeRate,externalProfileLink} from "./scripts/external-history.mjs";
+import {PUBLIC_KEY,overviewUrl} from "./scripts/history-demand.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=x=>Number(x).toLocaleString("de-DE");
@@ -19,6 +20,18 @@ async function registry(){
 }
 async function snapshot(id){
  if(cache.has(id))return cache.get(id);
+ // Central on-demand Supabase import is the primary verified store.
+ // The existing curated GitHub feed remains the free offline fallback.
+ try{
+  const response=await fetch(overviewUrl(id),{cache:"no-store",headers:{apikey:PUBLIC_KEY,Accept:"application/json"}});
+  if(response.ok){
+   const rows=await response.json();
+   if(Array.isArray(rows)&&rows.length===1&&validateExternalCareer(rows[0]?.summary,id)){
+    cache.set(id,rows[0].summary);
+    return rows[0].summary;
+   }
+  }
+ }catch(error){console.warn("Central career overview unavailable; using curated fallback",error?.message)}
  const index=await registry();
  const entry=index.profiles.find(p=>p.dbvId===id);
  if(!entry||entry.path!==id+".json")return null;

@@ -47,5 +47,5 @@ assert.match(stats,/Noch keine einzeln importierten und geprüften DBV-Matches/)
 assert.match(history,/externe historische Jahresübersichten/);
 assert.match(css,/\.career-year-card/);
 assert.match(sw,/career-history\.js/);
-assert.match(sw,/schmetterlinge-shell-v28/);
+assert.match(sw,/schmetterlinge-shell-v29/);
 console.log("Historical friend profile: 678/388 Badhub sourced aggregates, annual chronology, source separation, no cross-profile leak.");

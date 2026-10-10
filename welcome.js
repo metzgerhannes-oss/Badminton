@@ -1,4 +1,5 @@
 import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scripts/invitation.mjs";
+import {importPost} from "./scripts/history-demand.mjs";
 const $=id=>document.getElementById(id);
 let mode="manual";
 function updateMode(next){
@@ -41,6 +42,12 @@ function saveProfile(e){
   });
   const result=addProfileToStore(readSaved(),profile);
   localStorage.setItem(STORE,JSON.stringify(result));
+  // An own profile with a confirmed numeric DBV ID requests the same shared
+  // queue used by followed players. Non-verifiable IDs are rejected server-side.
+  const historyRequest=importPost(profile.id);
+  if(historyRequest)fetch(historyRequest.url,{
+   method:"POST",headers:historyRequest.headers,body:historyRequest.body
+  }).catch(()=>{ /* App can request again after opening Home. */ });
   $("onboard-profile").hidden=true;
   $("onboard-install").hidden=false;
   $("progress-profile").classList.remove("current");

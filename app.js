@@ -239,6 +239,7 @@ window.badmintonLibraryToggleFollow=player=>{
   club:String(player.club||"").slice(0,120),url:""
  });
  save();render();
+ window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
 window.badmintonLibraryView=id=>{
@@ -326,6 +327,7 @@ function setup(){
   if(!name||(!editingPlayerId&&state.players.some(p=>p.id===id))){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
   const club=String(data.get("club")||"").trim().slice(0,120);
   const record={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club,url:safeUrl(data.get("url")||"")};
+  const isNewOwn=!editingPlayerId;
   if(editingPlayerId)state.players=state.players.map(p=>p.id===editingPlayerId?record:p);
   else{
    if(state.friends.some(p=>p.id===id)){toast("Diese Spieler-ID ist bereits ein Freund");return}
@@ -336,6 +338,7 @@ function setup(){
   }
   editingPlayerId=null;
   save();render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
+  if(isNewOwn)window.dispatchEvent(new CustomEvent("badminton:own-profile-added",{detail:{playerId:id}}));
  });
  const friendDialog=el("friend-dialog"),friendForm=el("friend-form");
  let editingFriendId=null;
@@ -370,10 +373,12 @@ function setup(){
   if(!editingFriendId&&state.friends.length>=30){toast("Maximal 30 Freunde");return}
   const profileUrl=safeUrl(data.get("url")||"");
   const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club:String(data.get("club")||"").trim().slice(0,120),url:profileUrl};
+  const isNewFriend=!editingFriendId;
   if(editingFriendId)state.friends=state.friends.map(p=>p.id===editingFriendId?friend:p);
   else state.friends.push(friend);
   editingFriendId=null;
   save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
+  if(isNewFriend)window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  });
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());

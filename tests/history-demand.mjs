@@ -1,0 +1,57 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+import {validHistoryId,importPost,importStatusUrl,overviewUrl,importMessage,retryAfterHours} from "../scripts/history-demand.mjs";
+
+assert.equal(validHistoryId("05-061350"),true);
+for(const invalid of ["","local-123","05-12345","evil","05-061350 OR TRUE",undefined]){
+ assert.equal(validHistoryId(invalid),false);
+ assert.equal(importPost(invalid),null);
+ assert.equal(importStatusUrl(invalid),null);
+ assert.equal(overviewUrl(invalid),null);
+}
+const post=importPost("05-061350");
+assert.deepEqual(JSON.parse(post.body),{dbv_id:"05-061350"});
+assert.equal(post.headers.Prefer,"resolution=ignore-duplicates,return=minimal");
+assert.equal(post.url,"https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/player_history_imports?on_conflict=dbv_id");
+assert.match(importStatusUrl("05-061350"),/dbv_id=eq.05-061350/);
+assert.match(overviewUrl("05-061350"),/player_history_overviews/);
+assert.match(importMessage({status:"queued"}).title,/vorgemerkt/);
+assert.match(importMessage({status:"checking"}).title,/geprüft/);
+assert.match(importMessage({status:"partial"}).detail,/Einzelne offizielle DBV-Matches sind noch nicht importiert/);
+assert.match(importMessage({status:"awaiting_source"}).detail,/auswertbarer historischer Matchzugang fehlt/);
+assert.equal(retryAfterHours({status:"partial"}),168);
+assert.equal(retryAfterHours({status:"error"}),1);
+
+const sql=await readFile("database/history-on-demand.sql","utf8");
+const app=await readFile("app.js","utf8");
+const welcome=await readFile("welcome.js","utf8");
+const page=await readFile("index.html","utf8");
+const bridge=await readFile("history-demand.js","utf8");
+const career=await readFile("career-history.js","utf8");
+const sw=await readFile("sw.js","utf8");
+assert.match(sql,/create table if not exists public\.player_history_imports/);
+assert.match(sql,/create table if not exists public\.player_history_overviews/);
+assert.match(sql,/enable row level security/);
+assert.match(sql,/grant insert\(dbv_id\)/);
+assert.match(sql,/verified_at is not null/);
+assert.match(sql,/pg_advisory_xact_lock/);
+assert.match(sql,/>=60 then/);
+assert.match(sql,/limit batch_size for update skip locked/);
+assert.match(sql,/interval '7 days'/);
+assert.match(sql,/cron\.schedule\('badminton-history-demand-worker'/);
+assert.match(sql,/sourceStatus.*third-party-aggregated/);
+assert.match(sql,/awaiting_source/);
+assert.ok(!sql.includes("insert into public.matches"),"Never synthesize official match rows from Badhub aggregates");
+assert.match(app,/badminton:friend-followed/);
+assert.match(app,/badminton:own-profile-added/);
+assert.match(bridge,/badminton:profile-change/);
+assert.match(bridge,/enqueueQuietly/);
+assert.match(bridge,/importStatusUrl/);
+assert.match(welcome,/importPost\(profile.id\)/);
+assert.match(page,/id="history-import-status"/);
+assert.match(page,/id="home-import-status"/);
+assert.match(career,/overviewUrl\(id\)/);
+assert.match(career,/data\/player-history\/index.json/);
+assert.match(sw,/history-demand\.js/);
+assert.match(sw,/schmetterlinge-shell-v29/);
+console.log("History-on-follow: validated public IDs, one-per-player queue, server rate cap, transparent source gaps, own/friend trigger and PWA verified.");
