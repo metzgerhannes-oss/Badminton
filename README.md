@@ -2,10 +2,10 @@
 
 - Neue Historienaufträge nur bei bewusst geöffneter Historie; kein stiller Upload der DBV-IDs beim App-Start, Folgen oder Einrichten. Bestehende serverseitige Cronjobs laufen unverändert.
 - Einstellungen erläutern die zentrale Speicherung von DBV-Stammdaten und Badhub-Nachweisen, ohne die privaten Listen als Cloud-Daten darzustellen.
-- Der P0-Rechteentzug für `TRUNCATE` ist als SQL vorbereitet, aber mangels Zugriff auf das Badminton-Supabase-Projekt **noch nicht produktiv angewandt**. Keine Änderung am Supabase-Projekt Gartenwelt.
+- **Produktive P0-Sicherheitsmigration bestätigt:** Projekt `yadexibmjmnjfmfabrug`, Version `20261010200831` entzieht `TRUNCATE` an `anon`/`authenticated`/`PUBLIC` auf bestehenden öffentlichen Tabellen. Danach: 0 von 21 mit effektiver TRUNCATE-Berechtigung; 21/21 weiterhin RLS, 18/21 anonym lesbar, 0 Security-Advisor-Befunde. Migration `harden_postgres_default_truncate_v49_20261010` entfernt diese Standardberechtigungen auch für neue, von `postgres` erstellte Tabellen. **Verbleibend:** ältere Default Grants von `supabase_admin` für neu erstellte Tabellen gesondert sichern; keine Änderungen an Gartenwelt.
 - Noch offen: vollständige Datenschutzkontaktangaben, Lösch-/Cache-Fristen, Entfernen persönlicher Standardprofile aus dem öffentlichen Frontend, rechtliche Quellenabnahme.
 
-Siehe [Hybrid-Datenschutz v49](docs/HYBRID_DATENSCHUTZ_V49.md) und [vorbereitete SQL-Härtung](database/hybrid-privileges-v49.sql).
+Siehe [Hybrid-Datenschutz v49](docs/HYBRID_DATENSCHUTZ_V49.md) und [ausgeführte Rechtehärtung](database/hybrid-privileges-v49.sql).
 
 ## v48 – Zwölf belegte Platzierungen und fünf Einzelspiele aus Vereinsberichten
 
