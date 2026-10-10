@@ -54,7 +54,7 @@ const [html,js,sql,css,sw]=await Promise.all(["index.html","live-radar.js",
  "database/live-radar-on-demand.sql","design-v2.css","sw.js"].map(f=>readFile(f,"utf8")));
 assert.match(html,/id="live-radar-content"/);
 assert.match(html,/id="live-radar-refresh"/);
-assert.match(html,/Externe Live-Ansicht/);
+assert.match(html,/Originalquellen &amp; weitere Ergebnisse/);
 assert.match(js,/badminton:profile-change/);
 assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
