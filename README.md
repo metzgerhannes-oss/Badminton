@@ -8,6 +8,10 @@ Die Spielerbibliothek fragt Supabase direkt mit serverseitiger **Vereins-, Alter
 
 Neuer Tab **Spieler**: zentrale, von allen Nutzern gemeinsam lesbare Bibliothek bestätigter öffentlicher DBV-Ranglistenspieler. Filter nach **Verein**, offizieller **Altersklasse U11–U22**, Landesverband und Name/DBV-Spieler-ID, alphabetische Vereinsgruppierung und persönliche **Folgen/Entfolgen**-Funktion. Die vollständige Bibliothek wird über den bestehenden wöchentlichen DBV-Excel-Import aus dem öffentlichen Originalexport gewonnen, nach DBV-ID dedupliziert und kostenfrei als GitHub-Pages-JSON für alle bereitgestellt. Die beiden bisherigen Profile sind nur der Anfangsbestand; weitere belegte Einträge kommen nach dem ersten vollständigen Rankingschritt hinzu. **Lokale Nutzerprofile und Favoriten werden nicht zentral veröffentlicht.** [Konzept, Quellen und Implementierungsdetails](docs/SPIELERBIBLIOTHEK.md).
 
+## Home-Navigation (10.10.2026)
+
+Der untere Tab **Home** (vorher „Start“) und ein Tipp auf das Schmetterlinge-Logo führen **immer zum aktiven eigenen Spielerprofil**, auch wenn gerade ein Freundeprofil geöffnet ist oder die URL bereits auf `#start` steht. Eine Freundeansicht kann weiterhin über die Freundesliste, die Spielerbibliothek und den persönlichen Link aufgerufen werden. Das lokale Startprofil und gespeicherte Favoriten werden durch „Home“ **nicht verändert**.
+
 ## Einladungslink und Willkommensseite (10.10.2026)
 
 Neues familienfreundliches Onboarding: Über **Einstellungen → Familie & Freunde einladen** gibt es einen teilbaren Link auf die [Willkommensseite](https://metzgerhannes-oss.github.io/Badminton/welcome.html). Empfänger erstellen dort ihr eigenes Profil oder übernehmen eine gültige DBV-Spieler-ID/einen offiziellen DBV-Profil-Link. Die App speichert die Einrichtung lokal, schützt frühere Profile/Favoriten vor Überschreiben und zeigt anschließend die kostenlose iPhone-/Android-Installationsanleitung. Ein Einladungslink ist **kein Benutzerkonto und keine Cloud-Synchronisierung**. [Ausführliche Anleitung und technische Regeln](docs/EINLADUNG_INSTALLATION.md).
