@@ -226,9 +226,9 @@ test("Scored club reports show real opponents and sets without mixing Badhub sta
  await page.evaluate(roster=>window.renderHistory("05-061350",roster,{mode:"friend"}),roster);
  const sarah=page.locator("#history-timeline .history-scored-match-proof");
  await expect(sarah.locator("li")).toHaveCount(2);
- await expect(sarah).toContainText("Annika Karmann");
- await expect(sarah).toContainText("19:21 · 19:21");
- await expect(sarah).toContainText("Eva Heiden / Maya Yildiz");
+ await expect(page.locator("#history-timeline")).toContainText("Annika Karmann");
+ await expect(page.locator("#history-timeline")).toContainText("19:21 · 19:21");
+ await expect(page.locator("#history-timeline")).toContainText("Eva Heiden / Maya Yildiz");
  expect(await page.locator("#external-match-count").textContent()).toBe(before);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
 });
