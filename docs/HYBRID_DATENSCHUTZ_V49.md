@@ -22,13 +22,15 @@ Die öffentliche DBV-Spieler-ID kann eine Person identifizieren, auch Minderjäh
 - Im Bereich „Daten & Datenschutz“ werden Supabase-Speicherung, externe Quellen und die Übermittlung der DBV-ID ausdrücklich erklärt.
 - Vorhandene Quellenangaben, Matchvalidierung, Trennung von offiziellen DBV-Einzelmatches und Drittanbieterbelegen bleiben bestehen.
 
-## P0-Rechtehärtung: vorbereitet, **nicht auf Produktionsdatenbank ausgeführt**
+## P0-Rechtehärtung: in Badminton-Produktivdatenbank angewandt und geprüft
 
-Die aktuelle Supabase-Verbindung zeigt nur `JohannasGartenwelt`. Die Badminton-Projekt-ID laut Repository lautet **`yadexibmjmnjfmfabrug`**. `database/hybrid-privileges-v49.sql` entzieht `TRUNCATE` von `PUBLIC`, `anon` und `authenticated`, ohne vorhandene SELECT- oder RLS-Policies umzuschreiben. Dies muss mit berechtigtem Zugriff auf **dieses** Projekt angewendet und anschließend durch die enthaltene effektive Privilegienprüfung sowie Security Advisors und Endpunkt-Smoke-Tests kontrolliert werden.
+Über die Projekt-ID **`yadexibmjmnjfmfabrug`** wurde das richtige aktive Badminton-Supabase-Projekt direkt erreicht (die allgemeine Projektliste war unvollständig). Die Migration `20261010200831` (`harden_public_truncate_v49_20261010`) wurde produktiv angewandt und entzieht `TRUNCATE` an `PUBLIC`, `anon` und `authenticated` auf allen vorhandenen öffentlichen Tabellen. Kontrollresultat: **0 Tabellen mit effektivem `TRUNCATE` für `anon` oder `authenticated`, alle 21 Tabellen behalten RLS, 18 haben weiterhin öffentliche `SELECT`-Rechte, 0 Supabase-Security-Advisor-Befunde.** Zusätzliche Migration `harden_postgres_default_truncate_v49_20261010` entzieht `TRUNCATE` für künftig vom Besitzer `postgres` in `public` neu angelegte Tabellen (nachträglich in `pg_default_acl` bestätigt).
+
+**Offene Härtung für künftige Tabellen:** Unter der Besitzerrolle `supabase_admin` besteht im `public`-Schema weiterhin ein älterer Default-Grant mit `TRUNCATE` für `anon`/`authenticated`. Die aktuelle SQL-Sitzung als `postgres` gehört nicht dieser Rolle an; hierfür ist eine berechtigte Änderung an den Default-Rechten bzw. ein obligatorischer migrationsbasierter Privilegiencheck erforderlich. Diese Feststellung betrifft **noch nicht existierende, künftig von `supabase_admin` erstellte Tabellen**, nicht die bereits bereinigten 21 Tabellen. Keine Änderungen an `JohannasGartenwelt`.
 
 ## Aufgabenkatalog für den Betrieb
 
-1. **P0:** Rechtehärtung in Badminton-Supabase ausführen und für alle exponierten Tabellen/Funktionen die effektiven Berechtigungen überprüfen.
+1. **P0 abgeschlossen für bestehende Tabellen:** Entzug produktiv geprüft; **P1 offen** ist das Härten alter `supabase_admin`-Default-Grants für künftig angelegte Tabellen sowie ein fortlaufender Berechtigungs-/RLS-Review von neuen Objekten.
 2. **P0:** Vollständige Datenschutzerklärung: Verantwortliche mit Kontakt, Zwecke, Rechtsgrundlagen (inklusive Interessenabwägung), Empfänger/Hosting, Logs, Fristen und Betroffenenrechte.
 3. **P1:** Cache-, Aufbewahrungs- und Löschkonzept je Sportdatentabelle: Quelle, Alter, letzte Nutzung, zweckgebundene Aufbewahrungszeit. Eine Entfolgung muss nicht alle gemeinsam genutzten Sportdaten löschen.
 4. **P1:** Personenbezogene Erstprofile aus `app.js` sowie automatische persönliche Altprofilergänzungen aus `state-storage.js` entfernen und Altdaten sicher migrieren.
