@@ -1,3 +1,7 @@
+## v43 – Gleiche Matchprüfung in Historie und Home
+
+Einzelnachweise werden in beiden Ansichten identisch auf Gewinner, Sätze, Quelllinks und Dubletten geprüft. Die Historie unterstützt größere Teilbestände bis zur gleichen Obergrenze sowie Wiederholen nach Quellenfehler. Details in docs/HISTORY_MATCH_PARITY_V43.md.
+
 ## v42 – Spielerstatistik ohne falsche Leermeldungen
 
 Fehlerhafte Ergebnisabfragen werden nicht mehr als erfolgreich geprüfte leere Historie dargestellt. Ist nur eine Quelle (DBV oder Badhub-Einzelbelege) erreichbar, meldet Home **„Spielstatistik derzeit nur teilweise abrufbar“** mit erneutem Ladeversuch; bei Ausfall beider Quellen **„Spielstatistik gerade nicht erreichbar“**. Sichere Daten aus der verfügbaren Quelle bleiben sichtbar und werden nicht mit anderen Quellen addiert. Jede gültige DBV-Spieler-ID erhält einen klar gekennzeichneten Originalquellenlink „Öffentliche Ergebnisse bei Badhub nachsehen“. Das Vorhandensein des Links beweist keine Matches. Neue Unit- und reale mobile Browser-E2E-Prüfungen; keine Änderung an Supabase, Follow-Queue, Profilen oder Turnierdaten. Echte iPhone-/VoiceOver-Praxisabnahme bleibt #28.

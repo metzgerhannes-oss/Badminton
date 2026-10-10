@@ -110,6 +110,38 @@ test("Partial source outage never impersonates a verified empty history, and ret
  await expect(page.locator("#match-stats-retry")).toBeHidden();
 });
 
+test("Historical source validation matches the Home statistics",async ({page})=>{
+ await page.route("**/player_external_match_facts?*",route=>{
+  const url=new URL(route.request().url());
+  if(url.searchParams.get("dbv_id")==="eq."+PLAYER)return route.fulfill({
+   status:200,headers,body:JSON.stringify([
+    sourceRecord,{...sourceRecord,source_key:"bad-winner",winning_side:2}
+   ])
+  });
+  return route.fallback();
+ });
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
+ await expect(page.locator("#external-match-progress")).toContainText("1 unklare oder doppelte Quellkarten");
+ await expect(page.locator("#external-match-list .external-match-item")).toHaveCount(1);
+ await page.locator('.bottom-nav a[data-page="start"]').click();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+});
+
+test("Historical source failure has real retry and does not claim zero matches",async ({page})=>{
+ let fail=true;
+ await page.route("**/player_external_match_facts?*",route=>
+  fail?route.fulfill({status:503,headers,body:'{"error":"temporary"}'}):route.fallback());
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#external-match-progress")).toContainText("gerade nicht erreichbar");
+ await expect(page.locator("#external-match-count")).toContainText("nicht geprüft");
+ await expect(page.locator("#external-match-retry")).toBeVisible();
+ fail=false;
+ await page.locator("#external-match-retry").click();
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
+ await expect(page.locator("#external-match-retry")).toBeHidden();
+});
+
 test("Friend viewing never changes which own profile Home returns to",async ({page})=>{
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#view-spieler")).toBeVisible();
