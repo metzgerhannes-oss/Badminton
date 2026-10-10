@@ -55,8 +55,17 @@
       <label>Zeitraum
        <select id="match-stats-year"><option value="all">Gesamt</option></select>
       </label>
+      <label>Gespielte Altersklasse
+       <select id="match-stats-age" aria-label="Spiele nach Altersklasse filtern">
+        <option value="all">Alle Altersklassen</option>
+        <option value="own">Eigene Altersklasse</option>
+        <option value="higher">Höhere Altersklasse</option>
+        <option value="unclassified">Nicht zuordenbar</option>
+       </select>
+      </label>
     </div>
     <div id="match-stats-values" class="match-stats-values" aria-live="polite"><p class="match-stats-empty">Belegte Spiele werden geladen …</p></div>
+    <p id="match-stats-age-summary" class="match-stats-age-summary" aria-live="polite" hidden></p>
     <p id="match-stats-note" class="match-stats-note" role="status" aria-live="polite">Einzeln belegte, abgeschlossene Begegnungen.</p>
     <button id="match-stats-retry" class="outline-button match-stats-retry" type="button" hidden>Spielstatistik erneut laden</button>
     <a id="match-stats-source-link" class="match-stats-lookup" rel="noopener noreferrer" target="_blank" hidden>Öffentliche Ergebnisse bei Badhub nachsehen ↗</a>
