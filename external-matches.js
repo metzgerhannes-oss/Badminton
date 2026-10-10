@@ -13,7 +13,7 @@ function safeLink(raw){
  try{
   const u=new URL(raw);
   return u.protocol==="https:"&&u.hostname==="badhub.de" &&
-   /^\/bwbv\/(?:turnier|begegnung)\.php$/.test(u.pathname)&&
+   /^\/(?:bwbv\/(?:turnier|begegnung)|dbv\/turnier)\.php$/.test(u.pathname)&&
    /^\d+$/.test(u.searchParams.get("id")||"")?u.href:null;
  }catch{return null;}
 }

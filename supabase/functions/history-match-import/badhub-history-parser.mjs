@@ -88,7 +88,8 @@ function piece(source,segment,context){
    if(kind&&context.source_id){
     // Stable match identity does not depend on scores, so corrections update it.
     const playersAll=[...data.selfNames,...data.opponents].map(keyPart).sort().join(".");
-    const sourceKey=[source,context.source_id,keyPart(event),keyPart(phase),playersAll].join(":").slice(0,460);
+    const sourceKey=[source,context.source_namespace==="dbv"?"dbv-"+context.source_id:context.source_id,
+     keyPart(event),keyPart(phase),playersAll].join(":").slice(0,460);
     if(sourceKey.length>20)matches.push({
      source_key:sourceKey,competition:context.title.slice(0,180),
      competition_id:context.source_id,category:source,event:event.slice(0,60),
@@ -108,14 +109,17 @@ function piece(source,segment,context){
  return matches;
 }
 function tournamentFacts(html,playerName){
- const cards=html.split(/<div class="card sp-tournament-card">/).slice(1),all=[];
+ // Badhub's crossfed DBV cards have additional CSS classes.
+ // The formerly exact split joined entire DBV tournaments to the preceding
+ // BWBV event and therefore assigned wrong year, competition and source.
+ const cards=html.split(/<div class="card sp-tournament-card(?: [^"]*)?">/).slice(1),all=[];
  for(const card of cards){
-  const head=card.match(/class="sp-tournament-name"[^>]*>[\s\S]*?<a href="\/bwbv\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
+  const head=card.match(/class="sp-tournament-name"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
   if(!head)continue;
   const date=tournamentStart(card.slice(0,650));
   const year=date?Number(date.slice(0,4)):(Number((card.slice(0,600).match(/\b20\d{2}\b/)||[])[0])||null);
-  const c={source_id:head[1],title:plain(head[2]),date,year,
-   link:"https://badhub.de/bwbv/turnier.php?id="+head[1],playerName};
+  const c={source_id:head[2],source_namespace:head[1],title:plain(head[3]),date,year,
+   link:"https://badhub.de/"+head[1]+"/turnier.php?id="+head[2],playerName};
   for(const meeting of card.split(/<div class="sp-meeting">/).slice(1)){
    const event=plain((meeting.match(/class="sp-t-event-badge"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    all.push(...piece("tournament",meeting,{...c,event}));
