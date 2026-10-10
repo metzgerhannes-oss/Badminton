@@ -28,7 +28,7 @@ assert.match(stats,/Für diese Auswahl liegen keine einzeln geprüften Spiele vo
 assert.match(style,/\.history-source-details\[open\]>summary/);
 assert.match(style,/border-left:0;background:transparent/,"No amber warning background");
 assert.match(importMessage({status:"awaiting_source"}).title,/Einzelmatches noch nicht importiert/);
-assert.match(importMessage({status:"awaiting_source"}).detail,/aktuelle Nachfrage/);
+assert.match(importMessage({status:"awaiting_source"}).detail,/aktueller Nachfrage/);
 assert.doesNotMatch(importMessage({status:"awaiting_source"}).detail,/weiterhin regelmäßig geprüft/);
 assert.match(index,/14 Tage/,"Revalidation window must be visible in privacy notice");
 assert.match(index,/DATENKATALOG_BERICHTIGUNG_V53/,"Privacy notice must link the correction runbook");
