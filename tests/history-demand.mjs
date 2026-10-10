@@ -1,14 +1,18 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {validHistoryId,importPost,importStatusUrl,overviewUrl,importMessage,retryAfterHours} from "../scripts/history-demand.mjs";
+import {validHistoryId,importPost,demandPost,importStatusUrl,overviewUrl,importMessage,retryAfterHours} from "../scripts/history-demand.mjs";
 
 assert.equal(validHistoryId("05-061350"),true);
 for(const invalid of ["","local-123","05-12345","evil","05-061350 OR TRUE",undefined]){
  assert.equal(validHistoryId(invalid),false);
  assert.equal(importPost(invalid),null);
+ assert.equal(demandPost(invalid),null);
  assert.equal(importStatusUrl(invalid),null);
  assert.equal(overviewUrl(invalid),null);
 }
+const req=demandPost("05-061350");
+assert.equal(req.url,"https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/rpc/request_player_history_demand");
+assert.deepEqual(JSON.parse(req.body),{target_id:"05-061350"});
 const post=importPost("05-061350");
 assert.deepEqual(JSON.parse(post.body),{dbv_id:"05-061350"});
 assert.equal(post.headers.Prefer,"resolution=ignore-duplicates,return=minimal");
@@ -51,6 +55,8 @@ assert.doesNotMatch(bridge,/registerSavedProfiles|enqueueQuietly/);
 assert.doesNotMatch(bridge,/addEventListener\("badminton:friend-followed"/);
 assert.doesNotMatch(bridge,/addEventListener\("badminton:own-profile-added"/);
 assert.match(bridge,/importStatusUrl/);
+assert.match(bridge,/requestDemand\(id,signal\)/);
+assert.doesNotMatch(bridge,/requestNew\(/);
 assert.doesNotMatch(welcome,/importPost|history-match-import|player_history_imports/);
 assert.match(welcome,/Profile creation and invitation remain entirely local/);
 assert.match(page,/id="history-import-status"/);
@@ -66,4 +72,10 @@ assert.match(idleSQL,/if not exists \(/);
 assert.match(idleSQL,/jsonb_build_object\('processed',0/);
 assert.ok(idleSQL.indexOf("if not exists (")<idleSQL.indexOf("extensions.http_get("),"Check outstanding demand before any external HTTP request");
 assert.match(idleSQL,/interval '7 days'/,"Prior refresh rules remain unchanged");
+const lifecycle=await readFile("database/history-demand-lifecycle-v52.sql","utf8");
+assert.match(lifecycle,/add column if not exists last_demand_at/);
+assert.match(lifecycle,/create or replace function public.request_player_history_demand/);
+assert.match(lifecycle,/revoke select on public.player_history_imports/);
+assert.equal((lifecycle.match(/last_demand_at >= now\(\)-interval '14 days'/g)||[]).length,2);
+assert.doesNotMatch(lifecycle,/delete from public.player_external_match_facts/);
 console.log("History-on-open: validated public IDs, bounded source requests, no automatic registration on follow, onboarding or startup.");
