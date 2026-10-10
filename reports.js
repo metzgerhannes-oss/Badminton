@@ -1,8 +1,7 @@
 /* Player mentions and source directory: verified links only, no external fulltext replication. */
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 (() => {
  "use strict";
- const URL="https://yadexibmjmnjfmfabrug.supabase.co";
- const KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
  const $=id=>document.getElementById(id);
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -10,9 +9,8 @@
  const CATEGORIES={club:"Verein",opponent_club:"Andere Vereine",association:"Verband",dbv:"DBV",media:"Medien",regional_media:"Regionalpresse",sports_organization:"Sport & Stadt",result_portal:"Resultate"};
  let articles=[],sources=[],clubs=[],mentions=new Set(),localMentions=new Map(),profileId="",club="",loaded=false,busy=false;
  async function get(path){
-  const resp=await fetch(URL+"/rest/v1/"+path,{headers:{"apikey":KEY,"accept":"application/json"},cache:"no-store"});
-  if(!resp.ok)throw new Error("Supabase "+resp.status);
-  return resp.json();
+  const {rows}=await readPublicRows(path,{count:false});
+  return rows;
  }
  function validId(id){return /^\d{2}-\d{6}$/.test(id||"")}
  const norm=s=>String(s||"").trim().toLocaleLowerCase("de").replace(/[.]/g,"").replace(/\s+/g," ");
