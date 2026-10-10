@@ -1,3 +1,7 @@
+## Einzelne historische Matches beim Folgen importieren (v35)
+
+Die App liest jetzt öffentlich sichtbare Turnier- und Ligaergebnisse für ausgewählte, bereits gefolgte DBV-Spieler und speichert **nur eindeutig belegte Matchkarten** mit Gegner, Disziplin, Satzständen und Badhub-Quelllink als gesonderte **Drittanbieter-Einzelnachweise** in Supabase. Bei Sarah sind 120 von 608 auswertbaren Karten bereits importiert, bei Philipp 42 von 42; 69 bzw. 20 unklare Karten wurden nicht übernommen. Ein serverseitiger, gedrosselter Cron-Job setzt Teilimporte nach dem Verlassen der App fort. Die offizielle DBV-Matchstatistik bleibt davon **bewusst getrennt**. Unter Historie werden die belegten Badhub-Matches nach Jahr, Disziplin und Turnier/Liga gefiltert. [Regeln und Live-Tests](docs/HISTORISCHE_EINZELMATCHES_ON_DEMAND.md).
+
 ## Importstatus zurückhaltend anzeigen – v34 (10.10.2026)
 
 **iPhone-Sichtbefund:** Ein großes gelbes Feld „Einzelmatch-Quelle noch nicht verfügbar“ verdrängte auf Home die eigentlichen Spielerinformationen und wiederholte die ohnehin sichtbare leere Statistik. Deshalb gibt es auf **Home keine technische Importwarnkarte mehr**. Wenn keine Einzelmatchbelege übernommen wurden, bleibt nur ein knapper Hinweis: „Die detaillierte Spielhistorie wird noch ergänzt.“ Dieser unterscheidet sich korrekt von „für diese Disziplin/Jahresauswahl liegen keine Matches vor“.
