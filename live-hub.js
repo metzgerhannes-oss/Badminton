@@ -1,6 +1,7 @@
 /** One live-first Turniertag view and a Home teaser only for CURRENT source evidence.
  * Home never starts vendor polling and never shows an old result as live. */
-import {PUBLISHABLE,snapshotUrl,liveView,setText,matchLabel,opponents} from "./scripts/live-radar.mjs";
+import {snapshotPath,liveView,setText,matchLabel,opponents} from "./scripts/live-radar.mjs";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 let selected="",homeSeq=0,homeCtrl;
 const valid=id=>typeof id==="string"&&/^\d{2}-\d{6}$/.test(id);
@@ -65,17 +66,16 @@ async function readHome(id){
  ++homeSeq;homeCtrl?.abort();
  if(!valid(id)||location.hash!=="#start"){hideHome();return}
  const seq=homeSeq;homeCtrl=new AbortController();
+ const signal=homeCtrl.signal;
  hideHome();
  try{
-  const response=await fetch(snapshotUrl(id),{
-   cache:"no-store",signal:homeCtrl.signal,headers:{apikey:PUBLISHABLE,accept:"application/json"}
-  });
-  if(!response.ok)throw Error("Unable to load live snapshot");
-  const rows=await response.json();
-  if(seq!==homeSeq||id!==selected||location.hash!=="#start")return;
-  renderHome(Array.isArray(rows)?rows[0]||null:null,id);
+  const {rows}=await readPublicRows(snapshotPath(id),{signal,count:false});
+  if(seq!==homeSeq||signal.aborted||id!==selected||location.hash!=="#start")return;
+  renderHome(rows[0]||null,id);
  }catch(error){
-  if(error.name!=="AbortError")hideHome();
+  // Old aborted responses must never hide newer player live status.
+  if(seq!==homeSeq||signal.aborted||error?.kind==="aborted"||error?.name==="AbortError")return;
+  hideHome();
  }
 }
 document.addEventListener("DOMContentLoaded",()=>{
