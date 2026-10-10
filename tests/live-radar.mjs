@@ -89,5 +89,5 @@ assert.ok(!sql.includes("insert into public.matches"),"Never infer confirmed mat
 assert.match(css,/\.live-radar-panel/);
 assert.match(sw,/live-radar\.js/);
 assert.match(sw,/scripts\/live-radar\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v41/);
+assert.match(sw,/schmetterlinge-shell-v42/);
 console.log("Live radar: matchday idle/active/stale, perspective-safe scores, idempotent watches, RLS controls and iPhone UI passed.");
