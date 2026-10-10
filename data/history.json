@@ -360,6 +360,196 @@
       },
       "verified": true,
       "verificationNote": "Vereinsbericht vom 02.03.2026 nennt Vinzent und Platzierung; keine individuellen Satzstände."
+    },
+    {
+      "id": "ss-2026-01-18-c-me-u19",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-18",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U19",
+      "place": 1,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "ss-2026-01-18-c-md-u19",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-18",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Doppel",
+      "ageGroup": "U19",
+      "place": 1,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "vo-2026-01-17-c-je-u15",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2026-01-17",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 19,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "ss-2026-01-24-b-me-u17",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-24",
+      "event": "1. B-Rangliste SüdOst U13–U19",
+      "location": "Regensburg",
+      "level": "B",
+      "discipline": "Einzel",
+      "ageGroup": "U17",
+      "place": 1,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "ss-2026-01-24-b-md-u17",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-24",
+      "event": "1. B-Rangliste SüdOst U13–U19",
+      "location": "Regensburg",
+      "level": "B",
+      "discipline": "Doppel",
+      "ageGroup": "U17",
+      "place": 2,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "ss-2026-01-24-b-mx-u17",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-24",
+      "event": "1. B-Rangliste SüdOst U13–U19",
+      "location": "Regensburg",
+      "level": "B",
+      "discipline": "Mixed",
+      "ageGroup": "U17",
+      "place": 5,
+      "partner": "Raphael Argast (BC Lörrach-Brombach)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "vo-2026-04-24-c-je-u15",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2026-04-24",
+      "event": "3. C-Rangliste BW U11–U19",
+      "location": "Mössingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 9,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "vo-2026-04-24-c-jd-u15",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2026-04-24",
+      "event": "3. C-Rangliste BW U11–U19",
+      "location": "Mössingen",
+      "level": "C",
+      "discipline": "Doppel",
+      "ageGroup": "U15",
+      "place": 5,
+      "partner": "Ruixiang Wang (PSV Reutlingen)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "vo-2025-05-24-d-je-u15",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2025-05-24",
+      "event": "2. D-Rangliste BW Nordwürttemberg U11–U19",
+      "location": "Neuhausen auf den Fildern",
+      "level": "D",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 6,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "vo-2025-05-24-d-jd-u15",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2025-05-24",
+      "event": "2. D-Rangliste BW Nordwürttemberg U11–U19",
+      "location": "Neuhausen auf den Fildern",
+      "level": "D",
+      "discipline": "Doppel",
+      "ageGroup": "U15",
+      "place": 3,
+      "partner": "Ruixiang Wang (PSV Reutlingen)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
     }
   ],
   "pendingResults": []

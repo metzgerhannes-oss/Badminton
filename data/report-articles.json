@@ -36,6 +36,18 @@
       "checked_at": "2026-10-10"
     },
     {
+      "source": "bwbv",
+      "date": "2026-08-19",
+      "title": "Bezirksmeisterschaft BW Südwürttemberg U11-U19 am 11. Juli 2026",
+      "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/",
+      "summary": "Verbandbericht zum Mössinger Turnier; keine geprüfte namentliche Nennung der beiden Profile.",
+      "players": [],
+      "note": "Vereinsbezug; keine persönliche Zuordnung.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
       "source": "club-moessingen",
       "date": "2026-06-23",
       "title": "23. Hexen-Cup / 6. DBV A-Rangliste U11/U13+C-Rangliste BW U15/U17/U19 am 27./28. Juni 2026",
@@ -54,11 +66,12 @@
       "date": "2026-04-28",
       "title": "3. C-Rangliste BW U11-U19 am 24./25. April 2026",
       "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026",
-      "summary": "Mössinger Turnierbericht mit Ergebnissen im Einzel U13 und Doppel U11.",
+      "summary": "Mössinger C-Rangliste: Vinzent Pius Ott wurde Neunter im Einzel U15 und Fünfter im Doppel U15 mit Ruixiang Wang; Philipp Metzger ebenfalls mit Platzierungen vertreten.",
       "players": [
+        "05-070006",
         "05-070879"
       ],
-      "note": "Name und beide Wettbewerbsergebnisse im Bericht.",
+      "note": "Originalbericht nennt Spieler und Turnierplatzierungen mit Wettbewerb; keine vollständigen Gegner-/Satzbelege.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
@@ -122,15 +135,45 @@
       "checked_at": "2026-10-10"
     },
     {
+      "source": "bwbv",
+      "date": "2026-01-26",
+      "title": "YANG-YANG-BWBV-Circuit: 1. E-Rangliste in Gärtringen",
+      "url": "https://bwbv.de/2026/01/26/yang-yang-bwbv-circuit-1-e-rangliste-in-gaertringen/",
+      "summary": "Landesverbandsbericht mit Podiumsergebnis im Jungeneinzel U11.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger namentlich in der U11-Ergebnisliste des BWBV.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-01-26",
+      "title": "1. B-Rangliste SüdOst U13-U19 am 24./25. Januar 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026",
+      "summary": "SüdOst-Rangliste: Sarah Storz gewann das Einzel U17, erreichte Platz 2 im Doppel U17 mit Amishi Tiwari und Platz 5 im Mixed U17 mit Raphael Argast.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Originalbericht nennt Spieler und Turnierplatzierungen mit Wettbewerb; keine vollständigen Gegner-/Satzbelege.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
       "source": "club-moessingen",
       "date": "2026-01-20",
       "title": "1. C-Rangliste BW U11-U19 am 17./18. Januar 2026",
       "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026",
-      "summary": "Vereinsbericht zum Jahresauftakt der Jugendrangliste in Reutlingen.",
+      "summary": "Jahresauftakt in Reutlingen: Sarah Storz gewann Einzel und Doppel U19, Vinzent Pius Ott wurde 19. im Einzel U15; weitere Mössinger Jugendspieler einschließlich Philipp wurden platziert.",
       "players": [
+        "05-061350",
+        "05-070006",
         "05-070879"
       ],
-      "note": "Philipp Metzger steht namentlich in der Ergebnisliste.",
+      "note": "Originalbericht nennt Spieler und Turnierplatzierungen mit Wettbewerb; keine vollständigen Gegner-/Satzbelege.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
@@ -154,11 +197,12 @@
       "date": "2025-05-27",
       "title": "2. D-Rangliste BW Nordwürttemberg U11-U19 am 24. Mai 2025",
       "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025",
-      "summary": "Bericht zum ersten Turnierstart von Philipp in Neuhausen.",
+      "summary": "D-Rangliste in Neuhausen: Vinzent Pius Ott belegte Platz 6 im Einzel U15 und Platz 3 im Doppel U15 mit Ruixiang Wang; Philipp Metzger ebenfalls namentlich erwähnt.",
       "players": [
+        "05-070006",
         "05-070879"
       ],
-      "note": "Philipp Metzger wird direkt im Artikel erwähnt.",
+      "note": "Originalbericht nennt Spieler und Turnierplatzierungen mit Wettbewerb; keine vollständigen Gegner-/Satzbelege.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
@@ -187,32 +231,6 @@
         "05-070879"
       ],
       "note": "Philipp Metzger wird ausdrücklich als Finalgegner genannt.",
-      "status": "verified",
-      "club_id": "spvgg-moessingen",
-      "checked_at": "2026-10-10"
-    },
-    {
-      "source": "bwbv",
-      "date": "2026-01-26",
-      "title": "YANG-YANG-BWBV-Circuit: 1. E-Rangliste in Gärtringen",
-      "url": "https://bwbv.de/2026/01/26/yang-yang-bwbv-circuit-1-e-rangliste-in-gaertringen/",
-      "summary": "Landesverbandsbericht mit Podiumsergebnis im Jungeneinzel U11.",
-      "players": [
-        "05-070879"
-      ],
-      "note": "Philipp Metzger namentlich in der U11-Ergebnisliste des BWBV.",
-      "status": "verified",
-      "club_id": "spvgg-moessingen",
-      "checked_at": "2026-10-10"
-    },
-    {
-      "source": "bwbv",
-      "date": "2026-08-19",
-      "title": "Bezirksmeisterschaft BW Südwürttemberg U11-U19 am 11. Juli 2026",
-      "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/",
-      "summary": "Verbandbericht zum Mössinger Turnier; keine geprüfte namentliche Nennung der beiden Profile.",
-      "players": [],
-      "note": "Vereinsbezug; keine persönliche Zuordnung.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
