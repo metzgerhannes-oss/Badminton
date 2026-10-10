@@ -73,6 +73,8 @@
  document.addEventListener("DOMContentLoaded",()=>{
   if(!$("dbv-live-results"))return;
   $("dbv-live-refresh")?.addEventListener("click",refresh);
+  currentId=String(window.badmintonActivePlayerId||"");
+  if(visible())refresh();
   window.addEventListener("badminton:profile-change",event=>{
    const next=String(event.detail?.playerId||"");
    if(next!==currentId){currentId=next;requestId++;loading=false;if(visible())refresh()}
