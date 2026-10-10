@@ -54,5 +54,5 @@ state.page="bad-route";run("SchmetterlingeRouter.renderPage(state)");
 assert.equal(document.title,"Übersicht · Schmetterlinge");
 assert.match(html,/<script defer src="\.\/router\.js"><\/script>/);
 assert.match(sw,/\.\/router\.js/);
-assert.match(sw,/schmetterlinge-shell-v48/);
+assert.match(sw,/schmetterlinge-shell-v49/);
 console.log("Router v41: four tabs, history alias, settings, focus/scroll, same-hash Home, deep-link fallback.");
