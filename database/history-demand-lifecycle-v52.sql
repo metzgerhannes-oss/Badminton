@@ -47,7 +47,7 @@ grant execute on function demand_internal.request_player_history_demand(text) to
 create or replace function public.request_player_history_demand(target_id text)
 returns jsonb language sql security invoker
 set search_path=pg_catalog,public,pg_temp
-as $ select demand_internal.request_player_history_demand(target_id) $;
+as $$ select demand_internal.request_player_history_demand(target_id) $$;
 revoke all on function public.request_player_history_demand(text) from public,anon,authenticated;
 grant execute on function public.request_player_history_demand(text) to anon,authenticated;
 comment on function public.request_player_history_demand(text) is
