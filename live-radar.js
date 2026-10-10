@@ -1,9 +1,10 @@
 /** The radar reads only a central, source-checked Supabase snapshot.
  * It never fetches Badhub directly from browsers and never guesses live scores. */
 import {
- DBV_ID,PUBLISHABLE,watchRequest,snapshotUrl,liveView,
+ DBV_ID,watchRequest,snapshotPath,liveView,
  radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime
 } from "./scripts/live-radar.mjs";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
 let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
@@ -118,10 +119,7 @@ function render(row,id){
  }
 }
 async function getSnapshot(id,signal){
- const res=await fetch(snapshotUrl(id),{cache:"no-store",signal,headers:{apikey:PUBLISHABLE,Accept:"application/json"}});
- if(!res.ok)throw Error("Supabase response "+res.status);
- const rows=await res.json();
- if(!Array.isArray(rows))throw Error("Supabase data invalid");
+ const {rows}=await readPublicRows(snapshotPath(id),{signal,count:false});
  return rows[0]||null;
 }
 async function watch(id,signal){
