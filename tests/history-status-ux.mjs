@@ -20,7 +20,7 @@ assert.match(bridge,/badminton:friend-followed/,"On-follow queue stays enabled")
 assert.match(bridge,/badminton:own-profile-added/,"Own-player queue stays enabled");
 assert.match(bridge,/importStatusUrl/,"Live status still fetched");
 assert.match(worker,/badminton-history-demand-worker/,"Server worker unaffected");
-assert.match(stats,/records\.length===0/,"Zero-source vs filtered-empty must differ");
+assert.match(stats,/officialCount\.total===0&&external\.length>0/,"Fallback uses real sourced matches");
 assert.match(stats,/Die detaillierte Spielhistorie wird noch ergänzt/);
 assert.match(stats,/Für diese Auswahl liegen keine einzeln geprüften Matches vor/);
 assert.match(style,/\.history-source-details\[open\]>summary/);
