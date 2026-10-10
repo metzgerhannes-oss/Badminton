@@ -1,6 +1,7 @@
 import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
+import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
 const ROOT="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
 const KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
 const $=id=>document.getElementById(id);
@@ -16,7 +17,7 @@ const ownScore=m=>(Array.isArray(m.games)?m.games:[])
  .map(g=>m.player_side===2?g[1]+":"+g[0]:g[0]+":"+g[1]).join(" · ");
 let selected="",official=[],external=[],progress=null,officialError=false,externalError=false,
  status="idle",partialOfficial=false,partialExternal=false,seq=0,lastLoadedAt=0;
-let selectedYear="all",selectedDiscipline="all";
+let selectedYear="all",selectedDiscipline="all",selectedAgeClass="all",birthYear=null;
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let controller;
 async function getPage(path,signal){
@@ -57,22 +58,29 @@ async function queryExternal(id,signal){
  }
  return {rows,progress:status||null,partial:true};
 }
+async function queryBirthYear(id,signal){
+ const [profile]=await getPage("players?"+
+  new URLSearchParams({select:"birth_year",dbv_id:"eq."+id,limit:"1"}),signal);
+ const birth=profile?.birth_year;
+ return Number.isInteger(birth)&&birth>=1900&&birth<=2100?birth:null;
+}
 async function fetchProfile(id,force=false){
  if(!/^\d{2}-\d{6}$/.test(id||"")){
   controller?.abort();++seq;selected=id||"";official=[];external=[];
-  progress=null;status="missing-id";render();return;
+  progress=null;birthYear=null;status="missing-id";render();return;
  }
  if(id===selected&&!force&&status==="loaded")return;
  if(id!==selected){
-  selectedYear="all";selectedDiscipline="all";
+  selectedYear="all";selectedDiscipline="all";selectedAgeClass="all";
   if($("match-stats-discipline"))$("match-stats-discipline").value="all";
+   if($("match-stats-age"))$("match-stats-age").value="all";
  }
- selected=id;status="loading";official=[];external=[];progress=null;
+ selected=id;status="loading";official=[];external=[];progress=null;birthYear=null;
  officialError=false;externalError=false;partialOfficial=false;partialExternal=false;
  controller?.abort();controller=new AbortController();
  const ticket=++seq,signal=controller.signal;
  render();
- const results=await Promise.allSettled([queryOfficial(id,signal),queryExternal(id,signal)]);
+ const results=await Promise.allSettled([queryOfficial(id,signal),queryExternal(id,signal),queryBirthYear(id,signal)]);
  if(ticket!==seq||signal.aborted)return;
  if(results[0].status==="fulfilled"){
   official=results[0].value.rows;partialOfficial=results[0].value.partial;
@@ -81,7 +89,15 @@ async function fetchProfile(id,force=false){
   external=results[1].value.rows;progress=results[1].value.progress;
   partialExternal=results[1].value.partial;
  }else{externalError=true;console.warn("Sourced Badhub match history unavailable",results[1].reason)}
+ if(results[2].status==="fulfilled")birthYear=results[2].value;
+ else console.warn("Player birth year unavailable for age class breakdown",results[2].reason);
  status="loaded";lastLoadedAt=Date.now();render();
+}
+function ageProof(m){
+ const a=m.ageContext;
+ if(!a||a.category==="unclassified")return '<span class="match-age-proof muted-age">AK nicht zuordenbar</span>';
+ return '<span class="match-age-proof">'+esc(a.event)+
+  (a.category==="higher"?" · höhere AK (eigene "+esc(a.own)+")":" · eigene AK")+'</span>';
 }
 function externalProof(m){
  const u=sourceUrl(m.source_url);
@@ -92,7 +108,7 @@ function externalProof(m){
  const partner=(m.partner_names||[]).join(" / ");
  return '<article class="match-proof"><div class="match-proof-head"><span class="'+
   (m.won?"match-win":"match-loss")+'">'+(m.won?"Sieg":"Niederlage")+
-  '</span><time>'+esc(when)+'</time><span>'+esc(m.discipline)+'</span></div>'+
+  '</span><time>'+esc(when)+'</time><span>'+esc(m.discipline)+'</span>'+ageProof(m)+'</div>'+
   '<strong>'+esc(m.competition||"Öffentlich belegtes Turnier")+'</strong>'+
   '<p>Gegen '+esc(opp)+(partner?' · mit '+esc(partner):'')+
   ' · Sätze aus Spielersicht '+esc(ownScore(m))+'</p>'+
@@ -103,7 +119,7 @@ function officialProof(m){
  const url=sourceUrl(m.source_url);
  return '<article class="match-proof"><div class="match-proof-head"><span class="'+
  (m.won?"match-win":"match-loss")+'">'+(m.won?"Sieg":"Niederlage")+
- '</span><time>'+esc(dateLabel(m.match_date))+'</time><span>'+esc(m.discipline)+'</span></div>'+
+ '</span><time>'+esc(dateLabel(m.match_date))+'</time><span>'+esc(m.discipline)+'</span>'+ageProof(m)+'</div>'+
  '<strong>'+esc(m.tournament_name||"Turnier nicht benannt")+'</strong>'+
  '<p>Gegen '+esc(m.opponent_names)+(m.game_score?' · Sätze '+esc(m.game_score):'')+'</p>'+
  (url?'<a href="'+esc(url)+'" rel="noopener noreferrer" target="_blank">Originalbeleg ↗</a>':'')+
@@ -113,8 +129,9 @@ function render(){
  const values=$("match-stats-values"),note=$("match-stats-note"),details=$("match-stats-details"),
   list=$("match-stats-list"),counter=$("match-stats-detail-count"),year=$("match-stats-year"),
   source=$("match-stats-source"),sourceDetails=$("match-stats-provenance-copy"),
-  retry=$("match-stats-retry");
- if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry)return;
+  retry=$("match-stats-retry"),ageSummary=$("match-stats-age-summary");
+ if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry||!ageSummary)return;
+ ageSummary.hidden=true;
  // The public original is an optional cross-check, never evidence of a match.
  const lookup=$("match-stats-source-link");
  if(lookup){
@@ -150,19 +167,28 @@ function render(){
  const stats=sourced?
   computeExternalStats(rows,{year:selectedYear,discipline:selectedDiscipline}):
   computeMatchStats(rows,{year:selectedYear,discipline:selectedDiscipline});
- const missing=stats.total===0;
+ const context=ageContextBreakdown(stats,birthYear,{official:!sourced,filter:selectedAgeClass});
+ const byAge=context.buckets;
+ if(stats.total){
+  ageSummary.hidden=false;
+  ageSummary.textContent="Niederlagen nach gespielter AK · eigene: "+
+   byAge.own.losses+" · höhere: "+byAge.higher.losses+
+   " · nicht zuordenbar: "+byAge.unclassified.losses+
+   (birthYear===null?" · Spielerjahrgang nicht hinterlegt.":"");
+ }
+ const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
  retry.hidden=!availability.retry;
  source.textContent=!sourced&&!official.length&&availability.retry
   ?"Datenabgleich unvollständig":sourced?"Badhub · Einzelbelege":"Offizielle Matches";
  values.innerHTML=[
-  ["Gesamtspiele",missing?"–":stats.total,"matches"],
-  ["Siege",missing?"–":stats.wins,"wins"],
-  ["Niederlagen",missing?"–":stats.losses,"losses"],
-  ["Siegquote",missing?"–":stats.rate+" %","rate"]
+  ["Gesamtspiele",missing?"–":context.total,"matches"],
+  ["Siege",missing?"–":context.wins,"wins"],
+  ["Niederlagen",missing?"–":context.losses,"losses"],
+  ["Siegquote",missing?"–":context.rate+" %","rate"]
  ].map(([name,value,key])=>'<div class="match-stat '+key+'"><span>'+esc(name)+'</span><strong>'+esc(value)+'</strong></div>').join("");
  if(sourced){
-  note.textContent=stats.total
+  note.textContent=context.total
    ? "Belegte Spiele aus Badhub · derzeit verfügbarer Teilbestand."
    : availability.retry?availability.emptyNote:"Für diese Auswahl liegen noch keine belegten Spiele vor.";
   sourceDetails.textContent="Die Werte stammen aus einzelnen Badhub-Matchkarten, nicht aus einer vollständigen offiziellen DBV-Karriere. "+
@@ -187,14 +213,16 @@ function render(){
   sourceDetails.textContent=(availability.detail?availability.detail+" ":"")+
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
+ if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
  details.hidden=missing;
- counter.textContent="("+stats.total+")";
- list.innerHTML=stats.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
+ counter.textContent="("+context.total+")";
+ list.innerHTML=context.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("match-stats"))return;
  $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;render()});
  $("match-stats-year").addEventListener("change",e=>{selectedYear=e.target.value;render()});
+ $("match-stats-age").addEventListener("change",e=>{selectedAgeClass=e.target.value;render()});
  $("match-stats-retry")?.addEventListener("click",()=>fetchProfile(selected,true));
  window.addEventListener("badminton:network-restored",()=>{
   if(location.hash==="#start"&&selected&&status==="loaded"&&(officialError||externalError))

@@ -1,0 +1,35 @@
+name: Altersklassen-Auswertung
+on:
+  push:
+    branches: [main]
+    paths:
+      - "stats.js"
+      - "index.html"
+      - "scripts/match-age-context.mjs"
+      - "tests/match-age-context.mjs"
+      - "sw.js"
+      - ".github/workflows/match-age-context.yml"
+  pull_request:
+    paths:
+      - "stats.js"
+      - "index.html"
+      - "scripts/match-age-context.mjs"
+      - "tests/match-age-context.mjs"
+      - "sw.js"
+      - ".github/workflows/match-age-context.yml"
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: JavaScript syntax
+        run: |
+          node --check stats.js
+          node --check scripts/match-age-context.mjs
+      - name: Altersklassen und Match-Klassifikationen
+        run: node --test tests/match-age-context.mjs
