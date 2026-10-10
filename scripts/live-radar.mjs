@@ -11,13 +11,17 @@ export function watchRequest(id){
   headers:{apikey:PUBLISHABLE,"Content-Type":"application/json",Prefer:"return=minimal"}
  };
 }
-export function snapshotUrl(id){
+export function snapshotPath(id){
  if(!DBV_ID.test(id||""))return null;
  const query=new URLSearchParams({
   select:"dbv_id,provider,source_url,checked_at,payload,last_error_at",
   dbv_id:"eq."+id,limit:"1"
  });
- return LIVE_API+"/player_live_snapshots?"+query;
+ return "player_live_snapshots?"+query;
+}
+export function snapshotUrl(id){
+ const path=snapshotPath(id);
+ return path?LIVE_API+"/"+path:null;
 }
 export function validSource(url,id){
  return DBV_ID.test(id||"") && url==="https://badhub.de/spieler/"+id+"/live";
