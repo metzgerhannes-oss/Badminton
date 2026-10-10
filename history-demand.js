@@ -59,6 +59,7 @@ async function refresh(id,{enqueue=true}={}){
   if(!status&&enqueue){
    await requestNew(id,signal);
    status=await callStatus(id,signal);
+   void requestIndividualMatches(id);
   }
   if(seq!==requestSeq)return;
   show(status,id);
@@ -76,11 +77,25 @@ async function refresh(id,{enqueue=true}={}){
   }
  }
 }
+async function requestIndividualMatches(id){
+ if(!allowed(id))return;
+ try{
+  const response=await fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
+   method:"POST",headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
+   body:JSON.stringify({dbv_id:id})
+  });
+  if(response.ok){
+   window.dispatchEvent(new CustomEvent("badminton:external-matches-updated",
+    {detail:{playerId:id}}));
+  }
+ }catch(error){console.warn("Source-backed match import temporarily unavailable",error?.message)}
+}
 async function enqueueQuietly(id){
  if(!allowed(id))return;
  try{
   const prior=await callStatus(id);
   if(!prior)await requestNew(id);
+  await requestIndividualMatches(id);
  }catch(error){
   console.warn("History job could not be requested:",error?.message);
  }
@@ -105,7 +120,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  window.addEventListener("badminton:own-profile-added",e=>{
   const id=String(e.detail?.playerId||"");
-  if(allowed(id))refresh(id);
+  if(allowed(id)){refresh(id);enqueueQuietly(id);}
  });
  window.addEventListener("visibilitychange",()=>{
   if(document.visibilityState==="visible"&&shown&&allowed(shown))refresh(shown,{enqueue:false});
