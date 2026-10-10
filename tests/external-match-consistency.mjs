@@ -23,5 +23,5 @@ assert.match(history,/partial=collected\.length>=MAX_ROWS/);
 assert.match(history,/if\(!Array\.isArray\(data\)\)throw/);
 assert.match(history,/Der Datenstand kann derzeit nicht geprüft werden/);
 assert.match(history,/external-match-retry/);
-assert.match(sw,/schmetterlinge-shell-v45/);
+assert.match(sw,/schmetterlinge-shell-v46/);
 console.log("v43: Historie und Home validieren dieselben belegten Matches und Dubletten.");
