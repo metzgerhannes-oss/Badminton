@@ -1,3 +1,9 @@
+## Importstatus zurückhaltend anzeigen – v34 (10.10.2026)
+
+**iPhone-Sichtbefund:** Ein großes gelbes Feld „Einzelmatch-Quelle noch nicht verfügbar“ verdrängte auf Home die eigentlichen Spielerinformationen und wiederholte die ohnehin sichtbare leere Statistik. Deshalb gibt es auf **Home keine technische Importwarnkarte mehr**. Wenn keine Einzelmatchbelege übernommen wurden, bleibt nur ein knapper Hinweis: „Die detaillierte Spielhistorie wird noch ergänzt.“ Dieser unterscheidet sich korrekt von „für diese Disziplin/Jahresauswahl liegen keine Matches vor“.
+
+Die Quellen- und Importdiagnose ist weiterhin verfügbar, jetzt unter **Historie → Datenstand und Quellen** als standardmäßig geschlossener Bereich, ohne gelbe Alarmfläche. Die Importwarteschlange, automatischen Prüfungen, extern gekennzeichneten Badhub-Aggregate, offiziellen Statistikkriterien und tatsächlichen Datenstände bleiben unverändert. Neue Regression in `tests/history-status-ux.mjs` sichert diese UI-Trennung ab.
+
 ## Live-Radar: Nur fachlich hilfreiche Statusanzeigen (v33)
 
 Unter **Turniere → Aktuelle Spiele** zeigt die App nach einem Quellenabgleich vorrangig den tatsächlichen Turnierstatus statt der technischen Meldung „Live-Abgleich veraltet“. Meldet die Quelle kein Turnier, sieht man **„Derzeit kein Turniertag gemeldet“**, ergänzt um den Zeitpunkt der letzten Prüfung. Ein einige Minuten alter Leerstand löst **keine orangefarbene Warnung** aus. Falls der letzte Abruf über 30 Minuten zurückliegt, heißt es vorsichtig **„Turnierstatus wird geprüft“**, weil ein alter Leerstand kein aktueller Beleg ist. Bei einem gemeldeten Turnier mit älteren Satzständen wird **„Aktueller Spielstand wird geprüft“** angezeigt – alte Satzstände bleiben weiterhin verborgen. Ein Direktlink zu Badhub ist im Statusblock verfügbar; automatische Minutenprüfung, Home-Frischefilter und Source-Daten bleiben unverändert. Regressionstests decken alle Zustände ab.
