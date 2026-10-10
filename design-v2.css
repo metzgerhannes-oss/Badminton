@@ -772,3 +772,6 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  background:#dff1ff;white-space:normal}
 .match-age-proof.muted-age{background:#eef4f8;color:#57778c}
 @media(max-width:370px){.match-stats-filters{grid-template-columns:1fr}}
+
+/* v46: sourced minimum-win claim; not a scored individual match. */
+.history-match-evidence{font-size:12px;line-height:1.5;color:var(--muted,#65748a);margin:5px 0 0;max-width:55ch}
