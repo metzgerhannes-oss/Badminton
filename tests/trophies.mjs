@@ -15,8 +15,15 @@ assert.ok(p.results.some(r=>r.id.includes("gaertringen")));
 const c=summarizeTrophies(charlotte);
 assert.deepEqual(c.counts,{1:0,2:0,3:0,4:0});
 assert.equal(c.total,0,"Charlotte's documented 5th place must remain in history, not the trophy cabinet");
-const family=summarizeTrophies(results);
+const family=summarizeTrophies(results.filter(r=>
+ ["05-070879","05-071969"].includes(r.playerId)));
 assert.equal(family.total,9);
+const followedSarah=summarizeTrophies(results.filter(r=>r.playerId==="05-061350"));
+assert.deepEqual(followedSarah.counts,{1:0,2:0,3:1,4:0});
+const followedVinzent=summarizeTrophies(results.filter(r=>r.playerId==="05-070006"));
+assert.equal(followedVinzent.total,0,"19th place is no trophy");
+assert.equal(summarizeTrophies(results).total,10,
+ "Entire sourced dataset includes the extra friend's podium, not just family results");
 assert.equal(family.results.filter(r=>r.place===4).length,2);
 assert.deepEqual(summarizeTrophies(philipp.filter(r=>r.date.startsWith("2025"))).counts,{1:0,2:0,3:1,4:1});
 assert.deepEqual(summarizeTrophies([...philipp,philipp[0]]).counts,p.counts,"Duplicate sources must not add extra trophies");
