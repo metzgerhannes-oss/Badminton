@@ -607,3 +607,53 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  .match-stat strong{font-size:25px}
  .match-stats-heading h2{font-size:19px}
 }
+
+
+/* Focused navigation v3: four primary destinations, settings in the header. */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:80px;margin:6px 0 8px;overflow:visible;}
+.topbar:after{display:none}
+.topbar .brand{display:flex;align-items:center;flex:1 1 auto;min-width:0;gap:9px;text-decoration:none}
+.topbar .brand-logo{height:59px!important;width:59px!important;max-width:59px!important;min-width:59px!important;flex:none;object-fit:contain!important}
+.topbar .brand>span{display:block;font-size:clamp(17px,4.8vw,26px);line-height:1.18;overflow-wrap:normal}
+.topbar .brand small{display:block;margin-top:5px;line-height:1.25;letter-spacing:.45px;font-size:clamp(7px,1.65vw,9px)}
+.topbar-settings{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;
+  color:#1c5d87;background:#f8fcff;border:1px solid #a8d4ec;border-radius:14px;
+  box-shadow:0 3px 12px #5488ab17;z-index:1}
+.topbar-settings svg{width:25px;height:25px}
+.topbar-settings[aria-current=page]{color:#087dc3;background:#d1efff;border-color:#4baee2}
+.bottom-nav{padding:8px max(12px,calc((100vw - 780px)/2)) calc(8px + env(safe-area-inset-bottom))}
+.bottom-nav a{width:25%!important;flex:1 1 25%;min-height:55px;gap:5px;
+  padding:5px 8px;outline-offset:-2px}
+.bottom-nav a small{font-size:clamp(11px,2.9vw,13px);overflow:visible}
+.bottom-nav .nav-icon{width:25px;height:25px}
+.history-inline-link{display:inline-flex;min-height:43px;align-items:center;
+  padding:9px 12px;margin:4px 0 13px;border-radius:13px;border:1px solid #b9dbec;
+  background:#f5fbff;color:#076ba8;font-size:12px;font-weight:800;text-decoration:none}
+.library-section-heading{margin-top:16px}
+.library-result-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+#library-count{flex:1 1 auto}
+#library-reset{margin-left:auto;min-height:42px}
+.library-idle{display:grid;gap:7px;padding:25px 18px;text-align:center;
+  border:1px dashed #9fcce4;border-radius:18px;background:#f2faff;color:#3f6c8a}
+.library-idle strong{font-size:17px;color:#123e64}
+.library-idle span{font-size:12px;line-height:1.65}
+.player-management{margin:22px 0 15px;padding:17px;border-radius:19px;
+  border:1px solid #c4dfef;background:#fffefeff;box-shadow:var(--shadow)}
+.player-management-head h3{font-size:19px;color:#0d3559;margin:0 0 6px}
+.player-management-head p{font-size:12px;color:#587b95;line-height:1.5;margin:0 0 12px}
+.player-management .settings-section{margin:12px 0 18px;padding-top:13px;border-top:1px solid #d5eaf6}
+.player-management .section-heading h3{font-size:17px}
+.player-management .current-account-label{display:block;font-size:11px;color:#4c7391;margin-top:14px}
+.friend-add-manual{margin-top:12px;min-height:44px}
+@media(max-width:410px){
+  .topbar{min-height:71px}
+  .topbar .brand-logo{width:49px!important;min-width:49px!important;max-width:49px!important;height:49px!important}
+  .topbar .brand>span{font-size:clamp(16px,4.5vw,19px)}
+  .topbar .brand small{font-size:7px;letter-spacing:.2px}
+  .topbar-settings{width:44px;height:44px;flex-basis:44px}
+  .bottom-nav a{min-height:54px;padding-inline:4px}
+  .bottom-nav a small{font-size:11px}
+  .player-management{padding:12px}
+}
+@media(max-width:350px){.topbar .brand-logo{width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important}}
