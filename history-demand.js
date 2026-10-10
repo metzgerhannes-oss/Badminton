@@ -75,6 +75,15 @@ async function refresh(id,{enqueue=true}={}){
   }
  }
 }
+async function enqueueQuietly(id){
+ if(!allowed(id))return;
+ try{
+  const prior=await callStatus(id);
+  if(!prior)await requestNew(id);
+ }catch(error){
+  console.warn("History job could not be requested:",error?.message);
+ }
+}
 function select(id){
  clearTimeout(timeout);
  if(!allowed(id)){
@@ -91,7 +100,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("badminton:profile-change",e=>select(String(e.detail?.playerId||"")));
  window.addEventListener("badminton:friend-followed",e=>{
   const id=String(e.detail?.playerId||"");
-  if(allowed(id))refresh(id);
+  if(allowed(id))enqueueQuietly(id);
  });
  window.addEventListener("badminton:own-profile-added",e=>{
   const id=String(e.detail?.playerId||"");
