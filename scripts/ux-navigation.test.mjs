@@ -69,6 +69,6 @@ test("Home and friends use one profile navigation mechanism",()=>{
 test("neutral user-facing wording and changed PWA cache",()=>{
  assert.doesNotMatch(dashboard,/Familien-Datenbasis/);
  assert.doesNotMatch(history,/in unserer kuratierten DBV-Chronik/);
- assert.match(sw,/schmetterlinge-shell-v58/);
+ assert.match(sw,/schmetterlinge-shell-v59/);
  assert.doesNotMatch(sw,/\.\/friend-search\.js/);
 });
