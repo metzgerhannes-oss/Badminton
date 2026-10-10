@@ -753,3 +753,7 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  overflow-wrap:anywhere}
 .backup-feedback[data-error=true]{color:#a22d40}
 @media(max-width:390px){.backup-actions button,.backup-import button{width:100%}}
+
+/* v42 – calm source cross-check; hidden remains hidden on every screen. */
+.match-stats-lookup{display:inline-flex;align-items:center;min-height:44px;font-size:12px;font-weight:750;color:#086797;text-decoration:underline;text-underline-offset:3px}
+.match-stats-lookup[hidden]{display:none!important}
