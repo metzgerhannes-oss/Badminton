@@ -10,6 +10,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <link rel="stylesheet" href="./design-v2.css">
+<script defer src="./ui-feedback.js"></script>
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
 <script type="module" src="./library.js"></script>
@@ -26,20 +27,21 @@
 <script type="module" src="./dashboard.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#hauptinhalt">Zum Inhalt springen</a>
 <div class="app">
  <header class="topbar">
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small>SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
  </header>
- <main>
+ <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
+   <strong>Keine Verbindung gemeldet</strong>
+   <span>Du kannst vorhandene Ansichten weiter nutzen. Neue Ergebnisse werden bei Verbindung wieder geladen.</span>
+ </div>
+ <main id="hauptinhalt">
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">DBV-Rangliste wird geladen</span></div>
-   <div id="dashboard-rank-source" class="dashboard-source"></div>
    <a href="#turniere" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
-   <div id="dashboard-rankings" class="dashboard-ranking-grid" aria-label="Rangliste nach offizieller DBV-Altersklasse und Disziplin"></div>
-   <div id="dashboard-kpis" class="dashboard-kpi-grid" aria-label="Turniere und Auszeichnungen"></div>
-
    <div id="dashboard-next" class="dashboard-next"></div>
    <section id="match-stats" class="match-stats" aria-labelledby="match-stats-heading">
     <div class="section-heading match-stats-heading"><h2 id="match-stats-heading">Spielstatistik</h2><span id="match-stats-source" class="match-stats-source">Belegte Spiele</span></div>
@@ -52,12 +54,23 @@
       </label>
     </div>
     <div id="match-stats-values" class="match-stats-values" aria-live="polite"><p class="match-stats-empty">Belegte Spiele werden geladen …</p></div>
-    <p id="match-stats-note" class="match-stats-note" role="status" aria-live="polite">Es zählen ausschließlich vollständig belegte, abgeschlossene Begegnungen.</p>
+    <p id="match-stats-note" class="match-stats-note" role="status" aria-live="polite">Einzeln belegte, abgeschlossene Begegnungen.</p>
+    <button id="match-stats-retry" class="outline-button match-stats-retry" type="button" hidden>Spielstatistik erneut laden</button>
+    <details id="match-stats-provenance" class="match-stats-provenance">
+      <summary>Was zählt in die Statistik?</summary>
+      <p id="match-stats-provenance-copy">Nur einzeln belegte Spiele. Externe und offizielle Quellen werden nicht zusammengerechnet.</p>
+    </details>
     <div id="external-match-summary" class="external-match-summary" hidden></div>
     <details id="match-stats-details" class="match-stats-details">
       <summary>Einzelnachweise ansehen <span id="match-stats-detail-count"></span></summary>
       <div id="match-stats-list" class="match-stats-list"></div>
     </details>
+   </section>
+   <section class="home-ranking-section" aria-labelledby="home-rankings-title">
+    <div class="section-heading"><h2 id="home-rankings-title">Ranglisten</h2></div>
+    <div id="dashboard-rank-source" class="dashboard-source"></div>
+    <div id="dashboard-rankings" class="dashboard-ranking-grid" aria-label="Rangliste nach offizieller DBV-Altersklasse und Disziplin"></div>
+    <div id="dashboard-kpis" class="dashboard-kpi-grid" aria-label="Turniere und Auszeichnungen"></div>
    </section>
    <section class="dashboard-friends-section" aria-labelledby="dashboard-friends-heading">
     <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-add-friend" href="#spieler">+ Freund</a><a class="dashboard-friends-manage" href="#spieler">Verwalten ↗</a></div></div>
