@@ -734,3 +734,22 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  animation-duration:.01ms!important;animation-iteration-count:1!important;
  transition-duration:.01ms!important}
 }
+
+
+/* Versioned offline backup; local only and intentionally secondary in settings. */
+.backup-card{display:grid;gap:11px}
+.backup-card h3{margin:0;color:var(--ink,#0d3457)}
+.backup-card>p{margin:0;line-height:1.65}
+.backup-actions{display:flex;gap:10px;flex-wrap:wrap}
+.backup-actions button,.backup-import button{min-height:44px}
+.backup-import{display:grid;gap:9px;border-top:1px solid #cce2f0;padding-top:13px}
+.backup-import label{font-size:13px;font-weight:800;color:#244c6b}
+.backup-import input[type=file]{display:block;width:100%;max-width:100%;font-size:13px;
+ color:#244c6b;padding:10px;border:1px solid #bddbeb;background:#f5fbff;border-radius:10px}
+.backup-import input[type=file]::file-selector-button{min-height:38px;background:#e5f5ff;
+ border:1px solid #b1d6ed;border-radius:8px;color:#105d89;font-weight:800;padding:7px 10px;margin-right:10px}
+.backup-import button:disabled{opacity:.48;cursor:not-allowed}
+.backup-feedback{font-size:12px;line-height:1.55;min-height:0;color:#256445;
+ overflow-wrap:anywhere}
+.backup-feedback[data-error=true]{color:#a22d40}
+@media(max-width:390px){.backup-actions button,.backup-import button{width:100%}}
