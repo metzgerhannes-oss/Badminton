@@ -17,6 +17,26 @@ assert.equal(result.cards_seen,1);
 assert.equal(result.items.length,1);
 const m=result.items[0];
 assert.equal(m.competition_id,"4986");
+
+const crossfed=head+'<div class="card sp-tournament-card sp-tournament-card--crossfed">'+
+ '<div class="sp-tournament-header"><strong class="sp-tournament-name">'+
+ '<a href="/dbv/turnier.php?id=950">Deutsche Einzelmeisterschaften U15-U19 Hoyerswerda 2025</a></strong>'+
+ '<span class="sp-tournament-meta">12.–14. Dec 2025</span></div>'+
+ '<div class="sp-meeting"><span class="sp-t-event-badge">ME U17</span>'+
+ '<div class="sp-t-phase-header">KO</div>'+card+'</div></div>';
+const both=parsePublicHistory(tour+crossfed,player,"tournament");
+assert.equal(both.cards_seen,2,"Two public source matches on separate tournament cards");
+assert.equal(both.items.length,2,"Do not merge crossfed matches into prior BWBV card");
+const bwbv=both.items.find(x=>x.competition_id==="4986");
+const dbv=both.items.find(x=>x.competition_id==="950");
+assert.equal(bwbv.match_year,2026);
+assert.equal(dbv.match_year,2025);
+assert.equal(dbv.competition,"Deutsche Einzelmeisterschaften U15-U19 Hoyerswerda 2025");
+assert.equal(dbv.source_url,"https://badhub.de/dbv/turnier.php?id=950");
+assert.match(dbv.source_key,/^tournament:dbv-950:/);
+assert.match(bwbv.source_key,/^tournament:4986:/);
+assert.notEqual(dbv.source_key,bwbv.source_key);
+
 assert.equal(m.discipline,"Einzel");
 assert.equal(m.event,"ME U17");
 assert.equal(m.round_label,"Finale");
@@ -56,6 +76,7 @@ const welcome=await readFile("welcome.js","utf8");
 const sw=await readFile("sw.js","utf8");
 assert.match(sql,/public\.player_external_match_facts/);
 assert.match(sql,/enable row level security/g);
+assert.match(sql,/dbv\/turnier/,"The source URL constraint must allow authenticated Badhub crossfed page links");
 assert.match(sql,/grant select on public\.player_external_match_facts to anon,authenticated/);
 assert.match(sql,/grant execute on function public\.claim_external_match_import\(text\) to service_role/);
 assert.match(sql,/private\.external_match_attempts/);

@@ -1,3 +1,7 @@
+## v47 – Fehlerhafte Turnier-Zuordnung beim Badhub-Crossfeed korrigieren
+
+Crossfed-DBV-Turnierkarten dürfen nicht länger unter dem vorherigen BWBV-Turnier mit falschem Jahr/Turnierlink gespeichert werden. Der Parser trennt Kartentypen eindeutig, verifiziert die Quell-URL und trennt IDs nach Namensraum. Alte Falschzuordnungen müssen separat geprüft und mit Auditspur bereinigt werden. `docs/SOURCE_CARD_BOUNDARY_FIX_V47.md`.
+
 ## v46 – Vereinsbericht als nicht zählbaren Ergebnisnachweis in der Turnierchronik
 
 Charlotte Metzgers Turnierergebnis vom 26.09.2026 zeigt die vereinsseitig bestätigte Information über mindestens ein gewonnenes Spiel – ausdrücklich ohne Gegner-/Satzbeleg und daher **nicht** in der Einzelmatch-Statistik. Zusätzliche Quellen werden nach Evidenzgrad unterschieden (siehe `docs/EVIDENCE_LEVELS_V46.md`).
