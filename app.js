@@ -44,10 +44,7 @@ function currentProfile(){
 }
 function setActiveProfile(id){
  // Switching to one's own player is a local choice, not an online account login.
- if(!state.players.some(p=>p.id===id))return false;
- state.activeProfileId=id;
- state.viewingFriendId=null;
- state.chosen=id;
+ if(!SchmetterlingeStorage.selectOwn(state,id))return false;
  save();
  return true;
 }
@@ -56,8 +53,7 @@ function setActiveProfile(id){
 function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 function navigateHome(){
- state.viewingFriendId=null;
- state.chosen=state.activeProfileId;
+ SchmetterlingeStorage.showOwn(state);
  routeTo("start");
 }
 function renderFocusHeader(){
@@ -163,8 +159,7 @@ function renderFriends(){
  }));
  root.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
  root.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>{
-  state.friends=state.friends.filter(p=>p.id!==b.dataset.unfollow);
-  if(state.viewingFriendId===b.dataset.unfollow){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
+  if(!SchmetterlingeStorage.unfollow(state,b.dataset.unfollow))return;
   save();render();toast("Freund entfernt");
  }));
 }
@@ -180,8 +175,7 @@ window.badmintonLibraryToggleFollow=player=>{
  if(state.players.some(p=>p.id===id))return {ok:false,message:"Dieser Spieler ist bereits dein eigenes Profil."};
  const exists=state.friends.some(p=>p.id===id);
  if(exists){
-  state.friends=state.friends.filter(p=>p.id!==id);
-  if(state.viewingFriendId===id){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
+  SchmetterlingeStorage.unfollow(state,id);
   save();render();window.dispatchEvent(new Event("badminton:library-following"));
   return {ok:true,message:"Spieler entfolgt."};
  }
@@ -199,8 +193,7 @@ window.badmintonLibraryToggleFollow=player=>{
 window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
  if(state.players.some(p=>p.id===id)){
   setActiveProfile(id);
- }else if(state.friends.some(p=>p.id===id)){
-  state.viewingFriendId=id;state.chosen=id;
+ }else if(SchmetterlingeStorage.selectFriend(state,id)){
   save();
  }else return false;
  const destination=stayOnPage?"turniere":"start";
@@ -304,7 +297,7 @@ function setup(){
    if(state.friends.some(p=>p.id===id)){toast("Diese Spieler-ID ist bereits ein Freund");return}
    state.players.push(record);
    if(activatingNewProfile||!state.activeProfileId)state.activeProfileId=id;
-   if(activatingNewProfile){state.viewingFriendId=null;state.chosen=id;location.hash="#start";}
+   if(activatingNewProfile){SchmetterlingeStorage.showOwn(state);location.hash="#start";}
    activatingNewProfile=false;
   }
   editingPlayerId=null;
@@ -380,8 +373,7 @@ function setup(){
   const chooser=el("first-run-choices");
   chooser.innerHTML=state.players.length?state.players.map(p=>'<button class="first-run-choice" type="button" data-initial-player="'+esc(p.id)+'"><span>'+esc(p.name.charAt(0).toUpperCase())+'</span><strong>'+esc(p.name)+'</strong><span aria-hidden="true">›</span></button>').join(""):'<p class="settings-hint">Auf diesem Gerät ist noch kein eigenes Profil eingerichtet.</p>';
   chooser.querySelectorAll("[data-initial-player]").forEach(b=>b.addEventListener("click",()=>{
-   state.activeProfileId=b.dataset.initialPlayer;
-   state.viewingFriendId=null;state.chosen=state.activeProfileId;save();
+   if(!setActiveProfile(b.dataset.initialPlayer))return;
    welcome.close();location.hash="#start";render();
   }));
   el("first-run-new").addEventListener("click",()=>{
