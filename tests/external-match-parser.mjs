@@ -95,6 +95,6 @@ assert.match(js,/player_external_match_facts/);
 assert.match(js,/match_date/);
 assert.match(js,/Quellbeleg/);
 assert.match(bridge,/history-match-import/);
-assert.match(welcome,/history-match-import/);
+assert.doesNotMatch(welcome,/history-match-import/);
 assert.match(sw,/schmetterlinge-shell-v49/);
 console.log("Sourced external match import: parser identifies winner/sides/scores, refuses mismatched profile, idempotent DB and queue contracts verified.");
