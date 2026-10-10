@@ -180,8 +180,7 @@ test("Sourced friend tournament placements remain separate from individual match
  await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
  await expect(page.locator("#history-timeline")).toContainText("3.");
  await expect(page.locator("#history-timeline")).toContainText("Raphael Argast");
- await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
-  "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
+ await expect(page.locator('#history-timeline a.history-source-link[href="https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"]')).toHaveCount(1);
  await page.evaluate(profiles=>window.renderHistory("05-070006",profiles,{mode:"friend"}),profiles);
  await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
  await expect(page.locator("#history-timeline")).toContainText("19.");
