@@ -33,6 +33,21 @@ for(const r of history.results){
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+const verifiedNew=[{"id":"ss-2026-01-18-c-me-u19","playerId":"05-061350","place":1,"ageGroup":"U19","discipline":"Einzel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"},{"id":"ss-2026-01-18-c-md-u19","playerId":"05-061350","place":1,"ageGroup":"U19","discipline":"Doppel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"},{"id":"vo-2026-01-17-c-je-u15","playerId":"05-070006","place":19,"ageGroup":"U15","discipline":"Einzel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"},{"id":"ss-2026-01-24-b-me-u17","playerId":"05-061350","place":1,"ageGroup":"U17","discipline":"Einzel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026"},{"id":"ss-2026-01-24-b-md-u17","playerId":"05-061350","place":2,"ageGroup":"U17","discipline":"Doppel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026"},{"id":"ss-2026-01-24-b-mx-u17","playerId":"05-061350","place":5,"ageGroup":"U17","discipline":"Mixed","source":"https://spvgg.org/abteilungen/badminton/aktuelles/1-b-rangliste-suedost-u13-u19-am-24-25-januar-2026"},{"id":"vo-2026-04-24-c-je-u15","playerId":"05-070006","place":9,"ageGroup":"U15","discipline":"Einzel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"},{"id":"vo-2026-04-24-c-jd-u15","playerId":"05-070006","place":5,"ageGroup":"U15","discipline":"Doppel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026"},{"id":"vo-2025-05-24-d-je-u15","playerId":"05-070006","place":6,"ageGroup":"U15","discipline":"Einzel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025"},{"id":"vo-2025-05-24-d-jd-u15","playerId":"05-070006","place":3,"ageGroup":"U15","discipline":"Doppel","source":"https://spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025"}];
+for(const item of verifiedNew){
+ const got=history.results.find(x=>x.id===item.id);
+ assert.ok(got,"Missing backed historical placing "+item.id);
+ assert.equal(got.playerId,item.playerId);
+ assert.equal(got.place,item.place);
+ assert.equal(got.ageGroup,item.ageGroup);
+ assert.equal(got.discipline,item.discipline);
+ assert.equal(got.source.url,item.source);
+ assert.equal(got.verified,true);
+ assert.ok(!("games" in got)&&!("score" in got)&&!("won" in got),
+  "A newspaper/club placing is not a scored match");
+}
+assert.equal(verifiedNew.length,10);
+
 for(const [ident,person,date,discipline,age,place] of [
  ["ss-2026-03-01-c-rlt-mx-u19","Sarah Storz","2026-03-01","Mixed","U19",3],
  ["vo-2026-02-28-c-rlt-me-u15","Vinzent Pius Ott","2026-02-28","Einzel","U15",19]

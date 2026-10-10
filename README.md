@@ -1,3 +1,7 @@
+## Zehn weitere belegte Platzierungen für gefolgte Spieler (10.10.2026)
+
+B-, C- und D-Ranglisten aus vier veröffentlichten SpVgg-Mössingen-Vereinsberichten belegen zehn weitere Turnierplatzierungen von Sarah Storz und Vinzent Pius Ott aus 2025/2026. Drei davon waren bereits direkt in Supabase erfasst; die anderen sieben wurden sicher gegen Dubletten ergänzt. Die Turnierchronik und geprüften Spielerberichte werden synchronisiert. Familiäre Pokale bleiben separat, Freunde erhalten nur ihre eigenen belegten Ergebnisse. Keine neue Badhub-Matchzahl, kein künstlicher Karriereabschluss und keine neue API-/Service-Worker-Version.
+
 ## Nachrecherchierte Platzierungen für gefolgte Spieler (10.10.2026)
 
 Der geprüfte SpVgg-Mössingen-Ergebnisbericht vom 02.03.2026 zur C-Rangliste Friedrichshafen belegt **Sarah Storz: 3. Mixed U19 mit Raphael Argast** und **Vinzent Pius Ott: 19. Einzel U15**. Die bislang fehlenden Ergebnisse wurden idempotent in Supabase-Platzierungen und mit Originalquelle in `data/history.json` eingetragen; auch die namentlichen Berichtserwähnungen wurden ergänzt. Damit sind sie als Turnierchronik auch bei gefolgten Profilen sichtbar. Es wurden keine Einzelmatch-Scores, Siege oder neuen Gegner konstruiert. Keine Änderung von Match-Statistik, API-Rechten oder PWA-Shell.
