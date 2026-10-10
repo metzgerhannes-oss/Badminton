@@ -2,6 +2,55 @@
 import {selectPlayers,clubGroups,normalizeText,sortClubs} from "./scripts/library-utils.mjs";
 
 const ROOT="./data/player-library/";
+const API="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
+const APIKEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
+let dbMode=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
+const safePattern=x=>String(x||"").trim().replace(/[*,().%:"\\]/g," ").slice(0,85);
+async function dbGet(path){
+ const response=await fetch(API+path,{cache:"no-store",headers:{"apikey":APIKEY,"accept":"application/json","Prefer":"count=exact"}});
+ if(!response.ok)throw Error("Supabase "+response.status);
+ return {rows:await response.json(),range:response.headers.get("content-range")||""};
+}
+function dbPath(offset){
+ const qs=new URLSearchParams({select:"dbv_id,name,birth_year,age_class,club,association,last_ranking_week",
+  order:"club.asc.nullslast,name.asc,dbv_id.asc",limit:"40",offset:String(offset)});
+ const age=$("library-age")?.value||"all",association=$("library-association")?.value||"all";
+ const term=safePattern($("library-search")?.value),club=safePattern($("library-club")?.value);
+ if(age!=="all")qs.set("age_class","eq."+age);
+ if(association!=="all")qs.set("association","eq."+association);
+ if(club)qs.set("club","ilike.*"+club+"*");
+ if(term)qs.set("or","(name.ilike.*"+term+"*,dbv_id.ilike.*"+term+"*)");
+ return "players?"+qs;
+}
+async function dbPage(offset){
+ const {rows,range}=await dbGet(dbPath(offset));
+ if(!Array.isArray(rows))throw Error("Invalid database response");
+ const m=range.match(/\/(\d+)$/);
+ return {people:rows.filter(p=>/^\d{2}-\d{6}$/.test(p.dbv_id)&&p.name&&p.age_class).map(p=>({
+   id:p.dbv_id,name:p.name,birthYear:p.birth_year,ageClass:p.age_class,club:p.club||"",
+   association:p.association||"",lastSeen:p.last_ranking_week||""
+ })),total:m?Number(m[1]):offset+rows.length};
+}
+async function dbAssociations(){
+ const {rows}=await dbGet("clubs?select=association&dbv_club_id=not.is.null&limit=1000");
+ const box=$("library-association"),old=box.value;
+ const values=[...new Set(rows.map(x=>x.association).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
+ box.innerHTML='<option value="all">Alle Landesverbände</option>'+values.map(v=>
+  '<option value="'+escape(v)+'">'+escape(v)+'</option>').join("");
+ box.value=values.includes(old)?old:"all";
+ associationsLoaded=true;
+}
+async function dbClubs(){
+ const term=safePattern($("library-club")?.value),list=$("library-club-suggestions");
+ if(term.length<2){list.innerHTML="";return}
+ const ticket=++suggestionTicket;
+ try{
+  const qs=new URLSearchParams({select:"name",dbv_club_id:"not.is.null",name:"ilike.*"+term+"*",order:"name.asc",limit:"60"});
+  const {rows}=await dbGet("clubs?"+qs);
+  if(ticket===suggestionTicket)list.innerHTML=rows.map(x=>'<option value="'+escape(x.name)+'"></option>').join("");
+ }catch{if(ticket===suggestionTicket)list.innerHTML=""}
+}
+
 const $=id=>document.getElementById(id);
 const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ageNames=["U11","U13","U15","U17","U19","U22"];
@@ -15,7 +64,7 @@ async function fetchJson(path){
 function error(msg){const box=$("library-results");if(box)box.innerHTML='<div class="library-message">'+escape(msg)+'</div>'}
 function ageChoice(){return $("library-age")?.value||"all"}
 function filtered(){
- return selectPlayers(entries,{
+ return dbMode?entries:selectPlayers(entries,{
   query:$("library-search")?.value||"",
   club:$("library-club")?.value||"",
   association:$("library-association")?.value||"all"
@@ -23,6 +72,7 @@ function filtered(){
 }
 function updateClubSuggestions(){
  const list=$("library-club-suggestions");if(!list)return;
+ if(dbMode){dbClubs();return;}
  const query=normalizeText($("library-club")?.value||"");
  const clubs=sortClubs(entries.map(p=>p.club).filter(Boolean));
  const relevant=clubs.filter(c=>!query||normalizeText(c).includes(query)).slice(0,90);
@@ -43,8 +93,8 @@ function render(){
  if(!loaded)return;
  const own=new Set(localSelection().own),following=new Set(localSelection().following);
  const people=filtered(),count=$("library-count"),area=$("library-results");
- const shown=people.slice(0,visible);
- if(count)count.textContent=people.length.toLocaleString("de-DE")+" Spieler · "+new Set(people.map(x=>x.club).filter(Boolean)).size.toLocaleString("de-DE")+" Vereine";
+ const shown=dbMode?people:people.slice(0,visible);
+ if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+" Spieler · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
   error("Keine passenden bestätigten DBV-Spieler gefunden. Andere Filter wählen oder bei einem neuen Profil die DBV-ID ergänzen.");
@@ -77,7 +127,7 @@ function render(){
  area.querySelectorAll("[data-library-open]").forEach(button=>button.addEventListener("click",()=>{
   window.badmintonLibraryView?.(button.dataset.libraryOpen);
  }));
- $("library-more").hidden=people.length<=visible;
+ $("library-more").hidden=dbMode?people.length>=dbTotal:people.length<=visible;
 }
 async function fetchAge(age){
  if(memory.has(age))return memory.get(age);
@@ -89,7 +139,7 @@ async function fetchAge(age){
  memory.set(age,records);
  return records;
 }
-async function load(){
+async function loadBackup(){
  const ticket=++pending;
  $("library-more").hidden=true;
  loaded=false;
@@ -117,14 +167,45 @@ async function load(){
   console.warn("DBV directory unavailable:",e?.message);
  }
 }
+async function load(){
+ const ticket=++pending;
+ loaded=false;$("library-more").hidden=true;
+ error("Die Spielerbibliothek wird aus Supabase geladen …");
+ try{
+  const {people,total}=await dbPage(0);
+  if(ticket!==pending)return;
+  entries=people;dbTotal=total;dbMode=true;loaded=true;
+  $("library-source").textContent="Supabase · offizieller DBV-Ranglistenbestand · "+total.toLocaleString("de-DE")+" Spieler";
+  if(!associationsLoaded)dbAssociations().catch(e=>console.warn("Vereinsfilter:",e?.message));
+  render();
+ }catch(e){
+  if(ticket!==pending)return;
+  console.warn("Supabase nicht erreichbar – GitHub-Ausfallsicherung:",e?.message);
+  dbMode=false;await loadBackup();
+  if(loaded)$("library-source").textContent="GitHub-Ausfallsicherung · "+$("library-source").textContent;
+ }
+}
+async function nextPage(){
+ if(!dbMode){visible+=40;render();return}
+ const ticket=++pending,offset=entries.length;
+ try{
+  const {people,total}=await dbPage(offset);
+  if(ticket!==pending)return;
+  entries.push(...people);dbTotal=total;render();
+ }catch{const box=$("library-message");if(box)box.textContent="Weitere Spieler momentan nicht erreichbar."}
+}
+function delayedFilter(){
+ clearTimeout(filterTimer);
+ filterTimer=setTimeout(()=>{visible=40;if(dbMode)load();else render()},280);
+}
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("library-results"))return;
  $("library-age").addEventListener("change",load);
  for(const id of ["library-search","library-club"]){
-  $(id).addEventListener("input",()=>{visible=40;if(id==="library-club")updateClubSuggestions();render();});
+  $(id).addEventListener("input",()=>{if(id==="library-club")updateClubSuggestions();delayedFilter();});
  }
- $("library-association").addEventListener("change",()=>{visible=40;render();});
- $("library-more").addEventListener("click",()=>{visible+=40;render();});
+ $("library-association").addEventListener("change",()=>{visible=40;if(dbMode)load();else render();});
+ $("library-more").addEventListener("click",nextPage);
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
  window.addEventListener("hashchange",()=>{if(location.hash==="#spieler"&&!loaded)load();});
  window.addEventListener("badminton:library-following",()=>render());

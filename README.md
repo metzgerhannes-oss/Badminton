@@ -1,3 +1,9 @@
+## Supabase-Datenbanksynchronisierung (10.10.2026)
+
+Die zentrale Spielerbibliothek ist jetzt in **Supabase** synchronisiert: 9.246 eindeutige öffentliche DBV-Spieler, 916 Vereine, offizielle Altersklassen und Verknüpfungen. Die 3 offiziell ohne Verein gemeldeten Spieler bleiben ohne Vereinszuordnung. PostgreSQL-Cron ruft donnerstags (17:35 UTC) und freitags (07:25 UTC) den privaten, quellenvalidierenden Datenimport auf. Er lädt ausschließlich die öffentlichen, vom wöchentlichen GitHub-Ranglistenprozess erzeugten JSON-Dateien; **kein GitHub-Secret oder Browser-Schreibzugriff** nötig.
+
+Die Spielerbibliothek fragt Supabase direkt mit serverseitiger **Vereins-, Altersklassen-, Landesverbands- und Namenssuche** in 40er-Seiten ab. Wenn Supabase nicht erreichbar ist, werden die bisherigen öffentlichen GitHub-Dateien als Fallback verwendet. Die App-Favoriten bleiben bis zu einer freiwilligen Anmeldung lokal. Details: [Architektur, Synchronisierung und Kontrollen](docs/SUPABASE_PLAYER_SYNC.md).
+
 ## Gemeinsame Spielerbibliothek (10.10.2026)
 
 Neuer Tab **Spieler**: zentrale, von allen Nutzern gemeinsam lesbare Bibliothek bestätigter öffentlicher DBV-Ranglistenspieler. Filter nach **Verein**, offizieller **Altersklasse U11–U22**, Landesverband und Name/DBV-Spieler-ID, alphabetische Vereinsgruppierung und persönliche **Folgen/Entfolgen**-Funktion. Die vollständige Bibliothek wird über den bestehenden wöchentlichen DBV-Excel-Import aus dem öffentlichen Originalexport gewonnen, nach DBV-ID dedupliziert und kostenfrei als GitHub-Pages-JSON für alle bereitgestellt. Die beiden bisherigen Profile sind nur der Anfangsbestand; weitere belegte Einträge kommen nach dem ersten vollständigen Rankingschritt hinzu. **Lokale Nutzerprofile und Favoriten werden nicht zentral veröffentlicht.** [Konzept, Quellen und Implementierungsdetails](docs/SPIELERBIBLIOTHEK.md).
