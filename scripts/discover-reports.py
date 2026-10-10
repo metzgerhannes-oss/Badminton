@@ -25,6 +25,10 @@ NAMES = {
 CLUB = re.compile(r'\b(?:spvgg\.?\s+m[öo]ssingen|sportvereinigung\s+m[öo]ssingen)\b', re.I)
 SKIP_TAGS = {'script','style','noscript','svg','form','nav','header','footer','aside'}
 VOID_TAGS = {'meta','link','img','br','hr','input','source','area','base','embed','wbr'}
+# Strict post-content containers. Never search broad <main> or <article> wrappers:
+# WordPress related-post cards can contain names from unrelated stories.
+CONTENT_CLASSES = {'entry-content','post-content','elementor-widget-theme-post-content',
+                   'elementor-widget-post-content','td-post-content','news-content'}
 
 def canonical(raw):
     try:
@@ -57,6 +61,8 @@ class Page(HTMLParser):
         self.body=[]
         self.article=[]
         self.main=[]
+        self.editorial=[]
+        self.editorial_at=0
         self.depth=0
         self.skip_at=0
         self.article_at=0
@@ -73,6 +79,9 @@ class Page(HTMLParser):
         if tag in SKIP_TAGS:
             self.skip_at=self.depth
             return
+        classes=set(attr.get('class','').split())
+        if tag in ('div','section') and (classes & CONTENT_CLASSES) and not self.editorial_at:
+            self.editorial_at=self.depth
         if tag=='article' and not self.article_at:self.article_at=self.depth
         if tag=='main' and not self.main_at:self.main_at=self.depth
         if tag=='h1' and not self.h1_at:self.h1_at=self.depth
@@ -87,6 +96,7 @@ class Page(HTMLParser):
         if tag not in VOID_TAGS:self.handle_endtag(tag)
     def handle_endtag(self,tag):
         if self.skip_at and self.depth==self.skip_at:self.skip_at=0
+        if self.editorial_at and self.depth==self.editorial_at:self.editorial_at=0
         if tag=='article' and self.depth==self.article_at:self.article_at=0
         if tag=='main' and self.depth==self.main_at:self.main_at=0
         if tag=='h1' and self.depth==self.h1_at:self.h1_at=0
@@ -94,6 +104,7 @@ class Page(HTMLParser):
         self.depth=max(self.depth-1,0)
     def handle_data(self,s):
         if self.skip_at or not s.strip():return
+        if self.editorial_at:self.editorial.append(s)
         if self.article_at:self.article.append(s)
         if self.main_at:self.main.append(s)
         if self.h1_at:self.h1.append(s)
@@ -109,8 +120,9 @@ class Page(HTMLParser):
             except ValueError:pass
         return None
     def article_text(self):
-        # Refuse site-wide sidebars and navigation; no full article text is persisted.
-        return ' '.join(' '.join(self.article or self.main).split())
+        # Fail closed without an explicit article-body container.
+        # In particular, previews below the story in main/article never count.
+        return ' '.join(' '.join(self.editorial).split())
 
 def parse(html):
     p=Page()
