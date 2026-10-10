@@ -96,6 +96,12 @@ export function radarSituation(row,id,now=Date.now()){
  const {fresh,ageMs}=freshness(row,now);
  const checkedAt=row.checked_at;
  if(!row.payload.tournament){
+  // A report from yesterday cannot support "currently no match".
+  if(ageMs>30*60000){
+   return {kind:"pending",title:"Turnierstatus wird geprüft",
+    detail:"Bei der letzten Quellenprüfung war kein Turnier gemeldet. Ein aktuellerer Stand wird automatisch abgefragt.",
+    checkedAt,ageMs,showScore:false};
+  }
   return {kind:"idle",title:"Derzeit kein Turniertag gemeldet",
    detail:fresh
     ?"Die öffentliche Quelle meldet für diesen Spieler derzeit keine laufenden Turnierspiele."
