@@ -111,7 +111,7 @@ function focusCurrentView(){
   heading.setAttribute("tabindex","-1");
   heading.focus({preventScroll:true});
  }
- window.scrollTo({top:0,behavior:"instant"});
+ window.scrollTo({top:0,behavior:"auto"});
 }
 function navigateHome(){
  state.viewingFriendId=null;
