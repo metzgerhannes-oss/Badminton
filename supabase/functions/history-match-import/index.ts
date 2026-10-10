@@ -1,4 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
+import {assessSourceAvailability,importStatusForBatch} from "./source-availability.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const PUBLIC="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
@@ -66,30 +67,46 @@ Deno.serve(async req=>{
    throw Error("Verified profile unavailable");
   const ctl=new AbortController();
   const time=setTimeout(()=>ctl.abort(),35000);
-  let tournament:string,league:string;
+  let outcomes:PromiseSettledResult<string>[];
   try{
-   [tournament,league]=await Promise.all([
+   outcomes=await Promise.allSettled([
     source(id,"turnier",ctl.signal),source(id,"liga",ctl.signal)
    ]);
   }finally{clearTimeout(time)}
-  const t=parsePublicHistory(tournament,profiles[0],"tournament");
-  const l=parsePublicHistory(league,profiles[0],"league");
+  // A temporarily missing category must not discard valid results in the other.
+  // Do not claim complete if only tournament OR league was reachable.
+  const sources=assessSourceAvailability(outcomes);
+  if(sources.available.length===0){
+   await update(id,{status:"awaiting_source",lease_until:null,
+    last_finished_at:new Date().toISOString(),
+    detail:"Badhub-Turnier- und Ligaquellen derzeit nicht erreichbar; erneute Prüfung vorgesehen"});
+   return respond(200,{queued:true,stored:0,eligible:0,
+    reason:"source_temporarily_unavailable"},origin);
+  }
+  const parsed=sources.available.map(({category,html})=>
+   parsePublicHistory(html,profiles[0],category));
   const matches=new Map<string,any>();
-  for(const match of [...t.items,...l.items])matches.set(match.source_key,match);
+  for(const result of parsed)for(const match of result.items)
+   matches.set(match.source_key,match);
   const all=[...matches.values()].sort((a,b)=>
    b.match_year-a.match_year
    ||String(b.match_date||"").localeCompare(String(a.match_date||""))
    ||a.source_key.localeCompare(b.source_key));
-  const cardCount=t.cards_seen+l.cards_seen;
+  const cardCount=parsed.reduce((n,result)=>n+result.cards_seen,0);
   if(cardCount===0){
    await update(id,{status:"awaiting_source",lease_until:null,
     last_finished_at:new Date().toISOString(),
-    detail:"Für dieses Spielerprofil sind derzeit keine einzelnen öffentlichen Matchkarten verfügbar"});
-   return respond(200,{queued:true,stored:0,eligible:0,reason:"no_source_matches"},origin);
+    detail:sources.missing.length
+     ?"Nur ein Teil der Badhub-Quellen war erreichbar; bisher keine belegten Einzelmatches."
+     :"In den erreichbaren Badhub-Quellen sind derzeit keine Einzelmatchkarten veröffentlicht."});
+   return respond(200,{queued:true,stored:0,eligible:0,
+    reason:sources.missing.length?"partial_source_no_matches":"no_source_matches"},origin);
   }
   if(all.length<Math.floor(cardCount*0.55))
    throw Error("Match parser rejected unexpected amount of source cards");
-  const start=Math.min(Number(claim.cursor)||0,all.length);
+  // A partial source can reorder/shorten the feed: never resume at an old
+  // offset and silently skip verified matches from the accessible category.
+  const start=sources.missing.length?0:Math.min(Number(claim.cursor)||0,all.length);
   const selected=all.slice(start,start+120);
   for(let i=0;i<selected.length;i+=25){
    await api("player_external_match_facts?on_conflict=dbv_id,source_key",{
@@ -100,18 +117,21 @@ Deno.serve(async req=>{
   const progress=start+selected.length;
   const finished=progress>=all.length;
   const excluded=Math.max(0,cardCount-all.length);
-  const detail=finished
-   ?(String(all.length)+" einzelne Badhub-Matches übernommen; "+String(excluded)+" unklare Karten ausgeschlossen")
-   :(String(progress)+" von "+String(all.length)+" geprüften Quellenspielen übernommen");
+  const incomplete=sources.missing.length
+   ?" · "+sources.missing.join(" und ")+"-Quelle derzeit nicht abrufbar; Gesamtbestand unvollständig":"";
+  const detail=(finished
+   ?String(all.length)+" einzelne Badhub-Matches aus erreichbaren Quellen verarbeitet; "+String(excluded)+" unklare Karten ausgeschlossen"
+   :String(progress)+" von "+String(all.length)+" geprüften Quellenspielen verarbeitet")+incomplete;
   await update(id,{
-   status:finished&&excluded===0?"complete":"partial",
+   status:importStatusForBatch(finished,excluded,sources.missing),
    cursor_offset:progress,source_count:cardCount,
    verified_count:all.length,rejected_count:excluded,
    lease_until:null,last_finished_at:new Date().toISOString(),detail
   });
   return respond(200,{
    queued:true,stored:selected.length,progress,eligible:all.length,
-   source_cards:cardCount,excluded,completed:finished,
+   source_cards:cardCount,excluded,completed:finished&&!sources.missing.length,
+   unavailable_categories:sources.missing,
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
  }catch(error){
