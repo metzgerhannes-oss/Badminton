@@ -1,15 +1,12 @@
 /** Shared DBV player directory, generated weekly from the official published Excel. */
 import {selectPlayers,clubGroups,normalizeText,sortClubs} from "./scripts/library-utils.mjs";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 
 const ROOT="./data/player-library/";
-const API="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
-const APIKEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
 let dbMode=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
 const safePattern=x=>String(x||"").trim().replace(/[*,().%:"\\]/g," ").slice(0,85);
 async function dbGet(path){
- const response=await fetch(API+path,{cache:"no-store",headers:{"apikey":APIKEY,"accept":"application/json","Prefer":"count=exact"}});
- if(!response.ok)throw Error("Supabase "+response.status);
- return {rows:await response.json(),range:response.headers.get("content-range")||""};
+ return readPublicRows(path);
 }
 function dbPath(offset){
  const qs=new URLSearchParams({select:"dbv_id,name,birth_year,age_class,club,association,last_ranking_week",
