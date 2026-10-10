@@ -50,7 +50,7 @@ assert.match(style,/\.library-player-action button,\.library-player-action \.lib
 assert.match(style,/min-height:44px/);
 assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(style,/:focus-visible/);
-assert.match(sw,/schmetterlinge-shell-v53/);
+assert.match(sw,/schmetterlinge-shell-v55/);
 assert.match(sw,/ui-feedback\.js/);
 assert.match(sw,/router\.js/);
 assert.match(app,/SchmetterlingeRouter\.renderPage\(state\)/);
