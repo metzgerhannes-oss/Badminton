@@ -267,3 +267,43 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  .bottom-nav .nav-icon{height:20px;width:20px}
 }
 @media(prefers-reduced-motion:reduce){.bottom-nav,.ranking-tile,button,a{transition:none!important}}
+
+
+/* Freunde finden: verified public DBV player name search in Settings. */
+.dashboard-friends-links{display:flex;align-items:center;gap:13px;flex-wrap:wrap;justify-content:flex-end}
+.dashboard-friends-links a{font-size:11px;font-weight:800;color:var(--link);min-height:39px;display:inline-flex;align-items:center}
+.friend-search-block{background:linear-gradient(145deg,#fff,#edf8ff);
+  border:1px solid #c9e3f2;border-radius:18px;padding:14px 12px;margin:12px 0 18px;
+  box-shadow:0 6px 21px #5488ab15;}
+.friend-search-label{display:block;color:#123c60;font-size:13px;font-weight:850;margin-bottom:9px}
+.friend-search-input{width:100%;min-height:48px;border-radius:13px;border:1px solid #8cbedc;
+  background:#f8fcff;color:#0e365e;font:inherit;font-size:14px;padding:12px 13px}
+.friend-search-input::placeholder{color:#6388a2;opacity:1}
+.friend-search-input:focus-visible{outline:3px solid #138bd1;outline-offset:2px}
+.friend-search-status{color:#4d7190;font-size:11px;line-height:1.55;margin:10px 0 8px;min-height:16px}
+.friend-search-results{max-height:405px;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin;
+  display:grid;gap:7px}
+.friend-search-hit{display:flex;align-items:center;gap:10px;min-width:0;
+  padding:10px 9px;background:#f8fcff;border:1px solid #d1e5f2;border-radius:13px}
+.friend-search-avatar{display:grid;place-items:center;flex:none;width:36px;height:36px;border-radius:50%;
+  background:#bde5fa;color:#0b4777;font-weight:900}
+.friend-search-person{display:grid;gap:4px;min-width:0;flex:1;color:#17436b}
+.friend-search-person strong{font-size:12px;line-height:1.3;overflow-wrap:anywhere}
+.friend-search-person small{color:#51748f;font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+.friend-search-hit button{flex:none;min-width:77px;min-height:44px;font-size:11px;font-weight:850;
+  background:#0d84c8;color:white;border:1px solid #0c73b1;border-radius:11px;padding:8px}
+.friend-search-hit button:disabled{background:#e2f2fb;border:1px solid #c4dfef;color:#587b97;opacity:1;cursor:default}
+.friend-search-manual{display:flex;align-items:center;justify-content:space-between;gap:7px;
+  margin-top:12px;padding-top:10px;border-top:1px solid #d1e6f2}
+.friend-search-manual span{color:#5a7690;font-size:11px}
+.friend-search-manual button{font-size:11px;line-height:1.3;text-align:right;min-height:43px;padding:6px 0}
+.friend-saved-title{font-size:14px;color:#12385e;font-weight:850;margin:18px 0 10px}
+.friends-empty{color:#4f738d;background:#f3fbff;border:1px dashed #b4d5e9}
+@media(max-width:410px){
+ .dashboard-friends-links{gap:9px}
+ .friend-search-hit{gap:7px;padding:9px 7px}
+ .friend-search-avatar{width:32px;height:32px}
+ .friend-search-hit button{min-width:73px;padding:7px 5px;font-size:10px}
+ .friend-search-person strong{font-size:11px}
+ .friend-search-person small{font-size:9.5px}
+}

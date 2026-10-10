@@ -1,3 +1,7 @@
+## Freunde über Textsuche hinzufügen (10.10.2026)
+
+Unter **Einstellungen → Freunde** gibt es eine neue Suche nach Name oder DBV-Spieler-ID. Die Suchergebnisse stammen aus dem verifizierten, öffentlichen Supabase-DBV-Spielerregister (9.246 importierte Spieler); zur eindeutigen Zuordnung werden Verein, Jahrgang, Altersklasse und Spieler-ID angezeigt. Mit **„+ Folgen“** wird ein Spieler in der bestehenden gerätelokalen Freundesliste gespeichert – kein manuelles Abtippen der ID mehr nötig. Bereits gefolgte Spieler und eigene Profile werden erkannt, Doppeleinträge verhindert. Die Suche beginnt nach zwei Zeichen, liefert bis zu 30 Treffer (Name ggf. präzisieren) und nutzt bei Datenbankausfall den geprüften GitHub-Katalog. Das vorhandene manuelle Formular bleibt unter **„Manuell mit DBV-ID hinzufügen“** erhalten. **Home → Freunde → + Freund** springt direkt zur Suche. Es werden keine Einladungen an andere Personen verschickt und keine Freundeslisten zentral veröffentlicht.
+
 ## Offener Backlog: Spielstatistik und helles App-Design (10.10.2026)
 
 - **Siege / Niederlagen / Gesamtspiele / Siegquote:** neuer quellengestützter Bereich auf der Startseite mit Disziplin- und Jahresfiltern, Nachweisen pro Match und explizitem Hinweis bei fehlenden Matches. Gezählt werden nur eindeutig abgeschlossene Matches, niemals Platzierungen oder Ranglistenpunkte. Die Supabase-Matchtabellen enthalten noch keine importierten Einzelmatches; die Ansicht erfindet deshalb keine Karriereergebnisse.
