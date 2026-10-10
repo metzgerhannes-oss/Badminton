@@ -164,11 +164,11 @@ test("Backup in Einstellungen creates a local JSON and restores only after confi
  });
  await expect(page.locator("#backup-feedback")).toContainText("1 eigene Spieler");
  await expect(page.locator("#backup-restore")).toBeEnabled();
- const dialog=page.waitForEvent("dialog");
+ page.once("dialog",async confirmation=>{
+  expect(confirmation.message()).toContain("werden ersetzt");
+  await confirmation.accept();
+ });
  await page.locator("#backup-restore").click();
- const confirmation=await dialog;
- expect(confirmation.message()).toContain("werden ersetzt");
- await confirmation.accept();
  await expect(page.locator(".focused-profile")).toContainText("Philipp Backup");
  const actual=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(actual.players).toHaveLength(1);
