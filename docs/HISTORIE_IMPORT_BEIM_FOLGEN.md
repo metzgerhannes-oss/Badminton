@@ -1,10 +1,10 @@
 # Historie beim Folgen / eigene DBV-Profile – On-demand-Import
 
-Stand 10.10.2026. Ziel: nicht für alle 9.246 öffentlichen DBV-Spieler kostenintensive historische Matchdaten erfassen, sondern erst für tatsächlich aufgerufene/gespeicherte Spieler.
+Stand 10.10.2026; v49 ändert den Import-Auslöser. Ziel: Historienabfragen erst beim Öffnen der betreffenden Historie, nicht beim bloßen Folgen, Einrichten oder App-Start.
 
 ## Ablauf
 
-1. Ein Spieler wird unter **Spieler → Folgen**, **Einstellungen → Freunde**, manuell per DBV-ID als Freund oder als neues **eigenes DBV-Profil** gespeichert. Die bestehende Freundesliste und eigenen Profile bleiben auf dem Gerät. Übertragen wird ausschließlich eine öffentliche **DBV-ID** wie `05-061350`, niemals die Liste der Freunde oder Nutzeridentität.
+1. **Folgen, neue eigene Profile und Einladungen bleiben lokal.** Erst das Öffnen der **Historie** für einen eigenen/gefolgten Spieler überträgt dessen öffentliche **DBV-ID** (z. B. `05-061350`) zur Prüfung an Supabase. Die Followerliste wird nicht als Liste übertragen. Bereits vorhandene serverseitige Aufträge bleiben unberührt.
 2. Die App fragt Supabase `player_history_imports` ab. Liegt noch kein Auftrag vor, wird ein identitätsvalidierter **INSERT-only**-Auftrag angelegt. Durch `dbv_id` als Primärschlüssel und eine Sperre gibt es maximal einen gemeinsamen Auftrag pro DBV-Spieler. Folgen mehrere Familien derselben Person, verwenden sie den vorhandenen Status und die Ergebnisse.
 3. `pg_cron` führt alle **15 Minuten** den serverseitigen, auf maximal fünf Spieler pro Lauf begrenzten Worker `private.process_player_history_imports(5)` aus. Er verwendet eine **redaktionell freigegebene Quellliste** aus unserem öffentlichen GitHub-Projekt, lädt nur bereits geprüfte Metadaten-Snapshots, validiert Identität und Summen und speichert diese in `player_history_overviews`. Es gibt **keinen Crawler über alle Spieler**, keine Paywall-Umgehung und kein unkontrolliertes Scraping.
 4. Für Sarah Storz (`05-061350`) existiert der geprüfte Badhub-Stand: **678 erfasste Spiele, 388 Siege, 290 Niederlagen**. Der Worker hat diese Daten tatsächlich nach Supabase übertragen und als `partial` gekennzeichnet. Die App zeigt sie als **externe Karriereübersicht**, nicht als offizielle DBV-Einzelmatches.
@@ -36,10 +36,10 @@ Die Statusanzeige erscheint auf **Home** und **Historie** des ausgewählten eige
 
 - `database/history-on-demand.sql`: zwei RLS-gesicherte Tabellen, Einfüge-/Drosseltrigger, privater Quellen-Worker und automatischer 15-Minuten-Job.
 - `scripts/history-demand.mjs`: Eingabe- und REST-Validierung mit anonymem Publishable Key.
-- `history-demand.js`: Reaktion auf **Folgen, eigenes Profil anlegen und Profilwechsel**, Statusabfrage, sparsames Polling. Bereits verarbeitete IDs werden nicht erneut als neue Jobs angelegt.
-- `welcome.js`: Beim erstmaligen Einrichten eines eigenen DBV-Profils derselbe Auftragsweg.
+- `history-demand.js`: Statusabfrage und Abgleich erst bei geöffneter Historie; bei Profilwechsel innerhalb dieser Ansicht nur die gewählte DBV-ID. Externer Import maximal einmal je DBV-ID und 15 Minuten innerhalb einer Sitzung.
+- `welcome.js`: Die Ersteinrichtung bleibt rein lokal und erzeugt keinen Historienauftrag.
 - `career-history.js`: Supabase-Überblick bevorzugt, geprüfte GitHub-JSON-Dateien als Fallback.
-- `tests/history-demand.mjs`: DBV-ID-Validierung, Ressourcengrenzen und UI-Trigger.
+- `tests/history-demand.mjs`: DBV-ID-Validierung, Ressourcengrenzen und bedarfsgesteuerter Historienauslöser.
 
 ## Live-Verifikation (10.10.2026)
 
