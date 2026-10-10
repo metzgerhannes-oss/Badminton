@@ -162,7 +162,7 @@ test("Backup in Einstellungen creates a local JSON and restores only after confi
   name:"schmetterlinge-sicherung-test.json",mimeType:"application/json",
   buffer:Buffer.from(JSON.stringify(imported))
  });
- await expect(page.locator("#backup-feedback")).toContainText("1 eigene Spieler");
+ await expect(page.locator("#backup-feedback")).toContainText("Eigene Profile: 1");
  await expect(page.locator("#backup-restore")).toBeEnabled();
  page.once("dialog",async confirmation=>{
   expect(confirmation.message()).toContain("werden ersetzt");
