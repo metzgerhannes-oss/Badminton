@@ -88,6 +88,7 @@ jobs:
           node tests/design-v2.mjs
           node tests/ux-foundation.mjs
           node tests/supabase-read.mjs
+          node tests/report-read-client.mjs
           node tests/supabase-library.mjs
           python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
