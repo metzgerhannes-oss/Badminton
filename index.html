@@ -13,6 +13,7 @@
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
 <script type="module" src="./library.js"></script>
+<script type="module" src="./friend-search.js"></script>
 <script type="module" src="./stats.js"></script>
 <script defer src="./live.js"></script>
 <script defer src="./reports.js"></script>
@@ -51,7 +52,7 @@
     </details>
    </section>
    <section class="dashboard-friends-section" aria-labelledby="dashboard-friends-heading">
-    <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><a class="dashboard-friends-manage" href="#einstellungen">Verwalten ↗</a></div>
+    <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-add-friend" href="#einstellungen">+ Freund</a><a class="dashboard-friends-manage" href="#einstellungen">Verwalten ↗</a></div></div>
     <div id="dashboard-friends" class="dashboard-friends" aria-label="Freunden folgen und KPIs anzeigen"></div>
    </section>
   </section>
@@ -146,8 +147,16 @@
     <p class="settings-hint">Durchsuche das gemeinsame DBV-Verzeichnis nach Verein, Altersklasse und Name. Mit „Folgen“ speicherst du den gewünschten Spieler nur in deinem persönlichen Bereich.</p>
    </div>
    <div class="settings-section">
-    <div class="section-heading"><h3>Freunden folgen</h3><button id="add-friend" class="subtle-button" type="button">+ Freund</button></div>
-    <p class="settings-hint">Speichere einen Freund mit seiner öffentlichen DBV-Spieler-ID. Tippe ihn an, um zu seinen Haupt-KPIs zu wechseln. Nicht verfügbare Ranglistenwerte bleiben leer.</p>
+    <div class="section-heading"><h3>Freunde</h3><button id="add-friend" class="subtle-button" type="button">+ Freund suchen</button></div>
+    <p class="settings-hint">Finde Spielerinnen und Spieler über ihren Namen oder die DBV-ID. Der Verein und Jahrgang helfen dir, die richtige Person zu erkennen.</p>
+    <div class="friend-search-block">
+      <label for="friend-search" class="friend-search-label">Freund hinzufügen – Namen eingeben</label>
+      <input id="friend-search" class="friend-search-input" type="search" autocomplete="off" spellcheck="false" placeholder="z. B. Sarah Storz oder 05-061350" aria-controls="friend-search-results" aria-describedby="friend-search-status">
+      <div id="friend-search-status" class="friend-search-status" role="status" aria-live="polite">Mindestens zwei Zeichen eingeben, um im öffentlichen DBV-Verzeichnis zu suchen.</div>
+      <div id="friend-search-results" class="friend-search-results" aria-label="Passende DBV-Spieler" aria-live="polite"></div>
+      <div class="friend-search-manual"><span>Spieler nicht gefunden?</span><button id="add-friend-manual" class="subtle-button" type="button">Manuell mit DBV-ID hinzufügen ↗</button></div>
+    </div>
+    <h4 class="friend-saved-title">Meine gespeicherten Freunde</h4>
     <div id="friend-list" class="friends-list"></div>
    </div>
    <div class="settings-card"><h3>Datenquellen & Nachweise</h3>
