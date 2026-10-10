@@ -1,3 +1,7 @@
+## v53 – Transparenz der Quellen, Korrekturen und aktiven Prüffristen
+
+Die Historie bezeichnet Wiederprüfungen jetzt korrekt als nachfrageabhängig. Unter „Daten & Datenschutz“ wird das 14-Tage-Fenster für **automatische Quellenprüfungen** ausdrücklich von einer juristischen Aufbewahrungs-/Löschfrist abgegrenzt. Der überprüfte [Datenkatalog und Korrekturablauf](docs/DATENKATALOG_BERICHTIGUNG_V53.md) trennt Familiengerät, Verzeichnis, externe Matchbelege, echte offizielle DBV-Matches und serverseitige Protokolle. Weiterhin offen: tatsächlicher Verantwortlicher/Kontakt, verbindliche Retention, Nutzungsrechte und reale Geräteabnahme.
+
 ## v52 – Automatische Quellenprüfungen nach tatsächlicher Nachfrage
 
 Historienaufträge werden über einen begrenzten RPC nur beim bewussten Öffnen der Historie aktualisiert. Ohne Nachfrage in den letzten 14 Tagen ruhen die automatischen Wiederprüfungen, können aber beim erneuten Öffnen reaktiviert werden. Es gibt keine Löschung von Matchdaten. Die 14 Tage sind ein technisches Aktivitätsfenster, **keine Löschfrist**. [Architektur und Sicherheit](docs/HISTORY_DEMAND_LIFECYCLE_V52.md). Speicherung, Löschung und Rechteprüfung bleiben #53/#56.
