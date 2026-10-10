@@ -761,3 +761,14 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
 /* v43 – show historical retry only when source has failed. */
 #external-match-retry[hidden]{display:none!important}
 #external-match-retry:not([hidden]){min-height:44px;margin:6px 0 12px}
+
+
+/* Match context: optional age-class filter, no assumptions about opponents' ages. */
+.match-stats-filters label:has(#match-stats-age){grid-column:1/-1}
+.match-stats-age-summary{font-size:12px;line-height:1.55;color:#174b70;background:#e8f5ff;
+ border:1px solid #bcddf1;border-radius:12px;padding:10px 12px;margin:10px 0;overflow-wrap:anywhere}
+.match-stats-age-summary[hidden]{display:none}
+.match-age-proof{font-size:10px;font-weight:750;padding:4px 7px;border-radius:8px;color:#185783;
+ background:#dff1ff;white-space:normal}
+.match-age-proof.muted-age{background:#eef4f8;color:#57778c}
+@media(max-width:370px){.match-stats-filters{grid-template-columns:1fr}}
