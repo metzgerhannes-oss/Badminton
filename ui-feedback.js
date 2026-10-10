@@ -7,7 +7,13 @@
   if(!banner)return;
   banner.hidden=navigator.onLine!==false;
  }
- document.addEventListener("DOMContentLoaded",update);
+ document.addEventListener("DOMContentLoaded",()=>{
+  update();
+  document.querySelector(".skip-link")?.addEventListener("click",event=>{
+   event.preventDefault();
+   document.getElementById("hauptinhalt")?.focus({preventScroll:false});
+  });
+ });
  window.addEventListener("offline",update);
  window.addEventListener("online",()=>{
   update();
