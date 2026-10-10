@@ -46,7 +46,7 @@ create policy "Request import for verified DBV player only" on public.player_his
   for insert to anon,authenticated with check (
     dbv_id ~ '^[0-9]{2}-[0-9]{6}$'
     and status='queued' and requested_at is not null
-    and exists (select 1 from public.players p where p.dbv_id=dbv_id and p.verified_at is not null)
+    and exists (select 1 from public.players p where p.dbv_id=player_history_imports.dbv_id and p.verified_at is not null)
   );
 drop policy if exists "Anyone can read verified external overviews" on public.player_history_overviews;
 create policy "Anyone can read verified external overviews" on public.player_history_overviews
