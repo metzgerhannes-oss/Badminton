@@ -354,3 +354,15 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  .career-home-grid,.career-summary-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
  .career-years-grid{grid-template-columns:1fr}
 }
+
+/* Shared on-follow import status. Clear separation of queued jobs and verified matches. */
+.history-import-status{display:grid;gap:7px;border:1px solid #b7d9ed;border-left:4px solid #3b9bd2;
+ background:#f3fbff;color:#1a4769;padding:12px 14px;border-radius:13px;margin:12px 0 16px;
+ font-size:11px;line-height:1.55}
+.history-import-status strong{font-size:13px;color:#0c3c62}
+.history-import-status span{color:#476b86}
+.history-import-status small{color:#68849c;font-size:10px}
+.history-import-status[data-state="partial"]{border-left-color:#168f70;background:#f3fffa}
+.history-import-status[data-state="waiting"]{border-left-color:#d2a13d;background:#fffcf3}
+.history-import-status[data-state="error"],.history-import-status[data-state="offline"]{border-left-color:#c67b64}
+.history-import-status[hidden]{display:none!important}
