@@ -1,3 +1,11 @@
+## Automatischer Berichte-Abgleich (Oktober 2026)
+
+Täglicher GitHub-Actions-Workflow zur Recherche öffentlicher Berichte, mit unmittelbarem Prüfungslauf nach der Einrichtung. Es werden ausschließlich freigegebene Artikelübersichten (zunächst **SpVgg Mössingen** und **BWBV Jugend**) geprüft. Die übrigen Quellen bleiben als Recherchekandidaten hinterlegt, bis ein zulässiger Feed oder ein verifizierter Artikelindex vorliegt.
+
+Neue Artikel erscheinen zunächst als **GitHub-Prüfkandidaten** und nie ungeprüft als Spielererwähnung. Doppelte Links werden ignoriert. Eine bestätigte Originalquelle wird anschließend manuell in das veröffentlichte Artikelregister übernommen; nach Merge zeigt die App neue Einträge direkt aus dem GitHub-JSON-Feed, auch ohne sofortige Supabase-Synchronisierung.
+
+Details: [Quellenautomatik, Freigabe und Grenzen](docs/BERICHTE_QUELLEN.md).
+
 ## Berichte & Vereins-Stammdaten (10.10.2026)
 
 Neu: Spieler-Stammdaten mit **Verein** (SpVgg Mössingen für die bereits verifizierten beiden Profile) und der fünfte App-Bereich **„Berichte“**. Die Auswahl unterscheidet belegte **persönliche Namensnennungen** von weiteren **Vereinsberichten**. Es werden nur Titel, eigene Kurzbeschreibung, Veröffentlichungsdatum (soweit bestätigt), Quelle und Direktlink gespeichert; keine Artikelvolltexte.
