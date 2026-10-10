@@ -12,6 +12,12 @@ export function importPost(id){
     Prefer:"resolution=ignore-duplicates,return=minimal"}
  };
 }
+export function demandPost(id){
+ if(!validHistoryId(id))return null;
+ return {url:SUPABASE_ROOT+"/rpc/request_player_history_demand",
+  body:JSON.stringify({target_id:id}),
+  headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json",Accept:"application/json"}};
+}
 export function importStatusUrl(id){
  if(!validHistoryId(id))return null;
  const p=new URLSearchParams({select:"dbv_id,status,detail,source_name,imported_match_count,last_checked_at,updated_at",
