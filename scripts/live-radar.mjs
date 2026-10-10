@@ -83,6 +83,33 @@ export function liveView(row,id,now=Date.now()){
   entries:p.entries.filter(object).slice(0,10)
  };
 }
+/** User-facing meaning of the last SOURCED result, not a cache-maintenance warning.
+ * A stale active match must never display old scores as if live.
+ * A stale empty result remains an appropriately qualified source observation.
+ */
+export function radarSituation(row,id,now=Date.now()){
+ if(!validateSnapshot(row,id)){
+  return {kind:"pending",title:"Turnierdaten werden geprüft",
+   detail:"Wir prüfen, ob für dieses Spielerprofil aktuell Begegnungen gemeldet sind.",
+   checkedAt:null,showScore:false};
+ }
+ const {fresh,ageMs}=freshness(row,now);
+ const checkedAt=row.checked_at;
+ if(!row.payload.tournament){
+  return {kind:"idle",title:"Derzeit kein Turniertag gemeldet",
+   detail:fresh
+    ?"Die öffentliche Quelle meldet für diesen Spieler derzeit keine laufenden Turnierspiele."
+    :"Bei der letzten Prüfung war kein Turniertag gemeldet. Neuere Meldungen werden erneut abgefragt.",
+   checkedAt,ageMs,showScore:false,isCurrent:fresh};
+ }
+ if(!fresh){
+  return {kind:"updating",title:"Aktueller Spielstand wird geprüft",
+   detail:"Die Quelle hat einen Turniertag gemeldet. Bis zum nächsten bestätigten Abgleich werden keine älteren Satzstände als live angezeigt.",
+   checkedAt,ageMs,showScore:false,
+   tournament:str(row.payload.tournament.name,120)};
+ }
+ return {kind:"current",title:"Aktueller Turniertag",detail:"",checkedAt,ageMs,showScore:true};
+}
 export function playerOutcome(match){
  const m=object(match);
  if(!m||typeof m.team1_won!=="boolean"||
