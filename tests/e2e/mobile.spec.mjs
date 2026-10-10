@@ -141,7 +141,7 @@ test("Club-confirmed win is displayed separately from scored matches",async ({pa
  await expect(note).toContainText("nicht in der Spielstatistik enthalten");
  await expect(page.locator("#history-timeline .history-event")).toHaveCount(1);
  await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
-  /spvgg\.org\/abteilungen\/badminton\/aktuelles\/4-e-rangliste/);
+  "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026");
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
 });
@@ -165,6 +165,28 @@ test("Crossfed DBV tournament proofs keep their own source URL and year",async (
  await expect(page.locator('#external-match-list a[href="https://badhub.de/dbv/turnier.php?id=950"]')).toHaveCount(1);
  await page.locator("#external-match-year").selectOption("2025");
  await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
+});
+
+test("Sourced friend tournament placements remain separate from individual match facts",async ({page})=>{
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
+ const profiles=[
+  {id:"05-070879",name:"Philipp Metzger"},
+  {id:"05-071969",name:"Charlotte Metzger"},
+  {id:"05-061350",name:"Sarah Storz"},
+  {id:"05-070006",name:"Vinzent Pius Ott"}
+ ];
+ await page.evaluate(profiles=>window.renderHistory("05-061350",profiles,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
+ await expect(page.locator("#history-timeline")).toContainText("3.");
+ await expect(page.locator("#history-timeline")).toContainText("Raphael Argast");
+ await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
+  "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
+ await page.evaluate(profiles=>window.renderHistory("05-070006",profiles,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
+ await expect(page.locator("#history-timeline")).toContainText("19.");
+ await expect(page.locator("#history-timeline")).not.toContainText("Raphael Argast");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).not.toHaveText("2");
 });
 
 test("Historical source validation matches the Home statistics",async ({page})=>{

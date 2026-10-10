@@ -1,3 +1,7 @@
+## Nachrecherchierte Platzierungen für gefolgte Spieler (10.10.2026)
+
+Der geprüfte SpVgg-Mössingen-Ergebnisbericht vom 02.03.2026 zur C-Rangliste Friedrichshafen belegt **Sarah Storz: 3. Mixed U19 mit Raphael Argast** und **Vinzent Pius Ott: 19. Einzel U15**. Die bislang fehlenden Ergebnisse wurden idempotent in Supabase-Platzierungen und mit Originalquelle in `data/history.json` eingetragen; auch die namentlichen Berichtserwähnungen wurden ergänzt. Damit sind sie als Turnierchronik auch bei gefolgten Profilen sichtbar. Es wurden keine Einzelmatch-Scores, Siege oder neuen Gegner konstruiert. Keine Änderung von Match-Statistik, API-Rechten oder PWA-Shell.
+
 ## Quellenmonitor für alle registrierten Spieler
 
 Die täglich laufende, weiterhin robots.txt-konforme Vereins-/Verbandsrecherche sucht jetzt gezielt nach den öffentlich registrierten DBV-Profilen (maximal 60), statt nur nach zwei festen Namen. Gefundene Artikel bleiben zunächst prüfpflichtige Kandidaten. Sarah und Vinzent sind außerdem im veröffentlichten Vorbericht zur BWBV-Meisterschaft korrekt als *gemeldet* verknüpft; daraus werden keine Matches oder Starts abgeleitet. Details: `docs/SOURCE_DISCOVERY_REGISTERED_PROFILES.md`.

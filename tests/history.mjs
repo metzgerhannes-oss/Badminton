@@ -33,6 +33,24 @@ for(const r of history.results){
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+for(const [ident,person,date,discipline,age,place] of [
+ ["ss-2026-03-01-c-rlt-mx-u19","Sarah Storz","2026-03-01","Mixed","U19",3],
+ ["vo-2026-02-28-c-rlt-me-u15","Vinzent Pius Ott","2026-02-28","Einzel","U15",19]
+]){
+ const row=history.results.find(r=>r.id===ident);
+ assert.ok(row,"Missing new sourced club placement");
+ assert.equal(row.playerName,person);assert.equal(row.date,date);
+ assert.equal(row.discipline,discipline);assert.equal(row.ageGroup,age);
+ assert.equal(row.place,place);
+ assert.equal(row.source.url,"https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
+ assert.ok(row.verificationNote);
+ assert.ok(!("games" in row)&&!("won" in row)&&!("score" in row),
+  "Placings from a club report are not individual scored matches");
+}
+const report=JSON.parse(await readFile("data/report-articles.json","utf8")).articles
+ .find(x=>x.url==="https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
+assert.deepEqual(report.players,["05-061350","05-070006","05-070879"]);
+
 assert.equal(history.results.filter(r=>r.matchEvidence?.kind==="club-report-at-least-one-win").length,1);
 assert.ok(Array.isArray(history.pendingResults));
 assert.ok(!history.pendingResults.some(r=>r.id==="pm-2026-07-11-district-double-possible-bronze"),"Resolved double result must not remain pending");
