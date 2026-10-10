@@ -138,3 +138,57 @@ test("Offline hint is informative and clears on reconnection",async ({page,conte
  await context.setOffline(false);
  await expect(page.locator("#connection-status")).toBeHidden();
 });
+
+
+test("Backup in Einstellungen creates a local JSON and restores only after confirmation",async ({page})=>{
+ await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#backup-title")).toBeVisible();
+ const downloadPromise=page.waitForEvent("download");
+ await page.locator("#backup-export").click();
+ const download=await downloadPromise;
+ expect(download.suggestedFilename()).toMatch(/^schmetterlinge-sicherung-\d{4}-\d\d-\d\d\.json$/);
+ await expect(page.locator("#backup-feedback")).toContainText("Sicherung erstellt");
+
+ const imported={
+  kind:"schmetterlinge-local-backup",schemaVersion:1,
+  createdAt:"2026-10-10T15:00:00.000Z",
+  data:{
+   players:[{id:PLAYER,name:"Philipp Backup",birthYear:2016,club:"SpVgg Mössingen"}],
+   friends:[{id:"05-070006",name:"Vinzent Ott",club:"SpVgg Mössingen"}],
+   officialLinks:[],activeProfileId:PLAYER,chosen:PLAYER,historyProfilesInitialized:true
+  }
+ };
+ await page.locator("#backup-file").setInputFiles({
+  name:"schmetterlinge-sicherung-test.json",mimeType:"application/json",
+  buffer:Buffer.from(JSON.stringify(imported))
+ });
+ await expect(page.locator("#backup-feedback")).toContainText("1 eigene Spieler");
+ await expect(page.locator("#backup-restore")).toBeEnabled();
+ const dialog=page.waitForEvent("dialog");
+ await page.locator("#backup-restore").click();
+ const confirmation=await dialog;
+ expect(confirmation.message()).toContain("werden ersetzt");
+ await confirmation.accept();
+ await expect(page.locator(".focused-profile")).toContainText("Philipp Backup");
+ const actual=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(actual.players).toHaveLength(1);
+ expect(actual.friends).toEqual([expect.objectContaining({id:"05-070006",name:"Vinzent Ott"})]);
+ expect(actual.activeProfileId).toBe(PLAYER);
+});
+
+test("Invalid backup is rejected without changing local family state",async ({page})=>{
+ await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
+ const bad={
+  kind:"schmetterlinge-local-backup",schemaVersion:1,
+  createdAt:"2026-10-10T15:00:00.000Z",
+  data:{players:[{id:PLAYER,name:"Injected",url:"javascript:alert(1)"}],
+   friends:[],officialLinks:[],activeProfileId:PLAYER}
+ };
+ await page.locator("#backup-file").setInputFiles({
+  name:"invalid.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(bad))
+ });
+ await expect(page.locator("#backup-feedback")).toContainText("https");
+ await expect(page.locator("#backup-restore")).toBeDisabled();
+ expect(await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"))).toBe(before);
+});
