@@ -53,6 +53,7 @@ jobs:
           node --check scripts/live-links.mjs
       - name: Run tests
         run: |
+          node tests/security-gate.mjs
           node tests/validate.mjs
           node tests/history.mjs
           node tests/trophies.mjs
