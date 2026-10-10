@@ -19,7 +19,7 @@ const context=vm.createContext({
  },
  document:{getElementById:id=>fields[id]||null,addEventListener(){}}
 });
-vm.runInContext(source.replace(/^import [^\n]+\n/,""),context,{filename:"library.js"});
+vm.runInContext(source.replace(/^import[^\n]+\n/m,""),context,{filename:"library.js"});
 const path=vm.runInContext("dbPath(0)",context);
 const params=new URLSearchParams(path.split("?")[1]);
 assert.equal(params.get("age_class"),"eq.U13");
