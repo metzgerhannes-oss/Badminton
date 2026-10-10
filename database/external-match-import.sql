@@ -106,3 +106,9 @@ revoke all on function public.claim_external_match_import(text) from public,anon
 grant execute on function public.claim_external_match_import(text) to service_role;
 comment on function public.claim_external_match_import(text) is
 'Private server-side throttle: one import per verified followed DBV ID and max 24 distinct users per day.';
+
+-- This project's public tables use explicit revokes. Grant the internal
+-- service-role REST consumer only what the Edge importer needs.
+grant select(dbv_id,name) on public.players to service_role;
+grant select,insert,update on public.player_external_match_facts to service_role;
+grant select,insert,update on public.player_external_match_imports to service_role;
