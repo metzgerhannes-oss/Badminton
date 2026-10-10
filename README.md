@@ -1,3 +1,9 @@
+## Live-Zugang: Sofortlösung und Schnittstellenwege (10.10.2026)
+
+Unter **Turniere → Spielplan & Live-Ergebnisse** führt ein neuer externer Link für den ausgewählten DBV-Spieler direkt zur öffentlichen Badhub-Turniertag-Anzeige. Für Sarah (`05-061350`) und Philipp (`05-070879`) wurden die individuellen Seiten per HTTP 200 überprüft. Ein zweiter Link öffnet die gesamte öffentliche Badhub-Ergebnishistorie. Das ist ein **echter Quellenlink**, kein in die App importierter automatischer Live-Spielstand. Der fehlende Live-Datenfeed wird nicht vorgetäuscht.
+
+Für eine direkte eigene Live-Anzeige wurden drei Quellen analysiert: nuLiga-REST (dokumentiert, aus Supabase aber **HTTP 401 / Token oder IP-Freigabe erforderlich**), DBV/Tournamentsoftware (noch keine öffentliche Entwickler-API bestätigt) und ein möglicher autorisierter Badhub-Datenfeed. Als optionales Drittanbieterprodukt könnte Parse.bot Karriere-W/L liefern, aber keine vollständigen Live-Matchlisten. [Prüfergebnisse, Kontakte, Pilot und Datenarchitektur](docs/LIVE_DATENZUGANG_STRATEGIE.md).
+
 ## Historie erst beim Folgen importieren (10.10.2026)
 
 Bedarfsgesteuerte Supabase-Importwarteschlange: Beim **Folgen** eines verifizierten DBV-Spielers oder beim Anlegen eines **eigenen DBV-Profils** legt die App genau einen gemeinsamen, serverseitig gedrosselten Importauftrag je Spieler-ID an. Ein Cron-Worker verarbeitet höchstens fünf IDs alle 15 Minuten und prüft bestehende Fälle regelmäßig erneut. Auf Home und in Historie wird der echte Importstatus angezeigt. Öffentlich belegte Karriere-Zusammenfassungen werden zentral übernommen (Sarah Storz: externe Badhub-Karriereübersicht in Supabase importiert); für Spieler ohne legalen strukturierten Einzelmatchzugang bleibt **„Quellenzugang ausstehend“** statt erdachter Siege/Matchdaten. GitHub-Fallback und persönliche Favoriten bleiben erhalten. [Ablauf und technische Grenzen](docs/HISTORIE_IMPORT_BEIM_FOLGEN.md).

@@ -57,5 +57,5 @@ assert.match(css,/\.friend-search-input/);
 assert.match(css,/max-height:405px/);
 assert.match(sw,/friend-search\.js/);
 assert.match(sw,/scripts\/friend-search\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v29/);
+assert.match(sw,/schmetterlinge-shell-v30/);
 console.log("Friend text search: sanitized DBV queries, Sarah Storz identity, duplicate/own controls, Home entry and PWA verified.");
