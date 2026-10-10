@@ -84,5 +84,5 @@ assert.match(script,/window\.location\.reload/);
 assert.doesNotMatch(script,/fetch\(|XMLHttpRequest/,"Personal backups never go over the network");
 assert.match(sw,/scripts\/local-backup\.mjs/);
 assert.match(sw,/backup\.js/);
-assert.match(sw,/schmetterlinge-shell-v43/);
+assert.match(sw,/schmetterlinge-shell-v44/);
 console.log("Offline backup contract: roundtrip, canonical home profile, old app restore, unsafe/duplicate files rejected.");
