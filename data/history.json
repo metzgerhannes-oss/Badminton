@@ -360,6 +360,63 @@
       },
       "verified": true,
       "verificationNote": "Vereinsbericht vom 02.03.2026 nennt Vinzent und Platzierung; keine individuellen Satzstände."
+    },
+    {
+      "id": "ss-2026-01-18-c-rlt-e-u19-1",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-18",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U19",
+      "place": 1,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Vereinsbericht vom 20.01.2026: Platz 1 im Einzel U19; keine individuellen Satzstände."
+    },
+    {
+      "id": "ss-2026-01-18-c-rlt-d-u19-1",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-01-18",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Doppel",
+      "ageGroup": "U19",
+      "place": 1,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Vereinsbericht vom 20.01.2026: Platz 1 im Doppel U19 mit Amishi Tiwari; keine individuellen Satzstände."
+    },
+    {
+      "id": "vo-2026-01-17-c-rlt-e-u15-19",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2026-01-17",
+      "event": "1. C-Rangliste BW U11–U19",
+      "location": "Reutlingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 19,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026"
+      },
+      "verified": true,
+      "verificationNote": "Vereinsbericht vom 20.01.2026: Platz 19 im Einzel U15; keine individuellen Satzstände."
     }
   ],
   "pendingResults": []

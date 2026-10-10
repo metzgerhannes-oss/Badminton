@@ -19,10 +19,10 @@ const family=summarizeTrophies(results.filter(r=>
  ["05-070879","05-071969"].includes(r.playerId)));
 assert.equal(family.total,9);
 const followedSarah=summarizeTrophies(results.filter(r=>r.playerId==="05-061350"));
-assert.deepEqual(followedSarah.counts,{1:0,2:0,3:1,4:0});
+assert.deepEqual(followedSarah.counts,{1:2,2:0,3:1,4:0});
 const followedVinzent=summarizeTrophies(results.filter(r=>r.playerId==="05-070006"));
 assert.equal(followedVinzent.total,0,"19th place is no trophy");
-assert.equal(summarizeTrophies(results).total,10,
+assert.equal(summarizeTrophies(results).total,12,
  "Entire sourced dataset includes the extra friend's podium, not just family results");
 assert.equal(family.results.filter(r=>r.place===4).length,2);
 assert.deepEqual(summarizeTrophies(philipp.filter(r=>r.date.startsWith("2025"))).counts,{1:0,2:0,3:1,4:1});

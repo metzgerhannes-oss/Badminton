@@ -1,3 +1,7 @@
+## Weitere aus Originalquellen bestätigte Platzierungen (Januar 2026)
+
+Originalbericht zur 1. C-Rangliste Reutlingen am 17./18.01.2026: Sarah Storz Platz 1 Einzel U19 und Platz 1 Doppel U19 (mit Amishi Tiwari), Vinzent Pius Ott Platz 19 Einzel U15. Drei fehlende Turnierplatzierungen und zwei Berichtzuordnungen bereits idempotent in Supabase eingetragen; jetzt auch in der vorhandenen statischen Spielerchronik ergänzt. Keine Matchstatistikänderung oder aus dem Bericht erfundene Einzelsätze.
+
 ## Nachrecherchierte Platzierungen für gefolgte Spieler (10.10.2026)
 
 Der geprüfte SpVgg-Mössingen-Ergebnisbericht vom 02.03.2026 zur C-Rangliste Friedrichshafen belegt **Sarah Storz: 3. Mixed U19 mit Raphael Argast** und **Vinzent Pius Ott: 19. Einzel U15**. Die bislang fehlenden Ergebnisse wurden idempotent in Supabase-Platzierungen und mit Originalquelle in `data/history.json` eingetragen; auch die namentlichen Berichtserwähnungen wurden ergänzt. Damit sind sie als Turnierchronik auch bei gefolgten Profilen sichtbar. Es wurden keine Einzelmatch-Scores, Siege oder neuen Gegner konstruiert. Keine Änderung von Match-Statistik, API-Rechten oder PWA-Shell.

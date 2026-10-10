@@ -189,6 +189,23 @@ test("Sourced friend tournament placements remain separate from individual match
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).not.toHaveText("2");
 });
 
+test("January source report adds two Sarah titles and Vinzent U15 result",async ({page})=>{
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
+ const profiles=[
+  {id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"},
+  {id:"05-061350",name:"Sarah Storz"},{id:"05-070006",name:"Vinzent Pius Ott"}
+ ];
+ await page.evaluate(p=>window.renderHistory("05-061350",p,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("1. C-Rangliste BW");
+ await expect(page.locator("#history-timeline")).toContainText("Amishi Tiwari");
+ await expect(page.locator("#trophy-shelf")).toContainText("1.");
+ await page.evaluate(p=>window.renderHistory("05-070006",p,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("1. C-Rangliste BW");
+ await expect(page.locator("#history-timeline")).toContainText("19.");
+ await expect(page.locator("#history-timeline")).not.toContainText("Amishi Tiwari");
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());

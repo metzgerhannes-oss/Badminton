@@ -33,6 +33,22 @@ for(const r of history.results){
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+for(const [id,player,disc,place,age] of [
+ ["ss-2026-01-18-c-rlt-e-u19-1","Sarah Storz","Einzel",1,"U19"],
+ ["ss-2026-01-18-c-rlt-d-u19-1","Sarah Storz","Doppel",1,"U19"],
+ ["vo-2026-01-17-c-rlt-e-u15-19","Vinzent Pius Ott","Einzel",19,"U15"]
+]){
+ const row=history.results.find(r=>r.id===id);
+ assert.ok(row,"Sourced January result missing");
+ assert.equal(row.playerName,player);
+ assert.equal(row.discipline,disc);
+ assert.equal(row.place,place);
+ assert.equal(row.ageGroup,age);
+ assert.equal(row.source.url,"https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026");
+ assert.ok(!("won" in row)&&!("games" in row)&&!("score" in row),
+  "Placings are not individually scored matches");
+}
+
 for(const [ident,person,date,discipline,age,place] of [
  ["ss-2026-03-01-c-rlt-mx-u19","Sarah Storz","2026-03-01","Mixed","U19",3],
  ["vo-2026-02-28-c-rlt-me-u15","Vinzent Pius Ott","2026-02-28","Einzel","U15",19]
