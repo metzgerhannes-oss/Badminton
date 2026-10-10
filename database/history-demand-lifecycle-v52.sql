@@ -171,3 +171,107 @@ begin
   return jsonb_build_object('processed',count_processed,'external_overviews',count_partial,
          'awaiting_source',count_missing,'at',now());
 end $function$;
+
+-- Independent 30-minute external match batch runner is also bounded by recent demand.
+CREATE OR REPLACE FUNCTION private.continue_external_match_import()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog', 'public', 'extensions', 'pg_temp'
+AS $function$
+declare chosen text; h record; response_status integer; response_text text;
+begin
+ select j.dbv_id into chosen
+ from public.player_history_imports j
+ join public.players p on p.dbv_id=j.dbv_id and p.verified_at is not null
+ left join public.player_external_match_imports e on e.dbv_id=j.dbv_id
+ where j.last_demand_at >= now()-interval '14 days'
+   and (e.dbv_id is null
+   or (e.status='partial' and e.cursor_offset<e.verified_count
+       and e.last_started_at<now()-interval '15 minutes')
+   or (e.status in ('partial','complete') and e.cursor_offset>=e.verified_count
+       and e.last_started_at<now()-interval '7 days')
+   or (e.status='awaiting_source' and e.last_started_at<now()-interval '7 days')
+   or (e.status='loading' and e.lease_until<now()-interval '10 minutes')
+   or (e.status='error' and e.last_started_at<now()-interval '1 day'))
+ order by coalesce(e.last_started_at,'2000-01-01'::timestamptz),j.requested_at
+ limit 1;
+ if chosen is null then return jsonb_build_object('processed',0,'reason','no_pending_job');end if;
+ begin
+  select x.status,x.content into response_status,response_text
+   from extensions.http_post(
+    'https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import',
+    jsonb_build_object('dbv_id',chosen,
+      'public_key','sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE')::text,
+    'application/json'
+   ) x;
+  return jsonb_build_object('processed',1,'dbv_id',chosen,'status',response_status,
+                           'body',left(response_text,320));
+ exception when others then
+  return jsonb_build_object('processed',1,'dbv_id',chosen,
+                           'error','Temporary worker HTTP error');
+ end;
+end $function$;
+CREATE OR REPLACE FUNCTION public.claim_external_match_import(target_id text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog', 'public', 'pg_temp'
+AS $function$
+declare
+ status_now text;
+ last_start timestamptz;
+ cursor_now integer;
+ verified_count_now integer;
+ verified boolean;
+begin
+ if target_id !~ '^[0-9]{2}-[0-9]{6}$' then
+   return jsonb_build_object('accepted',false,'reason','invalid_id');
+ end if;
+ perform pg_advisory_xact_lock(9273,383);
+ select exists(
+  select 1 from public.player_history_imports h
+  join public.players p on p.dbv_id=h.dbv_id and p.verified_at is not null
+  where h.dbv_id=target_id
+    and h.last_demand_at >= now()-interval '14 days'
+ ) into verified;
+ if not verified then return jsonb_build_object('accepted',false,'reason','not_followed');end if;
+ insert into public.player_external_match_imports(dbv_id)
+  values(target_id) on conflict(dbv_id) do nothing;
+ select status,last_started_at,cursor_offset,verified_count
+  into status_now,last_start,cursor_now,verified_count_now
+  from public.player_external_match_imports
+  where dbv_id=target_id for update;
+ -- Partial with all source cards already scanned (but excluded cards) is
+ -- complete for now too. Never restart its first page every ten minutes.
+ if status_now in ('complete','partial') and cursor_now>=verified_count_now
+    and last_start>now()-interval '7 days' then
+  return jsonb_build_object('accepted',false,'reason','recently_complete');
+ end if;
+ if status_now='loading' and (select lease_until>now() from public.player_external_match_imports where dbv_id=target_id) then
+  return jsonb_build_object('accepted',false,'reason','already_loading');
+ end if;
+ if last_start>now()-interval '10 minutes' then
+  return jsonb_build_object('accepted',false,'reason','cooldown');
+ end if;
+ if (select count(*) from public.player_external_match_imports
+    where last_started_at>now()-interval '24 hours')>=24
+    and (last_start is null or last_start<now()-interval '24 hours') then
+   return jsonb_build_object('accepted',false,'reason','daily_limit');
+ end if;
+ if (select count(*) from private.external_match_attempts where attempted_at>=now()-interval '24 hours')>=36 then
+   return jsonb_build_object('accepted',false,'reason','global_cooldown');
+ end if;
+ insert into private.external_match_attempts(dbv_id) values(target_id);
+ -- The provider lists newest matches first; a weekly refresh must start
+ -- from index zero or it will miss newly inserted matches at the top.
+ if status_now in ('complete','partial') and cursor_now>=verified_count_now then
+   cursor_now:=0;
+ end if;
+ update public.player_external_match_imports set
+  status='loading',last_started_at=now(),lease_until=now()+interval '3 minutes',
+  cursor_offset=cursor_now,updated_at=now(),
+  detail='Öffentliche Matchkarten werden abgeglichen'
+ where dbv_id=target_id;
+ return jsonb_build_object('accepted',true,'cursor',cursor_now,'player_id',target_id);
+end $function$;
