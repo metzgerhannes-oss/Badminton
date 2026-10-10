@@ -8,7 +8,12 @@ create index if not exists history_import_recent_demand_idx on public.player_his
 revoke select on public.player_history_imports from anon,authenticated;
 grant select(dbv_id,status,requested_at,last_checked_at,updated_at,source_name,detail,imported_match_count)
  on public.player_history_imports to anon,authenticated;
-create or replace function public.request_player_history_demand(target_id text)
+-- Isolate privileged writes in a non-Data-API schema. The exposed RPC is
+-- SECURITY INVOKER; only its restricted internal function performs the updates.
+create schema if not exists demand_internal;
+revoke all on schema demand_internal from public,anon,authenticated;
+grant usage on schema demand_internal to anon,authenticated;
+create or replace function demand_internal.request_player_history_demand(target_id text)
 returns jsonb language plpgsql security definer set search_path=pg_catalog,public,pg_temp
 as $$
 declare prior timestamptz;
@@ -37,6 +42,12 @@ begin
 exception when sqlstate 'P0001' then
  return jsonb_build_object('accepted',false,'reason','capacity');
 end $$;
+revoke all on function demand_internal.request_player_history_demand(text) from public,anon,authenticated;
+grant execute on function demand_internal.request_player_history_demand(text) to anon,authenticated;
+create or replace function public.request_player_history_demand(target_id text)
+returns jsonb language sql security invoker
+set search_path=pg_catalog,public,pg_temp
+as $ select demand_internal.request_player_history_demand(target_id) $;
 revoke all on function public.request_player_history_demand(text) from public,anon,authenticated;
 grant execute on function public.request_player_history_demand(text) to anon,authenticated;
 comment on function public.request_player_history_demand(text) is
