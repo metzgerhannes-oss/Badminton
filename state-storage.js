@@ -37,6 +37,30 @@ function restore(state,normalizeBookmark){
 function save(state){
  try{localStorage.setItem(STORE,JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,activeProfileId:state.activeProfileId,chosen:state.activeProfileId,historyProfilesInitialized:true}))}catch{}
 }
-
- return Object.freeze({STORE,SCHEMA_VERSION,restore,save});
+// Pure local profile-navigation transitions: no cloud writes, new storage
+// schema or implicit changes to the user's chosen own starting profile.
+function selectOwn(state,id){
+ if(!state.players.some(p=>p.id===id))return false;
+ state.activeProfileId=id;
+ state.viewingFriendId=null;
+ state.chosen=id;
+ return true;
+}
+function selectFriend(state,id){
+ if(!state.friends.some(p=>p.id===id))return false;
+ state.viewingFriendId=id;
+ state.chosen=id;
+ return true;
+}
+function showOwn(state){
+ state.viewingFriendId=null;
+ state.chosen=state.activeProfileId;
+}
+function unfollow(state,id){
+ if(!state.friends.some(p=>p.id===id))return false;
+ state.friends=state.friends.filter(p=>p.id!==id);
+ if(state.viewingFriendId===id)showOwn(state);
+ return true;
+}
+ return Object.freeze({STORE,SCHEMA_VERSION,restore,save,selectOwn,selectFriend,showOwn,unfollow});
 })();
