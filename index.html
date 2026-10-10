@@ -18,6 +18,7 @@
 <script type="module" src="./history-demand.js"></script>
 <script type="module" src="./career-history.js"></script>
 <script defer src="./live.js"></script>
+<script type="module" src="./live-links.js"></script>
 <script defer src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
 <script type="module" src="./dashboard.js"></script>
@@ -99,6 +100,14 @@
     <div class="section-heading"><h3 id="dbv-live-title">Spielplan &amp; Live-Ergebnisse</h3><button class="subtle-button" id="dbv-live-refresh" type="button">Aktualisieren</button></div>
     <p class="settings-hint">Begegnungen zum gewählten Spielerprofil. Zeiten und Satzstände werden nur angezeigt, wenn verifizierte Quelldaten vorliegen.</p>
     <div id="dbv-live-results" aria-live="polite" role="status"><p class="live-dbv-note">Noch keine Daten geladen.</p></div>
+    <div id="external-live-player" class="external-live-player" hidden>
+      <div class="external-live-head"><strong>Turniertag des ausgewählten Spielers</strong><span>Externe Live-Ansicht · Badhub</span></div>
+      <p>Aktuelle Ansetzungen und veröffentlichte Ergebnisse direkt bei Badhub prüfen. Der Link öffnet die Quelle; eine laufende Begegnung ist nicht garantiert.</p>
+      <div class="external-live-actions">
+        <a id="external-live-open" href="#" rel="noopener noreferrer" target="_blank">Turniertag öffnen ↗</a>
+        <a id="external-live-career" href="#" rel="noopener noreferrer" target="_blank">Alle bisherigen Ergebnisse ↗</a>
+      </div>
+    </div>
    </section>
    <div id="official-tournament-list" class="tournament-list"></div>
    <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierportal<small>Offizielle Turnierinformationen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
