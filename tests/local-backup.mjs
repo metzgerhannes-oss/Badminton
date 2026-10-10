@@ -62,6 +62,7 @@ const ctx=vm.createContext({
  }
 });
 const app=await readFile("app.js","utf8");
+vm.runInContext(await readFile("state-storage.js","utf8"),ctx,{filename:"state-storage.js"});
 vm.runInContext(app,ctx,{filename:"app.js"});
 vm.runInContext("restore()",ctx);
 const restored=JSON.parse(vm.runInContext("JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,activeProfileId:state.activeProfileId,viewingFriendId:state.viewingFriendId})",ctx));
@@ -83,5 +84,5 @@ assert.match(script,/window\.location\.reload/);
 assert.doesNotMatch(script,/fetch\(|XMLHttpRequest/,"Personal backups never go over the network");
 assert.match(sw,/scripts\/local-backup\.mjs/);
 assert.match(sw,/backup\.js/);
-assert.match(sw,/schmetterlinge-shell-v39/);
+assert.match(sw,/schmetterlinge-shell-v40/);
 console.log("Offline backup contract: roundtrip, canonical home profile, old app restore, unsafe/duplicate files rejected.");

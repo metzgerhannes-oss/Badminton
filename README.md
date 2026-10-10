@@ -1,3 +1,9 @@
+## v40 – Lokaler State-/Storage-Vertrag (#29, Teilschritt 1)
+
+Die persistente Datenlogik (Wiederherstellung inklusive bisheriger Charlotte-ID-Migration und Speicherung) liegt jetzt isoliert in `state-storage.js`. `app.js` enthält nur noch die kompatiblen Aufrufe. **Der vorhandene Speicherkey `shuttleboard-v1`, alle Datenfelder, Browser-URLs und das bestehende vierteilige Menü bleiben unverändert.** Export/Import v39 bleibt abwärtskompatibel. Neue VM-Regressionen sichern lokale Datentreue, Offline-/Storage-Fehler und Startprofil/Freunde/Bookmarks ab. Automatisierte Browser- und CI-Tests sind erforderlich; echter iPhone-/VoiceOver-Test bleibt #28.
+
+Technischer Vertrag und weitere Schritte: [docs/STATE_STORAGE_V40.md](docs/STATE_STORAGE_V40.md).
+
 ## Lokale Familiendaten sichern und wiederherstellen (v39)
 
 Unter **Einstellungen → Meine Daten sichern** können eigene Spielerprofile, gefolgte Spieler und Turnierfavoriten lokal als versionierte JSON-Sicherung exportiert werden. Beim Einlesen werden ungültige Dateien, doppelte Profile, problematische Links und beschädigte Turnierdaten zurückgewiesen. Erst nach einer klaren Vorschau und ausdrücklicher Bestätigung werden die bisherigen lokalen Daten auf diesem Gerät ersetzt. **Keine Cloud-Übertragung, kein neues Konto und keine Veränderung der offiziellen Spielstatistik.** PWA v39. [Datenschutz, Speichervertrag und Einschränkungen](docs/LOCAL_BACKUP_STORAGE_V39.md).

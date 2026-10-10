@@ -3,6 +3,7 @@ import {readFile} from "node:fs/promises";
 import vm from "node:vm";
 
 const script=await readFile("app.js","utf8");
+const storageScript=await readFile("state-storage.js","utf8");
 const styles=await readFile("styles.css","utf8");
 const store=new Map();
 const header={innerHTML:"",querySelectorAll:()=>[]};
@@ -11,6 +12,7 @@ const context=vm.createContext({
  localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,String(v))},
  document:{addEventListener(){},getElementById:id=>id==="focused-profile"?header:null}
 });
+vm.runInContext(storageScript,context,{filename:"state-storage.js"});
 vm.runInContext(script,context,{filename:"app.js"});
 const run=q=>vm.runInContext(q,context);
 

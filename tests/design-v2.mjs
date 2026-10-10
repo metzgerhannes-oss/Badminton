@@ -9,7 +9,7 @@ assert.match(html,/rel="stylesheet" href="\.\/design-v2\.css"/);
 assert.match(sw,/design-v2\.css/);
 assert.match(sw,/stats\.js/);
 assert.match(sw,/scripts\/match-stats\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v39/);
+assert.match(sw,/schmetterlinge-shell-v40/);
 for(const id of ["start","turniere","berichte","spieler"]){
  assert.match(html,new RegExp('data-page="'+id+'"'));
 }

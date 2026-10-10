@@ -1,6 +1,6 @@
 "use strict";
 /** Schmetterlinge: historical results and official tournament bookmarks; optional verified Supabase match feed. */
-const STORE="shuttleboard-v1"; // Preserve existing device favourites.
+const STORE=SchmetterlingeStorage.STORE; // The device key is unchanged.
 const DEFAULT_PLAYERS=[
  {id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen",url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
  {id:"05-071969",name:"Charlotte Metzger",birthYear:2014,club:"SpVgg Mössingen",url:"https://turniere.badminton.de/ranking"}
@@ -28,50 +28,9 @@ function normalizeBookmark(x){
 }
 const localDay=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 const niceDay=x=>x?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(x+"T12:00:00Z")):"";
-function restore(){
- try{
-  const saved=JSON.parse(localStorage.getItem(STORE)||"null");
-  if(saved&&typeof saved==="object"){
-   if(Array.isArray(saved.players))state.players=saved.players.filter(p=>p&&typeof p.name==="string"&&typeof p.id==="string").slice(0,12);
-   const philipp=state.players.find(p=>p.id==="05-070879"); if(philipp&&!philipp.birthYear)philipp.birthYear=2016;
-   // Migrate the original local-only Charlotte profile to her confirmed DBV-ID.
-   // Keep any existing user favourites and active profile selection intact.
-   const legacyCharlotte=state.players.find(p=>p.id==="local-charlotte"&&p.name==="Charlotte Metzger");
-   const officialCharlotte=state.players.find(p=>p.id==="05-071969");
-   if(legacyCharlotte){
-     if(officialCharlotte){
-       state.players=state.players.filter(p=>p!==legacyCharlotte);
-     }else{
-       legacyCharlotte.id="05-071969";
-       legacyCharlotte.birthYear=2014;
-       legacyCharlotte.url=legacyCharlotte.url||"https://turniere.badminton.de/ranking";
-     }
-   }
-   const charlotte=state.players.find(p=>p.id==="05-071969");
-   if(charlotte){
-     charlotte.birthYear=2014;
-     if(!charlotte.url)charlotte.url="https://turniere.badminton.de/ranking";
-   }
-   if(Array.isArray(saved.officialLinks))state.officialLinks=saved.officialLinks.map(normalizeBookmark).filter(Boolean).map(t=>t.playerId==="local-charlotte"?{...t,playerId:"05-071969"}:t).slice(0,40);
-   if(Array.isArray(saved.friends))state.friends=saved.friends.filter(p=>p&&/^\d{2}-\d{6}$/.test(p.id)&&typeof p.name==="string"&&p.name.trim()).slice(0,30);
-   const preferred=typeof saved.activeProfileId==="string"?saved.activeProfileId:(typeof saved.chosen==="string"?saved.chosen:"");
-   const canonicalPreferred=preferred==="local-charlotte"&&state.players.some(p=>p.id==="05-071969")?"05-071969":preferred;
-   if(canonicalPreferred!=="all"&&state.players.some(p=>p.id===canonicalPreferred))state.activeProfileId=canonicalPreferred;
-   if(!saved.historyProfilesInitialized&&!state.players.some(p=>p.name==="Charlotte Metzger"))
-    state.players.push({id:"05-071969",name:"Charlotte Metzger",birthYear:2014,url:"https://turniere.badminton.de/ranking"});
-  }
- }catch{}
- // Legacy device profiles retain all favourites; fill only missing known club fields.
- for(const p of state.players){
-  if(["05-070879","05-071969"].includes(p.id)&&!p.club)p.club="SpVgg Mössingen";
- }
- if(!state.players.some(p=>p.id===state.activeProfileId))state.activeProfileId=state.players[0]?.id||"";
- state.friends=state.friends.filter(p=>!state.players.some(own=>own.id===p.id));
- state.chosen=state.activeProfileId;
-}
-function save(){
- try{localStorage.setItem(STORE,JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,activeProfileId:state.activeProfileId,chosen:state.activeProfileId,historyProfilesInitialized:true}))}catch{}
-}
+// Keep the legacy function names for UI callers and existing integrations.
+function restore(){SchmetterlingeStorage.restore(state,normalizeBookmark)}
+function save(){SchmetterlingeStorage.save(state)}
 let toastTimer;
 function toast(message){const node=el("toast");node.textContent=message;node.classList.add("visible");clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove("visible"),2800)}
 function selectedLinks(){if(state.viewingFriendId)return [];return state.officialLinks.filter(t=>t.playerId==="all"||t.playerId===state.activeProfileId)}
