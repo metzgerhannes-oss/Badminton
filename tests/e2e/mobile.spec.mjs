@@ -110,6 +110,25 @@ test("Partial source outage never impersonates a verified empty history, and ret
  await expect(page.locator("#match-stats-retry")).toBeHidden();
 });
 
+test("Import progress counts stored rows, not the server processing cursor",async ({page})=>{
+ await page.route("**/player_external_match_imports?*",route=>{
+  const url=new URL(route.request().url());
+  if(url.searchParams.get("dbv_id")==="eq."+PLAYER)return route.fulfill({
+   status:200,headers,body:JSON.stringify([{
+    dbv_id:PLAYER,status:"partial",cursor_offset:4,verified_count:5,
+    rejected_count:1,last_finished_at:"2026-10-10T12:00:00Z"
+   }])
+  });
+  return route.fallback();
+ });
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#external-match-progress")).toContainText("1 von 5");
+ await expect(page.locator("#external-match-progress")).toContainText("4 Quellkarten verarbeitet");
+ await expect(page.locator("#external-match-progress")).not.toContainText("4 von 5");
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
+ await expect(page.locator("#external-match-progress")).toContainText("Letzter dokumentierter Importversuch");
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());

@@ -103,7 +103,7 @@ async function load(id){
  const signal=abortController.signal;
  render();
  try{
-  const [status]=await readJSON("player_external_match_imports?select=dbv_id,status,cursor_offset,verified_count,rejected_count,source_count,detail&dbv_id=eq."+id+"&limit=1",signal);
+  const [status]=await readJSON("player_external_match_imports?select=dbv_id,status,cursor_offset,verified_count,rejected_count,source_count,detail,last_finished_at&dbv_id=eq."+id+"&limit=1",signal);
   const collected=[];
   for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
    const route="player_external_match_facts?select=dbv_id,source_key,category,competition,event,discipline,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,source_url"+
@@ -144,6 +144,13 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("badminton:external-matches-updated",e=>{
   const id=String(e.detail?.playerId||"");
   if(id===selected&&location.hash==="#historie")load(id);
+ });
+ let lastVisibleRefresh=0;
+ document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"&&location.hash==="#historie"&&
+   isValidId(selected)&&Date.now()-lastVisibleRefresh>=5*60000){
+   lastVisibleRefresh=Date.now();load(selected);
+  }
  });
  window.addEventListener("hashchange",()=>{
   if(location.hash==="#historie")load(current());

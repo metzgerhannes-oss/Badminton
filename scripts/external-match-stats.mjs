@@ -54,14 +54,46 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
  const total=wins+losses;
  return {total,wins,losses,excluded,rate:total?Math.round(wins/total*100):null,details};
 }
+/**
+ * Import cursor = source-processing position, never the number of persisted,
+ * accessible match facts. Report only actual REST rows as available. The
+ * provider overview and match evidence are not guaranteed to be exhaustive.
+ */
 export function importCompleteness(status,loadedCount){
- if(!status||!Number.isInteger(status.verified_count)||status.verified_count<=0)
-  return "Importbestand noch nicht vollständig abgeglichen.";
- const total=status.verified_count;
- const done=Math.min(total,Math.max(loadedCount,Number(status.cursor_offset)||0));
- const excluded=Math.max(0,Number(status.rejected_count)||0);
- return done<total
-  ?done+" von "+total+" auswertbaren Spielen importiert; weitere folgen."
-  :done+" auswertbare Quellenmatches übernommen."+
-      (excluded?" "+excluded+" unklare Matchkarten ausgeschlossen.":"");
+ const available=Number.isSafeInteger(loadedCount)&&loadedCount>=0?loadedCount:0;
+ const total=Number.isSafeInteger(status?.verified_count)&&status.verified_count>0
+  ?status.verified_count:null;
+ const cursor=Number.isSafeInteger(status?.cursor_offset)&&status.cursor_offset>=0
+  ?status.cursor_offset:0;
+ const rejected=Number.isSafeInteger(status?.rejected_count)&&status.rejected_count>0
+  ?status.rejected_count:0;
+ let message;
+ if(total===null){
+  message=available
+   ?available+" Quellkarten derzeit in der App abrufbar. Gesamtumfang des Imports noch nicht bekannt."
+   :"Importbestand noch nicht vollständig abgeglichen.";
+ }else if(available<total){
+  message=available+" von "+total+" als importierbar erkannten Quellkarten derzeit in der App abrufbar.";
+  if(cursor>available){
+   message+=" Der Import hat "+cursor+" Quellkarten verarbeitet; das bestätigt nicht, dass alle bereits in der App verfügbar sind.";
+  }else if(status.status==="loading"||status.status==="queued"){
+   message+=" Der Quellenabgleich läuft.";
+  }else{
+   message+=" Weitere Ergebnisse sind in der App noch nicht belegt.";
+  }
+ }else{
+  message=available+" Quellkarten derzeit in der App abrufbar.";
+  if(available>total)message+=" Der gespeicherte Quellumfang im Importstatus ist älter oder unvollständig.";
+ }
+ if(rejected)message+=" "+rejected+" unklare Matchkarten beim Import ausgeschlossen.";
+ if(status?.status==="awaiting_source")message+=" Die externe Quelle ist derzeit nicht abrufbar.";
+ if(status?.status==="error")message+=" Der letzte Importversuch war nicht erfolgreich.";
+ const checked=Date.parse(status?.last_finished_at||"");
+ if(Number.isFinite(checked)){
+  message+=" Letzter dokumentierter Importversuch: "+
+   new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",
+    hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"})
+    .format(new Date(checked))+".";
+ }
+ return message;
 }

@@ -1,3 +1,7 @@
+## v44 – Ehrlicher Quellenfortschritt und Aktualisieren bei App-Rückkehr
+
+Die Importanzeige zählt nur tatsächlich per REST abrufbare Quellkarten, niemals bloß den serverseitigen Importcursor als bereits gespeicherte Spiele. Verarbeitung, ausgeschlossene Quellkarten, fehlende Bestände und dokumentierter letzter Importversuch werden getrennt. Wenn die App lange im Hintergrund war, aktualisieren Home und Historie öffentliche Read-only-Spielstände beim nächsten Öffnen (höchstens ein Anlass alle fünf Minuten, keine Hintergrundabfragen). Keine Backend- oder Followerdatenänderung. Siehe docs/IMPORT_COVERAGE_V44.md.
+
 ## v43 – Gleiche Matchprüfung in Historie und Home
 
 Einzelnachweise werden in beiden Ansichten identisch auf Gewinner, Sätze, Quelllinks und Dubletten geprüft. Die Historie unterstützt größere Teilbestände bis zur gleichen Obergrenze sowie Wiederholen nach Quellenfehler. Details in docs/HISTORY_MATCH_PARITY_V43.md.
