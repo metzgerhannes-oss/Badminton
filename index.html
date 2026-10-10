@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="./styles.css">
 <link rel="stylesheet" href="./design-v2.css">
 <script defer src="./ui-feedback.js"></script>
+<script type="module" src="./backup.js"></script>
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
 <script type="module" src="./library.js"></script>
@@ -236,6 +237,20 @@
     <p>Wir bewerten die Datenquellen nach Verlässlichkeit: offizieller DBV, Verband, Vereinsbericht und Drittanbieter. Die aktuelle DBV-Excel-Rangliste enthält nur Gesamtpunkte; die fünf Turnier-Einzelwertungen werden separat geprüft.</p>
     <a class="sources-reference-link" href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/DATENQUELLEN_PRIORITAET.md" target="_blank" rel="noopener noreferrer">Quellenliste mit Qualitätsstufen ansehen ↗</a>
    </div>
+   <section class="settings-card backup-card" aria-labelledby="backup-title">
+    <h3 id="backup-title">Meine Daten sichern</h3>
+    <p>Eigene Spieler, gefolgte Freunde und gespeicherte Turniere liegen nur auf diesem Gerät. Mit einer Sicherungsdatei kannst du sie behalten oder auf ein anderes Gerät übertragen.</p>
+    <div class="backup-actions">
+     <button id="backup-export" class="primary-button" type="button">Sicherungsdatei erstellen</button>
+    </div>
+    <div class="backup-import">
+     <label for="backup-file">Vorhandene Sicherung auswählen</label>
+     <input id="backup-file" type="file" accept=".json,application/json">
+     <button id="backup-restore" class="outline-button" type="button" disabled>Ausgewählte Daten wiederherstellen</button>
+    </div>
+    <p id="backup-feedback" class="backup-feedback" role="status" aria-live="polite"></p>
+    <p class="small muted">Die Sicherung enthält Spielernamen und Favoriten. Sie wird nicht an uns übertragen. Eine Wiederherstellung ersetzt erst nach deiner Bestätigung die bisherigen Daten auf diesem Gerät.</p>
+   </section>
    <div class="settings-card"><h3>Daten & Datenschutz</h3>
     <p>Spielerprofile einschließlich Verein, Freunde und Turnierfavoriten werden weiterhin nur in diesem Browser gespeichert. Die öffentlichen DBV-Ranglisten und unsere kuratierte Turnierhistorie enthalten derzeit nicht jeden befreundeten Spieler.</p>
    </div>
