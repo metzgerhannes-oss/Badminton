@@ -26,6 +26,8 @@ jobs:
           node --check stats.js
           node --check friend-search.js
           node --check career-history.js
+          node --check external-matches.js
+          node --check scripts/badhub-history-parser.mjs
           node --check history-demand.js
           node --check scripts/history-demand.mjs
           node --check scripts/external-history.mjs
@@ -57,6 +59,7 @@ jobs:
           node tests/player-library.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
+          node tests/external-match-parser.mjs
           node tests/history-demand.mjs
           node tests/history-status-ux.mjs
           node tests/live-links.mjs

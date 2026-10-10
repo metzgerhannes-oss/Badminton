@@ -17,6 +17,7 @@
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
 <script type="module" src="./career-history.js"></script>
+<script type="module" src="./external-matches.js"></script>
 <script defer src="./live.js"></script>
 <script type="module" src="./live-links.js"></script>
 <script type="module" src="./live-radar.js"></script>
@@ -69,6 +70,19 @@
     <summary>Datenstand und Quellen</summary>
     <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
    </details>
+   <section id="external-match-history" class="external-match-history" aria-labelledby="external-match-title" hidden>
+    <div class="section-heading"><h3 id="external-match-title">Historische Einzelspiele</h3><span class="career-source-label">Badhub · Quellennachweise</span></div>
+    <p class="external-match-intro">Einzelne Begegnungen aus der öffentlichen Spielerhistorie, mit Gegner und Satzständen. Keine offiziellen DBV-Match-IDs.</p>
+    <div id="external-match-progress" class="external-match-progress" role="status" aria-live="polite"></div>
+    <div class="external-match-filters">
+      <label>Jahr<select id="external-match-year"><option value="all">Alle Jahre</option></select></label>
+      <label>Disziplin<select id="external-match-discipline"><option value="all">Alle</option><option>Einzel</option><option>Doppel</option><option>Mixed</option></select></label>
+      <label>Spielart<select id="external-match-category"><option value="all">Alle</option><option value="tournament">Turniere</option><option value="league">Liga</option></select></label>
+    </div>
+    <div id="external-match-count" class="external-match-count"></div>
+    <div id="external-match-list" class="external-match-list"></div>
+    <button id="external-match-more" class="subtle-button" type="button" hidden>Weitere Spiele anzeigen</button>
+   </section>
    <section id="career-history" class="career-history" aria-labelledby="career-heading" hidden>
      <div class="section-heading"><h3 id="career-heading">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
      <div id="career-summary" class="career-summary"></div>
