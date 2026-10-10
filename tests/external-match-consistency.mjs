@@ -32,5 +32,5 @@ assert.doesNotMatch(history,/fetch\(API\+/);
 assert.doesNotMatch(home,/fetch\(ROOT\+/);
 assert.match(history,/Der Datenstand kann derzeit nicht geprüft werden/);
 assert.match(history,/external-match-retry/);
-assert.match(sw,/schmetterlinge-shell-v59/);
+assert.match(sw,/schmetterlinge-shell-v60/);
 console.log("v43: Historie und Home validieren dieselben belegten Matches und Dubletten.");

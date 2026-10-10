@@ -26,7 +26,7 @@ assert.equal((tournament.match(/id="live-radar-refresh"/g)||[]).length,1);
 assert.equal((html.match(/data-page="/g)||[]).length,4,"Four primary destinations");
 assert.match(html,/data-page="start".*?<small>Home<\/small>/s);
 assert.match(app,/function navigateHome\(\)/);
-assert.match(app,/state\.viewingFriendId=null;\s*state\.chosen=state\.activeProfileId;/);
+assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);/,"Home must return to locally selected own profile");
 assert.match(app,/window\.badmintonSelectViewer/);
 assert.match(app,/stayOnPage:true|stayOnPage=false/);
 assert.match(app,/window\.badmintonLiveViewerOptions/);
@@ -54,7 +54,7 @@ assert.match(css,/\.live-hub-toolbar select/);
 assert.match(css,/\.live-hub-sources/);
 assert.match(css,/\.live-hub-bookmarks/);
 assert.match(sw,/live-hub\.js/);
-assert.match(sw,/schmetterlinge-shell-v59/);
+assert.match(sw,/schmetterlinge-shell-v60/);
 const t="2026-10-10T12:00:00Z",id="05-061350";
 const base={source_url:"https://badhub.de/spieler/"+id+"/live",provider:"Badhub",checked_at:t,
  payload:{tournament:{name:"Jugendturnier"},running:null,next:null,upcoming:[],past:[],entries:[]}};

@@ -64,6 +64,7 @@ jobs:
           node tests/profile-switch.mjs
           node tests/local-backup.mjs
           node tests/state-storage.mjs
+          node tests/profile-transitions.mjs
           node tests/router.mjs
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs

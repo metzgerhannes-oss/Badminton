@@ -30,7 +30,7 @@ const nav=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
 assert.deepEqual(nav,["start","turniere","spieler","berichte"]);
 assert.match(html,/href="#einstellungen" aria-label="Einstellungen öffnen"/);
 assert.match(app,/function navigateHome\(\)/);
-assert.match(app,/state\.viewingFriendId=null;\s*state\.chosen=state\.activeProfileId;\s*routeTo\("start"\)/);
+assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);\s*routeTo\("start"\)/);
 assert.match(app,/function focusCurrentView\(\)/);
 assert.match(router,/heading\.focus\(\{preventScroll:true\}\)/);
 assert.match(router,/window\.scrollTo\(\{top:0,behavior:"auto"\}\)/);
@@ -50,7 +50,7 @@ assert.match(style,/\.library-player-action button,\.library-player-action \.lib
 assert.match(style,/min-height:44px/);
 assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(style,/:focus-visible/);
-assert.match(sw,/schmetterlinge-shell-v59/);
+assert.match(sw,/schmetterlinge-shell-v60/);
 assert.match(sw,/ui-feedback\.js/);
 assert.match(sw,/router\.js/);
 assert.match(app,/SchmetterlingeRouter\.renderPage\(state\)/);
