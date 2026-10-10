@@ -757,3 +757,7 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
 /* v42 – calm source cross-check; hidden remains hidden on every screen. */
 .match-stats-lookup{display:inline-flex;align-items:center;min-height:44px;font-size:12px;font-weight:750;color:#086797;text-decoration:underline;text-underline-offset:3px}
 .match-stats-lookup[hidden]{display:none!important}
+
+/* v43 – show historical retry only when source has failed. */
+#external-match-retry[hidden]{display:none!important}
+#external-match-retry:not([hidden]){min-height:44px;margin:6px 0 12px}
