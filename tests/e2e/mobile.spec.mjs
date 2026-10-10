@@ -146,6 +146,27 @@ test("Club-confirmed win is displayed separately from scored matches",async ({pa
  expect(overflow).toBeLessThanOrEqual(2);
 });
 
+test("Crossfed DBV tournament proofs keep their own source URL and year",async ({page})=>{
+ await page.route("**/player_external_match_facts?*",route=>{
+  const url=new URL(route.request().url());
+  if(url.searchParams.get("dbv_id")==="eq."+PLAYER)return route.fulfill({
+   status:200,headers,body:JSON.stringify([sourceRecord,{
+    ...sourceRecord,source_key:"tournament:dbv-950:me-u17:ko:verified",
+    source_url:"https://badhub.de/dbv/turnier.php?id=950",
+    competition:"DBV-Turnier 2025",competition_id:"950",match_year:2025,
+    match_date:"2025-12-12",opponent_names:["Beleggegner"]
+   }])
+  });
+  return route.fallback();
+ });
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#external-match-count")).toContainText("2 einzeln belegte Spiele");
+ await expect(page.locator("#external-match-list .external-match-item")).toHaveCount(2);
+ await expect(page.locator('#external-match-list a[href="https://badhub.de/dbv/turnier.php?id=950"]')).toHaveCount(1);
+ await page.locator("#external-match-year").selectOption("2025");
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());

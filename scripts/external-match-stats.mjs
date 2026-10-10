@@ -5,7 +5,7 @@ const validUrl=value=>{
  try{
   const url=new URL(String(value||""));
   return url.protocol==="https:"&&url.hostname==="badhub.de" &&
-    /^\/bwbv\/(?:turnier|begegnung)\.php$/.test(url.pathname)&&
+    /^\/(?:bwbv\/(?:turnier|begegnung)|dbv\/turnier)\.php$/.test(url.pathname)&&
     /^\d+$/.test(url.searchParams.get("id")||"");
  }catch{return false}
 };
