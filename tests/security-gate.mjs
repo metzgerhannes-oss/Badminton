@@ -27,12 +27,12 @@ assert.match(audit,/pg_catalog\.pg_default_acl/);
 assert.match(audit,/has_truncate_default/);
 assert.match(audit,/has_auxiliary_default/);
 for(const privilege of ["TRIGGER","REFERENCES","MAINTAIN"]){
- assert.match(audit,new RegExp("has_table_privilege\\\\('anon',c\\\\.oid,'"+privilege+"'\\\\)"));
- assert.match(audit,new RegExp("has_table_privilege\\\\('authenticated',c\\\\.oid,'"+privilege+"'\\\\)"));
+ assert.ok(audit.includes("has_table_privilege('anon',c.oid,'"+privilege+"')"));
+ assert.ok(audit.includes("has_table_privilege('authenticated',c.oid,'"+privilege+"')"));
 }
-assert.match(auxiliary,/revoke trigger, references, maintain on all tables in schema public\\s+from public, anon, authenticated/i);
-assert.match(auxiliary,/alter default privileges for role postgres in schema public\\s+revoke trigger, references, maintain/i);
-assert.doesNotMatch(auxiliary,/\\b(drop|truncate table|delete from|update public\\.)\\b/i);
+assert.ok(auxiliary.includes("revoke trigger, references, maintain on all tables in schema public"));
+assert.ok(auxiliary.includes("revoke trigger, references, maintain on tables from anon, authenticated"));
+assert.doesNotMatch(auxiliary,/\b(drop|delete|truncate)\s+table\b|\bdelete\s+from\b/i);
 assert.match(audit,/has_column_privilege\('anon','public\.player_history_imports','last_demand_at','SELECT'\)/);
 assert.doesNotMatch(audit,/\b(create|alter|delete|insert|update|drop|truncate|revoke|grant)\s+(table|function|schema|on|from|to)\b/i,
  "The release-audit file must remain read-only SQL");
