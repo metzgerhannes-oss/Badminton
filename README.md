@@ -1,3 +1,7 @@
+## v52 – Automatische Quellenprüfungen nach tatsächlicher Nachfrage
+
+Historienaufträge werden über einen begrenzten RPC nur beim bewussten Öffnen der Historie aktualisiert. Ohne Nachfrage in den letzten 14 Tagen ruhen die automatischen Wiederprüfungen, können aber beim erneuten Öffnen reaktiviert werden. Es gibt keine Löschung von Matchdaten. Die 14 Tage sind ein technisches Aktivitätsfenster, **keine Löschfrist**. [Architektur und Sicherheit](docs/HISTORY_DEMAND_LIFECYCLE_V52.md). Speicherung, Löschung und Rechteprüfung bleiben #53/#56.
+
 ## v51 – Keine Quellennetzabfrage ohne fälligen Historienauftrag
 
 Der bestehende 15-Minuten-Worker der öffentlichen Historienwarteschlange prüft zuerst rein lokal, ob ein Import oder eine erneute Prüfung tatsächlich ansteht. Nur bei offenen Arbeitsaufträgen ruft er den GitHub-Quellenindex ab. Das vermeidet wiederkehrende Leerlauf-Anfragen, ohne vorhandene Ergebnisbelege, Importgrenzen, Quellenvalidierung oder das Aktualisierungsintervall zu ändern. Technische Änderung: `database/history-worker-idle-guard-v51.sql`; die fachlichen Aufbewahrungs- und Löschfristen aus Issue #53 bleiben offen.

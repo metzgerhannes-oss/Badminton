@@ -1,4 +1,4 @@
-import {PUBLIC_KEY,importPost,importStatusUrl,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
+import {PUBLIC_KEY,demandPost,importStatusUrl,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
 
 let shown="",requestSeq=0,timeout,controller;
 const $=id=>document.getElementById(id);
@@ -36,14 +36,14 @@ async function callStatus(id,signal){
  if(!Array.isArray(rows))throw Error("Unerwartete Antwort");
  return rows[0]||null;
 }
-async function requestNew(id,signal){
- const payload=importPost(id);
+async function requestDemand(id,signal){
+ const payload=demandPost(id);
  if(!payload)return false;
  const response=await fetch(payload.url,{
   method:"POST",signal,headers:payload.headers,body:payload.body
  });
- if(!response.ok)throw Error("Importauftrag HTTP "+response.status);
- return true;
+ if(!response.ok)throw Error("History demand HTTP "+response.status);
+ return (await response.json())?.accepted===true;
 }
 async function refresh(id,{enqueue=true}={}){
  if(!allowed(id))return;
@@ -55,13 +55,10 @@ async function refresh(id,{enqueue=true}={}){
  const signal=controller.signal;
  show({status:"checking"},id);
  try{
-  let status=await callStatus(id,signal);
-  if(!status&&enqueue){
-   await requestNew(id,signal);
-   status=await callStatus(id,signal);
-  }
-  // Only opening the history screen can trigger an import.
-  if(enqueue&&seq===requestSeq)void requestIndividualMatches(id);
+  // Only an explicit visit to Historie can activate the bounded server queue.
+  const accepted=enqueue?await requestDemand(id,signal):true;
+  const status=await callStatus(id,signal);
+  if(enqueue&&accepted&&seq===requestSeq)void requestIndividualMatches(id);
   if(seq!==requestSeq)return;
   show(status,id);
   if(status?.status==="queued"||status?.status==="checking"){

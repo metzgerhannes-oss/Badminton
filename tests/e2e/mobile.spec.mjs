@@ -55,6 +55,8 @@ test.beforeEach(async ({page})=>{
      payload:{tournament:null,running:null,next:null,hero:null,upcoming:[],past:[],entries:[]}
     }];
    }
+   if(url.pathname.endsWith("/rpc/request_player_history_demand"))
+    return route.fulfill({status:200,headers,body:'{"accepted":true,"reused":false}'});
    if(url.pathname.includes("/functions/v1/"))
     return route.fulfill({status:200,headers,body:'{"queued":false,"reason":"already_present"}'});
    return route.fulfill({status:200,headers,body:JSON.stringify(data)});
@@ -67,7 +69,7 @@ test.beforeEach(async ({page})=>{
 test("Following stays local; only Historie requests a new source import",async ({page})=>{
  const imports=[];
  page.on("request",request=>{
-  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/player_history_imports")
+  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/rpc/request_player_history_demand")
    imports.push(JSON.parse(request.postData()||"{}"));
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
@@ -76,7 +78,7 @@ test("Following stays local; only Historie requests a new source import",async (
  expect(imports).toHaveLength(0);
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect.poll(()=>imports.length,{timeout:10000}).toBeGreaterThan(0);
- expect(imports.some(request=>request.dbv_id===PLAYER)).toBe(true);
+ expect(imports.some(request=>request.target_id===PLAYER)).toBe(true);
 });
 
 test("Home shows individual sourced matches and fits the small viewport",async ({page})=>{
