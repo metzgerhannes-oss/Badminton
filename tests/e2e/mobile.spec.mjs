@@ -112,7 +112,7 @@ test("Turniertag is task-first; source-free status is calm and history is reacha
  await page.locator("#live-player-select").selectOption(FRIEND);
  await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
  await expect(page.locator("#view-turniere")).toBeVisible();
- await page.locator('a[href="#historie"]').first().click();
+ await page.locator('#view-turniere a[href="#historie"]:visible').first().click();
  await expect(page.locator("#view-historie")).toBeVisible();
  await expect(page.locator('.bottom-nav a[data-page="turniere"]')).toHaveAttribute("aria-current","page");
  await expect(page).toHaveTitle(/Turnierhistorie/);
