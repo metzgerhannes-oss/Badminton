@@ -36,8 +36,8 @@ export function importMessage(row){
   case "queued":return {kind:"queued",title:"Historie vorgemerkt",detail:"Der erste Quellenabgleich startet automatisch. Die Quelle wird anschließend gemeinsam für alle Nutzer genutzt."};
   case "checking":return {kind:"checking",title:"Historische Quellen werden geprüft",detail:"Der Quellenabgleich läuft auf dem Server."};
   case "partial":return {kind:"partial",title:"Historische Übersicht verfügbar",detail:"Externe Karriereübersicht in Supabase übernommen. Einzelne offizielle DBV-Matches sind noch nicht importiert."};
-  case "awaiting_source":return {kind:"waiting",title:"Einzelmatches noch nicht importiert",detail:"Wir können derzeit noch keine einzeln belegten historischen Matches übernehmen. Die Quellen werden weiterhin regelmäßig geprüft; vorhandene Ranglisten und Turnierergebnisse bleiben nutzbar."};
-  case "error":return {kind:"error",title:"Quellenprüfung vorübergehend fehlgeschlagen",detail:"Ein erneuter automatischer Versuch ist vorgesehen."};
+  case "awaiting_source":return {kind:"waiting",title:"Einzelmatches noch nicht importiert",detail:"Noch keine einzeln belegten historischen Matches aus der geprüften Quelle verfügbar. Weitere Prüfungen erfolgen nur bei aktueller Nachfrage; öffne die Historie bei Bedarf erneut. Vorhandene Ranglisten und Turnierergebnisse bleiben sichtbar."};
+  case "error":return {kind:"error",title:"Quellenprüfung vorübergehend fehlgeschlagen",detail:"Bei aktueller Nachfrage wird die Quellenprüfung erneut versucht. Die Historie kann später erneut geöffnet werden."};
   default:return {kind:"none",title:"Importstatus nicht bekannt",detail:"Bitte später erneut versuchen."};
  }
 }
