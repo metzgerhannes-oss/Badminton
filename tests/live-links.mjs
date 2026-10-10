@@ -20,5 +20,5 @@ assert.match(js,/badhubLiveUrl\(id\)/);
 assert.match(css,/\.external-live-player/);
 assert.match(sw,/live-links\.js/);
 assert.match(sw,/scripts\/live-links\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v50/);
+assert.match(sw,/schmetterlinge-shell-v52/);
 console.log("Externes Live: Sarah and Philipp player-specific URLs validated; no unverified in-app match data.");
