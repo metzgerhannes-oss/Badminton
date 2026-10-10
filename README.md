@@ -1,3 +1,7 @@
+## v51 – Keine Quellennetzabfrage ohne fälligen Historienauftrag
+
+Der bestehende 15-Minuten-Worker der öffentlichen Historienwarteschlange prüft zuerst rein lokal, ob ein Import oder eine erneute Prüfung tatsächlich ansteht. Nur bei offenen Arbeitsaufträgen ruft er den GitHub-Quellenindex ab. Das vermeidet wiederkehrende Leerlauf-Anfragen, ohne vorhandene Ergebnisbelege, Importgrenzen, Quellenvalidierung oder das Aktualisierungsintervall zu ändern. Technische Änderung: `database/history-worker-idle-guard-v51.sql`; die fachlichen Aufbewahrungs- und Löschfristen aus Issue #53 bleiben offen.
+
 ## v50 – Neutrale Ersteinrichtung ohne eingebaute Familienprofile
 
 - Neue Geräte erhalten ein leeres Profilverzeichnis und einen neutralen Einrichtungsdialog; keine persönlichen Beispielnamen, Geburtsjahre oder Vereinszuordnungen sind standardmäßig im ausgelieferten `app.js` enthalten.
