@@ -1,0 +1,269 @@
+/* Schmetterlinge – light-blue mobile design v2 (reference: approved 10 Oct screenshot).
+   Intentionally loaded AFTER the legacy stylesheet. Existing crest, profiles and data
+   are kept; this layer only changes presentation and accessible layout. */
+:root{
+  color-scheme:light;
+  --sky:#e5f4ff;--sky-deep:#cce8fb;--panel:#ffffffea;
+  --ink:#0b2a52;--ink-soft:#456588;--link:#087dc3;
+  --hairline:#b8dcef;--shadow:0 7px 26px #5488ab19;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);background:#d4ebfc;
+}
+html{background:#d4ebfc}
+body{color:var(--ink);min-height:100vh;overflow-x:hidden;
+  background:radial-gradient(ellipse at 90% 2%,#d8f0ff 0%,transparent 39%),
+    radial-gradient(ellipse at 3% 32%,#b8e4fa 0%,transparent 44%),
+    linear-gradient(180deg,#d8eefe 0%,#e8f5fe 59%,#d3ebfc 100%);
+}
+a{color:var(--link)}
+button{touch-action:manipulation}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,
+summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
+.app{width:100%;max-width:780px;margin:0 auto;padding:0 15px calc(118px + env(safe-area-inset-bottom));}
+.topbar{height:auto;min-height:116px;position:relative;margin:4px 0 8px;overflow:hidden;}
+.topbar:after{content:"🏸";position:absolute;right:-15px;top:4px;font-size:84px;transform:rotate(-32deg);opacity:.09;pointer-events:none;}
+.brand{color:var(--ink);gap:12px;min-width:0;}
+.brand>span{color:#071f47;font-size:clamp(20px,5.3vw,30px);letter-spacing:-.7px;font-weight:900;overflow-wrap:anywhere;}
+.brand small{color:#3e638a;font-size:clamp(7.5px,1.95vw,10px);font-weight:760;letter-spacing:.9px;}
+.brand-logo{background:transparent!important;box-shadow:none!important;border-radius:50%!important;object-fit:contain!important;min-width:80px!important;}
+.focused-profile{margin:5px 0 23px;padding:14px 13px;gap:12px;min-height:92px;
+  border:1px solid #d5e9f5;background:linear-gradient(112deg,#fff,#ebf8ff);
+  border-radius:21px;box-shadow:var(--shadow);}
+.focus-profile-avatar,.profile-initial,.friend-avatar{background:linear-gradient(135deg,#bfecff,#6dbbeb);color:#0c3865;box-shadow:none}
+.focus-profile-avatar{height:54px;width:54px;font-size:24px;}
+.focus-profile-copy small{font-size:11px;color:#4e7191}
+.focus-profile-copy strong{color:#071f49;font-size:clamp(16px,4.7vw,24px);font-weight:870}
+.focus-profile-copy>span,.focused-profile .focus-profile-copy .focus-club{font-size:11px;color:#486a8c;line-height:1.45}
+.focus-settings,.focus-switcher>summary{background:#e8f5ff!important;color:#12487a!important;border:1px solid #8dccec!important;border-radius:13px;font-weight:800;min-height:43px;display:flex;align-items:center;justify-content:center;padding:9px!important}
+.focus-switcher-options{background:#fff!important;border:1px solid var(--hairline)!important;box-shadow:0 12px 28px #15436a30}
+.focus-switcher-options button{color:#0a315a!important}
+.focus-switcher-options button:hover{background:#e4f3ff}
+.focus-switcher-check{color:#067aba}
+.page{color:var(--ink)}
+.page .section-heading{align-items:center}
+.section-heading h1,.section-heading h2,.section-heading h3,
+.dashboard-heading h1{color:var(--ink);letter-spacing:-.4px}
+.dashboard-heading{margin:8px 0 9px}
+.dashboard-heading h1{font-size:clamp(23px,5.6vw,29px);line-height:1.25}
+.muted,.supporting,.settings-hint,.small{color:var(--ink-soft)}
+.dashboard-source{color:#56758d;margin-bottom:11px;gap:9px}
+.dashboard-source a,.subtle-button,.ranking-stale-link,.dashboard-friends-manage{color:var(--link);font-weight:800}
+.dashboard-ranking-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:15px}
+.ranking-tile.ranking-compact{min-width:0;min-height:194px;border-radius:19px;
+  padding:15px 11px 12px;background:linear-gradient(145deg,#fff,#edf9ff 95%);
+  color:var(--ink);border:1px solid #d6eaf8;box-shadow:0 7px 20px #578eb021;}
+.ranking-compact .ranking-top{color:#0c2f58;font-size:clamp(12px,2.8vw,16px);font-weight:850}
+.ranking-bw-title{color:#4a7597;font-size:11px;margin-top:10px}
+.ranking-bw-row{margin-top:5px;min-width:0;white-space:normal;flex-wrap:wrap}
+.ranking-bw-row strong{color:#081f47;font-size:clamp(27px,6vw,42px);letter-spacing:-1.5px}
+.ranking-bw-row .movement{font-size:11px}
+.movement-up{color:#078b49!important}
+.movement-down{color:#b53f42!important}
+.movement-same{color:#56728b!important}
+.movement-unknown{color:#587893!important}
+.ranking-de-row{margin-top:12px;padding-top:9px;border-top:1px solid #d2e6f2;color:#4d6c89}
+.ranking-de-row strong{color:#0b2d54;font-size:18px}
+.ranking-compact-points{color:#0a2e55;margin-top:12px;font-size:clamp(11px,2.4vw,16px);white-space:normal}
+.ranking-compact-points small,.ranking-compact-footer{color:#577593}
+.ranking-compact-footer{margin-top:auto;font-size:9px;padding-top:9px}
+.ranking-compact-footer span{color:#087fbf}
+.ranking-tile:disabled{opacity:.72}
+.kpi-tile,.kpi-wide,.dashboard-empty-tile,
+.upcoming-tournaments-section,.trophy-section,
+.settings-card,.own-profile,.friend-card,.tournament-card,.link-tile,
+.notice,.pending-medal{color:var(--ink);border:1px solid #d0e5f4;
+  background:linear-gradient(145deg,#ffffff,#edf8ff);
+  box-shadow:var(--shadow);border-radius:20px;}
+.kpi-tile,.kpi-wide{color:var(--ink)}
+.kpi-label,.kpi-sub,.kpi-wide small,.kpi-link{color:#4f6b85}
+.kpi-value{color:#0a2d57}
+.dashboard-kpi-grid{display:block;margin:0 0 16px}
+.home-trophy{padding:18px 15px 17px;border-radius:22px;
+  background:linear-gradient(140deg,#fff,#f0faff);border:1px solid #d2e8f7;box-shadow:var(--shadow);}
+.home-trophy-heading{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:13px}
+.home-trophy-heading h2{font-size:clamp(19px,4.6vw,24px);margin:0;color:#0b2b52}
+.home-trophy-heading a{font-size:12px;font-weight:800;color:var(--link);white-space:nowrap}
+.home-trophy-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;gap:0}
+.home-trophy-slot,.home-trophy-tournaments{min-width:0;display:grid;grid-template-rows:38px 23px auto;
+  justify-items:center;align-items:center;gap:4px;padding:5px 3px;text-align:center;border-left:1px solid #d9e9f5;}
+.home-trophy-slot:first-child{border-left:0}
+.home-trophy-symbol{font-size:30px;line-height:1;text-shadow:0 2px 2px #3d5f7518}
+.home-trophy-slot.silver .home-trophy-symbol{filter:grayscale(1) brightness(1.24)}
+.home-trophy-slot.bronze .home-trophy-symbol{filter:sepia(1) saturate(1.6) hue-rotate(327deg) brightness(.83)}
+.home-trophy-slot.fourth .home-trophy-symbol{color:#98a8b7}
+.home-trophy-slot strong,.home-trophy-tournaments strong{font-size:21px;color:#092c54;line-height:1.1;font-weight:900}
+.home-trophy-slot small,.home-trophy-tournaments small{color:#526f8c;font-size:10px;line-height:1.25}
+.home-trophy-tournaments{color:inherit;text-decoration:none}
+.home-trophy-tournaments>span{font-size:29px}
+.home-trophy-note{font-size:10px;line-height:1.55;color:#6a8297;margin:11px 0 0}
+.upcoming-tournaments-section{margin:12px 0 20px;padding:15px 15px 9px}
+.upcoming-tournaments-header h2{color:#0a2b52;font-size:clamp(18px,4.3vw,23px)}
+.upcoming-tournaments-header a{color:var(--link);font-weight:800}
+.upcoming-tournament-row{min-height:64px;color:#143a62;padding:10px 6px;gap:11px}
+.upcoming-tournament-row+.upcoming-tournament-row{border-top:1px solid #d5e7f2}
+.upcoming-tournament-date{color:#123e67;min-width:71px;min-height:47px;text-align:center;
+  background:#e2f3ff;border-radius:11px;padding:6px;font-weight:800}
+.upcoming-tournament-info strong{color:#14345c;font-size:13px}
+.upcoming-tournament-info small,.upcoming-tournaments-empty{color:#54728d}
+.upcoming-tournament-arrow{color:#067fc5}
+.upcoming-tournament-date small{background:#d1eafa;color:#3f6582}
+.dashboard-friends-section .section-heading h2{color:#0e315b}
+.friend-quick{background:#fff;border-color:#c6e2f2;color:#143657}
+.friend-quick.is-current{background:#e6f6ff;border-color:#60b5e5}
+.friend-quick-avatar{background:#b0e0fb;color:#0e4169}
+.friend-quick-add{color:#176aab;border-color:#8ec3e6}
+.friend-quick-add-icon{background:#b9e8ff;color:#0e477d}
+/* Match statistics: verified outcomes only, with understandable empty state. */
+.match-stats{background:linear-gradient(140deg,#fff,#effaff);border:1px solid #d0e8f6;box-shadow:var(--shadow);
+  border-radius:21px;margin:15px 0 20px;padding:18px 14px;}
+.match-stats-heading{margin:0 0 12px}
+.match-stats-heading h2{font-size:20px}
+.match-stats-source{font-size:10px;color:#477d9e;font-weight:750}
+.match-stats-filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.match-stats-filters label{color:#486784;font-size:11px;display:grid;gap:6px;font-weight:800}
+.match-stats-filters select{width:100%;min-width:0;min-height:44px;border:1px solid #aed5ee;border-radius:12px;
+  color:#143756;background:#f3fbff;padding:9px 7px;font:inherit;font-size:12px}
+.match-stats-values{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.match-stat{display:grid;gap:8px;align-content:space-between;min-height:81px;background:#e9f6ff;
+  border:1px solid #d5eaf5;border-radius:14px;padding:12px 8px;min-width:0}
+.match-stat span{font-size:10px;font-weight:780;color:#45647d;overflow-wrap:anywhere}
+.match-stat strong{font-size:clamp(17px,4.3vw,28px);font-weight:900;color:#0a2d55;line-height:1.1;font-variant-numeric:tabular-nums}
+.match-stat.wins strong{color:#07864c}
+.match-stat.losses strong{color:#9b4242}
+.match-stats-note{font-size:11px;line-height:1.65;color:#607c96;margin:12px 0}
+.match-stats-empty{font-size:12px;color:#486e89;grid-column:1/-1;line-height:1.6}
+.match-stats-details{border-top:1px solid #d5e8f4;padding-top:10px;margin-top:8px}
+.match-stats-details summary{color:#0877b7;font-weight:850;font-size:12px;cursor:pointer;padding:6px 0}
+.match-stats-details summary span{color:#54758f;margin-left:5px}
+.match-stats-list{display:grid;gap:9px;margin-top:12px}
+.match-proof{padding:12px;background:#f3faff;border:1px solid #d0e4f2;border-radius:12px}
+.match-proof-head{display:flex;flex-wrap:wrap;gap:9px;align-items:center;color:#607c90;font-size:10px;margin-bottom:8px}
+.match-proof-head .match-win{color:#047d46;font-weight:900}
+.match-proof-head .match-loss{color:#ac3541;font-weight:900}
+.match-proof strong{color:#153c62;font-size:12px}
+.match-proof p{font-size:11px;line-height:1.55;margin:6px 0;color:#4a6a84}
+.match-proof a{color:var(--link);font-size:11px;font-weight:800}
+.match-stats-details[hidden]{display:none!important}
+/* History retains its real sourced award badges, but in the same visual language. */
+.trophy-section{background:linear-gradient(145deg,#fff,#effaff);border-color:#cce4f3;}
+.trophy-section h3,.trophy-section .section-heading h3{color:#092e57}
+.trophy-curated-label{border-color:#b5d9ed;color:#477493;background:#edf8ff}
+.trophy-description{color:#52728d}
+.trophy-shelf{background:#eaf6ff;border-color:#bcdced;box-shadow:inset 0 2px 10px #a4cbe52a}
+.trophy-slot{background:linear-gradient(#fff,#eaf6ff);border-color:#c9dce9;box-shadow:0 4px 11px #4f729a15;color:#0d3157}
+.trophy-slot:after,.trophy-shelf:after{opacity:.26}
+.trophy-section .trophy-description,.trophy-slot .trophy-label{color:#547590}
+.trophy-awards-heading h3{color:var(--ink)}
+.trophy-awards,.history-chronicle-title,.history-ranking-note{color:#25496a}
+.notice,.history-summary,.history-pending{color:#365d78}
+.notice{background:#f7fcff}
+.history-filters select,#history-filters select{color:#16446a;background:#fff;border:1px solid #c0dfed}
+/* Lists, forms and info panels. */
+.settings-card,.profile-card,.friend-card,.tournament-card,.link-tile{background:#f8fcff;border-color:#c7e0ef;color:#10345c}
+.settings-card h3,.profile-card h3,.tournament-card h3{color:#123960}
+.settings-card p,.profile-card p,.tournament-card p{color:#587691}
+.settings-hint,.small,.supporting{color:#4c708a}
+.remove-button{color:#2474a8;min-height:40px}
+.primary-button{background:#0c83c8;color:#fff;border:1px solid #0875b5;min-height:44px}
+.outline-button{border:1px solid #9dcde7;color:#11679f;background:#eef8ff;min-height:44px}
+.subtle-button{min-height:42px;color:#0879bd}
+.modal label{color:#1b456a}
+.modal input,.modal select,.report-filters input,.report-filters select,.library-filters input,.library-filters select{
+  color:#153c60!important;background:#f7fcff!important;border:1px solid #acd2e6!important;border-radius:12px;min-height:44px}
+input::placeholder{color:#7492a7!important}
+dialog,.first-run-dialog,.ranking-dialog{background:linear-gradient(145deg,#fff,#e7f5ff);border:1px solid #aed8ed;color:#0c305a}
+dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
+.first-run-header h2,.ranking-detail-content h2{color:#0f335a}
+.first-run-header p,.ranking-dialog-lead,.ranking-dialog-small{color:#557993}
+.first-run-choice{background:#e5f5ff;color:#123f64;border-color:#afd8ef}
+.first-run-choice>span:first-child{color:#0a4674}
+.first-run-new{color:#187cb6;border-color:#9fcbe4}
+.ranking-dialog-stats>div{background:#edf8ff;border-color:#c6dfeb}
+.ranking-dialog-stats span,.ranking-dialog-stats small,.ranking-score-note{color:#50718b}
+.ranking-dialog-stats strong{color:#0c3561}
+.ranking-dialog-link,.ranking-score-source-link{color:#067cb9}
+.ranking-score-total{color:#0c3156;background:#e4f5ff;border-color:#bad8ec}
+/* The whole library, reports, and DBV live pages follow the same light cards. */
+.library-source{color:#456a85;background:#e8f5ff;border-color:#b8ddef}
+.library-filters label,.report-filters label{color:#385d7c}
+.library-result-bar{color:#163f66}
+.library-club-group,.report-card,.report-source-directory{color:#11395f;background:#fff;border-color:#c6e0ef;box-shadow:var(--shadow)}
+.library-club-group h3{color:#0a3157;background:#e5f5ff}
+.library-club-group h3 span{color:#5c7c95}
+.library-player{border-top-color:#d8e9f3}
+.library-player-avatar{color:#0b4976;background:#c3eaff}
+.library-player-info strong{color:#143c64}
+.library-player-info span,.library-player-info small,.library-data-note{color:#5b7a95}
+.library-player-action button{color:#fff;background:#0c82c5;border-color:#0b7ab7}
+.library-player-action button.following{color:#067146;background:#e1f8ec;border-color:#73c8a3}
+.library-player-action button.library-view{color:#076fb1}
+.library-own{color:#2f6385;background:#e0f4ff;border-color:#acd7ed}
+.library-message,.report-empty{color:#4f7694;background:#f6fbff;border-color:#bdddeb}
+.report-card-meta,.report-card-footer span{color:#5c7b96}
+.report-card h3{color:#0e3560}
+.report-card p{color:#4f6d88}
+.report-card-footer a,.report-source-entry a{color:#047ebd}
+.report-source-directory summary{color:#153d5f}
+.report-source-directory>p,.report-source-status,.report-source-entry small{color:#577892}
+.report-source-entry{border-color:#d3e8f4}
+.report-result-heading{color:#143b62}
+.live-dbv,.live-dbv-match{background:#f6fbff;border-color:#bfdceb;color:#0e3459}
+.live-dbv-note,.live-dbv-row,.live-dbv-players{color:#2d5573}
+.live-dbv-players b{color:#6489a2}
+.live-dbv-set{color:#2e597a;background:#e0f3ff}
+.live-dbv-foot{border-color:#d1e6f3}
+.live-dbv-foot a{color:var(--link)}
+/* Bottom bar: all six routes remain visible even on a compact iPhone SE. */
+.bottom-nav{width:100%;max-width:none;left:0;right:0;transform:none;
+  border-radius:0;gap:0;display:flex;justify-content:center;align-items:stretch;
+  padding:8px max(9px,calc((100vw - 770px)/2)) calc(8px + env(safe-area-inset-bottom));
+  background:#f9fcffef;border-top:1px solid #c5ddeb;
+  box-shadow:0 -7px 25px #4b83a523;backdrop-filter:blur(18px)}
+.bottom-nav a{width:16.666%!important;min-width:0;min-height:51px;padding:6px 0;gap:3px;
+  display:grid;place-content:center;justify-items:center;color:#597c9e;overflow:hidden}
+.bottom-nav a[aria-current=page]{color:#0a86d0}
+.bottom-nav a>span{height:25px;display:grid;place-items:center}
+.bottom-nav .nav-icon{display:block;width:24px;height:24px}
+.bottom-nav a small{font-size:clamp(8px,2.1vw,11px);line-height:1.1;color:inherit;font-weight:760;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%;white-space:nowrap}
+.toast{color:#fff;background:#0d76b8}
+@media(min-width:701px){
+ .app{padding-inline:25px}
+ .bottom-nav{width:100%;left:0;right:0;transform:none;border-radius:0}
+ .ranking-compact{min-height:218px}
+}
+@media(max-width:410px){
+ .app{padding-inline:11px}
+ .topbar{min-height:100px}
+ .focused-profile{padding:11px 9px;gap:8px}
+ .focus-profile-avatar{width:46px;height:46px;flex:none}
+ .focus-profile-copy small{font-size:10px}
+ .focus-settings,.focus-switcher>summary{padding:8px!important;font-size:10px;min-height:40px}
+ .dashboard-ranking-grid{gap:7px}
+ .ranking-tile.ranking-compact{min-height:181px;padding:11px 8px 9px}
+ .ranking-compact .ranking-top{font-size:12px}
+ .ranking-bw-title{font-size:10px}
+ .ranking-bw-row strong{font-size:clamp(24px,7.1vw,33px)}
+ .ranking-bw-row .movement{font-size:10px}
+ .ranking-de-row strong{font-size:15px}
+ .ranking-compact-points{font-size:12px}
+ .ranking-compact-footer{font-size:8px;overflow-wrap:anywhere}
+ .home-trophy-slot,.home-trophy-tournaments{grid-template-rows:30px 21px auto;padding:4px 1px}
+ .home-trophy-symbol,.home-trophy-tournaments>span{font-size:25px}
+ .home-trophy-slot strong,.home-trophy-tournaments strong{font-size:18px}
+ .home-trophy-slot small,.home-trophy-tournaments small{font-size:9px}
+ .upcoming-tournament-date{min-width:63px}
+ .bottom-nav .nav-icon{height:23px;width:23px}
+}
+@media(max-width:350px){
+ .topbar{min-height:93px}
+ .brand>span{font-size:17px}
+ .dashboard-ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .ranking-tile.ranking-compact{min-height:160px}
+ .ranking-compact .ranking-top{font-size:13px}
+ .ranking-compact-points{font-size:13px}
+ .match-stats-values{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bottom-nav a small{font-size:8px}
+ .bottom-nav .nav-icon{height:20px;width:20px}
+}
+@media(prefers-reduced-motion:reduce){.bottom-nav,.ranking-tile,button,a{transition:none!important}}

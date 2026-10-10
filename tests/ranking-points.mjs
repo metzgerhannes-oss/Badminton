@@ -61,6 +61,6 @@ assert.ok(styles.includes(".ranking-score-section")&&styles.includes(".ranking-s
 assert.ok(styles.includes("mask-image:none;-webkit-mask-image:none"),"Approved crest cannot remain washed-out");
 assert.ok(styles.includes(".brand-logo{width:76px;height:76px"),"Larger crest for visibility");
 assert.ok(!styles.includes("background:purple"),"No alternate inconsistent theme");
-assert.ok(manifest.theme_color==="#204d73"&&manifest.background_color==="#123758");
-assert.ok(index.includes('content="#204d73"'));
+assert.ok(manifest.theme_color==="#d9ecfb"&&manifest.background_color==="#d4ebfc","The user-approved light-blue mobile theme must be reflected in the installed PWA");
+assert.ok(index.includes('content="#d9ecfb"'));
 console.log("Official total points and five-best ranking UI verified: no invented values, full reconciliation, larger crest and brighter blue.");

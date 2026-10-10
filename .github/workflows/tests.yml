@@ -23,6 +23,8 @@ jobs:
           node --check reports.js
           node --check invite.js
           node --check library.js
+          node --check stats.js
+          node --check scripts/match-stats.mjs
           node --check scripts/library-utils.mjs
           node --check welcome.js
           node --check scripts/invitation.mjs
@@ -42,6 +44,8 @@ jobs:
           node tests/source-register.mjs
           node tests/invitation.mjs
           node tests/player-library.mjs
+          node tests/match-stats.mjs
+          node tests/design-v2.mjs
           node tests/supabase-library.mjs
           python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
