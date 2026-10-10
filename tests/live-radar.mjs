@@ -53,7 +53,7 @@ assert.match(html,/id="live-radar-content"/);
 assert.match(html,/id="live-radar-refresh"/);
 assert.match(html,/Externe Live-Ansicht/);
 assert.match(js,/badminton:profile-change/);
-assert.match(js,/document.visibilityState/);
+assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
 assert.match(js,/Wartestand/);
 assert.match(js,/Live-Abgleich veraltet/);
