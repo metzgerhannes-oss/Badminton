@@ -21,7 +21,7 @@ const context=vm.createContext({
  fetch:async()=>{throw Error("Library must use public Supabase read module for remote queries")},
  document:{getElementById:id=>fields[id]||null,addEventListener(){}}
 });
-vm.runInContext(source.replace(/^import[^\n]+\n/g,""),context,{filename:"library.js"});
+vm.runInContext(source.replace(/^import[^\n]+\n/gm,""),context,{filename:"library.js"});
 const path=vm.runInContext("dbPath(0)",context);
 const params=new URLSearchParams(path.split("?")[1]);
 assert.equal(params.get("age_class"),"eq.U13");
