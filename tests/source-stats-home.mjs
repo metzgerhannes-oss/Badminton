@@ -69,5 +69,5 @@ assert.match(cron,/interval '7 days'/);
 assert.match(cron,/status='awaiting_source'/);
 assert.match(claim,/cursor_now:=0/,"Weekly refresh must revisit new matches at start of sorted source");
 assert.match(claim,/status_now in \('complete','partial'\)/);
-assert.match(sw,/schmetterlinge-shell-v49/);
+assert.match(sw,/schmetterlinge-shell-v50/);
 console.log("Real-source Home stats with on-demand Historie: verified source separation, filters, no doubles and weekly refresh.");

@@ -1,11 +1,8 @@
 "use strict";
 /** Schmetterlinge: historical results and official tournament bookmarks; optional verified Supabase match feed. */
 const STORE=SchmetterlingeStorage.STORE; // The device key is unchanged.
-const DEFAULT_PLAYERS=[
- {id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen",url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
- {id:"05-071969",name:"Charlotte Metzger",birthYear:2014,club:"SpVgg Mössingen",url:"https://turniere.badminton.de/ranking"}
-];
-const state={players:DEFAULT_PLAYERS.map(p=>({...p})),friends:[],officialLinks:[],activeProfileId:"05-070879",viewingFriendId:null,chosen:"05-070879",page:"start"};
+// No personal family profile is bundled in the publicly delivered app.
+const state={players:[],friends:[],officialLinks:[],activeProfileId:"",viewingFriendId:null,chosen:"",page:"start"};
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -376,10 +373,12 @@ function setup(){
   editing=null;save();render();tournamentDialog.close();event.currentTarget.reset();toast("Turnier gespeichert");
  });
  render();
- if(freshDevice){
+ // Also recover from empty/corrupted legacy state without restoring a
+ // hardcoded family. Existing valid stored profiles remain untouched.
+ if(freshDevice||!state.players.length){
   const welcome=el("first-run-dialog");
   const chooser=el("first-run-choices");
-  chooser.innerHTML=state.players.map(p=>'<button class="first-run-choice" type="button" data-initial-player="'+esc(p.id)+'"><span>'+esc(p.name.charAt(0).toUpperCase())+'</span><strong>'+esc(p.name)+'</strong><span aria-hidden="true">›</span></button>').join("");
+  chooser.innerHTML=state.players.length?state.players.map(p=>'<button class="first-run-choice" type="button" data-initial-player="'+esc(p.id)+'"><span>'+esc(p.name.charAt(0).toUpperCase())+'</span><strong>'+esc(p.name)+'</strong><span aria-hidden="true">›</span></button>').join(""):'<p class="settings-hint">Auf diesem Gerät ist noch kein eigenes Profil eingerichtet.</p>';
   chooser.querySelectorAll("[data-initial-player]").forEach(b=>b.addEventListener("click",()=>{
    state.activeProfileId=b.dataset.initialPlayer;
    state.viewingFriendId=null;state.chosen=state.activeProfileId;save();

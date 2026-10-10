@@ -52,12 +52,12 @@ assert.equal(second.run("state.officialLinks.length"),1);
 const corrupt=new Map([[key,"invalid json"]]);
 const damaged=makeVM(corrupt);
 assert.doesNotThrow(()=>damaged.run("restore()"));
-assert.equal(damaged.run("state.players.length"),2,"Malformed old storage must not empty default players");
+assert.equal(damaged.run("state.players.length"),0,"Invalid local data must not insert anybody else’s family profiles");
 const blocked=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},
  localStorage:{getItem(){throw new Error("blocked")},setItem(){throw new Error("blocked")}}
 });
 vm.runInContext(storageScript,blocked,{filename:"state-storage.js"});
 vm.runInContext(appScript,blocked,{filename:"app.js"});
 assert.doesNotThrow(()=>vm.runInContext("restore();save()",blocked));
-assert.equal(vm.runInContext("state.players.length",blocked),2);
-console.log("Storage v40: legacy migration, own profile, follows, bookmarks, unrelated settings and blocked storage preserved.");
+assert.equal(vm.runInContext("state.players.length",blocked),0,"Blocked storage does not bootstrap private profiles");
+console.log("Storage v50: neutral defaults, legacy ID migration, follows/bookmarks and blocked storage preserved.");

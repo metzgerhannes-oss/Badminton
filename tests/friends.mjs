@@ -6,7 +6,10 @@ const storageCode=await readFile("state-storage.js","utf8");
 const html=await readFile("index.html","utf8");
 const dashboard=await readFile("dashboard.js","utf8");
 const history=await readFile("history.js","utf8");
-const store=new Map();
+const store=new Map([["shuttleboard-v1",JSON.stringify({
+ players:[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"}],
+ friends:[],officialLinks:[],activeProfileId:"05-070879",historyProfilesInitialized:true
+})]]);
 function appVM(){
  const context=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},localStorage:{
   getItem(k){return store.get(k)??null},
@@ -16,7 +19,7 @@ function appVM(){
  vm.runInContext(code,context,{filename:"app.js"});
  return {context,run:q=>vm.runInContext(q,context)};
 }
-const first=appVM();
+const first=appVM();first.run("restore()");
 assert.equal(first.run("state.activeProfileId"),"05-070879");
 assert.equal(first.run("state.chosen"),"05-070879");
 assert.equal(first.run("state.friends.length"),0);
