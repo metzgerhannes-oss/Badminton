@@ -1,0 +1,66 @@
+name: Reportquellen automatisch prüfen
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: badminton-report-discovery
+  cancel-in-progress: false
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Offline quality tests
+        run: python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
+      - name: Load earlier unreviewed findings
+        shell: bash
+        run: |
+          if git ls-remote --exit-code --heads origin automation/report-candidates >/dev/null; then
+            git fetch origin refs/heads/automation/report-candidates:refs/remotes/origin/automation/report-candidates
+            git show origin/automation/report-candidates:data/report-pending.json > /tmp/previous-report-pending.json || true
+          fi
+      - name: Inspect allowed public article listings
+        shell: bash
+        run: |
+          if test -f /tmp/previous-report-pending.json; then
+            python3 scripts/discover-reports.py --previous /tmp/previous-report-pending.json
+          else
+            python3 scripts/discover-reports.py
+          fi
+      - name: Publish findings for human verification as a pull request
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if test -f /tmp/previous-report-pending.json && cmp -s data/report-pending.json /tmp/previous-report-pending.json; then
+            echo "No new findings since open review"
+            exit 0
+          fi
+          if git diff --quiet -- data/report-pending.json; then
+            echo "No new findings compared with main"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B automation/report-candidates
+          git add data/report-pending.json
+          git commit -m "data: update unpublished report findings"
+          git push --force origin HEAD:refs/heads/automation/report-candidates
+          existing="$(gh pr list --head automation/report-candidates --base main --state open --json number --jq '.[0].number // empty')"
+          if test -z "$existing"; then
+            gh pr create \
+              --base main \
+              --head automation/report-candidates \
+              --title "Berichte: neue mögliche Erwähnungen prüfen" \
+              --body "Automatisch entdeckte URLs, Titel und mögliche Namensnennungen aus freigegebenen Quellen. **Keine Kandidaten werden automatisch öffentlich angezeigt.** Bitte jede Originalquelle prüfen, bevor sie über scripts/approve-report.py in das geprüfte Artikelregister übernommen wird. Nach Bearbeitung kann dieser PR ohne Veröffentlichung offener Kandidaten gemergt werden."
+          else
+            echo "Updated existing review PR"
+          fi
