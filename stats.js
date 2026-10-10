@@ -15,7 +15,7 @@ const sourceUrl=x=>{try{let u=new URL(x);return u.protocol==="https:"&&
 const ownScore=m=>(Array.isArray(m.games)?m.games:[])
  .map(g=>m.player_side===2?g[1]+":"+g[0]:g[0]+":"+g[1]).join(" · ");
 let selected="",official=[],external=[],progress=null,officialError=false,externalError=false,
- status="idle",partialOfficial=false,partialExternal=false,seq=0;
+ status="idle",partialOfficial=false,partialExternal=false,seq=0,lastLoadedAt=0;
 let selectedYear="all",selectedDiscipline="all";
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let controller;
@@ -42,7 +42,7 @@ async function queryOfficial(id,signal){
 }
 async function queryExternal(id,signal){
  const [status]=await getPage("player_external_match_imports?"+
-  new URLSearchParams({select:"status,cursor_offset,verified_count,rejected_count,detail",
+  new URLSearchParams({select:"status,cursor_offset,verified_count,rejected_count,detail,last_finished_at",
    dbv_id:"eq."+id,limit:"1"}),signal);
  const rows=[];
  for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
@@ -81,7 +81,7 @@ async function fetchProfile(id,force=false){
   external=results[1].value.rows;progress=results[1].value.progress;
   partialExternal=results[1].value.partial;
  }else{externalError=true;console.warn("Sourced Badhub match history unavailable",results[1].reason)}
- status="loaded";render();
+ status="loaded";lastLoadedAt=Date.now();render();
 }
 function externalProof(m){
  const u=sourceUrl(m.source_url);
@@ -201,6 +201,12 @@ document.addEventListener("DOMContentLoaded",()=>{
    fetchProfile(selected,true);
  });
  window.addEventListener("badminton:profile-change",e=>{fetchProfile(String(e.detail?.playerId||""))});
+ // When returning to a long-open Home view, refresh read-only public snapshots.
+ // No periodic polling, importer write, third-party request or new background work.
+ document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"&&location.hash==="#start"&&selected&&
+   status==="loaded"&&Date.now()-lastLoadedAt>=5*60000)fetchProfile(selected,true);
+ });
  window.addEventListener("badminton:external-matches-updated",e=>{
   if(String(e.detail?.playerId||"")===selected)fetchProfile(selected,true);
  });

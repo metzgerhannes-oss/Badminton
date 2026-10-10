@@ -31,6 +31,15 @@ assert.equal(computeExternalStats(data,{discipline:"Mixed"}).total,1);
 assert.equal(computeExternalStats([]).rate,null);
 assert.match(importCompleteness({verified_count:608,cursor_offset:240,rejected_count:69},240),/240 von 608/);
 assert.match(importCompleteness({verified_count:42,cursor_offset:42,rejected_count:20},42),/20 unklare/);
+const discrepancy=importCompleteness({status:"partial",verified_count:608,cursor_offset:240,rejected_count:20},42);
+assert.match(discrepancy,/42 von 608/,"Read-back rows, not cursor, determine the visible amount");
+assert.match(discrepancy,/240 Quellkarten verarbeitet/);
+assert.doesNotMatch(discrepancy,/240 von 608/,"Cursor cannot impersonate stored match count");
+assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"error"},0),/0 von 42/);
+assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"error"},0),/nicht erfolgreich/);
+assert.match(importCompleteness(null,5),/5 Quellkarten/);
+assert.match(importCompleteness({verified_count:40,cursor_offset:40,status:"complete"},42),/42 Quellkarten/);
+assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"complete",last_finished_at:"2026-10-10T12:00:00Z"},42),/Letzter dokumentierter Importversuch/);
 const [stats,html,history,claim,cron,sw]=await Promise.all([
  "stats.js","index.html","history-demand.js","database/external-match-import.sql",
  "database/external-match-cron.sql","sw.js"].map(f=>readFile(f,"utf8")));
@@ -40,6 +49,9 @@ assert.match(stats,/officialCount\.total===0&&external\.length>0/,
  "Never aggregate external and official matches into one total");
 assert.match(stats,/computeExternalStats/);
 assert.match(stats,/importCompleteness/);
+assert.match(stats,/last_finished_at/);
+assert.match(stats,/lastLoadedAt/);
+assert.match(stats,/visibilitychange/);
 assert.match(stats,/Badhub · Einzelbelege/);
 assert.match(stats,/matchAvailability\(\{officialFailed:officialError,externalFailed:externalError\}\)/);
 assert.match(stats,/lookup\.hidden=!validId/);
