@@ -180,6 +180,34 @@
     },
     {
       "source": "club-moessingen",
+      "date": "2025-12-16",
+      "title": "Deutsche Meisterschaft U15–U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/deutsche-meisterschaft-u15-u19-vom-12-14-dezember-2025",
+      "summary": "Sarah Storz: Platz 17 im U17-Einzel und Platz 9 im U17-Doppel; für beide sind Gegner und Satzstände vorhanden.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-10-07",
+      "title": "54. Baden-Württembergische Meisterschaft U11–U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/54-baden-wuerttembergische-meisterschaft-u11-u19-am-4-5-oktober-2025",
+      "summary": "Sarah Storz gewann Einzel U17, wurde Zweite im Doppel und Fünfte im Mixed U17.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
       "date": "2025-07-15",
       "title": "34. Südwürttembergische Meisterschaft U11-U19 am 12. Juli 2025",
       "url": "https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025",
@@ -189,6 +217,34 @@
         "05-070879"
       ],
       "note": "Namentlich bestätigte Platzierungen im Bericht; keine neuen Einzelmatch-Satzstände.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-07-07",
+      "title": "3. B-Rangliste SüdOst U13-U19 am 5./6. Juli 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025",
+      "summary": "Herrenberg: Sarah Storz Einzel U17 Platz 4, Doppel U17 Platz 1 mit Amishi Tiwari und Mixed U17 Platz 5 mit Arthur Hähnel.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Drei namentlich bestätigte Turnierplatzierungen; Turnierbeginn 5. Juli, kein belegtes Einzelmatchdatum.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-07-01",
+      "title": "5. DBV A-Rangliste U17/U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/5-dbv-a-rangliste-u17-u19-am-28-29-juni-2025",
+      "summary": "Sarah Storz erreichte Platz 9 im Einzel und Doppel U17, Platz 21 im Mixed U17.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
@@ -210,28 +266,14 @@
     },
     {
       "source": "club-moessingen",
-      "date": "2025-05-05",
-      "title": "3. C-Rangliste BW U11-U19 am 3./4. Mai 2025",
-      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-3-4-mai-2025",
-      "summary": "Vereinsbericht mit den Platzierungen des Mössinger Nachwuchses.",
+      "date": "2025-05-27",
+      "title": "4. DBV A-Rangliste U15/U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-dbv-a-rangliste-u15-u19-am-24-25-mai-2025",
+      "summary": "Sarah Storz, U17-Spielerin, spielte im U19-Einzel und belegte Rang 17.",
       "players": [
-        "05-070879"
+        "05-061350"
       ],
-      "note": "Philipp Metzger namentlich in der Ergebnisliste.",
-      "status": "verified",
-      "club_id": "spvgg-moessingen",
-      "checked_at": "2026-10-10"
-    },
-    {
-      "source": "aalener-sportallianz",
-      "date": null,
-      "title": "3 Siege im Doppel beim baden-württembergischen Ranglistenturnier in Mössingen",
-      "url": "https://aalener-sportallianz.de/2026-04-26_moessingen/",
-      "summary": "Bericht des gegnerischen Vereins über das U11-Doppelfinale in Mössingen.",
-      "players": [
-        "05-070879"
-      ],
-      "note": "Philipp Metzger wird ausdrücklich als Finalgegner genannt.",
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
@@ -252,14 +294,70 @@
     },
     {
       "source": "club-moessingen",
-      "date": "2025-07-07",
-      "title": "3. B-Rangliste SüdOst U13-U19 am 5./6. Juli 2025",
-      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025",
-      "summary": "Herrenberg: Sarah Storz Einzel U17 Platz 4, Doppel U17 Platz 1 mit Amishi Tiwari und Mixed U17 Platz 5 mit Arthur Hähnel.",
+      "date": "2025-05-05",
+      "title": "3. C-Rangliste BW U11-U19 am 3./4. Mai 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-3-4-mai-2025",
+      "summary": "Vereinsbericht mit den Platzierungen des Mössinger Nachwuchses.",
       "players": [
-        "05-061350"
+        "05-070879"
       ],
-      "note": "Drei namentlich bestätigte Turnierplatzierungen; Turnierbeginn 5. Juli, kein belegtes Einzelmatchdatum.",
+      "note": "Philipp Metzger namentlich in der Ergebnisliste.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-02-10",
+      "title": "2. E-Rangliste Südwürttemberg Region 1 U11–U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-e-rangliste-bw-suedwuerttemberg-region-1-u11-u19-am-8-februar-2025",
+      "summary": "Vinzent Pius Ott erreichte Platz drei im U15-Einzel.",
+      "players": [
+        "05-070006"
+      ],
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-01-21",
+      "title": "1. E-Rangliste BAW Südbaden Ost U11–U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-e-rlt-baw-sb-ost-u11-u19-spaichingen-am-18-januar-2025",
+      "summary": "Vinzent Pius Ott erreichte Platz drei im U15-Einzel.",
+      "players": [
+        "05-070006"
+      ],
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2024-12-02",
+      "title": "3. D-Rangliste Baden-Württemberg U11–U19",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-d-rangliste-baden-wuerttemberg-u11-u19-am-30-november-1-dezember-2024",
+      "summary": "Vinzent Pius Ott wurde im U13-Einzel Siebter; für drei Spiele sind Gegner und Sätze im Vereinsbericht belegt.",
+      "players": [
+        "05-070006"
+      ],
+      "note": "Quellengesicherte Platzierung; fünf Matches mit vollständigen Sätzen werden ausschließlich in der Historie gesondert geführt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "aalener-sportallianz",
+      "date": null,
+      "title": "3 Siege im Doppel beim baden-württembergischen Ranglistenturnier in Mössingen",
+      "url": "https://aalener-sportallianz.de/2026-04-26_moessingen/",
+      "summary": "Bericht des gegnerischen Vereins über das U11-Doppelfinale in Mössingen.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger wird ausdrücklich als Finalgegner genannt.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"

@@ -702,6 +702,329 @@
       },
       "verified": true,
       "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "vo-2024-11-30-d-je-u13-7",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2024-11-30",
+      "event": "3. D-Rangliste Baden-Württemberg U11–U19",
+      "location": "Gomaringen",
+      "level": "D",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 7,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-d-rangliste-baden-wuerttemberg-u11-u19-am-30-november-1-dezember-2024"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag.",
+      "matchEvidence": {
+        "kind": "club-report-scored-games",
+        "checkedOn": "2026-10-10",
+        "statement": "Vereinsseitig mit Gegnern und Sätzen belegte Spiele; nicht mit Badhub summieren.",
+        "matches": [
+          {
+            "opponent": "Ruixiang Wang (PSV Reutlingen)",
+            "result": "Niederlage",
+            "games": [
+              [
+                14,
+                21
+              ],
+              [
+                25,
+                23
+              ],
+              [
+                17,
+                21
+              ]
+            ]
+          },
+          {
+            "opponent": "Wynnen Lim (TSG Heilbronn)",
+            "result": "Niederlage",
+            "games": [
+              [
+                19,
+                21
+              ],
+              [
+                24,
+                26
+              ]
+            ]
+          },
+          {
+            "opponent": "Paul Wader (TSV Gomaringen)",
+            "result": "Sieg",
+            "games": [
+              [
+                21,
+                8
+              ],
+              [
+                21,
+                8
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "vo-2025-01-18-e-je-u15-3",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2025-01-18",
+      "event": "1. E-Rangliste BAW Südbaden Ost U11–U19",
+      "location": "Spaichingen",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 3,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-e-rlt-baw-sb-ost-u11-u19-spaichingen-am-18-januar-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "vo-2025-02-08-e-je-u15-3",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2025-02-08",
+      "event": "2. E-Rangliste Südwürttemberg Region 1 U11–U19",
+      "location": "Gärtringen",
+      "level": "E",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 3,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-e-rangliste-bw-suedwuerttemberg-region-1-u11-u19-am-8-februar-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-05-24-a-me-u19-17",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-05-24",
+      "event": "4. DBV A-Rangliste U15/U19",
+      "location": "Stockach",
+      "level": "A",
+      "discipline": "Einzel",
+      "ageGroup": "U19",
+      "place": 17,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-dbv-a-rangliste-u15-u19-am-24-25-mai-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-06-28-a-me-u17-9",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-06-28",
+      "event": "5. DBV A-Rangliste U17/U19",
+      "location": "Kleinblittersdorf",
+      "level": "A",
+      "discipline": "Einzel",
+      "ageGroup": "U17",
+      "place": 9,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/5-dbv-a-rangliste-u17-u19-am-28-29-juni-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-06-28-a-md-u17-9",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-06-28",
+      "event": "5. DBV A-Rangliste U17/U19",
+      "location": "Kleinblittersdorf",
+      "level": "A",
+      "discipline": "Doppel",
+      "ageGroup": "U17",
+      "place": 9,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/5-dbv-a-rangliste-u17-u19-am-28-29-juni-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-06-28-a-mx-u17-21",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-06-28",
+      "event": "5. DBV A-Rangliste U17/U19",
+      "location": "Kleinblittersdorf",
+      "level": "A",
+      "discipline": "Mixed",
+      "ageGroup": "U17",
+      "place": 21,
+      "partner": "Artur Plaisant (ASV Landau)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/5-dbv-a-rangliste-u17-u19-am-28-29-juni-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-10-04-bw-me-u17-1",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-10-04",
+      "event": "54. Baden-Württembergische Meisterschaft U11–U19",
+      "location": "Ulm",
+      "level": "Meisterschaft",
+      "discipline": "Einzel",
+      "ageGroup": "U17",
+      "place": 1,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/54-baden-wuerttembergische-meisterschaft-u11-u19-am-4-5-oktober-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-10-04-bw-md-u17-2",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-10-04",
+      "event": "54. Baden-Württembergische Meisterschaft U11–U19",
+      "location": "Ulm",
+      "level": "Meisterschaft",
+      "discipline": "Doppel",
+      "ageGroup": "U17",
+      "place": 2,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/54-baden-wuerttembergische-meisterschaft-u11-u19-am-4-5-oktober-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-10-04-bw-mx-u17-5",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-10-04",
+      "event": "54. Baden-Württembergische Meisterschaft U11–U19",
+      "location": "Ulm",
+      "level": "Meisterschaft",
+      "discipline": "Mixed",
+      "ageGroup": "U17",
+      "place": 5,
+      "partner": "Athreya Narayanan (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/54-baden-wuerttembergische-meisterschaft-u11-u19-am-4-5-oktober-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag."
+    },
+    {
+      "id": "ss-2025-12-12-dm-me-u17-17",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-12-12",
+      "event": "Deutsche Meisterschaft U15–U19",
+      "location": "Hoyerswerda",
+      "level": "Deutsche Meisterschaft",
+      "discipline": "Einzel",
+      "ageGroup": "U17",
+      "place": 17,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/deutsche-meisterschaft-u15-u19-vom-12-14-dezember-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag.",
+      "matchEvidence": {
+        "kind": "club-report-scored-games",
+        "checkedOn": "2026-10-10",
+        "statement": "Vereinsseitig mit Gegnern und Sätzen belegte Spiele; nicht mit Badhub summieren.",
+        "matches": [
+          {
+            "opponent": "Annika Karmann (SuS Obere Saar)",
+            "result": "Niederlage",
+            "games": [
+              [
+                19,
+                21
+              ],
+              [
+                19,
+                21
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ss-2025-12-12-dm-md-u17-9",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-12-12",
+      "event": "Deutsche Meisterschaft U15–U19",
+      "location": "Hoyerswerda",
+      "level": "Deutsche Meisterschaft",
+      "discipline": "Doppel",
+      "ageGroup": "U17",
+      "place": 9,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereinsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/deutsche-meisterschaft-u15-u19-vom-12-14-dezember-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich überprüft; Datum ist Turnierbeginn, nicht zwingend Einzelmatch-Tag.",
+      "matchEvidence": {
+        "kind": "club-report-scored-games",
+        "checkedOn": "2026-10-10",
+        "statement": "Vereinsseitig mit Gegnern und Sätzen belegte Spiele; nicht mit Badhub summieren.",
+        "matches": [
+          {
+            "opponent": "Eva Heiden / Maya Yildiz (1. BC Beuel / TV Hofheim)",
+            "result": "Niederlage",
+            "games": [
+              [
+                18,
+                21
+              ],
+              [
+                14,
+                21
+              ]
+            ]
+          }
+        ]
+      }
     }
   ],
   "pendingResults": []

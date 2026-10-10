@@ -209,6 +209,31 @@ test("Older verified 2025 B-Ranglisten appear for followed players without inven
  await expect(page.locator('#history-timeline a.history-source-link[href="https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"]')).toHaveCount(1);
 });
 
+test("Scored club reports show real opponents and sets without mixing Badhub statistics",async ({page})=>{
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
+ const roster=[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"},
+  {id:"05-061350",name:"Sarah Storz"},{id:"05-070006",name:"Vinzent Pius Ott"}];
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
+ const before=await page.locator("#external-match-count").textContent();
+ await page.evaluate(roster=>window.renderHistory("05-070006",roster,{mode:"friend"}),roster);
+ const vinzent=page.locator("#history-timeline .history-scored-match-proof");
+ await expect(vinzent).toHaveCount(1);
+ await expect(vinzent.locator("li")).toHaveCount(3);
+ await expect(vinzent).toContainText("Ruixiang Wang");
+ await expect(vinzent).toContainText("14:21 · 25:23 · 17:21");
+ await expect(vinzent).toContainText("Paul Wader");
+ await expect(vinzent).toContainText("21:8 · 21:8");
+ await page.evaluate(roster=>window.renderHistory("05-061350",roster,{mode:"friend"}),roster);
+ const sarah=page.locator("#history-timeline .history-scored-match-proof");
+ await expect(sarah.locator("li")).toHaveCount(2);
+ await expect(page.locator("#history-timeline")).toContainText("Annika Karmann");
+ await expect(page.locator("#history-timeline")).toContainText("19:21 · 19:21");
+ await expect(page.locator("#history-timeline")).toContainText("Eva Heiden / Maya Yildiz");
+ expect(await page.locator("#external-match-count").textContent()).toBe(before);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());

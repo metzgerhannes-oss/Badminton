@@ -52,7 +52,7 @@ assert.match(css,/\.live-hub-toolbar select/);
 assert.match(css,/\.live-hub-sources/);
 assert.match(css,/\.live-hub-bookmarks/);
 assert.match(sw,/live-hub\.js/);
-assert.match(sw,/schmetterlinge-shell-v47/);
+assert.match(sw,/schmetterlinge-shell-v48/);
 const t="2026-10-10T12:00:00Z",id="05-061350";
 const base={source_url:"https://badhub.de/spieler/"+id+"/live",provider:"Badhub",checked_at:t,
  payload:{tournament:{name:"Jugendturnier"},running:null,next:null,upcoming:[],past:[],entries:[]}};

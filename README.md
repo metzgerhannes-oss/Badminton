@@ -1,3 +1,7 @@
+## v48 – Zwölf belegte Platzierungen und fünf Einzelspiele aus Vereinsberichten
+
+Für Sarah und Vinzent wurden zwölf zusätzliche Platzierungen 2024/2025 quellengeprüft und in Supabase hinterlegt. Neu sind fünf Spiele mit Gegnern und Satzständen: drei bei Vinzents U13-Turnier Gomaringen 2024 und zwei bei Sarahs Deutscher Meisterschaft 2025. Sie erscheinen als separat gekennzeichnete Vereinsbelege in der Historie und werden nicht mit den Badhub-Sieg-/Niederlagenstatistiken summiert. Mehr dazu: docs/CLUB_SCORE_PROOFS_V48.md.
+
 ## Aus öffentlichen Originalberichten erschlossen: acht weitere Platzierungen 2025
 
 Für Sarah Storz wurden aus der 2. B-Rangliste (Zittau, Mai 2025) und 3. B-Rangliste (Herrenberg, Juli 2025) jeweils drei nachweisbare U17-Platzierungen aufgenommen: 5/3/1 und 4/1/5 (Einzel/Mixed/Doppel bzw. Einzel/Doppel/Mixed). Vinzent Pius Ott erreichte bei der 34. Südwürttembergischen Meisterschaft 2025 Platz 9 im Einzel U15 und Platz 2 im Doppel U15 mit Ruixiang Wang. Acht Turnierplatzierungen bereits in Supabase eingetragen; nun auch in der vorhandenen App-Historie und dem geprüften Berichtfeed. Datumsfelder dokumentieren Veranstaltungstage, keine einzelnen Matchdaten; **keine** Veränderung der Matchstatistiken oder Live-Quellen.

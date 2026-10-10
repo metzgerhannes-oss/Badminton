@@ -25,14 +25,43 @@ for(const r of history.results){
  if(r.confirmation==="family-confirmed") assert.ok(r.verificationNote,"Family confirmation needs verification label");
  assert.ok(!("score" in r),"Do not invent individual match scores");
  if(r.matchEvidence){
-  assert.equal(r.matchEvidence.kind,"club-report-at-least-one-win");
-  assert.equal(r.matchEvidence.minimumWins,1);
-  assert.match(r.matchEvidence.statement,/nicht zur Matchstatistik/);
-  assert.ok(!("opponent" in r.matchEvidence)&&!("games" in r.matchEvidence));
+  if(r.matchEvidence.kind==="club-report-at-least-one-win"){
+   assert.equal(r.matchEvidence.minimumWins,1);
+   assert.match(r.matchEvidence.statement,/nicht zur Matchstatistik/);
+   assert.ok(!("opponent" in r.matchEvidence)&&!("games" in r.matchEvidence));
+  }else{
+   assert.equal(r.matchEvidence.kind,"club-report-scored-games");
+   assert.ok(r.matchEvidence.matches?.length>0);
+   for(const match of r.matchEvidence.matches){
+    assert.ok(match.opponent&&["Sieg","Niederlage"].includes(match.result));
+    assert.ok([2,3].includes(match.games?.length));
+    const score=match.games.reduce((a,g)=>{
+     assert.ok(Array.isArray(g)&&g.length===2&&g.every(n=>Number.isInteger(n)&&n>=0&&n<=30));
+     assert.notEqual(g[0],g[1]);a[g[0]>g[1]?0:1]++;return a;
+    },[0,0]);
+    assert.equal(score[0]===2?"Sieg":"Niederlage",match.result);
+   }
+  }
  }
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+const ids2024and25=["vo-2024-11-30-d-je-u13-7","vo-2025-01-18-e-je-u15-3","vo-2025-02-08-e-je-u15-3",
+ "ss-2025-05-24-a-me-u19-17","ss-2025-06-28-a-me-u17-9","ss-2025-06-28-a-md-u17-9",
+ "ss-2025-06-28-a-mx-u17-21","ss-2025-10-04-bw-me-u17-1","ss-2025-10-04-bw-md-u17-2",
+ "ss-2025-10-04-bw-mx-u17-5","ss-2025-12-12-dm-me-u17-17","ss-2025-12-12-dm-md-u17-9"];
+for(const id of ids2024and25){
+ const entry=history.results.find(r=>r.id===id);
+ assert.ok(entry&&entry.verified&&entry.verificationNote);
+ assert.equal(new URL(entry.source.url).hostname,"spvgg.org");
+}
+assert.equal(ids2024and25.length,12);
+const scoreReports=history.results.filter(r=>r.matchEvidence?.kind==="club-report-scored-games");
+assert.equal(scoreReports.length,3);
+const games=scoreReports.flatMap(r=>r.matchEvidence.matches);
+assert.equal(games.length,5,"Three Vinzent + two Sarah named matches");
+assert.equal(games.filter(m=>m.result==="Sieg").length,1);
+assert.equal(games.filter(m=>m.result==="Niederlage").length,4);
 const newSourced=[{"id":"ss-2025-05-17-brlt-e-u17-5","disc":"Einzel","age":"U17","place":5,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"},{"id":"ss-2025-05-17-brlt-m-u17-3","disc":"Mixed","age":"U17","place":3,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"},{"id":"ss-2025-05-17-brlt-d-u17-1","disc":"Doppel","age":"U17","place":1,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"},{"id":"ss-2025-07-05-brlt-e-u17-4","disc":"Einzel","age":"U17","place":4,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"},{"id":"ss-2025-07-05-brlt-d-u17-1","disc":"Doppel","age":"U17","place":1,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"},{"id":"ss-2025-07-05-brlt-m-u17-5","disc":"Mixed","age":"U17","place":5,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"},{"id":"vo-2025-07-12-swm-e-u15-9","disc":"Einzel","age":"U15","place":9,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"},{"id":"vo-2025-07-12-swm-d-u15-2","disc":"Doppel","age":"U15","place":2,"url":"https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"}];
 for(const expected of newSourced){
  const row=history.results.find(r=>r.id===expected.id);
@@ -109,6 +138,7 @@ assert.ok(!linked.includes("Platzierungen aus Vereins- und Verbandsberichten, na
 const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
 assert.ok(script.includes("history-match-evidence")&&script.includes("nicht in der Spielstatistik enthalten"));
+assert.ok(script.includes("history-scored-match-proof")&&script.includes("nicht in der Badhub-Statistik enthalten"));
 assert.ok(script.includes("playerMatch"));
 assert.ok(script.includes("Namentlichen Ergebnisbeleg")&&script.includes("DBV-Turnierergebnisse"));
 assert.ok(script.includes("renderTrophies(playerRecords)"),"Lifetime trophies should not change with chronicle filters");
