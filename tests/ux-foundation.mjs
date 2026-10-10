@@ -48,6 +48,6 @@ assert.match(style,/\.library-player-action button,\.library-player-action \.lib
 assert.match(style,/min-height:44px/);
 assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(style,/:focus-visible/);
-assert.match(sw,/schmetterlinge-shell-v38/);
+assert.match(sw,/schmetterlinge-shell-v39/);
 assert.match(sw,/ui-feedback\.js/);
 console.log("UX foundation: task-first Home, truthful source disclosure, retry/offline, keyboard routing, mobile touch targets and v38 PWA verified.");
