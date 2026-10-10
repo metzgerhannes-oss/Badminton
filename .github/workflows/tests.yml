@@ -15,6 +15,7 @@ jobs:
       - name: Validate scripts
         run: |
           node --check ui-feedback.js
+          node --check state-storage.js
           node --check app.js
           node --check backup.js
           node --check scripts/local-backup.mjs
@@ -56,6 +57,7 @@ jobs:
           node tests/friends.mjs
           node tests/profile-switch.mjs
           node tests/local-backup.mjs
+          node tests/state-storage.mjs
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
           node tests/ranking-points.mjs

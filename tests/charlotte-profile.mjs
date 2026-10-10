@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import vm from "node:vm";
 import {readFile} from "node:fs/promises";
 const code=await readFile("app.js","utf8");
+const storageCode=await readFile("state-storage.js","utf8");
 const history=JSON.parse(await readFile("data/history.json","utf8"));
 const localKey="shuttleboard-v1";
 const store=new Map([[localKey,JSON.stringify({
@@ -15,6 +16,7 @@ const store=new Map([[localKey,JSON.stringify({
 })]]);
 const context=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},
  localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,String(v))}});
+vm.runInContext(storageCode,context,{filename:"state-storage.js"});
 vm.runInContext(code,context,{filename:"app.js"});
 const run=script=>vm.runInContext(script,context);
 run("restore()");
@@ -40,6 +42,7 @@ const freshStore=new Map();
 const fresh=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},localStorage:{
  getItem:k=>freshStore.get(k)??null,setItem:(k,v)=>freshStore.set(k,String(v))
 }});
+vm.runInContext(storageCode,fresh,{filename:"state-storage.js"});
 vm.runInContext(code,fresh,{filename:"app.js"});
 assert.equal(vm.runInContext('state.players.find(p=>p.name==="Charlotte Metzger").id',fresh),"05-071969","New installs must have verified Charlotte ID");
 assert.equal(vm.runInContext('state.players.find(p=>p.id==="05-071969").birthYear',fresh),2014);

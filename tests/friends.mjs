@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import vm from "node:vm";
 const code=await readFile("app.js","utf8");
+const storageCode=await readFile("state-storage.js","utf8");
 const html=await readFile("index.html","utf8");
 const dashboard=await readFile("dashboard.js","utf8");
 const history=await readFile("history.js","utf8");
@@ -11,6 +12,7 @@ function appVM(){
   getItem(k){return store.get(k)??null},
   setItem(k,v){store.set(k,String(v))}
  }});
+ vm.runInContext(storageCode,context,{filename:"state-storage.js"});
  vm.runInContext(code,context,{filename:"app.js"});
  return {context,run:q=>vm.runInContext(q,context)};
 }
