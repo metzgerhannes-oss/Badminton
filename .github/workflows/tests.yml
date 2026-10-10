@@ -24,6 +24,7 @@ jobs:
           node --check invite.js
           node --check library.js
           node --check stats.js
+          node --check scripts/external-match-stats.mjs
           node --check friend-search.js
           node --check career-history.js
           node --check external-matches.js
@@ -66,6 +67,7 @@ jobs:
           node tests/live-radar.mjs
           node tests/live-hub.mjs
           node tests/match-stats.mjs
+          node tests/source-stats-home.mjs
           node tests/design-v2.mjs
           node tests/supabase-library.mjs
           python scripts/test-player-library.py

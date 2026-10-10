@@ -1,3 +1,9 @@
+## Home-Statistik: reale Einzelspiele statt Striche (v36)
+
+**Fehlerbehebung:** Die Home-Spielstatistik las bislang ausschließlich offizielle DBV-Matchdatensätze und blieb trotz bereits importierter Badhub-Einzelspiele leer. Sie nutzt jetzt **einzeln belegte Badhub-Spiele als klar bezeichneten Fallback** (nicht mit offiziellen Matches oder externen Karriereaggregaten vermischt). Beispiel Philipp: 39 belegte Einzelspiele, 17 Siege; insgesamt 42 importierte Matchkarten. Jahr und Disziplin funktionieren auch für die externe Quelle. 2×2-Kartenraster auf kleinen iPhones.
+
+Zusätzlich werden beim App-Start **alle auf dem jeweiligen Gerät gespeicherten eigenen und gefolgten Profile** in der zentralen Importwarteschlange nachgemeldet; danach aktualisiert der Server alle registrierten Player-IDs mit Quellenzugang bedarfsgerecht, bei vollständigen Beständen wöchentlich. Es werden nur bestätigte öffentliche DBV-IDs übertragen und keine 9.246 Profile pauschal gecrawlt. [Fachregeln, Datenstand, Einschränkungen](docs/HOME_MATCH_STATISTICS_SYNC_V36.md).
+
 ## Einzelne historische Matches beim Folgen importieren (v35)
 
 Die App liest jetzt öffentlich sichtbare Turnier- und Ligaergebnisse für ausgewählte, bereits gefolgte DBV-Spieler und speichert **nur eindeutig belegte Matchkarten** mit Gegner, Disziplin, Satzständen und Badhub-Quelllink als gesonderte **Drittanbieter-Einzelnachweise** in Supabase. Bei Sarah sind 120 von 608 auswertbaren Karten bereits importiert, bei Philipp 42 von 42; 69 bzw. 20 unklare Karten wurden nicht übernommen. Ein serverseitiger, gedrosselter Cron-Job setzt Teilimporte nach dem Verlassen der App fort. Die offizielle DBV-Matchstatistik bleibt davon **bewusst getrennt**. Unter Historie werden die belegten Badhub-Matches nach Jahr, Disziplin und Turnier/Liga gefiltert. [Regeln und Live-Tests](docs/HISTORISCHE_EINZELMATCHES_ON_DEMAND.md).

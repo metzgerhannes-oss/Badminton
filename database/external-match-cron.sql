@@ -13,7 +13,11 @@ begin
  where e.dbv_id is null
    or (e.status='partial' and e.cursor_offset<e.verified_count
        and e.last_started_at<now()-interval '15 minutes')
-   or (e.status='error' and e.last_started_at<now()-interval '1 hour')
+   or (e.status in ('partial','complete') and e.cursor_offset>=e.verified_count
+       and e.last_started_at<now()-interval '7 days')
+   or (e.status='awaiting_source' and e.last_started_at<now()-interval '7 days')
+   or (e.status='loading' and e.lease_until<now()-interval '10 minutes')
+   or (e.status='error' and e.last_started_at<now()-interval '1 day')
  order by coalesce(e.last_started_at,'2000-01-01'::timestamptz),j.requested_at
  limit 1;
  if chosen is null then return jsonb_build_object('processed',0,'reason','no_pending_job');end if;
