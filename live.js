@@ -61,7 +61,12 @@
    const select="id,status,court,scheduled_at,source_url,last_synced_at,tournaments(name,source_url),events(title,age_group,discipline),match_participants(side,player_position,participant_name,players(name,dbv_id)),match_games(game_number,side1_points,side2_points,finished)";
    const matches=await get("matches?select="+encodeURIComponent(select)+"&id=in.("+ids.join(",")+")&order=scheduled_at.asc.nullslast&limit=100");
    if(ticket!==requestId||dbvId!==currentId)return;
-   render(matches.filter(x=>x.status!=="cancelled"));
+   const priority=x=>x.status==="playing"?0:x.status==="called"?1:
+     (x.status==="scheduled"||x.status==="unknown")?2:3;
+   const visibleMatches=matches.filter(x=>x.status!=="cancelled")
+    .sort((a,b)=>priority(a)-priority(b) || ((a.scheduled_at||"9999").localeCompare(b.scheduled_at||"9999")))
+    .slice(0,12);
+   render(visibleMatches);
   }catch(error){
    if(ticket===requestId)notice("Die Live-Abfrage ist derzeit nicht erreichbar. Nutze die offiziellen DBV-Turnierlinks.");
    console.warn("Badminton live feed:",error.message);
