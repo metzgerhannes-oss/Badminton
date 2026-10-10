@@ -26,6 +26,8 @@ jobs:
           node --check stats.js
           node --check friend-search.js
           node --check career-history.js
+          node --check history-demand.js
+          node --check scripts/history-demand.mjs
           node --check scripts/external-history.mjs
           node --check scripts/friend-search.mjs
           node --check scripts/match-stats.mjs
@@ -50,6 +52,7 @@ jobs:
           node tests/player-library.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
+          node tests/history-demand.mjs
           node tests/match-stats.mjs
           node tests/design-v2.mjs
           node tests/supabase-library.mjs
