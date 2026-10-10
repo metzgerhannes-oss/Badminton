@@ -43,7 +43,7 @@ assert.match(js,/validateExternalCareer/);
 assert.match(js,/extern.*|Externe/i);
 assert.match(js,/Nicht mit den offiziellen Match-KPIs addieren/);
 assert.match(js,/separaten Trophäenschrank/);
-assert.match(stats,/Noch keine einzeln belegten Spiele verfügbar/);
+assert.match(await readFile("scripts/match-availability.mjs","utf8"),/Noch keine einzeln belegten Spiele verfügbar/);
 assert.match(history,/externe historische Jahresübersichten/);
 assert.match(css,/\.career-year-card/);
 assert.match(sw,/career-history\.js/);
