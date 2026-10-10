@@ -92,9 +92,9 @@
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
+   <p class="small muted">Hier wird bei Bedarf ein Historienabgleich für die ausgewählte öffentliche DBV-ID angefordert. Deine private Liste gefolgter Spieler bleibt auf dem Gerät.</p>
    <details id="history-source-details" class="history-source-details">
     <summary>Datenstand und Quellen</summary>
-    <p class="settings-hint">Beim Öffnen dieser Ansicht wird die öffentliche DBV-Spieler-ID für einen bedarfsgesteuerten Quellenabgleich an Supabase übermittelt. Persönliche Follower- und Familienlisten bleiben lokal.</p>
      <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
    </details>
    <section id="external-match-history" class="external-match-history" aria-labelledby="external-match-title" hidden>
@@ -268,7 +268,7 @@
    <div class="settings-card"><h3>Daten & Datenschutz</h3>
     <p>Deine eigenen Profile, gefolgten Spieler und Turnierfavoriten bleiben auf diesem Gerät im Browser gespeichert. Es findet keine automatische Cloud-Synchronisierung der Familie statt. Eine lokale Sicherungsdatei wird nicht an uns hochgeladen.</p>
      <p>Daneben stellt Schmetterlinge öffentlich lesbare DBV-Spielerstammdaten, Vereine, Turnierplatzierungen und einzelne Quellenbelege aus einer gemeinsamen Supabase-Datenbank bereit. Darunter können auch Daten von Minderjährigen sein.</p>
-     <p><strong>Beim Öffnen der Historie</strong> eines eigenen oder gefolgten DBV-Profils wird dessen öffentliche DBV-Spieler-ID an Supabase übertragen, um vorhandene Ergebnisse abzurufen und bei Bedarf eine Quellenprüfung anzufordern. Hierbei können öffentliche Badhub-Matchkarten automatisch abgerufen und zentral zwischengespeichert werden. Das bloße Folgen, Einrichten oder Öffnen von Home löst keinen neuen Historienauftrag aus. Bereits früher angeforderte serverseitige Aktualisierungen können weiterhin laufen.</p>
+     <p>Bei der Anzeige von Spielerergebnissen werden die jeweils angezeigten öffentlichen DBV-Spieler-IDs für schreibgeschützte Abfragen an die gemeinsame Supabase-Datenbank übermittelt. <strong>Erst beim Öffnen der Historie</strong> eines eigenen oder gefolgten DBV-Profils kann zusätzlich eine neue serverseitige Quellenprüfung angefordert werden. Hierbei können öffentliche Badhub-Matchkarten automatisch abgerufen und zentral zwischengespeichert werden. Das bloße Folgen, Einrichten oder Öffnen von Home löst keinen neuen Historienauftrag aus. Bereits früher angeforderte serverseitige Aktualisierungen können weiterhin laufen.</p>
      <p>Öffentlich auffindbare Sportdaten sind nicht automatisch für jede Weiterverwendung freigegeben. Quellen, Speicherfristen, Rechtsgrundlage und Berichtigungs-/Löschwege werden weiter geprüft. Eine vollständige Datenschutzerklärung einschließlich verantwortlicher Kontaktstelle steht noch aus.</p>
      <p class="small muted">Zur Technik: <a href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/HYBRID_DATENSCHUTZ_V49.md" target="_blank" rel="noopener noreferrer">Hybrides Daten- und Quellenkonzept ↗</a></p>
    </div>
