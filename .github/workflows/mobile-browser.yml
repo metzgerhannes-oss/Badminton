@@ -19,9 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
-      - name: Install deterministic test dependencies
-        run: npm ci --no-audit --no-fund
+      - name: Install pinned test dependencies
+        run: npm install --no-audit --no-fund
       - name: Install real browser engines
         run: npx playwright install --with-deps chromium webkit
       - name: Exercise user journeys on narrow screens
