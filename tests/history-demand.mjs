@@ -55,5 +55,5 @@ assert.match(bridge,/const views=\(\)=>\[\$\("history-import-status"\)\]/);
 assert.match(career,/overviewUrl\(id\)/);
 assert.match(career,/data\/player-history\/index.json/);
 assert.match(sw,/history-demand\.js/);
-assert.match(sw,/schmetterlinge-shell-v34/);
+assert.match(sw,/schmetterlinge-shell-v35/);
 console.log("History-on-follow: validated public IDs, one-per-player queue, server rate cap, transparent source gaps, own/friend trigger and PWA verified.");
