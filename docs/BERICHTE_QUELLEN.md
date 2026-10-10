@@ -50,3 +50,30 @@ Aktuell wird der Anfangsbestand nicht periodisch importiert. Für eine automatis
 - Kontinuierliche Recherche in lokalen Medien und auf weiteren Vereinsseiten.
 - Authentifizierter Elternbereich für die manuelle Aufnahme neuer Artikel und Korrekturen mit Prüfung.
 - Optional eine wöchentliche quellengebundene Aktualisierung, getrennt von der bestehenden Ranglistenversorgung.
+
+## Automatischer Quellenabgleich (ab 10.10.2026)
+
+**Täglich um 06:17 UTC** sowie bei Änderungen am Monitor prüft GitHub Actions die Quellen über [report-discovery.yml](../.github/workflows/report-discovery.yml). GitHub kann geplante Läufe verzögern. Manuelle Ausführung: **Actions → Reportquellen automatisch prüfen → Run workflow**.
+
+Der Monitor folgt nur ausdrücklich freigegebenen, öffentlich zugänglichen Artikelübersichten im [Quellenregister](../data/report-sources.json). Start: SpVgg Mössingen/Badminton und BWBV Jugend. Die 15 weiteren registrierten Quellen sind zunächst nicht für den automatischen Abruf freigegeben. robots.txt wird beachtet; Paywalls und Cookie-/Login-Seiten werden nicht umgangen.
+
+**Entdeckung und Freigabe:**
+
+1. [discover-reports.py](../scripts/discover-reports.py) erfasst URL, Titel, optional Veröffentlichungsdatum und eine potenzielle Spieler-ID nur bei einem vollständigen Namensfund im **Artikelkörper**, nicht in der Seitennavigation. Allgemeine Vereinstreffer bleiben ohne Spielerbezug.
+2. Bereits veröffentlichte und offene Links werden nach normalisierter URL dedupliziert (einschließlich www und abschließendem Slash).
+3. Neue Ergebnisse werden in [report-pending.json](../data/report-pending.json) **nur auf einem Bot-Zweig** abgelegt. Der Workflow legt dazu einen GitHub-Pull-Request für menschliche Prüfung an oder aktualisiert ihn. Kandidaten erscheinen nicht in der App.
+4. Die Originalquelle muss vor Veröffentlichung redaktionell geprüft werden. Danach kann man einen Kandidaten im Arbeitszweig so übernehmen:
+
+    python3 scripts/approve-report.py --url "https://beispiel.de/artikel" --players 05-070879 --confirm-original
+
+    Für allgemeine Vereinsberichte ohne Namensnennung:
+
+    python3 scripts/approve-report.py --url "https://beispiel.de/vereinsmeldung" --club-only --confirm-original
+
+5. Nach Merge des freigegebenen [Artikelregisters](../data/report-articles.json) ist der Artikel im PWA-Berichtebereich sichtbar. Der öffentliche JSON-Feed wird URL-basiert mit bisherigen Supabase-Berichten zusammengeführt, ohne Supabase-Service-Key im Browser. Neue geprüfte Berichte sind **zunächst nur im GitHub-Artikelregister** gespeichert, nicht automatisch in Supabase.
+
+Es werden keine vollständigen Presseartikel, geschützten Inhalte oder unbelegten Behauptungen kopiert. Ein automatischer Name-Fund ist noch keine redaktionelle Freigabe.
+
+**GitHub-Berechtigung:** Falls der Bot keine Pull Requests erstellen darf, muss im Repository unter **Settings → Actions → General → Workflow permissions** das Erstellen von PRs durch GitHub Actions zugelassen sein. Der Workflow gibt andernfalls einen Fehler aus.
+
+Der Monitor ist kostenfrei und nutzt keine KI-API. Die Vollständigkeit hängt von öffentlichen Quellen und deren Zugriffsregeln ab. Eine breite Echtzeitüberwachung der kommerziellen Presse ist damit noch nicht eingerichtet.
