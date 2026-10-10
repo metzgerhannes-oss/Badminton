@@ -1,5 +1,34 @@
 {
   "schemaVersion": 1,
   "description": "Candidate metadata only. Review original names and links before promoting to verified articles.",
-  "candidates": []
+  "candidates": [
+    {
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/regionalliga-auftakt-am-26-september-2026-das-fieber-steigt",
+      "source": "club-moessingen",
+      "title": "Regionalliga-Auftakt am 26.+27. September 2026: Vollgas Mössingen!",
+      "date": null,
+      "players": [
+        "05-070879",
+        "05-071969"
+      ],
+      "evidence": "explicit-name-in-article-body",
+      "club_context": false,
+      "detected_on": "2026-10-10",
+      "status": "needs-review"
+    },
+    {
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/regionalliga-spieltage-am-10-11-oktober-2026",
+      "source": "club-moessingen",
+      "title": "Regionalliga-Spieltage am 10./11. Oktober 2026",
+      "date": null,
+      "players": [
+        "05-070879",
+        "05-071969"
+      ],
+      "evidence": "explicit-name-in-article-body",
+      "club_context": false,
+      "detected_on": "2026-10-10",
+      "status": "needs-review"
+    }
+  ]
 }
