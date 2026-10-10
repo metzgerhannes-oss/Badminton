@@ -56,6 +56,15 @@ drop policy if exists "Read verified external history import progress" on public
 create policy "Read verified external history import progress" on public.player_external_match_imports
  for select to anon,authenticated using(true);
 
+-- A hard global cap includes repeat batches for the same profile.
+create table if not exists private.external_match_attempts(
+ dbv_id text not null,
+ attempted_at timestamptz not null default now()
+);
+create index if not exists external_match_attempts_recent_idx
+ on private.external_match_attempts(attempted_at desc);
+revoke all on private.external_match_attempts from public,anon,authenticated;
+
 -- Only the server-side service role can claim work; anon has no function
 -- EXECUTE grant and cannot edit either table. Strict atomic rate limiting.
 create or replace function public.claim_external_match_import(target_id text)
@@ -96,6 +105,10 @@ begin
     and (last_start is null or last_start<now()-interval '24 hours') then
    return jsonb_build_object('accepted',false,'reason','daily_limit');
  end if;
+ if (select count(*) from private.external_match_attempts where attempted_at>=now()-interval '24 hours')>=36 then
+   return jsonb_build_object('accepted',false,'reason','global_cooldown');
+ end if;
+ insert into private.external_match_attempts(dbv_id) values(target_id);
  update public.player_external_match_imports set
   status='loading',last_started_at=now(),lease_until=now()+interval '3 minutes',
   updated_at=now(),detail='Öffentliche Matchkarten werden abgeglichen'
