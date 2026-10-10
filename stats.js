@@ -111,17 +111,22 @@ function officialProof(m){
 function render(){
  const values=$("match-stats-values"),note=$("match-stats-note"),details=$("match-stats-details"),
   list=$("match-stats-list"),counter=$("match-stats-detail-count"),year=$("match-stats-year"),
-  source=$("match-stats-source");
- if(!values||!note||!details||!list||!year||!source)return;
+  source=$("match-stats-source"),sourceDetails=$("match-stats-provenance-copy"),
+  retry=$("match-stats-retry");
+ if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry)return;
+ retry.hidden=true;
  if(status==="loading"||status==="idle"){
   source.textContent="Belegte Spiele";
   values.innerHTML='<p class="match-stats-empty">Einzelspiele werden geladen …</p>';
-  note.textContent="Die Quelle wird geprüft.";details.hidden=true;return;
+  note.textContent="Belegte Ergebnisse werden geprüft.";
+  sourceDetails.textContent="Es werden ausschließlich einzelne Matches mit belastbaren Quellenbelegen berücksichtigt.";
+  details.hidden=true;return;
  }
  if(status==="missing-id"){
   source.textContent="DBV-Spieler-ID benötigt";
   values.innerHTML='<p class="match-stats-empty">Für Matchzahlen wird eine DBV-Spieler-ID benötigt.</p>';
-  note.textContent="Ohne eindeutige DBV-ID lassen sich Spiele nicht sicher zuordnen.";
+  note.textContent="Bitte unter Spieler eine DBV-ID ergänzen.";
+  sourceDetails.textContent="Nur mit einer eindeutigen Spieler-ID können fremde Matches sicher zugeordnet werden.";
   details.hidden=true;return;
  }
  const officialCount=computeMatchStats(official);
@@ -145,21 +150,34 @@ function render(){
   ["Siegquote",missing?"–":stats.rate+" %","rate"]
  ].map(([name,value,key])=>'<div class="match-stat '+key+'"><span>'+esc(name)+'</span><strong>'+esc(value)+'</strong></div>').join("");
  if(sourced){
-  note.textContent="Einzeln belegte Badhub-Spiele · kein offizieller DBV-Matchimport. "+
+  note.textContent=stats.total
+   ? "Belegte Spiele aus Badhub · derzeit verfügbarer Teilbestand."
+   : "Für diese Auswahl liegen noch keine belegten Spiele vor.";
+  sourceDetails.textContent="Die Werte stammen aus einzelnen Badhub-Matchkarten, nicht aus einer vollständigen offiziellen DBV-Karriere. "+
    importCompleteness(progress,external.length)+
-   (partialExternal?" Angezeigter Datenbestand unvollständig.":"")+
-   (stats.excluded?" "+stats.excluded+" weitere Einträge nicht gezählt.":"");
+   (partialExternal?" Diese Liste ist derzeit unvollständig.":"")+
+   (stats.excluded?" "+stats.excluded+" zusätzliche unklare Einträge wurden ausgeschlossen.":"")+
+   (officialError?" Der offizielle Datenabgleich war beim letzten Laden nicht erreichbar.":"")+
+   " Ergebnisse aus verschiedenen Quellen werden nicht addiert.";
  }else if(official.length){
   const last=official.map(x=>x.last_synced_at).filter(Boolean).sort().at(-1);
   const published=last?" · letzte offizielle Übernahme "+dateLabel(last.slice(0,10)):"";
-  note.textContent=(missing?"Für diese Auswahl liegen keine einzeln geprüften Matches vor.":
-   "Gezählt: "+stats.total+" eindeutig abgeschlossene, offiziell belegte Begegnungen.")+
-   (stats.excluded?" · "+stats.excluded+" offene/unklare nicht berücksichtigt.":"")+
-   (partialOfficial?" · Datenbestand unvollständig.":"")+published;
+  note.textContent=missing
+   ?"Für diese Auswahl liegen keine einzeln geprüften Spiele vor."
+   :"Einzeln geprüfte DBV-Spiele · Quelle: offizielle Matchbelege.";
+  sourceDetails.textContent="Gezählt werden nur abgeschlossene, eindeutig belegte Begegnungen."+
+    (stats.excluded?" "+stats.excluded+" unklare oder offene Begegnungen ausgeschlossen.":"")+
+    (partialOfficial?" Der Datenbestand ist aktuell unvollständig.":"")+
+    published+" Externe Badhub-Spiele werden nicht zu diesen Werten addiert.";
  }else{
-  note.textContent=externalError&&officialError
-   ?"Matchdaten derzeit nicht erreichbar – bitte später erneut versuchen."
-   :"Die detaillierte Spielhistorie wird noch ergänzt.";
+  const unavailable=externalError&&officialError;
+  note.textContent=unavailable
+   ?"Spielstatistik gerade nicht erreichbar."
+   :"Noch keine einzeln belegten Spiele verfügbar.";
+  retry.hidden=!unavailable;
+  sourceDetails.textContent=unavailable
+   ?"Beide Ergebnisquellen waren bei dieser Abfrage nicht erreichbar. Ein erneuter Versuch lädt die Daten neu."
+   :"Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
  details.hidden=missing;
  counter.textContent="("+stats.total+")";
@@ -169,6 +187,11 @@ document.addEventListener("DOMContentLoaded",()=>{
  if(!$("match-stats"))return;
  $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;render()});
  $("match-stats-year").addEventListener("change",e=>{selectedYear=e.target.value;render()});
+ $("match-stats-retry")?.addEventListener("click",()=>fetchProfile(selected,true));
+ window.addEventListener("badminton:network-restored",()=>{
+  if(location.hash==="#start"&&selected&&status==="loaded"&&(officialError||externalError))
+   fetchProfile(selected,true);
+ });
  window.addEventListener("badminton:profile-change",e=>{fetchProfile(String(e.detail?.playerId||""))});
  window.addEventListener("badminton:external-matches-updated",e=>{
   if(String(e.detail?.playerId||"")===selected)fetchProfile(selected,true);

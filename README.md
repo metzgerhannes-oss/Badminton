@@ -1,3 +1,14 @@
+## v38 – UX-/Architektur-Paket A (10.10.2026)
+
+Die App baut auf der bereits eingeführten **Vierer-Navigation v37** auf (Home, Turniere, Spieler, Berichte; Einstellungen oben). Das erste priorisierte Qualitäts-Paket verbessert **bestehende** Aufgaben, statt neue Hauptmenüs zu erzeugen:
+
+- **Home nach Nutzerwert:** Live-Hinweis (nur mit echtem Beleg) und nächster Turniertermin, dann Matchstatistik, Ranglisten und Freunde. Alle bestehenden Daten-/Quellbereiche bleiben erhalten.
+- **Statistik klar und prüfbar:** Badhub-/DBV-Herkunft sichtbar, kurze Erklärung, tiefergehende Quelleninformation nur nach Aufklappen; bei vollständigem Abruffehler ein echter Neuversuch. Keine Addition von möglicherweise identischen Matches aus mehreren Quellen.
+- **Mobil & barriereärmer:** Vorwärtsnavigation setzt den Tastaturfokus auf den Zielbereich, Dokumenttitel pro Route, Skip-Link, sichtbarer Fokus, größere primäre Bedienelemente, `prefers-reduced-motion`, Online-/Offlinehinweis ohne irreführende Versprechen.
+- **Prüfbar statt kosmetisch:** zusätzliche statische Regression `tests/ux-foundation.mjs`, PWA-Shell v38, vorhandene Regressionen behalten, kleiner iPhone-/Android-Test bleibt notwendige Praxisabnahme.
+
+Das überprüfte **Gesamtkonzept mit 26 priorisierten Maßnahmen, technischen Abhängigkeiten, Zielarchitektur und Testaufgaben** steht unter [docs/ARCHITEKTUR_UX_ROADMAP_V38.md](docs/ARCHITEKTUR_UX_ROADMAP_V38.md). Die weiteren P1-/P2-Maßnahmen sind bewusst nicht Teil dieses P0-Releases und müssen separat getestet/umgesetzt werden.
+
 ## Home-Statistik: reale Einzelspiele statt Striche (v36)
 
 **Fehlerbehebung:** Die Home-Spielstatistik las bislang ausschließlich offizielle DBV-Matchdatensätze und blieb trotz bereits importierter Badhub-Einzelspiele leer. Sie nutzt jetzt **einzeln belegte Badhub-Spiele als klar bezeichneten Fallback** (nicht mit offiziellen Matches oder externen Karriereaggregaten vermischt). Beispiel Philipp: 39 belegte Einzelspiele, 17 Siege; insgesamt 42 importierte Matchkarten. Jahr und Disziplin funktionieren auch für die externe Quelle. 2×2-Kartenraster auf kleinen iPhones.

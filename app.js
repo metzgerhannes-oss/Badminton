@@ -99,7 +99,19 @@ function setActiveProfile(id){
 function routeTo(page){
  state.page=page;
  if(location.hash!=="#"+page)location.hash="#"+page;
- else render();
+ else{render();focusCurrentView();}
+}
+// Keyboard and assistive-technology users must land at the new screen heading,
+// not remain on a nav link while a different view is shown.
+function focusCurrentView(){
+ const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)
+  ?state.page:"start";
+ const heading=document.querySelector("#view-"+page+" h1, #view-"+page+" h2");
+ if(heading){
+  heading.setAttribute("tabindex","-1");
+  heading.focus({preventScroll:true});
+ }
+ window.scrollTo({top:0,behavior:"auto"});
 }
 function navigateHome(){
  state.viewingFriendId=null;
@@ -285,6 +297,9 @@ function render(){
  const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelector(".app")?.setAttribute("data-current-view",page);
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
+ const routeTitles={start:"Übersicht",historie:"Turnierhistorie",turniere:"Turniertag",
+  spieler:"Spieler",berichte:"Berichte",einstellungen:"Einstellungen"};
+ document.title=routeTitles[page]+" · Schmetterlinge";
  const activeTab=page==="historie"?"turniere":page;
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
   if(a.dataset.page===activeTab)a.setAttribute("aria-current","page");
@@ -323,7 +338,11 @@ function setup(){
  document.querySelectorAll('.bottom-nav a[data-page="start"], .topbar .brand[href="#start"]').forEach(link=>{
   link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
  });
- window.addEventListener("hashchange",()=>{state.page=(location.hash||"#start").slice(1);render()});
+ window.addEventListener("hashchange",()=>{
+  state.page=(location.hash||"#start").slice(1);
+  render();
+  focusCurrentView();
+ });
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
  let editingPlayerId=null,activatingNewProfile=false;
  function openPlayerForm(p=null){

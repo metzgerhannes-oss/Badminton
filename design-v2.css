@@ -660,3 +660,77 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
 
 /* Avoid repeating the large active-player banner above unrelated tools. */
 .app[data-current-view="spieler"] .focused-profile,.app[data-current-view="einstellungen"] .focused-profile,.app[data-current-view="berichte"] .focused-profile{display:none}
+
+
+/* P0 UX foundation v38: a task-first Home, legible status, keyboard and touch UX. */
+.skip-link{position:fixed;left:12px;top:8px;z-index:5000;
+ transform:translateY(-150%);background:#fff;color:#0b4166;padding:12px 16px;
+ border:2px solid #117fc0;border-radius:12px;font-weight:800;font-size:14px}
+.skip-link:focus{transform:translateY(0)}
+.connection-status[hidden]{display:none!important}
+.connection-status{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center;
+ border:1px solid #d3bb81;border-left:4px solid #ba8b39;background:#fffbf1;
+ border-radius:12px;padding:12px 14px;margin:4px 0 12px;color:#5e4b22;
+ font-size:13px;line-height:1.5}
+.connection-status strong{font-size:13px}
+.connection-status span{font-size:12px}
+.page h1[tabindex="-1"]:focus,.page h2[tabindex="-1"]:focus{outline:none}
+.page h1[tabindex="-1"]:focus-visible,.page h2[tabindex="-1"]:focus-visible{
+ outline:3px solid #1384c2;outline-offset:5px;border-radius:6px}
+:where(button,a,input,select,textarea,summary):focus-visible{
+ outline:3px solid #117ec0!important;outline-offset:3px}
+.home-ranking-section{margin-top:20px}
+.home-ranking-section>.section-heading{margin:0 2px 13px}
+.home-ranking-section>.section-heading h2{font-size:20px;line-height:1.3;color:#0d365d}
+#view-start #dashboard-next{margin:8px 0 17px}
+#view-start #match-stats{margin:10px 0 18px}
+#view-start #dashboard-rank-source{margin:0 0 9px}
+.match-stats-retry{min-height:44px;margin:10px 0;font-size:13px;
+ font-weight:800;border-radius:12px}
+.match-stats-retry[hidden]{display:none!important}
+.match-stats-provenance{margin:10px 0 2px;border-top:1px solid #cce4f1;color:#426c86}
+.match-stats-provenance>summary{display:flex;align-items:center;min-height:44px;
+ font-weight:790;font-size:12px;cursor:pointer;padding:8px 0}
+.match-stats-provenance>p{font-size:12px;line-height:1.65;
+ color:#416983;background:#f3faff;border-radius:10px;padding:11px;margin:1px 0 12px}
+#view-start .match-stats-note{font-size:12px;line-height:1.55;overflow-wrap:break-word}
+#view-start .match-stats-source{font-size:12px;line-height:1.35;max-width:170px}
+#view-start .match-stats-heading{align-items:flex-start}
+#view-start .match-stats-heading h2{line-height:1.25}
+#view-start .match-stat span{font-size:12px;line-height:1.35}
+#view-start .match-stat strong{line-height:1.2}
+#view-start .match-stats-filters label{font-size:12px}
+#view-start .match-stats-filters select{font-size:14px;min-height:44px}
+.library-player-action button,.library-player-action .library-view{
+ min-height:44px;font-size:12px;line-height:1.35;padding:8px 10px;
+ border:1px solid #9ed2ed}
+.library-player-action{max-width:120px}
+.library-player-info strong{font-size:14px;line-height:1.35}
+.library-player-info span{font-size:12px;line-height:1.4}
+.library-player-info small{font-size:11px;line-height:1.4}
+.library-own{font-size:11px;line-height:1.4}
+.library-idle span,.library-data-note{font-size:12px}
+.external-match-intro,.external-match-progress,
+.external-match-item p,.external-match-foot,
+.external-match-filters label,.external-match-count{font-size:12px}
+.external-match-item strong{font-size:14px}
+.external-match-row{font-size:11px}
+.external-match-filters select{font-size:14px}
+#view-turniere .live-radar-disclaimer,#view-turniere .radar-source{
+ font-size:12px;line-height:1.5}
+#view-turniere .radar-opponent,#view-turniere .radar-match-detail{font-size:12px}
+#view-turniere .live-hub-follow-link{font-size:12px;line-height:1.45;
+ max-width:130px;min-height:44px}
+#view-turniere .radar-match-head strong{font-size:13px}
+#view-turniere .radar-tag{font-size:12px}
+@media(max-width:370px){
+ .library-player{gap:6px;padding-inline:8px}
+ .library-player-action{max-width:106px}
+ .library-player-action button,.library-player-action .library-view{font-size:11px;padding:7px 7px}
+ #view-turniere .live-hub-follow-link{max-width:100px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;
+ animation-duration:.01ms!important;animation-iteration-count:1!important;
+ transition-duration:.01ms!important}
+}
