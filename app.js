@@ -208,6 +208,7 @@ function renderFriends(){
  }));
 }
 // The verified shared DBV roster is public; following a player is only local.
+if(typeof window!=="undefined"){
 window.badmintonLibraryGetState=()=>({
  own:state.players.map(p=>p.id),
  following:state.friends.map(p=>p.id)
@@ -238,6 +239,7 @@ window.badmintonLibraryView=id=>{
  location.hash="#start";render();
  return true;
 };
+}
 function render(){
  renderFocusHeader();
  renderTournaments();
