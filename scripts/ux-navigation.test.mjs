@@ -13,7 +13,7 @@ const sw=file("sw.js");
 
 test("four focused main destinations; settings in header; history remains reachable",()=>{
  const links=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
- assert.deepEqual(links,["start","turniere","berichte","spieler"]);
+ assert.deepEqual(links,["start","turniere","spieler","berichte"]);
  assert.match(html,/class="topbar-settings" href="#einstellungen"/);
  assert.match(html,/href="#historie"/);
  assert.match(html,/href="#turniere">← Turniertag/);
