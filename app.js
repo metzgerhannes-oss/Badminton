@@ -96,19 +96,22 @@ function setActiveProfile(id){
  return true;
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
+function routeTo(page){
+ state.page=page;
+ if(location.hash!=="#"+page)location.hash="#"+page;
+ else render();
+}
 function navigateHome(){
  state.viewingFriendId=null;
  state.chosen=state.activeProfileId;
- state.page="start";
- if(location.hash!=="#start")location.hash="#start";
- render();
+ routeTo("start");
 }
 function renderFocusHeader(){
  const p=currentProfile();
  const isFriend=Boolean(state.viewingFriendId);
  const wrap=el("focused-profile");
  if(!p){
-  wrap.innerHTML='<span class="focus-profile-avatar">+</span><span class="focus-profile-label">Noch kein Spielerprofil angelegt</span><a href="#einstellungen" class="focus-settings">Einrichten ↗</a>';return;
+  wrap.innerHTML='<span class="focus-profile-avatar">+</span><span class="focus-profile-label">Noch kein Spielerprofil angelegt</span><a href="#spieler" class="focus-settings">Einrichten ↗</a>';return;
  }
  let action="";
  if(isFriend){
@@ -126,9 +129,7 @@ function renderFocusHeader(){
  (p.club?'<span class="focus-club">Verein: '+esc(p.club)+'</span>':"")+'</div>'+action;
  el("back-own")?.addEventListener("click",navigateHome);
  wrap.querySelectorAll("[data-switch-profile]").forEach(button=>button.addEventListener("click",()=>{
-  if(!setActiveProfile(button.dataset.switchProfile))return;
-  location.hash="#start";
-  render();
+  window.badmintonSelectViewer(button.dataset.switchProfile);
  }));
 }
 function renderTournaments(){
@@ -184,7 +185,7 @@ function renderProfiles(){
 function renderFriendQuick(){
  const root=el("dashboard-friends"); if(!root)return;
  if(!state.friends.length){
-  root.innerHTML='<a class="friend-quick-add" href="#einstellungen"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Freund hinzufügen</span><span aria-hidden="true">↗</span></a>';
+  root.innerHTML='<a class="friend-quick-add" href="#spieler"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Freund hinzufügen</span><span aria-hidden="true">↗</span></a>';
   return;
  }
  const own=state.players.find(p=>p.id===state.activeProfileId);
@@ -192,8 +193,7 @@ function renderFriendQuick(){
  root.innerHTML=links.map(p=>'<button type="button" class="friend-quick '+(state.viewingFriendId===p.id?'is-current':'')+'" data-friend-quick="'+esc(p.id)+'" data-is-own="'+(p.isOwn?'true':'false')+'" aria-label="'+esc(p.isOwn?'Zurück zu meinem Startprofil '+p.name:'KPIs von '+p.name)+'"><span class="friend-quick-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-quick-name">'+esc(p.isOwn?'Zu mir':p.name.split(" ")[0])+'</span></button>').join("");
  root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.isOwn==="true"){navigateHome();return;}
-  if(state.friends.some(p=>p.id===b.dataset.friendQuick)){state.viewingFriendId=b.dataset.friendQuick;state.chosen=b.dataset.friendQuick;}
-  location.hash="#start";render();
+  window.badmintonSelectViewer(b.dataset.friendQuick);
  }));
 }
 function renderFriends(){
@@ -205,8 +205,7 @@ function renderFriends(){
  root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>{
   const friend=state.friends.find(p=>p.id===b.dataset.viewFriend);
   if(!friend)return;
-  state.viewingFriendId=friend.id;state.chosen=friend.id;
-  location.hash="#start";render();
+  window.badmintonSelectViewer(friend.id);
  }));
  root.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
  root.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>{
@@ -229,7 +228,7 @@ window.badmintonLibraryToggleFollow=player=>{
  if(exists){
   state.friends=state.friends.filter(p=>p.id!==id);
   if(state.viewingFriendId===id){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
-  save();render();
+  save();render();window.dispatchEvent(new Event("badminton:library-following"));
   return {ok:true,message:"Spieler entfolgt."};
  }
  if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
@@ -238,7 +237,7 @@ window.badmintonLibraryToggleFollow=player=>{
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
  });
- save();render();
+ save();render();window.dispatchEvent(new Event("badminton:library-following"));
  window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
@@ -251,9 +250,7 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
   save();
  }else return false;
  const destination=stayOnPage?"turniere":"start";
- state.page=destination;
- if(location.hash!=="#"+destination)location.hash="#"+destination;
- render();
+  routeTo(destination);
  return true;
 };
 window.badmintonLiveViewerOptions=()=>({
@@ -266,6 +263,7 @@ window.badmintonLibraryView=id=>{
  return window.badmintonSelectViewer(id);
 };
 }
+let lastNotifiedProfile="",lastNotifiedClub="";
 function render(){
  renderFocusHeader();
  renderTournaments();
@@ -279,14 +277,23 @@ function render(){
  // Read-only live viewer follows whichever public DBV profile is currently shown.
  window.badmintonActivePlayerId=state.chosen;
  window.badmintonActiveClub=(currentProfile()?.club||"");
- window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
- window.dispatchEvent(new CustomEvent("badminton:friends-changed"));
+ if(state.chosen!==lastNotifiedProfile||window.badmintonActiveClub!==lastNotifiedClub){
+  lastNotifiedProfile=state.chosen;
+  lastNotifiedClub=window.badmintonActiveClub;
+  window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
+ }
  const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
+ const activeTab=page==="historie"?"turniere":page;
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
-  if(a.dataset.page===page)a.setAttribute("aria-current","page");
+  if(a.dataset.page===activeTab)a.setAttribute("aria-current","page");
   else a.removeAttribute("aria-current");
  });
+ const settingsLink=document.querySelector(".topbar-settings");
+ if(settingsLink){
+  if(page==="einstellungen")settingsLink.setAttribute("aria-current","page");
+  else settingsLink.removeAttribute("aria-current");
+ }
 }
 let editing=null;
 function openTournamentForm(item=null){
@@ -372,11 +379,11 @@ function setup(){
  }
  window.openFriendForm=openFriendForm;
  el("add-friend").addEventListener("click",()=>{
-  const input=el("friend-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});
+  const input=el("library-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});
  });
  el("add-friend-manual").addEventListener("click",()=>openFriendForm());
  el("dashboard-add-friend").addEventListener("click",()=>{
-  setTimeout(()=>{const input=el("friend-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});},0);
+  setTimeout(()=>{const input=el("library-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});},0);
  });
  el("cancel-friend").addEventListener("click",()=>friendDialog.close());
  friendForm.addEventListener("submit",event=>{
