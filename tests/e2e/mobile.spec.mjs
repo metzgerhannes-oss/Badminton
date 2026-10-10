@@ -167,6 +167,28 @@ test("Crossfed DBV tournament proofs keep their own source URL and year",async (
  await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
 });
 
+test("Sourced friend tournament placements remain separate from individual match facts",async ({page})=>{
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
+ const profiles=[
+  {id:"05-070879",name:"Philipp Metzger"},
+  {id:"05-071969",name:"Charlotte Metzger"},
+  {id:"05-061350",name:"Sarah Storz"},
+  {id:"05-070006",name:"Vinzent Pius Ott"}
+ ];
+ await page.evaluate(profiles=>window.renderHistory("05-061350",profiles,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
+ await expect(page.locator("#history-timeline")).toContainText("3.");
+ await expect(page.locator("#history-timeline")).toContainText("Raphael Argast");
+ await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute(
+  "href",/spvgg\\.org\\/abteilungen\\/badminton\\/aktuelles\\/2-c-rangliste/);
+ await page.evaluate(profiles=>window.renderHistory("05-070006",profiles,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("2. C-Rangliste BW");
+ await expect(page.locator("#history-timeline")).toContainText("19.");
+ await expect(page.locator("#history-timeline")).not.toContainText("Raphael Argast");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).not.toHaveText("2");
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());

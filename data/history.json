@@ -322,6 +322,44 @@
       },
       "verified": true,
       "playerName": "Philipp Metzger"
+    },
+    {
+      "id": "ss-2026-03-01-c-rlt-mx-u19",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2026-03-01",
+      "event": "2. C-Rangliste BW U11–U19",
+      "location": "Friedrichshafen",
+      "level": "C",
+      "discipline": "Mixed",
+      "ageGroup": "U19",
+      "place": 3,
+      "partner": "Raphael Argast (BC Lörrach-Brombach)",
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"
+      },
+      "verified": true,
+      "verificationNote": "Vereinsbericht vom 02.03.2026 nennt Sarah, Partner und Platzierung; keine individuellen Satzstände."
+    },
+    {
+      "id": "vo-2026-02-28-c-rlt-me-u15",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2026-02-28",
+      "event": "2. C-Rangliste BW U11–U19",
+      "location": "Friedrichshafen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 19,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Turnierbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026"
+      },
+      "verified": true,
+      "verificationNote": "Vereinsbericht vom 02.03.2026 nennt Vinzent und Platzierung; keine individuellen Satzstände."
     }
   ],
   "pendingResults": []
