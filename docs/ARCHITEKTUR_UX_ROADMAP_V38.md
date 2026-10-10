@@ -43,7 +43,7 @@ Stand: 10.10.2026 · Basis: GitHub `main` v37 (Vierer-Navigation), P0-Paket v38.
 | UX-16 | P1 | Performance | LCP/INP auf echtem Mobilgerät messen, kritischen JS/CSS-Pfad und PWA-SW-Warmstart reduzieren | p75 LCP ≤2,5s, p75 INP ≤200ms als Ziel | Offen |
 | UX-17 | P1 | Datenaktualisierung | Letzter erfolgreicher Quellbeleg + nächster Sync je System (Rank, Live, Historie) | Zeitstempel pro Datentyp, keine technische Warnung | Teilweise vorhanden |
 | UX-18 | P1 | Datenimport | Historien-Abdeckung offen deklarieren; Fehler/Teilmenge getrennt von „keine Spiele“, Match-Fakt-Validation härten | Matchcount = belegte Daten; Disziplin/Jahr korrekt | Teilweise vorhanden |
-| UX-19 | P1 | Familien-Backup | Lokaler Export/Import (mit Bestätigung und Validierung), vor Cloud-Sync | Wiederherstellung auf zweitem Gerät ohne Datenverlust | Offen |
+| UX-19 | P1 | Familien-Backup | Lokaler Export/Import (mit Bestätigung und Validierung), vor Cloud-Sync | Wiederherstellung auf zweitem Gerät ohne Datenverlust | **v39 programmiert; reale iPhone-Geräteprüfung offen** |
 | UX-20 | P1 | Releases | Automatisierte Browser-E2E-Tests (Playwright), UI-Screenshots auf kleinen Displays, CI-Gates | Keine ungeprüften visuellen Regressionen | **Mobiles Browser-Gate als Folgeschritt umgesetzt; reale Geräteabnahme weiterhin offen** |
 | UX-21 | P2 | Familiensynchronisierung | Opt-in Auth, Datenisolierung, Konfliktlösung, Widerruf und Löschung | RLS-Integration und zwei echte Geräte | Offen |
 | UX-22 | P2 | Trainerblick | Optional mehrere gefolgte Spieler beim Turniertag ohne ständige Profilebene | Zeitplan und Quelle pro Person, gezieltes Polling | Offen |
