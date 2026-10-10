@@ -59,7 +59,7 @@ assert.match(stats,/Sätze aus Spielersicht/);
 assert.match(stats,/badminton:external-matches-updated/);
 assert.match(stats,/fetchProfile\(selected,true\)/);
 assert.match(html,/id="match-stats-source"/);
-assert.match(history,/registerSavedProfiles\(\)/);
+assert.doesNotMatch(history,/registerSavedProfiles\(\)/);
 assert.match(history,/own\?\.own\|\|\[\]/);
 assert.match(history,/own\?\.following\|\|\[\]/);
 assert.match(history,/requestNew\(id\)/);
