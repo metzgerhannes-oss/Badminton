@@ -78,5 +78,32 @@ class ReportDiscoveryTests(unittest.TestCase):
             result=watcher.run(base,'2026-10-10',previous,scanner=scan)
             self.assertEqual([x['url'] for x in result['candidates']],[pending_url])
 
+
+    def test_approval_requires_explicit_confirmation_and_moves_candidate(self):
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            (root/'data').mkdir()
+            url='https://spvgg.org/abteilungen/badminton/aktuelles/neuer-bericht'
+            (root/'data/report-pending.json').write_text(json.dumps({'candidates':[{
+                'url':url,'title':'Neue Rangliste mit bekannten Namen',
+                'source':'club-moessingen','date':None,'players':['05-070879'],
+                'club_context':True,'status':'needs-review'}]}))
+            (root/'data/report-articles.json').write_text(json.dumps({'articles':[]}))
+            (root/'data/report-sources.json').write_text(json.dumps({'sources':[{'id':'club-moessingen'}]}))
+            executable=Path(__file__).resolve().parents[1]/'scripts/approve-report.py'
+            command=[sys.executable,str(executable),'--root',str(root),'--url',url,'--players','05-070879']
+            refused=subprocess.run(command,capture_output=True,text=True)
+            self.assertNotEqual(refused.returncode,0)
+            self.assertEqual(len(json.loads((root/'data/report-articles.json').read_text())['articles']),0)
+            approved=subprocess.run(command+['--confirm-original'],capture_output=True,text=True)
+            self.assertEqual(approved.returncode,0,approved.stderr)
+            items=json.loads((root/'data/report-articles.json').read_text())['articles']
+            self.assertEqual(len(items),1)
+            self.assertEqual(items[0]['players'],['05-070879'])
+            self.assertEqual(items[0]['status'],'verified')
+            self.assertEqual(len(json.loads((root/'data/report-pending.json').read_text())['candidates']),0)
+
 if __name__=='__main__':
     unittest.main()
