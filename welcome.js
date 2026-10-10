@@ -47,7 +47,13 @@ function saveProfile(e){
   const historyRequest=importPost(profile.id);
   if(historyRequest)fetch(historyRequest.url,{
    method:"POST",headers:historyRequest.headers,body:historyRequest.body
-  }).catch(()=>{ /* App can request again after opening Home. */ });
+  }).then(response=>{
+   if(!response.ok)return;
+   return fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
+    method:"POST",headers:{apikey:historyRequest.headers.apikey,"Content-Type":"application/json"},
+    body:JSON.stringify({dbv_id:profile.id})
+   });
+  }).catch(()=>{ /* Deferred importer will retry through the central queue. */ });
   $("onboard-profile").hidden=true;
   $("onboard-install").hidden=false;
   $("progress-profile").classList.remove("current");
