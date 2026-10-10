@@ -8,17 +8,19 @@
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
  const date=s=>s?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z")):"Datum offen";
  const CATEGORIES={club:"Verein",opponent_club:"Andere Vereine",association:"Verband",dbv:"DBV",media:"Medien",regional_media:"Regionalpresse",sports_organization:"Sport & Stadt",result_portal:"Resultate"};
- let articles=[],sources=[],mentions=new Set(),profileId="",club="",loaded=false,busy=false;
+ let articles=[],sources=[],clubs=[],mentions=new Set(),profileId="",club="",loaded=false,busy=false;
  async function get(path){
   const resp=await fetch(URL+"/rest/v1/"+path,{headers:{"apikey":KEY,"accept":"application/json"},cache:"no-store"});
   if(!resp.ok)throw new Error("Supabase "+resp.status);
   return resp.json();
  }
  function validId(id){return /^\d{2}-\d{6}$/.test(id||"")}
- function isClubArticle(a){
-  if(!club)return false;
-  return a.club_id==="spvgg-moessingen"&&/^spvgg mössingen$/i.test(club);
+ const norm=s=>String(s||"").trim().toLocaleLowerCase("de").replace(/[.]/g,"").replace(/\s+/g," ");
+ function clubId(){
+  const chosen=norm(club);
+  return clubs.find(c=>[c.name,c.short_name].some(name=>norm(name)===chosen))?.id||"";
  }
+ function isClubArticle(a){return !!clubId()&&a.club_id===clubId()}
  function renderSources(){
   const box=$("report-source-list");if(!box)return;
   if(!sources.length){box.textContent="Keine Quellen verfügbar.";return}
@@ -50,7 +52,7 @@
    let message="Für diese Filter gibt es noch keine belegten Artikel.";
    if(mode==="mentions"&&!validId(profileId))message="Für dieses Profil ist keine gültige DBV-ID hinterlegt.";
    else if(mode==="club"&&!club)message="Für dieses Spielerprofil ist noch kein Verein hinterlegt. Bitte in den Stammdaten ergänzen.";
-   else if(mode==="club"&&!/^spvgg mössingen$/i.test(club))message="Für diesen Verein sind noch keine Artikel importiert.";
+   else if(mode==="club"&&!clubId())message="Für diesen Verein sind noch keine Artikel importiert.";
    box.innerHTML='<div class="report-empty">'+esc(message)+'</div>';return;
   }
   box.innerHTML=matches.map(a=>{
@@ -71,11 +73,12 @@
   const button=$("report-refresh");if(button)button.disabled=true;
   const box=$("report-list");if(box)box.innerHTML='<p class="report-empty">Berichte werden geladen …</p>';
   try{
-   const [articleRows,sourceRows]=await Promise.all([
+   const [articleRows,sourceRows,clubRows]=await Promise.all([
     get("articles?select=id,url,title,published_on,summary,club_id,report_sources(name,category)&status=eq.verified&order=published_on.desc.nullslast&limit=500"),
-    get("report_sources?select=id,name,category,homepage_url,article_index_url,verification_status,access_note,priority&order=priority.asc&limit=200")
+    get("report_sources?select=id,name,category,homepage_url,article_index_url,verification_status,access_note,priority&order=priority.asc&limit=200"),
+    get("clubs?select=id,name,short_name&limit=200")
    ]);
-   articles=articleRows;sources=sourceRows;loaded=true;
+   articles=articleRows;sources=sourceRows;clubs=clubRows;loaded=true;
    renderSources();
    await loadMentions();
   }catch(e){
