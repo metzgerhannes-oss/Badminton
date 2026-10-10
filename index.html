@@ -19,6 +19,7 @@
 <script type="module" src="./career-history.js"></script>
 <script defer src="./live.js"></script>
 <script type="module" src="./live-links.js"></script>
+<script type="module" src="./live-radar.js"></script>
 <script defer src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
 <script type="module" src="./dashboard.js"></script>
@@ -99,7 +100,14 @@
    <section class="live-dbv" aria-labelledby="dbv-live-title">
     <div class="section-heading"><h3 id="dbv-live-title">Spielplan &amp; Live-Ergebnisse</h3><button class="subtle-button" id="dbv-live-refresh" type="button">Aktualisieren</button></div>
     <p class="settings-hint">Begegnungen zum gewählten Spielerprofil. Zeiten und Satzstände werden nur angezeigt, wenn verifizierte Quelldaten vorliegen.</p>
+    <div class="live-radar-panel" aria-labelledby="live-radar-title">
+     <div class="live-radar-heading"><h4 id="live-radar-title">Live-Radar</h4><button class="subtle-button" id="live-radar-refresh" type="button">Aktualisieren</button></div>
+     <p class="live-radar-disclaimer">Badhub-Quelle · zentraler Abgleich während du diese Ansicht geöffnet hast. Es werden ausschließlich bestätigte Quellenstände angezeigt.</p>
+     <div id="live-radar-content" class="live-radar-content" role="status" aria-live="polite"><p>Wähle ein Spielerprofil, um den Live-Radar zu starten.</p></div>
+    </div>
+    <details class="live-dbv-original"><summary>Zusätzlich: verifizierte DBV-Matches aus unserer Datenbank</summary>
     <div id="dbv-live-results" aria-live="polite" role="status"><p class="live-dbv-note">Noch keine Daten geladen.</p></div>
+    </details>
     <div id="external-live-player" class="external-live-player" hidden>
       <div class="external-live-head"><strong>Turniertag des ausgewählten Spielers</strong><span>Externe Live-Ansicht · Badhub</span></div>
       <p>Aktuelle Ansetzungen und veröffentlichte Ergebnisse direkt bei Badhub prüfen. Der Link öffnet die Quelle; eine laufende Begegnung ist nicht garantiert.</p>
