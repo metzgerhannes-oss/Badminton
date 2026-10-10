@@ -21,7 +21,7 @@ MAX_PENDING = 500
 MAX_MONITORED = 60
 REST_ROOT = 'https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/'
 REST_KEY = 'sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE'
-DBV_ID = re.compile(r'^\d{2}-\d{6}
+DBV_ID = re.compile(r'\d{2}-\d{6}')
 NAMES = {
     '05-070879': re.compile(r'(?<!\w)Philipp\s+Metzger(?!\w)', re.I),
     '05-071969': re.compile(r'(?<!\w)Charlotte\s+Metzger(?!\w)', re.I),
