@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-10",
+  "notes": "Verifizierte Quellen sind als Websites oder Artikel tatsächlich gefunden; Kandidaten sind ausschließlich Rechercheziele, keine belegten Treffer oder automatischen Feeds.",
+  "sources": [
+    {
+      "id": "club-moessingen",
+      "name": "SpVgg Mössingen – Badminton",
+      "category": "club",
+      "homepage_url": "https://spvgg.org/",
+      "article_index_url": "https://spvgg.org/abteilungen/badminton/aktuelles",
+      "verification_status": "verified",
+      "priority": 1,
+      "access_note": "Vereinsberichte direkt, öffentlich abrufbar"
+    },
+    {
+      "id": "bwbv",
+      "name": "Badminton Baden-Württemberg (BWBV)",
+      "category": "association",
+      "homepage_url": "https://bwbv.de/",
+      "article_index_url": "https://bwbv.de/neuigkeiten/neuigkeiten-jugend/",
+      "verification_status": "verified",
+      "priority": 2,
+      "access_note": "Jugend-, Turnier- und Bezirksberichte"
+    },
+    {
+      "id": "dbv",
+      "name": "Deutscher Badminton-Verband (DBV)",
+      "category": "dbv",
+      "homepage_url": "https://www.badminton.de/",
+      "article_index_url": "https://www.badminton.de/",
+      "verification_status": "verified",
+      "priority": 3,
+      "access_note": "Offizieller Verband, Artikel nur bei tatsächlicher Namensnennung zuordnen"
+    },
+    {
+      "id": "dbv-turnier",
+      "name": "DBV Turnierportal",
+      "category": "dbv",
+      "homepage_url": "https://dbv.turnier.de/",
+      "article_index_url": "https://dbv.turnier.de/",
+      "verification_status": "verified",
+      "priority": 4,
+      "access_note": "Ergebnisse und Teilnehmerdaten; Cookiewall möglich"
+    },
+    {
+      "id": "dbv-ranking",
+      "name": "DBV U19 Ranglistenportal",
+      "category": "dbv",
+      "homepage_url": "https://turniere.badminton.de/",
+      "article_index_url": "https://turniere.badminton.de/ranking",
+      "verification_status": "verified",
+      "priority": 5,
+      "access_note": "Excel enthält amtliche Gesamtscores, keine Einzelwertungen"
+    },
+    {
+      "id": "sportkreis-tuebingen",
+      "name": "Sportkreis Tübingen",
+      "category": "sports_organization",
+      "homepage_url": "https://sportkreis-tuebingen.de/",
+      "article_index_url": "https://sportkreis-tuebingen.de/skj-tuebingen/sportjugendehrung/anmeldung",
+      "verification_status": "verified",
+      "priority": 7,
+      "access_note": "Sportjugend-Ehrungen, ggf. allgemeine Veranstaltungen"
+    },
+    {
+      "id": "psv-reutlingen",
+      "name": "PSV Reutlingen – Badminton",
+      "category": "opponent_club",
+      "homepage_url": "https://www.psv-reutlingen.de/",
+      "article_index_url": "https://www.psv-reutlingen.de/aktuelles-badminton",
+      "verification_status": "verified",
+      "priority": 8,
+      "access_note": "Gegnerische Vereinsberichte zu Südwürttemberg"
+    },
+    {
+      "id": "aalener-sportallianz",
+      "name": "Aalener Sportallianz – Badminton",
+      "category": "opponent_club",
+      "homepage_url": "https://aalener-sportallianz.de/",
+      "article_index_url": "https://aalener-sportallianz.de/2026-04-26_moessingen/",
+      "verification_status": "verified",
+      "priority": 9,
+      "access_note": "Namentlicher Doppelfinal-Bericht vorhanden"
+    },
+    {
+      "id": "badhub",
+      "name": "Badhub",
+      "category": "result_portal",
+      "homepage_url": "https://badhub.de/",
+      "article_index_url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier",
+      "verification_status": "verified",
+      "priority": 10,
+      "access_note": "Sekundärübernahme von Ergebnissen, nicht für unbelegte Ranglistenpunkte"
+    },
+    {
+      "id": "tagblatt",
+      "name": "Schwäbisches Tagblatt",
+      "category": "regional_media",
+      "homepage_url": "https://www.tagblatt.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 20,
+      "access_note": "Quelle zur Recherche; keine namentliche Spielererwähnung bestätigt"
+    },
+    {
+      "id": "gea",
+      "name": "Reutlinger General-Anzeiger",
+      "category": "regional_media",
+      "homepage_url": "https://www.gea.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 21,
+      "access_note": "Quelle zur Recherche; automatischer Abruf eingeschränkt"
+    },
+    {
+      "id": "swp",
+      "name": "Südwest Presse",
+      "category": "regional_media",
+      "homepage_url": "https://www.swp.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 22,
+      "access_note": "Quelle zur Recherche; namentliche Spielererwähnung noch zu prüfen"
+    },
+    {
+      "id": "swr",
+      "name": "SWR Baden-Württemberg",
+      "category": "media",
+      "homepage_url": "https://www.swr.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 23,
+      "access_note": "Regionale Sportberichterstattung; noch kein persönlicher Treffer bestätigt"
+    },
+    {
+      "id": "stadt-moessingen",
+      "name": "Stadt Mössingen",
+      "category": "sports_organization",
+      "homepage_url": "https://www.moessingen.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 24,
+      "access_note": "Stadtnachrichten und Sportlerehrungen als Recherchequelle"
+    },
+    {
+      "id": "schwaebische",
+      "name": "Schwäbische Zeitung",
+      "category": "regional_media",
+      "homepage_url": "https://www.schwaebische.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 25,
+      "access_note": "Region Bodensee, mögliche Turnierberichte; keine Namensnennung bestätigt"
+    },
+    {
+      "id": "sportschau",
+      "name": "ARD Sportschau",
+      "category": "media",
+      "homepage_url": "https://www.sportschau.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 40,
+      "access_note": "Breite Sportrecherche, derzeit kein persönlicher Treffer"
+    },
+    {
+      "id": "tsv-gaertringen",
+      "name": "TSV Gärtringen – Badminton",
+      "category": "opponent_club",
+      "homepage_url": "https://www.tsv-gaertringen.de/",
+      "article_index_url": null,
+      "verification_status": "candidate",
+      "priority": 30,
+      "access_note": "Turnierausrichter Jugend-E-Rangliste, Vereinsnews prüfen"
+    }
+  ]
+}

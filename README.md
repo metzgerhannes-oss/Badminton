@@ -1,3 +1,11 @@
+## Berichte & Vereins-Stammdaten (10.10.2026)
+
+Neu: Spieler-Stammdaten mit **Verein** (SpVgg Mössingen für die bereits verifizierten beiden Profile) und der fünfte App-Bereich **„Berichte“**. Die Auswahl unterscheidet belegte **persönliche Namensnennungen** von weiteren **Vereinsberichten**. Es werden nur Titel, eigene Kurzbeschreibung, Veröffentlichungsdatum (soweit bestätigt), Quelle und Direktlink gespeichert; keine Artikelvolltexte.
+
+Initial erfasst: **17 Recherchequellen**, davon geprüfte und lediglich als Kandidaten hinterlegte Medienseiten, **15 Artikel**, **16 belegte Spieler-Artikel-Zuordnungen** (14 Philipp, zwei Charlotte). Diese Zahlen sind der Anfangsbestand, kein automatischer Pressespiegel. Offizielle und journalistische Quellen bleiben in ihrer eigenen Rangfolge; unbekannte oder gesperrte Presseartikel werden nicht als persönliche Treffer ausgegeben.
+
+Dauerhafte Dateien: [Quellenkatalog](data/report-sources.json), [Artikelregister](data/report-articles.json), [Qualitäts-/Implementierungsregeln](docs/BERICHTE_QUELLEN.md).
+
 ## Supabase-Datenbank (10.10.2026)
 
 Die separate Organisation **Badminton** und das Supabase-Projekt `yadexibmjmnjfmfabrug` sind eingerichtet. Public-DBV-Daten können schreibgeschützt gelesen werden, persönliche Listen sind durch RLS geschützt. Ein initialer Import der 16 kuratierten Platzierungen und vier KW41-Ranglistenwerte wurde durchgeführt. Eine **automatische Live-DBV-Ergebnisübernahme** ist noch nicht eingerichtet; die neue Turnieransicht zeigt nur belegte Importdaten. Vollständiger Stand und technische Hinweise: **[Supabase-Backend](docs/SUPABASE_BACKEND.md)**.

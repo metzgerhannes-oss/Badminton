@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-10",
+  "purpose": "Belegte öffentliche Artikel und nachweisbare persönliche Namenserwähnungen; keine Volltextkopien",
+  "articles": [
+    {
+      "source": "club-moessingen",
+      "date": "2026-09-29",
+      "title": "55. BWBV-Meisterschaft U11-U19 am 03./04. Oktober 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/55-bwbv-meisterschaft-u11-u19-am-03-04-oktober-2026",
+      "summary": "Vorbericht nennt beide als gemeldete Mössinger Jugendspieler; kein Ergebnisbericht.",
+      "players": [
+        "05-070879",
+        "05-071969"
+      ],
+      "note": "Beide Spieler werden in der Meldeliste namentlich genannt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-09-28",
+      "title": "4. E-Rangliste Südwürttemberg U11-U19 am 26. September 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026",
+      "summary": "Erster Turnierstart von Charlotte im Einzel U13 und weiterer Start von Philipp.",
+      "players": [
+        "05-070879",
+        "05-071969"
+      ],
+      "note": "Beide Spieler werden direkt namentlich im Bericht besprochen.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-06-23",
+      "title": "23. Hexen-Cup / 6. DBV A-Rangliste U11/U13+C-Rangliste BW U15/U17/U19 am 27./28. Juni 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/23-hexen-cup-6-dbv-a-rangliste-u11-u13-c-rangliste-bw-u15-u17-u19-am-27-28-juni-2026",
+      "summary": "Vorschau auf den Konstanzer Hexen-Cup mit Philipp im Teilnehmerfeld.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger wird als Teilnehmer namentlich genannt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-04-28",
+      "title": "3. C-Rangliste BW U11-U19 am 24./25. April 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-24-25-april-2026",
+      "summary": "Mössinger Turnierbericht mit Ergebnissen im Einzel U13 und Doppel U11.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Name und beide Wettbewerbsergebnisse im Bericht.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-04-21",
+      "title": "3. E-Rangliste BW Südwürttemberg U11-U19 am 19. April 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-e-rangliste-bw-suedwuerttemberg-u11-u19-am-19-april-2026",
+      "summary": "Vereinsbericht zur E-Rangliste in Gomaringen mit namentlichen Ergebnissen.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger namentlich in der Teilnehmer- und Ergebnisliste.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-03-14",
+      "title": "Sportjugendehrung des Sportkreis Tübingen am 13. März 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/sportjugendehrung-des-sportkreis-tuebingen-am-13-maerz-2026",
+      "summary": "Bericht zur Ehrung Mössinger Jugendspieler für Leistungen aus 2025.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger wird als anwesender und geehrter Spieler genannt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-03-02",
+      "title": "2. C-Rangliste BW U11-U19 am 28. Februar/1. März 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026",
+      "summary": "Mössinger Resultate im Einzel und Mixed beim Turnier in Friedrichshafen.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger namentlich in der Ergebnisliste.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-02-10",
+      "title": "2. E-Rangliste BW Südwürttemberg U11-U19 am 08. Februar 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-e-rangliste-bw-suedwuerttemberg-u11-u19-am-08-februar-2026",
+      "summary": "Start in der höheren Altersklasse U13 bei der Regionalrangliste.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger im Artikel namentlich erwähnt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2026-01-20",
+      "title": "1. C-Rangliste BW U11-U19 am 17./18. Januar 2026",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/1-c-rangliste-bw-u11-u19-am-17-18-januar-2026",
+      "summary": "Vereinsbericht zum Jahresauftakt der Jugendrangliste in Reutlingen.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger steht namentlich in der Ergebnisliste.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-07-15",
+      "title": "34. Südwürttembergische Meisterschaft U11-U19 am 12. Juli 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025",
+      "summary": "Vereinsbericht zur Jugendmeisterschaft mit Ergebnissen in U11.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger im Ergebnisabschnitt namentlich genannt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-05-27",
+      "title": "2. D-Rangliste BW Nordwürttemberg U11-U19 am 24. Mai 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-d-rangliste-bw-nordwuerttemberg-u11-u19-am-24-mai-2025",
+      "summary": "Bericht zum ersten Turnierstart von Philipp in Neuhausen.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger wird direkt im Artikel erwähnt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-05-05",
+      "title": "3. C-Rangliste BW U11-U19 am 3./4. Mai 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-c-rangliste-bw-u11-u19-am-3-4-mai-2025",
+      "summary": "Vereinsbericht mit den Platzierungen des Mössinger Nachwuchses.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger namentlich in der Ergebnisliste.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "aalener-sportallianz",
+      "date": null,
+      "title": "3 Siege im Doppel beim baden-württembergischen Ranglistenturnier in Mössingen",
+      "url": "https://aalener-sportallianz.de/2026-04-26_moessingen/",
+      "summary": "Bericht des gegnerischen Vereins über das U11-Doppelfinale in Mössingen.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger wird ausdrücklich als Finalgegner genannt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "bwbv",
+      "date": "2026-01-26",
+      "title": "YANG-YANG-BWBV-Circuit: 1. E-Rangliste in Gärtringen",
+      "url": "https://bwbv.de/2026/01/26/yang-yang-bwbv-circuit-1-e-rangliste-in-gaertringen/",
+      "summary": "Landesverbandsbericht mit Podiumsergebnis im Jungeneinzel U11.",
+      "players": [
+        "05-070879"
+      ],
+      "note": "Philipp Metzger namentlich in der U11-Ergebnisliste des BWBV.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "bwbv",
+      "date": "2026-08-19",
+      "title": "Bezirksmeisterschaft BW Südwürttemberg U11-U19 am 11. Juli 2026",
+      "url": "https://bwbv.de/2026/08/19/bezirksmeisterschaft-bw-suedwuerttemberg-u11-u19-am-11-juli-2026/",
+      "summary": "Verbandbericht zum Mössinger Turnier; keine geprüfte namentliche Nennung der beiden Profile.",
+      "players": [],
+      "note": "Vereinsbezug; keine persönliche Zuordnung.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    }
+  ]
+}

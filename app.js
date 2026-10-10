@@ -2,8 +2,8 @@
 /** Schmetterlinge: historical results and official tournament bookmarks; optional verified Supabase match feed. */
 const STORE="shuttleboard-v1"; // Preserve existing device favourites.
 const DEFAULT_PLAYERS=[
- {id:"05-070879",name:"Philipp Metzger",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
- {id:"05-071969",name:"Charlotte Metzger",birthYear:2014,url:"https://turniere.badminton.de/ranking"}
+ {id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen",url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
+ {id:"05-071969",name:"Charlotte Metzger",birthYear:2014,club:"SpVgg Mössingen",url:"https://turniere.badminton.de/ranking"}
 ];
 const state={players:DEFAULT_PLAYERS.map(p=>({...p})),friends:[],officialLinks:[],activeProfileId:"05-070879",viewingFriendId:null,chosen:"05-070879",page:"start"};
 const el=id=>document.getElementById(id);
@@ -61,6 +61,10 @@ function restore(){
     state.players.push({id:"05-071969",name:"Charlotte Metzger",birthYear:2014,url:"https://turniere.badminton.de/ranking"});
   }
  }catch{}
+ // Legacy device profiles retain all favourites; fill only missing known club fields.
+ for(const p of state.players){
+  if(["05-070879","05-071969"].includes(p.id)&&!p.club)p.club="SpVgg Mössingen";
+ }
  if(!state.players.some(p=>p.id===state.activeProfileId))state.activeProfileId=state.players[0]?.id||"";
  state.friends=state.friends.filter(p=>!state.players.some(own=>own.id===p.id));
  state.chosen=state.activeProfileId;
@@ -110,7 +114,8 @@ function renderFocusHeader(){
  }
  wrap.innerHTML='<div class="focus-profile-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</div>'+
  '<div class="focus-profile-copy"><small>'+(isFriend?"Du folgst":"Mein aktives Spielerprofil")+'</small><strong>'+esc(p.name)+'</strong>'+
- '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+action;
+ '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span>'+
+ (p.club?'<span class="focus-club">Verein: '+esc(p.club)+'</span>':"")+'</div>'+action;
  el("back-own")?.addEventListener("click",()=>{state.viewingFriendId=null;state.chosen=state.activeProfileId;save();location.hash="#start";render()});
  wrap.querySelectorAll("[data-switch-profile]").forEach(button=>button.addEventListener("click",()=>{
   if(!setActiveProfile(button.dataset.switchProfile))return;
@@ -147,7 +152,7 @@ function renderProfiles(){
  list.innerHTML=state.players.length?state.players.map(p=>{
  const active=state.activeProfileId===p.id;
  const birth=p.birthYear?" · Jg. "+esc(p.birthYear):"";
- return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
+ return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(p.club?'<p class="profile-club">Verein: '+esc(p.club)+'</p>':"")+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
  }).join(""):'<div class="empty">Noch kein eigenes Spielerprofil hinterlegt.</div>';
  list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
   if(!setActiveProfile(b.dataset.setActive))return;
@@ -214,8 +219,9 @@ function render(){
  window.renderHistory?.(state.chosen,viewedProfiles,{mode:state.viewingFriendId?"friend":"own"});
  // Read-only live viewer follows whichever public DBV profile is currently shown.
  window.badmintonActivePlayerId=state.chosen;
- window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen}}));
- const page=["start","historie","turniere","einstellungen"].includes(state.page)?state.page:"start";
+ window.badmintonActiveClub=(currentProfile()?.club||"");
+ window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
+ const page=["start","historie","turniere","berichte","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
   if(a.dataset.page===page)a.setAttribute("aria-current","page");
@@ -254,6 +260,7 @@ function setup(){
   playerForm.elements.namedItem("id").value=(p&&/^\d{2}-\d{6}$/.test(p.id))?p.id:"";
   playerForm.elements.namedItem("id").readOnly=Boolean(p);
   playerForm.elements.namedItem("birthYear").value=p?.birthYear||"";
+  playerForm.elements.namedItem("club").value=p?.club||"";
   playerForm.elements.namedItem("url").value=p?.url||"";
   playerDialog.showModal();
  }
@@ -270,7 +277,8 @@ function setup(){
   const id=editingPlayerId||String(data.get("id")||"").trim()||"local-"+Date.now();
   const birth=Number(data.get("birthYear"));
   if(!name||(!editingPlayerId&&state.players.some(p=>p.id===id))){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
-  const record={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,url:safeUrl(data.get("url")||"")};
+  const club=String(data.get("club")||"").trim().slice(0,120);
+  const record={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club,url:safeUrl(data.get("url")||"")};
   if(editingPlayerId)state.players=state.players.map(p=>p.id===editingPlayerId?record:p);
   else{
    if(state.friends.some(p=>p.id===id)){toast("Diese Spieler-ID ist bereits ein Freund");return}
@@ -291,6 +299,7 @@ function setup(){
   friendForm.elements.namedItem("id").value=p?.id||"";
   friendForm.elements.namedItem("id").readOnly=Boolean(p);
   friendForm.elements.namedItem("birthYear").value=p?.birthYear||"";
+  friendForm.elements.namedItem("club").value=p?.club||"";
   friendForm.elements.namedItem("url").value=p?.url||"";
   friendDialog.showModal();
  }
@@ -307,7 +316,7 @@ function setup(){
   if((!editingFriendId&&state.friends.some(p=>p.id===id))||state.players.some(p=>p.id===id)){toast("Dieser Spieler ist bereits gespeichert");return}
   if(!editingFriendId&&state.friends.length>=30){toast("Maximal 30 Freunde");return}
   const profileUrl=safeUrl(data.get("url")||"");
-  const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,url:profileUrl};
+  const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club:String(data.get("club")||"").trim().slice(0,120),url:profileUrl};
   if(editingFriendId)state.friends=state.friends.map(p=>p.id===editingFriendId?friend:p);
   else state.friends.push(friend);
   editingFriendId=null;
