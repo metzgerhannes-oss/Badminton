@@ -5,8 +5,8 @@
   "start_url": "./#start",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#123758",
-  "theme_color": "#204d73",
+  "background_color": "#d4ebfc",
+  "theme_color": "#d9ecfb",
   "icons": [
     {
       "src": "./assets/spvgg-schmetterlinge.svg",

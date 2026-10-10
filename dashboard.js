@@ -127,8 +127,20 @@ function renderOtherKpis(){
  const friendNoHistory=viewMode==="friend"&&results.length===0;
  const years=new Set(results.map(r=>r.date+"|"+r.event));
  const medals=trophies.counts;
- root.innerHTML='<a class="kpi-tile" href="#historie"><span class="kpi-label">Trophäenschrank</span><span class="kpi-value">'+(friendNoHistory?'–':num(trophies.total))+'</span><span class="kpi-sub">'+(friendNoHistory?'Für diesen Freund noch keine historischen Daten erfasst':'1. Platz '+medals[1]+' · 2. Platz '+medals[2]+' · 3. Platz '+medals[3]+' · 4. Platz '+medals[4])+'</span><span class="kpi-link">Zur Historie ↗</span></a>'+
- '<a class="kpi-tile" href="#historie"><span class="kpi-label">Erfasste Turniere</span><span class="kpi-value">'+(friendNoHistory?'–':num(years.size))+'</span><span class="kpi-sub">'+(friendNoHistory?'Keine öffentlichen Turnierdaten für diesen Freund in unserer Sammlung':'Auswahl: '+results.length+' belegte Platzierungen')+'</span><span class="kpi-link">Zur Historie ↗</span></a>';
+ const trophySlots=[
+  {place:1,label:"1. Platz",symbol:"🏆",style:"gold"},
+  {place:2,label:"2. Platz",symbol:"🏆",style:"silver"},
+  {place:3,label:"3. Platz",symbol:"🏆",style:"bronze"},
+  {place:4,label:"4. Platz",symbol:"◉",style:"fourth"}
+ ];
+ root.innerHTML='<section class="home-trophy" aria-labelledby="home-trophy-heading">'+
+  '<div class="home-trophy-heading"><h2 id="home-trophy-heading">Trophäenschrank</h2><a href="#historie">Alle anzeigen ↗</a></div>'+
+  '<div class="home-trophy-grid">'+trophySlots.map(slot=>
+   '<div class="home-trophy-slot '+slot.style+'"><span class="home-trophy-symbol" aria-hidden="true">'+slot.symbol+'</span>'+
+   '<strong>'+(friendNoHistory?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
+  ).join("")+
+  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(friendNoHistory?"–":num(years.size))+'</strong><small>Erfasste<br>Turniere</small></a></div>'+
+  '<p class="home-trophy-note">Nur belegte Platzierungen · die vollständige Turnierhistorie findest du unter Historie.</p></section>';
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
  const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){

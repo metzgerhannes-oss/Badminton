@@ -1,3 +1,11 @@
+## Offener Backlog: Spielstatistik und helles App-Design (10.10.2026)
+
+- **Siege / Niederlagen / Gesamtspiele / Siegquote:** neuer quellengestützter Bereich auf der Startseite mit Disziplin- und Jahresfiltern, Nachweisen pro Match und explizitem Hinweis bei fehlenden Matches. Gezählt werden nur eindeutig abgeschlossene Matches, niemals Platzierungen oder Ranglistenpunkte. Die Supabase-Matchtabellen enthalten noch keine importierten Einzelmatches; die Ansicht erfindet deshalb keine Karriereergebnisse.
+- **Design-Finalisierung:** hellblaue Oberfläche auf Basis der vom Nutzer freigegebenen mobilen Referenz. Weiße Karten, echte Ranglistenwerte, Trophäenschrank auf der Startseite, 6 einheitliche Navigationsicons und responsive Touch-Ziele. Die visuelle Abnahme auf realen Mobilgeräten bleibt eigenständig.
+- **Spielerbibliothek:** bestehender Supabase-Bestand von 9.246 DBV-Spielern und 916 Vereinen bleibt erhalten; Filter und Vereinsansichten erhalten dasselbe Design.
+
+Umsetzung und Qualitätsregeln: [Spielstatistik und Design v2](docs/BACKLOG_SPIELSTATISTIK_DESIGN_V2.md).
+
 ## Supabase-Datenbanksynchronisierung (10.10.2026)
 
 Die zentrale Spielerbibliothek ist jetzt in **Supabase** synchronisiert: 9.246 eindeutige öffentliche DBV-Spieler, 916 Vereine, offizielle Altersklassen und Verknüpfungen. Die 3 offiziell ohne Verein gemeldeten Spieler bleiben ohne Vereinszuordnung. PostgreSQL-Cron ruft donnerstags (17:35 UTC) und freitags (07:25 UTC) den privaten, quellenvalidierenden Datenimport auf. Er lädt ausschließlich die öffentlichen, vom wöchentlichen GitHub-Ranglistenprozess erzeugten JSON-Dateien; **kein GitHub-Secret oder Browser-Schreibzugriff** nötig.
