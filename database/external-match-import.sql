@@ -74,6 +74,7 @@ declare
  status_now text;
  last_start timestamptz;
  cursor_now integer;
+ verified_count_now integer;
  verified boolean;
 begin
  if target_id !~ '^[0-9]{2}-[0-9]{6}$' then
@@ -88,10 +89,14 @@ begin
  if not verified then return jsonb_build_object('accepted',false,'reason','not_followed');end if;
  insert into public.player_external_match_imports(dbv_id)
   values(target_id) on conflict(dbv_id) do nothing;
- select status,last_started_at,cursor_offset into status_now,last_start,cursor_now
+ select status,last_started_at,cursor_offset,verified_count
+  into status_now,last_start,cursor_now,verified_count_now
   from public.player_external_match_imports
   where dbv_id=target_id for update;
- if status_now='complete' and last_start>now()-interval '7 days' then
+ -- Partial with all source cards already scanned (but excluded cards) is
+ -- complete for now too. Never restart its first page every ten minutes.
+ if status_now in ('complete','partial') and cursor_now>=verified_count_now
+    and last_start>now()-interval '7 days' then
   return jsonb_build_object('accepted',false,'reason','recently_complete');
  end if;
  if status_now='loading' and (select lease_until>now() from public.player_external_match_imports where dbv_id=target_id) then
@@ -109,9 +114,15 @@ begin
    return jsonb_build_object('accepted',false,'reason','global_cooldown');
  end if;
  insert into private.external_match_attempts(dbv_id) values(target_id);
+ -- The provider lists newest matches first; a weekly refresh must start
+ -- from index zero or it will miss newly inserted matches at the top.
+ if status_now in ('complete','partial') and cursor_now>=verified_count_now then
+   cursor_now:=0;
+ end if;
  update public.player_external_match_imports set
   status='loading',last_started_at=now(),lease_until=now()+interval '3 minutes',
-  updated_at=now(),detail='Öffentliche Matchkarten werden abgeglichen'
+  cursor_offset=cursor_now,updated_at=now(),
+  detail='Öffentliche Matchkarten werden abgeglichen'
  where dbv_id=target_id;
  return jsonb_build_object('accepted',true,'cursor',cursor_now,'player_id',target_id);
 end $$;
