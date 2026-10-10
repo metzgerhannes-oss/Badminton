@@ -16,6 +16,8 @@ jobs:
         run: |
           node --check ui-feedback.js
           node --check app.js
+          node --check backup.js
+          node --check scripts/local-backup.mjs
           node --check dashboard.js
           node --check history.js
           node --check scripts/trophy-stats.mjs
@@ -53,6 +55,7 @@ jobs:
           node tests/upcoming-tournaments.mjs
           node tests/friends.mjs
           node tests/profile-switch.mjs
+          node tests/local-backup.mjs
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
