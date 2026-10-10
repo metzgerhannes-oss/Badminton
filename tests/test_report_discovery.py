@@ -15,10 +15,10 @@ CFG={'source':'club-moessingen',
 HTML='''<!doctype html><html><head>
 <meta property="article:published_time" content="2026-10-10T09:00:00+02:00"></head>
 <body><nav>Philipp Metzger</nav>
-<main><article><h1>Neue Badminton-Erfolge in Mössingen</h1>
+<main><article><div class="entry-content"><h1>Neue Badminton-Erfolge in Mössingen</h1>
 <p>Im Jugendturnier kam Philipp Metzger nach einem starken Spiel weit nach vorne.</p>
 <p>Auch Charlotte Metzger war im Wettbewerb vertreten und erreichte mehrere gute Ballwechsel. Die Sportvereinigung Mössingen zeigt Fotos.</p>
-</article></main><footer>Philipp Metzger</footer></body></html>'''
+</div></article></main><footer>Philipp Metzger</footer></body></html>'''
 
 class ReportDiscoveryTests(unittest.TestCase):
     def test_real_names_are_only_review_candidates(self):
@@ -28,23 +28,31 @@ class ReportDiscoveryTests(unittest.TestCase):
         self.assertEqual(item['status'],'needs-review')
 
     def test_names_in_navigation_do_not_count(self):
-        page='<nav>Philipp Metzger</nav><main><article><h1>Jugendturnier in Schorndorf</h1><p>Viele andere Mannschaften und Spielende haben sich bei dieser Badminton-Veranstaltung getroffen. Alle haben engagiert gespielt und anschließend gemeinsam gefeiert.</p></article></main>'
+        page='<nav>Philipp Metzger</nav><main><article><div class="entry-content"><h1>Jugendturnier in Schorndorf</h1><p>Viele andere Mannschaften und Spielende haben sich bei dieser Badminton-Veranstaltung getroffen. Alle haben engagiert gespielt und anschließend gemeinsam gefeiert.</p></div></article></main>'
         self.assertIsNone(watcher.analyze('https://spvgg.org/abteilungen/badminton/aktuelles/schorndorf',CFG,page,'2026-10-10'))
 
     def test_club_only_cannot_be_player_mention(self):
-        page='<main><article><h1>Regionalliga-Auftakt Mössingen</h1><p>Die SpVgg Mössingen spielte gegen Reutlingen und gewann deutlich. Der lange ausführliche Bericht betrifft die regionale Badminton-Mannschaft und eine spannende Begegnung.</p></article></main>'
+        page='<main><article><div class="entry-content"><h1>Regionalliga-Auftakt Mössingen</h1><p>Die SpVgg Mössingen spielte gegen Reutlingen und gewann deutlich. Der lange ausführliche Bericht betrifft die regionale Badminton-Mannschaft und eine spannende Begegnung.</p></div></article></main>'
         item=watcher.analyze('https://spvgg.org/abteilungen/badminton/aktuelles/regionalliga',CFG,page,'2026-10-10')
         self.assertEqual(item['players'],[])
         self.assertEqual(item['evidence'],'club-name-in-article-body')
 
     def test_unrelated_article_ignored(self):
-        page='<main><article><h1>Badminton in Bayern</h1><p>Es gab schöne Jugendspiele mit Mannschaften aus anderen Orten. Viele Besucher sahen ausgezeichnete Ballwechsel auf den Spielfeldern während der vergangenen Woche.</p></article></main>'
+        page='<main><article><div class="entry-content"><h1>Badminton in Bayern</h1><p>Es gab schöne Jugendspiele mit Mannschaften aus anderen Orten. Viele Besucher sahen ausgezeichnete Ballwechsel auf den Spielfeldern während der vergangenen Woche.</p></div></article></main>'
         self.assertIsNone(watcher.analyze('https://spvgg.org/abteilungen/badminton/aktuelles/bayern',CFG,page,'2026-10-10'))
 
     def test_no_foreign_hosts_or_unapproved_paths(self):
         for url in ['http://spvgg.org/abteilungen/badminton/aktuelles/test','https://spvgg.org.evil.net/abteilungen/badminton/aktuelles/test','https://spvgg.org/anderes/test','https://spvgg.org/abteilungen/badminton/aktuelles','https://evil.net/abteilungen/badminton/aktuelles/test']:
             with self.subTest(url=url):
                 self.assertFalse(watcher.article_allowed(url,CFG))
+
+    def test_related_story_teasers_cannot_create_false_child_mentions(self):
+        html='''<main><article><h1>Regionalliga in Mössingen</h1>
+        <div class="entry-content"><p>Die erste Mannschaft spielte an diesem Wochenende ihre beiden Begegnungen gegen starke Gastmannschaften und erlebte spannende Sätze. Die Mannschaft trat mit ihren Erwachsenen an.</p></div>
+        <section class="related-posts"><h2>Ähnliche Berichte</h2>
+        <p>Aus einem ganz anderen Jugendturnier: Charlotte Metzger und Philipp Metzger spielten sehr erfolgreich.</p>
+        </section></article></main>'''
+        self.assertIsNone(watcher.analyze('https://spvgg.org/abteilungen/badminton/aktuelles/regionalliga',CFG,html,'2026-10-10'))
 
     def test_www_and_without_www_share_identity(self):
         self.assertEqual(watcher.key('https://www.spvgg.org/abteilungen/badminton/aktuelles/test/'),
