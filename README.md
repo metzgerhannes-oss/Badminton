@@ -1,3 +1,7 @@
+## Live & Turniertag – fokussierte App-Bedienung (v32)
+
+Die Turnieransicht beginnt jetzt **mit dem aktuellen Turniertag** und einem direkten Umschalter zwischen eigenen und gefolgten DBV-Spielern. Der Live-Radar ist das sichtbare Herzstück; offizielle Einzelmatch-Zusatzdaten und externe Originalquellen lassen sich bei Bedarf unter „Originalquellen & weitere Ergebnisse“ öffnen. Die gespeicherten Turniere folgen als eigener, klarer Bereich. Auf **Home** erscheint nur bei tatsächlich frischen, veröffentlichten laufenden/aufgerufenen/nächsten Begegnungen ein kompakter Turniertag-Hinweis. Home bringt weiterhin immer zum eigenen Profil zurück. [Backlog-Matrix und QA](docs/LIVE_UX_BACKLOG_V32.md).
+
 ## Live-Radar ohne fremden API-Schlüssel (10.10.2026)
 
 Unter **Turniere → Live-Radar** zeigt die App für das ausgewählte DBV-Spielerprofil aktuelle und nachweisbare Turniertagsinformationen aus dem öffentlichen Badhub-JSON. Der Abruf läuft zentral über Supabase (maximal sechs aktive Spieler pro Minute), mit eindeutigem Quellenhinweis, eigenständigem Status für „kein Turnier“/„veraltet“ und richtiger Satzperspektive. Für Sarah und Philipp wurde der echte Leerzustand vom Quellenserver überprüft. Der Live-Radar **ist keine offizielle DBV-API** und erzeugt keine historischen Einzelmatches; die bisherigen Quelllinks bleiben erhalten. [Technische Dokumentation](docs/LIVE_RADAR_ON_DEMAND.md).

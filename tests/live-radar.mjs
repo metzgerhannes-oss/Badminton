@@ -33,6 +33,7 @@ const playing={...idle,payload:{
 }};
 assert.equal(liveView(playing,id,now).status,"playing");
 assert.equal(liveView({...playing,payload:{...playing.payload,running:null,next:{queue_position:0}}},id,now).status,"next");
+assert.equal(liveView({...playing,payload:{...playing.payload,running:null,next:{queue_position:null}}},id,now).status,"tournament","Unknown queue position is not next");
 assert.deepEqual(sourceSets(playing.payload.running),[[17,21],[5,8]],"Flip per player perspective");
 assert.equal(setText(playing.payload.running),"17:21 · 5:8");
 assert.equal(opponents({lineup:{opponents:[{name:"Mia A"},{name:"Mia B"}]}}),"Mia A / Mia B");
@@ -41,6 +42,8 @@ assert.deepEqual(sourceSets({sets_json:"[[21,18],[19,21]]",is_team1:1}),[[21,18]
 assert.deepEqual(sourceSets({sets_json:"broken"}),[]);
 assert.deepEqual(sourceSets({sets:[[-10,40],[999,1],[12,11]]}),[[12,11]]);
 assert.equal(playerOutcome({team1_won:true,is_team1:true}),"win");
+assert.equal(playerOutcome({team1_won:true,is_team1:1}),"win");
+assert.equal(playerOutcome({team1_won:true,is_team1:0}),"loss");
 assert.equal(playerOutcome({team1_won:true,is_team1:false}),"loss");
 assert.equal(playerOutcome({team1_won:null,is_team1:true}),null);
 assert.equal(sourceTime("invalid"),"");
@@ -51,7 +54,7 @@ const [html,js,sql,css,sw]=await Promise.all(["index.html","live-radar.js",
  "database/live-radar-on-demand.sql","design-v2.css","sw.js"].map(f=>readFile(f,"utf8")));
 assert.match(html,/id="live-radar-content"/);
 assert.match(html,/id="live-radar-refresh"/);
-assert.match(html,/Externe Live-Ansicht/);
+assert.match(html,/Originalquellen &amp; weitere Ergebnisse/);
 assert.match(js,/badminton:profile-change/);
 assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
@@ -68,5 +71,5 @@ assert.ok(!sql.includes("insert into public.matches"),"Never infer confirmed mat
 assert.match(css,/\.live-radar-panel/);
 assert.match(sw,/live-radar\.js/);
 assert.match(sw,/scripts\/live-radar\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v31/);
+assert.match(sw,/schmetterlinge-shell-v32/);
 console.log("Live radar: matchday idle/active/stale, perspective-safe scores, idempotent watches, RLS controls and iPhone UI passed.");

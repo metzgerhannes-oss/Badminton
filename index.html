@@ -20,6 +20,7 @@
 <script defer src="./live.js"></script>
 <script type="module" src="./live-links.js"></script>
 <script type="module" src="./live-radar.js"></script>
+<script type="module" src="./live-hub.js"></script>
 <script defer src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
 <script type="module" src="./dashboard.js"></script>
@@ -34,6 +35,7 @@
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">DBV-Rangliste wird geladen</span></div>
    <div id="dashboard-rank-source" class="dashboard-source"></div>
+   <a href="#turniere" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
    <div id="dashboard-rankings" class="dashboard-ranking-grid" aria-label="Rangliste nach offizieller DBV-Altersklasse und Disziplin"></div>
    <div id="dashboard-kpis" class="dashboard-kpi-grid" aria-label="Turniere und Auszeichnungen"></div>
 
@@ -95,30 +97,49 @@
    <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine belastbare Verlaufsgrafik benötigt mehrere datierte Ranglistenstände. Platzierungen unterschiedlicher Altersklassen werden nicht miteinander vermischt.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Offizielle DBV-Rangliste öffnen ↗</a></div>
   </section>
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
-   <div class="section-heading"><h2 id="heading-turniere">Meine Turnierlinks</h2><button class="subtle-button" id="add-tournament" type="button">+ Turnier anlegen</button></div>
-   <p class="supporting">Offizielle Turniere als Favoriten für die ganze Familie. Verifizierte Spielpläne und Ergebnisse werden über Supabase angezeigt, sobald DBV-Begegnungsdaten importiert wurden. Die Veranstalterlinks bleiben die maßgebliche Quelle.</p>
+   <div class="section-heading"><h2 id="heading-turniere">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
+   <p class="live-hub-lead">Deine aktuelle Begegnung, nächste Spiele und Ergebnisse – mit belegtem Quellenstand.</p>
    <section class="live-dbv" aria-labelledby="dbv-live-title">
-    <div class="section-heading"><h3 id="dbv-live-title">Spielplan &amp; Live-Ergebnisse</h3><button class="subtle-button" id="dbv-live-refresh" type="button">Aktualisieren</button></div>
-    <p class="settings-hint">Begegnungen zum gewählten Spielerprofil. Zeiten und Satzstände werden nur angezeigt, wenn verifizierte Quelldaten vorliegen.</p>
-    <div class="live-radar-panel" aria-labelledby="live-radar-title">
-     <div class="live-radar-heading"><h4 id="live-radar-title">Live-Radar</h4><button class="subtle-button" id="live-radar-refresh" type="button">Aktualisieren</button></div>
-     <p class="live-radar-disclaimer">Badhub-Quelle · zentraler Abgleich während du diese Ansicht geöffnet hast. Es werden ausschließlich bestätigte Quellenstände angezeigt.</p>
-     <div id="live-radar-content" class="live-radar-content" role="status" aria-live="polite"><p>Wähle ein Spielerprofil, um den Live-Radar zu starten.</p></div>
+    <div class="live-hub-toolbar">
+     <label for="live-player-select">Wen möchtest du verfolgen?</label>
+     <select id="live-player-select" aria-label="Spieler am Turniertag auswählen">
+      <option value="">Profil wird geladen …</option>
+     </select>
+     <a href="#spieler" class="live-hub-follow-link">+ Spieler suchen und folgen ↗</a>
     </div>
-    <details class="live-dbv-original"><summary>Zusätzlich: verifizierte DBV-Matches aus unserer Datenbank</summary>
-    <div id="dbv-live-results" aria-live="polite" role="status"><p class="live-dbv-note">Noch keine Daten geladen.</p></div>
-    </details>
-    <div id="external-live-player" class="external-live-player" hidden>
-      <div class="external-live-head"><strong>Turniertag des ausgewählten Spielers</strong><span>Externe Live-Ansicht · Badhub</span></div>
-      <p>Aktuelle Ansetzungen und veröffentlichte Ergebnisse direkt bei Badhub prüfen. Der Link öffnet die Quelle; eine laufende Begegnung ist nicht garantiert.</p>
-      <div class="external-live-actions">
-        <a id="external-live-open" href="#" rel="noopener noreferrer" target="_blank">Turniertag öffnen ↗</a>
-        <a id="external-live-career" href="#" rel="noopener noreferrer" target="_blank">Alle bisherigen Ergebnisse ↗</a>
+    <div class="live-radar-panel" aria-labelledby="dbv-live-title">
+     <div class="live-radar-heading">
+      <div class="live-hub-title"><h3 id="dbv-live-title">Aktuelle Spiele</h3><span class="live-radar-hint">Automatischer Abgleich</span></div>
+      <button class="subtle-button" id="live-radar-refresh" type="button" aria-label="Aktuelle Spielergebnisse aktualisieren">Aktualisieren</button>
+     </div>
+     <div id="live-radar-content" class="live-radar-content" role="status" aria-live="polite">
+      <p>Der aktuelle Turnierstand wird geladen …</p>
+     </div>
+     <p class="live-radar-disclaimer">Quelle: Badhub · öffentlich veröffentlichte Daten, nicht der offizielle DBV-Matchimport. Der Zeitpunkt des letzten Abgleichs steht am Ergebnis.</p>
+    </div>
+    <details class="live-hub-sources" id="live-hub-sources">
+      <summary>Originalquellen &amp; weitere Ergebnisse</summary>
+      <div id="external-live-player" class="external-live-player" hidden>
+       <div class="external-live-head"><strong>Direkt beim Anbieter prüfen</strong><span>Badhub</span></div>
+       <div class="external-live-actions">
+        <a id="external-live-open" href="#" rel="noopener noreferrer" target="_blank">Turniertag bei Badhub ↗</a>
+        <a id="external-live-career" href="#" rel="noopener noreferrer" target="_blank">Gesamte Ergebnishistorie ↗</a>
+       </div>
       </div>
-    </div>
+      <details class="live-dbv-original" id="dbv-live-advanced">
+        <summary>Einzeln geprüfte DBV-Begegnungen</summary>
+        <p class="settings-hint">Diese gesonderte Datenquelle enthält nur importierte offizielle Matchbelege. Fehlende Daten bedeuten nicht, dass der Spieler noch keine Begegnungen absolviert hat.</p>
+        <button class="subtle-button" id="dbv-live-refresh" type="button">DBV-Abgleich aktualisieren</button>
+        <div id="dbv-live-results" aria-live="polite" role="status"><p class="live-dbv-note">Nur bei Bedarf öffnen.</p></div>
+      </details>
+    </details>
    </section>
-   <div id="official-tournament-list" class="tournament-list"></div>
-   <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierportal<small>Offizielle Turnierinformationen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
+   <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
+    <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
+    <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
+    <div id="official-tournament-list" class="tournament-list"></div>
+    <a class="live-hub-official-link" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
+   </section>
   </section>
   <section class="page" id="view-berichte" aria-labelledby="heading-berichte">
    <div class="section-heading"><h2 id="heading-berichte">Berichte &amp; Erwähnungen</h2><button id="report-refresh" type="button" class="subtle-button">Aktualisieren</button></div>

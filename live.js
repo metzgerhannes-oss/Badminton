@@ -74,10 +74,22 @@
    if(ticket===requestId){loading=false;if(btn)btn.disabled=false}
   }
  }
- function visible(){return location.hash==="#turniere"&&!document.hidden}
+ function visible(){
+  const advanced=$("dbv-live-advanced");
+  return location.hash==="#turniere"&&!document.hidden&&Boolean(advanced?.open);
+ }
  document.addEventListener("DOMContentLoaded",()=>{
   if(!$("dbv-live-results"))return;
   $("dbv-live-refresh")?.addEventListener("click",refresh);
+  $("dbv-live-advanced")?.addEventListener("toggle",()=>{
+   if(visible())refresh();
+   else{
+    requestId++;
+    loading=false;
+    const button=$("dbv-live-refresh");
+    if(button)button.disabled=false;
+   }
+  });
   currentId=String(window.badmintonActivePlayerId||"");
   if(visible())refresh();
   window.addEventListener("badminton:profile-change",event=>{

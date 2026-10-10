@@ -242,11 +242,28 @@ window.badmintonLibraryToggleFollow=player=>{
  window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
+// One selection action for Home, player library and Turniertag.
+window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
+ if(state.players.some(p=>p.id===id)){
+  setActiveProfile(id);
+ }else if(state.friends.some(p=>p.id===id)){
+  state.viewingFriendId=id;state.chosen=id;
+  save();
+ }else return false;
+ const destination=stayOnPage?"turniere":"start";
+ state.page=destination;
+ if(location.hash!=="#"+destination)location.hash="#"+destination;
+ render();
+ return true;
+};
+window.badmintonLiveViewerOptions=()=>({
+ own:state.players.map(p=>({id:p.id,name:p.name})),
+ friends:state.friends.map(p=>({id:p.id,name:p.name})),
+ selected:state.viewingFriendId||state.activeProfileId
+});
 window.badmintonLibraryView=id=>{
  if(!state.friends.some(p=>p.id===id))return false;
- state.viewingFriendId=id;state.chosen=id;
- location.hash="#start";render();
- return true;
+ return window.badmintonSelectViewer(id);
 };
 }
 function render(){

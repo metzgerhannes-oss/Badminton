@@ -14,11 +14,11 @@ const [html,js,css,sw]=await Promise.all(["index.html","live-links.js","design-v
 assert.match(html,/id="external-live-player"/);
 assert.match(html,/id="external-live-open"/);
 assert.match(html,/id="external-live-career"/);
-assert.match(html,/Externe Live-Ansicht/);
+assert.match(html,/Originalquellen &amp; weitere Ergebnisse/);
 assert.match(js,/badminton:profile-change/);
 assert.match(js,/badhubLiveUrl\(id\)/);
 assert.match(css,/\.external-live-player/);
 assert.match(sw,/live-links\.js/);
 assert.match(sw,/scripts\/live-links\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v31/);
+assert.match(sw,/schmetterlinge-shell-v32/);
 console.log("Externes Live: Sarah and Philipp player-specific URLs validated; no unverified in-app match data.");
