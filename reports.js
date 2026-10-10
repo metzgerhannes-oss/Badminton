@@ -8,7 +8,7 @@
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
  const date=s=>s?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z")):"Datum offen";
  const CATEGORIES={club:"Verein",opponent_club:"Andere Vereine",association:"Verband",dbv:"DBV",media:"Medien",regional_media:"Regionalpresse",sports_organization:"Sport & Stadt",result_portal:"Resultate"};
- let articles=[],sources=[],clubs=[],mentions=new Set(),profileId="",club="",loaded=false,busy=false;
+ let articles=[],sources=[],clubs=[],mentions=new Set(),localMentions=new Map(),profileId="",club="",loaded=false,busy=false;
  async function get(path){
   const resp=await fetch(URL+"/rest/v1/"+path,{headers:{"apikey":KEY,"accept":"application/json"},cache:"no-store"});
   if(!resp.ok)throw new Error("Supabase "+resp.status);
@@ -73,12 +73,41 @@
   const button=$("report-refresh");if(button)button.disabled=true;
   const box=$("report-list");if(box)box.innerHTML='<p class="report-empty">Berichte werden geladen …</p>';
   try{
-   const [articleRows,sourceRows,clubRows]=await Promise.all([
+   // The approved GitHub registry is the portable read-only feed after editorial approval.
+   // Supabase historical records are merged by URL, without needing a privileged browser key.
+   const tasks=await Promise.allSettled([
     get("articles?select=id,url,title,published_on,summary,club_id,report_sources(name,category)&status=eq.verified&order=published_on.desc.nullslast&limit=500"),
     get("report_sources?select=id,name,category,homepage_url,article_index_url,verification_status,access_note,priority&order=priority.asc&limit=200"),
-    get("clubs?select=id,name,short_name&limit=200")
+    get("clubs?select=id,name,short_name&limit=200"),
+    fetch("./data/report-articles.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("GitHub articles unavailable");return r.json()}),
+    fetch("./data/report-sources.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("GitHub sources unavailable");return r.json()})
    ]);
-   articles=articleRows;sources=sourceRows;clubs=clubRows;loaded=true;
+   const getResult=i=>tasks[i].status==="fulfilled"?tasks[i].value:null;
+   const articleRows=getResult(0),sourceRows=getResult(1),clubRows=getResult(2);
+   const approved=getResult(3)?.articles||[];
+   const staticSources=getResult(4)?.sources||[];
+   if(!articleRows&&!approved.length)throw Error("No verified article feed available");
+   sources=sourceRows||staticSources;
+   clubs=clubRows||[{id:"spvgg-moessingen",name:"Sportvereinigung Mössingen 1904 e.V.",short_name:"SpVgg Mössingen"}];
+   const sourcesById=new Map([...staticSources,...sources].map(x=>[x.id,x]));
+   articles=(articleRows||[]).slice();
+   localMentions=new Map();
+   const byUrl=new Map(articles.map(a=>[safeUrl(a.url),a]));
+   for(const a of approved){
+    if(a.status!=="verified"||!safeUrl(a.url)||!sourcesById.has(a.source))continue;
+    let row=byUrl.get(safeUrl(a.url));
+    if(!row){
+     const src=sourcesById.get(a.source);
+     row={id:"git:"+encodeURIComponent(a.url),url:a.url,title:a.title,
+       published_on:a.date||null,summary:a.summary||"",club_id:a.club_id||null,
+       report_sources:{name:src.name,category:src.category}};
+     articles.push(row);
+     byUrl.set(safeUrl(a.url),row);
+    }
+    localMentions.set(row.id,new Set((a.players||[]).filter(x=>validId(x))));
+   }
+   articles.sort((a,b)=>(b.published_on||"").localeCompare(a.published_on||""));
+   loaded=true;
    renderSources();
    await loadMentions();
   }catch(e){
@@ -89,7 +118,7 @@
  let mentionRequest=0;
  async function loadMentions(){
   const ticket=++mentionRequest,dbv=profileId;
-  mentions=new Set();
+  mentions=new Set([...localMentions.entries()].filter(([,ids])=>ids.has(dbv)).map(([id])=>id));
   if(!validId(dbv)){render();return}
   try{
    const players=await get("players?select=id&dbv_id=eq."+encodeURIComponent(dbv)+"&limit=1");
@@ -97,7 +126,7 @@
    if(players.length){
     const rows=await get("article_player_mentions?select=article_id&player_id=eq."+players[0].id+"&limit=500");
     if(ticket!==mentionRequest||dbv!==profileId)return;
-    mentions=new Set(rows.map(x=>x.article_id));
+    for(const row of rows)mentions.add(row.article_id);
    }
   }catch(e){console.warn("Report mentions:",e.message)}
   if(ticket===mentionRequest)render();

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "checkedAt": "2026-10-10",
-  "notes": "Verifizierte Quellen sind als Websites oder Artikel tatsächlich gefunden; Kandidaten sind ausschließlich Rechercheziele, keine belegten Treffer oder automatischen Feeds.",
+  "notes": "Verifizierte Quellen sind als Websites oder Artikel tatsächlich gefunden; Kandidaten sind ausschließlich Rechercheziele, keine belegten Treffer oder automatischen Feeds. Der tägliche Monitor prüft nur ausdrücklich aktivierte Quellen und protokolliert neue Artikel zunächst als Freigabekandidaten.",
   "sources": [
     {
       "id": "club-moessingen",
@@ -11,7 +11,12 @@
       "article_index_url": "https://spvgg.org/abteilungen/badminton/aktuelles",
       "verification_status": "verified",
       "priority": 1,
-      "access_note": "Vereinsberichte direkt, öffentlich abrufbar"
+      "access_note": "Vereinsberichte direkt, öffentlich abrufbar",
+      "monitor": {
+        "enabled": true,
+        "index_url": "https://www.spvgg.org/abteilungen/badminton/aktuelles",
+        "article_path_regex": "^/abteilungen/badminton/aktuelles/[a-z0-9-]+/?$"
+      }
     },
     {
       "id": "bwbv",
@@ -21,7 +26,12 @@
       "article_index_url": "https://bwbv.de/neuigkeiten/neuigkeiten-jugend/",
       "verification_status": "verified",
       "priority": 2,
-      "access_note": "Jugend-, Turnier- und Bezirksberichte"
+      "access_note": "Jugend-, Turnier- und Bezirksberichte",
+      "monitor": {
+        "enabled": true,
+        "index_url": "https://bwbv.de/neuigkeiten/neuigkeiten-jugend/",
+        "article_path_regex": "^/\\d{4}/\\d{2}/\\d{2}/[a-z0-9-]+/?$"
+      }
     },
     {
       "id": "dbv",
@@ -31,7 +41,11 @@
       "article_index_url": "https://www.badminton.de/",
       "verification_status": "verified",
       "priority": 3,
-      "access_note": "Offizieller Verband, Artikel nur bei tatsächlicher Namensnennung zuordnen"
+      "access_note": "Offizieller Verband, Artikel nur bei tatsächlicher Namensnennung zuordnen",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "dbv-turnier",
@@ -41,7 +55,11 @@
       "article_index_url": "https://dbv.turnier.de/",
       "verification_status": "verified",
       "priority": 4,
-      "access_note": "Ergebnisse und Teilnehmerdaten; Cookiewall möglich"
+      "access_note": "Ergebnisse und Teilnehmerdaten; Cookiewall möglich",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "dbv-ranking",
@@ -51,7 +69,11 @@
       "article_index_url": "https://turniere.badminton.de/ranking",
       "verification_status": "verified",
       "priority": 5,
-      "access_note": "Excel enthält amtliche Gesamtscores, keine Einzelwertungen"
+      "access_note": "Excel enthält amtliche Gesamtscores, keine Einzelwertungen",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "sportkreis-tuebingen",
@@ -61,7 +83,11 @@
       "article_index_url": "https://sportkreis-tuebingen.de/skj-tuebingen/sportjugendehrung/anmeldung",
       "verification_status": "verified",
       "priority": 7,
-      "access_note": "Sportjugend-Ehrungen, ggf. allgemeine Veranstaltungen"
+      "access_note": "Sportjugend-Ehrungen, ggf. allgemeine Veranstaltungen",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "psv-reutlingen",
@@ -71,7 +97,11 @@
       "article_index_url": "https://www.psv-reutlingen.de/aktuelles-badminton",
       "verification_status": "verified",
       "priority": 8,
-      "access_note": "Gegnerische Vereinsberichte zu Südwürttemberg"
+      "access_note": "Gegnerische Vereinsberichte zu Südwürttemberg",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "aalener-sportallianz",
@@ -81,7 +111,11 @@
       "article_index_url": "https://aalener-sportallianz.de/2026-04-26_moessingen/",
       "verification_status": "verified",
       "priority": 9,
-      "access_note": "Namentlicher Doppelfinal-Bericht vorhanden"
+      "access_note": "Namentlicher Doppelfinal-Bericht vorhanden",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "badhub",
@@ -91,7 +125,11 @@
       "article_index_url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier",
       "verification_status": "verified",
       "priority": 10,
-      "access_note": "Sekundärübernahme von Ergebnissen, nicht für unbelegte Ranglistenpunkte"
+      "access_note": "Sekundärübernahme von Ergebnissen, nicht für unbelegte Ranglistenpunkte",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "tagblatt",
@@ -101,7 +139,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 20,
-      "access_note": "Quelle zur Recherche; keine namentliche Spielererwähnung bestätigt"
+      "access_note": "Quelle zur Recherche; keine namentliche Spielererwähnung bestätigt",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "gea",
@@ -111,7 +153,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 21,
-      "access_note": "Quelle zur Recherche; automatischer Abruf eingeschränkt"
+      "access_note": "Quelle zur Recherche; automatischer Abruf eingeschränkt",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "swp",
@@ -121,7 +167,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 22,
-      "access_note": "Quelle zur Recherche; namentliche Spielererwähnung noch zu prüfen"
+      "access_note": "Quelle zur Recherche; namentliche Spielererwähnung noch zu prüfen",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "swr",
@@ -131,7 +181,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 23,
-      "access_note": "Regionale Sportberichterstattung; noch kein persönlicher Treffer bestätigt"
+      "access_note": "Regionale Sportberichterstattung; noch kein persönlicher Treffer bestätigt",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "stadt-moessingen",
@@ -141,7 +195,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 24,
-      "access_note": "Stadtnachrichten und Sportlerehrungen als Recherchequelle"
+      "access_note": "Stadtnachrichten und Sportlerehrungen als Recherchequelle",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "schwaebische",
@@ -151,7 +209,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 25,
-      "access_note": "Region Bodensee, mögliche Turnierberichte; keine Namensnennung bestätigt"
+      "access_note": "Region Bodensee, mögliche Turnierberichte; keine Namensnennung bestätigt",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "sportschau",
@@ -161,7 +223,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 40,
-      "access_note": "Breite Sportrecherche, derzeit kein persönlicher Treffer"
+      "access_note": "Breite Sportrecherche, derzeit kein persönlicher Treffer",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     },
     {
       "id": "tsv-gaertringen",
@@ -171,7 +237,11 @@
       "article_index_url": null,
       "verification_status": "candidate",
       "priority": 30,
-      "access_note": "Turnierausrichter Jugend-E-Rangliste, Vereinsnews prüfen"
+      "access_note": "Turnierausrichter Jugend-E-Rangliste, Vereinsnews prüfen",
+      "monitor": {
+        "enabled": false,
+        "reason": "Keine verifizierte frei abrufbare Artikelübersicht bzw. Zugriff nur mit Zustimmung/Bezahlschranke"
+      }
     }
   ]
 }
