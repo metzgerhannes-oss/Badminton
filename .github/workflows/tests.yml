@@ -58,6 +58,7 @@ jobs:
           node tests/friend-search.mjs
           node tests/external-history.mjs
           node tests/history-demand.mjs
+          node tests/history-status-ux.mjs
           node tests/live-links.mjs
           node tests/live-radar.mjs
           node tests/live-hub.mjs

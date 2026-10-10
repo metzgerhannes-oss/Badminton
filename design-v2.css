@@ -526,3 +526,38 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
  min-height:44px;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:800;
  width:fit-content;max-width:100%}
 .radar-source-link:focus-visible{outline:3px solid #168dd2;outline-offset:2px}
+
+
+/* v34: import diagnostics are optional context, not a prominent Home warning. */
+.history-source-details{
+ margin:6px 0 16px;
+ border:1px solid #d3e6f1;
+ border-radius:14px;
+ background:linear-gradient(145deg,#fff,#f1f9ff);
+ padding:0 13px;
+ color:#214766;
+}
+.history-source-details>summary{
+ display:flex;align-items:center;gap:9px;
+ color:#356f95;font-size:12px;font-weight:800;
+ min-height:48px;cursor:pointer;list-style:none;
+}
+.history-source-details>summary::-webkit-details-marker{display:none}
+.history-source-details>summary::before{
+ content:"›";font-size:20px;line-height:1;transition:transform .2s ease;
+}
+.history-source-details[open]>summary::before{transform:rotate(90deg)}
+.history-source-details>.history-import-status{
+ border:0;border-top:1px solid #d3e6f1;border-radius:0;
+ border-left:0;background:transparent;box-shadow:none;
+ margin:0 0 8px;padding:12px 0 4px;
+ font-size:11px;color:#446c85;
+}
+.history-source-details>.history-import-status[data-state="waiting"],
+.history-source-details>.history-import-status[data-state="error"],
+.history-source-details>.history-import-status[data-state="offline"]{
+ border-left:0;background:transparent;
+}
+.history-source-details>.history-import-status strong{font-size:12px;color:#214b6b}
+.history-source-details>.history-import-status span{color:#53768d}
+#view-start .match-stats-note{font-size:11px;line-height:1.55}
