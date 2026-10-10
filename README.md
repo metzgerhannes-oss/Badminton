@@ -1,3 +1,7 @@
+## Supabase-Datenbank (10.10.2026)
+
+Die separate Organisation **Badminton** und das Supabase-Projekt `yadexibmjmnjfmfabrug` sind eingerichtet. Public-DBV-Daten können schreibgeschützt gelesen werden, persönliche Listen sind durch RLS geschützt. Ein initialer Import der 16 kuratierten Platzierungen und vier KW41-Ranglistenwerte wurde durchgeführt. Eine **automatische Live-DBV-Ergebnisübernahme** ist noch nicht eingerichtet; die neue Turnieransicht zeigt nur belegte Importdaten. Vollständiger Stand und technische Hinweise: **[Supabase-Backend](docs/SUPABASE_BACKEND.md)**.
+
 ## Verbindliche Quellenhierarchie (09.10.2026)
 
 Die dauerhafte, nach **A–D** priorisierte und maschinenlesbare Referenzliste liegt unter **[`data/source-register.json`](data/source-register.json)**. Lesbare Übersicht und Qualitäts-/Prüfregeln: **[`docs/DATENQUELLEN_PRIORITAET.md`](docs/DATENQUELLEN_PRIORITAET.md)**. Die Liste ist auch unter Einstellungen in der App verlinkt.

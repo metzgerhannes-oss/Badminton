@@ -10,6 +10,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <script defer src="./app.js"></script>
+<script defer src="./live.js"></script>
 <script type="module" src="./history.js"></script>
 <script type="module" src="./dashboard.js"></script>
 </head>
@@ -53,7 +54,12 @@
   </section>
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
    <div class="section-heading"><h2 id="heading-turniere">Meine Turnierlinks</h2><button class="subtle-button" id="add-tournament" type="button">+ Turnier anlegen</button></div>
-   <p class="supporting">Offizielle Turniere als Favoriten für die ganze Familie. Spielpläne und Ergebnisse werden direkt auf der Veranstalterseite geöffnet; hier findet keine Live-Abfrage statt.</p>
+   <p class="supporting">Offizielle Turniere als Favoriten für die ganze Familie. Verifizierte Spielpläne und Ergebnisse werden über Supabase angezeigt, sobald DBV-Begegnungsdaten importiert wurden. Die Veranstalterlinks bleiben die maßgebliche Quelle.</p>
+   <section class="live-dbv" aria-labelledby="dbv-live-title">
+    <div class="section-heading"><h3 id="dbv-live-title">Spielplan &amp; Live-Ergebnisse</h3><button class="subtle-button" id="dbv-live-refresh" type="button">Aktualisieren</button></div>
+    <p class="settings-hint">Begegnungen zum gewählten Spielerprofil. Zeiten und Satzstände werden nur angezeigt, wenn verifizierte Quelldaten vorliegen.</p>
+    <div id="dbv-live-results" aria-live="polite" role="status"><p class="live-dbv-note">Noch keine Daten geladen.</p></div>
+   </section>
    <div id="official-tournament-list" class="tournament-list"></div>
    <a class="link-tile" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer"><span>DBV-Turnierportal<small>Offizielle Turnierinformationen und Spielpläne</small></span><span aria-hidden="true">↗</span></a>
   </section>

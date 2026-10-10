@@ -1,5 +1,5 @@
 "use strict";
-/** Schmetterlinge: historical results and official tournament bookmarks. No live-result polling. */
+/** Schmetterlinge: historical results and official tournament bookmarks; optional verified Supabase match feed. */
 const STORE="shuttleboard-v1"; // Preserve existing device favourites.
 const DEFAULT_PLAYERS=[
  {id:"05-070879",name:"Philipp Metzger",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
@@ -212,6 +212,9 @@ function render(){
  const viewedProfiles=[...state.players,...state.friends];
  window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks,{mode:state.viewingFriendId?"friend":"own"});
  window.renderHistory?.(state.chosen,viewedProfiles,{mode:state.viewingFriendId?"friend":"own"});
+ // Read-only live viewer follows whichever public DBV profile is currently shown.
+ window.badmintonActivePlayerId=state.chosen;
+ window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen}}));
  const page=["start","historie","turniere","einstellungen"].includes(state.page)?state.page:"start";
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
