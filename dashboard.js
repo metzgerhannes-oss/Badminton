@@ -96,7 +96,7 @@ function renderRank(){
  const birth=known?.birthYear??chosen.birthYear;
  if(!known&&viewMode==="friend"){
   const profileLink=chosen.url&&/^https:\/\//.test(chosen.url)?'<a class="friend-ranking-official" rel="noopener noreferrer" target="_blank" href="'+escape(chosen.url)+'">Offizielles Spielerprofil ↗</a>':"";
-  root.innerHTML='<div class="dashboard-empty-tile friend-ranking-empty"><strong>Ranglisten-KPIs noch nicht verfügbar</strong><small>Für '+escape(chosen.name)+' wurde bisher kein offizieller Wochenstand in unsere Familien-Datenbasis übernommen.</small>'+profileLink+'</div>';
+  root.innerHTML='<div class="dashboard-empty-tile friend-ranking-empty"><strong>Ranglisten-KPIs noch nicht verfügbar</strong><small>Für '+escape(chosen.name)+' sind in der App derzeit noch keine bestätigten Ranglistendaten hinterlegt.</small>'+profileLink+'</div>';
   return;
  }
  const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:chosen.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
