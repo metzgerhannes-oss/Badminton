@@ -214,6 +214,7 @@ test("Scored club reports show real opponents and sets without mixing Badhub sta
  await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
  const roster=[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"},
   {id:"05-061350",name:"Sarah Storz"},{id:"05-070006",name:"Vinzent Pius Ott"}];
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
  const before=await page.locator("#external-match-count").textContent();
  await page.evaluate(roster=>window.renderHistory("05-070006",roster,{mode:"friend"}),roster);
  const vinzent=page.locator("#history-timeline .history-scored-match-proof");
