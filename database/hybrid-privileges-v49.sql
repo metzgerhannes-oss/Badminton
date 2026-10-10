@@ -1,10 +1,19 @@
 -- BADMINTON production only: project ref yadexibmjmnjfmfabrug.
--- Prepared, NOT deployed. Never execute in JohannasGartenwelt.
+-- Applied to Badminton production 2026-10-10 (migration 20261010200831).
+-- NEVER execute in JohannasGartenwelt.
 -- TRUNCATE bypasses PostgreSQL row-level security.
 begin;
 revoke truncate on all tables in schema public from public, anon, authenticated;
 commit;
 
+-- Also applied: harden_postgres_default_truncate_v49_20261010
+-- For future public tables created as role postgres:
+alter default privileges for role postgres in schema public
+ revoke truncate on tables from anon, authenticated;
+
+-- The pre-existing default ACL for owner supabase_admin still grants
+-- TRUNCATE on FUTURE tables to anon/authenticated. That owner must explicitly
+-- harden its default privileges via a separately authorized action.
 -- Effective privilege audit after applying in the correct project.
 -- All anon_can_truncate and signed_in_can_truncate values must be false.
 select c.relname as table_name,
