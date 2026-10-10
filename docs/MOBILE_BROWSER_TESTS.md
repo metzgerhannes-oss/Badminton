@@ -32,3 +32,10 @@ Die Workflowdatei `.github/workflows/mobile-browser.yml` läuft bei jedem PR und
 ## Folgeschritt nach stabilem Gate
 
 UX-10/UX-11: Aus `app.js` die Datenpersistenz und aus den API-Skripten die PostgREST-/Abort-/Fehlerlogik **schrittweise** in gemeinsam getestete Module auslagern. Navigation und 4 Haupttabs bleiben unverändert; die Browsertests verhindern Bedienregressionen.
+
+## Erweiterung: kompaktes iPhone-Layout und lokaler Datenbestand (PR #32)
+
+- **320 × 568 CSS-Pixel:** Zusätzlich zu den beiden Standard-Viewports prüft ein gesonderter Browserfall die vier mindestens 44 Pixel breiten/hohen Navigationsziele und den tatsächlich erreichbaren Speichern-/Schließenbereich beim Profil-Dialog. Der Test erstellt einen Screenshot als CI-Artefakt.
+- **Tastatur und Fokus:** Profil-Dialog öffnen und per Escape verlassen; Rückkehr zum eigenen Home-Profil; immer genau ein aktueller Hauptreiter.
+- **Offline-Datenverlustschutz:** Flugmodus simulieren, Seiten wechseln, zurück online gehen und die Seite neu laden. Die gespeicherte eigene DBV-ID und die gefolgte Spieler-ID müssen erhalten bleiben.
+- Die Tests greifen nur auf synthetische lokale Familiendaten zurück und schreiben keine echten Daten in Supabase. Auch ein grüner 320-Pixel-Browsertest ist **keine VoiceOver-/reale iPhone- oder Vollzoom-Abnahme**.
