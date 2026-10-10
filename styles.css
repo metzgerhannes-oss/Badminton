@@ -500,3 +500,36 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 .invitation-link,.invitation-guide{display:block;overflow-wrap:anywhere;color:#c0ebff;font-size:11px;line-height:1.6;margin-top:12px;text-decoration:underline;text-underline-offset:3px}
 .invitation-card .invitation-status{font-size:11px;margin:9px 0;min-height:0;color:#ceffee;font-weight:700}
 @media(max-width:350px){.invitation-actions{display:grid;grid-template-columns:1fr}}
+
+/* DBV player library: 6 touch-friendly tabs and responsive club groups. */
+.bottom-nav a{width:16.666%;padding-inline:1px}
+.bottom-nav a span{font-size:20px}
+.bottom-nav a small{font-size:9px}
+@media(max-width:370px){.bottom-nav a span{font-size:19px}.bottom-nav a small{font-size:8px}}
+.library-source{padding:10px 12px;margin:6px 0 12px;border:1px solid #527e9d;border-radius:11px;background:#183d5e;font-size:11px;color:#cbe9fa;font-weight:750}
+.library-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+.library-filters label{display:grid;gap:6px;min-width:0;font-weight:800;color:#d3e9f7;font-size:11px}
+.library-filters input,.library-filters select{width:100%;min-width:0;min-height:45px;border:1px solid #628ea9;border-radius:12px;background:#102a44;color:#f4fcff;padding:10px 11px;font-size:12px}
+.library-filters input::placeholder{color:#a5c5d8}
+.library-filters input:focus-visible,.library-filters select:focus-visible{outline:2px solid #b7ebff;outline-offset:2px}
+.library-result-bar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#d5edf8;font-size:12px;margin:18px 0}
+.library-result-bar span{font-size:11px;color:#b7e6d0}
+.library-results{display:grid;gap:15px}
+.library-club-group{background:linear-gradient(135deg,#183d5a,#102a43);border:1px solid #577e9d;border-radius:17px;overflow:hidden}
+.library-club-group h3{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:0;padding:14px 13px;background:#275476;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.library-club-group h3 span{flex:none;color:#baddf3;font-size:10px;font-weight:600}
+.library-player{display:flex;gap:10px;align-items:center;padding:11px 12px;border-top:1px solid #37617f;min-width:0}
+.library-player-avatar{display:grid;place-items:center;flex:none;width:38px;height:38px;background:#6bb4dd;color:#073154;border-radius:50%;font-weight:900;font-size:15px}
+.library-player-info{display:grid;gap:3px;min-width:0;flex:1}
+.library-player-info strong{font-size:12px;overflow-wrap:anywhere}
+.library-player-info span{color:#d2e8f4;font-size:11px}
+.library-player-info small{font-size:10px;color:#adc8d9;overflow-wrap:anywhere}
+.library-player-action{display:grid;gap:6px;flex:none;text-align:right;max-width:112px}
+.library-player-action button,.library-own{border:1px solid #8abbd9;border-radius:9px;background:#a5dcf8;color:#0b344d;font-weight:800;font-size:10px;padding:9px 10px;min-height:36px}
+.library-player-action button.following{background:#1f6b5e;color:#d1fae9;border-color:#5cb89d}
+.library-player-action button.library-view{background:transparent;color:#bce8ff;border-color:transparent;padding:3px 7px;min-height:23px}
+.library-own{background:#285d74;color:#d2eefa;font-size:9px;padding:7px}
+.library-message{background:#193e5a;color:#d7e8f3;border:1px dashed #5d8daa;border-radius:12px;padding:16px;font-size:12px;line-height:1.6}
+.library-more{display:block;width:100%;max-width:360px;margin:18px auto;font-weight:800;min-height:46px}
+.library-data-note{font-size:11px;line-height:1.6;color:#b4d4e6;margin:22px 0}
+@media(max-width:360px){.library-filters{grid-template-columns:1fr}.library-player{gap:7px;padding:10px 7px}.library-player-action{max-width:94px}.library-player-action button{padding:7px;font-size:9px}}
