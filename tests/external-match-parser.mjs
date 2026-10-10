@@ -27,7 +27,7 @@ assert.deepEqual(m.opponent_names,["Test Gegnerin"]);
 assert.deepEqual(m.games,[[21,18],[21,13]]);
 assert.match(m.source_url,/badhub.de\/bwbv\/turnier.php\?id=4986/);
 assert.equal(m.source_kind,"third-party-match-card");
-assert.equal(parsePublicHistory(tour,{dbv_id:"05-070879",name:"Philipp Metzger"},"tournament").items.length,0);
+assert.throws(()=>parsePublicHistory(tour,{dbv_id:"05-070879",name:"Philipp Metzger"},"tournament"),/mismatch/);
 assert.throws(()=>parsePublicHistory(tour,player,"liga"));
 const wrongWinner=tour.replace('sp-side sp-side--winner','sp-side').replace('sp-side sp-side--away','sp-side sp-side--away sp-side--winner');
 assert.equal(parsePublicHistory(wrongWinner,player,"tournament").items.length,0,
