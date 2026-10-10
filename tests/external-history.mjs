@@ -1,0 +1,51 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+import {validateExternalCareer,chooseHistory,seasonYears,lifetimeRate,externalProfileLink} from "../scripts/external-history.mjs";
+const data=JSON.parse(await readFile("data/player-history/05-061350.json","utf8"));
+const index=JSON.parse(await readFile("data/player-history/index.json","utf8"));
+assert.equal(index.schemaVersion,1);
+assert.deepEqual(index.profiles.map(x=>x.dbvId),["05-061350"]);
+assert.equal(validateExternalCareer(data,"05-061350"),true);
+assert.equal(validateExternalCareer(data,"05-070879"),false,"never apply Sarahs figures to Philipp");
+assert.equal(validateExternalCareer({...data,totals:{...data.totals,wins:999}},"05-061350"),false,"inconsistent results cannot be published");
+assert.equal(data.totals.matches,678);
+assert.equal(data.totals.wins,388);
+assert.equal(data.totals.losses,290);
+assert.equal(data.totals.tournament.matches,634);
+assert.equal(data.totals.league.matches,44);
+assert.equal(lifetimeRate(data),57);
+assert.equal(seasonYears(data).length,8);
+assert.equal(seasonYears(data)[0],2026);
+assert.equal(seasonYears(data).at(-1),2019);
+assert.equal(data.earliestListedYear,2018);
+assert.equal(data.sourceStatus,"third-party-aggregated");
+const sum=chooseHistory(data);
+assert.equal(sum.years.length,8);
+assert.equal(sum.years.find(x=>x.year===2022).gold,15);
+assert.equal(sum.years.find(x=>x.year===2024).placements,34);
+assert.equal(chooseHistory(data,{year:"2024"}).years.length,1);
+assert.equal(chooseHistory(data,{year:"2024",discipline:"Einzel"}).highlights.length,1);
+assert.equal(chooseHistory(data,{year:"2020",discipline:"Doppel"}).highlights.length,1);
+assert.equal(chooseHistory(data,{year:"2018"}).years.length,0,"do not invent unknown 2018 annual totals");
+assert.equal(externalProfileLink("05-061350"),"https://badhub.de/spieler/05-061350?saison=all&src=gesamt");
+assert.equal(externalProfileLink("local-test"),null);
+const [html,js,stats,history,css,sw]=await Promise.all([
+ readFile("index.html","utf8"),readFile("career-history.js","utf8"),
+ readFile("stats.js","utf8"),readFile("history.js","utf8"),
+ readFile("design-v2.css","utf8"),readFile("sw.js","utf8")
+]);
+assert.match(html,/id="career-history"/);
+assert.match(html,/id="career-year"/);
+assert.match(html,/id="career-discipline"/);
+assert.match(html,/id="external-match-summary"/);
+assert.match(js,/badminton:profile-change/);
+assert.match(js,/validateExternalCareer/);
+assert.match(js,/extern.*|Externe/i);
+assert.match(js,/Nicht mit den offiziellen Match-KPIs addieren/);
+assert.match(js,/separaten Trophäenschrank/);
+assert.match(stats,/Noch keine einzeln importierten und geprüften DBV-Matches/);
+assert.match(history,/externe historische Jahresübersichten/);
+assert.match(css,/\.career-year-card/);
+assert.match(sw,/career-history\.js/);
+assert.match(sw,/schmetterlinge-shell-v28/);
+console.log("Historical friend profile: 678/388 Badhub sourced aggregates, annual chronology, source separation, no cross-profile leak.");
