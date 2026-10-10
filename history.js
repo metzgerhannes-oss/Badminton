@@ -111,7 +111,7 @@ function render(){
   if(trophySection)trophySection.hidden=friendWithoutHistory;
   if(friendWithoutHistory){
    summary.innerHTML="";$("history-trends").innerHTML="";$("history-pending").innerHTML="";
-   timeline.innerHTML='<div class="empty"><h3>Historische Daten noch nicht verfügbar</h3><p>Die offizielle DBV-Spielerseite enthält gegebenenfalls weitere Ergebnisse. Der Freundesfavorit führt nicht automatisch zum Import.</p></div>';
+   timeline.innerHTML='<div class="empty"><h3>Historische Daten noch nicht verfügbar</h3><p>Für diesen Freund sind noch keine einzelnen Turnierplatzierungen in unserer kuratierten DBV-Chronik übernommen. Soweit vorhanden, findest du externe historische Jahresübersichten oben – mit eigenem Quellennachweis. So werden Drittanbieter-Aggregate nicht als verifizierte Einzelmatches ausgegeben.</p></div>';
    return;
   }
   const years=[...new Set(playerRecords.map(r=>r.date.slice(0,4)))].sort((a,b)=>b.localeCompare(a));
