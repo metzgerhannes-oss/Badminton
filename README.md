@@ -1,3 +1,7 @@
+## Quellenmonitor für alle registrierten Spieler
+
+Die täglich laufende, weiterhin robots.txt-konforme Vereins-/Verbandsrecherche sucht jetzt gezielt nach den öffentlich registrierten DBV-Profilen (maximal 60), statt nur nach zwei festen Namen. Gefundene Artikel bleiben zunächst prüfpflichtige Kandidaten. Sarah und Vinzent sind außerdem im veröffentlichten Vorbericht zur BWBV-Meisterschaft korrekt als *gemeldet* verknüpft; daraus werden keine Matches oder Starts abgeleitet. Details: `docs/SOURCE_DISCOVERY_REGISTERED_PROFILES.md`.
+
 ## v47 – Fehlerhafte Turnier-Zuordnung beim Badhub-Crossfeed korrigieren
 
 Crossfed-DBV-Turnierkarten dürfen nicht länger unter dem vorherigen BWBV-Turnier mit falschem Jahr/Turnierlink gespeichert werden. Der Parser trennt Kartentypen eindeutig, verifiziert die Quell-URL und trennt IDs nach Namensraum. Alte Falschzuordnungen müssen separat geprüft und mit Auditspur bereinigt werden. `docs/SOURCE_CARD_BOUNDARY_FIX_V47.md`.

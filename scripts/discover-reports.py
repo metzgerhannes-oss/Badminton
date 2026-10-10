@@ -18,10 +18,64 @@ USER_AGENT = 'SchmetterlingeReportMonitor/1.0 (+https://github.com/metzgerhannes
 MAX_BYTES = 1_000_000
 MAX_LINKS_PER_SOURCE = 45
 MAX_PENDING = 500
+MAX_MONITORED = 60
+REST_ROOT = 'https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/'
+REST_KEY = 'sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE'
+DBV_ID = re.compile(r'\d{2}-\d{6}')
 NAMES = {
     '05-070879': re.compile(r'(?<!\w)Philipp\s+Metzger(?!\w)', re.I),
     '05-071969': re.compile(r'(?<!\w)Charlotte\s+Metzger(?!\w)', re.I),
 }
+def read_public_register(path, opener=urlopen):
+    """Read only already public Supabase rows; do not access private follows."""
+    request = Request(REST_ROOT + path, headers={
+        'apikey': REST_KEY, 'Accept': 'application/json',
+        'User-Agent': USER_AGENT
+    })
+    with opener(request, timeout=14) as response:
+        payload = response.read(100001)
+    if len(payload) > 100000:
+        raise ValueError('Registry response too large')
+    result = json.loads(payload.decode('utf-8'))
+    if not isinstance(result, list):
+        raise ValueError('Registry did not return a list')
+    return result
+
+
+def registered_patterns(getter=read_public_register):
+    """Names only for history-import requests, never full DBV library."""
+    names = dict(NAMES)
+    try:
+        requests = getter('player_history_imports?select=dbv_id&order=dbv_id&limit=61')
+        ids = sorted({row['dbv_id'] for row in requests
+                      if isinstance(row, dict) and isinstance(row.get('dbv_id'), str)
+                      and DBV_ID.fullmatch(row['dbv_id'])})
+        if len(ids) > MAX_MONITORED:
+            print('WARN: public queue exceeded 60 profiles; capped', file=sys.stderr)
+        ids = ids[:MAX_MONITORED]
+        if not ids:
+            return names
+        players = getter('players?select=dbv_id,name&dbv_id=in.(' + ','.join(ids) + ')')
+        for row in players:
+            if not isinstance(row, dict) or row.get('dbv_id') not in ids:
+                continue
+            name = row.get('name')
+            if not isinstance(name, str):
+                continue
+            name = ' '.join(name.strip().split())
+            if len(name.split()) < 2 or not 5 <= len(name) <= 90:
+                continue
+            if not all(c.isalpha() or c in " -'.’" for c in name):
+                continue
+            expr = r'(?<!\w)' + r'\s+'.join(re.escape(w) for w in name.split()) + r'(?!\w)'
+            names[row['dbv_id']] = re.compile(expr, re.I)
+    except (HTTPError, URLError, TimeoutError, OSError, ValueError,
+            KeyError, TypeError) as error:
+        print('Public import registry unavailable (fallback to known profiles): ' +
+              type(error).__name__, file=sys.stderr)
+    return names
+
+
 CLUB = re.compile(r'\b(?:spvgg\.?\s+m[öo]ssingen|sportvereinigung\s+m[öo]ssingen)\b', re.I)
 SKIP_TAGS = {'script','style','noscript','svg','form','nav','header','footer','aside'}
 VOID_TAGS = {'meta','link','img','br','hr','input','source','area','base','embed','wbr'}
@@ -161,12 +215,13 @@ def robots_allowed(url,opener=urlopen):
     obj=ROBOTS_CACHE[origin]
     return obj if isinstance(obj,bool) else obj.can_fetch(USER_AGENT,url)
 
-def analyze(url,monitor,html,day):
+def analyze(url,monitor,html,day,names=None):
     if not article_allowed(url,monitor):return None
     p=parse(html)
     body=p.article_text()
     if len(body)<110:return None
-    matched=[ident for ident,pattern in NAMES.items() if pattern.search(body)]
+    tracked = NAMES if names is None else names
+    matched=[ident for ident,pattern in tracked.items() if pattern.search(body)]
     club=bool(CLUB.search(body))
     if not matched and not club:return None
     headline=p.headline().strip()[:220]
@@ -176,7 +231,7 @@ def analyze(url,monitor,html,day):
             'evidence':'explicit-name-in-article-body' if matched else 'club-name-in-article-body',
             'club_context':club,'detected_on':day,'status':'needs-review'}
 
-def discover(monitor,excluded,day,*,fetcher=fetch,robots=robots_allowed,sleeper=time.sleep):
+def discover(monitor,excluded,day,*,fetcher=fetch,robots=robots_allowed,sleeper=time.sleep,names=None):
     start=canonical(monitor['index_url'])
     if not start or not robots(start):
         print('SKIP '+monitor['source']+': robots.txt or connection unavailable',file=sys.stderr)
@@ -203,7 +258,7 @@ def discover(monitor,excluded,day,*,fetcher=fetch,robots=robots_allowed,sleeper=
             sleeper(0.4)
             final,html=fetcher(url)
             if not article_allowed(final,monitor):continue
-            item=analyze(final,monitor,html,day)
+            item=analyze(final,monitor,html,day,names=names)
             if item and key(item['url']) not in excluded:
                 discovered.append(item)
                 excluded.add(key(item['url']))
@@ -211,7 +266,7 @@ def discover(monitor,excluded,day,*,fetcher=fetch,robots=robots_allowed,sleeper=
             print('SKIP article '+type(e).__name__,file=sys.stderr)
     return discovered
 
-def run(root,day,previous=None,*,scanner=discover):
+def run(root,day,previous=None,*,scanner=discover,name_patterns=None):
     source_data=json.loads((root/'data/report-sources.json').read_text(encoding='utf-8'))
     approved=json.loads((root/'data/report-articles.json').read_text(encoding='utf-8'))['articles']
     out=root/'data/report-pending.json'
@@ -230,7 +285,9 @@ def run(root,day,previous=None,*,scanner=discover):
         monitor=source.get('monitor') or {}
         if source['verification_status']!='verified' or not monitor.get('enabled'):continue
         cfg={**monitor,'source':source['id']}
-        for item in scanner(cfg,seen|known,day):
+        findings = (scanner(cfg,seen|known,day,names=name_patterns)
+                    if name_patterns is not None else scanner(cfg,seen|known,day))
+        for item in findings:
             k=key(item['url'])
             if k and k not in seen and k not in known:
                 pending.append(item)
@@ -248,7 +305,9 @@ def main():
     cli.add_argument('--previous',type=Path)
     cli.add_argument('--today',default=date.today().isoformat())
     args=cli.parse_args()
-    out=run(args.root,args.today,args.previous)
+    names = registered_patterns()
+    print('Public registered/fallback player IDs monitored: '+str(len(names)))
+    out=run(args.root,args.today,args.previous,name_patterns=names)
     print('Pending review candidates:',len(out['candidates']))
 
 if __name__=='__main__':main()
