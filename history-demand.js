@@ -2,7 +2,8 @@ import {PUBLIC_KEY,importPost,importStatusUrl,importMessage,validHistoryId} from
 
 let shown="",requestSeq=0,timeout,controller;
 const $=id=>document.getElementById(id);
-const views=()=>[$("history-import-status"),$("home-import-status")].filter(Boolean);
+// Import diagnostics belong to Historie, not to the everyday Home dashboard.
+const views=()=>[$("history-import-status")].filter(Boolean);
 const allowed=id=>{
  const ids=window.badmintonLibraryGetState?.()||{own:[],following:[]};
  return validHistoryId(id)&&[...(ids.own||[]),...(ids.following||[])].includes(id);
