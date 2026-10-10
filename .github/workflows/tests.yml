@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate scripts
         run: |
+          node --check ui-feedback.js
           node --check app.js
           node --check dashboard.js
           node --check history.js
@@ -69,6 +70,7 @@ jobs:
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
           node tests/design-v2.mjs
+          node tests/ux-foundation.mjs
           node tests/supabase-library.mjs
           python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
