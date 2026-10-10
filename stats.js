@@ -2,8 +2,7 @@ import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
-const ROOT="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
-const KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const dateLabel=s=>{
@@ -21,11 +20,8 @@ let selectedYear="all",selectedDiscipline="all",selectedAgeClass="all",birthYear
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let controller;
 async function getPage(path,signal){
- const r=await fetch(ROOT+path,{signal,cache:"no-store",headers:{apikey:KEY,accept:"application/json"}});
- if(!r.ok)throw Error("Match source HTTP "+r.status);
- const data=await r.json();
- if(!Array.isArray(data))throw Error("Unexpected match source format");
- return data;
+ const {rows}=await readPublicRows(path,{signal,count:false});
+ return rows;
 }
 async function queryOfficial(id,signal){
  const rows=[];
