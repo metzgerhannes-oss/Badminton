@@ -5,6 +5,7 @@ import {readFileSync} from "node:fs";
 const file=name=>readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=file("index.html");
 const app=file("app.js");
+const router=file("router.js");
 const library=file("library.js");
 const css=file("design-v2.css");
 const dashboard=file("dashboard.js");
@@ -17,7 +18,7 @@ test("four focused main destinations; settings in header; history remains reacha
  assert.match(html,/class="topbar-settings" href="#einstellungen"/);
  assert.match(html,/href="#historie"/);
  assert.match(html,/href="#turniere">← Turniertag/);
- assert.match(app,/page==="historie"\?"turniere":page/);
+ assert.match(router,/page==="historie"\?"turniere":page/);
  assert.match(css,/\.bottom-nav a\{width:25%!important/);
 });
 
@@ -62,12 +63,12 @@ test("Home and friends use one profile navigation mechanism",()=>{
  assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.friendQuick\)/);
  assert.match(app,/window\.badmintonSelectViewer\(friend\.id\)/);
  assert.match(app,/window\.badmintonSelectViewer\(button\.dataset\.switchProfile\)/);
- assert.match(app,/data-current-view/);
+ assert.match(router,/data-current-view/);
 });
 
 test("neutral user-facing wording and changed PWA cache",()=>{
  assert.doesNotMatch(dashboard,/Familien-Datenbasis/);
  assert.doesNotMatch(history,/in unserer kuratierten DBV-Chronik/);
- assert.match(sw,/schmetterlinge-shell-v40/);
+ assert.match(sw,/schmetterlinge-shell-v41/);
  assert.doesNotMatch(sw,/\.\/friend-search\.js/);
 });

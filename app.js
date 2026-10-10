@@ -55,23 +55,9 @@ function setActiveProfile(id){
  return true;
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
-function routeTo(page){
- state.page=page;
- if(location.hash!=="#"+page)location.hash="#"+page;
- else{render();focusCurrentView();}
-}
-// Keyboard and assistive-technology users must land at the new screen heading,
-// not remain on a nav link while a different view is shown.
-function focusCurrentView(){
- const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)
-  ?state.page:"start";
- const heading=document.querySelector("#view-"+page+" h1, #view-"+page+" h2");
- if(heading){
-  heading.setAttribute("tabindex","-1");
-  heading.focus({preventScroll:true});
- }
- window.scrollTo({top:0,behavior:"auto"});
-}
+// Existing UI callers keep the same route and focus methods.
+function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
+function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 function navigateHome(){
  state.viewingFriendId=null;
  state.chosen=state.activeProfileId;
@@ -253,22 +239,7 @@ function render(){
   lastNotifiedClub=window.badmintonActiveClub;
   window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
  }
- const page=["start","historie","turniere","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
- document.querySelector(".app")?.setAttribute("data-current-view",page);
- document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+page));
- const routeTitles={start:"Übersicht",historie:"Turnierhistorie",turniere:"Turniertag",
-  spieler:"Spieler",berichte:"Berichte",einstellungen:"Einstellungen"};
- document.title=routeTitles[page]+" · Schmetterlinge";
- const activeTab=page==="historie"?"turniere":page;
- document.querySelectorAll(".bottom-nav a").forEach(a=>{
-  if(a.dataset.page===activeTab)a.setAttribute("aria-current","page");
-  else a.removeAttribute("aria-current");
- });
- const settingsLink=document.querySelector(".topbar-settings");
- if(settingsLink){
-  if(page==="einstellungen")settingsLink.setAttribute("aria-current","page");
-  else settingsLink.removeAttribute("aria-current");
- }
+ SchmetterlingeRouter.renderPage(state);
 }
 let editing=null;
 function openTournamentForm(item=null){

@@ -1,3 +1,9 @@
+## v41 – Routing und Navigation gekapselt (#29, Teilschritt 2)
+
+`router.js` übernimmt das bestehende Hash-Routing, Überschriftenfokus, Scroll-Reset, Seitenanzeige, Dokumenttitel und die aria-aktiven Navigationselemente. `app.js` besitzt nur noch kleine Delegationsfunktionen. Home/Logo führen weiterhin zum eigenen aktiven Profil, Historie bleibt Unterbereich von Turniere. Keine neue Navigation, Änderung an Profilen/Freunden/Favoriten, Online-Daten oder Auth. Neues Router-VM-Gate + mobile Chromium-/WebKit-Prüfung, PWA v41. Die echte iPhone-/VoiceOver-Abnahme bleibt #28.
+
+Mehr: [docs/ROUTING_V41.md](docs/ROUTING_V41.md).
+
 ## v40 – Lokaler State-/Storage-Vertrag (#29, Teilschritt 1)
 
 Die persistente Datenlogik (Wiederherstellung inklusive bisheriger Charlotte-ID-Migration und Speicherung) liegt jetzt isoliert in `state-storage.js`. `app.js` enthält nur noch die kompatiblen Aufrufe. **Der vorhandene Speicherkey `shuttleboard-v1`, alle Datenfelder, Browser-URLs und das bestehende vierteilige Menü bleiben unverändert.** Export/Import v39 bleibt abwärtskompatibel. Neue VM-Regressionen sichern lokale Datentreue, Offline-/Storage-Fehler und Startprofil/Freunde/Bookmarks ab. Automatisierte Browser- und CI-Tests sind erforderlich; echter iPhone-/VoiceOver-Test bleibt #28.
