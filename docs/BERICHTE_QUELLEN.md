@@ -74,6 +74,8 @@ Der Monitor folgt nur ausdrücklich freigegebenen, öffentlich zugänglichen Art
 
 Es werden keine vollständigen Presseartikel, geschützten Inhalte oder unbelegten Behauptungen kopiert. Ein automatischer Name-Fund ist noch keine redaktionelle Freigabe.
 
-**GitHub-Berechtigung:** Falls der Bot keine Pull Requests erstellen darf, muss im Repository unter **Settings → Actions → General → Workflow permissions** das Erstellen von PRs durch GitHub Actions zugelassen sein. Der Workflow gibt andernfalls einen Fehler aus.
+**GitHub-Berechtigung:** Falls der Bot keine Pull Requests erstellen darf, muss im Repository unter **Settings → Actions → General → Workflow permissions** das Erstellen von PRs durch GitHub Actions zugelassen sein. Wenn GitHub die Erstellung durch Actions sperrt, bleibt der Prüfzweig erhalten; die Automatik versucht stattdessen, ein GitHub-Issue mit Verweis auf den Prüfzweig anzulegen.
 
 Der Monitor ist kostenfrei und nutzt keine KI-API. Die Vollständigkeit hängt von öffentlichen Quellen und deren Zugriffsregeln ab. Eine breite Echtzeitüberwachung der kommerziellen Presse ist damit noch nicht eingerichtet.
+
+**Korrektur aus erstem Echtlauf (10.10.2026):** Zwei Regionalliga-Meldungen wurden zunächst irrtümlich als Kinder-Erwähnungen vorgemerkt, weil verwandte Jugendartikel in einer Vorschauleiste standen. Beide Kandidaten wurden verworfen, **niemals veröffentlicht**. Die Erkennung wertet jetzt ausschließlich bekannte Artikel-Inhaltscontainer aus; bei unklarer HTML-Struktur gibt es keinen automatischen Personentreffer. Regressionstest für diese Vorschau-Situation hinzugefügt.
