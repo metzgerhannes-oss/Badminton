@@ -60,5 +60,5 @@ assert.match(bridge,/const views=\(\)=>\[\$\("history-import-status"\)\]/);
 assert.match(career,/overviewUrl\(id\)/);
 assert.match(career,/data\/player-history\/index.json/);
 assert.match(sw,/history-demand\.js/);
-assert.match(sw,/schmetterlinge-shell-v48/);
+assert.match(sw,/schmetterlinge-shell-v49/);
 console.log("History-on-open: validated public IDs, bounded source requests, no automatic registration on follow, onboarding or startup.");
