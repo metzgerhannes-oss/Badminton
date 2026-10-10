@@ -100,6 +100,28 @@ async function enqueueQuietly(id){
   console.warn("History job could not be requested:",error?.message);
  }
 }
+/** Register ALL own and locally followed DBV profiles once on each app load.
+ * Only an ID enters the shared queue, never which device/user follows it.
+ * Bulk registration does NOT invoke the source crawler – the bounded server
+ * worker schedules the actual data collection. */
+async function registerSavedProfiles(){
+ const own=window.badmintonLibraryGetState?.();
+ const ids=[...new Set([...(own?.own||[]),...(own?.following||[])])]
+  .filter(validHistoryId).slice(0,60);
+ let next=0;
+ async function run(){
+  while(next<ids.length){
+   const id=ids[next++];
+   try{
+    const known=await callStatus(id);
+    if(!known)await requestNew(id);
+   }catch(error){
+    console.warn("Unable to register followed DBV history",id,error?.message);
+   }
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(3,ids.length)},run));
+}
 function select(id){
  clearTimeout(timeout);
  if(!allowed(id)){
@@ -125,5 +147,8 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("visibilitychange",()=>{
   if(document.visibilityState==="visible"&&shown&&allowed(shown))refresh(shown,{enqueue:false});
  });
- setTimeout(()=>select(String(window.badmintonActivePlayerId||"")),0);
+ setTimeout(()=>{
+  select(String(window.badmintonActivePlayerId||""));
+  void registerSavedProfiles();
+ },0);
 });
