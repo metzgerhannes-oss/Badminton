@@ -47,9 +47,10 @@ async function preview(file){
   const when=new Intl.DateTimeFormat("de-DE",{
    dateStyle:"medium",timeZone:"Europe/Berlin"
   }).format(new Date(inspected.createdAt));
-  feedback("Sicherung vom "+when+": "+s.players+" eigene Spieler, "+
-   s.friends+" Freunde und "+s.tournaments+" Turnierfavoriten. Aktives Profil: "+
-   s.activePlayer+". Prüfe die Angaben und bestätige erst dann die Wiederherstellung.");
+  feedback("Sicherung vom "+when+" · Eigene Profile: "+s.players+
+   " · Gefolgte Spieler: "+s.friends+" · Turnierfavoriten: "+s.tournaments+
+   ". Aktives Profil: "+s.activePlayer+
+   ". Prüfe die Angaben vor der Wiederherstellung.");
   $("backup-restore").disabled=false;
  }catch(err){feedback(err?.message||"Sicherungsdatei nicht gültig.",true)}
 }
@@ -57,8 +58,8 @@ function restore(){
  if(!pending)return;
  const s=pending.summary;
  const prompt="Vorhandene Profile, gefolgte Spieler und Turnierfavoriten auf DIESEM Gerät werden ersetzt.\n\n"+
-  "In der ausgewählten Sicherung: "+s.players+" eigene Spieler, "+s.friends+
-  " Freunde und "+s.tournaments+" Turnierfavoriten.\n\n"+
+  "In der Sicherung: "+s.players+" eigene Profile, "+s.friends+
+  " gefolgte Spieler und "+s.tournaments+" Turnierfavoriten.\n\n"+
   "Wenn du die aktuellen Daten behalten möchtest, erstelle zuerst eine eigene Sicherung.\n\n"+
   "Jetzt wirklich wiederherstellen?";
  if(!window.confirm(prompt)){feedback("Wiederherstellung abgebrochen. Deine Daten sind unverändert.");return}
