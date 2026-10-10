@@ -37,6 +37,7 @@ jobs:
           node --check live.js
           node --check live-links.js
           node --check live-radar.js
+          node --check live-hub.js
           node --check scripts/live-radar.mjs
           node --check scripts/live-links.mjs
       - name: Run tests
@@ -59,6 +60,7 @@ jobs:
           node tests/history-demand.mjs
           node tests/live-links.mjs
           node tests/live-radar.mjs
+          node tests/live-hub.mjs
           node tests/match-stats.mjs
           node tests/design-v2.mjs
           node tests/supabase-library.mjs
