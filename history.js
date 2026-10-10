@@ -142,6 +142,13 @@ function render(){
    (r.matchEvidence?.kind==="club-report-at-least-one-win"
     ?'<p class="history-match-evidence">Vereinsbericht: mindestens '+escape(r.matchEvidence.minimumWins)+
       ' Sieg bestätigt. Gegner und Satzstände fehlen – nicht in der Spielstatistik enthalten.</p>':"")+
+   (r.matchEvidence?.kind==="club-report-scored-games"&&Array.isArray(r.matchEvidence.matches)
+    ?'<section class="history-scored-match-proof"><strong>Einzelspiele aus Vereinsbericht · nicht in der Badhub-Statistik enthalten</strong><ul>'+
+      r.matchEvidence.matches.filter(m=>Array.isArray(m.games)&&[2,3].includes(m.games.length)&&
+        m.games.every(g=>Array.isArray(g)&&g.length===2&&g.every(v=>Number.isInteger(v)&&v>=0&&v<=30)))
+       .map(m=>'<li><span>'+escape(m.result)+' gegen '+escape(m.opponent)+'</span><small>Sätze: '+
+         escape(m.games.map(g=>g[0]+":"+g[1]).join(" · "))+'</small></li>').join("")+
+      '</ul><small>Quellbeleg aus Vereinsbericht; noch ohne Abgleich eindeutiger Match-IDs</small></section>':"")+
    '</div></div>').join("");
     return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(t.items.some(i=>i.confirmation==="family-confirmed")?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">'+(sourceUrl.includes("dbv.turnier.de")?'DBV-Turnierergebnisse ↗':'Originalbericht ansehen ↗')+'</a>':"")+(proofUrl?'<a href="'+escape(proofUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link history-verification-link">Namentlichen Ergebnisbeleg ↗</a>':"")+'</div></article>';
   }).join("");
