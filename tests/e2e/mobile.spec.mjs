@@ -191,6 +191,24 @@ test("Sourced friend tournament placements remain separate from individual match
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).not.toHaveText("2");
 });
 
+test("Older verified 2025 B-Ranglisten appear for followed players without invented matches",async ({page})=>{
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
+ const profiles=[
+  {id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"},
+  {id:"05-061350",name:"Sarah Storz"},{id:"05-070006",name:"Vinzent Pius Ott"}
+ ];
+ await page.evaluate(p=>window.renderHistory("05-061350",p,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("2. B-Rangliste SüdOst");
+ await expect(page.locator("#history-timeline")).toContainText("3. B-Rangliste SüdOst");
+ await expect(page.locator('#history-timeline a.history-source-link[href="https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"]')).toHaveCount(1);
+ await expect(page.locator('#history-timeline a.history-source-link[href="https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"]')).toHaveCount(1);
+ await page.evaluate(p=>window.renderHistory("05-070006",p,{mode:"friend"}),profiles);
+ await expect(page.locator("#history-timeline")).toContainText("34. Südwürttembergische Meisterschaft");
+ await expect(page.locator("#history-timeline")).toContainText("Ruixiang Wang");
+ await expect(page.locator('#history-timeline a.history-source-link[href="https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"]')).toHaveCount(1);
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());

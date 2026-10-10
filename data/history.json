@@ -550,6 +550,158 @@
       },
       "verified": true,
       "verificationNote": "Namentliche Turnierplatzierung aus veröffentlichtem Vereinsbericht; Datum bezeichnet den ersten Turniertag oder belegten Spieltag, keine Einzelmatch-Satzstände."
+    },
+    {
+      "id": "ss-2025-05-17-brlt-e-u17-5",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-05-17",
+      "event": "2. B-Rangliste SüdOst U13–U19",
+      "location": "Zittau",
+      "level": "B",
+      "discipline": "Einzel",
+      "ageGroup": "U17",
+      "place": 5,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "ss-2025-05-17-brlt-m-u17-3",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-05-17",
+      "event": "2. B-Rangliste SüdOst U13–U19",
+      "location": "Zittau",
+      "level": "B",
+      "discipline": "Mixed",
+      "ageGroup": "U17",
+      "place": 3,
+      "partner": "Arthur Hähnel (BV Marienberg)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "ss-2025-05-17-brlt-d-u17-1",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-05-17",
+      "event": "2. B-Rangliste SüdOst U13–U19",
+      "location": "Zittau",
+      "level": "B",
+      "discipline": "Doppel",
+      "ageGroup": "U17",
+      "place": 1,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "ss-2025-07-05-brlt-e-u17-4",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-07-05",
+      "event": "3. B-Rangliste SüdOst U13–U19",
+      "location": "Herrenberg",
+      "level": "B",
+      "discipline": "Einzel",
+      "ageGroup": "U17",
+      "place": 4,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "ss-2025-07-05-brlt-d-u17-1",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-07-05",
+      "event": "3. B-Rangliste SüdOst U13–U19",
+      "location": "Herrenberg",
+      "level": "B",
+      "discipline": "Doppel",
+      "ageGroup": "U17",
+      "place": 1,
+      "partner": "Amishi Tiwari (BSV Eggenstein-Leopoldshafen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "ss-2025-07-05-brlt-m-u17-5",
+      "playerId": "05-061350",
+      "playerName": "Sarah Storz",
+      "date": "2025-07-05",
+      "event": "3. B-Rangliste SüdOst U13–U19",
+      "location": "Herrenberg",
+      "level": "B",
+      "discipline": "Mixed",
+      "ageGroup": "U17",
+      "place": 5,
+      "partner": "Arthur Hähnel (BV Marienberg)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "vo-2025-07-12-swm-e-u15-9",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2025-07-12",
+      "event": "34. Südwürttembergische Meisterschaft U11–U19",
+      "location": "Mössingen",
+      "level": "C",
+      "discipline": "Einzel",
+      "ageGroup": "U15",
+      "place": 9,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
+    },
+    {
+      "id": "vo-2025-07-12-swm-d-u15-2",
+      "playerId": "05-070006",
+      "playerName": "Vinzent Pius Ott",
+      "date": "2025-07-12",
+      "event": "34. Südwürttembergische Meisterschaft U11–U19",
+      "location": "Mössingen",
+      "level": "C",
+      "discipline": "Doppel",
+      "ageGroup": "U15",
+      "place": 2,
+      "partner": "Ruixiang Wang (PSV Reutlingen)",
+      "source": {
+        "name": "SpVgg Mössingen · Vereins-Ergebnisbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"
+      },
+      "verified": true,
+      "verificationNote": "Namentlich aus dem veröffentlichten Vereinsbericht bestätigt. Datum=Turnierbeginn, kein individueller Matchtag; Gegner und Sätze nicht einzeln belegt."
     }
   ],
   "pendingResults": []

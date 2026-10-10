@@ -183,11 +183,12 @@
       "date": "2025-07-15",
       "title": "34. Südwürttembergische Meisterschaft U11-U19 am 12. Juli 2025",
       "url": "https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025",
-      "summary": "Vereinsbericht zur Jugendmeisterschaft mit Ergebnissen in U11.",
+      "summary": "Südwürttembergische Meisterschaft in Mössingen: Philipp Metzger Platz 3 im Einzel U11; Vinzent Pius Ott Platz 9 im Einzel U15 und Platz 2 im Doppel U15 mit Ruixiang Wang.",
       "players": [
+        "05-070006",
         "05-070879"
       ],
-      "note": "Philipp Metzger im Ergebnisabschnitt namentlich genannt.",
+      "note": "Namentlich bestätigte Platzierungen im Bericht; keine neuen Einzelmatch-Satzstände.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
@@ -231,6 +232,34 @@
         "05-070879"
       ],
       "note": "Philipp Metzger wird ausdrücklich als Finalgegner genannt.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-05-19",
+      "title": "2. B-Rangliste SüdOst U13-U19 am 17./18. Mai 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/2-b-rangliste-suedost-u13-u19-am-17-18-mai-2025",
+      "summary": "Zittau: Sarah Storz Einzel U17 Platz 5, Mixed U17 Platz 3 mit Arthur Hähnel und Doppel U17 Platz 1 mit Amishi Tiwari.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Drei namentlich bestätigte Turnierplatzierungen; Turnierbeginn 17. Mai, kein belegtes Einzelmatchdatum.",
+      "status": "verified",
+      "club_id": "spvgg-moessingen",
+      "checked_at": "2026-10-10"
+    },
+    {
+      "source": "club-moessingen",
+      "date": "2025-07-07",
+      "title": "3. B-Rangliste SüdOst U13-U19 am 5./6. Juli 2025",
+      "url": "https://spvgg.org/abteilungen/badminton/aktuelles/3-b-rangliste-suedost-u13-u19-am-5-6-juli-2025",
+      "summary": "Herrenberg: Sarah Storz Einzel U17 Platz 4, Doppel U17 Platz 1 mit Amishi Tiwari und Mixed U17 Platz 5 mit Arthur Hähnel.",
+      "players": [
+        "05-061350"
+      ],
+      "note": "Drei namentlich bestätigte Turnierplatzierungen; Turnierbeginn 5. Juli, kein belegtes Einzelmatchdatum.",
       "status": "verified",
       "club_id": "spvgg-moessingen",
       "checked_at": "2026-10-10"
