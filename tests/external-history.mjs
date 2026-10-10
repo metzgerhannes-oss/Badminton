@@ -47,5 +47,5 @@ assert.match(await readFile("scripts/match-availability.mjs","utf8"),/Noch keine
 assert.match(history,/externe historische Jahresübersichten/);
 assert.match(css,/\.career-year-card/);
 assert.match(sw,/career-history\.js/);
-assert.match(sw,/schmetterlinge-shell-v50/);
+assert.match(sw,/schmetterlinge-shell-v52/);
 console.log("Historical friend profile: 678/388 Badhub sourced aggregates, annual chronology, source separation, no cross-profile leak.");
