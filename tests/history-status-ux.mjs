@@ -19,7 +19,7 @@ assert.doesNotMatch(bridge,/home-import-status/);
 assert.doesNotMatch(bridge,/badminton:friend-followed/,"Following stays local");
 assert.doesNotMatch(bridge,/badminton:own-profile-added/,"Profile creation stays local");
 assert.match(bridge,/historyOpen/,"Only a history visit requests the source");
-assert.match(bridge,/importStatusUrl/,"Live status still fetched");
+assert.match(bridge,/readPublicRows\(importStatusPath\(id\),\{signal,count:false\}\)/,"Status uses the validated shared GET client");
 assert.match(bridge,/requestDemand/,"Explicit history opening can reactivate a dormant queue item");
 assert.match(worker,/badminton-history-demand-worker/,"Server worker unaffected");
 assert.match(stats,/officialCount\.total===0&&external\.length>0/,"Fallback uses real sourced matches");
