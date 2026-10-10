@@ -18,17 +18,25 @@ export function demandPost(id){
   body:JSON.stringify({target_id:id}),
   headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json",Accept:"application/json"}};
 }
-export function importStatusUrl(id){
+export function importStatusPath(id){
  if(!validHistoryId(id))return null;
  const p=new URLSearchParams({select:"dbv_id,status,detail,source_name,imported_match_count,last_checked_at,updated_at",
   dbv_id:"eq."+id,limit:"1"});
- return SUPABASE_ROOT+"/player_history_imports?"+p;
+ return "player_history_imports?"+p;
 }
-export function overviewUrl(id){
+export function importStatusUrl(id){
+ const path=importStatusPath(id);
+ return path?SUPABASE_ROOT+"/"+path:null;
+}
+export function overviewPath(id){
  if(!validHistoryId(id))return null;
  const p=new URLSearchParams({select:"dbv_id,source_name,source_kind,summary,source_checked_on",
   dbv_id:"eq."+id,limit:"1"});
- return SUPABASE_ROOT+"/player_history_overviews?"+p;
+ return "player_history_overviews?"+p;
+}
+export function overviewUrl(id){
+ const path=overviewPath(id);
+ return path?SUPABASE_ROOT+"/"+path:null;
 }
 export function importMessage(row){
  if(!row)return {kind:"none",title:"Noch kein Importauftrag",detail:"Eine bestätigte DBV-Spieler-ID startet die Quellenprüfung."};

@@ -1,12 +1,14 @@
 /** Source-marked career snapshots; never merge aggregate wins into official DBV match rows. */
 import {validateExternalCareer,seasonYears,chooseHistory,lifetimeRate,externalProfileLink} from "./scripts/external-history.mjs";
-import {PUBLIC_KEY,overviewUrl} from "./scripts/history-demand.mjs";
+import {overviewPath} from "./scripts/history-demand.mjs";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=x=>Number(x).toLocaleString("de-DE");
 const safeLink=x=>{try{const url=new URL(x);return url.protocol==="https:"&&url.hostname==="badhub.de"?url.href:""}catch{return ""}};
 let indexPromise,selected="",data=null,token=0,year="all",discipline="all";
 const cache=new Map();
+const CACHE_MS=60_000; // Small browser-side cache; reopen after a minute rechecks Supabase.
 async function readJson(path){
  const r=await fetch(path,{cache:"no-store"});
  if(!r.ok)throw Error("HTTP "+r.status);
@@ -19,17 +21,16 @@ async function registry(){
  return info;
 }
 async function snapshot(id){
- if(cache.has(id))return cache.get(id);
+ const cached=cache.get(id);
+ if(cached&&Date.now()-cached.checkedAt<CACHE_MS)return cached.data;
+ cache.delete(id);
  // Central on-demand Supabase import is the primary verified store.
  // The existing curated GitHub feed remains the free offline fallback.
  try{
-  const response=await fetch(overviewUrl(id),{cache:"no-store",headers:{apikey:PUBLIC_KEY,Accept:"application/json"}});
-  if(response.ok){
-   const rows=await response.json();
-   if(Array.isArray(rows)&&rows.length===1&&validateExternalCareer(rows[0]?.summary,id)){
-    cache.set(id,rows[0].summary);
-    return rows[0].summary;
-   }
+  const {rows}=await readPublicRows(overviewPath(id),{count:false});
+  if(rows.length===1&&validateExternalCareer(rows[0]?.summary,id)){
+   cache.set(id,{data:rows[0].summary,checkedAt:Date.now()});
+   return rows[0].summary;
   }
  }catch(error){console.warn("Central career overview unavailable; using curated fallback",error?.message)}
  const index=await registry();
@@ -37,7 +38,7 @@ async function snapshot(id){
  if(!entry||entry.path!==id+".json")return null;
  const obj=await readJson("./data/player-history/"+entry.path);
  if(!validateExternalCareer(obj,id))throw Error("Invalid historical career source");
- cache.set(id,obj);
+ cache.set(id,{data:obj,checkedAt:Date.now()});
  return obj;
 }
 function sourceLink(url,label){
@@ -104,7 +105,10 @@ function renderHistory(){
     '<p>'+esc(h.event)+(h.partner?' · mit '+esc(h.partner):'')+'</p>'+
     '<small>Turnierbeginn '+esc(h.startDate)+' · '+esc(data.source.name)+'</small></article>'
    ).join(""):'<p class="career-no-highlight">Für die gewählte Auswahl sind keine einzelnen Beispielergebnisse übertragen. Die Jahresgesamtzahlen gelten unabhängig vom Disziplinfilter.</p>');
- note.innerHTML='Erfasst sind öffentliche Jahresaggregate 2019–2026; die Quellseite führt auch 2018 auf. Die Jahre bilden nicht zwingend sämtliche Karriereergebnisse ab. '+
+ const available=seasonYears(data);
+ const yearsLabel=available.length===1?String(available[0]):
+  String(available[available.length-1])+"–"+String(available[0]);
+ note.innerHTML='Übernommene öffentliche Jahresaggregate '+esc(yearsLabel)+'. Die Jahre bilden nicht zwingend sämtliche Karriereergebnisse ab. '+
   'Die Zahlen sind <strong>externe Badhub-Auswertungen</strong>, keine einzeln validierten DBV-Matchimporte. '+
   'Die Auszeichnungen im separaten Trophäenschrank bleiben auf unsere eigenen belegten Einträge beschränkt. '+
   sourceLink(data.source.url,"Originalübersicht öffnen");
@@ -128,6 +132,10 @@ document.addEventListener("DOMContentLoaded",()=>{
  if(!$("career-history"))return;
  $("career-year").addEventListener("change",e=>{year=e.target.value;renderHistory()});
  $("career-discipline").addEventListener("change",e=>{discipline=e.target.value;renderHistory()});
+ window.addEventListener("badminton:external-matches-updated",e=>{
+  const id=String(e.detail?.playerId||"");
+  if(/^\d{2}-\d{6}$/.test(id))cache.delete(id);
+ });
  window.addEventListener("badminton:profile-change",e=>chooseProfile(String(e.detail?.playerId||"")));
  chooseProfile(String(window.badmintonActivePlayerId||""));
 });

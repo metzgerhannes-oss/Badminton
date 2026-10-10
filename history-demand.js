@@ -1,4 +1,5 @@
-import {PUBLIC_KEY,demandPost,importStatusUrl,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
+import {PUBLIC_KEY,demandPost,importStatusPath,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 
 let shown="",requestSeq=0,timeout,controller;
 const $=id=>document.getElementById(id);
@@ -28,12 +29,7 @@ function show(state,id=""){
  }
 }
 async function callStatus(id,signal){
- const response=await fetch(importStatusUrl(id),{
-  signal,cache:"no-store",headers:{apikey:PUBLIC_KEY,Accept:"application/json"}
- });
- if(!response.ok)throw Error("Status HTTP "+response.status);
- const rows=await response.json();
- if(!Array.isArray(rows))throw Error("Unerwartete Antwort");
+ const {rows}=await readPublicRows(importStatusPath(id),{signal,count:false});
  return rows[0]||null;
 }
 async function requestDemand(id,signal){
@@ -67,7 +63,7 @@ async function refresh(id,{enqueue=true}={}){
    },60000);
   }
  }catch(error){
-  if(seq!==requestSeq||error.name==="AbortError")return;
+  if(seq!==requestSeq||signal.aborted||error.name==="AbortError"||error.kind==="aborted")return;
   console.warn("History import queue temporarily unavailable:",error.message);
   for(const element of views()){
    element.hidden=false;element.dataset.state="offline";
