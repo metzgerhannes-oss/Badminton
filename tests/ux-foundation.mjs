@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 const file=path=>readFile(path,"utf8");
-const [html,app,style,stats,feedback,sw]=await Promise.all([
- "index.html","app.js","design-v2.css","stats.js","ui-feedback.js","sw.js"
+const [html,app,router,style,stats,feedback,sw]=await Promise.all([
+ "index.html","app.js","router.js","design-v2.css","stats.js","ui-feedback.js","sw.js"
 ].map(file));
 const home=html.slice(html.indexOf('id="view-start"'),html.indexOf('id="view-historie"'));
 assert.ok(home.indexOf('id="dashboard-next"')<home.indexOf('id="match-stats"'),"Next tournament must appear first");
@@ -30,10 +30,10 @@ assert.match(html,/href="#einstellungen" aria-label="Einstellungen öffnen"/);
 assert.match(app,/function navigateHome\(\)/);
 assert.match(app,/state\.viewingFriendId=null;\s*state\.chosen=state\.activeProfileId;\s*routeTo\("start"\)/);
 assert.match(app,/function focusCurrentView\(\)/);
-assert.match(app,/heading\.focus\(\{preventScroll:true\}\)/);
-assert.match(app,/window\.scrollTo\(\{top:0,behavior:"auto"\}\)/);
-assert.match(app,/page==="historie"\?"turniere":page/);
-assert.match(app,/document\.title=routeTitles\[page\]\+" · Schmetterlinge"/);
+assert.match(router,/heading\.focus\(\{preventScroll:true\}\)/);
+assert.match(router,/window\.scrollTo\(\{top:0,behavior:"auto"\}\)/);
+assert.match(router,/page==="historie"\?"turniere":page/);
+assert.match(router,/document\.title=routeTitles\[page\]\+" · Schmetterlinge"/);
 assert.match(html,/<a class="skip-link" href="#hauptinhalt">Zum Inhalt springen<\/a>/);
 assert.match(html,/<main id="hauptinhalt" tabindex="-1">/);
 assert.match(feedback,/event\.preventDefault\(\)/);
@@ -48,7 +48,10 @@ assert.match(style,/\.library-player-action button,\.library-player-action \.lib
 assert.match(style,/min-height:44px/);
 assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(style,/:focus-visible/);
-assert.match(sw,/schmetterlinge-shell-v40/);
+assert.match(sw,/schmetterlinge-shell-v41/);
 assert.match(sw,/ui-feedback\.js/);
+assert.match(sw,/router\.js/);
+assert.match(app,/SchmetterlingeRouter\.renderPage\(state\)/);
+assert.match(html,/<script defer src="\.\/router\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 assert.match(html,/<script defer src="\.\/state-storage\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 console.log("UX foundation: task-first Home, truthful source disclosure, retry/offline, keyboard routing, mobile touch targets and v38 PWA verified.");

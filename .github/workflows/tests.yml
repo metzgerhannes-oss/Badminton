@@ -16,6 +16,7 @@ jobs:
         run: |
           node --check ui-feedback.js
           node --check state-storage.js
+          node --check router.js
           node --check app.js
           node --check backup.js
           node --check scripts/local-backup.mjs
@@ -58,6 +59,7 @@ jobs:
           node tests/profile-switch.mjs
           node tests/local-backup.mjs
           node tests/state-storage.mjs
+          node tests/router.mjs
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
