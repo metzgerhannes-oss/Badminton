@@ -1,3 +1,7 @@
+## Live-Radar ohne fremden API-Schlüssel (10.10.2026)
+
+Unter **Turniere → Live-Radar** zeigt die App für das ausgewählte DBV-Spielerprofil aktuelle und nachweisbare Turniertagsinformationen aus dem öffentlichen Badhub-JSON. Der Abruf läuft zentral über Supabase (maximal sechs aktive Spieler pro Minute), mit eindeutigem Quellenhinweis, eigenständigem Status für „kein Turnier“/„veraltet“ und richtiger Satzperspektive. Für Sarah und Philipp wurde der echte Leerzustand vom Quellenserver überprüft. Der Live-Radar **ist keine offizielle DBV-API** und erzeugt keine historischen Einzelmatches; die bisherigen Quelllinks bleiben erhalten. [Technische Dokumentation](docs/LIVE_RADAR_ON_DEMAND.md).
+
 ## Live-Zugang: Sofortlösung und Schnittstellenwege (10.10.2026)
 
 Unter **Turniere → Spielplan & Live-Ergebnisse** führt ein neuer externer Link für den ausgewählten DBV-Spieler direkt zur öffentlichen Badhub-Turniertag-Anzeige. Für Sarah (`05-061350`) und Philipp (`05-070879`) wurden die individuellen Seiten per HTTP 200 überprüft. Ein zweiter Link öffnet die gesamte öffentliche Badhub-Ergebnishistorie. Das ist ein **echter Quellenlink**, kein in die App importierter automatischer Live-Spielstand. Der fehlende Live-Datenfeed wird nicht vorgetäuscht.
