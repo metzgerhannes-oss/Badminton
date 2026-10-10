@@ -138,7 +138,11 @@ function render(){
   timeline.innerHTML=[...grouped.values()].map(t=>{
     const sourceUrl=safeUrl(t.source?.url);
     const proofUrl=safeUrl(t.items.find(r=>r.verification?.url)?.verification?.url);
-    const entries=t.items.map(r=>'<div class="history-result"><div class="history-place '+rank(r.place)+'"><b>'+escape(r.place)+'.</b><small>Platz</small></div><div class="history-result-copy"><strong>'+escape(r.discipline)+" "+escape(r.ageGroup)+'</strong>'+(r.partner?'<small>mit '+escape(r.partner)+'</small>':"")+'</div></div>').join("");
+    const entries=t.items.map(r=>'<div class="history-result"><div class="history-place '+rank(r.place)+'"><b>'+escape(r.place)+'.</b><small>Platz</small></div><div class="history-result-copy"><strong>'+escape(r.discipline)+" "+escape(r.ageGroup)+'</strong>'+(r.partner?'<small>mit '+escape(r.partner)+'</small>':"")+
+   (r.matchEvidence?.kind==="club-report-at-least-one-win"
+    ?'<p class="history-match-evidence">Vereinsbericht: mindestens '+escape(r.matchEvidence.minimumWins)+
+      ' Sieg bestätigt. Gegner und Satzstände fehlen – nicht in der Spielstatistik enthalten.</p>':"")+
+   '</div></div>').join("");
     return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(t.items.some(i=>i.confirmation==="family-confirmed")?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">'+(sourceUrl.includes("dbv.turnier.de")?'DBV-Turnierergebnisse ↗':'Originalbericht ansehen ↗')+'</a>':"")+(proofUrl?'<a href="'+escape(proofUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link history-verification-link">Namentlichen Ergebnisbeleg ↗</a>':"")+'</div></article>';
   }).join("");
  }

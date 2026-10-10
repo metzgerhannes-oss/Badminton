@@ -24,9 +24,18 @@ for(const r of history.results){
  }
  if(r.confirmation==="family-confirmed") assert.ok(r.verificationNote,"Family confirmation needs verification label");
  assert.ok(!("score" in r),"Do not invent individual match scores");
+ if(r.matchEvidence){
+  assert.equal(r.matchEvidence.kind,"club-report-at-least-one-win");
+  assert.equal(r.matchEvidence.minimumWins,1);
+  assert.match(r.matchEvidence.statement,/nicht zur Matchstatistik/);
+  assert.match(r.source.url,/spvgg\.org/);
+  assert.ok(!("opponent" in r.matchEvidence)&&!("games" in r.matchEvidence));
+ }
+
  players.add(r.playerName);
 }
 assert.ok(players.has("Philipp Metzger")&&players.has("Charlotte Metzger"));
+assert.equal(history.results.filter(r=>r.matchEvidence?.kind==="club-report-at-least-one-win").length,1);
 assert.ok(Array.isArray(history.pendingResults));
 assert.ok(!history.pendingResults.some(r=>r.id==="pm-2026-07-11-district-double-possible-bronze"),"Resolved double result must not remain pending");
 const district=history.results.filter(r=>r.date==="2026-07-11"&&r.playerId==="05-070879");
@@ -55,6 +64,7 @@ assert.ok(!linked.includes("Platzierungen aus Vereins- und Verbandsberichten, na
 
 const script=await readFile("history.js","utf8");
 assert.ok(script.includes("plotTrends"));
+assert.ok(script.includes("history-match-evidence")&&script.includes("nicht in der Spielstatistik enthalten"));
 assert.ok(script.includes("playerMatch"));
 assert.ok(script.includes("Namentlichen Ergebnisbeleg")&&script.includes("DBV-Turnierergebnisse"));
 assert.ok(script.includes("renderTrophies(playerRecords)"),"Lifetime trophies should not change with chronicle filters");

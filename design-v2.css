@@ -761,3 +761,6 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
 /* v43 – show historical retry only when source has failed. */
 #external-match-retry[hidden]{display:none!important}
 #external-match-retry:not([hidden]){min-height:44px;margin:6px 0 12px}
+
+/* v45: editorial minimum-win claim is evidence, never a scored individual match. */
+.history-match-evidence{font-size:12px;line-height:1.5;color:var(--muted,#65748a);margin:5px 0 0;max-width:55ch}

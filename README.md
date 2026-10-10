@@ -1,3 +1,7 @@
+## v45 – Zusätzliches echtes Spielergebnis aus Vereinsbericht
+
+In der Turnierhistorie werden ab jetzt auch ausdrücklich gekennzeichnete, namentlich belegte Ergebnis-Hinweise aus Vereinsberichten gezeigt, wenn Gegner/Satzstände für einen vollwertigen Matchbeleg fehlen. Erster Beleg: Charlottes mindestens ein gewonnener Einzelmatch beim E-RLT in Ehingen am 26.09.2026 (Platz 5). **Nicht** in den gesicherten Spielstatistikzahlen enthalten. Quellensuche und Evidenzregeln: `docs/EVIDENCE_LEVELS_V45.md`.
+
 ## v44 – Ehrlicher Quellenfortschritt und Aktualisieren bei App-Rückkehr
 
 Die Importanzeige zählt nur tatsächlich per REST abrufbare Quellkarten, niemals bloß den serverseitigen Importcursor als bereits gespeicherte Spiele. Verarbeitung, ausgeschlossene Quellkarten, fehlende Bestände und dokumentierter letzter Importversuch werden getrennt. Wenn die App lange im Hintergrund war, aktualisieren Home und Historie öffentliche Read-only-Spielstände beim nächsten Öffnen (höchstens ein Anlass alle fünf Minuten, keine Hintergrundabfragen). Keine Backend- oder Followerdatenänderung. Siehe docs/IMPORT_COVERAGE_V44.md.
