@@ -3,10 +3,11 @@ import {readFile} from "node:fs/promises";
 
 // CI verifies that committed security contracts don't silently regress.
 // It does not pretend to replace the live production privilege audit.
-const [harden,lifecycle,audit,workflow]=await Promise.all([
+const [harden,lifecycle,audit,auxiliary,workflow]=await Promise.all([
  "database/hybrid-privileges-v49.sql",
  "database/history-demand-lifecycle-v52.sql",
  "database/public-security-audit-v54.sql",
+ "database/harden_auxiliary_table_privileges_v54.sql",
  ".github/workflows/tests.yml"
 ].map(p=>readFile(p,"utf8")));
 
@@ -24,6 +25,14 @@ assert.match(audit,/has_table_privilege\('anon',c\.oid,'TRUNCATE'\)/);
 assert.match(audit,/has_table_privilege\('authenticated',c\.oid,'TRUNCATE'\)/);
 assert.match(audit,/pg_catalog\.pg_default_acl/);
 assert.match(audit,/has_truncate_default/);
+assert.match(audit,/has_auxiliary_default/);
+for(const privilege of ["TRIGGER","REFERENCES","MAINTAIN"]){
+ assert.match(audit,new RegExp("has_table_privilege\\\\('anon',c\\\\.oid,'"+privilege+"'\\\\)"));
+ assert.match(audit,new RegExp("has_table_privilege\\\\('authenticated',c\\\\.oid,'"+privilege+"'\\\\)"));
+}
+assert.match(auxiliary,/revoke trigger, references, maintain on all tables in schema public\\s+from public, anon, authenticated/i);
+assert.match(auxiliary,/alter default privileges for role postgres in schema public\\s+revoke trigger, references, maintain/i);
+assert.doesNotMatch(auxiliary,/\\b(drop|truncate table|delete from|update public\\.)\\b/i);
 assert.match(audit,/has_column_privilege\('anon','public\.player_history_imports','last_demand_at','SELECT'\)/);
 assert.doesNotMatch(audit,/\b(create|alter|delete|insert|update|drop|truncate|revoke|grant)\s+(table|function|schema|on|from|to)\b/i,
  "The release-audit file must remain read-only SQL");
