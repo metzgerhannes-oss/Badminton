@@ -77,6 +77,7 @@ jobs:
           node tests/live-hub.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
+          node tests/external-match-consistency.mjs
           node tests/match-availability.mjs
           node tests/design-v2.mjs
           node tests/ux-foundation.mjs
