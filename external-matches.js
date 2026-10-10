@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(id===selected&&location.hash==="#historie")load(id);
  });
  window.addEventListener("hashchange",()=>{
-  if(location.hash==="#historie"&&(!loaded||current()!==selected))load(current());
+  if(location.hash==="#historie")load(current());
  });
  if(location.hash==="#historie")load(current());
 });
