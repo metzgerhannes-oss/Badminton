@@ -8,7 +8,7 @@ const localKey="shuttleboard-v1";
 const store=new Map([[localKey,JSON.stringify({
   players:[
     {id:"05-070879",name:"Philipp Metzger",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
-    {id:"local-charlotte",name:"Charlotte Metzger",url:""}
+    {id:"local-charlotte",name:"Charlotte Metzger",birthYear:2014,url:""}
   ],
   activeProfileId:"local-charlotte",chosen:"local-charlotte",
   officialLinks:[{id:"E24DC6EE-152A-454D-B00C-E625B751D7D5",playerId:"local-charlotte",name:"Charlottes Turnier",url:"https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5",startDate:"2026-10-12",endDate:""}],
@@ -44,6 +44,7 @@ const fresh=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},loca
 }});
 vm.runInContext(storageCode,fresh,{filename:"state-storage.js"});
 vm.runInContext(code,fresh,{filename:"app.js"});
-assert.equal(vm.runInContext('state.players.find(p=>p.name==="Charlotte Metzger").id',fresh),"05-071969","New installs must have verified Charlotte ID");
-assert.equal(vm.runInContext('state.players.find(p=>p.id==="05-071969").birthYear',fresh),2014);
-console.log("Charlotte DBV profile migration passed: verified identity, selected profile and bookmarked tournaments retained.");
+assert.equal(vm.runInContext("state.players.length",fresh),0,"New installs must never inherit someone else's family profiles");
+assert.equal(vm.runInContext("state.activeProfileId",fresh),"","New installs need explicit setup");
+assert.doesNotMatch(code,/DEFAULT_PLAYERS|name:"Charlotte Metzger"|name:"Philipp Metzger"/);
+console.log("Legacy local DBV-ID migration and bookmarks preserved; new devices start without personal family profiles.");
