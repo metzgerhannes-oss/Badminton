@@ -16,8 +16,9 @@ assert.match(history,/id="history-import-status"/);
 assert.doesNotMatch(history,/<details id="history-source-details"[^>]+open/,"Diagnostics default closed");
 assert.match(bridge,/const views=\(\)=>\[\$\("history-import-status"\)\]/);
 assert.doesNotMatch(bridge,/home-import-status/);
-assert.match(bridge,/badminton:friend-followed/,"On-follow queue stays enabled");
-assert.match(bridge,/badminton:own-profile-added/,"Own-player queue stays enabled");
+assert.doesNotMatch(bridge,/badminton:friend-followed/,"Following stays local");
+assert.doesNotMatch(bridge,/badminton:own-profile-added/,"Profile creation stays local");
+assert.match(bridge,/historyOpen/,"Only a history visit requests the source");
 assert.match(bridge,/importStatusUrl/,"Live status still fetched");
 assert.match(worker,/badminton-history-demand-worker/,"Server worker unaffected");
 assert.match(stats,/officialCount\.total===0&&external\.length>0/,"Fallback uses real sourced matches");
@@ -28,4 +29,4 @@ assert.match(style,/border-left:0;background:transparent/,"No amber warning back
 assert.match(importMessage({status:"awaiting_source"}).title,/Einzelmatches noch nicht importiert/);
 assert.match(importMessage({status:"awaiting_source"}).detail,/regelmäßig geprüft/);
 assert.match(sw,/schmetterlinge-shell-v48/);
-console.log("UX regression: Home stays useful and calm, importer accessible under Historie, queue unchanged.");
+console.log("UX regression: Home stays calm, and imports are activated only by opening Historie.");
