@@ -26,7 +26,7 @@ assert.equal((tournament.match(/id="live-radar-refresh"/g)||[]).length,1);
 assert.equal((html.match(/data-page="/g)||[]).length,4,"Four primary destinations");
 assert.match(html,/data-page="start".*?<small>Home<\/small>/s);
 assert.match(app,/function navigateHome\(\)/);
-assert.match(app,/state\.viewingFriendId=null;\s*state\.chosen=state\.activeProfileId;/);
+assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);/,"Home must return to locally selected own profile");
 assert.match(app,/window\.badmintonSelectViewer/);
 assert.match(app,/stayOnPage:true|stayOnPage=false/);
 assert.match(app,/window\.badmintonLiveViewerOptions/);
