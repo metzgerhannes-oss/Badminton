@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {DBV_ID,watchRequest,snapshotUrl,validSource,sourceSets,setText,opponents,matchLabel,
+import {DBV_ID,watchRequest,snapshotPath,snapshotUrl,validSource,sourceSets,setText,opponents,matchLabel,
  freshness,validateSnapshot,liveView,radarSituation,playerOutcome,sourceTime} from "../scripts/live-radar.mjs";
 const id="05-061350";
 assert.ok(DBV_ID.test(id));
 assert.equal(watchRequest("local-123"),null);
 assert.equal(snapshotUrl("not an id"),null);
+assert.equal(snapshotPath("not an id"),null);
+assert.match(snapshotPath(id),/^player_live_snapshots\?/);
+assert.equal(snapshotUrl(id),"https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/"+snapshotPath(id));
 assert.deepEqual(JSON.parse(watchRequest(id).body),{dbv_id:id});
 assert.equal(watchRequest(id).headers.Prefer,"return=minimal");
 assert.equal(watchRequest(id).url,"https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/player_live_watches");
@@ -79,6 +82,8 @@ assert.match(js,/Bei Badhub prüfen/);
 assert.doesNotMatch(js,/Live-Abgleich veraltet/,"Technical cache age must not be the headline");
 assert.match(css,/\.live-radar-content\[data-state="idle"\]/);
 assert.match(js,/sourceTime/);
+assert.match(js,/readPublicRows\(snapshotPath\(id\),\{signal,count:false\}\)/,"Live radar uses shared GET client");
+assert.doesNotMatch(js,/fetch\(snapshotUrl\(id\)/);
 assert.match(sql,/enable row level security/g);
 assert.match(sql,/grant insert\(dbv_id\)/);
 assert.match(sql,/pg_advisory_xact_lock/);
@@ -89,5 +94,5 @@ assert.ok(!sql.includes("insert into public.matches"),"Never infer confirmed mat
 assert.match(css,/\.live-radar-panel/);
 assert.match(sw,/live-radar\.js/);
 assert.match(sw,/scripts\/live-radar\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v57/);
+assert.match(sw,/schmetterlinge-shell-v58/);
 console.log("Live radar: matchday idle/active/stale, perspective-safe scores, idempotent watches, RLS controls and iPhone UI passed.");

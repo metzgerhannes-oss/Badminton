@@ -1,7 +1,7 @@
 {
   "name": "schmetterlinge-ux-tests",
   "private": true,
-  "version": "0.57.0",
+  "version": "0.58.0",
   "type": "module",
   "scripts": {
     "test:mobile": "playwright test",

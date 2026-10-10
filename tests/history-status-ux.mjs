@@ -33,5 +33,5 @@ assert.doesNotMatch(importMessage({status:"awaiting_source"}).detail,/weiterhin 
 assert.match(index,/14 Tage/,"Revalidation window must be visible in privacy notice");
 assert.match(index,/DATENKATALOG_BERICHTIGUNG_V53/,"Privacy notice must link the correction runbook");
 assert.match(await readFile("docs/DATENKATALOG_BERICHTIGUNG_V53.md","utf8"),/keine vollständige Datenschutzerklärung/);
-assert.match(sw,/schmetterlinge-shell-v57/);
+assert.match(sw,/schmetterlinge-shell-v58/);
 console.log("UX regression: Home stays calm, and imports are activated only by opening Historie.");
