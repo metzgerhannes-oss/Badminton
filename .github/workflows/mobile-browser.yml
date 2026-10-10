@@ -1,0 +1,38 @@
+name: Schmetterlinge Mobile Browser QA
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-browser:
+    name: Mobile UX · Chromium and WebKit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install deterministic test dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Install real browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Exercise user journeys on narrow screens
+        run: npm run test:mobile
+      - name: Preserve failing screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-browser-diagnostics
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
