@@ -1,3 +1,12 @@
+## v50 – Neutrale Ersteinrichtung ohne eingebaute Familienprofile
+
+- Neue Geräte erhalten ein leeres Profilverzeichnis und einen neutralen Einrichtungsdialog; keine persönlichen Beispielnamen, Geburtsjahre oder Vereinszuordnungen sind standardmäßig im ausgelieferten `app.js` enthalten.
+- Bereits lokal gespeicherte eigene Profile, Freunde, aktive Auswahl, Bookmarks und Sicherungen bleiben über denselben Speicherkey erhalten. Alte, **bereits vorhandene** lokale IDs werden ohne automatische Profil-Neuanlage weiterhin auf die zuvor bestätigte DBV-ID migriert. Geburtsjahr oder Verein werden nicht neu erfunden.
+- Abbruch des Einrichtungsformulars führt zurück zum Einrichtungsdialog, kein fremdes Familienprofil wird automatisch erzeugt.
+- V50-PWA-Shell mit Tests für Browser-Erststart, Profilwahl und Migration.
+
+Siehe [neutrale Ersteinrichtung v50](docs/NEUTRALE_ERSTEINRICHTUNG_V50.md). Lösch-/Cache-Fristen und vollständige Datenschutzerklärung bleiben separate Aufgaben.
+
 ## v49 – Hybridarchitektur und Datenschutztransparenz (Frontend)
 
 - Neue Historienaufträge nur bei bewusst geöffneter Historie; kein stiller Upload der DBV-IDs beim App-Start, Folgen oder Einrichten. Bestehende serverseitige Cronjobs laufen unverändert.
