@@ -76,7 +76,7 @@ assert.match(career,/readPublicRows\(overviewPath\(id\),\{count:false\}\)/);
 assert.doesNotMatch(career,/fetch\(overviewUrl/);
 assert.match(career,/data\/player-history\/index.json/);
 assert.match(sw,/history-demand\.js/);
-assert.match(sw,/schmetterlinge-shell-v56/);
+assert.match(sw,/schmetterlinge-shell-v57/);
 const idleSQL=await readFile("database/history-worker-idle-guard-v51.sql","utf8");
 assert.match(idleSQL,/if not exists \(/);
 assert.match(idleSQL,/jsonb_build_object\('processed',0/);
