@@ -76,6 +76,8 @@ const lifecycle=await readFile("database/history-demand-lifecycle-v52.sql","utf8
 assert.match(lifecycle,/add column if not exists last_demand_at/);
 assert.match(lifecycle,/create or replace function public.request_player_history_demand/);
 assert.match(lifecycle,/revoke select on public.player_history_imports/);
-assert.equal((lifecycle.match(/last_demand_at >= now\(\)-interval '14 days'/g)||[]).length,2);
+assert.equal((lifecycle.match(/last_demand_at >= now\(\)-interval '14 days'/g)||[]).length,4);
+assert.match(lifecycle,/create or replace function private.continue_external_match_import/);
+assert.match(lifecycle,/create or replace function public.claim_external_match_import/);
 assert.doesNotMatch(lifecycle,/delete from public.player_external_match_facts/);
 console.log("History-on-open: validated public IDs, bounded source requests, no automatic registration on follow, onboarding or startup.");
