@@ -31,6 +31,7 @@ jobs:
           node --check stats.js
           node --check scripts/external-match-stats.mjs
           node --check scripts/import-coverage-audit.mjs
+          node --check supabase/functions/history-match-import/source-availability.mjs
           node --check scripts/match-availability.mjs
           node --check friend-search.js
           node --check career-history.js
@@ -71,6 +72,7 @@ jobs:
           node tests/friend-search.mjs
           node tests/external-history.mjs
           node tests/external-match-parser.mjs
+          node tests/source-failover.mjs
           node tests/history-demand.mjs
           node tests/history-status-ux.mjs
           node tests/live-links.mjs
