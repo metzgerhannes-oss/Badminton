@@ -95,6 +95,14 @@ function setActiveProfile(id){
  save();
  return true;
 }
+// The Home action always opens the locally selected own profile, even when already on #start.
+function navigateHome(){
+ state.viewingFriendId=null;
+ state.chosen=state.activeProfileId;
+ state.page="start";
+ if(location.hash!=="#start")location.hash="#start";
+ render();
+}
 function renderFocusHeader(){
  const p=currentProfile();
  const isFriend=Boolean(state.viewingFriendId);
@@ -116,7 +124,7 @@ function renderFocusHeader(){
  '<div class="focus-profile-copy"><small>'+(isFriend?"Du folgst":"Mein aktives Spielerprofil")+'</small><strong>'+esc(p.name)+'</strong>'+
  '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span>'+
  (p.club?'<span class="focus-club">Verein: '+esc(p.club)+'</span>':"")+'</div>'+action;
- el("back-own")?.addEventListener("click",()=>{state.viewingFriendId=null;state.chosen=state.activeProfileId;save();location.hash="#start";render()});
+ el("back-own")?.addEventListener("click",navigateHome);
  wrap.querySelectorAll("[data-switch-profile]").forEach(button=>button.addEventListener("click",()=>{
   if(!setActiveProfile(button.dataset.switchProfile))return;
   location.hash="#start";
@@ -183,8 +191,8 @@ function renderFriendQuick(){
  const links=(state.viewingFriendId&&own?[{...own,isOwn:true}]:[]).concat(state.friends.map(p=>({...p,isOwn:false})));
  root.innerHTML=links.map(p=>'<button type="button" class="friend-quick '+(state.viewingFriendId===p.id?'is-current':'')+'" data-friend-quick="'+esc(p.id)+'" data-is-own="'+(p.isOwn?'true':'false')+'" aria-label="'+esc(p.isOwn?'Zurück zu meinem Startprofil '+p.name:'KPIs von '+p.name)+'"><span class="friend-quick-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-quick-name">'+esc(p.isOwn?'Zu mir':p.name.split(" ")[0])+'</span></button>').join("");
  root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
-  if(b.dataset.isOwn==="true"){state.viewingFriendId=null;state.chosen=state.activeProfileId;}
-  else if(state.friends.some(p=>p.id===b.dataset.friendQuick)){state.viewingFriendId=b.dataset.friendQuick;state.chosen=b.dataset.friendQuick;}
+  if(b.dataset.isOwn==="true"){navigateHome();return;}
+  if(state.friends.some(p=>p.id===b.dataset.friendQuick)){state.viewingFriendId=b.dataset.friendQuick;state.chosen=b.dataset.friendQuick;}
   location.hash="#start";render();
  }));
 }
@@ -283,6 +291,11 @@ function setup(){
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();
  state.page=(location.hash||"#start").slice(1);
+ // Native anchor routing alone retains the viewed friend's profile. Home must reset it,
+ // including a second tap while #start is already the active hash.
+ document.querySelectorAll('.bottom-nav a[data-page="start"], .topbar .brand[href="#start"]').forEach(link=>{
+  link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
+ });
  window.addEventListener("hashchange",()=>{state.page=(location.hash||"#start").slice(1);render()});
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
  let editingPlayerId=null,activatingNewProfile=false;
