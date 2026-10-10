@@ -141,7 +141,7 @@ test("Club-confirmed win is displayed separately from scored matches",async ({pa
  await expect(note).toContainText("nicht in der Spielstatistik enthalten");
  await expect(page.locator("#history-timeline .history-event")).toHaveCount(1);
  await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
-  /spvgg\.org\/abteilungen\/badminton\/aktuelles\/4-e-rangliste/);
+  "https://spvgg.org/abteilungen/badminton/aktuelles/2-c-rangliste-bw-u11-u19-am-28-februar-1-maerz-2026");
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
 });
