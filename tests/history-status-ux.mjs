@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+import {importMessage} from "../scripts/history-demand.mjs";
+const [index,bridge,stats,style,worker,sw]=await Promise.all([
+ "index.html","history-demand.js","stats.js","design-v2.css","database/history-on-demand.sql","sw.js"
+].map(path=>readFile(path,"utf8")));
+const home=index.slice(index.indexOf('id="view-start"'),index.indexOf('id="view-historie"'));
+const history=index.slice(index.indexOf('id="view-historie"'),index.indexOf('id="view-turniere"'));
+assert.doesNotMatch(home,/home-import-status/,"No large orange internal import alert on Home");
+assert.doesNotMatch(home,/Einzelmatch-Quelle noch nicht verfügbar/);
+assert.match(home,/id="match-stats"/,"Real stat totals remain visible");
+assert.match(home,/id="match-stats-note"/,"Concise missing-evidence notice remains");
+assert.match(history,/<details id="history-source-details"/);
+assert.match(history,/<summary>Datenstand und Quellen<\/summary>/);
+assert.match(history,/id="history-import-status"/);
+assert.doesNotMatch(history,/<details id="history-source-details"[^>]+open/,"Diagnostics default closed");
+assert.match(bridge,/const views=\(\)=>\[\$\("history-import-status"\)\]/);
+assert.doesNotMatch(bridge,/home-import-status/);
+assert.match(bridge,/badminton:friend-followed/,"On-follow queue stays enabled");
+assert.match(bridge,/badminton:own-profile-added/,"Own-player queue stays enabled");
+assert.match(bridge,/importStatusUrl/,"Live status still fetched");
+assert.match(worker,/badminton-history-demand-worker/,"Server worker unaffected");
+assert.match(stats,/records\.length===0/,"Zero-source vs filtered-empty must differ");
+assert.match(stats,/Die detaillierte Spielhistorie wird noch ergänzt/);
+assert.match(stats,/Für diese Auswahl liegen keine einzeln geprüften Matches vor/);
+assert.match(style,/\.history-source-details\[open\]>summary/);
+assert.match(style,/border-left:0;background:transparent/,"No amber warning background");
+assert.match(importMessage({status:"awaiting_source"}).title,/Einzelmatches noch nicht importiert/);
+assert.match(importMessage({status:"awaiting_source"}).detail,/regelmäßig geprüft/);
+assert.match(sw,/schmetterlinge-shell-v34/);
+console.log("UX regression: Home stays useful and calm, importer accessible under Historie, queue unchanged.");
