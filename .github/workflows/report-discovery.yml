@@ -1,5 +1,12 @@
 name: Reportquellen automatisch prüfen
 on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/discover-reports.py
+      - data/report-sources.json
+      - data/report-articles.json
+      - .github/workflows/report-discovery.yml
   schedule:
     - cron: "17 6 * * *"
   workflow_dispatch:
