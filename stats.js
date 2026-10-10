@@ -213,6 +213,7 @@ function render(){
   sourceDetails.textContent=(availability.detail?availability.detail+" ":"")+
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
+ if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
  details.hidden=missing;
  counter.textContent="("+context.total+")";
  list.innerHTML=context.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
