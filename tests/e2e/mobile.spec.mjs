@@ -30,7 +30,9 @@ const headers={
  "Content-Type":"application/json"
 };
 test.beforeEach(async ({page})=>{
- await page.addInitScript(data=>localStorage.setItem("shuttleboard-v1",data),ownStore());
+ await page.addInitScript(data=>{
+  if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",data);
+ },ownStore());
  await page.route("**/*",async route=>{
   const request=route.request();
   const url=new URL(request.url());
