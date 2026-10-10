@@ -1,7 +1,6 @@
 /** Badhub historical match details: same scoring and evidence rules as Home. */
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
-const API="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
-const KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
+import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n||0).toLocaleString("de-DE");
@@ -21,11 +20,8 @@ const gameScore=row=>(Array.isArray(row.games)?row.games:[])
  .filter(g=>Array.isArray(g)&&g.length===2&&g.every(Number.isInteger))
  .map(g=>row.player_side===2?g[1]+":"+g[0]:g[0]+":"+g[1]).join(" · ");
 async function readJSON(route,signal){
- const response=await fetch(API+route,{signal,cache:"no-store",headers:{apikey:KEY,Accept:"application/json"}});
- if(!response.ok)throw Error("Match archive HTTP "+response.status);
- const data=await response.json();
- if(!Array.isArray(data))throw Error("Unexpected match archive format");
- return data;
+ const {rows}=await readPublicRows(route,{signal,count:false});
+ return rows;
 }
 function render(){
  const root=$("external-match-history");if(!root)return;
