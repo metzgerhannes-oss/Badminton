@@ -129,6 +129,24 @@ test("Import progress counts stored rows, not the server processing cursor",asyn
  await expect(page.locator("#external-match-progress")).toContainText("Letzter dokumentierter Importversuch");
 });
 
+test("Club-confirmed win appears as evidence, never as a synthetic match",async ({page})=>{
+ await page.goto("/#historie",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
+ await page.evaluate(()=>window.renderHistory("05-071969",[
+  {id:"05-071969",name:"Charlotte Metzger"},{id:"05-070879",name:"Philipp Metzger"}
+ ],{mode:"own"}));
+ const note=page.locator("#history-timeline .history-match-evidence");
+ await expect(note).toHaveCount(1);
+ await expect(note).toContainText("mindestens 1 Sieg bestätigt");
+ await expect(note).toContainText("nicht in der Spielstatistik enthalten");
+ await expect(page.locator("#history-timeline .history-event")).toHaveCount(1);
+ await expect(page.locator("#history-timeline .history-event .history-place")).toContainText(["5."]);
+ await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
+  /spvgg\.org\/abteilungen\/badminton\/aktuelles\/4-e-rangliste/);
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+ expect(overflow).toBeLessThanOrEqual(2);
+});
+
 test("Historical source validation matches the Home statistics",async ({page})=>{
  await page.route("**/player_external_match_facts?*",route=>{
   const url=new URL(route.request().url());
