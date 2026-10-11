@@ -60,3 +60,32 @@ test("v63 app chrome keeps four readable, non-overlapping tabs from SE to tablet
  await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator(".focused-profile")).toContainText("Philipp");
 });
+
+test("v64 extracted home cards and dialogs retain readable component styling",async ({page})=>{
+ for(const width of [320,375,390,768]){
+  await page.setViewportSize({width,height:700});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".focused-profile")).toBeVisible();
+  const profile=page.locator(".focused-profile");
+  const shape=await profile.evaluate(el=>{
+   const css=getComputedStyle(el);
+   return {radius:css.borderTopLeftRadius,color:css.color,background:css.backgroundImage};
+  });
+  expect(shape.radius).toBe("21px");
+  expect(shape.background).toContain("linear-gradient");
+  await page.locator('.bottom-nav a[data-page="spieler"]').click();
+  await page.locator("#add-player").click();
+  await expect(page.locator("#player-dialog")).toBeVisible();
+  const dialogStyle=await page.locator("#player-dialog").evaluate(el=>{
+   const css=getComputedStyle(el);
+   return {color:css.color,background:css.backgroundImage};
+  });
+  expect(dialogStyle.background).toContain("linear-gradient");
+  expect(dialogStyle.color).toBe("rgb(12, 48, 90)");
+  const button=page.locator("#player-dialog button[type=submit]");
+  await button.scrollIntoViewIfNeeded();
+  await expect(button).toBeVisible();
+  await page.locator("#cancel-dialog").click();
+  await expect(page.locator("#player-dialog")).not.toBeVisible();
+ }
+});
