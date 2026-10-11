@@ -65,15 +65,17 @@ function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
  // Badhub also publishes matches as a winner in bold and a dash instead
  // of set points. Count their REPORTED OUTCOME, never invent set points.
  // The same card must name both opponents and mark exactly one winning side.
- const scoreColumn=(post.slice(0,rightStart).match(
-  /class="[^"]*\bsp-result-col\b[^"]*"[^>]*>([\s\S]*?)(?:<\/div>|<div\b)/)||[])[1]||"";
- const isDash=/^[–—-]$/.test(plain(scoreColumn));
+ // post begins inside the result-column opening tag; restore the tag
+ // before stripping HTML so Badhub's printed en dash is parsed correctly.
+ const printedResult=plain("<div "+post.slice(0,rightStart));
+ const isDash=/^[–—-]$/.test(printedResult);
  const declaredWinner=allowDeclaredWinner&&scores.length===0&&isDash;
  const completion=declaredWinner
   ?{winningSide:winA?1:2,ruleSource:"badhub-bold-no-scores"}
   :completedMatchWinner(scores,{year,rule});
  if(!completion){
-  noteReject(counts,"incomplete_or_invalid_score");
+  noteReject(counts,allowDeclaredWinner&&scores.length===0
+   ?"unscored_with_opponent":"incomplete_or_invalid_score");
   return null;
  }
  const winningSide=winA?1:2;
