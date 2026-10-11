@@ -21,7 +21,7 @@ check([[11,10],[11,8],[11,7]],"5x11");
 check([[12,10],[13,11],[9,11],[15,13]],"5x11");
 check([[11,8],[8,11],[11,8],[9,11],[15,14]],"5x11");
 check([[11,10],[11,8],[11,7]],null);
-check([[11,10],[11,8],[11,7],[8,11],[11,7]],null);
+check([[11,10],[8,11],[11,7],[8,11],[11,7]],null);
 assert.equal(completedMatchWinner([[11,8],[8,11],[11,9]],{rule:"5x11"}),null,
  "Two game wins in 5x11 are not a completed match");
 assert.equal(completedMatchWinner([[21,14]]),null,
