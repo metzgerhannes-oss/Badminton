@@ -78,9 +78,12 @@
     if (lang === "de") return {meta:{locale:"de",direction:"ltr"},messages:{}};
     if (loaded.has(lang)) return loaded.get(lang);
     const local = new URL("./locales/" + lang + ".json", document.baseURI).href;
-    const cdn = typeof window.SCHMETTERLINGE_LANGUAGE_BASE_URL === "string"
-      ? window.SCHMETTERLINGE_LANGUAGE_BASE_URL.trim() : DEFAULT_CDN;
-    const candidates = cdn ? [cdn.replace(/\/+$/,"") + "/" + lang + ".json", local] : [local];
+    const customCdn = typeof window.SCHMETTERLINGE_LANGUAGE_BASE_URL === "string"
+      ? window.SCHMETTERLINGE_LANGUAGE_BASE_URL.trim() : "";
+    // The language files shipped with this release are available immediately and offline.
+    // A configured Cloudflare origin may override them; the default CDN is a fallback.
+    const candidates = customCdn ? [customCdn.replace(/\/+$/,"") + "/" + lang + ".json", local]
+      : [local, DEFAULT_CDN + "/" + lang + ".json"];
     for (const url of candidates) {
       try {
         let response;
