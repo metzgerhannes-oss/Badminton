@@ -54,11 +54,7 @@ DROP POLICY IF EXISTS "Read shared tournaments" ON public.shared_player_tourname
 CREATE POLICY "Read shared tournaments" ON public.shared_player_tournaments
   FOR SELECT TO anon, authenticated
   USING (
-    (is_shared AND EXISTS (
-      SELECT 1 FROM public.dbv_player_sharing_claims c
-      WHERE c.user_id = owner_id AND c.dbv_player_id = dbv_player_id
-        AND c.verified_at IS NOT NULL
-    ))
+    is_shared
     OR (owner_id = (SELECT auth.uid()))
   );
 
@@ -70,7 +66,7 @@ CREATE POLICY "Publish tournament for verified player" ON public.shared_player_t
     AND COALESCE((SELECT auth.jwt())->>'is_anonymous','true') = 'false'
     AND EXISTS (
       SELECT 1 FROM public.dbv_player_sharing_claims c
-      WHERE c.user_id = owner_id AND c.dbv_player_id = dbv_player_id
+      WHERE c.user_id = shared_player_tournaments.owner_id AND c.dbv_player_id = shared_player_tournaments.dbv_player_id
         AND c.verified_at IS NOT NULL
     )
   );
@@ -83,7 +79,7 @@ CREATE POLICY "Update own verified tournament" ON public.shared_player_tournamen
     AND COALESCE((SELECT auth.jwt())->>'is_anonymous','true') = 'false'
     AND EXISTS (
       SELECT 1 FROM public.dbv_player_sharing_claims c
-      WHERE c.user_id = owner_id AND c.dbv_player_id = dbv_player_id
+      WHERE c.user_id = shared_player_tournaments.owner_id AND c.dbv_player_id = shared_player_tournaments.dbv_player_id
         AND c.verified_at IS NOT NULL
     )
   )
@@ -92,7 +88,7 @@ CREATE POLICY "Update own verified tournament" ON public.shared_player_tournamen
     AND COALESCE((SELECT auth.jwt())->>'is_anonymous','true') = 'false'
     AND EXISTS (
       SELECT 1 FROM public.dbv_player_sharing_claims c
-      WHERE c.user_id = owner_id AND c.dbv_player_id = dbv_player_id
+      WHERE c.user_id = shared_player_tournaments.owner_id AND c.dbv_player_id = shared_player_tournaments.dbv_player_id
         AND c.verified_at IS NOT NULL
     )
   );
@@ -102,5 +98,27 @@ CREATE POLICY "Remove own verified tournament" ON public.shared_player_tournamen
   FOR DELETE TO authenticated
   USING (owner_id = (SELECT auth.uid()) AND
     COALESCE((SELECT auth.jwt())->>'is_anonymous','true') = 'false');
+
+-- Revoking a verified manager claim must immediately unpublish their shares.
+-- Private, trigger-only definer: no callable public RPC and fixed search_path.
+CREATE SCHEMA IF NOT EXISTS private;
+CREATE OR REPLACE FUNCTION private.unpublish_revoked_player_tournaments()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''
+AS $
+BEGIN
+  IF TG_OP = 'DELETE' OR (TG_OP = 'UPDATE' AND NEW.verified_at IS NULL) THEN
+    UPDATE public.shared_player_tournaments t
+       SET is_shared = false, updated_at = now()
+     WHERE t.owner_id = OLD.user_id AND t.dbv_player_id = OLD.dbv_player_id
+       AND t.is_shared;
+  END IF;
+  RETURN NULL;
+END;
+$;
+REVOKE ALL ON FUNCTION private.unpublish_revoked_player_tournaments() FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS unpublish_on_claim_revoke ON public.dbv_player_sharing_claims;
+CREATE TRIGGER unpublish_on_claim_revoke AFTER UPDATE OF verified_at OR DELETE
+  ON public.dbv_player_sharing_claims
+  FOR EACH ROW EXECUTE FUNCTION private.unpublish_revoked_player_tournaments();
 
 COMMIT;
