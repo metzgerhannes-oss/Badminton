@@ -22,6 +22,7 @@
 <script defer src="./i18n.js"></script>
 <script defer src="./club-branding.js"></script>
 <script defer src="./app-release.js"></script>
+<script defer src="./matchday-view.js"></script>
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
 <script type="module" src="./library.js"></script>
@@ -155,7 +156,11 @@
   </section>
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
    <div class="section-heading"><h2 id="heading-turniere">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
-   <p class="live-hub-lead">Deine aktuelle Begegnung, nächste Spiele und Ergebnisse – mit belegtem Quellenstand.</p>
+   <p class="live-hub-lead">Dein Spieltag auf einen Blick.</p>
+   <div class="matchday-switch" id="matchday-switch" role="group" aria-label="LIVE-Ansicht wählen">
+    <button type="button" data-matchday-view="mine" aria-pressed="true">Meine Spiele</button>
+    <button type="button" data-matchday-view="all" aria-pressed="false">Alle Spiele</button>
+   </div>
     <a class="history-inline-link" href="#historie">Turnierhistorie und Auszeichnungen ansehen ↗</a>
      <a class="history-inline-link live-tournaments-return" href="#turniere"><span aria-hidden="true">←</span> <span>Turniere</span></a>
    <section class="live-dbv" aria-labelledby="dbv-live-title">
@@ -194,15 +199,15 @@
     </details>
    </section>
    <section class="live-tournament-follow" id="live-tournament-follow" aria-labelledby="live-tournament-follow-title">
-    <h3 id="live-tournament-follow-title">Turnierübersicht</h3>
-    <p>Alle bisher importierten, belegten Turnierbegegnungen direkt ansehen. Fehlende Matches werden nicht ergänzt oder geschätzt.</p>
+    <h3 id="live-tournament-follow-title">Alle Spiele des Turniers</h3>
     <div class="tournament-live-toolbar">
      <label for="tournament-live-select">Turnier auswählen</label>
      <select id="tournament-live-select" aria-label="Gespeichertes Turnier auswählen"><option value="">Turniere werden geladen</option></select>
      <button type="button" id="tournament-live-refresh" class="subtle-button">Aktualisieren</button>
     </div>
+    <div id="live-tournament-links" class="live-tournament-links" aria-label="Offizieller Turnier-Spielplan"></div>
     <p class="tournament-live-count" id="tournament-live-count" role="status" aria-live="polite"></p>
-    <div class="tournament-live-filters" aria-label="Turnierspiele filtern">
+    <div class="tournament-live-filters" id="tournament-live-filters" aria-label="Turnierspiele filtern" hidden>
      <button type="button" data-tournament-status="all" aria-pressed="true">Alle</button>
      <button type="button" data-tournament-status="live" aria-pressed="false">Jetzt</button>
      <button type="button" data-tournament-status="upcoming" aria-pressed="false">Danach</button>
@@ -216,8 +221,7 @@
      <summary>Datenvollständigkeit und Quellen</summary>
      <p>Es werden nur verifiziert importierte DBV-Turniermatches angezeigt. Nicht alle Turniere und Begegnungen liegen bereits im gemeinsamen Datenbestand vor. Ein aktiver Spielstand gilt nur mit einem maximal zwei Minuten alten Quellenabgleich als live. Keine zusätzlichen Badhub-Abfragen oder privaten Spielerdaten.</p>
     </details>
-    <h4>Original-Spielplan beim Veranstalter</h4>
-    <div id="live-tournament-links" class="live-tournament-links"></div>
+
    </section>
    <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
     <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
