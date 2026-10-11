@@ -1,0 +1,88 @@
+import {test,expect} from "@playwright/test";
+
+const PLAYER="05-070879",FRIEND="05-071969";
+const TOURNAMENT="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+const AUTH_USER="2980046b-abd4-4056-b275-090a7364c4ac";
+const headers={"Access-Control-Allow-Origin":"*","Content-Type":"application/json",
+ "Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer",
+ "Access-Control-Allow-Methods":"GET,POST,PATCH,DELETE,OPTIONS"};
+
+test("Opt-in shared event becomes visible on follower device and can be revoked",async ({browser})=>{
+ const publicRows=[];
+ const publisher=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});
+ const follower=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});
+ const owner=await publisher.newPage(),reader=await follower.newPage();
+ const storeA={players:[{id:PLAYER,name:"Philipp Metzger",birthYear:2016}],
+  activeProfileId:PLAYER,chosen:PLAYER,officialLinks:[],friends:[]};
+ const storeB={players:[{id:FRIEND,name:"Charlotte Metzger",birthYear:2014}],
+  activeProfileId:FRIEND,chosen:FRIEND,officialLinks:[],
+  friends:[{id:PLAYER,name:"Philipp Metzger",birthYear:2016}]};
+ await publisher.addInitScript(s=>localStorage.setItem("shuttleboard-v1",JSON.stringify(s)),storeA);
+ await follower.addInitScript(s=>localStorage.setItem("shuttleboard-v1",JSON.stringify(s)),storeB);
+ let written=null;
+ const mock=async route=>{
+  const request=route.request(),url=new URL(request.url()),method=request.method();
+  if(url.hostname==="127.0.0.1")return route.continue();
+  if(method==="OPTIONS")return route.fulfill({status:204,headers,body:""});
+  if(url.pathname==="/auth/v1/signup"&&method==="POST")
+   return route.fulfill({status:200,headers,body:JSON.stringify({
+    access_token:"test.token.session",refresh_token:"test.refresh",expires_in:3600,user:{id:AUTH_USER}
+   })});
+  if(url.pathname==="/rest/v1/user_tournament_links"){
+   if(method==="POST"){
+    written=JSON.parse(request.postData()||"{}");
+    publicRows.splice(0,publicRows.length,written);
+    return route.fulfill({status:204,headers,body:""});
+   }
+   if(method==="DELETE"){
+    publicRows.splice(0);
+    return route.fulfill({status:204,headers,body:""});
+   }
+   return route.fulfill({status:200,headers,
+    body:JSON.stringify(publicRows.map(r=>({
+     player_dbv_id:r.player_dbv_id,external_tournament_id:r.external_tournament_id,
+     title:r.title,start_date:r.start_date,end_date:r.end_date,updated_at:new Date().toISOString()
+    })))});
+  }
+  return route.fulfill({status:200,headers,body:"[]"});
+ };
+ await publisher.route("**/*",mock);
+ await follower.route("**/*",mock);
+ try{
+  await owner.goto("/#turniere");
+  await owner.locator("#add-tournament").click();
+  await owner.locator("#tournament-player").selectOption(PLAYER);
+  await owner.locator('#tournament-form input[name="url"]').fill(
+   "https://dbv.turnier.de/tournament/"+TOURNAMENT);
+  await owner.locator('#tournament-form input[name="name"]').fill("Jugendturnier Badminton");
+  await owner.locator('#tournament-form input[name="startDate"]').fill("2026-12-03");
+  await owner.locator("#tournament-share").check();
+  await owner.locator("#tournament-save").click();
+  await expect(owner.locator("#community-sync-status")).toContainText("Deine Follower können es sehen");
+  expect(written.player_dbv_id).toBe(PLAYER);
+  expect(written.external_tournament_id).toBe(TOURNAMENT);
+  expect(written.is_shared).toBe(true);
+  expect(written).not.toHaveProperty("friends");
+  expect(written).not.toHaveProperty("birthYear");
+
+  await reader.goto("/#start");
+  await reader.evaluate(id=>window.badmintonSelectViewer(id),PLAYER);
+  await expect(reader.locator("#shared-tournaments")).toContainText("Jugendturnier Badminton");
+  await expect(reader.locator("#shared-tournaments")).toContainText("Nutzerhinweis (unbestätigt)");
+  await expect(reader.locator("#shared-tournaments a")).toHaveAttribute("href",
+   "https://dbv.turnier.de/tournament/"+TOURNAMENT);
+
+  await owner.locator('[data-edit-id="'+TOURNAMENT+'"]').first().click();
+  await expect(owner.locator("#tournament-share")).toBeChecked();
+  await owner.locator("#tournament-share").uncheck();
+  await owner.locator("#tournament-save").click();
+  await expect(owner.locator("#community-sync-status")).toContainText("privat gespeichert");
+  await reader.evaluate(()=>window.dispatchEvent(new Event("badminton:community-refresh")));
+  await expect(reader.locator("#shared-tournaments")).not.toContainText("Jugendturnier Badminton");
+  const personal=await owner.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+  expect(personal.officialLinks).toHaveLength(1);
+ }finally{
+  await publisher.close();
+  await follower.close();
+ }
+});
