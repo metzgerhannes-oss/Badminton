@@ -1,3 +1,4 @@
+import {completedMatchWinner} from "./badminton-score-rules.mjs";
 /** Aggregate individually sourced third-party match cards, never rank points
  * or bulk Badhub career totals. Matches are explicitly not official DBV IDs. */
 export const SOURCE_TYPES=["Einzel","Doppel","Mixed"];
@@ -40,10 +41,8 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
    &&Array.isArray(games)&&games.length>=2&&games.length<=5
    &&games.every(g=>Array.isArray(g)&&g.length===2&&g.every(x=>Number.isInteger(x)&&x>=0&&x<=40)&&g[0]!==g[1]);
   if(!valid){excluded++;continue;}
-  const side1=games.filter(x=>x[0]>x[1]).length;
-  const side2=games.filter(x=>x[1]>x[0]).length;
-  const winner=side1>side2?1:side2>side1?2:null;
-  if(winner!==r.winning_side){excluded++;continue;}
+  const completion=completedMatchWinner(games);
+  if(!completion||completion.winningSide!==r.winning_side){excluded++;continue;}
   const won=r.player_side===r.winning_side;
   won?wins++:losses++;
   details.push({...r,won});

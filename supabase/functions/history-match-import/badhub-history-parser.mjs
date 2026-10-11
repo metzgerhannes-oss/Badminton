@@ -1,3 +1,4 @@
+import {completedMatchWinner} from "./badminton-score-rules.mjs";
 /** Publicly rendered match-card facts from a followed player's Badhub profile.
  * This is a separately source-labelled third-party transcription, NEVER an
  * official DBV match ID. Unknown sides, walkovers and malformed scores excluded.
@@ -34,13 +35,6 @@ function players(markup){
   .map(m=>plain(m[1])).filter(Boolean).slice(0,4);
 }
 function noteReject(counts,reason){counts[reason]=(counts[reason]||0)+1;}
-function validSetScore(score){
- if(!Array.isArray(score)||score.length!==2||!score.every(Number.isInteger))return false;
- const hi=Math.max(...score),lo=Math.min(...score);
- if(hi===21)return lo>=0&&lo<=19;
- if(hi>=22&&hi<=29)return hi-lo===2;
- return hi===30&&(lo===28||lo===29);
-}
 function sides(chunk,counts){
  const start=chunk.search(/class="[^"]*\bsp-match-body\b[^"]*"/);
  const mid=start<0?-1:start+chunk.slice(start).search(/class="[^"]*\bsp-result-col\b[^"]*"/);
@@ -60,13 +54,10 @@ function sides(chunk,counts){
  const scores=[...post.slice(0,rightStart).matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
   .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)].map(x=>Number(x[1])))
   .filter(s=>s.length===2&&s.every(x=>x>=0&&x<=40));
- if(scores.length<2||scores.length>3||scores.some(x=>!validSetScore(x))){
-  noteReject(counts,"incomplete_or_invalid_score");return null
- }
- const counted=[scores.filter(x=>x[0]>x[1]).length,scores.filter(x=>x[1]>x[0]).length];
- const winner=counted[0]===2?1:counted[1]===2?2:null;
+ const completion=completedMatchWinner(scores);
+ if(!completion){noteReject(counts,"incomplete_or_invalid_score");return null}
  const winningSide=winA?1:2;
- if(winner!==winningSide||counted[0]>2||counted[1]>2){
+ if(completion.winningSide!==winningSide){
   noteReject(counts,"winner_score_conflict");return null
  }
  const currentSide=ownA?1:2;
