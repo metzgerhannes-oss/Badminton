@@ -128,6 +128,26 @@ const scoreOutside15=scoreOutsideTour.replaceAll('sp-s">21','sp-s">15')
 assert.equal(parsePublicHistory(scoreOutside15,player,"tournament").items.length,1,
  "Completed 15-point match with an alternate score layout must be imported");
 
+
+// An isolated game is countable only if the public tournament title
+// expressly declares the DBV-approved 1×21 alternative.
+const single='<div class="sp-result-col"><div class="sp-set-score">'+
+ '<span class="sp-s">21</span><span class="sp-s">16</span></div></div>';
+const singleWithoutRule=tour.replace(games,single);
+assert.equal(parsePublicHistory(singleWithoutRule,player,"tournament").items.length,0);
+const singleWithRule=singleWithoutRule.replace('Jugend-Turnier','Jugend-Turnier 1×21');
+assert.equal(parsePublicHistory(singleWithRule,player,"tournament").items.length,1);
+assert.deepEqual(parsePublicHistory(singleWithRule,player,"tournament").items[0].games,[[21,16]]);
+const fiveWithDeuce=tour.replace('Jugend-Turnier','Jugend-Turnier 5×11')
+ .replace(games,'<div class="sp-result-col">'+
+ [ [11,7],[12,10],[15,14] ].map(([a,b])=>
+ '<div class="sp-set-score"><span class="sp-s">'+a+
+ '</span><span class="sp-s">'+b+'</span></div>').join("")+'</div>');
+assert.equal(parsePublicHistory(fiveWithDeuce,player,"tournament").items.length,1);
+const retirement=tour.replace(games,'<div class="sp-result-col"><span>Aufgabe</span></div>');
+assert.equal(parsePublicHistory(retirement,player,"tournament").items.length,0);
+assert.equal(parsePublicHistory(retirement,player,"tournament").rejection_reasons.marked_retirement,1);
+
 const sql=await readFile("database/external-match-import.sql","utf8");
 const cron=await readFile("database/external-match-cron.sql","utf8");
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");

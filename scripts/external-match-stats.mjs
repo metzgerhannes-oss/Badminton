@@ -46,7 +46,7 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
   if(!completion||completion.winningSide!==r.winning_side){excluded++;continue;}
   const won=r.player_side===r.winning_side;
   won?wins++:losses++;
-  details.push({...r,won});
+  details.push({...r,won,scoring:completion});
  }
  details.sort((a,b)=>b.match_year-a.match_year||
   String(b.match_date||"").localeCompare(String(a.match_date||""))||

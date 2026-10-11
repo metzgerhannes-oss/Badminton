@@ -1,5 +1,6 @@
 /** Badhub historical match details: same scoring and evidence rules as Home. */
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
+import {MATCH_RULES} from "./scripts/badminton-score-rules.mjs";
 import {getDbvMatchReference,getBadhubMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
@@ -96,7 +97,10 @@ function render(){
    '<span>'+esc(r.discipline)+'</span></div>'+
    '<strong>'+esc(r.competition||"Historisches Turnier")+'</strong>'+
    '<p>Gegen '+esc(opponent)+(partner?' · mit '+esc(partner):'')+'</p>'+
-   '<div class="external-match-foot"><span>Sätze: '+esc(gameScore(r))+(r.round_label?' · '+esc(r.round_label):'')+'</span>'+
+   '<div class="external-match-foot"><span>Sätze: '+esc(gameScore(r))+
+    (r.scoring?.ruleId?' · '+esc(MATCH_RULES[r.scoring.ruleId]?.label||r.scoring.ruleId)+
+       (r.scoring.ruleSource==="explicit"?' · laut Quellenangabe':' · aus Ergebnis abgeleitet'):'')+
+    (r.round_label?' · '+esc(r.round_label):'')+'</span>'+
    (url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Quellbeleg ↗</a>':'')+
    '</div></article>';
  }).join("");
