@@ -27,11 +27,27 @@ for(const category of ["turnier","liga"]){
   const maxEndpointHistogram={};
   const scoreLengthHistogram={};
   const shortPatterns={};
+  const skipKeywords={bye:0,rast:0,rust:0,freilos:0,spielfrei:0,wo:0,walkover:0,aufgabe:0,unknown:0};
+  const noScoreClassHints={};
   for(const chunk of html.split(/<div class="sp-match-item\b[^>]*>/).slice(1)){
    const values=[...chunk.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)]
      .map(x=>Number(x[1]))).filter(v=>v.length===2);
    const max=values.length?Math.max(...values.flat()):0;
+   if(values.length===0){
+    const keywords={bye:/\bBYE\b/i,rast:/\bRAST\b/i,rust:/\bRUST\b/i,
+      freilos:/\bFreilos\b/i,spielfrei:/\bspielfrei\b/i,
+      wo:/\bW[.]?O[.]?\b/i,walkover:/\bwalkover\b/i,aufgabe:/\bAufgabe\b/i};
+    let found=false;
+    for(const [key,re] of Object.entries(keywords))
+     if(re.test(chunk)){skipKeywords[key]++;found=true;}
+    if(!found)skipKeywords.unknown++;
+    // Aggregate CSS modifier families; do not output HTML or player details.
+    const names=[...chunk.matchAll(/class="([^"]+)"/g)].flatMap(m=>m[1].split(/\s+/))
+       .filter(v=>/^(sp-match|sp-side|sp-result|sp-status|sp-player)/.test(v))
+       .map(v=>v.replace(/\d+/g,"#"));
+    for(const name of new Set(names))noScoreClassHints[name]=(noScoreClassHints[name]||0)+1;
+   }
    const band=max>=30?"30+":max>=21?"21-29":max>=15?"15-20":max>=11?"11-14":max?"under11":"no-sets";
    scoreHistogram[band]=(scoreHistogram[band]||0)+1;
    const endpoint=String(max||0);maxEndpointHistogram[endpoint]=(maxEndpointHistogram[endpoint]||0)+1;
@@ -42,7 +58,7 @@ for(const category of ["turnier","liga"]){
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,skipKeywords,noScoreClassHints});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
