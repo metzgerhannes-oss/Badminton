@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {matchdayOverview} from "../scripts/live-radar.mjs";
+import {matchdayOverview,isExplicitNonplayedLiveMatch} from "../scripts/live-radar.mjs";
 const id="05-070879",checked_at="2026-10-11T13:00:00Z",now=Date.parse(checked_at);
 const row={dbv_id:id,provider:"Badhub",source_url:"https://badhub.de/spieler/"+id+"/live",checked_at,
  payload:{tournament:{name:"C-RLT"},running:{match_id:"m1",class:"HE U11",sets:[[11,8]],is_team1:1},
@@ -20,4 +20,12 @@ const empty=matchdayOverview({...row,payload:{...row.payload,running:null,next:{
 assert.equal(empty.queue,null);
 assert.equal(empty.hasPublishedGames,false);
 assert.equal(empty.pendingCount,0);
+assert.equal(isExplicitNonplayedLiveMatch({status:"BYE"}),true);
+assert.equal(isExplicitNonplayedLiveMatch({status:"Rast"}),true);
+assert.equal(isExplicitNonplayedLiveMatch({status:"Walkover"}),true);
+assert.equal(isExplicitNonplayedLiveMatch({opponent:"Rust",sets:[[21,17],[21,9]]}),false,"Surname Rust is not a bye");
+const skip=matchdayOverview({...row,payload:{...row.payload,
+ upcoming:[{status:"BYE"},...row.payload.upcoming],past:[{status:"Rast"},...row.payload.past]}},id,now);
+assert.equal(skip.shownResults,1,"BYE/Rast cannot count as played results");
+assert.equal(skip.pendingCount,2,"BYE cannot become a pending match");
 console.log("Matchday overview: sourced current/next/upcoming/past, deduplication and freshness.");

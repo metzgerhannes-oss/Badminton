@@ -137,6 +137,15 @@ export function sourceTime(value){
 
 /** A player-centred day view, never a guessed tournament-wide schedule.
  * The order is supplied by Badhub; deduplication requires explicit match IDs. */
+/** Never treat explicitly skipped BYE/Rast/W.O. entries as played games.
+ * Opponent names alone (e.g. surname Rust) are NOT evidence of a bye. */
+export function isExplicitNonplayedLiveMatch(match){
+ const m=object(match);if(!m)return false;
+ if(m.played===false)return true;
+ const flag=str(m.status||m.result_type||m.match_type||"",35).toUpperCase()
+   .replace(/[\\s._-]/g,"");
+ return new Set(["BYE","RAST","RUST","FREILOS","SPIELFREI","WALKOVER","WO","KAMPFLOS"]).has(flag);
+}
 export function matchdayOverview(row,id,now=Date.now()){
  const view=liveView(row,id,now);
  if(!["playing","next","tournament"].includes(view.status))return null;
@@ -148,6 +157,7 @@ export function matchdayOverview(row,id,now=Date.now()){
  const seen=new Set();
  if(view.running&&matchId(view.running))seen.add(matchId(view.running));
  const upcoming=view.upcoming.filter(m=>{
+  if(isExplicitNonplayedLiveMatch(m))return false;
   const key=matchId(m);
   if(key&&seen.has(key))return false;
   if(key)seen.add(key);
@@ -157,13 +167,13 @@ export function matchdayOverview(row,id,now=Date.now()){
   ?Math.min(99,view.next.queue_position):null;
  return {
   tournament:view.tournament,
-  running:view.running,
+  running:view.running&&!isExplicitNonplayedLiveMatch(view.running)?view.running:null,
   queue,
   upcoming,
-  past:view.past,
-  pendingCount:upcoming.length+(view.running?1:0),
+  past:view.past.filter(m=>!isExplicitNonplayedLiveMatch(m)),
+  pendingCount:upcoming.length+(view.running&&!isExplicitNonplayedLiveMatch(view.running)?1:0),
   // Counts refer only to the bounded provider snapshot, never total career matches.
-  shownResults:view.past.length,
-  hasPublishedGames:!!view.running||queue!==null||upcoming.length>0||view.past.length>0
+  shownResults:view.past.filter(m=>!isExplicitNonplayedLiveMatch(m)).length,
+  hasPublishedGames:!!(view.running&&!isExplicitNonplayedLiveMatch(view.running))||queue!==null||upcoming.length>0||view.past.some(m=>!isExplicitNonplayedLiveMatch(m))
  };
 }
