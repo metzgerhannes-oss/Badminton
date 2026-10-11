@@ -41,16 +41,30 @@ const temp=await mkdtemp(join(tmpdir(),"schmetterlinge-release-"));
 try{
   await Promise.all([
     writeFile(join(temp,"app-release.js"),release),
-    writeFile(join(temp,"sw.js"),sw)
+    writeFile(join(temp,"sw.js"),sw),
+    writeFile(join(temp,"index.html"),app),
+    writeFile(join(temp,"welcome.html"),welcome)
   ]);
   const sha="1234567890abcdef1234567890abcdef12345678";
   const stamp=resolve("scripts/stamp-release.mjs");
   execFileSync(process.execPath,[stamp],{cwd:temp,
     env:{...process.env,GITHUB_SHA:sha,GITHUB_RUN_NUMBER:"203"}});
-  const [builtJs,builtSw]=await Promise.all(["app-release.js","sw.js"].map(p=>readFile(join(temp,p),"utf8")));
+  const [builtJs,builtSw,builtApp,builtWelcome]=await Promise.all(["app-release.js","sw.js","index.html","welcome.html"].map(p=>readFile(join(temp,p),"utf8")));
   assert.match(builtJs,new RegExp('version:"'+version+'", build:"pages-203", commit:"'+sha+'"'));
   assert.ok(builtSw.includes('const CACHE="schmetterlinge-shell-'+version+'-'+sha.slice(0,10)+'"'),
     "Each deployment must change the worker bytes and thus refresh the PWA");
+  assert.match(builtApp,/data-app-version data-release-build="1234567890abcdef/);
+  assert.match(builtWelcome,/data-app-version data-release-build="1234567890abcdef/);
+  assert.match(builtApp,/id="app-build-info" data-release-build="1234567890abcdef/);
+  assert.match(builtApp,/pages-203 · Commit 1234567890abcdef/);
+  const lockedBadge={textContent:"v81",title:"",getAttribute:key=>key==="data-release-build"?sha:null};
+  const lockedInfo={textContent:"Version v81 · Build pages-203",getAttribute:key=>key==="data-release-build"?sha:null};
+  const lockedDoc={readyState:"complete",querySelectorAll:()=>[lockedBadge],
+    getElementById:id=>id==="app-build-info"?lockedInfo:null};
+  // A later network response must not relabel an older HTML shell.
+  vm.runInNewContext(builtJs,{window:{},document:lockedDoc});
+  assert.equal(lockedBadge.textContent,"v81");
+  assert.equal(lockedInfo.textContent,"Version v81 · Build pages-203");
   const builtBadge={textContent:"",attributes:{},setAttribute(k,v){this.attributes[k]=v}};
   const builtInfo={textContent:""};
   const builtDoc={readyState:"complete",querySelectorAll:()=>[builtBadge],
