@@ -1,5 +1,5 @@
 import {classifyNonPlayedCard} from "./nonplayed-rounds.mjs";
-import {completedMatchWinner} from "./badminton-score-rules.mjs";
+import {completedMatchWinner,explicitScoringRule} from "./badminton-score-rules.mjs";
 /** Publicly rendered match-card facts from a followed player's Badhub profile.
  * This is a separately source-labelled third-party transcription, NEVER an
  * official DBV match ID. Unknown sides, walkovers and malformed scores excluded.
@@ -36,7 +36,7 @@ function players(markup){
   .map(m=>plain(m[1])).filter(Boolean).slice(0,4);
 }
 function noteReject(counts,reason){counts[reason]=(counts[reason]||0)+1;}
-function sides(chunk,counts,year){
+function sides(chunk,counts,year,rule){
  const start=chunk.search(/class="[^"]*\bsp-match-body\b[^"]*"/);
  const mid=start<0?-1:start+chunk.slice(start).search(/class="[^"]*\bsp-result-col\b[^"]*"/);
  if(start<0||mid<start){noteReject(counts,"missing_match_layout");return null}
@@ -60,9 +60,9 @@ function sides(chunk,counts,year){
  let scores=readScores(post.slice(0,rightStart));
  if(scores.length===0){
   const alternate=readScores(chunk);
-  if(alternate.length>=2&&alternate.length<=5)scores=alternate;
+  if(alternate.length>=(rule==="1x21"?1:2)&&alternate.length<=5)scores=alternate;
  }
- const completion=completedMatchWinner(scores,{year});
+ const completion=completedMatchWinner(scores,{year,rule});
  if(!completion){
   noteReject(counts,"incomplete_or_invalid_score");
   return null;
@@ -95,7 +95,8 @@ function piece(source,segment,context,counts){
   const nextPhase=(chunk.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
   const nonplayed=classifyNonPlayedCard(chunk);
   if(nonplayed){noteReject(counts,nonplayed);continue;}
-  const data=sides(chunk,counts,context.year);
+  const rule=explicitScoringRule(context.title+" "+(context.event||""));
+  const data=sides(chunk,counts,context.year,rule);
   if(data){
    const event=context.event||plain((chunk.match(/class="sp-match-disc[^"]*"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    const kind=discipline(event);

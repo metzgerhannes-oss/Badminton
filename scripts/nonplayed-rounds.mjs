@@ -19,11 +19,17 @@ export function classifyNonPlayedCard(card){
   .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)])
   .filter(items=>items.length===2).length;
  const bye="BYE|RAST|RUST|FREILOS|SPIELFREI";
- const walkover="W[.]?O[.]?|WALKOVER|KAMPFLOS|AUFGABE";
+ const walkover="W[.]?O[.]?|WALKOVER|KAMPFLOS";
+ const retirement="AUFGABE|RETIRED|RETIREMENT|ABBRUCH";
+ const disqualified="DISQUALIFIKATION|DISQUALIFIZIERT|DISQUALIFIED";
  // The result column can explicitly mark a BYE even with contradictory scores.
  // An opponent's surname ("Rust", "Rast") never overrides a scored match.
  if(isolated(center,bye)||(!scores&&isolated(other,bye)))
   return scores?"conflicting_bye_with_scores":"confirmed_bye_rast";
+ if(isolated(center,retirement)||(!scores&&isolated(other,retirement)))
+  return "marked_retirement";
+ if(isolated(center,disqualified)||(!scores&&isolated(other,disqualified)))
+  return "marked_disqualification";
  if(isolated(center,walkover)||(!scores&&isolated(other,walkover)))
   return scores?"conflicting_walkover_with_scores":"marked_walkover";
  if(scores)return null;
