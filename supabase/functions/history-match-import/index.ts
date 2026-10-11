@@ -119,9 +119,16 @@ Deno.serve(async req=>{
   const excluded=Math.max(0,cardCount-all.length);
   const incomplete=sources.missing.length
    ?" · "+sources.missing.join(" und ")+"-Quelle derzeit nicht abrufbar; Gesamtbestand unvollständig":"";
+  const rejectedByReason={};
+  for(const result of parsed)for(const [reason,count] of Object.entries(result.rejection_reasons||{}))
+   rejectedByReason[reason]=(rejectedByReason[reason]||0)+count;
+  const reasonSummary=Object.entries(rejectedByReason)
+   .filter(([,count])=>Number.isSafeInteger(count)&&count>0)
+   .map(([reason,count])=>reason+":"+count).slice(0,12).join(", ");
   const detail=(finished
    ?String(all.length)+" einzelne Badhub-Matches aus erreichbaren Quellen verarbeitet; "+String(excluded)+" unklare Karten ausgeschlossen"
-   :String(progress)+" von "+String(all.length)+" geprüften Quellenspielen verarbeitet")+incomplete;
+   :String(progress)+" von "+String(all.length)+" geprüften Quellenspielen verarbeitet")+incomplete+
+   (reasonSummary?" · Prüfung: "+reasonSummary:"");
   await update(id,{
    status:importStatusForBatch(finished,excluded,sources.missing),
    cursor_offset:progress,source_count:cardCount,
