@@ -33,6 +33,7 @@
 <script type="module" src="./live-links.js"></script>
 <script type="module" src="./live-radar.js"></script>
 <script type="module" src="./live-hub.js"></script>
+<script type="module" src="./tournament-live.js"></script>
 <script type="module" src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
 <script type="module" src="./dashboard.js"></script>
@@ -193,8 +194,29 @@
     </details>
    </section>
    <section class="live-tournament-follow" id="live-tournament-follow" aria-labelledby="live-tournament-follow-title">
-    <h3 id="live-tournament-follow-title">Gesamtes Turnier verfolgen</h3>
-    <p>Turnier-Spielplan, Auslosungen und Ergebnisse beim offiziellen Veranstalter öffnen. Deine eigenen Begegnungen bleiben oben im Blick.</p>
+    <h3 id="live-tournament-follow-title">Turnierübersicht</h3>
+    <p>Alle bisher importierten, belegten Turnierbegegnungen direkt ansehen. Fehlende Matches werden nicht ergänzt oder geschätzt.</p>
+    <div class="tournament-live-toolbar">
+     <label for="tournament-live-select">Turnier auswählen</label>
+     <select id="tournament-live-select" aria-label="Gespeichertes Turnier auswählen"><option value="">Turniere werden geladen</option></select>
+     <button type="button" id="tournament-live-refresh" class="subtle-button">Aktualisieren</button>
+    </div>
+    <p class="tournament-live-count" id="tournament-live-count" role="status" aria-live="polite"></p>
+    <div class="tournament-live-filters" aria-label="Turnierspiele filtern">
+     <button type="button" data-tournament-status="all" aria-pressed="true">Alle</button>
+     <button type="button" data-tournament-status="live" aria-pressed="false">Jetzt</button>
+     <button type="button" data-tournament-status="upcoming" aria-pressed="false">Danach</button>
+     <button type="button" data-tournament-status="finished" aria-pressed="false">Gespielt</button>
+    </div>
+    <label class="tournament-court-label" for="tournament-court-filter">Feldfilter
+     <select id="tournament-court-filter" aria-label="Nach Spielfeld filtern" hidden><option value="all">Alle Felder</option></select>
+    </label>
+    <div id="tournament-live-content" class="tournament-live-content" role="region" aria-live="polite" aria-label="Belegte Begegnungen des Turniers"></div>
+    <details class="tournament-coverage">
+     <summary>Datenvollständigkeit und Quellen</summary>
+     <p>Es werden nur verifiziert importierte DBV-Turniermatches angezeigt. Nicht alle Turniere und Begegnungen liegen bereits im gemeinsamen Datenbestand vor. Ein aktiver Spielstand gilt nur mit einem maximal zwei Minuten alten Quellenabgleich als live. Keine zusätzlichen Badhub-Abfragen oder privaten Spielerdaten.</p>
+    </details>
+    <h4>Original-Spielplan beim Veranstalter</h4>
     <div id="live-tournament-links" class="live-tournament-links"></div>
    </section>
    <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">

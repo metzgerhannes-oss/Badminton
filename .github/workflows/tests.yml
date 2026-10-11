@@ -58,6 +58,8 @@ jobs:
           node --check live-links.js
           node --check live-radar.js
           node --check live-hub.js
+          node --check tournament-live.js
+          node --check scripts/tournament-live.mjs
           node --check scripts/live-radar.mjs
           node --check scripts/live-links.mjs
       - name: Run tests
@@ -94,6 +96,7 @@ jobs:
           node tests/live-links.mjs
           node tests/live-radar.mjs
           node tests/live-hub.mjs
+          node tests/tournament-live.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
           node tests/dbv-match-reference.mjs

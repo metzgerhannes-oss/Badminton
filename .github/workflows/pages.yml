@@ -22,6 +22,9 @@ jobs:
       - name: Validate
         run: |
           node --check app.js
+          node --check tournament-live.js
+          node --check scripts/tournament-live.mjs
+          node tests/tournament-live.mjs
           node --check app-release.js
           node --check scripts/stamp-release.mjs
           node --check club-branding.js
