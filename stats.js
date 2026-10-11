@@ -194,8 +194,10 @@ function render(){
    '<div class="dbv-reference-totals"><span><strong>'+esc(badhub.total)+
    '</strong> Spiele</span><span><strong>'+esc(badhub.wins)+
    '</strong> Siege</span><span><strong>'+esc(badhub.losses)+
-   '</strong> Niederlagen</span></div>'+
-   '<p>Quelle: '+esc(badhub.sourceName)+' · datierter Gesamtstand, keine Live-Abfrage.</p>'+
+   '</strong> Niederlagen</span><span><strong>'+esc(new Intl.NumberFormat("de-DE",{
+    style:"percent",minimumFractionDigits:1,maximumFractionDigits:1
+   }).format(badhub.total?badhub.wins/badhub.total:0))+
+   '</strong> Siegquote</span></div>'+
    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
  }
  retry.hidden=!availability.retry;

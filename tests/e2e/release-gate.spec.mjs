@@ -160,3 +160,23 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
   await expect(page.locator(".focused-profile")).toContainText("Philipp");
  }
 });
+
+test("v72 compact Badhub career summary on mobile",async ({page})=>{
+ for(const width of [320,375,390,768]){
+  await page.setViewportSize({width,height:700});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  const panel=page.locator("#match-stats-reference");
+  await expect(panel).toBeVisible();
+  await expect(panel.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9/]);
+  await expect(panel).not.toContainText("Quelle:");
+  await expect(panel.locator("a")).toContainText("Aktuellen Badhub-Stand öffnen");
+  const metrics=await panel.evaluate(el=>({
+   columns:getComputedStyle(el.querySelector(".dbv-reference-totals")).gridTemplateColumns.split(" ").length,
+   right:el.getBoundingClientRect().right,
+   contentRight:Math.max(...[...el.querySelectorAll(".dbv-reference-totals span")].map(x=>x.getBoundingClientRect().right))
+  }));
+  expect(metrics.columns).toBe(width<=500?2:4);
+  expect(metrics.right).toBeLessThanOrEqual(width+1);
+  expect(metrics.contentRight).toBeLessThanOrEqual(metrics.right+1);
+ }
+});
