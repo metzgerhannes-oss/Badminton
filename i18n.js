@@ -3,6 +3,7 @@
 (function () {
   const STORAGE_KEY = "schmetterlinge.uiLanguage";
   const DEFAULT_CDN = "https://schmetterlinge-language-packs.pages.dev";
+  const CATALOG_VERSION = 2;
   const SUPPORTED = ["de","en","fr","uk","ru","zh-Hans","tr","ar","it","es","pl"];
   const directions = {"ar":"rtl"};
   let selected = "auto";
@@ -91,7 +92,7 @@
         if ((!response || !response.ok) && "caches" in window) response = await caches.match(url);
         if (!response || !response.ok) continue;
         const json = await response.json();
-        if (json.meta?.locale !== lang || !json.messages || typeof json.messages !== "object") continue;
+        if (json.meta?.locale !== lang || json.meta?.version !== CATALOG_VERSION || !json.messages || typeof json.messages !== "object") continue;
         loaded.set(lang, json);
         // Explicit cache of cross-origin Cloudflare JSON, also on Safari without an active SW.
         if ("caches" in window) caches.open("schmetterlinge-i18n-v1")
