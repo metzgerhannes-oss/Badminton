@@ -9,7 +9,7 @@ const MAX_BYTES=900000;
 export function eventUrl(raw){
  try{
   const u=new URL(String(raw||""));
-  if(u.protocol!=="https:"||u.hostname!=="badhub.de"||u.port||u.username||u.password)return null;
+  if(u.protocol!=="https:"||u.hostname!=="badhub.de"||u.port||u.username||u.password||u.hash)return null;
   const m=u.pathname.match(/^\/([a-z]{2,5})\/turnier(?:\.php)?\/?$/);
   if(!m||!ASSOCIATIONS.has(m[1]))return null;
   const id=u.searchParams.get("id");
