@@ -29,4 +29,29 @@ for(const page of ["index.html","welcome.html"]){
  assert.match(html,/data-language-select/);
  assert.match(html,/<script defer src="\.\/i18n\.js"><\/script>/);
 }
+
+const mandatory=["i18n-extended-sources.json","i18n-label-sources.json","i18n-final-static-sources.json"]
+  .flatMap(file=>JSON.parse(fs.readFileSync(path.join(rootDir,"scripts",file),"utf8")));
+assert.equal(base.length,320,"Expected full static UI, help text and common runtime status inventory");
+for(const source of mandatory) assert.ok(base.includes(source),"Missing source phrase: "+source);
+
+const allowedUntranslated = new Set([
+ "Schmetterlinge · Badminton Jugend","Willkommen · Schmetterlinge Badminton",
+ "Schmetterlinge","SPVGG MÖSSINGEN · BADMINTON JUGEND","BADMINTON JUGEND","Badhub",
+ "U11","U13","U15","U17","U19","U22",
+ "Deutsch","English","Français","Türkçe","Italiano","Español","Polski",
+ "05-123456","Format 05-123456",
+ "https://dbv.turnier.de/player-profile/…","https://dbv.turnier.de/tournament/…",
+ "iPhone / iPad","Android","Safari","Google Chrome"
+]);
+for(const page of ["index.html","welcome.html"]){
+ const html=fs.readFileSync(path.join(rootDir,page),"utf8");
+ const content=[...html.matchAll(/>([^<>]+)</g)].map(x=>x[1].replaceAll("&amp;","&").trim());
+ const labels=[...html.matchAll(/(?:placeholder|aria-label|title)="([^"]+)"/g)].map(x=>x[1]);
+ const missing=[...new Set([...content,...labels])]
+  .filter(x=>x.length>2&&/[a-zäöüß]/i.test(x))
+  .filter(x=>!base.includes(x)&&!allowedUntranslated.has(x));
+ assert.deepEqual(missing,[],page+": untranslated static UI text");
+}
+
 console.log("i18n: "+packs.length+" locales, "+base.length+" matching keys, both screens wired");
