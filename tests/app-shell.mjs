@@ -7,8 +7,10 @@ const href=[...html.matchAll(/<link rel="stylesheet" href="\.\/([^"]+)"/g)].map(
 assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css"],
  "Application chrome must be the last CSS layer");
 const tabs=[...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]);
-assert.deepEqual(tabs,["start","turniere","spieler","berichte"]);
+assert.deepEqual(tabs,["start","turniere","live","spieler","berichte"]);
 assert.match(shell,/\.bottom-nav a\{width:25%!important/);
+assert.match(shell,/\.bottom-nav\.has-live-tab a\{width:20%!important/);
+assert.match(shell,/\.bottom-nav a\[hidden\]\{display:none!important\}/);
 assert.match(shell,/\.topbar-settings\{/);
 assert.match(shell,/@media\(max-width:410px\)/);
 assert.match(shell,/@media\(max-width:350px\)/);
