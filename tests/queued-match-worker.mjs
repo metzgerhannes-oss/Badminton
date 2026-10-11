@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+const sql=await readFile("database/queued-match-worker-v67.sql","utf8");
+assert.match(sql,/private\.continue_external_match_import/);
+assert.match(sql,/e\.status='queued' and e\.lease_until is null/);
+assert.match(sql,/j\.last_demand_at >= now\(\)-interval '14 days'/);
+assert.match(sql,/e\.status='awaiting_source'/);
+assert.match(sql,/e\.status='partial'/);
+assert.match(sql,/e\.status='loading'/);
+assert.match(sql,/extensions\.http_post/);
+assert.match(sql,/revoke all on function private\.continue_external_match_import\(\) from public,anon,authenticated/);
+assert.doesNotMatch(sql,/grant execute .*anon/);
+console.log("v67 queue worker stays demand-limited and private.");
