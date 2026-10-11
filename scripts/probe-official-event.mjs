@@ -46,7 +46,7 @@ for(const url of urls){
     console.log("TOURNAMENT_TARGETS",JSON.stringify(other).slice(0,5500));
    }
    if(u.pathname.includes("cookiewall")){
-    console.log("FORM",JSON.stringify([...body.matchAll(/<form[^>]*>[\\s\\S]*?<\\/form>/gi)].slice(0,2).map(x=>x[0].slice(0,1500))).slice(0,3300));
+    console.log("FORM",clean(body.slice(Math.max(0,body.indexOf("<form")),body.indexOf("<form")+2700)));
    }
    const markers=["__NEXT_DATA__","__NUXT__","__INITIAL_STATE__","application/ld+json","/api/","Matches","Spiele","matches","Auslosung","Live","tournamentsoftware"];
    console.log("MARKERS",markers.filter(m=>body.includes(m)).join(","));
