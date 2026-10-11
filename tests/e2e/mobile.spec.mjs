@@ -91,7 +91,7 @@ test("Home uses one Badhub career summary; filters retain separately evidenced m
  await expect(page.locator("#match-stats-source")).toHaveText("Badhub · Karrierebilanz");
  const reference=page.locator("#match-stats-reference");
  await expect(reference).toBeVisible();
- await expect(reference.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9\\s*%/]);
+ await expect(reference.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9\s*%/]);
  await expect(reference).not.toContainText("Quelle:");
  await expect(reference).not.toContainText("Screenshot");
  await expect(reference).not.toContainText("keine Live-Abfrage");
