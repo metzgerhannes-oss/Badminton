@@ -11,9 +11,13 @@ export function classifyNonPlayedCard(card){
  if(result<0||away<0)return null;
  const center=body.slice(result,away),other=body.slice(away);
  const scores=(center.match(/class="[^"]*\bsp-set-score\b/g)||[]).length;
- if(isolated(center+" "+other,"BYE|RAST|RUST|FREILOS|SPIELFREI"))
+ const bye="BYE|RAST|RUST|FREILOS|SPIELFREI";
+ const walkover="W[.]?O[.]?|WALKOVER|KAMPFLOS|AUFGABE";
+ // The result column can explicitly mark a BYE even with contradictory scores.
+ // An opponent's surname ("Rust", "Rast") never overrides a scored match.
+ if(isolated(center,bye)||(!scores&&isolated(other,bye)))
   return scores?"conflicting_bye_with_scores":"confirmed_bye_rast";
- if(isolated(center+" "+other,"W[.]?O[.]?|WALKOVER|KAMPFLOS|AUFGABE"))
+ if(isolated(center,walkover)||(!scores&&isolated(other,walkover)))
   return scores?"conflicting_walkover_with_scores":"marked_walkover";
  if(scores)return null;
  const opponent=/class="[^"]*\bsp-name-full\b/.test(other);
