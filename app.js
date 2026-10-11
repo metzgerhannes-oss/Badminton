@@ -193,6 +193,10 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
   routeTo(destination);
  return true;
 };
+window.badmintonTournamentOptions=()=>state.officialLinks.slice().sort((a,b)=>{
+ const order={today:0,future:1,unknown:2,past:3};
+ return order[bookmarkPhase(a)[1]]-order[bookmarkPhase(b)[1]]||a.name.localeCompare(b.name,"de");
+});
 window.badmintonLiveViewerOptions=()=>({
  own:state.players.map(p=>({id:p.id,name:p.name})),
  friends:state.friends.map(p=>({id:p.id,name:p.name})),
@@ -219,6 +223,7 @@ function render(){
  renderFocusHeader();
  renderTournaments();
  renderLiveTournamentLinks();
+ window.dispatchEvent(new CustomEvent("badminton:tournament-bookmarks"));
  renderProfiles();
  renderFriends();
  renderFriendQuick();

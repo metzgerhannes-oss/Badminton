@@ -91,3 +91,40 @@
 .live-tournament-links .matchday-event-note{margin:3px 0;color:#627b8e;font-size:11px}
 .app[data-current-view="live"] #view-turniere .live-tournament-follow{border-color:#77bce4}
 @media(max-width:350px){.matchday-overview{padding:10px}.matchday-count{padding:9px 6px}.matchday-count small{font-size:10px}}
+
+
+/* v82: inline official tournament match browser, intentionally separate from Badhub personal live radar. */
+.tournament-live-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end;margin:15px 0 10px}
+.tournament-live-toolbar label{grid-column:1/-1;color:#315c78;font-size:12px;font-weight:800}
+.tournament-live-toolbar select,.tournament-court-label select{width:100%;min-width:0;min-height:46px;padding:9px 10px;border:1px solid #afcede;border-radius:11px;background:#fff;color:#173d5e;font-size:13px}
+.tournament-live-toolbar button{min-height:46px;font-size:12px;padding:8px 11px;border-radius:11px}
+.tournament-live-count{font-size:11px;line-height:1.5;color:#567187;margin:6px 0 10px}
+.tournament-live-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:8px 0 12px}
+.tournament-live-filters button{min-height:44px;min-width:0;padding:7px 3px;background:#edf6fc;border:1px solid #c5deec;border-radius:9px;color:#215171;font-size:clamp(10px,2.5vw,12px);font-weight:800}
+.tournament-live-filters button[aria-pressed="true"]{background:#126eaa;border-color:#126eaa;color:#fff}
+.tournament-court-label{display:grid;gap:5px;font-size:11px;font-weight:760;color:#476984;margin-bottom:12px}
+.tournament-court-label[hidden]{display:none!important}
+.tournament-court-label select[hidden]{display:none!important}
+.tournament-live-content{display:grid;gap:8px}
+.event-match-card{display:grid;gap:9px;border:1px solid #d0e2ee;border-radius:12px;padding:12px;background:#fafcff;min-width:0}
+.event-status-live{border-left:4px solid #118a7b}
+.event-status-finished{border-left:4px solid #9db5c3}
+.event-match-top,.event-match-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;align-items:center}
+.event-match-top strong{font-size:13px;color:#133e61}
+.event-match-status{color:#325d7a;background:#e8f2fa;border-radius:8px;padding:5px 7px;font-size:10px;font-weight:850}
+.event-status-live .event-match-status{color:#087b60;background:#daf7ed}
+.event-match-players{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center;font-size:12px;color:#183f5b}
+.event-match-players span:first-child{text-align:right}
+.event-match-players span:last-child{text-align:left}
+.event-versus{color:#7b94a8;font-weight:800}
+.event-match-meta{font-size:11px;color:#436e88}
+.event-match-meta strong{font-variant-numeric:tabular-nums;color:#0e3c60;font-size:12px}
+.event-match-caveat{color:#657e91;font-size:10px}
+.event-empty{display:grid;gap:8px;background:#f6faff;border:1px dashed #b5d3e5;border-radius:12px;padding:14px;color:#2f5976}
+.event-empty strong{font-size:13px}
+.event-empty p{font-size:12px;margin:0;line-height:1.55}
+.tournament-coverage{margin:12px 0 15px;border-top:1px solid #d6e8f0;padding-top:5px}
+.tournament-coverage summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:11px;font-weight:780;color:#4e7590}
+.tournament-coverage p{font-size:11px;line-height:1.55;color:#60788b}
+.live-tournament-follow h4{font-size:13px;color:#285675;margin:15px 0 5px}
+@media(max-width:350px){.event-match-card{padding:10px 8px}.tournament-live-filters{gap:3px}}
