@@ -18,21 +18,23 @@ language quality. Untranslated text falls back to German.
 - The UI supports Arabic right-to-left direction. Player names, club names,
   official event titles, DBV IDs and numerical match calculations remain
   unchanged.
-- Optional Cloudflare Pages Free static hosting: create a Pages project tied
-  to repository `metzgerhannes-oss/Badminton`, branch `main`, output
-  directory `locales`, no build command, root `/`. A verified Pages URL
-  may be configured as `window.SCHMETTERLINGE_LANGUAGE_BASE_URL` before
-  loading `i18n.js`; the same-origin catalogs remain a fallback.
+- Cloudflare Pages Free static hosting is active at
+  `https://schmetterlinge-language-packs.pages.dev`. It follows GitHub
+  repository `metzgerhannes-oss/Badminton`, branch `main`, output directory
+  `locales`, without a build command or Pages Functions.
+- This verified Pages URL is the default catalog source, with a 1.2-second
+  timeout and same-origin GitHub Pages catalogs as the offline/outage fallback.
+  `window.SCHMETTERLINGE_LANGUAGE_BASE_URL` can override the URL if needed.
+  Passing an empty string disables the CDN.
 - No paid Cloudflare R2/KV/D1/Workers, translation APIs or additional
   Supabase tables are required.
 
 ## External hosting state
 
-The linked Cloudflare account initially had no Pages projects. Attempting
-to connect the GitHub repository for Pages through Cloudflare's API returned
-error 8000011 (Pages Git installation issue). Reauthorization of the
-Cloudflare GitHub integration is required for that route. Do **not** set a
-Cloudflare URL before a successful deployment.
+The GitHub integration was reauthorized and the Cloudflare Pages project
+`schmetterlinge-language-packs` was created. The first deployment succeeded
+on 11 October 2026, with 12 static files uploaded (11 JSON catalogs and
+`manifest.json`). No paid services or Functions were enabled.
 
 ## Verification
 
