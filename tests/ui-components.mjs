@@ -22,5 +22,5 @@ assert.match(components,/\.kpi-tile,\.kpi-wide,\.dashboard-empty-tile/);
 assert.match(legacy,/\.ranking-dialog\{width:calc/);
 assert.match(design,/\.library-club-group/);
 assert.match(cache,/"\.\/ui-components.css"/);
-assert.match(cache,/schmetterlinge-shell-v69/);
+assert.match(cache,/schmetterlinge-shell-v70/);
 console.log("v65 component cascade, extracted home and player cards, dialogs, preserved legacy bases and PWA cache verified.");
