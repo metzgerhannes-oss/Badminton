@@ -28,22 +28,22 @@ if (process.argv.includes("--verify")) {
   const pages = ["index.html", "welcome.html"];
   const originals = await Promise.all(pages.map(p => readFile(p, "utf8")));
   const stampedPages = originals.map((html, i) => {
-    const badges = [...html.matchAll(/<span\\b[^>]*\\bdata-app-version\\b[^>]*>[^<]*<\\/span>/g)];
+    const badges = [...html.matchAll(/<span\b[^>]*\bdata-app-version\b[^>]*>[^<]*<\/span>/g)];
     assert.equal(badges.length, 1, "Expected exactly one release badge in " + pages[i]);
     assert.ok(badges[0][0].includes(">" + version + "</span>"),
       "HTML badge must match the canonical release: " + pages[i]);
     const badge = badges[0][0];
-    let updatedBadge = badge.replace(/\\stitle="[^"]*"/, "");
+    let updatedBadge = badge.replace(/\stitle="[^"]*"/, "");
     updatedBadge = updatedBadge.replace(" data-app-version",
       ' data-app-version data-release-build="' + sha + '" title="Version ' + version +
       ' · Build pages-' + run + ' · Commit ' + sha + '"');
     let updated = html.replace(badge, updatedBadge);
     if (pages[i] === "index.html") {
-      const info = /<p\\b[^>]*\\bid="app-build-info"[^>]*>[^<]*<\\/p>/;
+      const info = /<p\b[^>]*\bid="app-build-info"[^>]*>[^<]*<\/p>/;
       assert.match(updated, info, "Settings build info missing");
       updated = updated.replace(info, match => match
         .replace('id="app-build-info"', 'id="app-build-info" data-release-build="' + sha + '"')
-        .replace(/>[^<]*<\\/p>$/, '>Version ' + version + ' · Build pages-' + run +
+        .replace(/>[^<]*<\/p>$/, '>Version ' + version + ' · Build pages-' + run +
           ' · Commit ' + sha + '</p>'));
     }
     return updated;
