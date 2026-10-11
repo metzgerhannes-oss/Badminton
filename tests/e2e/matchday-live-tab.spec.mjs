@@ -203,3 +203,13 @@ test("Stale player snapshots must not present old sets as live scores",async ({p
  await expect(page.locator(".followed-live-card").first()).not.toContainText("15:2");
  await expect(page.locator(".followed-live-card").first()).not.toContainText("Spielt gerade");
 });
+
+test("research only: official tournament's public browser consent pathway",async ({page})=>{
+ try{
+  const res=await page.goto("https://dbv.turnier.de/tournament/F7B661DD-BC15-4B5B-B38D-49D48FD9A67A",{timeout:15000,waitUntil:"domcontentloaded"});
+  console.log("OFFICIAL_PROBE",JSON.stringify({status:res?.status(),url:page.url(),title:await page.title(),
+   forms:await page.locator("form").evaluateAll(xs=>xs.slice(0,4).map(f=>({action:f.action,method:f.method,buttons:[...f.querySelectorAll("button")].map(x=>({text:x.textContent.trim().slice(0,70),type:x.type,name:x.name,value:x.value})),inputs:[...f.querySelectorAll("input")].map(x=>({name:x.name,type:x.type,checked:x.checked}))}))),
+   buttons:(await page.getByRole("button").allTextContents()).slice(0,12)
+  }));
+ }catch(e){console.log("OFFICIAL_PROBE_ERROR",String(e).slice(0,200))}
+});
