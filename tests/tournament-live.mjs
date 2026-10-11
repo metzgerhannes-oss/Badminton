@@ -40,6 +40,7 @@ assert.equal(old.label,"Stand prüfen");
 assert.deepEqual(old.sets,[],"Stale live points must not be shown");
 assert.equal(toMatch({...first,match_games:[{game_number:1,side1_points:999,side2_points:4}]},now).sets.length,0);
 assert.equal(toMatch({...first,status:"walkover"},now).category,"other","Walkover is not a played match");
+assert.deepEqual(toMatch({...first,status:"walkover"},now).sets,[],"Walkover/BYE must never present sets as played");
 assert.equal(toMatch({...first,status:"cancelled"},now).label,"Abgesagt");
 assert.equal(filterTournament(rows,{status:"finished"}).length,1);
 assert.equal(filterTournament(rows,{court:"5"}).length,2);

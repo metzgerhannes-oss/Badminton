@@ -55,7 +55,7 @@ export function toMatch(row,now=Date.now()){
   side1:names(1),side2:names(2),court:bounded(row.court,45),
   scheduledAt:Number.isFinite(Date.parse(row.scheduled_at||""))?row.scheduled_at:null,
   // A stale provisional score is not advertised as a live score.
-  sets:category==="live"&&!liveFresh?[]:games,
+  sets:category==="other"||(category==="live"&&!liveFresh)?[]:games,
   source:typeof row.source_url==="string"&&eventId(row.source_url)?row.source_url:null
  };
 }
