@@ -25,6 +25,7 @@ for(const category of ["turnier","liga"]){
   // Anonymous histogram of set-size patterns; helps identify youth shortened games.
   const scoreHistogram={};
   const maxEndpointHistogram={};
+  const scoreLengthHistogram={};
   for(const chunk of html.split(/<div class="sp-match-item\b[^>]*>/).slice(1)){
    const values=[...chunk.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)]
@@ -33,12 +34,13 @@ for(const category of ["turnier","liga"]){
    const band=max>=30?"30+":max>=21?"21-29":max>=15?"15-20":max>=11?"11-14":max?"under11":"no-sets";
    scoreHistogram[band]=(scoreHistogram[band]||0)+1;
    const endpoint=String(max||0);maxEndpointHistogram[endpoint]=(maxEndpointHistogram[endpoint]||0)+1;
+   const scoreType=endpoint+"/"+values.length+" sets";scoreLengthHistogram[scoreType]=(scoreLengthHistogram[scoreType]||0)+1;
   }
   results.push({source:category,cardCount:data.cards_seen,accepted:data.items.length,
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
