@@ -9,7 +9,7 @@ const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
 let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
 let busy=false,timer;
-const displayed=()=>location.hash==="#turniere"&&!document.hidden;
+const displayed=()=>(location.hash==="#turniere"||location.hash==="#live")&&!document.hidden;
 function element(tag,cls,value){
  const e=document.createElement(tag);
  if(cls)e.className=cls;
@@ -76,6 +76,7 @@ function sourceShortcut(row,id){
 function render(row,id){
  reset();const box=root();if(!box)return;
  const situation=radarSituation(row,id);
+  window.dispatchEvent(new CustomEvent("badminton:live-evidence",{detail:{playerId:id,active:situation.kind==="current"}}));
  box.dataset.state=situation.kind;
  // Source freshness is supporting metadata, never the main status message.
  const top=element("div","radar-summary");
