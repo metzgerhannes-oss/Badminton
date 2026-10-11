@@ -36,13 +36,39 @@ export function normalizeProfile(fields){
  return {id,name,club,birthYear,url:parsed.url};
 }
 
-export function addProfileToStore(previous,profile){
+const DBV_ID=/^\\d{2}-\\d{6}$/;
+const comparable=value=>String(value??"").normalize("NFKC").trim().replace(/\\s+/g," ").toLocaleLowerCase("de");
+function sameKnownValue(a,b){
+ // A missing detail cannot disprove identity; conflicting known details can.
+ return !a||!b||comparable(a)===comparable(b);
+}
+function matchingLocalIndex(players,profile){
+ const matches=players.map((candidate,index)=>({candidate,index})).filter(({candidate})=>
+  /^local-/.test(candidate.id)&&comparable(candidate.name)===comparable(profile.name)&&
+  sameKnownValue(candidate.club,profile.club)&&sameKnownValue(candidate.birthYear,profile.birthYear));
+ // Repair only if the confirmed player unambiguously identifies one local entry.
+ return matches.length===1?matches[0].index:-1;
+}
+/** "confirmed" is only for an explicitly selected verified directory row.
+ * Existing local profiles are not silently upgraded by matching a name alone.
+ */
+export function addProfileToStore(previous,profile,{confirmed=false}={}){
  const saved=previous&&typeof previous==="object"&&!Array.isArray(previous)?previous:{};
  const players=Array.isArray(saved.players)?saved.players.filter(x=>x&&typeof x.id==="string"&&typeof x.name==="string"):[];
+ if(confirmed&&!DBV_ID.test(profile.id))throw Error("Der ausgewählte Spieler hat keine bestätigte DBV-ID. Bitte erneut suchen.");
  if(players.some(p=>p.id===profile.id))throw Error("Diese DBV-Spieler-ID ist bereits als eigenes Profil angelegt. Öffne die App und bearbeite sie dort.");
- const active=typeof saved.activeProfileId==="string"&&players.some(p=>p.id===saved.activeProfileId)?saved.activeProfileId:profile.id;
- return {...saved,players:[...players,profile],friends:Array.isArray(saved.friends)?saved.friends:[],
-  officialLinks:Array.isArray(saved.officialLinks)?saved.officialLinks:[],
+ const repairedIndex=confirmed?matchingLocalIndex(players,profile):-1;
+ const priorId=repairedIndex>=0?players[repairedIndex].id:"";
+ const nextPlayers=repairedIndex>=0
+  ?players.map((p,i)=>i===repairedIndex?{...p,...profile,id:profile.id}:p)
+  :[...players,profile];
+ const active=confirmed?profile.id:(
+  typeof saved.activeProfileId==="string"&&players.some(p=>p.id===saved.activeProfileId)
+   ?saved.activeProfileId:profile.id);
+ const officialLinks=Array.isArray(saved.officialLinks)?saved.officialLinks.map(link=>
+  priorId&&link?.playerId===priorId?{...link,playerId:profile.id}:link):[];
+ const friends=Array.isArray(saved.friends)?saved.friends.filter(p=>!confirmed||p?.id!==profile.id):[];
+ return {...saved,players:nextPlayers,friends,officialLinks,
   activeProfileId:active,chosen:active,historyProfilesInitialized:true};
 }
 
