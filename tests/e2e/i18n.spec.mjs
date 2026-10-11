@@ -58,3 +58,37 @@ test("Cloudflare CDN outage falls back to bundled offline-ready catalog", async 
   await expect(page.locator("html")).toHaveAttribute("lang","it");
   expect(intercepted).toBeGreaterThan(0);
 });
+
+
+test("English translates longer explanatory copy and dynamically set search status",async ({page})=>{
+ await page.goto("/welcome.html");
+ await page.locator("#welcome-language").selectOption("en");
+ await expect(page.locator(".welcome-hero")).toContainText("All rankings, tournaments and reports");
+ await expect(page.locator("#welcome-search-status")).toHaveText("Enter at least two characters to find players.");
+ await expect(page.locator("#setup-title")).toHaveText("Whose badminton journey would you like to follow?");
+});
+test("French translates privacy notices while preserving DBV and Supabase",async ({page})=>{
+ await page.goto("/#einstellungen");
+ await page.locator("#app-language").selectOption("fr");
+ await expect(page.locator(".language-settings .settings-hint")).toContainText("Ce choix s’applique à cet appareil");
+ const text=await page.locator("#view-einstellungen").innerText();
+ expect(text).toContain("Schmetterlinge met également à disposition");
+ expect(text).toContain("Supabase");
+ expect(text).not.toContain("Deine eigenen Profile, gefolgten Spieler");
+});
+test("Arabic shows translated onboarding content in RTL",async ({page})=>{
+ await page.goto("/welcome.html");
+ await page.locator("#welcome-language").selectOption("ar");
+ await expect(page.locator("html")).toHaveAttribute("dir","rtl");
+ await expect(page.locator("#welcome-search-status")).toHaveText("أدخل حرفين على الأقل للبحث عن اللاعبين.");
+ await expect(page.locator(".welcome-hero")).toContainText("كل التصنيفات والبطولات");
+});
+test("Offline source has complete extended local copy",async ({page})=>{
+ await page.route("https://schmetterlinge-language-packs.pages.dev/**",route=>route.abort());
+ await page.goto("/welcome.html#installation");
+ await page.locator("#welcome-language").selectOption("en");
+ await expect(page.locator("#install-title")).toHaveText("Open Schmetterlinge like an app");
+ await expect(page.locator("#onboard-install")).toContainText("No App Store installation required");
+ await page.locator("#install-ios").click();
+ await expect(page.locator("#install-ios-steps")).toContainText("Open the Schmetterlinge page in");
+});
