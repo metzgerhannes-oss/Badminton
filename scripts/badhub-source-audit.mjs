@@ -16,6 +16,7 @@ for(const category of ["turnier","liga"]){
   const html=await response.text();
   if(html.length>5500000)throw Error("Oversize page");
   const data=parsePublicHistory(html,player,category==="turnier"?"tournament":"league");
+  if(category==="turnier")showFourUnscored(html);
   const grouped={};
   for(const item of data.items){
    const key=item.category+":"+(item.match_year||"unknown")+":"+item.competition_id;
@@ -78,3 +79,53 @@ for(const category of ["turnier","liga"]){
 }
 console.log("Sourced match-card diagnostic (no personally identifying match data):");
 console.log(JSON.stringify(results));
+
+function textOnly(html){return String(html||"").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&")
+ .replace(/&nbsp;|&#160;/g," ").replace(/\s+/g," ").trim().slice(0,140);}
+function showFourUnscored(html){
+ const output=[];
+ const tournaments=html.split(/<div class="card sp-tournament-card(?: [^"]*)?">/).slice(1);
+ for(const eventBlock of tournaments){
+  const title=eventBlock.match(/class="sp-tournament-name"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
+  if(!title)continue;
+  const competition=textOnly(title[3]),source="https://badhub.de/"+title[1]+"/turnier.php?id="+title[2];
+  const date=eventBlock.match(/class="sp-tournament-meta"[^>]*>([\s\S]*?)<\/span>/);
+  for(const meeting of eventBlock.split(/<div class="sp-meeting">/).slice(1)){
+   const event=meeting.match(/class="sp-t-event-badge"[^>]*>([\s\S]*?)<\/span>/);
+   const pieces=meeting.split(/<div class="sp-match-item\b[^>]*>/);
+   let round=(pieces[0].match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
+   for(let i=1;i<pieces.length;i++){
+    const chunk=pieces[i];
+    const nextPhase=chunk.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/);
+    const sets=[...chunk.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
+     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)].map(x=>Number(x[1])))
+     .filter(pair=>pair.length===2);
+    if(!sets.length){
+     const start=chunk.search(/class="[^"]*\bsp-match-body\b/);
+     const mid=chunk.search(/class="[^"]*\bsp-result-col\b/);
+     const right=chunk.search(/class="(?=[^"]*\bsp-side\b)(?=[^"]*\bsp-side--away\b)[^"]*"/);
+     const home=start>=0&&mid>start?chunk.slice(start,mid):"";
+     const away=right>=0?chunk.slice(right):"";
+     const names=x=>[...x.matchAll(/class="sp-name-full"[^>]*>([\s\S]*?)<\/span>/g)]
+      .map(n=>textOnly(n[1])).filter(Boolean).slice(0,2);
+     const winClass=/class="(?=[^"]*\bsp-side\b)(?=[^"]*\bsp-side--winner\b)[^"]*"/;
+     const selfOnHome=/sp-player-name--self/.test(home),selfOnAway=/sp-player-name--self/.test(away);
+     const winHome=winClass.test(home),winAway=winClass.test(away);
+     const midText=mid>=0&&right>mid?textOnly(chunk.slice(mid,right)):"";
+     const flagged=chunk.match(/class="sp-match-item[^"]*"|sp-match-item--t-(?:won|lost)/);
+     output.push({
+      competition,date:textOnly(date?.[1]),event:textOnly(event?.[1]),
+      round:textOnly(round),source,
+      home:names(home),away:names(away),selfOnHome,selfOnAway,
+      boldHome:winHome,boldAway:winAway,
+      resultText:midText,cardType:flagged?.[0]||null
+     });
+    }
+    if(nextPhase)round=nextPhase[1];
+   }
+  }
+ }
+ console.log("UNSCORED_PUBLIC_BW_MATCHES_START");
+ console.log(JSON.stringify(output));
+ console.log("UNSCORED_PUBLIC_BW_MATCHES_END");
+}
