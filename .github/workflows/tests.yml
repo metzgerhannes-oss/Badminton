@@ -90,7 +90,8 @@ jobs:
           node tests/external-match-consistency.mjs
           node tests/match-availability.mjs
           node tests/design-v2.mjs
-           node tests/app-shell.mjs
+          node tests/app-shell.mjs
+          node tests/ui-components.mjs
           node tests/ux-foundation.mjs
           node tests/supabase-read.mjs
           node tests/report-read-client.mjs
