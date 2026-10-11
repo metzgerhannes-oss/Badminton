@@ -89,3 +89,34 @@ test("v65 extracted home cards and dialogs retain readable component styling",as
   await expect(page.locator("#player-dialog")).not.toBeVisible();
  }
 });
+
+test("v68 legacy cleanup preserves active app views and dialog on narrow layouts",async ({page})=>{
+ for(const width of [320,375,390]){
+  await page.setViewportSize({width,height:700});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#view-start")).toBeVisible();
+  const base=await page.locator(".bottom-nav").evaluate(el=>{
+   const css=getComputedStyle(el);
+   return {position:css.position,display:css.display};
+  });
+  expect(base.position).toBe("fixed");
+  expect(base.display).toBe("flex");
+  const brand=await page.locator(".brand-logo").evaluate(el=>({
+   clip:getComputedStyle(el).clipPath,mask:getComputedStyle(el).maskImage
+  }));
+  expect(brand.clip).toBe("none");
+  expect(brand.mask).toBe("none");
+  for(const view of ["turniere","spieler","berichte"]){
+   await page.locator('.bottom-nav a[data-page="'+view+'"]').click();
+   await expect(page.locator("#view-"+view)).toBeVisible();
+  }
+  await page.locator('.bottom-nav a[data-page="spieler"]').click();
+  await page.locator("#add-player").click();
+  await expect(page.locator("#player-dialog")).toBeVisible();
+  await page.locator("#cancel-dialog").click();
+  await expect(page.locator("#player-dialog")).not.toBeVisible();
+  await page.locator(".brand").click();
+  await expect(page.locator("#view-start")).toBeVisible();
+  await expect(page.locator(".focused-profile")).toContainText("Philipp");
+ }
+});
