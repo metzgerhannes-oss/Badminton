@@ -4,6 +4,7 @@ import vm from "node:vm";
 
 const script=await readFile("app.js","utf8");
 const storageScript=await readFile("state-storage.js","utf8");
+const bookmarksScript=await readFile("tournament-bookmarks.js","utf8");
 const styles=await readFile("styles.css","utf8");
 const store=new Map([["shuttleboard-v1",JSON.stringify({
  players:[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"}],
@@ -16,6 +17,7 @@ const context=vm.createContext({
  document:{addEventListener(){},getElementById:id=>id==="focused-profile"?header:null}
 });
 vm.runInContext(storageScript,context,{filename:"state-storage.js"});
+vm.runInContext(bookmarksScript,context,{filename:"tournament-bookmarks.js"});
 vm.runInContext(script,context,{filename:"app.js"});
 const run=q=>vm.runInContext(q,context);
 run("restore()"); // Existing local profiles survive neutral default onboarding.
