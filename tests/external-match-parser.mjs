@@ -99,6 +99,23 @@ const youth15=tour.replace(/21/g,"15").replace(/18/g,"10").replace(/13/g,"7");
 assert.equal(parsePublicHistory(youth15,player,"tournament").items.length,1,
  "Completed 15-point youth match must be counted");
 
+// BYE/Rast is a round advancement, not a match win.
+const byeCard=card.replace(games,'<div class="sp-result-col"><span>BYE</span></div>')
+ .replace('>Test Gegnerin<','>Rast<');
+const bye=parsePublicHistory(tour.replace(card,byeCard),player,"tournament");
+assert.equal(bye.items.length,0);
+assert.equal(bye.rejection_reasons.confirmed_bye_rast,1);
+const noScore=card.replace(games,'<div class="sp-result-col"></div>');
+const unresolved=parsePublicHistory(tour.replace(card,noScore),player,"tournament");
+assert.equal(unresolved.items.length,0);
+assert.equal(unresolved.rejection_reasons.unscored_with_opponent,1);
+const byeScored=card.replace('class="sp-result-col"',
+ 'class="sp-result-col"><span>BYE</span><div data-ignore="');
+const conflict=parsePublicHistory(tour.replace(card,byeScored),player,"tournament");
+assert.equal(conflict.items.length,0,"Contradictory BYE and scores never count");
+const realRust=card.replace('>Test Gegnerin<','>Rust<');
+assert.equal(parsePublicHistory(tour.replace(card,realRust),player,"tournament").items.length,1);
+
 const sql=await readFile("database/external-match-import.sql","utf8");
 const cron=await readFile("database/external-match-cron.sql","utf8");
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");
