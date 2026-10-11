@@ -1,31 +1,27 @@
-# DBV-Zählweisen und Quellenbelege (v72, 11.10.2026)
+# Spielstatistik nach gemeldetem Satz- und Matchergebnis – v72 (11.10.2026)
 
-## Fachlich verbindliche Regeln
+## Verbindliche Importlogik
 
-- **3×21:** zwei Gewinnsätze, ab 20:20 zwei Punkte Vorsprung, Höchststand 30 (gültig: 30:28 und 30:29).
-- **3×15:** zwei Gewinnsätze, ab 14:14 zwei Punkte Vorsprung, Höchststand 21 (gültig: 21:19 und 21:20). DBV-Individualturniere ab 04.01.2027, im Jahr 2026 nur bei ausgeschriebener Nutzung. Keine pauschale Umstellung von Liga oder historischen Turnieren allein wegen der Jahreszahl.
-- **5×11:** drei Gewinnsätze, ab 10:10 zwei Punkte Vorsprung, Höchststand 15 (gültig: 12:10, 13:11, 14:12, 15:13 und 15:14). Bundesliga 2026 weiter 5×11.
-- **1×21:** ein einziger Satz bis 21 mit standardmäßiger Verlängerung ist eine erlaubte alternative Wettkampfform. Aus einem einzelnen gespeicherten Satz darf sie **nicht** automatisch erschlossen werden. Sie muss ausdrücklich durch die Turnierausschreibung oder einen vergleichbar eindeutigen Quellhinweis belegt sein.
-- **3×11 Jugendsonderform:** ältere Daten bleiben als anhand gültiger Satzergebnisse erschließbare Teilbelege möglich, sind jedoch keine automatisch bestätigte offizielle Turnierregel.
-- **Abweichende Altregeln:** nur bei ausdrücklichem Quellbeleg auswählbar. Insbesondere 11:10 und 15:14 sind ohne eindeutig passendes Format nicht pauschal gültig.
+**Nicht** aus Punktgrenzen, Jahrgang oder Alter auf die Gültigkeit eines Matches schließen.
+Maßgeblich ist der veröffentlichte Badhub-/DBV-Spielbericht:
+1. Jeder gemeldete Satz mit zwei unterschiedlichen ganzzahligen Punktzahlen erhält genau einen Gewinner: die Seite mit mehr Punkten.
+2. Normalfall: zwei gewonnene Sätze ergeben den Matchsieger (2:0, 2:1). Wenn eine Quelle ausdrücklich 5×11 meldet: drei Gewinnsätze (3:0, 3:1, 3:2). Bei drei kurzen Sätzen mit 3:0 kann die Drei-Gewinnsatz-Regel anhand der Satzfolge erschlossen werden, ohne die offizielle Turnierregel zu behaupten.
+3. Der aus den Satzsiegen ermittelte Gewinner muss exakt der **von der Quelle gekennzeichneten Gewinnerseite** entsprechen. Bei Widerspruch wird der Matchbeleg nicht als Sieg/Niederlage übernommen.
+4. Ein Satz nach bereits entschiedenem Match ist nicht zulässig; eine einzige Partie gilt nur bei explizitem 1×21-Quellenhinweis als abgeschlossen.
+5. **21:20, 15:14 und 11:10** sind allein wegen ihrer Punktzahl **kein Ausschlussgrund** für einen als gespielt gemeldeten Satz. Jugend- und historische Turnierregeln unterscheiden sich. Die präzisen DBV-Zählweisen sind optionaler Kontext, kein Importfilter.
+6. BYE/Rast, Walkover/kampflos, Aufgabe/Abbruch, Disqualifikation und Quellkarten ohne lesbare Satzstände werden **getrennt** kategorisiert und nie als regulär ausgespielte Siege gezählt.
 
-## Datenmodell und Verhalten
+## Darstellung und Datenherkunft
 
-`scripts/badminton-score-rules.mjs` enthält die versionsunabhängigen Regelprofile mit Sieger-, Satzende-, Maximalpunkte- und Matchabschlussprüfung. Ein Match endet zwingend beim Erreichen der erforderlichen Gewinnsätze; weitere Satzfolgen werden verworfen.
+- In der Spielhistorie steht die echte gemeldete Satzfolge, das nach den gemeldeten Satzsiegen gewonnene/verlorene Match sowie die Quell-URL. Nur bei expliziter Angabe wird das offiziell benannte Zählformat gezeigt.
+- **DBV-Ranglistenpunkte** sind eine separate Kennzahl aus dem offiziellen Excel-Ranglistenexport (inklusive eigener/höherer Altersklasse). Sie werden nicht aus Badhub-Sätzen berechnet.
+- Die Supabase-Edge-Importfunktion und die Browser-Statistik nutzen exakt dasselbe `scripts/badminton-score-rules.mjs`-Regelmodul (Edge-Kopie identisch).
+- Keine Änderung an offiziellen Platzierungen, keine automatische Auffüllung der Badhub-/DBV-Gesamtsummen durch erfundene Spiele.
 
-`explicitScoringRule` liest ausschließlich **explizite** Zählweisen aus Turnierbezeichnung/Quellkennzeichen. Jahr, Disziplin und Altersklasse allein bestimmen keine gültige Zählweise. Importfunktion und Frontend teilen dieselbe Scoring-Engine. Aus den Satzständen erschlossene Formate werden als solche kenntlich gemacht.
+## Verifizierter aktueller Befund
 
-Der bestehende separate Klassifikator behandelt **BYE/Rast**, **Walkover/kampflos**, **Aufgabe/Abbruch**, **Disqualifikation** und **fehlenden Satzstand** getrennt. Diese Fälle gelangen ohne belegtes, regulär abgeschlossenes Match nicht in den Siegzähler. Ein Status kann auf Turnierfortschritt/Ranglistenwertung Einfluss haben, ohne dass ein tatsächlich gespielter Matchsieg vorliegt.
+Philipp Metzger (DBV-ID 05-070879): 62 Quellkarten in Badhub, davon **58** mit eindeutigem Sieger anhand gemeldeter Sätze und veröffentlichter Winner-Kennzeichnung. Darunter zwei U11-Small-Games-Karten mit 11:10-Sätzen, die nicht wegen einer Punktgrenze verworfen werden dürfen. **4** Quellkarten enthalten keinen verlässlich auswertbaren Satzstand und bleiben ungeklärt. Die 58 Einzelbelege sind bereits im produktiven Supabase gespeichert.
 
-**DBV-Ranglistenpunkte** bleiben ausschließlich offizielle, datierte Ranglistenwerte. Nicht aus Matchpunkten, Erfolgsquoten oder fremden Turnierkarten hochrechnen. `scripts/update-ranking.py` übernimmt weiterhin nur den offiziellen DBV-Excel-Export.
+Andere 2026/27-Zählweisen (3×21, 3×15, 5×11, 1×21) bleiben als offizielle Hintergrundregeln dokumentiert, ohne eine verbands- oder turnierübergreifende Zwangsprüfung der Ballpunktzahl einzuführen.
 
-## Praktischer Plausibilitätsbefund
-
-Philipp Metzger: 62 erkannte Badhub-Quellkarten, 58 gespeicherte Einzelbelege vor v72. Mit den strengeren Regelprofilen im aktuellen öffentlichen Badhub-Quell-Audit sind **56** auswertbar, **4** haben keine Sätze und **2** enthalten 11:10-Satzstände. Letztere liegen bei A-RLT U11/U13 „Small Games“ 2026. Ob dort gesonderte verkürzte Zählweisen gelten, ist der jeweiligen offiziellen Turnierausschreibung zu entnehmen; darum nicht allein aus dem Ergebnis als gewerteten Matchsieg bestätigen. Die gespeicherten Originalbelege werden nicht gelöscht, nur nicht ohne gesicherte Regel als verifizierte Statistik gezählt.
-
-## Nachweise
-
-- Offizielle DBV-Regeln 2026/27, S. 372 (3×21), Anhang 3 S. 383–384 (1×21, 3×15, 5×11), Bundesliga-Spielformat S. 268: https://www.badminton.de/fileadmin/dateien_upload/dateien_2026/juli_2026/dbv_satzungswerk_2026-27_stand_13.06.2026.pdf
-- DBV-Nationaländerung ab 2027: https://www.badminton.de/news/badminton/neue-zaehlweise-dbv-praesidium-beschliesst-einfuehrung-von-3-x-15/
-- Small Games U11/U13: https://www.badminton.de/der-dbv/jugend-wettkampf/small-games-u11/u13/
-- DBV Ranglisten-Punktetabellen: https://www.badminton.de/ergebnisse/dbv-ranglisten/
+Fachquellen: https://www.badminton.de/fileadmin/dateien_upload/dateien_2026/juli_2026/dbv_satzungswerk_2026-27_stand_13.06.2026.pdf ; https://www.badminton.de/der-dbv/jugend-wettkampf/small-games-u11/u13/
