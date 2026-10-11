@@ -57,6 +57,55 @@ assert.deepEqual(further.officialLinks,existing.officialLinks);
 assert.equal(further.customSetting,"keep-this");
 assert.equal(existing.players.length,1,"Original stored object must not be modified");
 assert.throws(()=>addProfileToStore(existing,{...fresh,id:"05-070879"}),/bereits/);
+// A search result has a genuine DBV-ID. It must become the visible own profile
+// even when an older local family profile was selected.
+const selectedOwn=addProfileToStore(existing,fresh,{confirmed:true});
+assert.equal(selectedOwn.activeProfileId,fresh.id);
+assert.equal(selectedOwn.chosen,fresh.id);
+assert.equal(selectedOwn.players.length,2);
+assert.equal(selectedOwn.players.find(p=>p.id===fresh.id).name,fresh.name);
+assert.equal(selectedOwn.friends.length,1);
+assert.equal(existing.activeProfileId,"05-070879","Source state must be immutable");
+// The same player can already exist with DBV data: reuse, never create a twin.
+const knownWithAlias={
+ players:[{id:"local-42",name:"Philipp",club:"SpVgg Mössingen"},
+  {id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen",
+   url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
+  {id:"05-071969",name:"Charlotte Metzger"}],
+ activeProfileId:"local-42",chosen:"local-42",
+ friends:[{id:"05-070879",name:"Philipp Metzger"},{id:"05-061350",name:"Sarah"}],
+ officialLinks:[{id:"T1",playerId:"local-42",name:"Turnier 1",startDate:"2026-12-01"},
+  {id:"T2",playerId:"05-071969",name:"Turnier 2"}],
+ customSetting:"still-here"
+};
+const verified=normalizeProfile({mode:"dbv",reference:"05-070879",name:"Philipp Metzger",
+ birthYear:"2016",club:"SpVgg Mössingen"});
+const repaired=addProfileToStore(knownWithAlias,verified,{confirmed:true});
+assert.deepEqual(repaired.players.map(p=>p.id),["05-070879","05-071969"]);
+assert.equal(repaired.activeProfileId,"05-070879");
+assert.equal(repaired.chosen,"05-070879");
+assert.equal(repaired.officialLinks[0].playerId,"05-070879","Next tournaments are migrated");
+assert.equal(repaired.officialLinks[1].playerId,"05-071969");
+assert.equal(repaired.players[0].url,knownWithAlias.players[1].url,"Existing official link survives");
+assert.deepEqual(repaired.friends.map(f=>f.id),["05-061350"]);
+assert.equal(repaired.customSetting,"still-here");
+assert.equal(knownWithAlias.players.length,3,"Must not mutate previous storage");
+const localOnly={players:[{id:"local-1",name:"Philipp Metzger"}],
+ officialLinks:[{id:"T3",playerId:"local-1",startDate:"2026-11-21"}]};
+const replacedLocal=addProfileToStore(localOnly,verified,{confirmed:true});
+assert.equal(replacedLocal.players.length,1);
+assert.equal(replacedLocal.players[0].id,"05-070879");
+assert.equal(replacedLocal.officialLinks[0].playerId,"05-070879");
+assert.throws(()=>addProfileToStore(null,{id:"local-123",name:"Philipp"},{confirmed:true}),/DBV-ID/);
+const differentBirth={players:[{id:"local-1",name:"Philipp",birthYear:2013},
+ {id:"05-070879",name:"Philipp Metzger",birthYear:2016}]};
+assert.equal(addProfileToStore(differentBirth,verified,{confirmed:true}).players.length,2,
+ "Conflicting birth years must never be silently merged");
+const ambiguous={players:[{id:"local-1",name:"Philipp"},
+ {id:"local-2",name:"Philipp"}, {id:"05-070879",name:"Philipp Metzger"}]};
+assert.equal(addProfileToStore(ambiguous,verified,{confirmed:true}).players.length,3,
+ "Two same-name local profiles must not be guessed into one");
+
 const direct=normalizeProfile({mode:"dbv",name:"Neu",reference:url.url});
 assert.match(direct.id,/^local-/,"Do not misrepresent UUID as numeric DBV ID");
 assert.equal(direct.url,url.url);
