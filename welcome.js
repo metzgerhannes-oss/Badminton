@@ -41,7 +41,7 @@ function readSaved(){
 function persistAndContinue(profile){
  const result=addProfileToStore(readSaved(),profile);
  localStorage.setItem(STORE,JSON.stringify(result));
- // Only the public directory is queried. Private selections remain on this device.
+ // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
  $("onboard-profile").hidden=true;
  $("onboard-install").hidden=false;
  $("progress-profile").classList.remove("current");
