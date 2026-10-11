@@ -190,3 +190,24 @@
 .app[data-current-view="turniere"] #view-turniere .live-tournament-follow >:not(.badhub-event-panel):not(.tournament-live-toolbar){display:none!important}
 .app[data-current-view="turniere"] #view-turniere .live-tournament-follow .badhub-event-panel{margin:4px 0 0}
 .app[data-current-view="turniere"] #view-turniere .live-tournament-follow .tournament-live-toolbar{margin:5px 0 9px}
+/* v88: compact, source-labelled public tournament hints and explicit opt-in. */
+.community-share-optin{display:flex;align-items:flex-start;gap:11px;padding:12px;
+ border:1px solid #bed5e7;border-radius:12px;background:#f4f9fd;line-height:1.4}
+.community-share-optin input{width:20px;height:20px;margin-top:3px;flex:none;accent-color:#227aa6}
+.community-share-optin span{display:flex;flex-direction:column;gap:5px;min-width:0}
+.community-share-optin small{font-size:12px;line-height:1.5;color:#385570}
+.community-save-status{font-size:12px;line-height:1.4;color:#174d77;padding:8px 0}
+.community-save-status[hidden],.shared-tournaments[hidden]{display:none!important}
+.shared-event-section{margin:12px 0 20px;padding:14px;border:1px solid #bfd9e9;
+ background:#f7fbff;border-radius:16px}
+.shared-event-head h3{font-size:16px;margin:0 0 7px}
+.shared-event-note{font-size:12px;line-height:1.45;color:#4b6072;margin:0 0 9px}
+.shared-event-row{display:flex;gap:10px;justify-content:space-between;align-items:center;
+ padding:11px 0;border-top:1px solid #d5e5ef;min-width:0}
+.shared-event-row div{min-width:0;display:flex;flex-direction:column;gap:4px}
+.shared-event-row strong{font-size:14px;overflow-wrap:anywhere}
+.shared-event-row small{font-size:11px;line-height:1.35;color:#526779}
+.shared-event-row a{flex:none;font-size:12px;color:#19577f;font-weight:750;text-decoration:underline}
+.shared-event-empty{font-size:13px;margin:4px 0;color:#55697b}
+@media(max-width:370px){.shared-event-row{align-items:flex-start;flex-direction:column;gap:6px}
+ .community-share-optin{padding:9px}}
