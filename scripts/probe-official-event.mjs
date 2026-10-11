@@ -7,6 +7,7 @@ const urls=[
  "https://badhub.de/api/spieler_live.php?lic=05-061350",
  "https://badhub.de/bvbb/turniere.php?jahr=2026",
  "https://badhub.de/bvbb/turnier.php?id=4962",
+ "https://badhub.de/bvbb/turnier.php?id=4962&player=08-017967",
  "https://badhub.de/assets/js/turniere.js?v=1787664608",
  "https://badhub.de/assets/js/turnier.js?v=1787664608",
  "https://dbv.turnier.de/cookiewall/",
@@ -52,14 +53,17 @@ for(const url of urls){
      if(i>=0)console.log("NEAR",word,body.slice(Math.max(0,i-190),i+900).replace(/\\s+/g," ").slice(0,1100));
     }
     console.log("HTML COUNTS",JSON.stringify({table:body.split("<table").length-1,tr:body.split("<tr").length-1,score:body.split("score").length-1,match:body.toLowerCase().split("match").length-1}));
-    if(u.pathname.includes("turnier.php"))console.log("EVENT_HTML_SECTION",body.slice(10500,17500));
+    if(u.pathname.includes("turnier.php"))console.log("EVENT_HTML_SECTION",body.slice(12500,21500));
    }
    if(u.pathname.includes("turniere.php")){
     const other=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/turnier|event|match|spiel/i.test(x)).slice(0,45);
     console.log("TOURNAMENT_TARGETS",JSON.stringify(other).slice(0,5500));
    }
    if(u.pathname.includes("cookiewall")){
-    console.log("FORM",clean(body.slice(Math.max(0,body.indexOf("<form")),body.indexOf("<form")+2700)));
+    const form=body.slice(Math.max(0,body.indexOf("<form")),body.indexOf("<form")+5000);
+    console.log("COOKIE_FORM_ACTION",form.match(/<form[^>]+/i)?.[0]||"");
+    console.log("COOKIE_INPUT_NAMES",[...form.matchAll(/<input[^>]+/gi)].map(x=>({type:x[0].match(/type="([^"]+)/)?.[1]||"",name:x[0].match(/name="([^"]+)/)?.[1]||""})).slice(0,15));
+    console.log("COOKIE_BUTTON_TEXT",[...form.matchAll(/<button[^>]*>[\\s\\S]*?<\\/button>/gi)].map(x=>x[0].replace(/<[^>]+>/g,"").trim().slice(0,80)).slice(0,10));
    }
    const markers=["__NEXT_DATA__","__NUXT__","__INITIAL_STATE__","application/ld+json","/api/","Matches","Spiele","matches","Auslosung","Live","tournamentsoftware"];
    console.log("MARKERS",markers.filter(m=>body.includes(m)).join(","));
