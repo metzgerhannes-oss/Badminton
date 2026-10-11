@@ -31,7 +31,23 @@
    </div>
    <section id="onboard-profile" class="welcome-panel" aria-labelledby="setup-title">
     <h2 id="setup-title">Wessen Badminton möchtest du verfolgen?</h2>
-    <p>Lege ein eigenes Spielerprofil an. Falls du schon eine DBV-Spieler-ID oder den Link zum offiziellen Spielerprofil hast, kannst du ihn direkt übernehmen.</p>
+    <p>Finde deinen Spieler im öffentlichen DBV-Verzeichnis. Wähle den passenden Namen anhand von Verein, Jahrgang und DBV-ID aus.</p>
+    <section class="welcome-search" aria-labelledby="welcome-search-heading">
+      <h3 id="welcome-search-heading">Spieler suchen</h3>
+      <label for="welcome-player-search">Name oder DBV-Spieler-ID</label>
+      <input id="welcome-player-search" type="search" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Vorname, Nachname oder 05-123456">
+      <p id="welcome-search-status" class="welcome-search-status" role="status" aria-live="polite">Mindestens zwei Zeichen eingeben, um Spieler zu finden.</p>
+      <div id="welcome-search-results" class="welcome-search-results" aria-label="Suchergebnisse"></div>
+      <div id="welcome-selection" class="welcome-selection" hidden>
+       <span class="welcome-selection-eyebrow">Ausgewählter DBV-Spieler</span>
+       <strong id="welcome-selection-name"></strong>
+       <span id="welcome-selection-detail"></span>
+       <button id="welcome-selection-save" class="welcome-primary" type="button">Diesen Spieler übernehmen <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+    <p id="welcome-error" class="welcome-error" role="alert" hidden></p>
+    <details id="welcome-manual-panel" class="welcome-manual-panel">
+     <summary>Spieler nicht gefunden? Manuell einrichten</summary>
     <div class="welcome-modes" role="group" aria-label="Art der Einrichtung">
       <button id="mode-own" type="button" class="mode-card active" aria-pressed="true"><strong>Spielerprofil anlegen</strong><small>Mit Name, Jahrgang und Verein</small></button>
       <button id="mode-dbv" type="button" class="mode-card" aria-pressed="false"><strong>Mit DBV-Profil starten</strong><small>ID oder offiziellen Link einfügen</small></button>
@@ -49,10 +65,10 @@
       </div>
       <p id="dbv-reference-note" class="welcome-info">Eine DBV-Spieler-ID kannst du später jederzeit unter Einstellungen ergänzen.</p>
       <p class="welcome-info" id="dbv-manual-note" hidden>Ein DBV-Profil-Link enthält häufig nur eine technische UUID, nicht die numerische DBV-ID. Deshalb brauchen wir den Namen zusätzlich. Die Werte werden nicht automatisch als verifiziert ausgegeben.</p>
-      <p id="welcome-error" class="welcome-error" role="alert" hidden></p>
       <button class="welcome-primary" type="submit">Profil speichern &amp; weiter <span aria-hidden="true">→</span></button>
     </form>
     <p class="welcome-small">Noch keine DBV-ID? Du kannst auch zunächst ein eigenes Profil ohne DBV-ID anlegen. Öffentliche Ranglistenwerte erscheinen erst, wenn sie für deine DBV-ID verfügbar sind.</p>
+    </details>
     <p id="welcome-existing" class="welcome-existing" hidden>Auf diesem Gerät sind bereits Profile gespeichert. Ein zusätzliches Profil wird hinzugefügt; deine bisherigen Daten bleiben erhalten.</p>
     <a class="welcome-official" href="https://dbv.turnier.de/" rel="noopener noreferrer" target="_blank">DBV-Turnierportal öffnen ↗</a>
    </section>

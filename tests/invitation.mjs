@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {parseDbvReference,normalizeProfile,addProfileToStore,invitationUrl,STORE} from "../scripts/invitation.mjs";
+import {invitationCandidates,searchInvitationPlayers} from "../scripts/invitation-search.mjs";
 
 assert.equal(STORE,"shuttleboard-v1","Legacy storage key must remain unchanged");
 const playerId=parseDbvReference("05-070879");
@@ -75,4 +76,48 @@ assert.match(welcome,/name="name"/);
 assert.match(welcomeJs,/addProfileToStore/);
 assert.match(sw,/welcome\.html/);
 assert.match(sw,/scripts\/invitation\.mjs/);
+
+assert.match(welcome,/id="welcome-player-search"/);
+assert.match(welcome,/id="welcome-search-results"/);
+assert.match(welcome,/id="welcome-selection-save"/);
+assert.match(welcome,/id="welcome-manual-panel"/);
+assert.match(welcomeJs,/searchInvitationPlayers/);
+assert.match(sw,/scripts\/invitation-search\.mjs/);
+assert.match(sw,/scripts\/friend-search\.mjs/);
+assert.match(sw,/scripts\/supabase-read\.mjs/);
+assert.equal(invitationCandidates([
+ {dbv_id:"05-061350",name:"Sarah Storz",birth_year:2010,club:"SpVgg Mössingen"},
+ {dbv_id:"05-061350",name:"Duplicate Sarah"},
+ {dbv_id:"invalid",name:"Wrong ID"}
+]).length,1,"Search must deduplicate and reject unverified IDs");
+const responses=(value)=>({ok:true,json:async()=>value,headers:{get:()=>null}});
+const live=await searchInvitationPlayers("Sarah Storz",{
+ fetchImpl:async (url,{method})=>{
+  assert.equal(method,"GET");
+  const parsed=new URL(url);
+  assert.equal(parsed.pathname,"/rest/v1/players");
+  assert.match(parsed.searchParams.get("or"),/Sarah Storz/);
+  return responses([{dbv_id:"05-061350",name:"Sarah Storz",birth_year:2010,club:"SpVgg Mössingen"}]);
+ }
+});
+assert.equal(live.source,"dbv");
+assert.equal(live.players[0].id,"05-061350");
+assert.equal(live.players[0].birthYear,2010);
+const empty=await searchInvitationPlayers("S");
+assert.deepEqual(empty,{players:[],source:"none"});
+const backedUp=await searchInvitationPlayers("Storz",{
+ fetchImpl:async (url)=>{
+  const path=String(url);
+  if(path.includes("/rest/v1/players"))throw Error("offline");
+  if(path.endsWith("/index.json"))return responses({schemaVersion:1,ageGroups:[{age:"U17"}]});
+  if(path.endsWith("/U17.json"))return responses({players:[{id:"05-061350",name:"Sarah Storz",birthYear:2010,club:"SpVgg Mössingen"}]});
+  throw Error("Unexpected request: "+path);
+ }
+});
+assert.equal(backedUp.source,"backup");
+assert.equal(backedUp.players[0].id,"05-061350");
+const aborted=new AbortController();
+aborted.abort();
+await assert.rejects(()=>searchInvitationPlayers("Sarah",{signal:aborted.signal,fetchImpl:async()=>{throw Error("No fetch on abort")}}));
+
 console.log("Invitation tests passed: shareable URL, DBV reference validation, fresh setup, existing-data preservation, guided install.");
