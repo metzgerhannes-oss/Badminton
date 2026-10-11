@@ -204,12 +204,23 @@ test("Stale player snapshots must not present old sets as live scores",async ({p
  await expect(page.locator(".followed-live-card").first()).not.toContainText("Spielt gerade");
 });
 
-test("research only: official tournament's public browser consent pathway",async ({page})=>{
+
+test("research only: inspect consented public DBV event page",async ({page,browserName})=>{
+ if(browserName!=="chromium")return;
  try{
-  const res=await page.goto("https://dbv.turnier.de/tournament/F7B661DD-BC15-4B5B-B38D-49D48FD9A67A",{timeout:15000,waitUntil:"domcontentloaded"});
-  console.log("OFFICIAL_PROBE",JSON.stringify({status:res?.status(),url:page.url(),title:await page.title(),
-   forms:await page.locator("form").evaluateAll(xs=>xs.slice(0,4).map(f=>({action:f.action,method:f.method,buttons:[...f.querySelectorAll("button")].map(x=>({text:x.textContent.trim().slice(0,70),type:x.type,name:x.name,value:x.value})),inputs:[...f.querySelectorAll("input")].map(x=>({name:x.name,type:x.type,checked:x.checked}))}))),
-   buttons:(await page.getByRole("button").allTextContents()).slice(0,12)
-  }));
- }catch(e){console.log("OFFICIAL_PROBE_ERROR",String(e).slice(0,200))}
+  const url="https://dbv.turnier.de/tournament/F7B661DD-BC15-4B5B-B38D-49D48FD9A67A";
+  await page.goto(url,{waitUntil:"domcontentloaded",timeout:16000});
+  const boxes=page.locator('form input[name="CookiePurposes"]');
+  const options=await boxes.evaluateAll(xs=>xs.map(x=>({value:x.value,checked:x.checked,html:x.parentElement?.textContent?.trim().slice(0,100)})));
+  console.log("OFFICIAL_OPTIONS",JSON.stringify(options));
+  const settings=page.getByRole("button",{name:"Settings",exact:true});
+  if(await settings.count())await settings.click({timeout:3500});
+  for(let i=1;i<await boxes.count();i++)await boxes.nth(i).uncheck({force:true});
+  const save=page.getByRole("button",{name:"Speichern",exact:true});
+  if(await save.count())await save.click({force:true,timeout:5000});
+  await page.waitForLoadState("domcontentloaded",{timeout:11000}).catch(()=>{});
+  console.log("OFFICIAL_AFTER",JSON.stringify({url:page.url(),title:await page.title(),
+   links:await page.locator('a[href*="/match"],a[href*="/draw"],a[href*="/matches"]').evaluateAll(xs=>xs.slice(0,12).map(a=>({text:a.textContent?.trim().slice(0,45),url:a.getAttribute("href")}))),
+   body:(await page.locator("body").innerText()).slice(0,1000)}));
+ }catch(e){console.log("OFFICIAL_CONSENT_PROBE_ERROR",String(e).slice(0,230));}
 });
