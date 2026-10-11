@@ -103,7 +103,7 @@
 .tournament-live-filters button{min-height:44px;min-width:0;padding:7px 3px;background:#edf6fc;border:1px solid #c5deec;border-radius:9px;color:#215171;font-size:clamp(10px,2.5vw,12px);font-weight:800}
 .tournament-live-filters button[aria-pressed="true"]{background:#126eaa;border-color:#126eaa;color:#fff}
 .tournament-court-label{display:grid;gap:5px;font-size:11px;font-weight:760;color:#476984;margin-bottom:12px}
-.tournament-court-label:has(select[hidden]){display:none}
+.tournament-court-label[hidden]{display:none!important}
 .tournament-court-label select[hidden]{display:none!important}
 .tournament-live-content{display:grid;gap:8px}
 .event-match-card{display:grid;gap:9px;border:1px solid #d0e2ee;border-radius:12px;padding:12px;background:#fafcff;min-width:0}

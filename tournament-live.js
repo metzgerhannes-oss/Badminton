@@ -49,6 +49,7 @@ function courtFilter(){
  if(!names.includes(court))court="all";
  input.value=court;
  input.hidden=names.length===0;
+ input.parentElement.hidden=names.length===0;
 }
 function time(value){
  if(!value)return "Spielzeit offen";
