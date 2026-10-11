@@ -22,10 +22,13 @@ jobs:
       - name: Validate
         run: |
           node --check app.js
+          node --check app-release.js
+          node --check scripts/stamp-release.mjs
           node --check club-branding.js
           node --check i18n.js
           node --check welcome.js
           node tests/club-branding.mjs
+          node tests/release-version.mjs
           node --check dashboard.js
           node --check history.js
           node --check scripts/trophy-stats.mjs
@@ -42,6 +45,8 @@ jobs:
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
           node tests/source-register.mjs
+      - name: Stamp deployed version and PWA build
+        run: node scripts/stamp-release.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
