@@ -29,3 +29,9 @@
   .bottom-nav a small{font-size:11px}
 }
 @media(max-width:350px){.topbar .brand-logo{width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important}}
+
+/* v77 internationalization: compact language picker with RTL-safe score values. */
+.language-settings select { display:block; width:100%; max-width:380px; min-height:44px; padding:10px 12px; border-radius:10px; background:var(--card,#fff); color:inherit; border:1px solid var(--border,#b7cce0); font:inherit; margin:8px 0 10px; }
+.language-settings label { font-weight:600; }
+[dir="rtl"] .match-stats-values, [dir="rtl"] .match-stats-reference { font-variant-numeric:tabular-nums; }
+[dir="rtl"] input[name="id"], [dir="rtl"] input[name="url"], [dir="rtl"] input[name="startDate"], [dir="rtl"] input[name="endDate"] { direction:ltr; text-align:left; }
