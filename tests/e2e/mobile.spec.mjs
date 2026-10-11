@@ -347,6 +347,37 @@ test("Friend viewing never changes which own profile Home returns to",async ({pa
  await expect(page.locator("#view-start")).toBeVisible();
 });
 
+test("Live tab shows personal matchday and a verified official tournament link",async ({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+ const part=type=>today.find(x=>x.type===type).value;
+ const date=part("year")+"-"+part("month")+"-"+part("day");
+ const id="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+ await page.evaluate(({date,id})=>{
+  const key="shuttleboard-v1";const saved=JSON.parse(localStorage.getItem(key));
+  saved.officialLinks=[{id,url:"https://dbv.turnier.de/tournament/"+id,name:"Test Jugendturnier",
+   startDate:date,endDate:date,playerId:"05-070879"}];
+  localStorage.setItem(key,JSON.stringify(saved));
+ },{date,id});
+ await page.route("**/player_live_snapshots?*",route=>route.fulfill({status:200,headers,body:JSON.stringify([{
+  dbv_id:PLAYER,provider:"Badhub",source_url:"https://badhub.de/spieler/"+PLAYER+"/live",
+  checked_at:new Date().toISOString(),payload:{tournament:{name:"Test Jugendturnier"},
+   running:{match_id:"m1",class:"HE U11",opponent:"Gegner A",is_team1:1,sets:[[11,8]],court:"Feld 3"},
+   next:{queue_position:0},upcoming:[{match_id:"m1"},{match_id:"m2",class:"HD U11",opponent:"Gegner B"}],
+   past:[{match_id:"m0",class:"HE U11",team1_won:true,is_team1:1,sets:[[11,7],[11,9]]}],entries:[]}
+  }])}));
+ await page.reload({waitUntil:"domcontentloaded"});
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#live-nav-tab")).toBeVisible();
+ await expect(page.locator(".matchday-overview")).toBeVisible();
+ await expect(page.locator("#live-radar-content")).toContainText("Jetzt auf dem Feld");
+ await expect(page.locator("#live-radar-content")).toContainText("Deine nächsten Spiele");
+ await expect(page.locator("#live-radar-content")).toContainText("Bereits gespielte Begegnungen");
+ await expect(page.locator("#live-radar-content .radar-match")).toHaveCount(3);
+ await expect(page.locator("#live-tournament-links a").first()).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+id);
+ await expect(page.locator(".bottom-nav a[aria-current='page']")).toHaveCount(1);
+});
+
 test("Turniertag is task-first; source-free status is calm and history is reachable",async ({page})=>{
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#view-turniere")).toBeVisible();

@@ -82,8 +82,8 @@ export function liveView(row,id,now=Date.now()){
   tournament:str(p.tournament.name,120),
   running:object(p.running),
   next:Number.isInteger(p.next?.queue_position)?object(p.next):null,
-  upcoming:p.upcoming.filter(object).slice(0,12),
-  past:p.past.filter(object).slice(0,8),
+  upcoming:p.upcoming.filter(object).slice(0,20),
+  past:p.past.filter(object).slice(0,12),
   entries:p.entries.filter(object).slice(0,10)
  };
 }
@@ -133,4 +133,37 @@ export function sourceTime(value){
  if(n<1e10||n>3e13)return "";
  const d=new Date(n);
  return Number.isNaN(d.getTime())?"":new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(d)+" Uhr";
+}
+
+/** A player-centred day view, never a guessed tournament-wide schedule.
+ * The order is supplied by Badhub; deduplication requires explicit match IDs. */
+export function matchdayOverview(row,id,now=Date.now()){
+ const view=liveView(row,id,now);
+ if(!["playing","next","tournament"].includes(view.status))return null;
+ const matchId=m=>{
+  const value=object(m)?.match_id??object(m)?.match_key??object(m)?.id;
+  return (typeof value==="string"&&value.trim())||(Number.isSafeInteger(value)&&value>0)
+   ?String(value):"";
+ };
+ const seen=new Set();
+ if(view.running&&matchId(view.running))seen.add(matchId(view.running));
+ const upcoming=view.upcoming.filter(m=>{
+  const key=matchId(m);
+  if(key&&seen.has(key))return false;
+  if(key)seen.add(key);
+  return true;
+ });
+ const queue=Number.isInteger(view.next?.queue_position)&&view.next.queue_position>=0
+  ?Math.min(99,view.next.queue_position):null;
+ return {
+  tournament:view.tournament,
+  running:view.running,
+  queue,
+  upcoming,
+  past:view.past,
+  pendingCount:upcoming.length+(view.running?1:0),
+  // Counts refer only to the bounded provider snapshot, never total career matches.
+  shownResults:view.past.length,
+  hasPublishedGames:!!view.running||queue!==null||upcoming.length>0||view.past.length>0
+ };
 }
