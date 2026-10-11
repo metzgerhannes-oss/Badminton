@@ -1,6 +1,6 @@
 import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
-import {getDbvMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
+import {getDbvMatchReference,getBadhubMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
@@ -182,21 +182,38 @@ function render(){
  const reference=getDbvMatchReference(selected,{
   year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
  });
- if(referenceSection&&reference){
-  const outcome={total:context.total,wins:context.wins,losses:context.losses};
+ const badhub=getBadhubMatchReference(selected,{
+  year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
+ });
+ if(referenceSection&&(reference||badhub)){
+  const observed={total:context.total,wins:context.wins,losses:context.losses};
   const unavailable=(officialError&&externalError)||(availability.retry&&!rows.length);
+  const card=(snapshot,title,comparison)=>{
+   return '<div class="dbv-reference-heading"><strong>'+esc(title)+'</strong>'+
+    '<time datetime="'+esc(snapshot.capturedOn)+'">Stand '+esc(dateLabel(snapshot.capturedOn))+'</time></div>'+
+    '<div class="dbv-reference-totals"><span><strong>'+esc(snapshot.total)+
+    '</strong> Spiele</span><span><strong>'+esc(snapshot.wins)+
+    '</strong> Siege</span><span><strong>'+esc(snapshot.losses)+
+    '</strong> Niederlagen</span></div>'+
+    '<p>Quelle: '+esc(snapshot.sourceName)+' · datierter Gesamtstand, keine Live-Abfrage.</p>'+
+    '<p class="dbv-reference-comparison">'+esc(comparison)+'</p>';
+  };
+  let sections="";
+  if(badhub){
+   const comparison=dbvReferenceMessage(badhub,observed,{readFailed:unavailable});
+   sections+=card(badhub,"Badhub · veröffentlichte Karrierebilanz",comparison)+
+    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
+  }
+  if(reference){
+   const comparison=badhub
+    ? "Badhub und DBV weisen in den vorliegenden Screenshots trotz gleicher Siegzahl unterschiedliche Spielzahlen aus ("+
+       badhub.total+" gegenüber "+reference.total+"). Ohne Belegabgleich werden diese Zahlen nicht angeglichen."
+    : dbvReferenceMessage(reference,observed,{readFailed:unavailable});
+   sections+='<div class="dbv-secondary-reference">'+
+    card(reference,"DBV · Kontrollstand",comparison)+'</div>';
+  }
   referenceSection.hidden=false;
-  referenceSection.innerHTML='<div class="dbv-reference-heading"><strong>DBV-Profilstand · '+
-   esc(reference.period)+'</strong><time datetime="'+esc(reference.capturedOn)+'">Stand '+
-   esc(dateLabel(reference.capturedOn))+'</time></div>'+
-   '<div class="dbv-reference-totals"><span><strong>'+esc(reference.total)+
-   '</strong> Spiele</span><span><strong>'+esc(reference.wins)+
-   '</strong> Siege</span><span><strong>'+esc(reference.losses)+
-   '</strong> Niederlagen</span></div>'+
-   '<p>Quelle: '+esc(reference.sourceName)+
-   ' (bereitgestellter Screenshot). Datierten Kontrollstand anzeigen, keine Live-Abfrage.</p>'+
-   '<p class="dbv-reference-comparison">'+
-   esc(dbvReferenceMessage(reference,outcome,{readFailed:unavailable}))+'</p>';
+  referenceSection.innerHTML=sections;
  }
  retry.hidden=!availability.retry;
  source.textContent=!sourced&&!official.length&&availability.retry

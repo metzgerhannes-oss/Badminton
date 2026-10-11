@@ -91,6 +91,14 @@ const multi=tour.replace('<div class="sp-meeting">',
 assert.equal(parsePublicHistory(multi,player,"tournament").items.length,1);
 assert.equal(typeof variant.rejection_reasons,"object");
 
+
+const youth11=tour.replace(/21/g,"11").replace(/18/g,"8").replace(/13/g,"3");
+assert.equal(parsePublicHistory(youth11,player,"tournament").items.length,1,
+ "Completed 11-point youth match must be counted");
+const youth15=tour.replace(/21/g,"15").replace(/18/g,"10").replace(/13/g,"7");
+assert.equal(parsePublicHistory(youth15,player,"tournament").items.length,1,
+ "Completed 15-point youth match must be counted");
+
 const sql=await readFile("database/external-match-import.sql","utf8");
 const cron=await readFile("database/external-match-cron.sql","utf8");
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");

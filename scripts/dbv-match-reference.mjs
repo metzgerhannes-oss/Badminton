@@ -46,3 +46,21 @@ export function dbvReferenceMessage(reference,observed,options={}){
  return "Die Summen stimmen mit diesem DBV-Profilstand überein. "+
   "Eine vollständige, einzeln bestätigte Karrierehistorie ist damit noch nicht nachgewiesen.";
 }
+
+/** Snapshot of the public Badhub career header, supplied on 11.10.2026.
+ * This is an aggregate, not 62 independently audited match facts. */
+export const badhubMatchReferences=Object.freeze({
+ "05-070879":{
+  playerName:"Philipp Metzger",capturedOn:"2026-10-11",
+  sourceName:"Badhub · Turnier-Profil (Screenshot)",
+  sourceUrl:"https://badhub.de/spieler/05-070879?saison=all&src=gesamt",
+  career:{total:62,wins:26,losses:36}
+ }
+});
+export function getBadhubMatchReference(id,{year="all",discipline="all",ageClass="all",category="all"}={}){
+ if(year!=="all"||discipline!=="all"||ageClass!=="all"||category!=="all")return null;
+ const snapshot=badhubMatchReferences[id];
+ return snapshot&&validTotals(snapshot.career)?{...snapshot.career,
+  capturedOn:snapshot.capturedOn,sourceName:snapshot.sourceName,sourceUrl:snapshot.sourceUrl,
+  sourceType:"user-provided-screenshot",period:"Karriere"}:null;
+}
