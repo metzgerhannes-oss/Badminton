@@ -36,7 +36,7 @@ function players(markup){
   .map(m=>plain(m[1])).filter(Boolean).slice(0,4);
 }
 function noteReject(counts,reason){counts[reason]=(counts[reason]||0)+1;}
-function sides(chunk,counts){
+function sides(chunk,counts,year){
  const start=chunk.search(/class="[^"]*\bsp-match-body\b[^"]*"/);
  const mid=start<0?-1:start+chunk.slice(start).search(/class="[^"]*\bsp-result-col\b[^"]*"/);
  if(start<0||mid<start){noteReject(counts,"missing_match_layout");return null}
@@ -55,7 +55,7 @@ function sides(chunk,counts){
  const scores=[...post.slice(0,rightStart).matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
   .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)].map(x=>Number(x[1])))
   .filter(s=>s.length===2&&s.every(x=>x>=0&&x<=40));
- const completion=completedMatchWinner(scores);
+ const completion=completedMatchWinner(scores,{year});
  if(!completion){noteReject(counts,"incomplete_or_invalid_score");return null}
  const winningSide=winA?1:2;
  if(completion.winningSide!==winningSide){
@@ -85,7 +85,7 @@ function piece(source,segment,context,counts){
   const nextPhase=(chunk.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
   const nonplayed=classifyNonPlayedCard(chunk);
   if(nonplayed){noteReject(counts,nonplayed);continue;}
-  const data=sides(chunk,counts);
+  const data=sides(chunk,counts,context.year);
   if(data){
    const event=context.event||plain((chunk.match(/class="sp-match-disc[^"]*"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    const kind=discipline(event);

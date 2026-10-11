@@ -41,7 +41,7 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
    &&Array.isArray(games)&&games.length>=2&&games.length<=5
    &&games.every(g=>Array.isArray(g)&&g.length===2&&g.every(x=>Number.isInteger(x)&&x>=0&&x<=40)&&g[0]!==g[1]);
   if(!valid){excluded++;continue;}
-  const completion=completedMatchWinner(games);
+  const completion=completedMatchWinner(games,{year:r.match_year});
   if(!completion||completion.winningSide!==r.winning_side){excluded++;continue;}
   const won=r.player_side===r.winning_side;
   won?wins++:losses++;
