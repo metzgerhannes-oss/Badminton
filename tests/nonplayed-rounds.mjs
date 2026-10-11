@@ -16,5 +16,12 @@ assert.equal(classifyNonPlayedCard(card(match+match,"Rust")),null,
  "A normally scored match against a player named Rust must remain countable");
 assert.equal(classifyNonPlayedCard(card(match+"<span>BYE</span>")),"conflicting_bye_with_scores");
 assert.equal(classifyNonPlayedCard(card(match+match)),null);
+const outside='<div class="sp-match-item"><div class="sp-match-body">'+
+ match+match+
+ '<div class="sp-result-col"></div><div class="sp-side sp-side--away">'+
+ '<span class="sp-name-full">Other</span></div></div></div>';
+assert.equal(classifyNonPlayedCard(outside),null,
+ "Valid scores outside the result column are not unplayed rounds");
+
 assert.equal(classifyNonPlayedCard(""),null);
 console.log("Nonplayed BYE/Rast and scoreless/WO categories cannot become wins.");
