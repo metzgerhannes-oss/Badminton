@@ -151,7 +151,7 @@ test("Switches focus without parallel full-event queries and restores personal v
  await page.locator(".live-tournaments-return").click();
  await expect(page).toHaveURL(/#turniere$/);
  await expect(page.locator(".live-hub-bookmarks")).toBeVisible();
- await expect(page.locator(".live-tournament-follow")).toBeHidden();
+ await expect(page.locator(".live-tournament-follow")).toBeVisible();
  await page.goto("/#live",{waitUntil:"domcontentloaded"});
  await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
 });
