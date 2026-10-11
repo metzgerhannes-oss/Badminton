@@ -76,7 +76,7 @@
  }
  function visible(){
   const advanced=$("dbv-live-advanced");
-  return (location.hash==="#turniere"||location.hash==="#live")&&!document.hidden&&Boolean(advanced?.open);
+  return (location.hash==="#turniere"||(location.hash==="#live"&&window.badmintonMatchdayMode!=="all"))&&!document.hidden&&Boolean(advanced?.open);
  }
  document.addEventListener("DOMContentLoaded",()=>{
   if(!$("dbv-live-results"))return;
@@ -95,6 +95,13 @@
   window.addEventListener("badminton:profile-change",event=>{
    const next=String(event.detail?.playerId||"");
    if(next!==currentId){currentId=next;requestId++;loading=false;if(visible())refresh()}
+  });
+  window.addEventListener("badminton:matchday-mode",()=>{
+   if(visible())refresh();
+   else{
+    requestId++;loading=false;
+    const button=$("dbv-live-refresh");if(button)button.disabled=false;
+   }
   });
   window.addEventListener("hashchange",()=>{if(visible())refresh()});
   document.addEventListener("visibilitychange",()=>{if(visible())refresh()});

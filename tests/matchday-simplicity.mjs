@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import vm from "node:vm";
-const [html,controller,radar,event,app,css,sw]=await Promise.all([
- "index.html","matchday-view.js","live-radar.js","tournament-live.js","app.js","app-shell.css","sw.js"
+const [html,controller,radar,event,app,css,sw,dbv]=await Promise.all([
+ "index.html","matchday-view.js","live-radar.js","tournament-live.js","app.js","app-shell.css","sw.js","live.js"
 ].map(file=>readFile(file,"utf8")));
 const count=(value,text)=>(value.match(new RegExp(text,"g"))||[]).length;
 assert.equal(count(html,'id="matchday-switch"'),1);
@@ -15,6 +15,8 @@ assert.doesNotMatch(app,/function renderLiveTournamentLinks\(/,"Duplicate extern
 assert.match(radar,/badmintonMatchdayMode!=="all"/,"Personal vendor watch stops when full event is active");
 assert.match(event,/badmintonMatchdayMode==="all"/,"Full-event read is lazy");
 assert.match(event,/badminton:matchday-mode/);
+assert.match(dbv,/badmintonMatchdayMode!=="all"/,"Advanced DBV feed must also stop when event view is active");
+assert.match(dbv,/badminton:matchday-mode/);
 assert.match(event,/sourceHost\.replaceChildren\(\)/,"Exactly one event link, not every saved event");
 assert.match(event,/sourceId=eventId\(chosen\?\.url\)/,"External source link must be validated");
 assert.match(css,/data-matchday-mode="mine".*live-tournament-follow/);
