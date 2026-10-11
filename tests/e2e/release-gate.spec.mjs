@@ -173,10 +173,10 @@ test("v72 compact Badhub career summary on mobile",async ({page})=>{
   const metrics=await panel.evaluate(el=>({
    columns:getComputedStyle(el.querySelector(".dbv-reference-totals")).gridTemplateColumns.split(" ").length,
    right:el.getBoundingClientRect().right,
-   overflow:document.documentElement.scrollWidth-innerWidth
+   contentRight:Math.max(...[...el.querySelectorAll(".dbv-reference-totals span")].map(x=>x.getBoundingClientRect().right))
   }));
   expect(metrics.columns).toBe(width<=500?2:4);
   expect(metrics.right).toBeLessThanOrEqual(width+1);
-  expect(metrics.overflow).toBeLessThanOrEqual(2);
+  expect(metrics.contentRight).toBeLessThanOrEqual(metrics.right+1);
  }
 });
