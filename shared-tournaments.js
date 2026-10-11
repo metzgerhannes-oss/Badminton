@@ -79,9 +79,9 @@ const fmt=v=>v?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year
  timeZone:"UTC"}).format(new Date(v+"T12:00:00Z")):"Termin offen";
 function render(items,reason=""){
  const host=$("shared-tournaments");if(!host)return;
- host.hidden=!DBV_ID.test(selected);
- if(host.hidden){host.replaceChildren();return}
  const rows=sharedItems(items,selected,day());
+ host.hidden=!DBV_ID.test(selected)||!rows.length;
+ if(host.hidden){host.replaceChildren();return}
  host.innerHTML='<section class="shared-event-section" aria-labelledby="shared-event-heading">'+
   '<div class="shared-event-head"><h3 id="shared-event-heading">Von Nutzern gemeldete Turniere</h3></div>'+
   '<p class="shared-event-note">Gemeinschaftlich geteilte Turnierlinks · keine bestätigte Meldung oder Teilnahme. Spiele und Ergebnisse stammen ausschließlich aus belegten DBV-/Badhub-Daten.</p>'+
@@ -105,11 +105,13 @@ async function refresh(id){
   const {rows}=await readPublicRows(communityPath(selected),{signal:request.signal,count:false,retries:0,timeoutMs:8500});
   if(current!==ticket)return;
   latest=rows;hasRendered=true;render(latest);
+  window.dispatchEvent(new Event("badminton:tournament-bookmarks"));
  }catch(err){
   if(current!==ticket||request.signal.aborted)return;
   render([],"Die geteilten Turniere sind derzeit nicht erreichbar. Lokale Turniere bleiben erhalten.");
  }
 }
+window.badmintonCommunityTournamentOptions=()=>sharedItems(latest,selected,day());
 window.badmintonCommunity={
  isShared:bookmark=>Boolean(getFlags()[sharedKey(bookmark)]),
  refresh:()=>refresh(selected)
