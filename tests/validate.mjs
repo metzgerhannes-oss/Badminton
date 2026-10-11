@@ -19,3 +19,6 @@ assert.ok(embedded,"Approved logo missing");
 assert.equal(createHash("sha256").update(Buffer.from(embedded,"base64")).digest("hex"),"8aced9ebd1eb23035fd59a18d2ddb332ac6c754da11328011f9e3613a32d1fb3");
 assert.ok(!html.includes('id="player-pills"'),"No family-wide player switch on home");
 console.log("Focused user settings, friends, tournament bookmarks and approved crest valid.");
+
+// Guard every translated catalog against missing static copy and mismatched keys.
+await import("../scripts/validate-i18n.mjs");
