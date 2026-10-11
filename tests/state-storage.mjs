@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import vm from "node:vm";
 
-const [storageScript,appScript]=await Promise.all([
- readFile("state-storage.js","utf8"),readFile("app.js","utf8")
+const [storageScript,bookmarksScript,appScript]=await Promise.all([
+ readFile("state-storage.js","utf8"),readFile("tournament-bookmarks.js","utf8"),readFile("app.js","utf8")
 ]);
 assert.doesNotMatch(storageScript,/fetch\(|XMLHttpRequest/,"Local state may not call remote APIs");
 assert.match(storageScript,/const STORE="shuttleboard-v1"/);
@@ -23,6 +23,7 @@ function makeVM(storage=items){
   setItem:(k,v)=>storage.set(k,String(v))
  }});
  vm.runInContext(storageScript,context,{filename:"state-storage.js"});
+ vm.runInContext(bookmarksScript,context,{filename:"tournament-bookmarks.js"});
  vm.runInContext(appScript,context,{filename:"app.js"});
  return {context,run:q=>vm.runInContext(q,context)};
 }
@@ -57,6 +58,7 @@ const blocked=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},
  localStorage:{getItem(){throw new Error("blocked")},setItem(){throw new Error("blocked")}}
 });
 vm.runInContext(storageScript,blocked,{filename:"state-storage.js"});
+vm.runInContext(bookmarksScript,blocked,{filename:"tournament-bookmarks.js"});
 vm.runInContext(appScript,blocked,{filename:"app.js"});
 assert.doesNotThrow(()=>vm.runInContext("restore();save()",blocked));
 assert.equal(vm.runInContext("state.players.length",blocked),0,"Blocked storage does not bootstrap private profiles");

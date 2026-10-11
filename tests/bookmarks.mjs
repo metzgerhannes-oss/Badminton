@@ -3,8 +3,10 @@ import assert from "node:assert/strict";
 import vm from "node:vm";
 const content=await readFile("app.js","utf8");
 const storage=await readFile("state-storage.js","utf8");
+const bookmarks=await readFile("tournament-bookmarks.js","utf8");
 const ctx=vm.createContext({URL,document:{addEventListener(){}}});
 vm.runInContext(storage,ctx,{filename:"state-storage.js"});
+vm.runInContext(bookmarks,ctx,{filename:"tournament-bookmarks.js"});
 vm.runInContext(content,ctx,{filename:"app.js"});
 function invoke(statement){return vm.runInContext(statement,ctx)}
 const example="https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5";

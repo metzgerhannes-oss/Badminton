@@ -6,39 +6,18 @@ const state={players:[],friends:[],officialLinks:[],activeProfileId:"",viewingFr
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=x=>{try{const u=new URL(String(x));return u.protocol==="https:"?u.href:""}catch{return ""}};
-function parseDbvTournamentLink(value){
- try{
-  const u=new URL(String(value).trim());
-  if(u.protocol!=="https:"||!["dbv.turnier.de","turnier.de","www.turnier.de"].includes(u.hostname))return null;
-  const m=u.pathname.match(/^\/tournament\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
-  if(!m)return null;
-  const id=m[1].toUpperCase();
-  return {id,url:"https://dbv.turnier.de/tournament/"+id};
- }catch{return null}
-}
-function normalizeBookmark(x){
- const p=parseDbvTournamentLink(x?.url);
- if(!p)return null;
- const title=String(x.name||"").trim().slice(0,100)||"DBV-Turnier "+p.id.slice(0,8);
- const validDate=d=>typeof d==="string"&&/^\d{4}-\d\d-\d\d$/.test(d)&&!Number.isNaN(Date.parse(d))?d:"";
- return {id:p.id,url:p.url,name:title,playerId:String(x.playerId||"all"),startDate:validDate(x.startDate),endDate:validDate(x.endDate)};
-}
-const localDay=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-const niceDay=x=>x?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(x+"T12:00:00Z")):"";
+// Preserve established local UI/test entry points while moving pure business rules.
+function parseDbvTournamentLink(value){return SchmetterlingeBookmarks.parseDbvTournamentLink(value)}
+function normalizeBookmark(value){return SchmetterlingeBookmarks.normalizeBookmark(value)}
+const localDay=()=>SchmetterlingeBookmarks.localDay();
+const niceDay=value=>SchmetterlingeBookmarks.niceDay(value);
 // Keep the legacy function names for UI callers and existing integrations.
 function restore(){SchmetterlingeStorage.restore(state,normalizeBookmark)}
 function save(){SchmetterlingeStorage.save(state)}
 let toastTimer;
 function toast(message){const node=el("toast");node.textContent=message;node.classList.add("visible");clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove("visible"),2800)}
-function selectedLinks(){if(state.viewingFriendId)return [];return state.officialLinks.filter(t=>t.playerId==="all"||t.playerId===state.activeProfileId)}
-function bookmarkPhase(t){
- if(!t.startDate)return ["Termin offen","unknown"];
- const today=localDay();
- if(today<t.startDate)return ["Bevorstehend","future"];
- const end=t.endDate&&t.endDate>=t.startDate?t.endDate:t.startDate;
- if(today>end)return ["Vergangen","past"];
- return ["Turniertag","today"];
-}
+function selectedLinks(){return SchmetterlingeBookmarks.visible(state)}
+function bookmarkPhase(t){return SchmetterlingeBookmarks.phase(t)}
 function currentProfile(){
  return state.viewingFriendId?state.friends.find(p=>p.id===state.viewingFriendId):state.players.find(p=>p.id===state.activeProfileId);
 }
@@ -83,11 +62,7 @@ function renderFocusHeader(){
  }));
 }
 function renderTournaments(){
- const sorted=selectedLinks().slice().sort((a,b)=>{
-  const order={today:0,future:1,unknown:2,past:3};
-  const aKind=bookmarkPhase(a)[1],bKind=bookmarkPhase(b)[1];
-  return order[aKind]-order[bKind]||(aKind==="past"?(b.startDate||"").localeCompare(a.startDate||""):(a.startDate||"").localeCompare(b.startDate||""))||a.name.localeCompare(b.name,"de");
- });
+ const sorted=SchmetterlingeBookmarks.sorted(state);
  const section=el("official-tournament-list");
  if(!sorted.length){section.innerHTML='<div class="empty"><h3>Noch keine Turniere gespeichert</h3><p>Füge einen DBV-Turnierlink hinzu, den du nach der Anmeldung erhalten hast.</p></div>';return}
  section.innerHTML=sorted.map(t=>{

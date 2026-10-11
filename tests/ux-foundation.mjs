@@ -50,9 +50,11 @@ assert.match(style,/\.library-player-action button,\.library-player-action \.lib
 assert.match(style,/min-height:44px/);
 assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(style,/:focus-visible/);
-assert.match(sw,/schmetterlinge-shell-v60/);
+assert.match(sw,/schmetterlinge-shell-v61/);
 assert.match(sw,/ui-feedback\.js/);
 assert.match(sw,/router\.js/);
+assert.match(sw,/tournament-bookmarks\.js/);
+assert.match(html,/<script defer src="\.\/tournament-bookmarks\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 assert.match(app,/SchmetterlingeRouter\.renderPage\(state\)/);
 assert.match(html,/<script defer src="\.\/router\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 assert.match(html,/<script defer src="\.\/state-storage\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);

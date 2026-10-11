@@ -16,6 +16,7 @@ jobs:
         run: |
           node --check ui-feedback.js
           node --check state-storage.js
+          node --check tournament-bookmarks.js
           node --check router.js
           node --check app.js
           node --check backup.js
@@ -59,6 +60,7 @@ jobs:
           node tests/history.mjs
           node tests/trophies.mjs
           node tests/bookmarks.mjs
+          node tests/tournament-bookmarks.mjs
           node tests/upcoming-tournaments.mjs
           node tests/friends.mjs
           node tests/profile-switch.mjs
