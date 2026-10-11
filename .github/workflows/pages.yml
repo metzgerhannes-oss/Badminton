@@ -36,8 +36,11 @@ jobs:
           node --check i18n.js
           node --check welcome.js
           node tests/club-branding.mjs
+          node tests/shared-tournaments.mjs
           node tests/release-version.mjs
           node --check dashboard.js
+          node --check shared-tournaments.js
+          node --check scripts/shared-tournaments.mjs
           node --check history.js
           node --check scripts/trophy-stats.mjs
           node --check scripts/upcoming-tournaments.mjs
