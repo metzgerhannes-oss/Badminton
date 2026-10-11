@@ -98,6 +98,7 @@ jobs:
           node tests/live-radar.mjs
           node tests/live-hub.mjs
           node tests/tournament-live.mjs
+          node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
           node tests/dbv-match-reference.mjs
