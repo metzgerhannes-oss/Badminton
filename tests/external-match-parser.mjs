@@ -116,6 +116,18 @@ assert.equal(conflict.items.length,0,"Contradictory BYE and scores never count")
 const realRust=card.replace('>Test Gegnerin<','>Rust<');
 assert.equal(parsePublicHistory(tour.replace(card,realRust),player,"tournament").items.length,1);
 
+
+// A completed youth match may render the sets before, not inside, sp-result-col.
+const scoresOutside=games.replace('class="sp-result-col"','class="sp-score-container"');
+const scoreOutsideCard=card.replace(games,'<div class="sp-result-col"></div>')
+ .replace('<div class="sp-match-body">','<div class="sp-match-body">'+scoresOutside);
+const scoreOutsideTour=tour.replace(card,scoreOutsideCard);
+assert.equal(parsePublicHistory(scoreOutsideTour,player,"tournament").items.length,1);
+const scoreOutside15=scoreOutsideTour.replaceAll('sp-s">21','sp-s">15')
+ .replaceAll('sp-s">18','sp-s">10').replaceAll('sp-s">13','sp-s">8');
+assert.equal(parsePublicHistory(scoreOutside15,player,"tournament").items.length,1,
+ "Completed 15-point match with an alternate score layout must be imported");
+
 const sql=await readFile("database/external-match-import.sql","utf8");
 const cron=await readFile("database/external-match-cron.sql","utf8");
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");
