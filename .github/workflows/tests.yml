@@ -65,6 +65,8 @@ jobs:
           node --check scripts/tournament-live.mjs
           node --check scripts/live-radar.mjs
           node --check scripts/live-links.mjs
+      - name: Investigate public tournament source shapes (bounded, read-only)
+        run: node scripts/probe-official-event.mjs
       - name: Run tests
         run: |
           node tests/security-gate.mjs
