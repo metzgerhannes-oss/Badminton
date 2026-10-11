@@ -1,10 +1,52 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
+import {readSharedTournaments} from "./scripts/shared-tournaments.mjs";
 "use strict";
 const rankUrl="./data/ranking.json";
 const historyUrl="./data/history.json";
 const rankNames={HE:"Einzel",DE:"Einzel",HD:"Doppel",DD:"Doppel",HM:"Mixed",DM:"Mixed"};
 let ranking=null,history=null,rankError=false,historyError=false,selection="",profiles=[],bookmarks=[],viewMode="own";
+const sharedCache=new Map();
+const sharedTTL=120000; // Public, bounded lookup on explicit friend view only.
+function renderSharedFriendTournaments(){
+ const host=$("shared-friend-tournaments");if(!host)return;
+ const cache=sharedCache.get(selection);
+ const entries=cache?.available?cache.rows.filter(p=>p.playerId===selection):[];
+ if(!entries.length){host.replaceChildren();return}
+ const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"})
+  .formatToParts(new Date()).filter(x=>x.type!=="literal");
+ const day=Object.fromEntries(today.map(x=>[x.type,x.value]));
+ const current=day.year+"-"+day.month+"-"+day.day;
+ const relevant=entries.filter(t=>!t.endDate||t.endDate>=current).slice(0,3);
+ if(!relevant.length){host.replaceChildren();return}
+ const section=document.createElement("section");
+ section.className="upcoming-tournaments-section shared-friend-section";
+ const title=document.createElement("h3");title.textContent="Geteilte Turniere";section.appendChild(title);
+ const explain=document.createElement("p");explain.className="small muted";
+ explain.textContent="Von Profilverantwortlichen geteilt · noch keine offizielle Anmelde- oder Spielbestätigung";
+ section.appendChild(explain);
+ for(const t of relevant){
+  const link=document.createElement("a");link.className="upcoming-tournament-row";
+  link.href=t.officialUrl;link.rel="noopener noreferrer";link.target="_blank";
+  const label=document.createElement("strong");label.textContent=t.title;
+  link.appendChild(label);
+  const meta=document.createElement("small");
+  meta.textContent=(t.startDate||"Datum offen")+" · DBV-Turnierseite ↗";
+  link.appendChild(meta);
+  section.appendChild(link);
+ }
+ host.replaceChildren(section);
+}
+async function refreshSharedForFriend(id){
+ if(!/^\d{2}-\d{6}$/.test(id))return;
+ const existing=sharedCache.get(id);
+ if(existing?.pending||Date.now()-(existing?.checked||0)<sharedTTL)return;
+ const entry={pending:true,available:false,rows:[],checked:Date.now()};
+ sharedCache.set(id,entry);
+ const result=await readSharedTournaments([id]);
+ sharedCache.set(id,{...result,pending:false,checked:Date.now()});
+ if(selection===id&&viewMode==="friend")renderSharedFriendTournaments();
+}
 const $=id=>document.getElementById(id);
 const escape=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=x=>typeof x==="number"&&Number.isFinite(x)?new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(x):"–";
@@ -146,7 +188,8 @@ function renderOtherKpis(){
  if(viewMode==="friend"){
   const p=profiles.find(x=>x.id===selection);
   const official=p?.url&&/^https:\/\//.test(p.url)?p.url:null;
-  next.innerHTML='<a class="kpi-wide" href="'+escape(official||"#einstellungen")+'"'+(official?' target="_blank" rel="noopener noreferrer"':"")+'><span><strong>Offizielles Spielerprofil</strong><small>'+(official?'Spielerdaten beim DBV ansehen':'Bitte in den Freundeseinstellungen einen offiziellen Profil-Link ergänzen')+'</small></span><span class="kpi-next-date">'+(official?'Profil ↗':'Einstellungen ↗')+'</span></a>';
+  next.innerHTML='<a class="kpi-wide" href="'+escape(official||"#einstellungen")+'"'+(official?' target="_blank" rel="noopener noreferrer"':"")+'><span><strong>Offizielles Spielerprofil</strong><small>'+(official?'Spielerdaten beim DBV ansehen':'Bitte in den Freundeseinstellungen einen offiziellen Profil-Link ergänzen')+'</small></span><span class="kpi-next-date">'+(official?'Profil ↗':'Einstellungen ↗')+'</span></a>' + '<div id="shared-friend-tournaments"></div>';
+  renderSharedFriendTournaments();
   return;
  }
  const upcoming=upcomingTournaments(bookmarks,selection,today);
@@ -172,6 +215,7 @@ function renderDashboard(){
 window.renderDashboard=(selected,ps,links,options={})=>{
  selection=selected||"";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
  renderDashboard();
+ if(viewMode==="friend")void refreshSharedForFriend(selection);
 };
 async function load(){
  await Promise.all([
