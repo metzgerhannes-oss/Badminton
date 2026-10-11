@@ -30,6 +30,7 @@ for(const category of ["turnier","liga"]){
   const scoreLengthHistogram={};
   const shortPatterns={};
   const short15Unresolved={};
+  const short15Layout={};
   const skipKeywords={bye:0,rast:0,rust:0,freilos:0,spielfrei:0,wo:0,walkover:0,aufgabe:0,unknown:0};
   const noScoreClassHints={};
   const noScoreSides={};
@@ -69,6 +70,17 @@ for(const category of ["turnier","liga"]){
    const endpoint=String(max||0);maxEndpointHistogram[endpoint]=(maxEndpointHistogram[endpoint]||0)+1;
    const scoreType=endpoint+"/"+values.length+" sets";scoreLengthHistogram[scoreType]=(scoreLengthHistogram[scoreType]||0)+1;
    if(max>=15&&max<21){const p=values.map(v=>Math.max(...v)).sort((a,b)=>a-b).join("-");shortPatterns[p]=(shortPatterns[p]||0)+1;}
+   if(values.length>=2&&values.every(v=>Math.max(...v)===15)){
+    const firstBody=chunk.search(/class="[^"]*\\bsp-match-body\\b/);
+    const firstResult=chunk.search(/class="[^"]*\\bsp-result-col\\b/);
+    const firstAway=chunk.search(/class="(?=[^"]*\\bsp-side\\b)(?=[^"]*\\bsp-side--away\\b)[^"]*"/);
+    const resultSlice=firstResult>=0&&firstAway>firstResult?chunk.slice(firstResult,firstAway):"";
+    const inMiddle=(resultSlice.match(/class="sp-set-score"/g)||[]).length;
+    const cssWinner=(chunk.match(/sp-side--winner/g)||[]).length;
+    const yes=!!completedMatchWinner(values,{year:2026});
+    const kind=(yes?"complete":"incomplete")+"_resultScores"+inMiddle+"_total"+values.length+"_winners"+cssWinner;
+    short15Layout[kind]=(short15Layout[kind]||0)+1;
+   }
    if(values.length>=2&&values.every(v=>Math.max(...v)===15)&&!completedMatchWinner(values,{year:2026})){
     const a=values.filter(v=>v[0]>v[1]).length,b=values.filter(v=>v[1]>v[0]).length;
     const cause=a===b?"split_set_winners":Math.max(a,b)>2?"too_many_set_wins":"unresolved_set_pattern";
@@ -79,7 +91,7 @@ for(const category of ["turnier","liga"]){
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,short15Unresolved,skipKeywords,noScoreClassHints,noScoreSides,roundKinds});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,short15Unresolved,short15Layout,skipKeywords,noScoreClassHints,noScoreSides,roundKinds});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
