@@ -29,5 +29,5 @@ assert.doesNotMatch(stats,/getDbvMatchReference|DBV · Kontrollstand|dbvReferenc
 assert.match(html,/aria-label="Datierte Badhub-Karrierebilanz"/);
 assert.match(css,/#match-stats-values\[hidden\]/);
 assert.match(css,/#match-stats-note\[hidden\]/);
-assert.match(sw,/schmetterlinge-shell-v71/);
+assert.match(sw,/schmetterlinge-shell-v72/);
 console.log("v71: one sourced Badhub career balance, no duplicate DBV summary, filtered facts remain separate.");
