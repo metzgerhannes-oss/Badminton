@@ -26,6 +26,7 @@ for(const category of ["turnier","liga"]){
   const scoreHistogram={};
   const maxEndpointHistogram={};
   const scoreLengthHistogram={};
+  const shortPatterns={};
   for(const chunk of html.split(/<div class="sp-match-item\b[^>]*>/).slice(1)){
    const values=[...chunk.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)]
@@ -35,12 +36,13 @@ for(const category of ["turnier","liga"]){
    scoreHistogram[band]=(scoreHistogram[band]||0)+1;
    const endpoint=String(max||0);maxEndpointHistogram[endpoint]=(maxEndpointHistogram[endpoint]||0)+1;
    const scoreType=endpoint+"/"+values.length+" sets";scoreLengthHistogram[scoreType]=(scoreLengthHistogram[scoreType]||0)+1;
+   if(max>=15&&max<21){const p=values.map(v=>Math.max(...v)).sort((a,b)=>a-b).join("-");shortPatterns[p]=(shortPatterns[p]||0)+1;}
   }
   results.push({source:category,cardCount:data.cards_seen,accepted:data.items.length,
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
