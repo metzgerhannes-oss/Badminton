@@ -32,7 +32,9 @@ assert.doesNotMatch(stats,/getDbvMatchReference|DBV · Kontrollstand|dbvReferenc
 assert.match(html,/aria-label="Datierte Badhub-Karrierebilanz"/);
 assert.match(css,/#match-stats-values\[hidden\]/);
 assert.match(css,/\.dbv-reference-totals\{display:grid;grid-template-columns:repeat\(4/);
-assert.match(css,/@media\(max-width:500px\)\{\.dbv-reference-totals\{grid-template-columns:repeat\(2/);
+assert.doesNotMatch(css,/@media\(max-width:500px\)\{\.dbv-reference-totals\{grid-template-columns:repeat\(2/,
+ "Small iPhones must show four career totals in one row");
+assert.match(css,/v74: all four Badhub career figures share one compact/);
 assert.match(css,/#match-stats-note\[hidden\]/);
-assert.match(sw,/schmetterlinge-shell-v73/);
+assert.match(sw,/schmetterlinge-shell-v74/);
 console.log("v72: one sourced Badhub career balance, no duplicate DBV summary, filtered facts remain separate.");
