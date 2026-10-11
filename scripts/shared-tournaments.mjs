@@ -6,9 +6,9 @@ export function communityPath(playerId){
  if(!DBV_ID.test(String(playerId||"")))return null;
  const q=new URLSearchParams({
   select:"player_dbv_id,external_tournament_id,title,start_date,end_date,updated_at,shared_at",
-  player_dbv_id:"eq."+playerId,is_shared:"eq.true",order:"start_date.asc.nullslast",limit:String(MAX_SHARES)
+  player_dbv_id:"eq."+playerId,order:"start_date.asc.nullslast",limit:String(MAX_SHARES)
  });
- return "user_tournament_links?"+q.toString();
+ return "shared_tournament_hints?"+q.toString();
 }
 export function sharedRecord(row){
  if(!row||!DBV_ID.test(row.player_dbv_id)||!UUID.test(row.external_tournament_id))return null;
