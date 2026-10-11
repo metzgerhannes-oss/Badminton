@@ -9,7 +9,10 @@ export function classifyNonPlayedCard(card){
  const result=body.search(/class="[^"]*\bsp-result-col\b/);
  const away=body.search(/class="(?=[^"]*\bsp-side\b)(?=[^"]*\bsp-side--away\b)[^"]*"/);
  if(result<0||away<0)return null;
- const center=body.slice(result,away),other=body.slice(away);
+ // Bound the away slot: later tournament markup can contain unrelated names.
+ const awayEnd=body.indexOf("</div>",away);
+ const center=body.slice(result,away);
+ const other=body.slice(away,awayEnd>=0?awayEnd+6:undefined);
  const scores=[...center.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
   .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)])
   .filter(items=>items.length===2).length;
