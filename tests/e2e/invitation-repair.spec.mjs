@@ -34,9 +34,14 @@ test("confirmed directory search reselects existing DBV account without making a
  await page.locator("#welcome-player-search").fill("Philipp");
  const found=page.locator(".welcome-search-hit").filter({hasText:"Philipp Metzger"});
  await expect(found).toHaveCount(1);
- // Already-existing players are disabled to prevent unintended duplicate creations.
- await expect(found).toBeDisabled();
+ await expect(found).toBeEnabled();
+ await found.click();
+ await expect(page.locator("#welcome-selection-detail")).toContainText("DBV 05-070879");
+ await page.locator("#welcome-selection-save").click();
+ await expect(page.locator("#onboard-install")).toBeVisible();
+ await expect(page.locator(".welcome-success")).toContainText("05-070879");
  const current=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(current.players).toHaveLength(1);
  expect(current.players[0].id).toBe("05-070879");
+ expect(current.activeProfileId).toBe("05-070879");
 });
