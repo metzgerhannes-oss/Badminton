@@ -63,7 +63,7 @@ for(const url of urls){
     const form=body.slice(Math.max(0,body.indexOf("<form")),body.indexOf("<form")+5000);
     console.log("COOKIE_FORM_ACTION",form.match(/<form[^>]+/i)?.[0]||"");
     console.log("COOKIE_INPUT_NAMES",[...form.matchAll(/<input[^>]+/gi)].map(x=>({type:x[0].match(/type="([^"]+)/)?.[1]||"",name:x[0].match(/name="([^"]+)/)?.[1]||""})).slice(0,15));
-    console.log("COOKIE_BUTTON_TEXT",[...form.matchAll(/<button[^>]*>[\\s\\S]*?<\\/button>/gi)].map(x=>x[0].replace(/<[^>]+>/g,"").trim().slice(0,80)).slice(0,10));
+    console.log("COOKIE_BUTTONS",form.slice(Math.max(0,form.indexOf("<button")),form.indexOf("<button")+650).replace(/<[^>]+>/g," "));
    }
    const markers=["__NEXT_DATA__","__NUXT__","__INITIAL_STATE__","application/ld+json","/api/","Matches","Spiele","matches","Auslosung","Live","tournamentsoftware"];
    console.log("MARKERS",markers.filter(m=>body.includes(m)).join(","));
