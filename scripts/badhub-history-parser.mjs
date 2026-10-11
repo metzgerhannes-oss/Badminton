@@ -60,14 +60,11 @@ function sides(chunk,counts,year){
  let scores=readScores(post.slice(0,rightStart));
  if(scores.length===0){
   const alternate=readScores(chunk);
-  if(alternate.length>=2&&alternate.length<=3)scores=alternate;
+  if(alternate.length>=2&&alternate.length<=5)scores=alternate;
  }
  const completion=completedMatchWinner(scores,{year});
  if(!completion){
   noteReject(counts,"incomplete_or_invalid_score");
-  noteReject(counts,"debug_source_score_count_"+scores.length+"_card_"+readScores(chunk).length);
-  noteReject(counts,"debug_max_"+scores.map(x=>Math.max(...x)).join("-")+
-   "_setWinners_"+scores.map(x=>x[0]>x[1]?"A":"B").join(""));
   return null;
  }
  const winningSide=winA?1:2;
