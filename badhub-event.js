@@ -2,7 +2,8 @@
  * No provider scraping from the PWA and no official result-table writes. */
 import {SOURCE_KEY,parseBadhubLink,queryEvent,validateEventResult,renderSummary} from "./scripts/badhub-event.mjs";
 const $=id=>document.getElementById(id);
-const present=()=>location.hash==="#live"&&window.badmintonMatchdayMode==="all"&&!document.hidden;
+const present=()=>!document.hidden&&(location.hash==="#turniere"||
+ (location.hash==="#live"&&window.badmintonMatchdayMode==="all"));
 const root=()=> $("badhub-event-results");
 let sequence=0,abort=null,busy=false,loadedAt=0,activeKey="",eventUrl="",discipline="",sourceInfo=null;
 const elem=(tag,css,text)=>{
