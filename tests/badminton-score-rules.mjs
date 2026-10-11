@@ -27,7 +27,7 @@ assert.equal(completedMatchWinner([[11,8],[8,11],[11,9]],{rule:"5x11"}),null,
 assert.equal(completedMatchWinner([[21,14]]),null,
  "Do not infer 1-set matches without a declared rule");
 for(const [scores,rule] of [
- [[],null],[[10,10],[11,8]],[[21,9],[21,9],[21,9]],null],
+ [[],null], [[[10,10],[11,8]],null], [[[21,9],[21,9],[21,9]],null],
  [[[21,8],[21,4],[8,21]],"3x21"],
  [[[11,7],[11,8],[11,9],[8,11]],null],
  [[[21,10],[21,11],[21,9]],"3x21"],
