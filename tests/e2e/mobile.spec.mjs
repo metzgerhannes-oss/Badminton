@@ -294,7 +294,7 @@ test("Historical source validation matches the Home statistics",async ({page})=>
  await expect(page.locator("#external-match-progress")).toContainText("1 unklare oder doppelte Quellkarten");
  await expect(page.locator("#external-match-list .external-match-item")).toHaveCount(1);
  await page.locator('.bottom-nav a[data-page="start"]').click();
- await expect(page.locator("#match-stats-reference .dbv-reference-totals strong")).toHaveText(["62","26","36"]);
+ await expect(page.locator("#match-stats-reference .dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9/]);
  await expect(page.locator("#match-stats-values")).toBeHidden();
 });
 
