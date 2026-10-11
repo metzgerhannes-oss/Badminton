@@ -182,10 +182,18 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
   routeTo(destination);
  return true;
 };
-window.badmintonTournamentOptions=()=>state.officialLinks.slice().sort((a,b)=>{
- const order={today:0,future:1,unknown:2,past:3};
- return order[bookmarkPhase(a)[1]]-order[bookmarkPhase(b)[1]]||a.name.localeCompare(b.name,"de");
-});
+window.badmintonTournamentOptions=()=>{
+ // Shared event hints are never written to family bookmarks. Their DBV source
+ // link can still open the already verified LIVE/tournament match views.
+ const local=state.officialLinks.slice();
+ const community=window.badmintonCommunityTournamentOptions?.()||[];
+ const seen=new Set(local.map(t=>t.id));
+ for(const t of community){if(!seen.has(t.id)){local.push(t);seen.add(t.id)}}
+ return local.sort((a,b)=>{
+  const order={today:0,future:1,unknown:2,past:3};
+  return order[bookmarkPhase(a)[1]]-order[bookmarkPhase(b)[1]]||a.name.localeCompare(b.name,"de");
+ });
+};
 window.badmintonLiveViewerOptions=()=>({
  own:state.players.map(p=>({id:p.id,name:p.name})),
  friends:state.friends.map(p=>({id:p.id,name:p.name})),
