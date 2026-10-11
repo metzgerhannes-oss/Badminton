@@ -91,6 +91,26 @@
     "Weiter": "متابعة",
     "Mit DBV-Profil starten": "البدء بملف DBV",
     "Name des Spielers oder der Spielerin": "اسم اللاعب أو اللاعبة",
-    "Name oder DBV-Spieler-ID": "الاسم أو معرّف لاعب DBV"
+    "Name oder DBV-Spieler-ID": "الاسم أو معرّف لاعب DBV",
+    "DEIN PERSÖNLICHER START": "بدايتك الشخصية",
+    "Willkommen bei den": "مرحبًا بك في",
+    "Schmetterlingen.": "Schmetterlinge.",
+    "Wessen Badminton möchtest du verfolgen?": "أي لاعب بادمنتون تريد متابعته؟",
+    "1 · Spielerprofil": "١ · ملف اللاعب",
+    "2 · Zum Home-Bildschirm": "٢ · إضافة إلى الشاشة الرئيسية",
+    "Diesen Spieler übernehmen": "اختيار هذا اللاعب",
+    "Spieler nicht gefunden? Manuell einrichten": "لم تجد اللاعب؟ الإعداد يدويًا",
+    "Schmetterlinge wie eine App öffnen": "فتح Schmetterlinge كتطبيق",
+    "Jetzt Schmetterlinge öffnen": "افتح Schmetterlinge الآن",
+    "Zur App ↗": "الانتقال إلى التطبيق ↗",
+    "Erscheinungsbild & Verein": "المظهر والنادي",
+    "Vereinsname": "اسم النادي",
+    "Logo entfernen": "إزالة الشعار",
+    "Vereinsfarbe": "لون النادي",
+    "Live-Vorschau": "معاينة مباشرة",
+    "Vereinsdesign speichern": "حفظ تصميم النادي",
+    "Standarddesign": "التصميم الافتراضي",
+    "Vereinslogo (PNG, JPG oder WebP, maximal 2 MB)": "شعار النادي (PNG أو JPG أو WebP، بحد أقصى 2 ميغابايت)",
+    "Mindestens zwei Zeichen eingeben, um Spieler zu finden.": "أدخل حرفين على الأقل للبحث عن لاعبين."
   }
 }

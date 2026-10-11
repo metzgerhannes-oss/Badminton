@@ -91,6 +91,26 @@
     "Weiter": "Continua",
     "Mit DBV-Profil starten": "Inizia con profilo DBV",
     "Name des Spielers oder der Spielerin": "Nome del giocatore o della giocatrice",
-    "Name oder DBV-Spieler-ID": "Nome o ID giocatore DBV"
+    "Name oder DBV-Spieler-ID": "Nome o ID giocatore DBV",
+    "DEIN PERSÖNLICHER START": "IL TUO INIZIO PERSONALE",
+    "Willkommen bei den": "Benvenuto in",
+    "Schmetterlingen.": "Schmetterlinge.",
+    "Wessen Badminton möchtest du verfolgen?": "Quale giocatore di badminton vuoi seguire?",
+    "1 · Spielerprofil": "1 · Profilo giocatore",
+    "2 · Zum Home-Bildschirm": "2 · Aggiungi alla schermata Home",
+    "Diesen Spieler übernehmen": "Seleziona questo giocatore",
+    "Spieler nicht gefunden? Manuell einrichten": "Giocatore non trovato? Configura manualmente",
+    "Schmetterlinge wie eine App öffnen": "Apri Schmetterlinge come un'app",
+    "Jetzt Schmetterlinge öffnen": "Apri Schmetterlinge ora",
+    "Zur App ↗": "Vai all'app ↗",
+    "Erscheinungsbild & Verein": "Aspetto e club",
+    "Vereinsname": "Nome del club",
+    "Logo entfernen": "Rimuovi logo",
+    "Vereinsfarbe": "Colore del club",
+    "Live-Vorschau": "Anteprima dal vivo",
+    "Vereinsdesign speichern": "Salva stile del club",
+    "Standarddesign": "Stile predefinito",
+    "Vereinslogo (PNG, JPG oder WebP, maximal 2 MB)": "Logo del club (PNG, JPG o WebP, max 2 MB)",
+    "Mindestens zwei Zeichen eingeben, um Spieler zu finden.": "Inserisci almeno due caratteri per trovare i giocatori."
   }
 }
