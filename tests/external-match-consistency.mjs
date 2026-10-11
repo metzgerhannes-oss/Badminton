@@ -15,7 +15,11 @@ assert.equal(computeExternalStats([dbvCrossfed]).total,1,
 assert.equal(result.total,1);assert.equal(result.wins,1);
 assert.equal(result.losses,0);assert.equal(result.excluded,3);
 assert.equal(computeExternalStats(cards,{year:"2025"}).total,0);
-assert.equal(result.details[0].scoring.ruleId,"3x21");
+assert.equal(result.details[0].scoring.ruleId,null,
+ "Match victory is confirmed by sourced W/L and set comparisons, not an inferred scoring rule");
+assert.equal(result.details[0].scoring.ruleSource,"set-results");
+assert.equal(computeExternalStats([{...good,competition:"Turnier 3x21"}]).details[0].scoring.ruleId,"3x21",
+ "An explicitly published scoring format may be displayed as metadata");
 const one={...good,source_key:"one",games:[[21,17]],competition:"Jugendturnier"};
 assert.equal(computeExternalStats([one]).total,0,"One set without a source rule is not a match");
 assert.equal(computeExternalStats([{...one,competition:"Jugendturnier 1x21"}]).total,1,
