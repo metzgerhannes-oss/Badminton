@@ -93,6 +93,7 @@ jobs:
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
           node tests/dbv-match-reference.mjs
+          node tests/badhub-primary-career.mjs
           node scripts/import-coverage-audit.test.mjs
           node tests/external-match-consistency.mjs
           node tests/match-availability.mjs
