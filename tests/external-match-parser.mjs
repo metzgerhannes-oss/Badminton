@@ -66,6 +66,39 @@ assert.equal(l.items[0].category,"league");
 assert.equal(l.items[0].match_date,"2026-10-09");
 assert.equal(l.items[0].event,"DE");
 assert.equal(l.items[0].competition_id,"290071");
+
+const variantCard=card
+ .replace('class="sp-side sp-side--winner"','class="sp-side sp-side--home sp-side--winner"')
+ .replace('class="sp-match-body"','class="sp-match-body sp-match-body--compact"')
+ .replace('class="sp-result-col"','class="sp-result-col sp-result-col--small"');
+const variantTour=tour.replace(card,variantCard);
+const variant=parsePublicHistory(variantTour,player,"tournament");
+assert.equal(variant.items.length,1,"CSS modifiers may not drop a valid sourced game");
+const foreignSelf=tour.replace(
+ '<span class="sp-name-full">Sarah Storz</span>',
+ '<span class="sp-name-full">Someone Else</span>');
+const wrongIdentity=parsePublicHistory(foreignSelf,player,"tournament");
+assert.equal(wrongIdentity.items.length,0,"Self marker alone is not identity proof");
+assert.equal(wrongIdentity.rejection_reasons.wrong_self_identity,1);
+const incomplete=tour.replace('<span class="sp-s">18</span>','<span class="sp-s">20</span>');
+assert.equal(parsePublicHistory(incomplete,player,"tournament").items.length,0,
+ "21:20 is not a completed badminton game");
+const conflicting=tour.replace('<div class="sp-side sp-side--winner">',
+ '<div class="sp-side">');
+assert.equal(parsePublicHistory(conflicting,player,"tournament").items.length,0);
+const multi=tour.replace('<div class="sp-meeting">',
+ '<div class="sp-meeting">');
+assert.equal(parsePublicHistory(multi,player,"tournament").items.length,1);
+assert.equal(typeof variant.rejection_reasons,"object");
+
+
+const youth11=tour.replace(/21/g,"11").replace(/18/g,"8").replace(/13/g,"3");
+assert.equal(parsePublicHistory(youth11,player,"tournament").items.length,1,
+ "Completed 11-point youth match must be counted");
+const youth15=tour.replace(/21/g,"15").replace(/18/g,"10").replace(/13/g,"7");
+assert.equal(parsePublicHistory(youth15,player,"tournament").items.length,1,
+ "Completed 15-point youth match must be counted");
+
 const sql=await readFile("database/external-match-import.sql","utf8");
 const cron=await readFile("database/external-match-cron.sql","utf8");
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");
@@ -96,5 +129,5 @@ assert.match(js,/match_date/);
 assert.match(js,/Quellbeleg/);
 assert.match(bridge,/history-match-import/);
 assert.doesNotMatch(welcome,/history-match-import/);
-assert.match(sw,/schmetterlinge-shell-v65/);
+assert.match(sw,/schmetterlinge-shell-v66/);
 console.log("Sourced external match import: parser identifies winner/sides/scores, refuses mismatched profile, idempotent DB and queue contracts verified.");

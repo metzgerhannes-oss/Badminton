@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {dbvMatchReferences,getDbvMatchReference,compareDbvMatchReference,
+import {dbvMatchReferences,getDbvMatchReference,getBadhubMatchReference,compareDbvMatchReference,
  dbvReferenceMessage} from "../scripts/dbv-match-reference.mjs";
+const bh=getBadhubMatchReference("05-070879");
+assert.equal(bh.total,62);
+assert.equal(bh.wins,26);
+assert.equal(bh.losses,36);
+assert.equal(bh.capturedOn,"2026-10-11");
+assert.equal(getBadhubMatchReference("05-070879",{year:"2026"}),null);
+assert.equal(getBadhubMatchReference("05-070879",{discipline:"Einzel"}),null);
+assert.equal(getBadhubMatchReference("05-071969"),null);
 const career=getDbvMatchReference("05-070879");
 assert.equal(career.total,60);
 assert.equal(career.wins,26);

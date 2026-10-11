@@ -606,3 +606,7 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .dbv-reference-totals strong{font-size:1.35rem;color:var(--text, #243544);font-variant-numeric:tabular-nums}
 .dbv-match-reference p{margin:7px 0 0}
 .dbv-match-reference .dbv-reference-comparison{font-weight:600;color:var(--text, #243544)}
+
+/* v66: dated Badhub aggregate compared separately with DBV and source proofs. */
+.dbv-secondary-reference{margin-top:14px;padding-top:12px;border-top:1px solid rgba(120,144,164,.4)}
+.dbv-match-reference>a{display:inline-flex;min-height:36px;align-items:center;font-weight:650;overflow-wrap:anywhere}
