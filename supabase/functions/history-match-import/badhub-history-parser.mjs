@@ -52,9 +52,16 @@ function sides(chunk,counts,year){
  const winnerClass=/class="(?=[^"]*\bsp-side\b)(?=[^"]*\bsp-side--winner\b)[^"]*"/;
  const winA=winnerClass.test(left),winB=winnerClass.test(right);
  if(winA===winB){noteReject(counts,"missing_or_ambiguous_winner");return null}
- const scores=[...post.slice(0,rightStart).matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
+ // Badhub uses two layouts: standard result columns and youth match cards
+ // with set scores elsewhere in the SAME sp-match-item.
+ const readScores=markup=>[...markup.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
   .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)].map(x=>Number(x[1])))
   .filter(s=>s.length===2&&s.every(x=>x>=0&&x<=40));
+ let scores=readScores(post.slice(0,rightStart));
+ if(scores.length===0){
+  const alternate=readScores(chunk);
+  if(alternate.length>=2&&alternate.length<=3)scores=alternate;
+ }
  const completion=completedMatchWinner(scores,{year});
  if(!completion){noteReject(counts,"incomplete_or_invalid_score");return null}
  const winningSide=winA?1:2;
