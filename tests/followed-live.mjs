@@ -65,4 +65,4 @@ assert.match(sw,/followed-live\.js/);
 assert.match(sw,/scripts\/followed-live\.mjs/);
 assert.match(worker,/node tests\/followed-live\.mjs/);
 assert.match(radar,/window\.badmintonMatchdayMode!=="all"/);
-console.log("v84 followed LIVE: grouped public IDs, bounded on-demand reads, fresh-only scores, XSS-safe cards.");
+console.log("v86 followed LIVE: grouped public IDs, bounded on-demand reads, fresh-only scores, XSS-safe cards.");
