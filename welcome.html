@@ -9,6 +9,8 @@
  <link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
  <link rel="manifest" href="./manifest.webmanifest">
  <link rel="stylesheet" href="./welcome.css">
+ <link rel="stylesheet" href="./language.css">
+ <script defer src="./i18n.js"></script>
  <script type="module" src="./welcome.js"></script>
 </head>
 <body>
@@ -19,6 +21,10 @@
    <a href="./#start" id="existing-app-link">Zur App ↗</a>
   </header>
   <main>
+  <div class="welcome-language-picker">
+      <label for="welcome-language">Sprache</label>
+      <select id="welcome-language" data-language-select aria-label="App-Sprache"><option value="auto">Automatisch</option><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="uk">Українська</option><option value="ru">Русский</option><option value="zh-Hans">简体中文</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="it">Italiano</option><option value="es">Español</option><option value="pl">Polski</option></select>
+     </div>
    <section class="welcome-hero" aria-labelledby="welcome-title">
     <span class="welcome-eyebrow">DEIN PERSÖNLICHER START</span>
     <h1 id="welcome-title">Willkommen bei den <em>Schmetterlingen.</em></h1>

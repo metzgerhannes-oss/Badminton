@@ -1,0 +1,15 @@
+/* Isolated multilingual controls; app and invitation UI both use this file. */
+.language-settings label {display:block;font-weight:600;margin:8px 0 6px}
+.language-settings select,.welcome-language-picker select {
+  box-sizing:border-box;width:100%;max-width:100%;min-height:44px;
+  font:inherit;border:1px solid #87a6be;border-radius:10px;padding:10px 12px
+}
+.language-settings select{background:#fff;color:#163148}
+.welcome-language-picker{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;margin:0 0 16px}
+.welcome-language-picker label{font-weight:600}
+.welcome-language-picker select{width:auto;max-width:100%;min-width:175px;flex:1;
+  background:var(--surface,#142e4b);color:var(--ink,#fff)}
+[data-language-select] option{direction:auto}
+html[dir="rtl"] .welcome-language-picker,html[dir="rtl"] .language-settings{direction:rtl}
+html[dir="rtl"] .welcome-language-picker select,html[dir="rtl"] .language-settings select{text-align:right}
