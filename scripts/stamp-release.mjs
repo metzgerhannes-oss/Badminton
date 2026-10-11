@@ -25,6 +25,32 @@ if (process.argv.includes("--verify")) {
     '{version:"' + version + '", build:"pages-' + run + '", commit:"' + sha + '"}');
   const swOut = sw.replace('const CACHE="schmetterlinge-shell-' + version + '"',
     'const CACHE="schmetterlinge-shell-' + version + '-' + sha.slice(0,10) + '"');
-  await Promise.all([writeFile(releasePath, scriptOut), writeFile(swPath, swOut)]);
+  const pages = ["index.html", "welcome.html"];
+  const originals = await Promise.all(pages.map(p => readFile(p, "utf8")));
+  const stampedPages = originals.map((html, i) => {
+    const badges = [...html.matchAll(/<span\\b[^>]*\\bdata-app-version\\b[^>]*>[^<]*<\\/span>/g)];
+    assert.equal(badges.length, 1, "Expected exactly one release badge in " + pages[i]);
+    assert.ok(badges[0][0].includes(">" + version + "</span>"),
+      "HTML badge must match the canonical release: " + pages[i]);
+    const badge = badges[0][0];
+    let updatedBadge = badge.replace(/\\stitle="[^"]*"/, "");
+    updatedBadge = updatedBadge.replace(" data-app-version",
+      ' data-app-version data-release-build="' + sha + '" title="Version ' + version +
+      ' · Build pages-' + run + ' · Commit ' + sha + '"');
+    let updated = html.replace(badge, updatedBadge);
+    if (pages[i] === "index.html") {
+      const info = /<p\\b[^>]*\\bid="app-build-info"[^>]*>[^<]*<\\/p>/;
+      assert.match(updated, info, "Settings build info missing");
+      updated = updated.replace(info, match => match
+        .replace('id="app-build-info"', 'id="app-build-info" data-release-build="' + sha + '"')
+        .replace(/>[^<]*<\\/p>$/, '>Version ' + version + ' · Build pages-' + run +
+          ' · Commit ' + sha + '</p>'));
+    }
+    return updated;
+  });
+  await Promise.all([
+    writeFile(releasePath, scriptOut), writeFile(swPath, swOut),
+    ...pages.map((p, i) => writeFile(p, stampedPages[i]))
+  ]);
   console.log("Stamped " + version + " (build " + run + ", commit " + sha.slice(0,10) + ")");
 }
