@@ -65,10 +65,10 @@ function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
  // Badhub also publishes matches as a winner in bold and a dash instead
  // of set points. Count their REPORTED OUTCOME, never invent set points.
  // The same card must name both opponents and mark exactly one winning side.
- // post begins inside the result-column opening tag; restore the tag
- // before stripping HTML so Badhub's printed en dash is parsed correctly.
- const printedResult=plain("<div "+post.slice(0,rightStart));
- const isDash=/^[–—-]$/.test(printedResult);
+ // A printed dash inside the RESULT column and a bold, unique winner
+ // are independent published result evidence when sets are not available.
+ const resultColumn=post.slice(0,rightStart);
+ const isDash=/(?:>|^)\s*[–—-]\s*(?=<|$)/.test(resultColumn);
  const declaredWinner=allowDeclaredWinner&&scores.length===0&&isDash;
  const completion=declaredWinner
   ?{winningSide:winA?1:2,ruleSource:"badhub-bold-no-scores"}
