@@ -23,7 +23,7 @@ assert.match(stats,/fetchProfile\(selected,true\)/);
 assert.match(stats,/badminton:network-restored/);
 assert.match(stats,/officialCount\.total===0&&external\.length>0/);
 assert.match(stats,/Ergebnisse aus verschiedenen Quellen werden nicht addiert/);
-assert.match(stats,/Badhub · Einzelbelege/);
+assert.match(stats,/Badhub · Teilbestand/);
 assert.doesNotMatch(stats,/note\.textContent="Einzeln belegte Badhub-Spiele · kein offizieller DBV-Matchimport\./);
 
 const nav=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
