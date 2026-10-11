@@ -6,10 +6,12 @@ const [html,css,sw,js,manifest]=await Promise.all([
  readFile("manifest.webmanifest","utf8").then(JSON.parse)
 ]);
 assert.match(html,/rel="stylesheet" href="\.\/design-v2\.css"/);
+assert.match(html,/rel="stylesheet" href="\.\/app-shell\.css"/);
+assert.match(sw,/app-shell\.css/);
 assert.match(sw,/design-v2\.css/);
 assert.match(sw,/stats\.js/);
 assert.match(sw,/scripts\/match-stats\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v62/);
+assert.match(sw,/schmetterlinge-shell-v63/);
 for(const id of ["start","turniere","berichte","spieler"]){
  assert.match(html,new RegExp('data-page="'+id+'"'));
 }
