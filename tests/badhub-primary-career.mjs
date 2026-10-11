@@ -22,6 +22,12 @@ assert.doesNotMatch(stats,/<p>Quelle: /);
 assert.match(stats,/Intl\.NumberFormat\("de-DE"/);
 assert.match(stats,/badhub\.wins\/badhub\.total/);
 assert.match(stats,/Siegquote/);
+assert.match(stats,/<span class="wins"><strong>/);
+assert.match(stats,/<span class="losses"><strong>/);
+assert.match(css,/\.dbv-reference-totals span\.wins strong\{color:#07864c\}/);
+assert.match(css,/\.dbv-reference-totals span\.losses strong\{color:#9b4242\}/);
+assert.match(css,/background:#e9f6ff;color:var\(--muted/);
+
 assert.match(stats,/badhub\.sourceUrl/);
 assert.match(stats,/if\(badhub&&referenceSection\)\{[\s\S]*?values\.hidden=true;/);
 assert.match(stats,/if\(provenance\)provenance\.hidden=true;/);
@@ -36,5 +42,5 @@ assert.doesNotMatch(css,/@media\(max-width:500px\)\{\.dbv-reference-totals\{grid
  "Small iPhones must show four career totals in one row");
 assert.match(css,/v74: all four Badhub career figures share one compact/);
 assert.match(css,/#match-stats-note\[hidden\]/);
-assert.match(sw,/schmetterlinge-shell-v74/);
+assert.match(sw,/schmetterlinge-shell-v75/);
 console.log("v72: one sourced Badhub career balance, no duplicate DBV summary, filtered facts remain separate.");

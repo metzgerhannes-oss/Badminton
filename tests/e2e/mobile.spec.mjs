@@ -101,6 +101,16 @@ test("Home uses one Badhub career summary; filters retain separately evidenced m
  await expect(reference).not.toContainText("DBV · Kontrollstand");
  await expect(reference).not.toContainText("Einzelbeleg-Teilbestand");
  await expect(reference.locator(".dbv-reference-totals span")).toHaveCount(4);
+ const careerPalette=await reference.evaluate(el=>{
+  const box=el.querySelector(".dbv-reference-totals .wins");
+  return {
+   win:getComputedStyle(box.querySelector("strong")).color,
+   loss:getComputedStyle(el.querySelector(".dbv-reference-totals .losses strong")).color,
+   background:getComputedStyle(box).backgroundColor,
+   border:getComputedStyle(box).borderTopColor
+  };
+ });
+
  await expect(page.locator("#match-stats-values")).toBeHidden();
  await expect(page.locator("#match-stats-note")).toBeHidden();
  await expect(page.locator("#match-stats-provenance")).toBeHidden();
@@ -113,6 +123,17 @@ test("Home uses one Badhub career summary; filters retain separately evidenced m
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("0");
+ const proofPalette=await page.locator("#match-stats-values").evaluate(el=>{
+  const box=el.querySelector(".match-stat.wins");
+  return {
+   win:getComputedStyle(box.querySelector("strong")).color,
+   loss:getComputedStyle(el.querySelector(".match-stat.losses strong")).color,
+   background:getComputedStyle(box).backgroundColor,
+   border:getComputedStyle(box).borderTopColor
+  };
+ });
+ expect(careerPalette).toEqual(proofPalette);
+
  await page.locator("#match-stats-discipline").selectOption("all");
  await expect(reference).toBeVisible();
  await expect(page.locator("#match-stats-values")).toBeHidden();

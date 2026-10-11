@@ -178,5 +178,15 @@ test("v74 four compact Badhub career tiles on every mobile width",async ({page})
   expect(metrics.columns).toBe(4);
   expect(metrics.right).toBeLessThanOrEqual(width+1);
   expect(metrics.contentRight).toBeLessThanOrEqual(metrics.right+1);
+  const color=await panel.evaluate(el=>({
+   win:getComputedStyle(el.querySelector(".dbv-reference-totals .wins strong")).color,
+   loss:getComputedStyle(el.querySelector(".dbv-reference-totals .losses strong")).color,
+   tile:getComputedStyle(el.querySelector(".dbv-reference-totals .wins")).backgroundColor
+  }));
+  expect(color).toEqual({
+   win:"rgb(7, 134, 76)",
+   loss:"rgb(155, 66, 66)",
+   tile:"rgb(233, 246, 255)"
+  });
  }
 });

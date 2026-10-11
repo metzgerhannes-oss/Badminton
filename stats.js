@@ -191,10 +191,10 @@ function render(){
   referenceSection.innerHTML=
    '<div class="dbv-reference-heading"><strong>Badhub · veröffentlichte Karrierebilanz</strong>'+
    '<time datetime="'+esc(badhub.capturedOn)+'">Stand '+esc(dateLabel(badhub.capturedOn))+'</time></div>'+
-   '<div class="dbv-reference-totals"><span><strong>'+esc(badhub.total)+
-   '</strong> Spiele</span><span><strong>'+esc(badhub.wins)+
-   '</strong> Siege</span><span><strong>'+esc(badhub.losses)+
-   '</strong> Niederlagen</span><span><strong>'+esc(new Intl.NumberFormat("de-DE",{
+   '<div class="dbv-reference-totals"><span class="matches"><strong>'+esc(badhub.total)+
+   '</strong> Spiele</span><span class="wins"><strong>'+esc(badhub.wins)+
+   '</strong> Siege</span><span class="losses"><strong>'+esc(badhub.losses)+
+   '</strong> Niederlagen</span><span class="rate"><strong>'+esc(new Intl.NumberFormat("de-DE",{
     style:"percent",minimumFractionDigits:1,maximumFractionDigits:1
    }).format(badhub.total?badhub.wins/badhub.total:0))+
    '</strong> Siegquote</span></div>'+
