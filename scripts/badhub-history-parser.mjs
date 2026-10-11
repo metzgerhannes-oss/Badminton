@@ -63,7 +63,11 @@ function sides(chunk,counts,year){
   if(alternate.length>=2&&alternate.length<=3)scores=alternate;
  }
  const completion=completedMatchWinner(scores,{year});
- if(!completion){noteReject(counts,"incomplete_or_invalid_score");return null}
+ if(!completion){
+  noteReject(counts,"incomplete_or_invalid_score");
+  noteReject(counts,"debug_source_score_count_"+scores.length+"_card_"+readScores(chunk).length);
+  return null;
+ }
  const winningSide=winA?1:2;
  if(completion.winningSide!==winningSide){
   noteReject(counts,"winner_score_conflict");return null
