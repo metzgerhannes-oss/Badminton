@@ -22,3 +22,9 @@
 .welcome-manual-panel>summary{font-size:13px;font-weight:800;cursor:pointer;color:#d3edff;line-height:1.5}
 .welcome-manual-panel[open]>summary{margin-bottom:14px}
 @media(max-width:370px){.welcome-search{padding:13px}.welcome-search-hit{padding:11px}.welcome-manual-panel{padding:12px}}
+
+/* v77 language choice on the invitation/install entry page. */
+.welcome-language-picker { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:10px 0 2px; font-size:.85rem; }
+.welcome-language-picker label { font-weight:600; }
+.welcome-language-picker select { max-width:min(55vw,210px); min-height:40px; font:inherit; color:inherit; background:transparent; border:1px solid currentColor; border-radius:10px; padding:7px 10px; }
+[dir="rtl"] #welcome-reference, [dir="rtl"] #welcome-player-search { direction:ltr; text-align:left; }
