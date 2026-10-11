@@ -2,7 +2,7 @@
  * It never fetches Badhub directly from browsers and never guesses live scores. */
 import {
  DBV_ID,watchRequest,snapshotPath,liveView,
- radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime
+ radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime,matchdayOverview
 } from "./scripts/live-radar.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
@@ -61,7 +61,7 @@ function matchList(label,items,params){
  if(!items?.length)return null;
  const section=element("section","radar-section");
  section.appendChild(element("h4","",label));
- for(const m of items.slice(0,8))section.appendChild(fixture(m,params));
+ for(const m of items.slice(0,20))section.appendChild(fixture(m,params));
  return section;
 }
 function sourceShortcut(row,id){
@@ -76,13 +76,12 @@ function sourceShortcut(row,id){
 function render(row,id){
  reset();const box=root();if(!box)return;
  const situation=radarSituation(row,id);
-  window.dispatchEvent(new CustomEvent("badminton:live-evidence",{detail:{playerId:id,active:situation.kind==="current"}}));
+ window.dispatchEvent(new CustomEvent("badminton:live-evidence",{detail:{playerId:id,active:situation.kind==="current"}}));
  box.dataset.state=situation.kind;
- // Source freshness is supporting metadata, never the main status message.
  const top=element("div","radar-summary");
  if(situation.checkedAt){
-  const t=new Date(situation.checkedAt);
-  const printed=t.toLocaleString("de-DE",{
+  const date=new Date(situation.checkedAt);
+  const printed=date.toLocaleString("de-DE",{
    day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"
   });
   top.appendChild(element("span","radar-source","Badhub · zuletzt geprüft "+printed+" Uhr"));
@@ -92,32 +91,55 @@ function render(row,id){
   top.appendChild(element("p","",situation.detail));
   box.appendChild(top);
   const shortcut=sourceShortcut(row,id);
-  if(situation.kind==="updating"&&situation.tournament){
+  if(situation.kind==="updating"&&situation.tournament)
    box.appendChild(line("Bekanntes Turnier",situation.tournament));
-  }
   if(shortcut)box.appendChild(shortcut);
   return;
  }
- const view=liveView(row,id);
- top.appendChild(element("strong","radar-tournament",view.tournament||"Aktuelles Turnier"));
- if(view.status==="playing")top.appendChild(tag(setText(view.running)?"Live-Stand":"Spiel aufgerufen",setText(view.running)?"live":"called"));
- if(view.status==="next"&&!view.running)top.appendChild(tag("Als Nächstes","next"));
+ const day=matchdayOverview(row,id);
+ if(!day){message("Turnierstatus wird geprüft","Noch kein bestätigter Spieltagsplan verfügbar.","pending");return}
+ top.appendChild(element("strong","radar-tournament",day.tournament||"Aktuelles Turnier"));
  box.appendChild(top);
- if(view.running){
-  const block=matchList("Aktuelle Begegnung",[view.running],{running:true});
-  if(block)box.appendChild(block);
+ const overview=element("section","matchday-overview");
+ const topRow=element("div","matchday-overview-head");
+ topRow.appendChild(element("strong","","Mein Spieltag"));
+ const stateTag=day.running
+   ?tag(setText(day.running)?"Spiel läuft":"Spiel aufgerufen",setText(day.running)?"live":"called")
+   :day.queue===0?tag("Als Nächstes","next"):tag("Turniertag","next");
+ topRow.appendChild(stateTag);
+ overview.appendChild(topRow);
+ const totals=element("div","matchday-counts");
+ for(const item of [
+   [String(day.pendingCount),"offene / laufende Spiele"],
+   [String(day.shownResults),"gemeldete Ergebnisse"]
+ ]){
+  const tile=element("div","matchday-count");
+  tile.appendChild(element("strong","",item[0]));
+  tile.appendChild(element("small","",item[1]));
+  totals.appendChild(tile);
  }
- if(view.next&&Number.isInteger(view.next.queue_position)){
-  const n=Number(view.next.queue_position);
-  box.appendChild(line("Wartestand",n===0?"Als Nächstes":n===1?"Noch 1 Spiel vorher":"Noch "+Math.min(99,n)+" Spiele vorher"));
+ overview.appendChild(totals);
+ overview.appendChild(element("p","matchday-coverage","Angezeigt werden Begegnungen aus dem aktuellen Quellen-Snapshot, nicht zwingend alle Partien des Turniers."));
+ box.appendChild(overview);
+ if(day.running){
+  const block=matchList("Jetzt auf dem Feld",[day.running],{running:true});
+  if(block){block.classList.add("matchday-current");box.appendChild(block)}
  }
- const upcoming=matchList("Kommende Spiele",view.upcoming);
+ if(day.queue!==null){
+  const label=day.queue===0?"Dein Spiel ist als Nächstes dran":day.queue===1?"Noch 1 Spiel vor dir":"Noch "+day.queue+" Spiele vor dir";
+  const call=element("section","matchday-queue");
+  call.appendChild(element("strong","",label));
+  call.appendChild(element("small","","Wartestand laut Turnierquelle · keine feste Startzeit"));
+  box.appendChild(call);
+ }
+ const upcoming=matchList("Deine nächsten Spiele",day.upcoming);
  if(upcoming)box.appendChild(upcoming);
- const past=matchList("Heute gespielt",view.past,{past:true});
- if(past)box.appendChild(past);
- if(!view.running&&!view.next&&!view.upcoming?.length&&!view.past?.length){
-  box.appendChild(line("Turnier zugeordnet","Aktuell sind keine Einzelbegegnungen veröffentlicht."));
- }
+ const finished=matchList("Bereits gespielte Begegnungen",day.past,{past:true});
+ if(finished)box.appendChild(finished);
+ if(!day.hasPublishedGames)box.appendChild(line("Noch keine Einzelspiele gemeldet",
+  "Der Turniertag ist zugeordnet. Sobald Begegnungen veröffentlicht werden, erscheinen sie hier."));
+ const shortcut=sourceShortcut(row,id);
+ if(shortcut)box.appendChild(shortcut);
 }
 async function getSnapshot(id,signal){
  const {rows}=await readPublicRows(snapshotPath(id),{signal,count:false});

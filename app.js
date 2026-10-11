@@ -81,6 +81,21 @@ function renderTournaments(){
   save();render();toast("Turnierlink entfernt");
  }));
 }
+function renderLiveTournamentLinks(){
+ const host=el("live-tournament-links");if(!host)return;
+ const today=localDay();
+ const saved=(state.viewingFriendId?[]:state.officialLinks).filter(t=>
+  (t.playerId==="all"||t.playerId===state.chosen)&&bookmarkPhase(t)[1]==="today"
+ ).slice(0,6);
+ const isDbv=/^\\d{2}-\\d{6}$/.test(state.chosen);
+ const source=isDbv?"https://badhub.de/spieler/"+encodeURIComponent(state.chosen)+"/live":"";
+ const links=saved.map(t=>'<a class="matchday-event-link" href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+
+  '<strong>'+esc(t.name)+'</strong><span>Gesamten Turnier-Spielplan bei DBV öffnen ↗</span></a>').join("");
+ host.innerHTML=links+
+  (source?'<a class="matchday-event-link matchday-event-source" href="'+esc(source)+'" target="_blank" rel="noopener noreferrer">'+
+   '<strong>Badhub · Spieler-Liveansicht</strong><span>Zusätzliche Spieltagsdaten an der Quelle ansehen ↗</span></a>':"")+
+  (!saved.length?'<p class="matchday-event-note">Noch kein offizieller Turnierlink für heute gespeichert. Unter „Turniere“ kannst du ihn hinzufügen. Der gesamte Spielplan lässt sich nicht aus einzelnen Spielerfeeds ableiten.</p>':"");
+}
 function renderProfiles(){
  const list=el("profile-list");
  list.innerHTML=state.players.length?state.players.map(p=>{
@@ -203,6 +218,7 @@ let lastNotifiedProfile="",lastNotifiedClub="";
 function render(){
  renderFocusHeader();
  renderTournaments();
+ renderLiveTournamentLinks();
  renderProfiles();
  renderFriends();
  renderFriendQuick();
