@@ -97,7 +97,9 @@ function render(){
    '<span>'+esc(r.discipline)+'</span></div>'+
    '<strong>'+esc(r.competition||"Historisches Turnier")+'</strong>'+
    '<p>Gegen '+esc(opponent)+(partner?' · mit '+esc(partner):'')+'</p>'+
-   '<div class="external-match-foot"><span>Sätze: '+esc(gameScore(r))+
+   '<div class="external-match-foot"><span>'+esc(r.scoring?.ruleSource==="badhub-bold-no-scores"
+     ?"Gewinner laut Badhub hervorgehoben · Satzstände nicht angegeben"
+     :"Sätze: "+gameScore(r))+
     (r.scoring?.ruleId?' · '+esc(MATCH_RULES[r.scoring.ruleId]?.label||r.scoring.ruleId)+
        (r.scoring.ruleSource==="explicit"?' · laut Quellenangabe':' · aus Ergebnis abgeleitet'):'')+
     (r.round_label?' · '+esc(r.round_label):'')+'</span>'+

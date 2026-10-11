@@ -24,6 +24,17 @@ const one={...good,source_key:"one",games:[[21,17]],competition:"Jugendturnier"}
 assert.equal(computeExternalStats([one]).total,0,"One set without a source rule is not a match");
 assert.equal(computeExternalStats([{...one,competition:"Jugendturnier 1x21"}]).total,1,
  "Explicit single-game alternative must count");
+const sourceOutcomeOnly={...good,source_key:"reported-only",games:[],winning_side:2};
+const outcome=computeExternalStats([sourceOutcomeOnly]);
+assert.equal(outcome.total,1);
+assert.equal(outcome.wins,0);
+assert.equal(outcome.losses,1);
+assert.equal(outcome.details[0].scoring.ruleSource,"badhub-bold-no-scores");
+assert.deepEqual(outcome.details[0].games,[]);
+assert.equal(computeExternalStats([{
+ ...sourceOutcomeOnly,source_url:"https://bad.invalid/bwbv/turnier.php?id=1"
+}]).total,0,"Even scoreless results require a trusted Badhub proof link");
+
 const extended11={...good,source_key:"5x11",competition:"Bundesliga 5x11",
  games:[[11,9],[12,10],[15,14]]};
 assert.equal(computeExternalStats([extended11]).total,1);

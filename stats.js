@@ -108,7 +108,9 @@ function externalProof(m){
   '</span><time>'+esc(when)+'</time><span>'+esc(m.discipline)+'</span>'+ageProof(m)+'</div>'+
   '<strong>'+esc(m.competition||"Öffentlich belegtes Turnier")+'</strong>'+
   '<p>Gegen '+esc(opp)+(partner?' · mit '+esc(partner):'')+
-  ' · Sätze aus Spielersicht '+esc(ownScore(m))+'</p>'+
+  ' · '+esc(m.scoring?.ruleSource==="badhub-bold-no-scores"
+   ?"Ergebnis laut Badhub-Hervorhebung, ohne Satzstände"
+   :"Sätze aus Spielersicht "+ownScore(m))+'</p>'+
   (u?'<a href="'+esc(u)+'" rel="noopener noreferrer" target="_blank">Badhub-Quellbeleg ↗</a>':'')+
   '</article>';
 }

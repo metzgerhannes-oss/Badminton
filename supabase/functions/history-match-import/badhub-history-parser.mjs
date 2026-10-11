@@ -36,7 +36,7 @@ function players(markup){
   .map(m=>plain(m[1])).filter(Boolean).slice(0,4);
 }
 function noteReject(counts,reason){counts[reason]=(counts[reason]||0)+1;}
-function sides(chunk,counts,year,rule){
+function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
  const start=chunk.search(/class="[^"]*\bsp-match-body\b[^"]*"/);
  const mid=start<0?-1:start+chunk.slice(start).search(/class="[^"]*\bsp-result-col\b[^"]*"/);
  if(start<0||mid<start){noteReject(counts,"missing_match_layout");return null}
@@ -62,7 +62,16 @@ function sides(chunk,counts,year,rule){
   const alternate=readScores(chunk);
   if(alternate.length>=(rule==="1x21"?1:2)&&alternate.length<=5)scores=alternate;
  }
- const completion=completedMatchWinner(scores,{year,rule});
+ // Badhub also publishes matches as a winner in bold and a dash instead
+ // of set points. Count their REPORTED OUTCOME, never invent set points.
+ // The same card must name both opponents and mark exactly one winning side.
+ const scoreColumn=(post.slice(0,rightStart).match(
+  /class="[^"]*\\bsp-result-col\\b[^"]*"[^>]*>([\\s\\S]*?)(?:<\\/div>|<div\\b)/)||[])[1]||"";
+ const isDash=/^[–—-]$/.test(plain(scoreColumn));
+ const declaredWinner=allowDeclaredWinner&&scores.length===0&&isDash;
+ const completion=declaredWinner
+  ?{winningSide:winA?1:2,ruleSource:"badhub-bold-no-scores"}
+  :completedMatchWinner(scores,{year,rule});
  if(!completion){
   noteReject(counts,"incomplete_or_invalid_score");
   return null;
@@ -94,9 +103,14 @@ function piece(source,segment,context,counts){
  for(const chunk of chunks){
   const nextPhase=(chunk.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
   const nonplayed=classifyNonPlayedCard(chunk);
-  if(nonplayed){noteReject(counts,nonplayed);continue;}
+  // The source winner marker plus an explicit dash is valid outcome evidence,
+  // although no individual sets were supplied. Other unplayed statuses remain excluded.
+  if(nonplayed&&nonplayed!=="unscored_with_opponent"){
+   noteReject(counts,nonplayed);continue;
+  }
   const rule=explicitScoringRule(context.title+" "+(context.event||""));
-  const data=sides(chunk,counts,context.year,rule);
+  const data=sides(chunk,counts,context.year,rule,
+   nonplayed==="unscored_with_opponent");
   if(data){
    const event=context.event||plain((chunk.match(/class="sp-match-disc[^"]*"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    const kind=discipline(event);
