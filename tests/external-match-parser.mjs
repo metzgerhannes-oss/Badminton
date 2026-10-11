@@ -109,8 +109,8 @@ const noScore=card.replace(games,'<div class="sp-result-col"></div>');
 const unresolved=parsePublicHistory(tour.replace(card,noScore),player,"tournament");
 assert.equal(unresolved.items.length,0);
 assert.equal(unresolved.rejection_reasons.unscored_with_opponent,1);
-const byeScored=card.replace('class="sp-result-col"',
- 'class="sp-result-col"><span>BYE</span><div data-ignore="');
+const byeScored=card.replace('<div class="sp-result-col">',
+ '<div class="sp-result-col"><span>BYE</span>');
 const conflict=parsePublicHistory(tour.replace(card,byeScored),player,"tournament");
 assert.equal(conflict.items.length,0,"Contradictory BYE and scores never count");
 const realRust=card.replace('>Test Gegnerin<','>Rust<');
@@ -146,5 +146,5 @@ assert.match(js,/match_date/);
 assert.match(js,/Quellbeleg/);
 assert.match(bridge,/history-match-import/);
 assert.doesNotMatch(welcome,/history-match-import/);
-assert.match(sw,/schmetterlinge-shell-v66/);
+assert.match(sw,/schmetterlinge-shell-v67/);
 console.log("Sourced external match import: parser identifies winner/sides/scores, refuses mismatched profile, idempotent DB and queue contracts verified.");
