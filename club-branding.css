@@ -1,7 +1,7 @@
 /* Private club appearance: intentionally limited to navigation, actions and brand chrome.
    No changes to match wins/losses, chart colors, warning tones or source provenance. */
 .club-themed .topbar .brand-logo{border-radius:15px!important;background:#fff!important;padding:3px;box-shadow:0 1px 6px #1d507522!important}
-.club-themed .topbar .brand small{color:var(--club-accent)!important;letter-spacing:.2px;overflow-wrap:anywhere}
+.club-themed .topbar .brand small{color:#244665!important;border-inline-start:3px solid var(--club-accent);padding-inline-start:6px;letter-spacing:.2px;overflow-wrap:anywhere}
 .club-themed .topbar-settings{background:var(--club-accent);color:var(--club-contrast);border-color:transparent}
 .club-themed .topbar-settings[aria-current="page"]{background:var(--club-accent);color:var(--club-contrast);border-color:transparent;outline:2px solid currentColor;outline-offset:1px}
 .club-themed .bottom-nav a[aria-current="page"]{background:var(--club-accent);color:var(--club-contrast);border-radius:13px}
