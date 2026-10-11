@@ -31,3 +31,17 @@ test("app and welcome page share the same setting without touching player storag
   const original = await page.evaluate(() => Object.keys(localStorage).filter(k=>k.includes("schmetterlinge")));
   expect(original).toContain("schmetterlinge.uiLanguage");
 });
+
+test("all eleven locales load and translate the selector heading", async ({page}) => {
+  await page.goto("/welcome.html");
+  const cases = [
+    ["de","Sprache"],["en","Language"],["fr","Langue"],["uk","Мова"],
+    ["ru","Язык"],["zh-Hans","语言"],["tr","Dil"],["ar","اللغة"],
+    ["it","Lingua"],["es","Idioma"],["pl","Język"]
+  ];
+  for (const [lang,label] of cases) {
+    await page.locator("#welcome-language").selectOption(lang);
+    await expect(page.locator('label[for="welcome-language"]')).toHaveText(label);
+    await expect(page.locator("html")).toHaveAttribute("lang",lang);
+  }
+});
