@@ -136,3 +136,26 @@
 @media(max-width:350px){.matchday-switch button{font-size:12px}}
 
 /* v83: the current match and queue beat decorative KPI tiles on a small iPhone. */
+
+/* v84: six bounded evidence-based player cards, visible only in the tournament view. */
+.followed-live{margin:5px 0 18px}
+.followed-live-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px}
+.followed-live-heading h4{margin:0;font-size:16px;color:#184461}
+.followed-live-heading>span{font-size:11px;color:#58778a}
+.followed-live-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.followed-live-card{display:flex;flex-direction:column;gap:6px;min-width:0;padding:12px 10px;border:1px solid #bfd8e9;border-radius:13px;background:#f8fbff}
+.followed-live-current{border-color:#48a9c5;background:#edfbfd}
+.followed-live-card-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.followed-live-card-head strong{min-width:0;overflow-wrap:anywhere;font-size:13px;color:#163b56}
+.followed-live-role{font-size:10px;color:#56758b}
+.followed-live-state{font-size:12px;color:#085f87}
+.followed-live-tournament,.followed-live-time{font-size:10px;color:#55758b;overflow-wrap:anywhere}
+.followed-live-detail{font-size:11px;color:#365d75;line-height:1.4;overflow-wrap:anywhere}
+.followed-live-score{font-size:12px;color:#075981;overflow-wrap:anywhere}
+.followed-live-result{font-size:10px;color:#436a82}
+.followed-live-actions{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:5px}
+.followed-live-detail-button,.followed-live-source{display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;text-decoration:none;border:1px solid #bed8e7;border-radius:9px;padding:7px 8px;background:#fff;color:#135781;font-weight:750;font-size:10px;cursor:pointer}
+.followed-live-detail-button{flex:1 1 auto}
+.followed-live-note,.followed-live-empty{font-size:11px;line-height:1.5;color:#587286;margin:9px 0 0}
+.tournament-matches-heading{font-size:15px;margin:17px 0 0;color:#194767}
+@media(max-width:365px){.followed-live-grid{gap:6px}.followed-live-card{padding:10px 7px}.followed-live-detail-button,.followed-live-source{font-size:9px;padding:6px 4px}}

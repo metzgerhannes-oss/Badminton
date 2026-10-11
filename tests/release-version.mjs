@@ -57,14 +57,14 @@ try{
   assert.match(builtWelcome,/data-app-version data-release-build="1234567890abcdef/);
   assert.match(builtApp,/id="app-build-info" data-release-build="1234567890abcdef/);
   assert.match(builtApp,/pages-203 · Commit 1234567890abcdef/);
-  const lockedBadge={textContent:"v83",title:"",getAttribute:key=>key==="data-release-build"?sha:null};
-  const lockedInfo={textContent:"Version v83 · Build pages-203",getAttribute:key=>key==="data-release-build"?sha:null};
+  const lockedBadge={textContent:"v84",title:"",getAttribute:key=>key==="data-release-build"?sha:null};
+  const lockedInfo={textContent:"Version v84 · Build pages-203",getAttribute:key=>key==="data-release-build"?sha:null};
   const lockedDoc={readyState:"complete",querySelectorAll:()=>[lockedBadge],
     getElementById:id=>id==="app-build-info"?lockedInfo:null};
   // A later network response must not relabel an older HTML shell.
   vm.runInNewContext(builtJs,{window:{},document:lockedDoc});
-  assert.equal(lockedBadge.textContent,"v83");
-  assert.equal(lockedInfo.textContent,"Version v83 · Build pages-203");
+  assert.equal(lockedBadge.textContent,"v84");
+  assert.equal(lockedInfo.textContent,"Version v84 · Build pages-203");
   const builtBadge={textContent:"",attributes:{},setAttribute(k,v){this.attributes[k]=v}};
   const builtInfo={textContent:""};
   const builtDoc={readyState:"complete",querySelectorAll:()=>[builtBadge],
