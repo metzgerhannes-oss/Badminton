@@ -68,14 +68,7 @@
 }
 
 /* v81 – sourced personal matchday and event links without inventing a full event feed. */
-.matchday-overview{padding:14px;border-radius:14px;background:#fff;border:1px solid #b9dfef;margin:10px 0 14px}
-.matchday-overview-head{display:flex;align-items:center;justify-content:space-between;gap:9px;color:#103c60}
-.matchday-overview-head strong{font-size:18px}
-.matchday-counts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
-.matchday-count{padding:12px 10px;background:#f0f8fe;border:1px solid #d2e7f3;border-radius:11px;display:grid;gap:3px}
-.matchday-count strong{font-size:24px;line-height:1.1;color:#0e5684;font-variant-numeric:tabular-nums}
-.matchday-count small,.matchday-coverage{color:#536f83;line-height:1.4;font-size:11px}
-.matchday-coverage{margin:4px 0 0}
+.matchday-overview{padding:9px 11px;margin:8px 0 13px;border:1px solid #d5e6f0;border-radius:10px;background:#f2f7fb;color:#476c83;font-size:11px;line-height:1.45}
 .matchday-current{border:2px solid #0c86bd;border-radius:14px;padding:10px;background:#eafaff}
 .matchday-queue{display:grid;gap:4px;padding:13px;border-radius:12px;border:1px solid #edcb77;background:#fff8e8;color:#654a14}
 .matchday-queue strong{font-size:15px}
@@ -87,10 +80,8 @@
 .matchday-event-link{display:grid;gap:5px;padding:12px;min-height:58px;text-decoration:none;border-radius:12px;border:1px solid #a5d4ec;background:#eaf7ff;color:#0a5580}
 .matchday-event-link strong{font-size:13px}
 .matchday-event-link span{font-size:12px}
-.matchday-event-source{background:#f8fafc;border-color:#d4e0e9}
-.live-tournament-links .matchday-event-note{margin:3px 0;color:#627b8e;font-size:11px}
 .app[data-current-view="live"] #view-turniere .live-tournament-follow{border-color:#77bce4}
-@media(max-width:350px){.matchday-overview{padding:10px}.matchday-count{padding:9px 6px}.matchday-count small{font-size:10px}}
+@media(max-width:350px){.matchday-overview{padding:8px 9px}}
 
 
 /* v82: inline official tournament match browser, intentionally separate from Badhub personal live radar. */
@@ -126,7 +117,6 @@
 .tournament-coverage{margin:12px 0 15px;border-top:1px solid #d6e8f0;padding-top:5px}
 .tournament-coverage summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:11px;font-weight:780;color:#4e7590}
 .tournament-coverage p{font-size:11px;line-height:1.55;color:#60788b}
-.live-tournament-follow h4{font-size:13px;color:#285675;margin:15px 0 5px}
 @media(max-width:350px){.event-match-card{padding:10px 8px}.tournament-live-filters{gap:3px}}
 
 /* v83: one task per LIVE screen, no duplicate source list or hidden polling. */
@@ -146,4 +136,3 @@
 @media(max-width:350px){.matchday-switch button{font-size:12px}}
 
 /* v83: the current match and queue beat decorative KPI tiles on a small iPhone. */
-.live-radar-content .matchday-overview{padding:9px 11px;margin:8px 0 13px;border-radius:10px;background:#f2f7fb;border-color:#d5e6f0;color:#476c83;font-size:11px;line-height:1.45}
