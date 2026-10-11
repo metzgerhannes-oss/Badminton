@@ -155,3 +155,51 @@ test("Switches focus without parallel full-event queries and restores personal v
  await page.goto("/#live",{waitUntil:"domcontentloaded"});
  await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
 });
+
+test("Verified player snapshots produce real multi-player LIVE cards without claiming whole-event coverage",async ({page})=>{
+ const now=new Date().toISOString();
+ await page.route("**/rest/v1/player_live_snapshots?*",route=>route.fulfill({
+  status:200,headers:{"Access-Control-Allow-Origin":"*","Content-Type":"application/json"},
+  body:JSON.stringify([
+   {dbv_id:PLAYER,provider:"Badhub",source_url:"https://badhub.de/spieler/"+PLAYER+"/live",
+    checked_at:now,payload:{tournament:{name:"Jugendcup"},
+     running:{match_id:"m17",class:"JE U11",opponent:"Gegnerin A",is_team1:1,sets:[[15,9],[8,9]],court:"Feld 4"},
+     next:null,upcoming:[],past:[],entries:[]}},
+   {dbv_id:FRIEND,provider:"Badhub",source_url:"https://badhub.de/spieler/"+FRIEND+"/live",
+    checked_at:now,payload:{tournament:{name:"Jugendcup"},
+     running:null,next:{queue_position:1},upcoming:[{match_id:"m99",class:"DE U13",opponent:"Gegnerin B"}],
+     past:[],entries:[]}}
+  ])
+ }));
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await expect(page.locator(".followed-live")).toBeHidden();
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator(".followed-live-card")).toHaveCount(2);
+ await expect(page.locator(".followed-live-card").first()).toContainText("Eigener Spieler");
+ await expect(page.locator(".followed-live-card").first()).toContainText("15:9");
+ await expect(page.locator(".followed-live-card").first()).toContainText("Spielt gerade");
+ await expect(page.locator(".followed-live-card").nth(1)).toContainText("Verfolgter Spieler");
+ await expect(page.locator(".followed-live-card").nth(1)).toContainText("Noch ein Spiel davor");
+ await expect(page.locator(".followed-live-note")).toContainText("Nicht sämtliche Spiele");
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+ expect(overflow).toBeLessThanOrEqual(2);
+ await page.locator(".followed-live-card").nth(1).getByRole("button",{name:"Meine Spiele ansehen"}).click();
+ await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator("#live-player-select")).toHaveValue(FRIEND);
+});
+test("Stale player snapshots must not present old sets as live scores",async ({page})=>{
+ await page.route("**/rest/v1/player_live_snapshots?*",route=>route.fulfill({
+  status:200,headers:{"Access-Control-Allow-Origin":"*","Content-Type":"application/json"},
+  body:JSON.stringify([{
+   dbv_id:PLAYER,provider:"Badhub",source_url:"https://badhub.de/spieler/"+PLAYER+"/live",
+   checked_at:new Date(Date.now()-20*60000).toISOString(),
+   payload:{tournament:{name:"Gestern"},running:{sets:[[15,2]],class:"JE U11"},
+    next:null,upcoming:[],past:[],entries:[]}
+  }])
+ }));
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator(".followed-live-card").first()).not.toContainText("15:2");
+ await expect(page.locator(".followed-live-card").first()).not.toContainText("Spielt gerade");
+});

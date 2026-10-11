@@ -60,6 +60,8 @@ jobs:
           node --check live-radar.js
           node --check live-hub.js
           node --check tournament-live.js
+          node --check followed-live.js
+          node --check scripts/followed-live.mjs
           node --check scripts/tournament-live.mjs
           node --check scripts/live-radar.mjs
           node --check scripts/live-links.mjs
@@ -98,6 +100,7 @@ jobs:
           node tests/live-radar.mjs
           node tests/live-hub.mjs
           node tests/tournament-live.mjs
+          node tests/followed-live.mjs
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
