@@ -8,6 +8,7 @@ const app=file("app.js");
 const router=file("router.js");
 const library=file("library.js");
 const css=file("design-v2.css");
+const shell=file("app-shell.css");
 const dashboard=file("dashboard.js");
 const history=file("history.js");
 const sw=file("sw.js");
@@ -19,7 +20,7 @@ test("four focused main destinations; settings in header; history remains reacha
  assert.match(html,/href="#historie"/);
  assert.match(html,/href="#turniere">← Turniertag/);
  assert.match(router,/page==="historie"\?"turniere":page/);
- assert.match(css,/\.bottom-nav a\{width:25%!important/);
+ assert.match(shell,/\.bottom-nav a\{width:25%!important/);
 });
 
 test("single follow/search route; profiles live under Spieler, not Einstellungen",()=>{
@@ -70,6 +71,6 @@ test("Home and friends use one profile navigation mechanism",()=>{
 test("neutral user-facing wording and changed PWA cache",()=>{
  assert.doesNotMatch(dashboard,/Familien-Datenbasis/);
  assert.doesNotMatch(history,/in unserer kuratierten DBV-Chronik/);
- assert.match(sw,/schmetterlinge-shell-v62/);
+ assert.match(sw,/schmetterlinge-shell-v63/);
  assert.doesNotMatch(sw,/\.\/friend-search\.js/);
 });
