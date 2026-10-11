@@ -80,9 +80,15 @@ const foreignSelf=tour.replace(
 const wrongIdentity=parsePublicHistory(foreignSelf,player,"tournament");
 assert.equal(wrongIdentity.items.length,0,"Self marker alone is not identity proof");
 assert.equal(wrongIdentity.rejection_reasons.wrong_self_identity,1);
-const incomplete=tour.replace('<span class="sp-s">18</span>','<span class="sp-s">20</span>');
-assert.equal(parsePublicHistory(incomplete,player,"tournament").items.length,0,
- "21:20 is not a completed badminton game");
+const unusualScore=tour.replace('<span class="sp-s">18</span>','<span class="sp-s">20</span>');
+assert.equal(parsePublicHistory(unusualScore,player,"tournament").items.length,1,
+ "A reported played match is not rejected because of unusual game points");
+const youthSmall=tour.replace(games,'<div class="sp-result-col">'+
+ [[11,10],[10,11],[11,10]].map(([a,b])=>
+ '<div class="sp-set-score"><span class="sp-s">'+a+
+ '</span><span class="sp-s">'+b+'</span></div>').join("")+'</div>');
+assert.equal(parsePublicHistory(youthSmall,player,"tournament").items.length,1,
+ "Small Games: count game winners, then reconcile with published match winner");
 const conflicting=tour.replace('<div class="sp-side sp-side--winner">',
  '<div class="sp-side">');
 assert.equal(parsePublicHistory(conflicting,player,"tournament").items.length,0);
