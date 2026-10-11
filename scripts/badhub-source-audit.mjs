@@ -69,6 +69,9 @@ for(const category of ["turnier","liga"]){
    if(max>=15&&max<21){const p=values.map(v=>Math.max(...v)).sort((a,b)=>a-b).join("-");shortPatterns[p]=(shortPatterns[p]||0)+1;}
   }
   results.push({source:category,cardCount:data.cards_seen,accepted:data.items.length,
+   winnerMarkers:data.items.filter(x=>x.player_side===x.winning_side).length,
+   loserMarkers:data.items.filter(x=>x.player_side!==x.winning_side).length,
+   declaredNoSets:data.items.filter(x=>x.games.length===0).length,
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
