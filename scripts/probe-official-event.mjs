@@ -53,7 +53,12 @@ for(const url of urls){
      if(i>=0)console.log("NEAR",word,body.slice(Math.max(0,i-190),i+900).replace(/\\s+/g," ").slice(0,1100));
     }
     console.log("HTML COUNTS",JSON.stringify({table:body.split("<table").length-1,tr:body.split("<tr").length-1,score:body.split("score").length-1,match:body.toLowerCase().split("match").length-1}));
-    if(u.pathname.includes("turnier.php"))console.log("EVENT_HTML_SECTION",body.slice(12500,21500));
+    if(u.pathname.includes("turnier.php")){
+     console.log("EVENT_HTML_SECTION",body.slice(12500,21500));
+     console.log("EVENT_UUIDS",[...new Set(body.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi)||[])].slice(0,10));
+     console.log("EVENT_LINKS",[...new Set([...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/dbv|turnier|match|spiel/i.test(x)))].slice(0,25));
+     console.log("EVENT_TABLE_SNIP",body.slice(Math.max(0,body.indexOf("<table")-300),body.indexOf("<table")+1850));
+    }
    }
    if(u.pathname.includes("turniere.php")){
     const other=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/turnier|event|match|spiel/i.test(x)).slice(0,45);
@@ -64,6 +69,7 @@ for(const url of urls){
     console.log("COOKIE_FORM_ACTION",form.match(/<form[^>]+/i)?.[0]||"");
     console.log("COOKIE_INPUT_NAMES",[...form.matchAll(/<input[^>]+/gi)].map(x=>({type:x[0].match(/type="([^"]+)/)?.[1]||"",name:x[0].match(/name="([^"]+)/)?.[1]||""})).slice(0,15));
     console.log("COOKIE_BUTTONS",form.slice(Math.max(0,form.indexOf("<button")),form.indexOf("<button")+650).replace(/<[^>]+>/g," "));
+    console.log("COOKIE_PAGE_TEXT",body.slice(body.indexOf("<main"),body.indexOf("<main")+3600).replace(/<[^>]+>/g," ").slice(0,2300));
    }
    const markers=["__NEXT_DATA__","__NUXT__","__INITIAL_STATE__","application/ld+json","/api/","Matches","Spiele","matches","Auslosung","Live","tournamentsoftware"];
    console.log("MARKERS",markers.filter(m=>body.includes(m)).join(","));
