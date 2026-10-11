@@ -36,8 +36,8 @@ export function normalizeProfile(fields){
  return {id,name,club,birthYear,url:parsed.url};
 }
 
-const DBV_ID=/^\\d{2}-\\d{6}$/;
-const comparable=value=>String(value??"").normalize("NFKC").trim().replace(/\\s+/g," ").toLocaleLowerCase("de");
+const DBV_ID=/^\d{2}-\d{6}$/;
+const comparable=value=>String(value??"").normalize("NFKC").trim().replace(/\s+/g," ").toLocaleLowerCase("de");
 function sameKnownValue(a,b){
  // A missing detail cannot disprove identity; conflicting known details can.
  return !a||!b||comparable(a)===comparable(b);
