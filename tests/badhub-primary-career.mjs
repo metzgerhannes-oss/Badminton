@@ -1,11 +1,23 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {getBadhubMatchReference} from "../scripts/dbv-match-reference.mjs";
+import {getBadhubMatchReference,getReportedPlayedWithoutScores} from "../scripts/dbv-match-reference.mjs";
 const [stats,html,css,sw]=await Promise.all([
  "stats.js","index.html","design-v2.css","sw.js"
 ].map(x=>readFile(x,"utf8")));
 const summary=getBadhubMatchReference("05-070879");
 assert.deepEqual([summary.total,summary.wins,summary.losses],[62,26,36]);
+const confirmed=getReportedPlayedWithoutScores("05-070879");
+assert.equal(confirmed.count,4);
+assert.equal(confirmed.confirmedOn,"2026-10-11");
+assert.equal(confirmed.confirmation,"user-reported-played");
+assert.equal(confirmed.individualOutcomesVerified,false);
+assert.equal(getReportedPlayedWithoutScores("05-070879",{year:"2026"}),null);
+assert.equal(getReportedPlayedWithoutScores("05-070879",{discipline:"Einzel"}),null);
+assert.equal(getReportedPlayedWithoutScores("05-070879",{category:"league"}),null);
+assert.equal(getReportedPlayedWithoutScores("05-061350"),null);
+assert.match(await readFile("external-matches.js","utf8"),/getReportedPlayedWithoutScores\(selected/);
+assert.match(await readFile("external-matches.js","utf8"),/Keine davon wird als Rast\/Freilos eingestuft/);
+assert.match(await readFile("external-matches.js","utf8"),/Einzelne Siege oder Niederlagen werden ohne Ergebnisbeleg nicht zugeschrieben/);
 assert.equal(summary.capturedOn,"2026-10-11");
 assert.equal(summary.sourceType,"user-provided-screenshot");
 assert.equal(getBadhubMatchReference("05-070879",{discipline:"Einzel"}),null,
