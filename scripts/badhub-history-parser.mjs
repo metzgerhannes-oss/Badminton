@@ -66,6 +66,8 @@ function sides(chunk,counts,year){
  if(!completion){
   noteReject(counts,"incomplete_or_invalid_score");
   noteReject(counts,"debug_source_score_count_"+scores.length+"_card_"+readScores(chunk).length);
+  noteReject(counts,"debug_max_"+scores.map(x=>Math.max(...x)).join("-")+
+   "_setWinners_"+scores.map(x=>x[0]>x[1]?"A":"B").join(""));
   return null;
  }
  const winningSide=winA?1:2;
