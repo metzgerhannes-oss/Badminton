@@ -49,6 +49,10 @@ var SchmetterlingeBookmarks=(function(){
   if(today>end)return ["Vergangen","past"];
   return ["Turniertag","today"];
  }
+ function hasTournamentToday(state,today=localDay()){
+  const ownIds=new Set((state?.players||[]).map(p=>p.id));
+  return (state?.officialLinks||[]).some(t=>(t.playerId==="all"||ownIds.has(t.playerId))&&phase(t,today)[1]==="today");
+ }
  function sorted(state,today=localDay()){
   const order={today:0,future:1,unknown:2,past:3};
   return visible(state).slice().sort((a,b)=>{
@@ -59,5 +63,5 @@ var SchmetterlingeBookmarks=(function(){
     a.name.localeCompare(b.name,"de");
   });
  }
- return Object.freeze({parseDbvTournamentLink,normalizeBookmark,validDate,localDay,niceDay,visible,phase,sorted});
+ return Object.freeze({parseDbvTournamentLink,normalizeBookmark,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
 })();
