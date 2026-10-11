@@ -29,6 +29,7 @@ for(const category of ["turnier","liga"]){
   const shortPatterns={};
   const skipKeywords={bye:0,rast:0,rust:0,freilos:0,spielfrei:0,wo:0,walkover:0,aufgabe:0,unknown:0};
   const noScoreClassHints={};
+  const noScoreSides={};
   for(const chunk of html.split(/<div class="sp-match-item\b[^>]*>/).slice(1)){
    const values=[...chunk.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)]
@@ -42,6 +43,15 @@ for(const category of ["turnier","liga"]){
     for(const [key,re] of Object.entries(keywords))
      if(re.test(chunk)){skipKeywords[key]++;found=true;}
     if(!found)skipKeywords.unknown++;
+    const a=chunk.indexOf('class="sp-match-body"');
+    const scoreAt=chunk.indexOf('class="sp-result-col"',Math.max(0,a));
+    const awayAt=chunk.indexOf('class="sp-side sp-side--away"',Math.max(0,scoreAt));
+    const home=a>=0?chunk.slice(a,scoreAt>=0?scoreAt:undefined):"";
+    const away=awayAt>=0?chunk.slice(awayAt):"";
+    const countNames=s=>(s.match(/class="sp-name-full"/g)||[]).length;
+    const flag=(countNames(home)>0?"home-name":"no-home")+"-"+(countNames(away)>0?"away-name":"no-away")+
+      "-"+(chunk.includes("sp-side--winner")?"marked-winner":"no-winner");
+    noScoreSides[flag]=(noScoreSides[flag]||0)+1;
     // Aggregate CSS modifier families; do not output HTML or player details.
     const names=[...chunk.matchAll(/class="([^"]+)"/g)].flatMap(m=>m[1].split(/\s+/))
        .filter(v=>/^(sp-match|sp-side|sp-result|sp-status|sp-player)/.test(v))
@@ -58,7 +68,7 @@ for(const category of ["turnier","liga"]){
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,skipKeywords,noScoreClassHints});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,skipKeywords,noScoreClassHints,noScoreSides});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
