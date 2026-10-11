@@ -13,13 +13,13 @@ const dashboard=file("dashboard.js");
 const history=file("history.js");
 const sw=file("sw.js");
 
-test("four focused main destinations; settings in header; history remains reachable",()=>{
+test("four usual destinations plus conditional LIVE; settings in header; history reachable",()=>{
  const links=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
- assert.deepEqual(links,["start","turniere","spieler","berichte"]);
+ assert.deepEqual(links,["start","turniere","live","spieler","berichte"]);
  assert.match(html,/class="topbar-settings" href="#einstellungen"/);
  assert.match(html,/href="#historie"/);
  assert.match(html,/href="#turniere">← Turniertag/);
- assert.match(router,/page==="historie"\?"turniere":page/);
+ assert.match(router,/page==="historie"\|\|\(page==="live"&&liveHidden\)\?"turniere":page/);
  assert.match(shell,/\.bottom-nav a\{width:25%!important/);
 });
 

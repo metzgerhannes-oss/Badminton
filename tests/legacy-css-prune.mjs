@@ -28,5 +28,5 @@ assert.ok(css.includes("clip-path:none!important"));
 assert.ok(shell.includes(".bottom-nav a{width:25%!important"));
 assert.ok(components.includes(".ranking-tile.ranking-compact{"));
 assert.match(cache,/schmetterlinge-shell-v79/);
-assert.equal((html.match(/data-page="/g)||[]).length,4);
+assert.equal((html.match(/data-page="/g)||[]).length,5);
 console.log("v68: unused prototype CSS retired; active four-tab navigation, dialogs, PWA and approved crest intact.");

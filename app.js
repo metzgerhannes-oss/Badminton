@@ -174,7 +174,7 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
  }else if(SchmetterlingeStorage.selectFriend(state,id)){
   save();
  }else return false;
- const destination=stayOnPage?"turniere":"start";
+ const destination=stayOnPage?(state.page==="live"?"live":"turniere"):"start";
   routeTo(destination);
  return true;
 };
@@ -187,6 +187,17 @@ window.badmintonLibraryView=id=>{
  if(!state.friends.some(p=>p.id===id))return false;
  return window.badmintonSelectViewer(id);
 };
+}
+let liveEvidence={playerId:"",day:"",active:false};
+function updateLiveNavigation(){
+ const tab=el("live-nav-tab");if(!tab)return false;
+ const today=localDay();
+ const shouldShow=SchmetterlingeBookmarks.hasTournamentToday(state,today)||
+  (liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today);
+ const changed=tab.hidden===shouldShow;
+ tab.hidden=!shouldShow;
+ tab.parentElement?.classList.toggle("has-live-tab",shouldShow);
+ return changed;
 }
 let lastNotifiedProfile="",lastNotifiedClub="";
 function render(){
@@ -207,6 +218,7 @@ function render(){
   lastNotifiedClub=window.badmintonActiveClub;
   window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
  }
+ updateLiveNavigation();
  SchmetterlingeRouter.renderPage(state);
 }
 let editing=null;
@@ -227,6 +239,14 @@ function openTournamentForm(item=null){
  dialog.showModal();
 }
 function setup(){
+ window.addEventListener("badminton:live-evidence",event=>{
+  const playerId=String(event.detail?.playerId||"");
+  if(playerId!==state.chosen)return;
+  liveEvidence={playerId,day:localDay(),active:event.detail?.active===true};
+  if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
+ });
+ // Local date rollover check only: no additional provider polling.
+ setInterval(()=>{if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state)},60_000);
  let freshDevice=false;
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();

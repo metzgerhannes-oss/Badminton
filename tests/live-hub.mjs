@@ -23,7 +23,7 @@ assert.ok(tournament.indexOf('id="live-radar-content"')<tournament.indexOf('id="
 assert.ok(tournament.indexOf('id="dbv-live-advanced"')<tournament.indexOf('id="dbv-live-results"'),
  "Unused DBV query behind details");
 assert.equal((tournament.match(/id="live-radar-refresh"/g)||[]).length,1);
-assert.equal((html.match(/data-page="/g)||[]).length,4,"Four primary destinations");
+assert.equal((html.match(/data-page="/g)||[]).length,5,"Four core destinations plus conditional LIVE");
 assert.match(html,/data-page="start".*?<small>Home<\/small>/s);
 assert.match(app,/function navigateHome\(\)/);
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);/,"Home must return to locally selected own profile");
@@ -46,6 +46,8 @@ assert.doesNotMatch(hub,/fetch\(snapshotUrl\(id\)/);
 assert.doesNotMatch(hub,/watchRequest\(/,"Home must never poll the third-party source");
 assert.match(hub,/homeCtrl\?\.abort/,"Stale Home responses are cancelled");
 assert.match(radar,/location\.hash==="#turniere"/);
+assert.match(radar,/location\.hash==="#live"/);
+assert.match(hub,/badminton:live-evidence/);
 assert.match(radar,/document\.hidden/);
 assert.match(dbv,/Boolean\(advanced\?\.open\)/,"No duplicate DBV polling unless opened");
 assert.match(dbv,/addEventListener\("toggle"/);

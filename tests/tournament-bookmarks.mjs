@@ -43,6 +43,14 @@ assert.deepEqual(Array.from(bookmarks.sorted(state,"2026-10-11"),p=>p.id),["toda
  "Same sorting and ownership filter as the legacy tournament view");
 assert.equal(bookmarks.visible({...state,viewingFriendId:"05-123456"}).length,0,
  "Friend views must not inherit private tournament bookmarks");
+assert.equal(bookmarks.hasTournamentToday({...state,players:[{id:"05-070879"},{id:"05-071969"}]},"2026-10-11"),true,
+ "Any locally owned participant may activate the matchday tab");
+assert.equal(bookmarks.hasTournamentToday({...state,players:[{id:"05-123456"}],officialLinks:[owned[4]]},"2026-10-11"),false,
+ "Following-only or unrelated profiles cannot activate a tournament bookmark");
+assert.equal(bookmarks.hasTournamentToday({...state,players:[{id:"05-070879"}]},"2026-10-12"),false,
+ "Tab disappears the next day without matching dates");
+assert.equal(bookmarks.hasTournamentToday({...state,players:[{id:"05-070879"}],officialLinks:[{playerId:"all",startDate:"2026-10-10",endDate:"2026-10-12"}]},"2026-10-11"),true,
+ "Multi-day tournament is active throughout its stated range");
 assert.deepEqual(owned.map(p=>p.id),["future","past","today","unknown","other"],
  "Sorting must not mutate saved local bookmark order");
 assert.doesNotMatch(source,/\bfetch\s*\(|XMLHttpRequest|localStorage|service_role|supabaseUrl/i);

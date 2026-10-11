@@ -7,14 +7,15 @@ const sw=await readFile("sw.js","utf8");
 const state={page:"historie"}, seen={scroll:0,focus:0,render:0};
 const attr=()=>({attrs:{},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]}});
 const pages=["start","historie","turniere","spieler","berichte","einstellungen"].map(name=>({...attr(),id:"view-"+name,classList:{active:false,toggle(k,yes){this.active=yes}}}));
-const tabs=["start","turniere","spieler","berichte"].map(name=>({...attr(),dataset:{page:name}}));
-const app=attr(),settings=attr();
+const tabs=["start","turniere","live","spieler","berichte"].map(name=>({...attr(),dataset:{page:name}}));
+const app=attr(),settings=attr(),liveLink={hidden:true};
 const heading={setAttribute(){},focus(options){assert.equal(options.preventScroll,true);seen.focus++}};
 const document={
  title:"",
  querySelector(q){
   if(q===".app")return app;
   if(q===".topbar-settings")return settings;
+  if(q==="#live-nav-tab")return liveLink;
   if(q.startsWith("#view-"))return heading;
   return null;
  },
@@ -50,6 +51,14 @@ run('SchmetterlingeRouter.routeTo(state,"turniere",()=>{seen.render++})');
 assert.equal(state.page,"turniere");
 assert.equal(location.hash,"#turniere");
 assert.equal(seen.render,1,"Changing hash uses existing native hashchange render");
+state.page="live";liveLink.hidden=false;
+run("SchmetterlingeRouter.renderPage(state)");
+assert.equal(document.title,"Live-Matches · Schmetterlinge");
+assert.equal(app.attrs["data-current-view"],"live");
+assert.equal(pages.find(x=>x.id==="view-turniere").classList.active,true);
+assert.equal(tabs.find(x=>x.dataset.page==="live").attrs["aria-current"],"page");
+liveLink.hidden=true;run("SchmetterlingeRouter.renderPage(state)");
+assert.equal(tabs.find(x=>x.dataset.page==="turniere").attrs["aria-current"],"page");
 state.page="bad-route";run("SchmetterlingeRouter.renderPage(state)");
 assert.equal(document.title,"Übersicht · Schmetterlinge");
 assert.match(html,/<script defer src="\.\/router\.js"><\/script>/);
