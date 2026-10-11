@@ -19,6 +19,8 @@ jobs:
           node --check tournament-bookmarks.js
           node --check router.js
           node --check app.js
+          node --check app-release.js
+          node --check scripts/stamp-release.mjs
           node --check backup.js
           node --check scripts/local-backup.mjs
           node --check dashboard.js
@@ -106,6 +108,7 @@ jobs:
           node tests/css-cascade-consolidation.mjs
           node tests/ux-foundation.mjs
           node tests/club-branding.mjs
+          node tests/release-version.mjs
           node tests/supabase-read.mjs
           node tests/report-read-client.mjs
           node tests/supabase-library.mjs
