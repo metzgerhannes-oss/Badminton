@@ -28,3 +28,9 @@
 .welcome-language-picker label { font-weight:600; }
 .welcome-language-picker select { max-width:min(55vw,210px); min-height:40px; font:inherit; color:inherit; background:transparent; border:1px solid currentColor; border-radius:10px; padding:7px 10px; }
 [dir="rtl"] #welcome-reference, [dir="rtl"] #welcome-player-search { direction:ltr; text-align:left; }
+
+/* Same release number on the invitation page; no additional menu route. */
+.welcome-footer .welcome-app-version{display:inline-block;margin-top:7px;
+ padding:3px 8px;border:1px solid #6386a3;border-radius:9px;
+ font-size:11px;line-height:1.4;color:#c9e4f6;font-weight:750;
+ font-variant-numeric:tabular-nums}
