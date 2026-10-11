@@ -159,3 +159,28 @@
 .followed-live-note,.followed-live-empty{font-size:11px;line-height:1.5;color:#587286;margin:9px 0 0}
 .tournament-matches-heading{font-size:15px;margin:17px 0 0;color:#194767}
 @media(max-width:365px){.followed-live-grid{gap:6px}.followed-live-card{padding:10px 7px}.followed-live-detail-button,.followed-live-source{font-size:9px;padding:6px 4px}}
+
+/* v85: sourced event-wide results, separated from live player ticker and official DBV import. */
+.badhub-event-panel{margin:18px 0 22px;border:1px solid #c6dfeb;border-radius:14px;background:#f9fcff;padding:12px}
+.badhub-event-panel>h4{margin:0 0 11px;font-size:16px;color:#143f60}
+.badhub-event-form{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}
+.badhub-event-form label,.badhub-event-controls label{min-width:0;display:grid;gap:5px;font-size:12px;font-weight:750;color:#315970}
+.badhub-event-form input,.badhub-event-controls select{display:block;width:100%;min-width:0;min-height:44px;padding:9px;border:1px solid #b8d3e4;border-radius:9px;background:#fff;color:#16405c;font-size:12px}
+.badhub-event-form button,.badhub-event-controls button{min-height:44px;align-self:end;border-radius:9px;font-size:12px;padding:8px 10px}
+.badhub-event-instructions,.badhub-event-note{font-size:11px;line-height:1.55;color:#58758a;margin:7px 0 10px}
+.badhub-event-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin:12px 0 10px}
+.badhub-event-source-line{display:flex;gap:8px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;font-size:11px;color:#456984;margin:8px 0 12px}
+.badhub-event-source-line a{color:#085b83;text-decoration:underline}
+.badhub-event-results{display:grid;gap:8px}
+.badhub-event-empty{font-size:12px;line-height:1.5;color:#47657b;margin:4px 0 8px}
+.badhub-match-card{display:grid;gap:8px;padding:10px;border-radius:11px;border:1px solid #d3e6f0;background:#fff;min-width:0}
+.badhub-match-header{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:#4c7187}
+.badhub-match-header strong{color:#205779}
+.badhub-match-sides{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;font-size:12px;line-height:1.45}
+.badhub-match-sides span{min-width:0;overflow-wrap:anywhere}
+.badhub-match-sides span:first-child{text-align:right}
+.badhub-match-sides span:last-child{text-align:left}
+.badhub-match-sides b{color:#9cb1bd}
+.badhub-match-sides .badhub-winner{color:#09674f;font-weight:850}
+.badhub-match-score{text-align:center;font-size:12px;letter-spacing:.02em;color:#173f5a}
+@media(max-width:365px){.badhub-event-panel{padding:9px}.badhub-event-form,.badhub-event-controls{gap:5px}.badhub-event-form button,.badhub-event-controls button{font-size:11px;padding:7px}}

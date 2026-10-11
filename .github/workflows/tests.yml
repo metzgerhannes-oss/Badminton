@@ -65,11 +65,9 @@ jobs:
           node --check scripts/tournament-live.mjs
           node --check scripts/live-radar.mjs
           node --check workers/badhub-event-bridge.mjs
+          node --check badhub-event.js
+          node --check scripts/badhub-event.mjs
           node --check scripts/live-links.mjs
-      - name: Investigate public tournament source shapes (bounded, read-only)
-        run: node scripts/probe-official-event.mjs
-      - name: Verify scoped event-worker bridge (one sample event)
-        run: node scripts/check-event-worker.mjs
       - name: Run tests
         run: |
           node tests/security-gate.mjs
@@ -106,6 +104,7 @@ jobs:
           node tests/live-hub.mjs
           node tests/tournament-live.mjs
           node tests/badhub-event-bridge.mjs
+          node tests/badhub-event-ui.mjs
           node tests/followed-live.mjs
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs

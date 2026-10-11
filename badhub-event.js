@@ -68,7 +68,7 @@ async function load(){
  const label=$("badhub-event-count");if(label)label.textContent="Veröffentlichte Ergebnisse werden abgeglichen …";
  try{
   const url=queryEvent(eventUrl,discipline);if(!url)throw Error("invalid");
-  const timer=setTimeout(()=>abort?.abort(),12500);let resp;
+  const localAbort=abort;const timer=setTimeout(()=>localAbort.abort(),12500);let resp;
   try{resp=await fetch(url,{method:"GET",headers:{Accept:"application/json"},cache:"no-store",signal})}
   finally{clearTimeout(timer)}
   if(!resp.ok)throw Error("HTTP "+resp.status);
