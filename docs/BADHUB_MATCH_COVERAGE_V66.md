@@ -36,3 +36,5 @@ BWBV veröffentlicht explizit Jugendturniere mit 11 oder 15 Punkten (z. B. BWBV 
 - Sarahs Badhub-Sammelübersicht muss vor Nutzung in einer offiziellen Statistik mit den Einzelbelegen abgestimmt werden.
 - Die Differenz zwischen 62 Spielen in Badhub und 60 Spielen im DBV bleibt quellenabhängig, ohne behauptete Ursache.
 - Der Nutzwert von 52 belegten Quellkarten steigt erst nach dem erneuten produktiven Import. GitHub-Merge allein aktualisiert keine Supabase-Edge-Function und keine bestehenden Matchtabellen.
+
+Die CI- und Browserprüfungen gelten jeweils für den letzten PR-Commit und sind vor Merge erneut zu prüfen.
