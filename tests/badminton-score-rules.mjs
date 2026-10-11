@@ -7,7 +7,7 @@ const valid=[
  {score:[[9,11],[11,9],[11,8]],side:1,format:11},
  {score:[[15,10],[15,14]],side:1,format:15},
  {score:[[13,15],[15,11],[15,13]],side:1,format:15},
- {score:[[18,21],[21,17],[25,23]],side:2,format:21}
+ {score:[[18,21],[21,17],[25,23]],side:1,format:21}
 ];
 for(const {score,side,format} of valid){
  const proof=completedMatchWinner(score);
