@@ -91,13 +91,16 @@ test("Home uses one Badhub career summary; filters retain separately evidenced m
  await expect(page.locator("#match-stats-source")).toHaveText("Badhub · Karrierebilanz");
  const reference=page.locator("#match-stats-reference");
  await expect(reference).toBeVisible();
- await expect(reference.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36"]);
- await expect(reference).toContainText("Badhub · Turnier-Profil (Screenshot)");
- await expect(reference).toContainText("keine Live-Abfrage");
+ await expect(reference.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9\\s*%/]);
+ await expect(reference).not.toContainText("Quelle:");
+ await expect(reference).not.toContainText("Screenshot");
+ await expect(reference).not.toContainText("keine Live-Abfrage");
+ await expect(reference).toContainText("Siegquote");
  await expect(reference.locator("a")).toHaveAttribute("href",
   "https://badhub.de/spieler/"+PLAYER+"?saison=all&src=gesamt");
  await expect(reference).not.toContainText("DBV · Kontrollstand");
  await expect(reference).not.toContainText("Einzelbeleg-Teilbestand");
+ await expect(reference.locator(".dbv-reference-totals span")).toHaveCount(4);
  await expect(page.locator("#match-stats-values")).toBeHidden();
  await expect(page.locator("#match-stats-note")).toBeHidden();
  await expect(page.locator("#match-stats-provenance")).toBeHidden();
