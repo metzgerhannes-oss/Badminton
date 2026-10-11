@@ -11,17 +11,17 @@ assert.match(sw,/app-shell\.css/);
 assert.match(sw,/design-v2\.css/);
 assert.match(sw,/stats\.js/);
 assert.match(sw,/scripts\/match-stats\.mjs/);
-assert.match(sw,/schmetterlinge-shell-v63/);
+assert.match(sw,/schmetterlinge-shell-v64/);
 for(const id of ["start","turniere","berichte","spieler"]){
  assert.match(html,new RegExp('data-page="'+id+'"'));
 }
 assert.equal((html.match(/class="nav-icon"/g)||[]).length,4);
 assert.match(css,/--ink:\s*#0b2a52/);
-assert.match(css,/\.dashboard-ranking-grid\s*\{[^}]*repeat\(3,minmax\(0,1fr\)\)/);
-assert.match(css,/\.match-stats-values\s*\{[^}]*repeat\(4,minmax\(0,1fr\)\)/);
+assert.match(await readFile("ui-components.css","utf8"),/\.dashboard-ranking-grid\s*\{[^}]*repeat\(3,minmax\(0,1fr\)\)/);
+assert.match(await readFile("ui-components.css","utf8"),/\.match-stats-values\s*\{[^}]*repeat\(4,minmax\(0,1fr\)\)/);
 assert.match(css,/env\(safe-area-inset-bottom\)/);
 assert.match(css,/max-width:350px/);
-assert.match(css,/dialog::backdrop/);
+assert.match(await readFile("ui-components.css","utf8"),/dialog::backdrop/);
 assert.match(js,/home-trophy/);
 assert.match(js,/friendNoHistory/);
 assert.match(js,/summarizeTrophies\(results\)/);
