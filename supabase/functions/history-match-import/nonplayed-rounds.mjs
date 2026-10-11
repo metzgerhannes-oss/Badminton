@@ -10,7 +10,9 @@ export function classifyNonPlayedCard(card){
  const away=body.search(/class="(?=[^"]*\bsp-side\b)(?=[^"]*\bsp-side--away\b)[^"]*"/);
  if(result<0||away<0)return null;
  const center=body.slice(result,away),other=body.slice(away);
- const scores=(center.match(/class="[^"]*\bsp-set-score\b/g)||[]).length;
+ const scores=[...center.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
+  .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)])
+  .filter(items=>items.length===2).length;
  const bye="BYE|RAST|RUST|FREILOS|SPIELFREI";
  const walkover="W[.]?O[.]?|WALKOVER|KAMPFLOS|AUFGABE";
  // The result column can explicitly mark a BYE even with contradictory scores.
