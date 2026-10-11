@@ -6,6 +6,8 @@ const urls=[
  "https://dbv.turnier.de/tournament/F7B661DD-BC15-4B5B-B38D-49D48FD9A67A/player/114",
  "https://badhub.de/api/spieler_live.php?lic=05-061350",
  "https://badhub.de/bvbb/turniere.php?jahr=2026",
+ "https://badhub.de/bvbb/turnier.php?id=4962",
+ "https://badhub.de/assets/js/turniere.js?v=1787664608",
  "https://dbv.turnier.de/cookiewall/",
 ];
 const allowed=new Set(["dbv.turnier.de","badhub.de"]);
@@ -21,6 +23,7 @@ for(const url of urls){
   let body=res.status===200?await res.text():"";
   if(body.length>2200000)body=body.slice(0,2200000);
   console.log("\nPROBE",u.pathname,"status",res.status,"type",type,"bytes",body.length,"location",res.headers.get("location")||"");
+  if(u.pathname.endsWith(".js")){console.log("SCRIPT",body.slice(0,3000));}
   if(type.includes("json")){
    let doc;try{doc=JSON.parse(body)}catch{}
    if(doc&&typeof doc==="object"){
@@ -41,6 +44,14 @@ for(const url of urls){
    console.log("SCRIPTS",JSON.stringify(scripts).slice(0,2200));
    const links=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/match|draw|tournament|court|schedule|livescore|live/i.test(x)).slice(0,32);
    console.log("MATCH_LINKS",JSON.stringify(links).slice(0,3500));
+   if(u.pathname.includes("turnier.php")||u.pathname.includes("turniere.php")){
+    const look=["turnier.php?id=4962","Spielplan","matches","match","Begegnungen","Ergebnisse","Spieler","Disziplin"];
+    for(const word of look){
+     const i=body.toLowerCase().indexOf(word.toLowerCase());
+     if(i>=0)console.log("NEAR",word,body.slice(Math.max(0,i-190),i+900).replace(/\\s+/g," ").slice(0,1100));
+    }
+    console.log("HTML COUNTS",JSON.stringify({table:body.split("<table").length-1,tr:body.split("<tr").length-1,score:body.split("score").length-1,match:body.toLowerCase().split("match").length-1}));
+   }
    if(u.pathname.includes("turniere.php")){
     const other=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/turnier|event|match|spiel/i.test(x)).slice(0,45);
     console.log("TOURNAMENT_TARGETS",JSON.stringify(other).slice(0,5500));
