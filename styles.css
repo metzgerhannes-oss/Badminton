@@ -48,7 +48,6 @@
 .history-ranking-note h3{margin:0 0 8px;font-size:15px}
 .history-ranking-note p{font-size:12px;color:#b0c1d6;line-height:1.6}
 .history-ranking-note a{font-size:12px;font-weight:750;color:#8bd8ff}
-.bottom-nav a{width:25%}
 @media(max-width:375px){.history-content{padding:12px}.history-stat{padding:12px 9px}.history-stat span{font-size:10px}.history-content h3{font-size:14px}}
 
 
@@ -119,7 +118,6 @@
 .pending-medal a{font-size:11px;color:#b9e1ff;font-weight:750}
 
 /* Bookmarked tournaments, without polling or an implied live status */
-.bottom-nav a{width:33.3333%}
 .saved-tournament-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .saved-tournament-top h3{min-width:0;flex:1}
 .saved-tournament-phase{flex:none;display:inline-block;padding:5px 8px;border-radius:999px;border:1px solid #54758c;background:#253d55;color:#d3e9f7;font-size:10px;font-weight:750;white-space:nowrap}
@@ -164,7 +162,6 @@
 .kpi-next-date{white-space:nowrap;color:#8fdbff;font-size:12px;font-weight:850}
 .dashboard-empty-tile{display:grid;gap:10px;padding:17px;grid-column:1/-1;min-height:120px}
 .dashboard-empty-tile strong{font-size:15px}.dashboard-empty-tile small{color:#9fbad2;font-size:12px;line-height:1.5}.dashboard-empty-tile span{color:#9edfff;font-size:11px;font-weight:800}
-.bottom-nav a{width:25%}
 @media(min-width:600px){.dashboard-ranking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ranking-tile{min-height:186px}}
 @media(max-width:350px){.ranking-tile{padding:12px 10px}.ranking-place{font-size:30px}.dashboard-heading h1{font-size:22px}.ranking-top{font-size:12px}}
 
@@ -455,10 +452,10 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 .live-dbv-foot a{color:#bbe9ff;font-size:11px;font-weight:800;white-space:nowrap}
 @media(max-width:370px){.live-dbv{padding:10px}.live-dbv-players{font-size:12px;gap:4px}}
 
-/* Profile club and fifth navigation item */
+/* Player club details and legacy navigation presentation */
 .focused-profile .focus-profile-copy .focus-club{display:block;margin-top:3px;color:#b7dcef;font-size:11px;line-height:1.35}
 .profile-card .profile-club{color:#bbd6ec;font-size:11px;margin-top:3px}
-.bottom-nav a{width:20%;min-width:0;padding-inline:2px}
+.bottom-nav a{min-width:0;padding-inline:2px}
 .bottom-nav a span{font-size:22px}
 .bottom-nav a small{font-size:9px;white-space:nowrap}
 @media(min-width:700px){.bottom-nav{width:min(580px,94vw)}}
@@ -501,8 +498,8 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 .invitation-card .invitation-status{font-size:11px;margin:9px 0;min-height:0;color:#ceffee;font-weight:700}
 @media(max-width:350px){.invitation-actions{display:grid;grid-template-columns:1fr}}
 
-/* DBV player library: 6 touch-friendly tabs and responsive club groups. */
-.bottom-nav a{width:16.666%;padding-inline:1px}
+/* DBV player library: responsive club groups. */
+.bottom-nav a{padding-inline:1px}
 .bottom-nav a span{font-size:20px}
 .bottom-nav a small{font-size:9px}
 @media(max-width:370px){.bottom-nav a span{font-size:19px}.bottom-nav a small{font-size:8px}}
