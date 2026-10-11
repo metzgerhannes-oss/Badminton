@@ -172,6 +172,11 @@ function showProfileForm(){
  $("welcome-existing").hidden=false;
  window.scrollTo?.(0,0);
 }
+window.addEventListener("schmetterlinge:language-change", event => {
+ const notice=$("welcome-language-status");
+ if(notice)notice.textContent=event.detail?.fallback
+  ?"Dieses Sprachpaket ist derzeit nicht verfügbar. Die deutschen Texte bleiben lesbar.":"";
+});
 document.addEventListener("DOMContentLoaded",()=>{
  $("mode-own").addEventListener("click",()=>updateMode("manual"));
  $("mode-dbv").addEventListener("click",()=>updateMode("dbv"));
