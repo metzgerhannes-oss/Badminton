@@ -10,6 +10,8 @@ assert.equal(classifyNonPlayedCard(card("<span>BYE</span>")),"confirmed_bye_rast
 for(const word of ["Rast","Rust","Freilos","Spielfrei"])
  assert.equal(classifyNonPlayedCard(card("",word)),"confirmed_bye_rast");
 assert.equal(classifyNonPlayedCard(card("<span>W.O.</span>")),"marked_walkover");
+assert.equal(classifyNonPlayedCard(card("<span>Aufgabe</span>")),"marked_retirement");
+assert.equal(classifyNonPlayedCard(card("<span>Disqualifiziert</span>")),"marked_disqualification");
 assert.equal(classifyNonPlayedCard(card("","")),"unscored_without_opponent");
 assert.equal(classifyNonPlayedCard(card("")),"unscored_with_opponent");
 assert.equal(classifyNonPlayedCard(card(match+match,"Rust")),null,

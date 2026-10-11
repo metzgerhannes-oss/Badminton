@@ -34,5 +34,5 @@ assert.match(css,/#match-stats-values\[hidden\]/);
 assert.match(css,/\.dbv-reference-totals\{display:grid;grid-template-columns:repeat\(4/);
 assert.match(css,/@media\(max-width:500px\)\{\.dbv-reference-totals\{grid-template-columns:repeat\(2/);
 assert.match(css,/#match-stats-note\[hidden\]/);
-assert.match(sw,/schmetterlinge-shell-v72/);
+assert.match(sw,/schmetterlinge-shell-v73/);
 console.log("v72: one sourced Badhub career balance, no duplicate DBV summary, filtered facts remain separate.");
