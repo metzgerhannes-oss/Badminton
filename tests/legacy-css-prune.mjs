@@ -18,8 +18,8 @@ assert.doesNotMatch(html,/id="player-pills"|id="next-match"|id="match-list"/);
 // All still-used foundation elements and the approved full logo must survive.
 for(const rule of [
  "*{box-sizing:border-box}","button{cursor:pointer}",".page{display:none}",
- ".page.active{display:block}",".icon-button{display:grid}",
- ".bottom-nav{position:fixed}","dialog{padding:0",".modal{padding:20px",
+ ".page.active{display:block}",".icon-button{display:grid;",
+ ".bottom-nav{position:fixed;","dialog{padding:0",".modal{padding:20px",
  ".toast.visible{display:block}"
 ])assert.ok(css.includes(rule),"Required foundational styling missing: "+rule);
 assert.ok(css.includes(".icon-button:hover{"),"Active close-button hover feedback missing");
