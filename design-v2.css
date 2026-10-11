@@ -596,7 +596,7 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .history-scored-match-proof{margin-top:8px;padding-top:8px;border-top:1px solid rgba(160,180,200,.22);font-size:12px;line-height:1.5;min-width:0}
 .history-scored-match-proof strong{display:block}.history-scored-match-proof ul{margin:6px 0;padding:0;list-style:none;display:grid;gap:6px}.history-scored-match-proof li{display:flex;flex-wrap:wrap;gap:4px 10px;overflow-wrap:anywhere}.history-scored-match-proof small{color:var(--muted,#92a2b1)}
 
-/* v64: dated DBV career reference stays separate from match proofs. */
+/* Dated Badhub career reference: only one all-time summary, separately filtered proofs. */
 .dbv-match-reference{margin:12px 0;border:1px solid var(--border, #d6dce4);border-left:3px solid #5c738c;border-radius:12px;padding:12px;background:var(--card, #f7f9fc);font-size:.88rem;line-height:1.45}
 .dbv-match-reference[hidden]{display:none}
 .dbv-reference-heading{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
@@ -605,8 +605,7 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .dbv-reference-totals span{display:flex;flex-direction:column;font-size:.78rem;color:var(--muted, #556170)}
 .dbv-reference-totals strong{font-size:1.35rem;color:var(--text, #243544);font-variant-numeric:tabular-nums}
 .dbv-match-reference p{margin:7px 0 0}
-.dbv-match-reference .dbv-reference-comparison{font-weight:600;color:var(--text, #243544)}
 
-/* v66: dated Badhub aggregate compared separately with DBV and source proofs. */
-.dbv-secondary-reference{margin-top:14px;padding-top:12px;border-top:1px solid rgba(120,144,164,.4)}
-.dbv-match-reference>a{display:inline-flex;min-height:36px;align-items:center;font-weight:650;overflow-wrap:anywhere}
+.dbv-match-reference>a{display:inline-flex;min-height:44px;align-items:center;font-weight:650;overflow-wrap:anywhere}
+#match-stats-values[hidden],#match-stats-note[hidden],
+#match-stats-provenance[hidden],#match-stats-source-link[hidden]{display:none!important}
