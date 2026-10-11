@@ -76,7 +76,7 @@
  }
  function visible(){
   const advanced=$("dbv-live-advanced");
-  return location.hash==="#turniere"&&!document.hidden&&Boolean(advanced?.open);
+  return (location.hash==="#turniere"||location.hash==="#live")&&!document.hidden&&Boolean(advanced?.open);
  }
  document.addEventListener("DOMContentLoaded",()=>{
   if(!$("dbv-live-results"))return;
