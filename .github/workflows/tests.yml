@@ -68,6 +68,8 @@ jobs:
           node --check scripts/live-links.mjs
       - name: Investigate public tournament source shapes (bounded, read-only)
         run: node scripts/probe-official-event.mjs
+      - name: Verify scoped event-worker bridge (one sample event)
+        run: node scripts/check-event-worker.mjs
       - name: Run tests
         run: |
           node tests/security-gate.mjs
