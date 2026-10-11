@@ -8,6 +8,7 @@ const urls=[
  "https://badhub.de/bvbb/turniere.php?jahr=2026",
  "https://badhub.de/bvbb/turnier.php?id=4962",
  "https://badhub.de/assets/js/turniere.js?v=1787664608",
+ "https://badhub.de/assets/js/turnier.js?v=1787664608",
  "https://dbv.turnier.de/cookiewall/",
 ];
 const allowed=new Set(["dbv.turnier.de","badhub.de"]);
@@ -23,7 +24,7 @@ for(const url of urls){
   let body=res.status===200?await res.text():"";
   if(body.length>2200000)body=body.slice(0,2200000);
   console.log("\nPROBE",u.pathname,"status",res.status,"type",type,"bytes",body.length,"location",res.headers.get("location")||"");
-  if(u.pathname.endsWith(".js")){console.log("SCRIPT",body.slice(0,3000));}
+  if(u.pathname.endsWith(".js")){console.log("SCRIPT",body.slice(0,12500));}
   if(type.includes("json")){
    let doc;try{doc=JSON.parse(body)}catch{}
    if(doc&&typeof doc==="object"){
@@ -51,6 +52,7 @@ for(const url of urls){
      if(i>=0)console.log("NEAR",word,body.slice(Math.max(0,i-190),i+900).replace(/\\s+/g," ").slice(0,1100));
     }
     console.log("HTML COUNTS",JSON.stringify({table:body.split("<table").length-1,tr:body.split("<tr").length-1,score:body.split("score").length-1,match:body.toLowerCase().split("match").length-1}));
+    if(u.pathname.includes("turnier.php"))console.log("EVENT_HTML_SECTION",body.slice(10500,17500));
    }
    if(u.pathname.includes("turniere.php")){
     const other=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/turnier|event|match|spiel/i.test(x)).slice(0,45);
