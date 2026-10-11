@@ -1,6 +1,6 @@
 # Einladungslink, Willkommensseite und Installation
 
-Stand: 10.10.2026. Statische GitHub-Pages-PWA Schmetterlinge ohne Benutzerkonten.
+Stand: 11.10.2026 (v76). Statische GitHub-Pages-PWA Schmetterlinge ohne Benutzerkonten.
 
 ## Einladen
 
@@ -12,10 +12,13 @@ Der Link ist für alle nutzbar; er enthält keine persönlichen Informationen, k
 
 ## Neues Profil
 
-1. Willkommensseite öffnen.
-2. Eigenes Spielerprofil anlegen (Name, Jahrgang und Verein) oder die DBV-Spieler-ID bzw. einen offiziellen DBV-Profil-Link angeben.
-3. Zusätzlich einen Namen angeben und Profil speichern.
-4. iPhone-/Android-Anleitung lesen und die App öffnen.
+1. Willkommensseite öffnen und direkt per Namen, Namensbestandteil oder DBV-Spieler-ID suchen (ab zwei Zeichen).
+2. Im öffentlichen DBV-Spielerverzeichnis einen Treffer anhand von Verein, Jahrgang und ID auswählen.
+3. Die Auswahl **ausdrücklich bestätigen**. Die verifizierte DBV-ID, der Name, der Verein und – sofern vorhanden – das Geburtsjahr werden lokal als eigenes Profil gespeichert.
+4. Falls kein Treffer existiert oder die Suche nicht erreichbar ist: „Spieler nicht gefunden? Manuell einrichten“ öffnen, Name/Jahrgang/Verein angeben oder eine DBV-ID bzw. einen offiziellen Link einfügen.
+5. iPhone-/Android-Anleitung lesen und die App öffnen.
+
+Die Suche liest nur veröffentlichte DBV-Verzeichnisdaten aus Supabase. Bei Ausfall kann die statische GitHub-Spielerbibliothek verwendet werden. Vor einer Eingabe werden keine vollständigen Spielerverzeichnisse heruntergeladen. Es erfolgt kein serverseitiges Speichern privater Profile und keine automatische Spielerübernahme ohne Bestätigung.
 
 Eine offizielle DBV-URL mit player-profile/UUID enthält nicht die numerische DBV-ID. Diese wird daher nicht erraten. Verifizierte Ranglisten erscheinen nur, wenn die ID separat verfügbar und importiert ist.
 
@@ -33,7 +36,8 @@ Es handelt sich um eine Progressive Web App, keinen klassischen App-Store-Downlo
 
 ## Implementierung
 
-- welcome.html, welcome.css, welcome.js: mobile Willkommens- und Einrichtungsseite
+- welcome.html, welcome.css, welcome.js: mobile Willkommens- und Einrichtungsseite mit Suche und Bestätigung
+- scripts/invitation-search.mjs: schreibgeschützte DBV-Volltextsuche, GitHub-Ausfallsicherung, Validierung und Duplikatfilter
 - scripts/invitation.mjs: strenge DBV-Validierung, verlustfreies Zusammenführen bestehender Profildaten
 - invite.js: systemeigenes Teilen, Link kopieren mit Fallback
 - index.html: Einstellungsbereich für Einladungen und Installationshilfe
