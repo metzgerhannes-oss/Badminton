@@ -1,0 +1,21 @@
+name: Badhub source audit (bounded)
+on:
+  pull_request:
+    paths:
+      - scripts/badhub-history-parser.mjs
+      - scripts/badhub-source-audit.mjs
+      - .github/workflows/badhub-source-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check source card parsing without storing HTML
+        run: node scripts/badhub-source-audit.mjs
