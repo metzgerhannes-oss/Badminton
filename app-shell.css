@@ -144,3 +144,6 @@
 .app[data-current-view="live"] .live-tournament-links{margin:9px 0 14px}
 .app[data-current-view="live"] .live-tournament-links .matchday-event-link{min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;padding:9px 11px;font-weight:780}
 @media(max-width:350px){.matchday-switch button{font-size:12px}}
+
+/* v83: the current match and queue beat decorative KPI tiles on a small iPhone. */
+.live-radar-content .matchday-overview{padding:9px 11px;margin:8px 0 13px;border-radius:10px;background:#f2f7fb;border-color:#d5e6f0;color:#476c83;font-size:11px;line-height:1.45}
