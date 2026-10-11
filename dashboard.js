@@ -160,7 +160,7 @@ function renderOtherKpis(){
    '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'">'+escape(date(t.startDate))+'</time>'+(active?'<small>Im Zeitraum</small>':'')+'</span>'+
    '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+escape(range)+' · '+escape(owner)+'</small></span>'+
    '<span class="upcoming-tournament-arrow" aria-hidden="true">↗</span></a>';
- }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Noch keine bevorstehenden Turniere gespeichert.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
+ }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Für diesen Spieler sind noch keine zukünftigen Turniere mit Datum gespeichert. Die Anzeige nutzt gespeicherte Turnierlinks; künftige DBV-Meldungen werden hier noch nicht automatisch eingelesen.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
  next.innerHTML='<section class="upcoming-tournaments-section" aria-labelledby="upcoming-tournaments-heading">'+
   '<div class="upcoming-tournaments-header"><h2 id="upcoming-tournaments-heading">Die nächsten Turniere</h2><a href="#turniere">Alle Turniere ↗</a></div>'+
   '<div class="upcoming-tournaments-list">'+list+'</div></section>';

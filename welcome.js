@@ -38,9 +38,15 @@ function showPlatform(value){
 function readSaved(){
  try{const value=localStorage.getItem(STORE);return value?JSON.parse(value):null}catch{return null}
 }
-function persistAndContinue(profile){
- const result=addProfileToStore(readSaved(),profile);
+function persistAndContinue(profile,{confirmed=false}={}){
+ if(confirmed&&!/^\d{2}-\d{6}$/.test(profile?.id))throw Error("Der ausgewählte Spieler hat keine gültige DBV-ID. Bitte erneut suchen.");
+ const result=addProfileToStore(readSaved(),profile,{confirmed});
  localStorage.setItem(STORE,JSON.stringify(result));
+ const stored=readSaved();
+ if(confirmed&&(!stored?.players?.some(p=>p.id===profile.id)||stored.activeProfileId!==profile.id))
+  throw Error("Die DBV-ID konnte nicht als aktives Profil gespeichert werden. Bitte erneut versuchen.");
+ const savedStatus=$("welcome-success");
+ if(savedStatus)savedStatus.textContent=confirmed?"✓ DBV-Profil "+profile.id+" übernommen":"✓ Profil auf diesem Gerät gespeichert";
  // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
  $("onboard-profile").hidden=true;
  $("onboard-install").hidden=false;
@@ -69,10 +75,11 @@ function saveSelected(){
  if(!selectedCandidate)return;
  clearError();
  try{
+  if(!/^\d{2}-\d{6}$/.test(selectedCandidate.id))throw Error("Der Suchtreffer hat keine bestätigte DBV-ID. Bitte einen anderen Treffer auswählen.");
   persistAndContinue(normalizeProfile({
    mode:"dbv",reference:selectedCandidate.id,name:selectedCandidate.name,
    birthYear:selectedCandidate.birthYear||"",club:selectedCandidate.club||""
-  }));
+  }),{confirmed:true});
  }catch(error){
   showError(error?.message||"Der ausgewählte Spieler konnte nicht gespeichert werden.");
  }
@@ -98,25 +105,22 @@ function showSearchResults(players,source){
   detail.textContent=[player.club||"Verein unbekannt",player.birthYear?"Jg. "+player.birthYear:player.ageClass,player.id?"DBV "+player.id:""].filter(Boolean).join(" · ");
   button.append(name,detail);
   if(existing.has(player.id)){
-   button.disabled=true;
-   button.setAttribute("aria-label",player.name+" – bereits als eigenes Profil gespeichert");
    const note=document.createElement("small");
-   note.textContent="Bereits angelegt";
+   note.textContent="Bereits angelegt · als Startprofil auswählen";
    button.append(note);
-  }else{
-   button.addEventListener("click",()=>{
-    ++searchTicket;
-    searchController?.abort();
-    selectedCandidate=player;
-    $("welcome-selection-name").textContent=player.name;
-    $("welcome-selection-detail").textContent=detail.textContent;
-    $("welcome-selection").hidden=false;
-    root.replaceChildren();
-    clearError();
-    setSearchStatus("Spieler ausgewählt. Bitte die Angaben prüfen und bestätigen.");
-    $("welcome-selection-save").focus();
-   });
   }
+  button.addEventListener("click",()=>{
+   ++searchTicket;
+   searchController?.abort();
+   selectedCandidate=player;
+   $("welcome-selection-name").textContent=player.name;
+   $("welcome-selection-detail").textContent=detail.textContent;
+   $("welcome-selection").hidden=false;
+   root.replaceChildren();
+   clearError();
+   setSearchStatus("DBV-Spieler ausgewählt. Identität prüfen und als aktives Profil übernehmen.");
+   $("welcome-selection-save").focus();
+  });
   root.append(button);
  }
  if(!players.length)setSearchStatus("Kein passender DBV-Spieler gefunden. Versuche einen anderen Namen oder richte das Profil manuell ein.");
