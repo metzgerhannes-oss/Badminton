@@ -1,7 +1,7 @@
 /** Badhub historical match details: same scoring and evidence rules as Home. */
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
 import {MATCH_RULES} from "./scripts/badminton-score-rules.mjs";
-import {getDbvMatchReference,getBadhubMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
+import {getDbvMatchReference,getBadhubMatchReference,getReportedPlayedWithoutScores,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -71,6 +71,13 @@ function render(){
   info+=" DBV-Profilstand "+reference.period+" vom "+reference.capturedOn+": "+
    reference.total+" Spiele ("+reference.wins+" Siege / "+reference.losses+" Niederlagen). "+
    dbvReferenceMessage(reference,evidence);
+ }
+ const playedUnscored=getReportedPlayedWithoutScores(selected,{year,discipline,category});
+ if(playedUnscored){
+  const verifiedWithoutSets=rows.filter(r=>Array.isArray(r.games)&&r.games.length===0).length;
+  info+=verifiedWithoutSets
+   ?" "+verifiedWithoutSets+" Ergebnisse sind durch den von Badhub fett markierten Gewinner belegt; Satzstände fehlen."
+   :" Vier Badhub-Ergebnisse ohne Satzstände haben einen eindeutigen, fett markierten Gewinner und werden beim nächsten Quellenimport übernommen.";
  }
  progressEl.textContent=info;
  const options=sourceMatchYears(rows);

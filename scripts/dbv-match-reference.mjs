@@ -64,3 +64,26 @@ export function getBadhubMatchReference(id,{year="all",discipline="all",ageClass
   capturedOn:snapshot.capturedOn,sourceName:snapshot.sourceName,sourceUrl:snapshot.sourceUrl,
   sourceType:"user-provided-screenshot",period:"Karriere"}:null;
 }
+
+/**
+ * Human-confirmed clarification for historical Badhub source cards.
+ * The source winner is now confirmed individually by Badhub's bold winner
+ * marker in each of four named match cards. No set scores are invented.
+ * This historical annotation alone does not create database facts.
+ */
+export const reportedPlayedWithoutScores=Object.freeze({
+ "05-070879":{
+  confirmedOn:"2026-10-11",
+  count:4,
+  confirmation:"user-reported-played",
+  issue:"source-result-incomplete",
+  evidence:"4 Badhub match cards with a printed dash and one bold winner: 1 Sieg, 3 Niederlagen; no scores",
+  individualOutcomesVerified:true
+ }
+});
+export function getReportedPlayedWithoutScores(id,{year="all",discipline="all",category="all"}={}){
+ if(year!=="all"||discipline!=="all"||category!=="all")return null;
+ const entry=reportedPlayedWithoutScores[id];
+ return entry&&entry.confirmation==="user-reported-played"&&
+  Number.isSafeInteger(entry.count)&&entry.count>0?{...entry}:null;
+}
