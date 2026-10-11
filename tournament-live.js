@@ -6,7 +6,7 @@ import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const root=()=> $("tournament-live-content");
 let selected="",status="all",court="all",items=[],controller=null,serial=0,loadedAt=0;
-const visible=()=>["#live","#turniere"].includes(location.hash)&&!document.hidden;
+const visible=()=>location.hash==="#live"&&window.badmintonMatchdayMode==="all"&&!document.hidden;
 function node(tag,cls,value){
  const n=document.createElement(tag);if(cls)n.className=cls;
  if(value!==undefined)n.textContent=String(value);return n;
@@ -33,6 +33,21 @@ function choose(){
   }
   if(!options.some(t=>t.id===selected))selected=options[0].id;
   input.value=selected;
+ }
+ const sourceHost=$("live-tournament-links");
+ if(sourceHost){
+  sourceHost.replaceChildren();
+  const chosen=options.find(x=>x.id===selected);
+  const sourceId=eventId(chosen?.url);
+  if(sourceId){
+   const link=node("a","matchday-event-link","Original-Spielplan bei DBV öffnen ↗");
+   link.href="https://dbv.turnier.de/tournament/"+sourceId;
+   link.target="_blank";link.rel="noopener noreferrer";
+   sourceHost.appendChild(link);
+  }else{
+   const link=node("a","matchday-event-link","Turnier unter „Turniere“ speichern ↗");
+   link.href="#turniere";sourceHost.appendChild(link);
+  }
  }
  return previous!==selected;
 }
@@ -61,9 +76,12 @@ function render(){
  host.replaceChildren();
  const totals=tournamentCounts(items);
  const counter=$("tournament-live-count");
- if(counter)counter.textContent=items.length
-  ?totals.total+" importierte Matches · "+totals.live+" aktuell · "+totals.upcoming+" offen · "+totals.finished+" beendet"
-  :"Noch keine importierten Matchdaten";
+ if(counter){
+  counter.hidden=items.length===0;
+  counter.textContent=items.length?totals.total+" belegte Spiele · "+totals.live+" live · "+
+   totals.upcoming+" offen · "+totals.finished+" gespielt":"";
+ }
+ const filters=$("tournament-live-filters");if(filters)filters.hidden=items.length===0;
  courtFilter();
  for(const tab of document.querySelectorAll("[data-tournament-status]")){
   tab.setAttribute("aria-pressed",String(tab.dataset.tournamentStatus===status));
@@ -73,8 +91,8 @@ function render(){
  }
  const shown=filterTournament(items,{status,court});
  if(!items.length){
-  note("Noch kein turnierweiter Spielplan importiert",
-   "Für dieses gespeicherte Turnier fehlen derzeit geprüfte DBV-Matchdaten im gemeinsamen Cache. Wir zeigen keine erfundenen Live-Stände. Den Originalspielplan findest du direkt darunter.");
+  note("Noch keine Begegnungen importiert",
+   "Der offizielle Spielplan ist über die Schaltfläche oben erreichbar. Hier erscheinen nur bestätigte, bereits importierte Spiele.");
   return;
  }
  if(!shown.length){note("Keine Spiele in diesem Filter","Probiere eine andere Kategorie oder ein anderes Feld.");return}
@@ -118,14 +136,14 @@ async function refresh(){
   const {rows:events}=await readPublicRows(tournamentPath(id),{signal,count:false});
   if(signal.aborted||request!==serial)return;
   const tournament=matchTournament(events,chosen);
-  if(!tournament){items=[];render();return}
+  if(!tournament){items=[];loadedAt=Date.now();render();return}
   const {rows}=await readPublicRows(matchesPath(tournament.id),{signal,count:false,timeoutMs:9000});
   if(signal.aborted||request!==serial)return;
   items=tournamentOverview(rows,tournament.id);
   loadedAt=Date.now();render();
  }catch(error){
   if(signal.aborted||request!==serial)return;
-  items=[];
+  items=[];loadedAt=Date.now();
   note("Turnierdaten derzeit nicht verfügbar",
    "Der geprüfte Datenbestand lässt sich gerade nicht abrufen. Der offizielle Turnierlink bleibt darunter erreichbar.");
  }finally{if(request===serial&&btn)btn.disabled=false}
@@ -148,6 +166,10 @@ document.addEventListener("DOMContentLoaded",()=>{
   status=button.dataset.tournamentStatus;render();
  }));
  window.addEventListener("badminton:tournament-bookmarks",sync);
+ window.addEventListener("badminton:matchday-mode",()=>{
+  if(visible())sync();
+  else{serial++;controller?.abort()}
+ });
  window.addEventListener("hashchange",()=>{if(visible())sync();else{++serial;controller?.abort()}});
  document.addEventListener("visibilitychange",()=>{if(visible())sync();else{++serial;controller?.abort()}});
  setInterval(()=>{if(visible()&&selected&&Date.now()-loadedAt>60000)refresh()},60000);

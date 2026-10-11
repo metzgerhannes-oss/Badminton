@@ -9,7 +9,7 @@ const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
 let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
 let busy=false,timer;
-const displayed=()=>(location.hash==="#turniere"||location.hash==="#live")&&!document.hidden;
+const displayed=()=>(location.hash==="#turniere"||(location.hash==="#live"&&window.badmintonMatchdayMode!=="all"))&&!document.hidden;
 function element(tag,cls,value){
  const e=document.createElement(tag);
  if(cls)e.className=cls;
@@ -198,6 +198,13 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("badminton:profile-change",e=>{
   const id=String(e.detail?.playerId||"");
   if(id!==currentId)switchPlayer(id);
+ });
+ window.addEventListener("badminton:matchday-mode",()=>{
+  if(displayed())refresh();
+  else{
+   generation++;controller?.abort();busy=false;
+   const btn=$("live-radar-refresh");if(btn)btn.disabled=false;
+  }
  });
  window.addEventListener("hashchange",()=>{if(displayed())refresh()});
  document.addEventListener("visibilitychange",()=>{if(displayed())refresh()});
