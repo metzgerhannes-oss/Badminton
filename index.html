@@ -17,6 +17,7 @@
 <script defer src="./state-storage.js"></script>
 <script defer src="./router.js"></script>
 <script defer src="./tournament-bookmarks.js"></script>
+<script defer src="./i18n.js"></script>
 <script defer src="./app.js"></script>
 <script defer src="./invite.js"></script>
 <script type="module" src="./library.js"></script>
@@ -239,6 +240,12 @@
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
+   <section class="settings-card language-settings" aria-labelledby="language-title">
+    <h3 id="language-title">Sprache</h3>
+    <label for="app-language">App-Sprache</label>
+    <select id="app-language" data-language-select aria-label="App-Sprache"><option value="auto">Automatisch</option><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="uk">Українська</option><option value="ru">Русский</option><option value="zh-Hans">简体中文</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="it">Italiano</option><option value="es">Español</option><option value="pl">Polski</option></select>
+    <p class="settings-hint">Die Auswahl gilt auf diesem Gerät. Sprachpakete sind nach dem ersten Laden auch offline verfügbar. Nicht übersetzte Texte erscheinen auf Deutsch.</p>
+   </section>
    <section class="settings-card invitation-card" aria-labelledby="invitation-title">
     <h3 id="invitation-title">Familie &amp; Freunde einladen</h3>
     <p>Teile den öffentlichen Einrichtungslink. Er führt auf eine Willkommensseite zum Anlegen des eigenen Spielers oder zum Eintragen einer DBV-Spieler-ID bzw. eines offiziellen Profil-Links.</p>
