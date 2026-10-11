@@ -25,6 +25,6 @@ export function classifyNonPlayedCard(card){
  if(isolated(center,walkover)||(!scores&&isolated(other,walkover)))
   return scores?"conflicting_walkover_with_scores":"marked_walkover";
  if(scores)return null;
- const opponent=/class="[^"]*\bsp-name-full\b/.test(other);
+ const opponent=/class="sp-name-full"/.test(other);
  return opponent?"unscored_with_opponent":"unscored_without_opponent";
 }
