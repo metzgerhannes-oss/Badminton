@@ -258,6 +258,9 @@ function openTournamentForm(item=null){
  dialog.showModal();
 }
 function setup(){
+ window.addEventListener("badminton:community-feedback",event=>{
+  if(typeof event.detail?.message==="string")toast(event.detail.message);
+ });
  window.addEventListener("badminton:live-evidence",event=>{
   const playerId=String(event.detail?.playerId||"");
   if(playerId!==state.chosen)return;
