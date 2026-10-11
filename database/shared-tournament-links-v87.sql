@@ -48,14 +48,14 @@ CREATE POLICY "Public opt-in reported tournament hints"
 -- and publication timestamp for every shared insert/update, and bound spam.
 DROP POLICY IF EXISTS "Bound public tournament publications on insert" ON public.user_tournament_links;
 CREATE POLICY "Bound public tournament publications on insert"
-  AS RESTRICTIVE ON public.user_tournament_links FOR INSERT TO authenticated
+  ON public.user_tournament_links AS RESTRICTIVE FOR INSERT TO authenticated
   WITH CHECK (NOT is_shared OR (
     player_dbv_id IS NOT NULL AND shared_at IS NOT NULL
     AND EXISTS (SELECT 1 FROM public.players p WHERE p.dbv_id = player_dbv_id AND p.verified_at IS NOT NULL)
   ));
 DROP POLICY IF EXISTS "Bound public tournament publications on update" ON public.user_tournament_links;
 CREATE POLICY "Bound public tournament publications on update"
-  AS RESTRICTIVE ON public.user_tournament_links FOR UPDATE TO authenticated
+  ON public.user_tournament_links AS RESTRICTIVE FOR UPDATE TO authenticated
   USING (user_id = (SELECT auth.uid()))
   WITH CHECK (NOT is_shared OR (
     player_dbv_id IS NOT NULL AND shared_at IS NOT NULL
