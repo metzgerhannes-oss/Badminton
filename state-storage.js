@@ -7,6 +7,31 @@
 var SchmetterlingeStorage=(function(){
  const STORE="shuttleboard-v1";
  const SCHEMA_VERSION=1;
+// Repair exactly one locally-created alias when there is a unique, compatible
+// DBV profile already on this device. No remote lookup, no guessed DBV identity.
+function resolveLocalAliases(state){
+ const normalize=name=>String(name||"").normalize("NFKC").trim().replace(/\s+/g," ").toLocaleLowerCase("de");
+ const compatible=(a,b)=>!a||!b||normalize(a)===normalize(b);
+ const aliases=state.players.filter(p=>/^local-/.test(p.id));
+ for(const local of aliases){
+  const short=normalize(local.name);
+  const official=state.players.filter(p=>/^\d{2}-\d{6}$/.test(p.id)&&(
+   normalize(p.name)===short||(short&&!short.includes(" ")&&normalize(p.name).startsWith(short+" ")))&&
+   compatible(local.birthYear,p.birthYear)&&compatible(local.club,p.club));
+  if(official.length!==1)continue;
+  const target=official[0];
+  // Do not guess if two distinct players on this device share this first name.
+  const first=short.split(" ")[0];
+  if(state.players.some(p=>p!==local&&p!==target&&normalize(p.name).split(" ")[0]===first))continue;
+  target.club=target.club||local.club;
+  target.birthYear=target.birthYear||local.birthYear;
+  target.url=target.url||local.url;
+  state.officialLinks=state.officialLinks.map(link=>link.playerId===local.id
+   ?{...link,playerId:target.id}:link);
+  if(state.activeProfileId===local.id)state.activeProfileId=target.id;
+  state.players=state.players.filter(p=>p!==local);
+ }
+}
 function restore(state,normalizeBookmark){
  try{
   const saved=JSON.parse(localStorage.getItem(STORE)||"null");
@@ -26,6 +51,7 @@ function restore(state,normalizeBookmark){
    const preferred=typeof saved.activeProfileId==="string"?saved.activeProfileId:(typeof saved.chosen==="string"?saved.chosen:"");
    const canonicalPreferred=preferred==="local-charlotte"&&state.players.some(p=>p.id==="05-071969")?"05-071969":preferred;
    if(canonicalPreferred!=="all"&&state.players.some(p=>p.id===canonicalPreferred))state.activeProfileId=canonicalPreferred;
+   resolveLocalAliases(state);
 
   }
  }catch{}

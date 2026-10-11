@@ -50,6 +50,36 @@ second.run("restore()");
 assert.equal(second.run("state.activeProfileId"),"05-071969");
 assert.equal(second.run("state.friends.length"),1);
 assert.equal(second.run("state.officialLinks.length"),1);
+// Restore a previous user's duplicate Philipp (one local without ID, one
+// confirmed DBV player). Do not lose tournaments attached to the old alias.
+const aliasStore=new Map([[key,JSON.stringify({
+ players:[
+  {id:"local-older",name:"Philipp",club:"SpVgg Mössingen"},
+  {id:"05-070879",name:"Philipp Metzger",club:"SpVgg Mössingen",birthYear:2016},
+  {id:"05-071969",name:"Charlotte Metzger"}],
+ officialLinks:[{id:"ignored",url:tournament,name:"Philipps nächstes Turnier",
+  playerId:"local-older",startDate:"2026-11-21",endDate:""}],
+ activeProfileId:"local-older",chosen:"local-older",friends:[{id:"05-061350",name:"Sarah Storz"}]
+})]]);
+const aliasApp=makeVM(aliasStore);
+aliasApp.run("restore();save()");
+const aliasData=JSON.parse(aliasStore.get(key));
+assert.deepEqual(aliasData.players.map(p=>p.id),["05-070879","05-071969"]);
+assert.equal(aliasData.activeProfileId,"05-070879");
+assert.equal(aliasData.chosen,"05-070879");
+assert.equal(aliasData.officialLinks[0].playerId,"05-070879");
+assert.equal(aliasData.officialLinks[0].startDate,"2026-11-21");
+assert.equal(aliasData.friends[0].id,"05-061350");
+const conflictStore=new Map([[key,JSON.stringify({
+ players:[{id:"local-ph",name:"Philipp",birthYear:2013},
+  {id:"05-070879",name:"Philipp Metzger",birthYear:2016}],
+ activeProfileId:"local-ph",officialLinks:[],friends:[]
+})]]);
+const conflictApp=makeVM(conflictStore);
+conflictApp.run("restore();save()");
+assert.equal(JSON.parse(conflictStore.get(key)).players.length,2,
+ "Different known birth years must not merge into one profile");
+
 const corrupt=new Map([[key,"invalid json"]]);
 const damaged=makeVM(corrupt);
 assert.doesNotThrow(()=>damaged.run("restore()"));
