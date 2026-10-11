@@ -42,6 +42,7 @@ function renderHome(snapshot,id){
  const box=$("home-live-peek");
  if(!box||id!==selected||location.hash!=="#start"){hideHome();return}
  const state=liveView(snapshot,id);
+  window.dispatchEvent(new CustomEvent("badminton:live-evidence",{detail:{playerId:id,active:["playing","next","tournament"].includes(state.status)}}));
  if(!["playing","next","tournament"].includes(state.status)){hideHome();return}
  // "tournament" without published games is not an active-match alert.
  const hasGame=state.status==="playing"||state.status==="next"||state.upcoming?.length>0;
