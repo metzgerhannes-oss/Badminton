@@ -31,7 +31,7 @@ assert.ok(!("player_name" in body)&&!("friends" in body),"Never upload private f
 assert.equal(sharedKey({id:tournamentId,playerId:player}),player+"|"+tournamentId);
 assert.throws(()=>sharePayload({...body,playerId:"all"},body.user_id),/Spielerprofil/);
 assert.throws(()=>sharePayload({id:tournamentId,playerId:player,name:"x"},body.user_id),/Turniernamen/);
-assert.throws(()=>sharePayload({...body,playerId:player,id:tournamentId,name:"Test",startDate:"2026-12-05",endDate:"2026-12-01"},body.user_id),/Ende/);
+assert.throws(()=>sharePayload({...body,playerId:player,id:tournamentId,name:"Test",startDate:"2026-12-05",endDate:"2026-12-01"},body.user_id),/Turnierende/);
 
 const [app,html,sw,js,css,db]=await Promise.all([
  "app.js","index.html","sw.js","shared-tournaments.js","app-shell.css","database/shared-tournament-links-v87.sql"
