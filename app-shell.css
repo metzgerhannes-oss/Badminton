@@ -184,3 +184,9 @@
 .badhub-match-sides .badhub-winner{color:#09674f;font-weight:850}
 .badhub-match-score{text-align:center;font-size:12px;letter-spacing:.02em;color:#173f5a}
 @media(max-width:365px){.badhub-event-panel{padding:9px}.badhub-event-form,.badhub-event-controls{gap:5px}.badhub-event-form button,.badhub-event-controls button{font-size:11px;padding:7px}}
+
+/* Same verified event-result source is usable from Turniere on non-match days. */
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow{display:block!important;margin-top:14px}
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow >:not(.badhub-event-panel):not(.tournament-live-toolbar){display:none!important}
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow .badhub-event-panel{margin:4px 0 0}
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow .tournament-live-toolbar{margin:5px 0 9px}

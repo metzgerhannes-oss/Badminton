@@ -241,3 +241,13 @@ test("Real Badhub event results from verified Worker display winning doubles and
  await expect(page.locator("#badhub-event-url")).toHaveValue(provider);
  await expect(page.locator(".badhub-match-card")).toHaveCount(1);
 });
+
+test("Published Badhub results remain reachable from Turniere without a live tournament",async ({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#badhub-event-form")).toBeVisible();
+ await expect(page.locator("#tournament-live-select")).toBeVisible();
+ await expect(page.locator("#live-radar-content")).toBeVisible();
+ await expect(page.locator("#tournament-live-content")).toBeHidden();
+ await page.locator("#badhub-event-url").fill("https://badhub.de/bvbb/turnier.php?id=4962");
+ await expect(page.locator("#badhub-event-form button[type=submit]")).toBeEnabled();
+});
