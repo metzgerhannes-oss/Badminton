@@ -4,7 +4,6 @@ import {readFile} from "node:fs/promises";
 const code=await readFile("app.js","utf8");
 const storageCode=await readFile("state-storage.js","utf8");
 const bookmarksCode=await readFile("tournament-bookmarks.js","utf8");
-const bookmarksCode=await readFile("tournament-bookmarks.js","utf8");
 const history=JSON.parse(await readFile("data/history.json","utf8"));
 const localKey="shuttleboard-v1";
 const store=new Map([[localKey,JSON.stringify({
@@ -19,7 +18,6 @@ const store=new Map([[localKey,JSON.stringify({
 const context=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},
  localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,String(v))}});
 vm.runInContext(storageCode,context,{filename:"state-storage.js"});
-vm.runInContext(bookmarksCode,context,{filename:"tournament-bookmarks.js"});
 vm.runInContext(bookmarksCode,context,{filename:"tournament-bookmarks.js"});
 vm.runInContext(code,context,{filename:"app.js"});
 const run=script=>vm.runInContext(script,context);
@@ -47,7 +45,6 @@ const fresh=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},loca
  getItem:k=>freshStore.get(k)??null,setItem:(k,v)=>freshStore.set(k,String(v))
 }});
 vm.runInContext(storageCode,fresh,{filename:"state-storage.js"});
-vm.runInContext(bookmarksCode,fresh,{filename:"tournament-bookmarks.js"});
 vm.runInContext(bookmarksCode,fresh,{filename:"tournament-bookmarks.js"});
 vm.runInContext(code,fresh,{filename:"app.js"});
 assert.equal(vm.runInContext("state.players.length",fresh),0,"New installs must never inherit someone else's family profiles");
