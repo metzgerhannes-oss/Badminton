@@ -161,7 +161,7 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
  }
 });
 
-test("v72 compact Badhub career summary on mobile",async ({page})=>{
+test("v74 four compact Badhub career tiles on every mobile width",async ({page})=>{
  for(const width of [320,375,390,768]){
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
@@ -175,7 +175,7 @@ test("v72 compact Badhub career summary on mobile",async ({page})=>{
    right:el.getBoundingClientRect().right,
    contentRight:Math.max(...[...el.querySelectorAll(".dbv-reference-totals span")].map(x=>x.getBoundingClientRect().right))
   }));
-  expect(metrics.columns).toBe(width<=500?2:4);
+  expect(metrics.columns).toBe(4);
   expect(metrics.right).toBeLessThanOrEqual(width+1);
   expect(metrics.contentRight).toBeLessThanOrEqual(metrics.right+1);
  }
