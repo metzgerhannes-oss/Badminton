@@ -160,7 +160,10 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("tournament-live-select")?.addEventListener("change",e=>{
   selected=e.currentTarget.value;items=[];status="all";court="all";loadedAt=0;refresh();
  });
- $("tournament-live-refresh")?.addEventListener("click",refresh);
+ $("tournament-live-refresh")?.addEventListener("click",()=>{
+  window.dispatchEvent(new Event("badminton:followed-live-refresh"));
+  refresh();
+ });
  $("tournament-court-filter")?.addEventListener("change",e=>{court=e.currentTarget.value;render()});
  document.querySelectorAll("[data-tournament-status]").forEach(button=>button.addEventListener("click",()=>{
   status=button.dataset.tournamentStatus;render();

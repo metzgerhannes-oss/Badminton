@@ -35,6 +35,7 @@
 <script type="module" src="./live-radar.js"></script>
 <script type="module" src="./live-hub.js"></script>
 <script type="module" src="./tournament-live.js"></script>
+<script type="module" src="./followed-live.js"></script>
 <script type="module" src="./reports.js"></script>
 <script type="module" src="./history.js"></script>
 <script type="module" src="./dashboard.js"></script>
@@ -46,7 +47,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v83" title="Version v83">v83</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v84" title="Version v84">v84</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -199,7 +200,16 @@
     </details>
    </section>
    <section class="live-tournament-follow" id="live-tournament-follow" aria-labelledby="live-tournament-follow-title">
-    <h3 id="live-tournament-follow-title">Alle Spiele des Turniers</h3>
+    <h3 id="live-tournament-follow-title">Turnier &amp; verfolgte Spieler</h3>
+    <section class="followed-live" id="followed-live" aria-labelledby="followed-live-heading">
+     <div class="followed-live-heading">
+      <h4 id="followed-live-heading">Unsere Spieler</h4>
+      <span id="followed-live-status" class="muted"></span>
+     </div>
+     <div id="followed-live-cards" class="followed-live-grid" role="region" aria-live="polite" aria-label="Aktueller Stand verfolgter Spieler"></div>
+     <p class="followed-live-note">Öffentliche Badhub-Livedaten unserer Spieler. Nicht sämtliche Spiele des Turniers. Neue Daten erscheinen nach der nächsten Quellenprüfung.</p>
+    </section>
+    <h4 class="tournament-matches-heading">Offizieller Turnier-Spielplan</h4>
     <div class="tournament-live-toolbar">
      <label for="tournament-live-select">Turnier auswählen</label>
      <select id="tournament-live-select" aria-label="Gespeichertes Turnier auswählen"><option value="">Turniere werden geladen</option></select>
@@ -219,7 +229,7 @@
     <div id="tournament-live-content" class="tournament-live-content" role="region" aria-live="polite" aria-label="Belegte Begegnungen des Turniers"></div>
     <details class="tournament-coverage">
      <summary>Datenvollständigkeit und Quellen</summary>
-     <p>Es werden nur verifiziert importierte DBV-Turniermatches angezeigt. Nicht alle Turniere und Begegnungen liegen bereits im gemeinsamen Datenbestand vor. Ein aktiver Spielstand gilt nur mit einem maximal zwei Minuten alten Quellenabgleich als live. Keine zusätzlichen Badhub-Abfragen oder privaten Spielerdaten.</p>
+     <p>Die Spielerkacheln zeigen nur öffentliche Badhub-Daten eigener und gefolgter Spieler (maximal sechs, bedarfsgesteuert). Der offizielle Turniermatch-Bereich zeigt ausschließlich verifiziert importierte DBV-Matches. Die beiden Quellen werden nicht zu einem vermeintlich vollständigen Turnier-Spielplan vermischt. Bei über zwei Minuten alten Spielersnapshots erscheinen keine Live-Sätze.</p>
     </details>
 
    </section>
@@ -279,7 +289,7 @@
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v83 · Release-Informationen werden geladen</p>
+   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v84 · Release-Informationen werden geladen</p>
    <section class="settings-card language-settings" aria-labelledby="language-title">
     <h3 id="language-title">Sprache</h3>
     <label for="app-language">App-Sprache</label>
