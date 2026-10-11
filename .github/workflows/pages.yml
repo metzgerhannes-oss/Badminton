@@ -22,6 +22,7 @@ jobs:
       - name: Validate
         run: |
           node --check app.js
+          node --check matchday-view.js
           node --check tournament-live.js
           node --check scripts/tournament-live.mjs
           node tests/tournament-live.mjs

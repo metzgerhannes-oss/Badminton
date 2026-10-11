@@ -128,3 +128,19 @@
 .tournament-coverage p{font-size:11px;line-height:1.55;color:#60788b}
 .live-tournament-follow h4{font-size:13px;color:#285675;margin:15px 0 5px}
 @media(max-width:350px){.event-match-card{padding:10px 8px}.tournament-live-filters{gap:3px}}
+
+/* v83: one task per LIVE screen, no duplicate source list or hidden polling. */
+.matchday-switch{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:4px;margin:8px 0 14px;border:1px solid #c2dceb;background:#e8f3fb;border-radius:13px}
+.matchday-switch button{min-width:0;min-height:46px;border:0;background:transparent;color:#315d78;font-size:13px;font-weight:800;border-radius:10px}
+.matchday-switch button[aria-pressed="true"]{background:#fff;color:#095887;box-shadow:0 1px 4px rgba(9,63,94,.14)}
+.matchday-switch button:focus-visible{outline:3px solid #117ab9;outline-offset:2px}
+.app[data-current-view="live"] .matchday-switch{display:grid}
+.app[data-current-view="live"] #view-turniere>.history-inline-link:not(.live-tournaments-return){display:none}
+.app[data-current-view="live"][data-matchday-mode="mine"] #view-turniere .live-tournament-follow{display:none!important}
+.app[data-current-view="live"][data-matchday-mode="all"] #view-turniere .live-dbv{display:none!important}
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow{display:none!important}
+.tournament-live-filters[hidden],.tournament-live-count[hidden]{display:none!important}
+.app[data-current-view="live"] .live-tournament-follow{margin-top:0}
+.app[data-current-view="live"] .live-tournament-links{margin:9px 0 14px}
+.app[data-current-view="live"] .live-tournament-links .matchday-event-link{min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;padding:9px 11px;font-weight:780}
+@media(max-width:350px){.matchday-switch button{font-size:12px}}

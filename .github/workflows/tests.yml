@@ -56,6 +56,7 @@ jobs:
           node --check scripts/invitation.mjs
           node --check live.js
           node --check live-links.js
+          node --check matchday-view.js
           node --check live-radar.js
           node --check live-hub.js
           node --check tournament-live.js
