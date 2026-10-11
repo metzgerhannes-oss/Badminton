@@ -56,6 +56,7 @@ jobs:
           node --check scripts/invitation.mjs
           node --check live.js
           node --check live-links.js
+          node --check matchday-view.js
           node --check live-radar.js
           node --check live-hub.js
           node --check tournament-live.js
@@ -97,6 +98,7 @@ jobs:
           node tests/live-radar.mjs
           node tests/live-hub.mjs
           node tests/tournament-live.mjs
+          node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
           node tests/dbv-match-reference.mjs

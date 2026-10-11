@@ -62,5 +62,8 @@ assert.match(js,/location\.hash/);
 assert.match(js,/sourceFresh/);
 assert.match(app,/badminton:tournament-bookmarks/);
 assert.match(sw,/tournament-live\.js/);
+assert.match(js,/window\.badmintonMatchdayMode==="all"/);
+assert.match(html,/data-matchday-view="mine"/);
+assert.match(html,/data-matchday-view="all"/);
 assert.match(sw,/scripts\/tournament-live\.mjs/);
 console.log("Tournament live: URL provenance, read-only bounded queries, correct sets, stale-score guard, filtering and UI wiring.");

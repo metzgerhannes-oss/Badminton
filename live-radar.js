@@ -9,7 +9,7 @@ const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
 let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
 let busy=false,timer;
-const displayed=()=>(location.hash==="#turniere"||location.hash==="#live")&&!document.hidden;
+const displayed=()=>(location.hash==="#turniere"||(location.hash==="#live"&&window.badmintonMatchdayMode!=="all"))&&!document.hidden;
 function element(tag,cls,value){
  const e=document.createElement(tag);
  if(cls)e.className=cls;
@@ -100,27 +100,6 @@ function render(row,id){
  if(!day){message("Turnierstatus wird geprüft","Noch kein bestätigter Spieltagsplan verfügbar.","pending");return}
  top.appendChild(element("strong","radar-tournament",day.tournament||"Aktuelles Turnier"));
  box.appendChild(top);
- const overview=element("section","matchday-overview");
- const topRow=element("div","matchday-overview-head");
- topRow.appendChild(element("strong","","Mein Spieltag"));
- const stateTag=day.running
-   ?tag(setText(day.running)?"Spiel läuft":"Spiel aufgerufen",setText(day.running)?"live":"called")
-   :day.queue===0?tag("Als Nächstes","next"):tag("Turniertag","next");
- topRow.appendChild(stateTag);
- overview.appendChild(topRow);
- const totals=element("div","matchday-counts");
- for(const item of [
-   [String(day.pendingCount),"offene / laufende Spiele"],
-   [String(day.shownResults),"gemeldete Ergebnisse"]
- ]){
-  const tile=element("div","matchday-count");
-  tile.appendChild(element("strong","",item[0]));
-  tile.appendChild(element("small","",item[1]));
-  totals.appendChild(tile);
- }
- overview.appendChild(totals);
- overview.appendChild(element("p","matchday-coverage","Angezeigt werden Begegnungen aus dem aktuellen Quellen-Snapshot, nicht zwingend alle Partien des Turniers."));
- box.appendChild(overview);
  if(day.running){
   const block=matchList("Jetzt auf dem Feld",[day.running],{running:true});
   if(block){block.classList.add("matchday-current");box.appendChild(block)}
@@ -132,6 +111,10 @@ function render(row,id){
   call.appendChild(element("small","","Wartestand laut Turnierquelle · keine feste Startzeit"));
   box.appendChild(call);
  }
+ const overview=element("div","matchday-overview");
+ overview.appendChild(element("span","","Aus der Quelle: "+day.pendingCount+
+  " offen / laufend · "+day.shownResults+" gespielt"));
+ box.appendChild(overview);
  const upcoming=matchList("Deine nächsten Spiele",day.upcoming);
  if(upcoming)box.appendChild(upcoming);
  const finished=matchList("Bereits gespielte Begegnungen",day.past,{past:true});
@@ -198,6 +181,13 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("badminton:profile-change",e=>{
   const id=String(e.detail?.playerId||"");
   if(id!==currentId)switchPlayer(id);
+ });
+ window.addEventListener("badminton:matchday-mode",()=>{
+  if(displayed())refresh();
+  else{
+   generation++;controller?.abort();busy=false;
+   const btn=$("live-radar-refresh");if(btn)btn.disabled=false;
+  }
  });
  window.addEventListener("hashchange",()=>{if(displayed())refresh()});
  document.addEventListener("visibilitychange",()=>{if(displayed())refresh()});

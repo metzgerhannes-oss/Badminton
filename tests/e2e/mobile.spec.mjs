@@ -374,6 +374,13 @@ test("Live tab shows personal matchday and a verified official tournament link",
  await expect(page.locator("#live-radar-content")).toContainText("Deine nächsten Spiele");
  await expect(page.locator("#live-radar-content")).toContainText("Bereits gespielte Begegnungen");
  await expect(page.locator("#live-radar-content .radar-match")).toHaveCount(3);
+ await expect(page.locator("#live-radar-content .matchday-current")).toBeVisible();
+ const order=await page.locator("#live-radar-content").evaluate(host=>{
+  const game=host.querySelector(".matchday-current"),counts=host.querySelector(".matchday-overview");
+  return game&&counts&&Boolean(game.compareDocumentPosition(counts)&Node.DOCUMENT_POSITION_FOLLOWING);
+ });
+ expect(order).toBe(true,"The actual game must come before secondary counts");
+
  await expect(page.locator("#live-tournament-links a").first()).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+id);
  await expect(page.locator(".bottom-nav a[aria-current='page']")).toHaveCount(1);
 });

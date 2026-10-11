@@ -96,9 +96,15 @@ test("Tournament-wide browser shows only sourced matches and supports fields and
  }));
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator(".live-dbv")).toBeVisible();
+ await expect(page.locator(".live-tournament-follow")).toBeHidden();
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator(".live-dbv")).toBeHidden();
+ await expect(page.locator(".live-tournament-follow")).toBeVisible();
  await expect(page.locator("#tournament-live-select")).toHaveValue(TOURNAMENT_ID);
  await expect(page.locator(".event-match-card")).toHaveCount(2);
- await expect(page.locator("#tournament-live-count")).toContainText("2 importierte Matches");
+ await expect(page.locator("#tournament-live-count")).toContainText("2 belegte Spiele");
  await expect(page.locator("#tournament-live-content")).toContainText("11:9");
  await expect(page.locator("#tournament-live-content")).toContainText("15:11");
  await page.locator('[data-tournament-status="finished"]').click();
@@ -114,7 +120,38 @@ test("Tournament-wide browser shows only sourced matches and supports fields and
 });
 test("No verified import is never presented as an empty official tournament",async ({page})=>{
  await page.goto("/#live",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#tournament-live-content")).toContainText("Noch kein turnierweiter Spielplan importiert");
- await expect(page.locator("#tournament-live-count")).toContainText("Noch keine importierten Matchdaten");
+ await expect(page.locator(".live-tournament-follow")).toBeHidden();
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator(".live-tournament-follow")).toBeVisible();
+ await expect(page.locator("#tournament-live-content")).toContainText("Noch keine Begegnungen importiert");
+ await expect(page.locator("#tournament-live-filters")).toBeHidden();
+ await expect(page.locator("#tournament-live-count")).toBeHidden();
  await expect(page.locator("#tournament-live-content")).not.toContainText("0 Spiele im Turnier");
+});
+
+test("Switches focus without parallel full-event queries and restores personal view",async ({page})=>{
+ const hits=[];
+ page.on("request",req=>{
+  if(new URL(req.url()).pathname==="/rest/v1/tournaments")hits.push("tournaments");
+  if(new URL(req.url()).pathname==="/rest/v1/matches")hits.push("matches");
+ });
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await expect(page.locator(".live-dbv")).toBeVisible();
+ await expect(page.locator(".live-tournament-follow")).toBeHidden();
+ expect(hits).toHaveLength(0);
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator(".live-tournament-follow")).toBeVisible();
+ await expect(page.locator(".live-dbv")).toBeHidden();
+ await expect.poll(()=>hits.length).toBeGreaterThan(0);
+ await expect(page.locator('[data-matchday-view="all"]')).toHaveAttribute("aria-pressed","true");
+ await page.locator('[data-matchday-view="mine"]').click();
+ await expect(page.locator(".live-dbv")).toBeVisible();
+ await expect(page.locator(".live-tournament-follow")).toBeHidden();
+ await page.locator(".live-tournaments-return").click();
+ await expect(page).toHaveURL(/#turniere$/);
+ await expect(page.locator(".live-hub-bookmarks")).toBeVisible();
+ await expect(page.locator(".live-tournament-follow")).toBeHidden();
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
 });
