@@ -31,6 +31,7 @@ jobs:
           node --check library.js
           node --check stats.js
           node --check scripts/external-match-stats.mjs
+          node --check scripts/dbv-match-reference.mjs
           node --check scripts/import-coverage-audit.mjs
           node --check supabase/functions/history-match-import/source-availability.mjs
           node --check scripts/match-availability.mjs
@@ -86,6 +87,7 @@ jobs:
           node tests/live-hub.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
+          node tests/dbv-match-reference.mjs
           node scripts/import-coverage-audit.test.mjs
           node tests/external-match-consistency.mjs
           node tests/match-availability.mjs

@@ -23,7 +23,7 @@ assert.match(stats,/fetchProfile\(selected,true\)/);
 assert.match(stats,/badminton:network-restored/);
 assert.match(stats,/officialCount\.total===0&&external\.length>0/);
 assert.match(stats,/Ergebnisse aus verschiedenen Quellen werden nicht addiert/);
-assert.match(stats,/Badhub · Einzelbelege/);
+assert.match(stats,/Badhub · Teilbestand/);
 assert.doesNotMatch(stats,/note\.textContent="Einzeln belegte Badhub-Spiele · kein offizieller DBV-Matchimport\./);
 
 const nav=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
@@ -50,7 +50,7 @@ assert.match(style,/\.library-player-action button,\.library-player-action \.lib
 assert.match(style,/min-height:44px/);
 assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(style,/:focus-visible/);
-assert.match(sw,/schmetterlinge-shell-v63/);
+assert.match(sw,/schmetterlinge-shell-v64/);
 assert.match(sw,/ui-feedback\.js/);
 assert.match(sw,/router\.js/);
 assert.match(sw,/tournament-bookmarks\.js/);

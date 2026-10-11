@@ -29,7 +29,7 @@ test("Compact iPhone layout and dialog buttons remain operable",async ({page},in
  await expect(page.locator("#player-dialog")).not.toBeVisible();
 });
 
-test("v63 app chrome keeps four readable, non-overlapping tabs from SE to tablet",async ({page})=>{
+test("v64 app chrome keeps four readable, non-overlapping tabs from SE to tablet",async ({page})=>{
  for(const width of [320,375,390,768]){
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
