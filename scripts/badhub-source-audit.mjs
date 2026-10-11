@@ -16,6 +16,7 @@ for(const category of ["turnier","liga"]){
   const html=await response.text();
   if(html.length>5500000)throw Error("Oversize page");
   const data=parsePublicHistory(html,player,category==="turnier"?"tournament":"league");
+  if(category==="turnier")reportUnknownScorelessCards(html);
   const grouped={};
   for(const item of data.items){
    const key=item.category+":"+(item.match_year||"unknown")+":"+item.competition_id;
@@ -78,3 +79,60 @@ for(const category of ["turnier","liga"]){
 }
 console.log("Sourced match-card diagnostic (no personally identifying match data):");
 console.log(JSON.stringify(results));
+
+/* Temporary public-source review. Print ONLY cards without readable scores.
+ * Never output HTML source, response headers, cookies or account data. */
+function normalizePublicText(str){
+ return String(str||"").replace(/<[^>]*>/g," ").replace(/&nbsp;|&#160;/g," ")
+  .replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/\s+/g," ").trim().slice(0,170);
+}
+function firstContent(markup,regex){
+ const m=markup.match(regex);return normalizePublicText(m?.[1]||"");
+}
+function publicNames(markup){
+ return [...markup.matchAll(/class="sp-name-full"[^>]*>([\s\S]*?)<\/span>/g)]
+  .map(m=>normalizePublicText(m[1])).filter(Boolean).slice(0,2);
+}
+function reportUnknownScorelessCards(html){
+ const unknown=[];
+ const sections=html.split(/<div class="card sp-tournament-card(?: [^"]*)?">/).slice(1);
+ for(const section of sections){
+  const top=section.slice(0,section.indexOf('<div class="sp-meeting">')>0?section.indexOf('<div class="sp-meeting">'):1400);
+  const head=top.match(/class="sp-tournament-name"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
+  const tournament=head?normalizePublicText(head[3]):"Turniername nicht lesbar";
+  const link=head?"https://badhub.de/"+head[1]+"/turnier.php?id="+head[2]:null;
+  const date=firstContent(top,/class="sp-tournament-meta"[^>]*>([\s\S]*?)<\/span>/);
+  const meetings=section.split(/<div class="sp-meeting">/).slice(1);
+  for(const meeting of meetings){
+   const event=firstContent(meeting.slice(0,950),/class="sp-t-event-badge"[^>]*>([\s\S]*?)<\/span>/);
+   const split=meeting.split(/<div class="sp-match-item\b[^>]*>/);
+   let phase=firstContent(split[0],/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/);
+   for(let i=1;i<split.length;i++){
+    const card=split[i];
+    const sets=[...card.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
+     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)])
+     .filter(values=>values.length===2);
+    if(!sets.length){
+     const bodyStart=card.search(/class="[^"]*\bsp-match-body\b/);
+     const resultAt=card.search(/class="[^"]*\bsp-result-col\b/);
+     const awayAt=card.search(/class="(?=[^"]*\bsp-side\b)(?=[^"]*\bsp-side--away\b)[^"]*"/);
+     const home=bodyStart>=0&&resultAt>=bodyStart?card.slice(bodyStart,resultAt):"";
+     const center=resultAt>=0&&awayAt>=resultAt?card.slice(resultAt,awayAt):"";
+     const away=awayAt>=0?card.slice(awayAt,card.indexOf("</div>",awayAt)+6):"";
+     const label=normalizePublicText(center);
+     const sourceWinnerSide=home.includes("sp-side--winner")?"links":
+         away.includes("sp-side--winner")?"rechts":"kein Sieger markiert";
+     const sourceSelfSide=home.includes("sp-player-name--self")?"links":
+         away.includes("sp-player-name--self")?"rechts":"nicht erkennbar";
+     unknown.push({tournament,date,event,round:phase||"nicht ausgewiesen",
+       left:publicNames(home),right:publicNames(away),
+       resultText:label||"kein Satzergebnis",winner:sourceWinnerSide,
+       playerSide:sourceSelfSide,source:link,cardInEvent:i});
+    }
+    const next=firstContent(card,/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/);
+    if(next)phase=next;
+   }
+  }
+ }
+ console.log("REVIEW_PHILIPP_UNRESOLVED="+JSON.stringify({count:unknown.length,cards:unknown}));
+}
