@@ -120,3 +120,43 @@ test("v68 legacy cleanup preserves active app views and dialog on narrow layouts
   await expect(page.locator(".focused-profile")).toContainText("Philipp");
  }
 });
+
+test("v69 CSS consolidation preserves app chrome, profile and dialog on phones and tablets",async ({page})=>{
+ for(const width of [320,375,390,768]){
+  await page.setViewportSize({width,height:700});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  const tabs=page.locator(".bottom-nav a");
+  await expect(tabs).toHaveCount(4);
+  await expect(page.locator(".focused-profile")).toContainText("Philipp");
+  const chrome=await page.evaluate(()=>{
+   const nav=getComputedStyle(document.querySelector(".bottom-nav"));
+   const crest=getComputedStyle(document.querySelector(".brand-logo"));
+   const profile=getComputedStyle(document.querySelector(".focused-profile"));
+   return {
+    navPosition:nav.position,navDisplay:nav.display,logoClip:crest.clipPath,
+    logoMask:crest.maskImage,profileRadius:profile.borderTopLeftRadius,
+    profileGradient:profile.backgroundImage
+   };
+  });
+  expect(chrome.navPosition).toBe("fixed");
+  expect(chrome.navDisplay).toBe("flex");
+  expect(chrome.logoClip).toBe("none");
+  expect(chrome.logoMask).toBe("none");
+  expect(chrome.profileRadius).toBe("21px");
+  expect(chrome.profileGradient).toContain("linear-gradient");
+  for(const tab of await tabs.all()){
+   const box=await tab.boundingBox();
+   expect(box.width).toBeGreaterThanOrEqual(44);
+   expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  await page.locator('.bottom-nav a[data-page="spieler"]').click();
+  await expect(page.locator("#view-spieler")).toBeVisible();
+  await page.locator("#add-player").click();
+  await expect(page.locator("#player-dialog")).toBeVisible();
+  await page.locator("#cancel-dialog").click();
+  await expect(page.locator("#player-dialog")).not.toBeVisible();
+  await page.locator(".brand").click();
+  await expect(page.locator("#view-start")).toBeVisible();
+  await expect(page.locator(".focused-profile")).toContainText("Philipp");
+ }
+});
