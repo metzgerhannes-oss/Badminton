@@ -105,25 +105,22 @@ function showSearchResults(players,source){
   detail.textContent=[player.club||"Verein unbekannt",player.birthYear?"Jg. "+player.birthYear:player.ageClass,player.id?"DBV "+player.id:""].filter(Boolean).join(" · ");
   button.append(name,detail);
   if(existing.has(player.id)){
-   button.disabled=true;
-   button.setAttribute("aria-label",player.name+" – bereits als eigenes Profil gespeichert");
    const note=document.createElement("small");
-   note.textContent="Bereits angelegt";
+   note.textContent="Bereits angelegt · als Startprofil auswählen";
    button.append(note);
-  }else{
-   button.addEventListener("click",()=>{
-    ++searchTicket;
-    searchController?.abort();
-    selectedCandidate=player;
-    $("welcome-selection-name").textContent=player.name;
-    $("welcome-selection-detail").textContent=detail.textContent;
-    $("welcome-selection").hidden=false;
-    root.replaceChildren();
-    clearError();
-    setSearchStatus("Spieler ausgewählt. Bitte die Angaben prüfen und bestätigen.");
-    $("welcome-selection-save").focus();
-   });
   }
+  button.addEventListener("click",()=>{
+   ++searchTicket;
+   searchController?.abort();
+   selectedCandidate=player;
+   $("welcome-selection-name").textContent=player.name;
+   $("welcome-selection-detail").textContent=detail.textContent;
+   $("welcome-selection").hidden=false;
+   root.replaceChildren();
+   clearError();
+   setSearchStatus("DBV-Spieler ausgewählt. Identität prüfen und als aktives Profil übernehmen.");
+   $("welcome-selection-save").focus();
+  });
   root.append(button);
  }
  if(!players.length)setSearchStatus("Kein passender DBV-Spieler gefunden. Versuche einen anderen Namen oder richte das Profil manuell ein.");
