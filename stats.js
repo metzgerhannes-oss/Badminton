@@ -1,5 +1,6 @@
 import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
+import {getDbvMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
@@ -125,9 +126,11 @@ function render(){
  const values=$("match-stats-values"),note=$("match-stats-note"),details=$("match-stats-details"),
   list=$("match-stats-list"),counter=$("match-stats-detail-count"),year=$("match-stats-year"),
   source=$("match-stats-source"),sourceDetails=$("match-stats-provenance-copy"),
-  retry=$("match-stats-retry"),ageSummary=$("match-stats-age-summary");
+  retry=$("match-stats-retry"),ageSummary=$("match-stats-age-summary"),
+  referenceSection=$("match-stats-reference");
  if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry||!ageSummary)return;
  ageSummary.hidden=true;
+ if(referenceSection){referenceSection.hidden=true;referenceSection.innerHTML="";}
  // The public original is an optional cross-check, never evidence of a match.
  const lookup=$("match-stats-source-link");
  if(lookup){
@@ -174,18 +177,39 @@ function render(){
  }
  const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
+ // A dated authenticated DBV profile summary can be checked against the
+ // currently visible individual proofs; it cannot create new match facts.
+ const reference=getDbvMatchReference(selected,{
+  year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
+ });
+ if(referenceSection&&reference){
+  const outcome={total:context.total,wins:context.wins,losses:context.losses};
+  const unavailable=(officialError&&externalError)||(availability.retry&&!rows.length);
+  referenceSection.hidden=false;
+  referenceSection.innerHTML='<div class="dbv-reference-heading"><strong>DBV-Profilstand · '+
+   esc(reference.period)+'</strong><time datetime="'+esc(reference.capturedOn)+'">Stand '+
+   esc(dateLabel(reference.capturedOn))+'</time></div>'+
+   '<div class="dbv-reference-totals"><span><strong>'+esc(reference.total)+
+   '</strong> Spiele</span><span><strong>'+esc(reference.wins)+
+   '</strong> Siege</span><span><strong>'+esc(reference.losses)+
+   '</strong> Niederlagen</span></div>'+
+   '<p>Quelle: '+esc(reference.sourceName)+
+   ' (bereitgestellter Screenshot). Datierten Kontrollstand anzeigen, keine Live-Abfrage.</p>'+
+   '<p class="dbv-reference-comparison">'+
+   esc(dbvReferenceMessage(reference,outcome,{readFailed:unavailable}))+'</p>';
+ }
  retry.hidden=!availability.retry;
  source.textContent=!sourced&&!official.length&&availability.retry
-  ?"Datenabgleich unvollständig":sourced?"Badhub · Einzelbelege":"Offizielle Matches";
+  ?"Datenabgleich unvollständig":sourced?"Badhub · Teilbestand":"Offizielle Einzelmatches";
  values.innerHTML=[
-  ["Gesamtspiele",missing?"–":context.total,"matches"],
+  [(sourced?"Quellkarten":"Gesamtspiele"),missing?"–":context.total,"matches"],
   ["Siege",missing?"–":context.wins,"wins"],
   ["Niederlagen",missing?"–":context.losses,"losses"],
   ["Siegquote",missing?"–":context.rate+" %","rate"]
  ].map(([name,value,key])=>'<div class="match-stat '+key+'"><span>'+esc(name)+'</span><strong>'+esc(value)+'</strong></div>').join("");
  if(sourced){
   note.textContent=context.total
-   ? "Belegte Spiele aus Badhub · derzeit verfügbarer Teilbestand."
+   ? "Auswertbare Badhub-Quellkarten · Teilbestand, keine vollständige Karrierebilanz."
    : availability.retry?availability.emptyNote:"Für diese Auswahl liegen noch keine belegten Spiele vor.";
   sourceDetails.textContent="Die Werte stammen aus einzelnen Badhub-Matchkarten, nicht aus einer vollständigen offiziellen DBV-Karriere. "+
    importCompleteness(progress,external.length)+

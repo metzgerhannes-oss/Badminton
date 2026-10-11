@@ -1,5 +1,6 @@
 /** Badhub historical match details: same scoring and evidence rules as Home. */
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
+import {getDbvMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -57,6 +58,13 @@ function render(){
  }
  if(all.excluded)info+=" "+fmt(all.excluded)+" unklare oder doppelte Quellkarten wurden nicht als Spiel gezählt.";
  if(partial)info+=" Es konnten höchstens "+fmt(MAX_ROWS)+" Quellkarten geladen werden; die Historie ist möglicherweise unvollständig.";
+ const reference=getDbvMatchReference(selected,{year,discipline,category});
+ if(reference){
+  const evidence=computeExternalStats(rows,{year,discipline});
+  info+=" DBV-Profilstand "+reference.period+" vom "+reference.capturedOn+": "+
+   reference.total+" Spiele ("+reference.wins+" Siege / "+reference.losses+" Niederlagen). "+
+   dbvReferenceMessage(reference,evidence);
+ }
  progressEl.textContent=info;
  const options=sourceMatchYears(rows);
  years.innerHTML='<option value="all">Alle Jahre</option>'+options.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
