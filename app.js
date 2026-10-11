@@ -77,8 +77,12 @@ function renderTournaments(){
  }));
  section.querySelectorAll("[data-remove-id]").forEach(button=>button.addEventListener("click",()=>{
   const id=button.dataset.removeId,player=button.dataset.removePlayer;
+  const removed=state.officialLinks.find(t=>t.id===id&&t.playerId===player);
   state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
   save();render();toast("Turnierlink entfernt");
+  if(removed)window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
+   detail:{bookmark:removed,publicShare:false,removed:true}
+  }));
  }));
 }
 function renderProfiles(){
@@ -178,10 +182,18 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
   routeTo(destination);
  return true;
 };
-window.badmintonTournamentOptions=()=>state.officialLinks.slice().sort((a,b)=>{
- const order={today:0,future:1,unknown:2,past:3};
- return order[bookmarkPhase(a)[1]]-order[bookmarkPhase(b)[1]]||a.name.localeCompare(b.name,"de");
-});
+window.badmintonTournamentOptions=()=>{
+ // Shared event hints are never written to family bookmarks. Their DBV source
+ // link can still open the already verified LIVE/tournament match views.
+ const local=state.officialLinks.slice();
+ const community=window.badmintonCommunityTournamentOptions?.()||[];
+ const seen=new Set(local.map(t=>t.id));
+ for(const t of community){if(!seen.has(t.id)){local.push(t);seen.add(t.id)}}
+ return local.sort((a,b)=>{
+  const order={today:0,future:1,unknown:2,past:3};
+  return order[bookmarkPhase(a)[1]]-order[bookmarkPhase(b)[1]]||a.name.localeCompare(b.name,"de");
+ });
+};
 window.badmintonLiveViewerOptions=()=>({
  own:state.players.map(p=>({id:p.id,name:p.name})),
  friends:state.friends.map(p=>({id:p.id,name:p.name})),
@@ -241,9 +253,14 @@ function openTournamentForm(item=null){
  form.elements.namedItem("endDate").value=item?.endDate||"";
  el("tournament-dialog-heading").textContent=item?"Turnier bearbeiten":"Turnier anlegen";
  el("tournament-save").textContent=item?"Änderungen speichern":"Turnier speichern";
+ if(el("tournament-share"))el("tournament-share").checked=Boolean(item&&window.badmintonCommunity?.isShared(item));
+ if(el("community-save-status")){el("community-save-status").hidden=true;el("community-save-status").textContent="";}
  dialog.showModal();
 }
 function setup(){
+ window.addEventListener("badminton:community-feedback",event=>{
+  if(typeof event.detail?.message==="string")toast(event.detail.message);
+ });
  window.addEventListener("badminton:live-evidence",event=>{
   const playerId=String(event.detail?.playerId||"");
   if(playerId!==state.chosen)return;
@@ -354,16 +371,26 @@ function setup(){
   if(!parsed){toast("Bitte eine gültige DBV-Turnier-URL mit Turnier-ID verwenden");return}
   const playerId=String(data.get("playerId")||"all");
   if(playerId!=="all"&&!state.players.some(p=>p.id===playerId)){toast("Spieler nicht gefunden");return}
+  const publicShare=Boolean(data.get("publicShare"));
+  if(publicShare&&!/^\d{2}-\d{6}$/.test(playerId)){
+   toast("Öffentliches Teilen benötigt eine gültige DBV-Spieler-ID und einen einzelnen Spieler.");
+   return;
+  }
   const start=String(data.get("startDate")||"");
   const end=String(data.get("endDate")||"");
   if(start&&end&&end<start){toast("Das Enddatum liegt vor dem Beginn");return}
   const bookmark=normalizeBookmark({url:parsed.url,playerId,name:data.get("name"),startDate:start,endDate:end});
   const duplicate=state.officialLinks.some(t=>t.id===bookmark.id&&t.playerId===bookmark.playerId&&(!editing||t.id!==editing.id||t.playerId!==editing.playerId));
   if(duplicate){toast("Das Turnier ist für diesen Spieler bereits gespeichert");return}
+  const previous=editing?state.officialLinks.find(t=>t.id===editing.id&&t.playerId===editing.playerId):null;
   if(editing)state.officialLinks=state.officialLinks.filter(t=>!(t.id===editing.id&&t.playerId===editing.playerId));
   state.officialLinks.unshift(bookmark);
   state.officialLinks=state.officialLinks.slice(0,40);
-  editing=null;save();render();tournamentDialog.close();event.currentTarget.reset();toast("Turnier gespeichert");
+  editing=null;save();render();tournamentDialog.close();event.currentTarget.reset();
+  toast(publicShare?"Turnier lokal gespeichert · Freigabe wird geprüft":"Turnier privat gespeichert");
+  window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
+   detail:{bookmark,previous,publicShare}
+  }));
  });
  render();
  // Also recover from empty/corrupted legacy state without restoring a
