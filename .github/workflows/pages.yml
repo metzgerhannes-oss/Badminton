@@ -22,6 +22,10 @@ jobs:
       - name: Validate
         run: |
           node --check app.js
+          node --check club-branding.js
+          node --check i18n.js
+          node --check welcome.js
+          node tests/club-branding.mjs
           node --check dashboard.js
           node --check history.js
           node --check scripts/trophy-stats.mjs
