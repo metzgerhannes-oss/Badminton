@@ -2,6 +2,7 @@ import {classifyNonPlayedCard} from "./nonplayed-rounds.mjs";
 // Optional, bounded Badhub source audit. Records only grouped rejection reasons,
 // never page HTML, opponent names, raw match cards or credentials.
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
+import {completedMatchWinner} from "./badminton-score-rules.mjs";
 const player={dbv_id:"05-070879",name:"Philipp Metzger"};
 const results=[];
 for(const category of ["turnier","liga"]){
@@ -28,6 +29,7 @@ for(const category of ["turnier","liga"]){
   const maxEndpointHistogram={};
   const scoreLengthHistogram={};
   const shortPatterns={};
+  const short15Unresolved={};
   const skipKeywords={bye:0,rast:0,rust:0,freilos:0,spielfrei:0,wo:0,walkover:0,aufgabe:0,unknown:0};
   const noScoreClassHints={};
   const noScoreSides={};
@@ -67,12 +69,17 @@ for(const category of ["turnier","liga"]){
    const endpoint=String(max||0);maxEndpointHistogram[endpoint]=(maxEndpointHistogram[endpoint]||0)+1;
    const scoreType=endpoint+"/"+values.length+" sets";scoreLengthHistogram[scoreType]=(scoreLengthHistogram[scoreType]||0)+1;
    if(max>=15&&max<21){const p=values.map(v=>Math.max(...v)).sort((a,b)=>a-b).join("-");shortPatterns[p]=(shortPatterns[p]||0)+1;}
+   if(values.length>=2&&values.every(v=>Math.max(...v)===15)&&!completedMatchWinner(values,{year:2026})){
+    const a=values.filter(v=>v[0]>v[1]).length,b=values.filter(v=>v[1]>v[0]).length;
+    const cause=a===b?"split_set_winners":Math.max(a,b)>2?"too_many_set_wins":"unresolved_set_pattern";
+    short15Unresolved[cause]=(short15Unresolved[cause]||0)+1;
+   }
   }
   results.push({source:category,cardCount:data.cards_seen,accepted:data.items.length,
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,skipKeywords,noScoreClassHints,noScoreSides,roundKinds});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,short15Unresolved,skipKeywords,noScoreClassHints,noScoreSides,roundKinds});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
