@@ -203,3 +203,41 @@ test("Stale player snapshots must not present old sets as live scores",async ({p
  await expect(page.locator(".followed-live-card").first()).not.toContainText("15:2");
  await expect(page.locator(".followed-live-card").first()).not.toContainText("Spielt gerade");
 });
+
+
+
+test("Real Badhub event results from verified Worker display winning doubles and published sets",async ({page})=>{
+ const provider="https://badhub.de/bvbb/turnier.php?id=4962";
+ await page.route("**/v1/event?*",route=>{
+  const url=new URL(route.request().url());
+  const discipline=url.searchParams.get("disc")||"";
+  const payload={provider:"Badhub",kind:"published-event-results",source_url:provider,
+   checked_at:new Date().toISOString(),event:{id:"4962",association:"bvbb",name:"BBB 1. CD-RLT U9 2026"},
+   disciplines:["winner","player","offenes Doppel U9","offenes Einzel C U9"],
+   selected_discipline:discipline||null,
+   matches:discipline?[{id:"bvbb:4962:offenes%20Doppel%20U9:1",discipline,round:"Achtelfinale",
+    home:"Fahed Islam / Oskar Yi",away:"Leon Schneider-Zhao / Levi Weise",
+    sets:["15:11","18:16"],winner:"home",category:"finished"}]:[]};
+  return route.fulfill({status:200,contentType:"application/json",
+   headers:{"Access-Control-Allow-Origin":"*"},body:JSON.stringify(payload)});
+ });
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator("#badhub-event-form")).toBeVisible();
+ await page.locator("#badhub-event-url").fill(provider);
+ await page.locator("#badhub-event-form button[type=submit]").click();
+ await expect(page.locator("#badhub-event-discipline")).toHaveValue("offenes Doppel U9");
+ await expect(page.locator(".badhub-match-card")).toHaveCount(1);
+ await expect(page.locator(".badhub-match-card")).toContainText("15:11");
+ await expect(page.locator(".badhub-match-card")).toContainText("18:16");
+ await expect(page.locator(".badhub-match-card .badhub-winner")).toContainText("Fahed Islam");
+ await expect(page.locator("#badhub-event-source")).toHaveAttribute("href",provider);
+ await expect(page.locator("#badhub-event-note")).toContainText("Kein offizieller DBV-Livefeed");
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+ expect(overflow).toBeLessThanOrEqual(2);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await page.locator('[data-matchday-view="all"]').click();
+ await expect(page.locator("#badhub-event-url")).toHaveValue(provider);
+ await expect(page.locator(".badhub-match-card")).toHaveCount(1);
+});

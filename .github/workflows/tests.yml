@@ -64,6 +64,9 @@ jobs:
           node --check scripts/followed-live.mjs
           node --check scripts/tournament-live.mjs
           node --check scripts/live-radar.mjs
+          node --check workers/badhub-event-bridge.mjs
+          node --check badhub-event.js
+          node --check scripts/badhub-event.mjs
           node --check scripts/live-links.mjs
       - name: Run tests
         run: |
@@ -100,6 +103,8 @@ jobs:
           node tests/live-radar.mjs
           node tests/live-hub.mjs
           node tests/tournament-live.mjs
+          node tests/badhub-event-bridge.mjs
+          node tests/badhub-event-ui.mjs
           node tests/followed-live.mjs
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
