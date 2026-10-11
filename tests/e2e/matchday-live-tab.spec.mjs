@@ -237,6 +237,7 @@ test("Real Badhub event results from verified Worker display winning doubles and
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
  await page.reload({waitUntil:"domcontentloaded"});
+ await page.locator('[data-matchday-view="all"]').click();
  await expect(page.locator("#badhub-event-url")).toHaveValue(provider);
  await expect(page.locator(".badhub-match-card")).toHaveCount(1);
 });
