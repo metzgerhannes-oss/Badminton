@@ -272,6 +272,7 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
 /* Freunde finden: verified public DBV player name search in Settings. */
 .dashboard-friends-links{display:flex;align-items:center;gap:13px;flex-wrap:wrap;justify-content:flex-end}
 .dashboard-friends-links a{font-size:11px;font-weight:800;color:var(--link);min-height:39px;display:inline-flex;align-items:center}
+.dashboard-friends-links a[hidden]{display:none!important}
 .friend-search-block{background:linear-gradient(145deg,#fff,#edf8ff);
   border:1px solid #c9e3f2;border-radius:18px;padding:14px 12px;margin:12px 0 18px;
   box-shadow:0 6px 21px #5488ab15;}

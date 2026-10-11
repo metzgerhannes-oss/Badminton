@@ -63,6 +63,7 @@ jobs:
           node tests/tournament-bookmarks.mjs
           node tests/upcoming-tournaments.mjs
           node tests/friends.mjs
+          node tests/friend-home-entry.mjs
           node tests/profile-switch.mjs
           node tests/local-backup.mjs
           node tests/state-storage.mjs

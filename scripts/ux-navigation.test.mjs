@@ -30,7 +30,8 @@ test("single follow/search route; profiles live under Spieler, not Einstellungen
   assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1);
   assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'));
  }
- assert.match(html,/href="#spieler">Verwalten/);
+ assert.match(html,/id="dashboard-friends-manage"[^>]*href="#spieler" hidden/);
+ assert.doesNotMatch(html,/id="dashboard-add-friend"/);
 });
 
 test("empty default library state and explicit search/filter criteria",()=>{
@@ -69,6 +70,6 @@ test("Home and friends use one profile navigation mechanism",()=>{
 test("neutral user-facing wording and changed PWA cache",()=>{
  assert.doesNotMatch(dashboard,/Familien-Datenbasis/);
  assert.doesNotMatch(history,/in unserer kuratierten DBV-Chronik/);
- assert.match(sw,/schmetterlinge-shell-v61/);
+ assert.match(sw,/schmetterlinge-shell-v62/);
  assert.doesNotMatch(sw,/\.\/friend-search\.js/);
 });

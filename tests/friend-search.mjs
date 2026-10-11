@@ -20,14 +20,15 @@ const html=await readFile("index.html","utf8");
 const app=await readFile("app.js","utf8");
 const library=await readFile("library.js","utf8");
 const sw=await readFile("sw.js","utf8");
-for(const id of ["library-search","library-results","add-friend","add-friend-manual","dashboard-add-friend","friend-list"]){
+for(const id of ["library-search","library-results","add-friend","add-friend-manual","dashboard-friends-manage","friend-list"]){
  assert.match(html,new RegExp('id="'+id+'"'));
 }
 assert.equal((html.match(/id="library-search"/g)||[]).length,1);
+assert.doesNotMatch(html,/id="dashboard-add-friend"/);
 assert.ok(!html.includes('src="./friend-search.js"'));
 assert.ok(!html.includes('id="friend-search"'));
 assert.match(app,/badmintonLibraryToggleFollow/);
 assert.match(app,/add-friend-manual/);
 assert.match(library,/data-library-toggle/);
-assert.match(sw,/schmetterlinge-shell-v61/);
+assert.match(sw,/schmetterlinge-shell-v62/);
 console.log("Friend search uses one library search path, with correct DBV identity handling and manual ID fallback.");

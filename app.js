@@ -109,8 +109,11 @@ function renderProfiles(){
 }
 function renderFriendQuick(){
  const root=el("dashboard-friends"); if(!root)return;
+ // Keep just one contextual action for the Home friends section.
+ const manage=el("dashboard-friends-manage");
+ if(manage)manage.hidden=!state.friends.length;
  if(!state.friends.length){
-  root.innerHTML='<a class="friend-quick-add" href="#spieler"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Freund hinzufügen</span><span aria-hidden="true">↗</span></a>';
+  root.innerHTML='<a class="friend-quick-add" href="#spieler"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Spieler suchen und folgen</span><span aria-hidden="true">↗</span></a>';
   return;
  }
  const own=state.players.find(p=>p.id===state.activeProfileId);
@@ -297,9 +300,6 @@ function setup(){
   const input=el("library-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});
  });
  el("add-friend-manual").addEventListener("click",()=>openFriendForm());
- el("dashboard-add-friend").addEventListener("click",()=>{
-  setTimeout(()=>{const input=el("library-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});},0);
- });
  el("cancel-friend").addEventListener("click",()=>friendDialog.close());
  friendForm.addEventListener("submit",event=>{
   event.preventDefault();
