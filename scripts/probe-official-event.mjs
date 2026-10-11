@@ -5,6 +5,8 @@ const urls=[
  "https://dbv.turnier.de/tournament/F7B661DD-BC15-4B5B-B38D-49D48FD9A67A",
  "https://dbv.turnier.de/tournament/F7B661DD-BC15-4B5B-B38D-49D48FD9A67A/player/114",
  "https://badhub.de/api/spieler_live.php?lic=05-061350",
+ "https://badhub.de/bvbb/turniere.php?jahr=2026",
+ "https://dbv.turnier.de/cookiewall/",
 ];
 const allowed=new Set(["dbv.turnier.de","badhub.de"]);
 const clean=s=>String(s||"").replace(/[\\r\\n\\t]+/g," ").replace(/\\s+/g," ").trim().slice(0,150);
@@ -39,6 +41,13 @@ for(const url of urls){
    console.log("SCRIPTS",JSON.stringify(scripts).slice(0,2200));
    const links=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/match|draw|tournament|court|schedule|livescore|live/i.test(x)).slice(0,32);
    console.log("MATCH_LINKS",JSON.stringify(links).slice(0,3500));
+   if(u.pathname.includes("turniere.php")){
+    const other=[...body.matchAll(/href=["']([^"']+)/gi)].map(m=>m[1]).filter(x=>/turnier|event|match|spiel/i.test(x)).slice(0,45);
+    console.log("TOURNAMENT_TARGETS",JSON.stringify(other).slice(0,5500));
+   }
+   if(u.pathname.includes("cookiewall")){
+    console.log("FORM",JSON.stringify([...body.matchAll(/<form[^>]*>[\\s\\S]*?<\\/form>/gi)].slice(0,2).map(x=>x[0].slice(0,1500))).slice(0,3300));
+   }
    const markers=["__NEXT_DATA__","__NUXT__","__INITIAL_STATE__","application/ld+json","/api/","Matches","Spiele","matches","Auslosung","Live","tournamentsoftware"];
    console.log("MARKERS",markers.filter(m=>body.includes(m)).join(","));
    const needle=body.search(/__NEXT_DATA__|match-list|matches|matchlist|startlist|match\//i);
