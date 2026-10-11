@@ -104,7 +104,7 @@ test("Tournament-wide browser shows only sourced matches and supports fields and
  await expect(page.locator(".live-tournament-follow")).toBeVisible();
  await expect(page.locator("#tournament-live-select")).toHaveValue(TOURNAMENT_ID);
  await expect(page.locator(".event-match-card")).toHaveCount(2);
- await expect(page.locator("#tournament-live-count")).toContainText("2 importierte Matches");
+ await expect(page.locator("#tournament-live-count")).toContainText("2 belegte Spiele");
  await expect(page.locator("#tournament-live-content")).toContainText("11:9");
  await expect(page.locator("#tournament-live-content")).toContainText("15:11");
  await page.locator('[data-tournament-status="finished"]').click();
