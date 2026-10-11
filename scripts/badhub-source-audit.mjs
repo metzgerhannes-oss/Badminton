@@ -1,3 +1,4 @@
+import {classifyNonPlayedCard} from "./nonplayed-rounds.mjs";
 // Optional, bounded Badhub source audit. Records only grouped rejection reasons,
 // never page HTML, opponent names, raw match cards or credentials.
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
@@ -30,10 +31,13 @@ for(const category of ["turnier","liga"]){
   const skipKeywords={bye:0,rast:0,rust:0,freilos:0,spielfrei:0,wo:0,walkover:0,aufgabe:0,unknown:0};
   const noScoreClassHints={};
   const noScoreSides={};
+  const roundKinds={};
   for(const chunk of html.split(/<div class="sp-match-item\b[^>]*>/).slice(1)){
    const values=[...chunk.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
     .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)]
      .map(x=>Number(x[1]))).filter(v=>v.length===2);
+   const roundKind=classifyNonPlayedCard(chunk);
+   if(roundKind)roundKinds[roundKind]=(roundKinds[roundKind]||0)+1;
    const max=values.length?Math.max(...values.flat()):0;
    if(values.length===0){
     const keywords={bye:/\bBYE\b/i,rast:/\bRAST\b/i,rust:/\bRUST\b/i,
@@ -68,7 +72,7 @@ for(const category of ["turnier","liga"]){
    rejected:Math.max(0,data.cards_seen-data.items.length),
    reasons:data.rejection_reasons,
    acceptedCompetitionCounts:Object.values(grouped).map(v=>v.count).sort((a,b)=>b-a).slice(0,10),
-   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,skipKeywords,noScoreClassHints,noScoreSides});
+   scoreBands:scoreHistogram,scoreMaxima:maxEndpointHistogram,scoreLengths:scoreLengthHistogram,shortSetWinnerPoints:shortPatterns,skipKeywords,noScoreClassHints,noScoreSides,roundKinds});
  }catch(error){results.push({source:category,status:"unavailable",reason:error.name==="AbortError"?"timeout":"fetch_or_parse_failed"});}
  finally{clearTimeout(timer);}
 }
