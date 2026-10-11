@@ -38,10 +38,15 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
     publicRows.splice(0);
     return route.fulfill({status:204,headers,body:""});
    }
+   return route.fulfill({status:200,headers,body:"[]"});
+  }
+  if(url.pathname==="/rest/v1/shared_tournament_hints"){
+   const dbvId=(url.searchParams.get("player_dbv_id")||"").replace(/^eq\\./,"");
    return route.fulfill({status:200,headers,
-    body:JSON.stringify(publicRows.map(r=>({
+    body:JSON.stringify(publicRows.filter(r=>r.player_dbv_id===dbvId).map(r=>({
      player_dbv_id:r.player_dbv_id,external_tournament_id:r.external_tournament_id,
-     title:r.title,start_date:r.start_date,end_date:r.end_date,updated_at:new Date().toISOString()
+     title:r.title,start_date:r.start_date,end_date:r.end_date,
+     shared_at:r.shared_at,updated_at:new Date().toISOString()
     })))});
   }
   return route.fulfill({status:200,headers,body:"[]"});
