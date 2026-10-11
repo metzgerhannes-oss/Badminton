@@ -1,6 +1,17 @@
 import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scripts/invitation.mjs";
+import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
+import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
 const $=id=>document.getElementById(id);
-let mode="manual";
+let mode="manual",searchTimer=null,searchController=null,searchTicket=0,selectedCandidate=null;
+
+function showError(message){
+ const error=$("welcome-error");
+ error.textContent=message;
+ error.hidden=false;
+}
+function clearError(){
+ $("welcome-error").hidden=true;
+}
 function updateMode(next){
  mode=next;
  const dbv=mode==="dbv";
@@ -13,55 +24,150 @@ function updateMode(next){
  $("welcome-reference").value="";
  $("dbv-manual-note").hidden=!dbv;
  $("dbv-reference-note").hidden=dbv;
- $("welcome-error").hidden=true;
+ clearError();
 }
 function preferredPlatform(){
  return /Android/i.test(navigator.userAgent||"")?"android":"ios";
 }
 function showPlatform(value){
  for(const name of ["ios","android"]){
-  $(("install-"+name)).setAttribute("aria-pressed",String(value===name));
-  $(("install-"+name+"-steps")).hidden=value!==name;
+  $("install-"+name).setAttribute("aria-pressed",String(value===name));
+  $("install-"+name+"-steps").hidden=value!==name;
  }
 }
 function readSaved(){
  try{const value=localStorage.getItem(STORE);return value?JSON.parse(value):null}catch{return null}
 }
+function persistAndContinue(profile){
+ const result=addProfileToStore(readSaved(),profile);
+ localStorage.setItem(STORE,JSON.stringify(result));
+ // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
+ $("onboard-profile").hidden=true;
+ $("onboard-install").hidden=false;
+ $("progress-profile").classList.remove("current");
+ $("progress-profile").classList.add("done");
+ $("progress-install").classList.add("current");
+ showPlatform(preferredPlatform());
+ document.title="App zum Home-Bildschirm hinzufügen · Schmetterlinge";
+ window.scrollTo?.(0,0);
+}
 function saveProfile(e){
  e.preventDefault();
- const error=$("welcome-error");
- error.hidden=true;
+ clearError();
  try{
-  const form=$("welcome-form");
-  const data=new FormData(form);
+  const data=new FormData($("welcome-form"));
   const reference=String($("welcome-reference").value||"").trim();
   if(mode==="dbv"&&!parseDbvReference(reference).valid)throw Error("Bitte eine gültige DBV-Spieler-ID oder einen offiziellen DBV-Spielerprofil-Link angeben.");
-  const profile=normalizeProfile({
+  persistAndContinue(normalizeProfile({
    mode,reference,name:data.get("name"),birthYear:data.get("birthYear"),club:data.get("club")
-  });
-  const result=addProfileToStore(readSaved(),profile);
-  localStorage.setItem(STORE,JSON.stringify(result));
-  // Profile creation and invitation remain entirely local.
-  // A source request occurs only when Historie is opened later.
-  $("onboard-profile").hidden=true;
-  $("onboard-install").hidden=false;
-  $("progress-profile").classList.remove("current");
-  $("progress-profile").classList.add("done");
-  $("progress-install").classList.add("current");
-  showPlatform(preferredPlatform());
-  document.title="App zum Home-Bildschirm hinzufügen · Schmetterlinge";
-  window.scrollTo?.(0,0);
- }catch(ex){
-  error.textContent=ex?.message||"Das Profil konnte nicht gespeichert werden. Bitte erneut versuchen.";
-  error.hidden=false;
+  }));
+ }catch(error){
+  showError(error?.message||"Das Profil konnte nicht gespeichert werden. Bitte erneut versuchen.");
  }
+}
+function saveSelected(){
+ if(!selectedCandidate)return;
+ clearError();
+ try{
+  persistAndContinue(normalizeProfile({
+   mode:"dbv",reference:selectedCandidate.id,name:selectedCandidate.name,
+   birthYear:selectedCandidate.birthYear||"",club:selectedCandidate.club||""
+  }));
+ }catch(error){
+  showError(error?.message||"Der ausgewählte Spieler konnte nicht gespeichert werden.");
+ }
+}
+function clearSelection(){
+ selectedCandidate=null;
+ $("welcome-selection").hidden=true;
+}
+function setSearchStatus(message){
+ $("welcome-search-status").textContent=message;
+}
+function showSearchResults(players,source){
+ const root=$("welcome-search-results");
+ root.replaceChildren();
+ const existing=new Set((readSaved()?.players||[]).map(p=>p.id));
+ for(const player of players){
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="welcome-search-hit";
+  const name=document.createElement("strong");
+  name.textContent=player.name;
+  const detail=document.createElement("span");
+  detail.textContent=[player.club||"Verein unbekannt",player.birthYear?"Jg. "+player.birthYear:player.ageClass,player.id?"DBV "+player.id:""].filter(Boolean).join(" · ");
+  button.append(name,detail);
+  if(existing.has(player.id)){
+   button.disabled=true;
+   button.setAttribute("aria-label",player.name+" – bereits als eigenes Profil gespeichert");
+   const note=document.createElement("small");
+   note.textContent="Bereits angelegt";
+   button.append(note);
+  }else{
+   button.addEventListener("click",()=>{
+    ++searchTicket;
+    searchController?.abort();
+    selectedCandidate=player;
+    $("welcome-selection-name").textContent=player.name;
+    $("welcome-selection-detail").textContent=detail.textContent;
+    $("welcome-selection").hidden=false;
+    root.replaceChildren();
+    clearError();
+    setSearchStatus("Spieler ausgewählt. Bitte die Angaben prüfen und bestätigen.");
+    $("welcome-selection-save").focus();
+   });
+  }
+  root.append(button);
+ }
+ if(!players.length)setSearchStatus("Kein passender DBV-Spieler gefunden. Versuche einen anderen Namen oder richte das Profil manuell ein.");
+ else setSearchStatus(players.length+" passende Spieler"+(players.length===30?" (maximal 30; Suche eingrenzen)":"")+
+  (source==="backup"?" · GitHub-Ausfallsicherung":"")+". Wähle den richtigen Spieler aus.");
+}
+async function searchPlayers(value){
+ const current=++searchTicket;
+ searchController?.abort();
+ searchController=new AbortController();
+ clearSelection();
+ $("welcome-search-results").replaceChildren();
+ const term=normalizeFriendSearch(value);
+ if(term.length<2){
+  setSearchStatus("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
+  return;
+ }
+ clearError();
+ setSearchStatus("Spieler werden im öffentlichen DBV-Verzeichnis gesucht …");
+ try{
+  const {players,source}=await searchInvitationPlayers(term,{signal:searchController.signal});
+  if(current!==searchTicket)return;
+  showSearchResults(players,source);
+ }catch(error){
+  if(current!==searchTicket||searchController?.signal.aborted)return;
+  setSearchStatus("Suche derzeit nicht erreichbar. Bitte Internetverbindung prüfen oder das Profil manuell einrichten.");
+ }
+}
+function onSearchInput(){
+ clearTimeout(searchTimer);
+ ++searchTicket;
+ searchController?.abort();
+ clearSelection();
+ $("welcome-search-results").replaceChildren();
+ const value=$("welcome-player-search").value;
+ if(normalizeFriendSearch(value).length<2){
+  setSearchStatus("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
+  return;
+ }
+ setSearchStatus("Suche wird vorbereitet …");
+ searchTimer=setTimeout(()=>searchPlayers(value),280);
 }
 function showProfileForm(){
  $("onboard-install").hidden=true;
  $("onboard-profile").hidden=false;
  $("progress-install").classList.remove("current");
+ $("progress-profile").classList.remove("done");
  $("progress-profile").classList.add("current");
  $("welcome-form").reset();
+ $("welcome-player-search").value="";
+ onSearchInput();
  updateMode("manual");
  $("welcome-existing").hidden=false;
  window.scrollTo?.(0,0);
@@ -70,6 +176,9 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("mode-own").addEventListener("click",()=>updateMode("manual"));
  $("mode-dbv").addEventListener("click",()=>updateMode("dbv"));
  $("welcome-form").addEventListener("submit",saveProfile);
+ $("welcome-selection-save").addEventListener("click",saveSelected);
+ $("welcome-player-search").addEventListener("input",onSearchInput);
+ $("welcome-player-search").addEventListener("search",onSearchInput);
  $("install-ios").addEventListener("click",()=>showPlatform("ios"));
  $("install-android").addEventListener("click",()=>showPlatform("android"));
  $("install-back").addEventListener("click",showProfileForm);

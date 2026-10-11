@@ -39,3 +39,55 @@ test("Canceled initial player form does not force another family's defaults",asy
  const profiles=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).players);
  expect(profiles).toHaveLength(0);
 });
+
+
+test("Invitation link finds a verified player by name and saves only after confirmation",async ({page})=>{
+ await page.route("**/*",route=>{
+  const url=new URL(route.request().url());
+  if(url.pathname==="/rest/v1/players"){
+   return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify([
+    {dbv_id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",birth_year:2010,age_class:"U17"},
+    {dbv_id:"05-051234",name:"Sarah Beispiel",club:"Anderer Verein",birth_year:2011,age_class:"U17"}
+   ]),headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer"}});
+  }
+  if(url.hostname==="127.0.0.1"||url.hostname==="localhost")return route.continue();
+  return route.fulfill({status:200,contentType:"application/json",body:"[]",
+   headers:{"Access-Control-Allow-Origin":"*"}});
+ });
+ await page.goto("/welcome.html",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#welcome-manual-panel")).not.toHaveAttribute("open","");
+ await page.locator("#welcome-player-search").fill("Storz");
+ const result=page.locator(".welcome-search-hit",{hasText:"Sarah Storz"});
+ await expect(result).toContainText("05-061350");
+ await result.click();
+ await expect(page.locator("#welcome-selection")).toBeVisible();
+ const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
+ expect(before).toBeNull();
+ await page.locator("#welcome-selection-save").click();
+ await expect(page.locator("#onboard-install")).toBeVisible();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toHaveLength(1);
+ expect(saved.players[0]).toMatchObject({id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",birthYear:2010});
+ expect(saved.activeProfileId).toBe("05-061350");
+});
+
+test("Invitation still offers manual creation when no public DBV result exists",async ({page})=>{
+ await page.route("**/*",route=>{
+  const url=new URL(route.request().url());
+  if(url.hostname==="127.0.0.1"||url.hostname==="localhost")return route.continue();
+  return route.fulfill({status:200,contentType:"application/json",body:"[]",
+   headers:{"Access-Control-Allow-Origin":"*"}});
+ });
+ await page.goto("/welcome.html",{waitUntil:"domcontentloaded"});
+ await page.locator("#welcome-player-search").fill("Nicht Vorhanden");
+ await expect(page.locator("#welcome-search-status")).toContainText("Kein passender");
+ await page.locator("#welcome-manual-panel summary").click();
+ await page.locator("#welcome-name").fill("Neues Kind");
+ await page.locator('#welcome-form input[name="birthYear"]').fill("2016");
+ await page.locator('#welcome-form button[type="submit"]').click();
+ await expect(page.locator("#onboard-install")).toBeVisible();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toHaveLength(1);
+ expect(saved.players[0].name).toBe("Neues Kind");
+ expect(saved.players[0].id).toMatch(/^local-/);
+});
