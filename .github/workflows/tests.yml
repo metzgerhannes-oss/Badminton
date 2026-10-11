@@ -40,6 +40,7 @@ jobs:
           node --check external-matches.js
           node --check scripts/badhub-history-parser.mjs
           node --check scripts/badminton-score-rules.mjs
+          node --check scripts/nonplayed-rounds.mjs
           node --check history-demand.js
           node --check scripts/history-demand.mjs
           node --check scripts/external-history.mjs
@@ -81,6 +82,7 @@ jobs:
           node tests/external-history.mjs
           node tests/external-match-parser.mjs
           node tests/badminton-score-rules.mjs
+          node tests/nonplayed-rounds.mjs
           node tests/queued-match-worker.mjs
           node tests/source-failover.mjs
           node tests/history-demand.mjs
