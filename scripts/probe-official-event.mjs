@@ -8,6 +8,7 @@ const urls=[
  "https://badhub.de/bvbb/turniere.php?jahr=2026",
  "https://badhub.de/bvbb/turnier.php?id=4962",
  "https://badhub.de/bvbb/turnier.php?id=4962&player=08-017967",
+ "https://badhub.de/bvbb/turnier.php?id=4962&disc=offenes%20Doppel%20U9",
  "https://badhub.de/assets/js/turniere.js?v=1787664608",
  "https://badhub.de/assets/js/turnier.js?v=1787664608",
  "https://dbv.turnier.de/cookiewall/",
