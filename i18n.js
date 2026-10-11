@@ -2,6 +2,7 @@
 /* Schmetterlinge i18n: static JSON language packs; no translation service or personal-data transfer. */
 (function () {
   const STORAGE_KEY = "schmetterlinge.uiLanguage";
+  const DEFAULT_CDN = "https://schmetterlinge-language-packs.pages.dev";
   const SUPPORTED = ["de","en","fr","uk","ru","zh-Hans","tr","ar","it","es","pl"];
   const directions = {"ar":"rtl"};
   let selected = "auto";
@@ -78,12 +79,15 @@
     if (loaded.has(lang)) return loaded.get(lang);
     const local = new URL("./locales/" + lang + ".json", document.baseURI).href;
     const cdn = typeof window.SCHMETTERLINGE_LANGUAGE_BASE_URL === "string"
-      ? window.SCHMETTERLINGE_LANGUAGE_BASE_URL.trim() : "";
+      ? window.SCHMETTERLINGE_LANGUAGE_BASE_URL.trim() : DEFAULT_CDN;
     const candidates = cdn ? [cdn.replace(/\/+$/,"") + "/" + lang + ".json", local] : [local];
     for (const url of candidates) {
       try {
         let response;
-        try { response = await fetch(url, {cache:"no-cache"}); } catch (_) {}
+        const controller = url !== local && typeof AbortController !== "undefined" ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), 1200) : null;
+        try { response = await fetch(url, {cache:"no-cache", ...(controller ? {signal:controller.signal} : {})}); }
+        catch (_) {} finally { if (timer !== null) clearTimeout(timer); }
         if ((!response || !response.ok) && "caches" in window) response = await caches.match(url);
         if (!response || !response.ok) continue;
         const json = await response.json();
