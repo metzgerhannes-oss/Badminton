@@ -6,7 +6,7 @@
 const ASSOCIATIONS=new Set(["bvbb","bvrp","hbv","bwbv","nbv","bbv","bvs","bvr","sbv","dbv"]);
 const ALLOWED_ORIGIN="https://metzgerhannes-oss.github.io";
 const MAX_BYTES=900000;
-function eventUrl(raw){
+export function eventUrl(raw){
  try{
   const u=new URL(String(raw||""));
   if(u.protocol!=="https:"||u.hostname!=="badhub.de"||u.port||u.username||u.password)return null;
@@ -28,7 +28,7 @@ function decode(value){
   return s;
  }).replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim().slice(0,150);
 }
-function disciplineLinks(html,id){
+export function disciplineLinks(html,id){
  const out=new Map();
  for(const m of html.matchAll(/href=["']([^"']*\bdisc=[^"']+)["']/gi)){
   const raw=decode(m[1]);let url;
@@ -48,7 +48,7 @@ function teams(html,side){
  const names=[...cell.matchAll(/<span\s+class="name-full"[^>]*>([^<]+)<\/span>/gi)].map(m=>decode(m[1])).filter(Boolean).slice(0,2);
  return names.length?names.join(" / "):"";
 }
-function parseDiscipline(html,source,discipline){
+export function parseDiscipline(html,source,discipline){
  const matches=[],re=/<tr\b([^>]*\bbericht-row\b[^>]*)>([\s\S]*?)<\/tr>/gi;
  let m,ordinal=0;
  while((m=re.exec(html))&&matches.length<200){
