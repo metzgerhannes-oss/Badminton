@@ -21,7 +21,7 @@ for(const [games,side] of [
  [[[16,14],[17,15]],1],
  [[[21,20],[15,7]],1],
  [[[15,7],[18,20],[21,20]],1],
- [[[15,8],[16,14],[15,11]],1]
+ [[[15,8],[14,16],[15,11]],1]
 ]){
  const proof=completedMatchWinner(games,{year:2027});
  assert.equal(proof?.format,15);
