@@ -46,7 +46,7 @@ test("all eleven locales load and translate the selector heading", async ({page}
   }
 });
 
-test("Cloudflare CDN outage falls back to bundled offline-ready catalog", async ({page}) => {
+test("bundled language catalog remains usable during a Cloudflare outage without a CDN request", async ({page}) => {
   let intercepted = 0;
   await page.route("https://schmetterlinge-language-packs.pages.dev/**", route => {
     intercepted += 1;
@@ -56,5 +56,5 @@ test("Cloudflare CDN outage falls back to bundled offline-ready catalog", async 
   await page.locator("#welcome-language").selectOption("it");
   await expect(page.locator('label[for="welcome-language"]')).toHaveText("Lingua");
   await expect(page.locator("html")).toHaveAttribute("lang","it");
-  expect(intercepted).toBeGreaterThan(0);
+  expect(intercepted).toBe(0); // Bundled language files are served immediately, even offline.
 });
