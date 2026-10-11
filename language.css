@@ -13,3 +13,16 @@
 [data-language-select] option{direction:auto}
 html[dir="rtl"] .welcome-language-picker,html[dir="rtl"] .language-settings{direction:rtl}
 html[dir="rtl"] .welcome-language-picker select,html[dir="rtl"] .language-settings select{text-align:right}
+
+/* The recipient can choose a language before creating a profile.
+   Visible on 320 px-wide iPhones and independent of any signed-in session. */
+.welcome-language-picker{display:flex;align-items:center;justify-content:space-between;
+  margin:0 0 10px;padding:12px 14px;border:1px solid #628fb2;
+  border-radius:14px;background:#173b5c;gap:10px}
+.welcome-language-picker label{font-size:14px;font-weight:800;color:#f3faff;white-space:nowrap}
+.welcome-language-picker select{flex:1 1 auto;width:50%;max-width:260px;min-width:0;
+  height:46px;min-height:46px;background:#0b2947;color:#fff;border:1px solid #a2d5f2;
+  font-size:16px;border-radius:10px;padding:9px 12px}
+.welcome-language-status{color:#ffe1ab;font-size:12px;line-height:1.4;margin:0 0 9px}
+.welcome-language-status:empty{display:none}
+@media(max-width:355px){.welcome-language-picker{padding:10px}.welcome-language-picker label{font-size:12px}}
