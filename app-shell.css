@@ -35,3 +35,18 @@
 .language-settings label { font-weight:600; }
 [dir="rtl"] .match-stats-values, [dir="rtl"] .match-stats-reference { font-variant-numeric:tabular-nums; }
 [dir="rtl"] input[name="id"], [dir="rtl"] input[name="url"], [dir="rtl"] input[name="startDate"], [dir="rtl"] input[name="endDate"] { direction:ltr; text-align:left; }
+
+/* v79: fifth LIVE destination is only shown on a confirmed tournament day. */
+.bottom-nav a[hidden]{display:none!important}
+.bottom-nav.has-live-tab a{width:20%!important;flex:1 1 20%}
+.bottom-nav.has-live-tab .live-nav-tab{color:#ac1743;background:#fff2f5;border:1px solid #f1b9c8;border-radius:12px}
+.bottom-nav.has-live-tab .live-nav-tab[aria-current="page"]{color:#fff;background:#b91f4d;border-color:#9f123b}
+.bottom-nav.has-live-tab .live-nav-tab .nav-icon{stroke-width:2.1}
+.live-tournaments-return{display:none}
+.app[data-current-view="live"] #view-turniere .live-hub-bookmarks{display:none}
+.app[data-current-view="live"] #view-turniere .live-tournaments-return{display:inline-flex;min-height:44px;align-items:center}
+@media(max-width:350px){
+ .bottom-nav.has-live-tab a{padding-inline:2px}
+ .bottom-nav.has-live-tab a small{font-size:10px}
+ .bottom-nav.has-live-tab .nav-icon{width:22px;height:22px}
+}
