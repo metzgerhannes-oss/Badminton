@@ -13,7 +13,7 @@ let selected="",ticket=0,latest=[],request=null,hasRendered=false;
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||"null")||fallback}catch{return fallback}};
 const getFlags=()=>read(CONFIRMED,{});
 const setFlag=(id,on)=>{const flags=getFlags();if(on)flags[id]=true;else delete flags[id];localStorage.setItem(CONFIRMED,JSON.stringify(flags))};
-function notify(message){const node=$("community-save-status");if(node){node.hidden=false;node.textContent=message}}
+function notify(message){for(const id of ["community-save-status","community-sync-status"]){const node=$(id);if(node){node.hidden=false;node.textContent=message}}}
 function headers(token){return {apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"}}
 async function asJson(res){const text=await res.text();let data;try{data=JSON.parse(text)}catch{data={}};if(!res.ok)throw Error(data.msg||data.error_description||data.message||"HTTP "+res.status);return data}
 async function getSession(create=false){
