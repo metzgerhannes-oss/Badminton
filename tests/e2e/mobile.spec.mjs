@@ -81,18 +81,38 @@ test("Following stays local; only Historie requests a new source import",async (
  expect(imports.some(request=>request.target_id===PLAYER)).toBe(true);
 });
 
-test("Home shows individual sourced matches and fits the small viewport",async ({page})=>{
+test("Home uses one Badhub career summary; filters retain separately evidenced matches",async ({page})=>{
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#first-run-dialog")).not.toBeVisible();
  await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator(".focused-profile")).toContainText("Philipp");
  const mainTabs=page.locator(".bottom-nav a");
  await expect(mainTabs).toHaveCount(4);
- await expect(page.locator("#match-stats-source")).toContainText("Badhub");
+ await expect(page.locator("#match-stats-source")).toHaveText("Badhub · Karrierebilanz");
+ const reference=page.locator("#match-stats-reference");
+ await expect(reference).toBeVisible();
+ await expect(reference.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36"]);
+ await expect(reference).toContainText("Badhub · Turnier-Profil (Screenshot)");
+ await expect(reference).toContainText("keine Live-Abfrage");
+ await expect(reference.locator("a")).toHaveAttribute("href",
+  "https://badhub.de/spieler/"+PLAYER+"?saison=all&src=gesamt");
+ await expect(reference).not.toContainText("DBV · Kontrollstand");
+ await expect(reference).not.toContainText("Einzelbeleg-Teilbestand");
+ await expect(page.locator("#match-stats-values")).toBeHidden();
+ await expect(page.locator("#match-stats-note")).toBeHidden();
+ await expect(page.locator("#match-stats-provenance")).toBeHidden();
+ await expect(page.locator("#match-stats-source-link")).toBeHidden();
+ // A scoped filter shows individual-source evidence instead of inventing a
+ // detailed breakdown for the all-career Badhub screenshot.
+ await page.locator("#match-stats-discipline").selectOption("Einzel");
+ await expect(reference).toBeHidden();
+ await expect(page.locator("#match-stats-values")).toBeVisible();
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("0");
- await expect(page.locator("#match-stats-values .match-stat.rate strong")).toContainText("100");
+ await page.locator("#match-stats-discipline").selectOption("all");
+ await expect(reference).toBeVisible();
+ await expect(page.locator("#match-stats-values")).toBeHidden();
  const viewport=await page.evaluate(()=>({
   excess:document.documentElement.scrollWidth-window.innerWidth,
   nav:[...document.querySelectorAll(".bottom-nav a")].map(x=>{
@@ -115,6 +135,10 @@ test("Partial source outage never impersonates a verified empty history, and ret
   return route.fallback();
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ // The published all-career snapshot is still valid when match-import
+ // endpoints fail; use a scoped filter to verify the independent retry UX.
+ await expect(page.locator("#match-stats-reference")).toBeVisible();
+ await page.locator("#match-stats-discipline").selectOption("Einzel");
  await expect(page.locator("#match-stats-note")).toContainText("nur teilweise abrufbar");
  await expect(page.locator("#match-stats-source")).toContainText("unvollständig");
  await expect(page.locator("#match-stats-retry")).toBeVisible();
@@ -267,7 +291,8 @@ test("Historical source validation matches the Home statistics",async ({page})=>
  await expect(page.locator("#external-match-progress")).toContainText("1 unklare oder doppelte Quellkarten");
  await expect(page.locator("#external-match-list .external-match-item")).toHaveCount(1);
  await page.locator('.bottom-nav a[data-page="start"]').click();
- await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await expect(page.locator("#match-stats-reference .dbv-reference-totals strong")).toHaveText(["62","26","36"]);
+ await expect(page.locator("#match-stats-values")).toBeHidden();
 });
 
 test("Historical source failure has real retry and does not claim zero matches",async ({page})=>{

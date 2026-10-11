@@ -32,8 +32,8 @@ assert.match(dbvReferenceMessage(career,{total:42,wins:21,losses:21}),/kein Nach
 assert.match(dbvReferenceMessage(career,{total:60,wins:26,losses:34}),/noch nicht nachgewiesen/);
 assert.equal(dbvMatchReferences["05-070879"].career.wins+dbvMatchReferences["05-070879"].career.losses,60);
 const [home,history,html,sw]=await Promise.all(["stats.js","external-matches.js","index.html","sw.js"].map(f=>readFile(f,"utf8")));
-assert.match(home,/getDbvMatchReference/);
-assert.match(home,/dbvReferenceMessage/);
+assert.match(home,/getBadhubMatchReference/);
+assert.doesNotMatch(home,/DBV · Kontrollstand|dbvReferenceMessage|dbv-secondary-reference/);
 assert.match(home,/match-stats-reference/);
 assert.match(history,/getDbvMatchReference/);
 assert.match(history,/dbvReferenceMessage/);

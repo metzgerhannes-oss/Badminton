@@ -19,7 +19,7 @@ assert.doesNotMatch(design,/\.bottom-nav a\{width:16\.666/);
 assert.doesNotMatch(legacy,/\.bottom-nav a\{width:(?:16\.666|20%|33\.3333)/);
 assert.match(legacy,/mask:none!important;-webkit-mask:none!important/);
 assert.match(legacy,/clip-path:none!important/);
-assert.match(cache,/schmetterlinge-shell-v70/);
+assert.match(cache,/schmetterlinge-shell-v71/);
 assert.match(cache,/"\.\/app-shell.css"/);
 assert.equal(JSON.parse(manifest).theme_color,"#d9ecfb");
 console.log("v63 app shell: CSS precedence, four navigation tabs, current responsive header, full logo and offline cache verified.");

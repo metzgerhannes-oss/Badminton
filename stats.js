@@ -1,6 +1,6 @@
 import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
-import {getDbvMatchReference,getBadhubMatchReference,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
+import {getBadhubMatchReference} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
@@ -129,6 +129,10 @@ function render(){
   retry=$("match-stats-retry"),ageSummary=$("match-stats-age-summary"),
   referenceSection=$("match-stats-reference");
  if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry||!ageSummary)return;
+ const provenance=$("match-stats-provenance");
+ values.hidden=false;
+ note.hidden=false;
+ if(provenance)provenance.hidden=false;
  ageSummary.hidden=true;
  if(referenceSection){referenceSection.hidden=true;referenceSection.innerHTML="";}
  // The public original is an optional cross-check, never evidence of a match.
@@ -177,43 +181,22 @@ function render(){
  }
  const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
- // A dated authenticated DBV profile summary can be checked against the
- // currently visible individual proofs; it cannot create new match facts.
- const reference=getDbvMatchReference(selected,{
-  year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
- });
+ // The dated Badhub career header is the single displayed full-career total.
+ // Individual match cards remain independent evidence for the filtered drill-down.
  const badhub=getBadhubMatchReference(selected,{
   year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
  });
- if(referenceSection&&(reference||badhub)){
-  const observed={total:context.total,wins:context.wins,losses:context.losses};
-  const unavailable=(officialError&&externalError)||(availability.retry&&!rows.length);
-  const card=(snapshot,title,comparison)=>{
-   return '<div class="dbv-reference-heading"><strong>'+esc(title)+'</strong>'+
-    '<time datetime="'+esc(snapshot.capturedOn)+'">Stand '+esc(dateLabel(snapshot.capturedOn))+'</time></div>'+
-    '<div class="dbv-reference-totals"><span><strong>'+esc(snapshot.total)+
-    '</strong> Spiele</span><span><strong>'+esc(snapshot.wins)+
-    '</strong> Siege</span><span><strong>'+esc(snapshot.losses)+
-    '</strong> Niederlagen</span></div>'+
-    '<p>Quelle: '+esc(snapshot.sourceName)+' · datierter Gesamtstand, keine Live-Abfrage.</p>'+
-    '<p class="dbv-reference-comparison">'+esc(comparison)+'</p>';
-  };
-  let sections="";
-  if(badhub){
-   const comparison=dbvReferenceMessage(badhub,observed,{readFailed:unavailable});
-   sections+=card(badhub,"Badhub · veröffentlichte Karrierebilanz",comparison)+
-    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
-  }
-  if(reference){
-   const comparison=badhub
-    ? "Badhub und DBV weisen in den vorliegenden Screenshots trotz gleicher Siegzahl unterschiedliche Spielzahlen aus ("+
-       badhub.total+" gegenüber "+reference.total+"). Ohne Belegabgleich werden diese Zahlen nicht angeglichen."
-    : dbvReferenceMessage(reference,observed,{readFailed:unavailable});
-   sections+='<div class="dbv-secondary-reference">'+
-    card(reference,"DBV · Kontrollstand",comparison)+'</div>';
-  }
+ if(referenceSection&&badhub){
   referenceSection.hidden=false;
-  referenceSection.innerHTML=sections;
+  referenceSection.innerHTML=
+   '<div class="dbv-reference-heading"><strong>Badhub · veröffentlichte Karrierebilanz</strong>'+
+   '<time datetime="'+esc(badhub.capturedOn)+'">Stand '+esc(dateLabel(badhub.capturedOn))+'</time></div>'+
+   '<div class="dbv-reference-totals"><span><strong>'+esc(badhub.total)+
+   '</strong> Spiele</span><span><strong>'+esc(badhub.wins)+
+   '</strong> Siege</span><span><strong>'+esc(badhub.losses)+
+   '</strong> Niederlagen</span></div>'+
+   '<p>Quelle: '+esc(badhub.sourceName)+' · datierter Gesamtstand, keine Live-Abfrage.</p>'+
+   '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
  }
  retry.hidden=!availability.retry;
  source.textContent=!sourced&&!official.length&&availability.retry
@@ -251,6 +234,17 @@ function render(){
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
  if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
+ // Do not display a second, partial set of career counters under Badhub's
+ // published total. Filtering switches back to individually evidenced figures.
+ if(badhub&&referenceSection){
+  values.hidden=true;
+  note.hidden=true;
+  ageSummary.hidden=true;
+  if(provenance)provenance.hidden=true;
+  if(lookup)lookup.hidden=true;
+  retry.hidden=true;
+  source.textContent="Badhub · Karrierebilanz";
+ }
  details.hidden=missing;
  counter.textContent="("+context.total+")";
  list.innerHTML=context.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
