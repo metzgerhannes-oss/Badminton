@@ -1,3 +1,4 @@
+import {classifyNonPlayedCard} from "./nonplayed-rounds.mjs";
 import {completedMatchWinner} from "./badminton-score-rules.mjs";
 /** Publicly rendered match-card facts from a followed player's Badhub profile.
  * This is a separately source-labelled third-party transcription, NEVER an
@@ -82,6 +83,8 @@ function piece(source,segment,context,counts){
  const matches=[];let phase=plain((prefix.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1]);
  for(const chunk of chunks){
   const nextPhase=(chunk.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
+  const nonplayed=classifyNonPlayedCard(chunk);
+  if(nonplayed){noteReject(counts,nonplayed);continue;}
   const data=sides(chunk,counts);
   if(data){
    const event=context.event||plain((chunk.match(/class="sp-match-disc[^"]*"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
