@@ -89,7 +89,7 @@ function render(items,reason=""){
    '</strong><small>'+esc(t.startDate?fmt(t.startDate):"Termin offen")+
    (t.endDate&&t.endDate!==t.startDate?" – "+esc(fmt(t.endDate)):"")+
    ' · Nutzerhinweis (unbestätigt)</small></div><a href="'+esc(t.url)+
-   '" target="_blank" rel="noopener noreferrer">DBV-Turnier ↗</a></article>').join("")
+   '" target="_blank" rel="noopener noreferrer">Spielplan / Ergebnisse ↗</a></article>').join("")
    :'<p class="shared-event-empty">'+(reason||"Noch keine öffentlich geteilten Turniere für diesen Spieler.")+'</p>')+
   '</section>';
 }
