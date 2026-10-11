@@ -66,7 +66,7 @@ function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
  // of set points. Count their REPORTED OUTCOME, never invent set points.
  // The same card must name both opponents and mark exactly one winning side.
  const scoreColumn=(post.slice(0,rightStart).match(
-  /class="[^"]*\\bsp-result-col\\b[^"]*"[^>]*>([\\s\\S]*?)(?:<\\/div>|<div\\b)/)||[])[1]||"";
+  /class="[^"]*\bsp-result-col\b[^"]*"[^>]*>([\s\S]*?)(?:<\/div>|<div\b)/)||[])[1]||"";
  const isDash=/^[–—-]$/.test(plain(scoreColumn));
  const declaredWinner=allowDeclaredWinner&&scores.length===0&&isDash;
  const completion=declaredWinner
