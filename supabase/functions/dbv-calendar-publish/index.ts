@@ -55,7 +55,9 @@ function normalize(raw:unknown):Record<string,unknown>{
  const row=raw as Record<string,any>;
  if(!ID.test(String(row.source_key||""))||!validDate(row.start_date)||!validDate(row.end_date))throw Error("id_or_date");
  const days=(Date.parse(row.end_date)-Date.parse(row.start_date))/86400000;
- if(days<0||days>14)throw Error("duration");
+ // The verified official DBV 2027 calendar includes competitions spanning several months.
+ // Keep the exact published dates; the live-matchday UI never assumes participation from this feed.
+ if(days<0||days>366)throw Error("duration");
  const title=cleanText(row.title,240),organizer=cleanText(row.organizer,100);
  if(!title||title.length<3||!organizer)throw Error("text");
  const location=cleanText(row.location_text,180,true);
