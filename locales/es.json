@@ -95,7 +95,6 @@
     "DEIN PERSÖNLICHER START": "TU COMIENZO PERSONAL",
     "Willkommen bei den": "Te damos la bienvenida a",
     "Schmetterlingen.": "Schmetterlinge.",
-    "Wessen Badminton möchtest du verfolgen?": "¿A qué jugador de bádminton quieres seguir?",
     "1 · Spielerprofil": "1 · Perfil de jugador",
     "2 · Zum Home-Bildschirm": "2 · Añadir a pantalla de inicio",
     "Diesen Spieler übernehmen": "Seleccionar este jugador",
@@ -113,6 +112,7 @@
     "Vereinslogo (PNG, JPG oder WebP, maximal 2 MB)": "Logotipo del club (PNG, JPG o WebP, máximo 2 MB)",
     "Mindestens zwei Zeichen eingeben, um Spieler zu finden.": "Introduce al menos dos caracteres para buscar jugadores.",
     "1. Schritt Profil anlegen": "Paso 1: Crear perfil",
-    "2. Schritt App hinzufügen": "Paso 2: Añadir la aplicación"
+    "2. Schritt App hinzufügen": "Paso 2: Añadir la aplicación",
+    "Für wen möchtest du ein Profil anlegen?": "¿Para quién quieres crear un perfil?"
   }
 }
