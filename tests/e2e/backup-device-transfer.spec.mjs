@@ -25,6 +25,17 @@ test("Offline backup from one device restores both kinds of tournaments on anoth
    // programmatically clicked blob: URL. Capture the real export Blob instead.
    const original=URL.createObjectURL.bind(URL);
    URL.createObjectURL=blob=>{window.__exportedBackup=blob;return original(blob)};
+   // Playwright can wait indefinitely for its own navigation/download lifecycle
+   // when the app activates a blob: download link. Suppress ONLY that actual
+   // click in the test harness; keep the real export path and Blob intact.
+   const nativeClick=HTMLAnchorElement.prototype.click;
+   HTMLAnchorElement.prototype.click=function(){
+    if(this.href.startsWith("blob:")){
+     window.__exportedFilename=this.download;
+     return;
+    }
+    return nativeClick.call(this);
+   };
   },fixture);
   await from.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
   await expect(from.locator("#backup-export")).toBeVisible();
@@ -32,6 +43,7 @@ test("Offline backup from one device restores both kinds of tournaments on anoth
   await expect(from.locator("#backup-feedback")).toContainText("Sicherung erstellt");
   const actualExport=await from.evaluate(async()=>window.__exportedBackup?.text()||"");
   expect(actualExport).toContain('"kind": "schmetterlinge-local-backup"');
+  expect(await from.evaluate(()=>window.__exportedFilename)).toMatch(/^schmetterlinge-sicherung-\d{4}-\d{2}-\d{2}\.json$/);
   const bytes=Buffer.from(actualExport,"utf8");
   const archive=JSON.parse(bytes.toString("utf8"));
   expect(archive.kind).toBe("schmetterlinge-local-backup");
