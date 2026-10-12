@@ -61,7 +61,7 @@ for(const bad of [
  damaged(b=>b.data.officialLinks[1].url="https://example.com/"),
  damaged(b=>b.data.officialLinks[1].startDate=""),
  damaged(b=>b.data.officialLinks[1].endDate="2027-02-01"),
- damaged(b=>b.data.officialLinks[1].name="Bad\\nName"),
+ damaged(b=>b.data.officialLinks[1].name="Bad\nName"),
  damaged(b=>b.data.officialLinks.push({...b.data.officialLinks[1]})),
  damaged(b=>b.data.players[0].name="<script>\n"),
 ])assert.throws(()=>inspectLocalBackup(bad));
