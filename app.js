@@ -285,7 +285,7 @@ function render(){
  renderFriendQuick();
  state.chosen=state.viewingFriendId||state.activeProfileId;
  const viewedProfiles=[...state.players,...state.friends];
- window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:[...state.officialLinks,...SchmetterlingeSpond.dashboardItems(state.chosen,state.officialLinks)],{mode:state.viewingFriendId?"friend":"own"});
+ window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks.concat(SchmetterlingeSpond.dashboardItems(state.chosen,state.officialLinks)),{mode:state.viewingFriendId?"friend":"own"});
  window.renderHistory?.(state.chosen,viewedProfiles,{mode:state.viewingFriendId?"friend":"own"});
  // Read-only live viewer follows whichever public DBV profile is currently shown.
  window.badmintonActivePlayerId=state.chosen;
