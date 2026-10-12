@@ -1,7 +1,7 @@
-/* v63 – application chrome. Loaded last to keep the current, four-route
+/* v63 – application chrome. Loaded last to keep the current, five-route
    header and bottom navigation separate from the historical design cascade.
    Logo artwork and local-profile behaviour are unchanged. */
-/* Focused navigation v3: four primary destinations, settings in the header. */
+/* Focused navigation v3: five primary destinations, settings in the header. */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;
   min-height:80px;margin:6px 0 8px;overflow:visible;}
 .topbar:after{display:none}
