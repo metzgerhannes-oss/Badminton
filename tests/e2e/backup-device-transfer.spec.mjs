@@ -16,8 +16,8 @@ const fixture={
  activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true
 };
 test("Offline backup from one device restores both kinds of tournaments on another",async ({browser})=>{
- const sender=await browser.newContext({acceptDownloads:true,serviceWorkers:"block",viewport:{width:375,height:667}});
- const receiver=await browser.newContext({serviceWorkers:"block",viewport:{width:375,height:667}});
+ const sender=await browser.newContext({baseURL:"http://127.0.0.1:4173",acceptDownloads:true,serviceWorkers:"block",viewport:{width:375,height:667}});
+ const receiver=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block",viewport:{width:375,height:667}});
  try{
   const from=await sender.newPage();
   await from.addInitScript(value=>localStorage.setItem("shuttleboard-v1",JSON.stringify(value)),fixture);
