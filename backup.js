@@ -65,11 +65,11 @@ function restore(){
  const s=pending.summary;
  const prompt="Vorhandene Profile, gefolgte Spieler und Turnierfavoriten auf DIESEM Gerät werden ersetzt."+
   (s.calendarEvents===null?" Private Kalendertermine bleiben unverändert.":" Auch die privaten Kalendertermine werden ersetzt.")+
-  "\\n\\nIn der Sicherung: "+s.players+" eigene Profile, "+s.friends+
+  "\n\nIn der Sicherung: "+s.players+" eigene Profile, "+s.friends+
   " gefolgte Spieler, "+s.tournaments+" Turnierfavoriten"+
   (s.calendarEvents===null?" (alte Sicherung ohne Kalendertermine).":", "+s.calendarEvents+" private Kalendertermine.")+
-  "\\n\\nWenn du die aktuellen Daten behalten möchtest, erstelle zuerst eine eigene Sicherung."+
-  "\\n\\nJetzt wirklich wiederherstellen?";
+  "\n\nWenn du die aktuellen Daten behalten möchtest, erstelle zuerst eine eigene Sicherung."+
+  "\n\nJetzt wirklich wiederherstellen?";
  if(!window.confirm(prompt)){feedback("Wiederherstellung abgebrochen. Deine Daten sind unverändert.");return}
  const previousFamily=localStorage.getItem(LOCAL_STORE_KEY);
  const previousCalendar=localStorage.getItem(SPOND_STORE_KEY);
