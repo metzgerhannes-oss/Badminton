@@ -14,6 +14,14 @@ Offizieller öffentlicher Turnierkalender: https://turniere.badminton.de/
 - Öffentlicher Kalender enthält teilweise nur die Ausschreibung als PDF, nicht immer einen verifizierten DBV-Turnier.de-Link. In diesem Fall wird **nur der offizielle Kalender geöffnet**, kein künstlicher Deep-Link erzeugt.
 - Ein Turniertermin bedeutet **keine** bestätigte Meldung, Zulassung, Teilnahme, Paarung oder Wertung.
 
+## Erweiterung 2027 – Stand 12. Oktober 2026
+
+- Offizielle DBV-Jahresfilter wurden unabhängig geprüft: **109 Turniere 2026** und **174 bereits veröffentlichte Turniere 2027**, insgesamt **283 eindeutige Quellkennungen**.
+- Die 2027-Einträge umfassen Anfang Januar bis Dezember 2027; **noch kein für 2027 als „Baden-Württemberg“ markierter Eintrag** in der DBV-Quelle. Der Landesverband veröffentlicht allerdings eigene Kalendertermine. Diese werden nicht unbemerkt mit DBV-Quellkennungen vermischt.
+- Die Datumsspalte der Quelle enthält mindestens ein offiziell ausgewiesenes mehrmonatiges Fenster („D-RLT SAH Süd U11–U19“, 13.03.–23.07.2027). Parser und Edge Writer berücksichtigen daher längere Quellzeiträume bis 366 Tage. Daraus werden **keine einzelnen Spieltage erfunden**.
+- 2027 ist in `public.dbv_calendar_entries` nach Datenbankkontrolle mit **174 Quellzeilen** vorhanden. Nach internem Supabase-Deploy-Fehler wurde der signaturgesichert geprüfte 2027-Quellenexport einmalig und kontrolliert per Datenbankwerkzeug importiert; außerdem im öffentlichen JSON-Snapshot hinterlegt.
+- **Betrieblicher Restpunkt:** Der veröffentlichte OIDC-Writer (Edge Function v3) muss noch auf den neuen Zeitraum-Validator redeployt werden. Solange Supabase dessen Deployment mit internem Fehler ablehnt, schlägt der geplante tägliche Datenbank-Writer bei Langzeitfenstern sichtbar fehl. Das darf nicht als bereits behobener Automatikbetrieb gelten. Die App kann auf die gespeicherten 283 bestätigten Datensätze und den JSON-Snapshot zugreifen.
+
 ## Speicherung und Sicherheit
 
 - Initialer Import direkt in das **Badminton-Supabase-Projekt** `yadexibmjmnjfmfabrug` (Frankfurt), Tabelle `public.dbv_calendar_entries`.
