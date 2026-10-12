@@ -178,6 +178,20 @@
     "BADMINTON JUGEND": "ريشة طائرة للناشئين",
     "Schmetterlinge · Badminton Jugend": "Schmetterlinge · ريشة طائرة للناشئين",
     "Profil anlegen · Schmetterlinge Badminton": "إنشاء ملف اللاعب · Schmetterlinge بادمنتون",
-    "Für wen möchtest du ein Profil anlegen?": "لمن تريد إنشاء ملف شخصي؟"
+    "Für wen möchtest du ein Profil anlegen?": "لمن تريد إنشاء ملف شخصي؟",
+    "Mannschaft": "الفريق",
+    "Meine Mannschaften": "فرقي",
+    "Mannschaften finden": "البحث عن فرق",
+    "Mannschaft oder Verein suchen": "البحث عن فريق أو نادٍ",
+    "Verein oder Liga": "النادي أو الدوري",
+    "Saison": "الموسم",
+    "Spiele": "المباريات",
+    "Tabelle": "الترتيب",
+    "+ Folgen": "+ متابعة",
+    "✓ Gefolgt": "✓ تتم المتابعة",
+    "Offizielle Saison bei nuLiga öffnen ↗": "فتح الموسم الرسمي على nuLiga ↗",
+    "Mannschaften werden geladen …": "جارٍ تحميل الفرق …",
+    "Ligatabelle": "جدول الدوري",
+    "Spielplan": "جدول المباريات"
   }
 }
