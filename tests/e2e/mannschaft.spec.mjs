@@ -27,10 +27,12 @@ test("Mannschaft has its own mobile tab, persistent following, fixtures and offi
  await expect(page.locator("#view-mannschaft")).toBeVisible();
  await expect(page.locator(".bottom-nav a:visible")).toHaveCount(5);
  await expect(page.locator(".bottom-nav a[data-page=mannschaft]")).toHaveAttribute("aria-current","page");
- await expect(page.locator("#team-results .team-card")).toHaveCount(3);
+ await expect(page.locator("#team-results .team-card")).toHaveCount(0);
+ await page.locator("#team-search").fill("mossingen");
+ await expect(page.locator("#team-results .team-card")).toHaveCount(2);
  await page.locator("#team-search").fill("heilbronn");
  await expect(page.locator("#team-results .team-card")).toHaveCount(1);
- await page.locator("#team-search").fill("");
+ await page.locator("#team-search").fill("mossingen");
  await page.locator('#team-results [data-team-toggle="nuliga:10777:2"]').click();
  await expect(page.locator("#team-followed .team-card")).toHaveCount(1);
  await page.locator('#team-results [data-team-open="nuliga:10777:2026-27:2"]').click();
