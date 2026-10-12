@@ -1,5 +1,4 @@
 import {test,expect} from "@playwright/test";
-import {readFile} from "node:fs/promises";
 
 const CALENDAR="dbv-calendar-44577";
 const fixture={
@@ -20,14 +19,20 @@ test("Offline backup from one device restores both kinds of tournaments on anoth
  const receiver=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block",viewport:{width:375,height:667}});
  try{
   const from=await sender.newPage();
-  await from.addInitScript(value=>localStorage.setItem("shuttleboard-v1",JSON.stringify(value)),fixture);
+  await from.addInitScript(value=>{
+   localStorage.setItem("shuttleboard-v1",JSON.stringify(value));
+   // Mobile WebKit does not always emit a Playwright 'download' event for a
+   // programmatically clicked blob: URL. Capture the real export Blob instead.
+   const original=URL.createObjectURL.bind(URL);
+   URL.createObjectURL=blob=>{window.__exportedBackup=blob;return original(blob)};
+  },fixture);
   await from.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
   await expect(from.locator("#backup-export")).toBeVisible();
-  const [download]=await Promise.all([
-   from.waitForEvent("download"),
-   from.locator("#backup-export").click()
-  ]);
-  const bytes=await readFile(await download.path());
+  await from.locator("#backup-export").click();
+  await expect(from.locator("#backup-feedback")).toContainText("Sicherung erstellt");
+  const actualExport=await from.evaluate(async()=>window.__exportedBackup?.text()||"");
+  expect(actualExport).toContain('"kind": "schmetterlinge-local-backup"');
+  const bytes=Buffer.from(actualExport,"utf8");
   const archive=JSON.parse(bytes.toString("utf8"));
   expect(archive.kind).toBe("schmetterlinge-local-backup");
   expect(archive.data.officialLinks).toHaveLength(2);
