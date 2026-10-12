@@ -73,6 +73,9 @@ test("Chinese profile-first onboarding is fully localized, including installatio
   await expect(page.locator("#mode-own")).toContainText("创建球员档案");
   await expect(page.locator("#welcome-manual-panel")).toContainText("关联 DBV 编号后");
   await page.goto("/welcome.html#installation");
+  // Same-document hash navigation does not re-fire DOMContentLoaded.
+  await page.reload();
+  await expect(page.locator("#onboard-install")).toBeVisible();
   await expect(page.locator("#install-title")).toHaveText("像应用一样打开 Schmetterlinge");
   await expect(page.locator("#onboard-install > p").first()).toContainText("无需通过应用商店安装");
   await expect(page.locator("#install-ios-steps")).toContainText("在 Safari 中打开");
