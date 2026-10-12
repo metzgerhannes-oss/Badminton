@@ -61,16 +61,13 @@ test("official club full name resolves 13 DBV players by linked club ID",async (
 });
 
 test("zero results hide pagination button on mobile",async ({page})=>{
- await page.route("**/rest/v1/clubs?*",route=>route.fulfill({
-  status:200,contentType:"application/json",body:"[]",
-  headers:{...CORS,"Content-Range":"*/0"},
-  headers:{...CORS,"Content-Range":"*/0"}
- }));
- await page.route("**/rest/v1/players?*",route=>route.fulfill({
-  status:200,contentType:"application/json",body:"[]",
-  headers:{...CORS,"Content-Range":"*/0"},
-  headers:{...CORS,"Content-Range":"*/0"}
- }));
+ for(const table of ["clubs","players"]){
+  await page.route("**/rest/v1/"+table+"?*",route=>
+   route.request().method()==="OPTIONS"
+    ?route.fulfill({status:204,headers:CORS})
+    :route.fulfill({status:200,contentType:"application/json",body:"[]",
+      headers:{...CORS,"Content-Range":"*/0"}}));
+ }
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await page.locator("#library-club").fill("Nirgendwo FC");
  await expect(page.locator("#library-count")).toContainText("0 passende Spieler");
