@@ -44,6 +44,12 @@ class OIDCContractTests(unittest.TestCase):
   self.assertIn("last_seen_at:checkedAt",source)
   self.assertIn("stamped.slice(n,n+40)",source)
   self.assertIn('source_url:SOURCE',source)
+  # DBV 2027 officially reports windows longer than fourteen days (e.g. March–July).
+  # Match the read-only parser ceiling instead of discarding the entire signed import.
+  self.assertIn('if(days<0||days>366)throw Error("duration")',source)
+  self.assertNotIn('if(days<0||days>14)throw Error("duration")',source)
+  parser=(ROOT/"scripts/import-dbv-calendar.py").read_text()
+  self.assertIn('(end-start).days>366',parser)
   self.assertNotIn("user_tournament_links?",source)
   self.assertIn('verify_jwt = false',(ROOT/"supabase/config.toml").read_text())
 
