@@ -41,6 +41,8 @@ class OIDCContractTests(unittest.TestCase):
   self.assertIn("repo:metzgerhannes-oss@326005713/Badminton@1412033492:ref:refs/heads/main",source)
   self.assertIn('payload.ref==="refs/heads/main"',source)
   self.assertIn("maxTokenAge:",source)
+  self.assertIn("days>366",source,"Verify the server accepts published long-running DBV series from 2027")
+  self.assertNotIn("days>14",source,"Old 14-day limiter must not reject the entire year")
   self.assertIn("last_seen_at:checkedAt",source)
   self.assertIn("stamped.slice(n,n+40)",source)
   self.assertIn('source_url:SOURCE',source)
