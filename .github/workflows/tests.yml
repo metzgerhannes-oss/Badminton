@@ -25,6 +25,8 @@ jobs:
           node --check backup.js
           node --check scripts/local-backup.mjs
           node --check dashboard.js
+          node --check dbv-calendar.js
+          node --check scripts/dbv-calendar-utils.mjs
           node --check shared-tournaments.js
           node --check scripts/shared-tournaments.mjs
           node --check history.js
@@ -83,6 +85,7 @@ jobs:
           node tests/tournament-bookmarks.mjs
           node tests/spond-calendar.mjs
           node tests/upcoming-tournaments.mjs
+          node tests/dbv-calendar.mjs
           node tests/friends.mjs
           node tests/friend-home-entry.mjs
           node tests/profile-switch.mjs
@@ -138,3 +141,4 @@ jobs:
           node tests/supabase-library.mjs
           python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
+          python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v

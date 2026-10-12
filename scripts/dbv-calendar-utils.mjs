@@ -1,0 +1,59 @@
+/** Official DBV calendar facets. No player participation is inferred. */
+export const AGE_OPTIONS=["U9","U11","U13","U15","U17","U19","U22","O19","O35ff."];
+export const LEVEL_OPTIONS=["A","B","C","D","E","Freizeit","International","Sonstige"];
+export const ALLOWED_ASSOCIATIONS=new Set(["Baden-Württemberg","Bayern","Berlin-Brandenburg","Bremen","Hamburg","Hessen",
+"Mecklenburg-Vorpommern","Niedersachsen","Nordrhein-Westfalen","Rheinhessen-Pfalz","Rheinland",
+"Saarland","Sachsen","Sachsen-Anhalt","Schleswig-Holstein","Thüringen"]);
+const DATE=/^\d{4}-\d{2}-\d{2}$/;
+export function calendarEntry(raw){
+ if(!raw||!/^dbv-calendar-\d{2,12}$/.test(String(raw.source_key||""))||
+  !DATE.test(String(raw.start_date||""))||!DATE.test(String(raw.end_date||""))||
+  raw.end_date<raw.start_date||!String(raw.title||"").trim())return null;
+ const ages=Array.isArray(raw.age_groups)?raw.age_groups.filter(a=>AGE_OPTIONS.includes(a)):[];
+ const level=LEVEL_OPTIONS.includes(raw.level_group)?raw.level_group:"Sonstige";
+ return {
+  key:raw.source_key,title:String(raw.title).slice(0,240),
+  start:raw.start_date,end:raw.end_date,
+  place:String(raw.location_text||"").slice(0,180),
+  organizer:String(raw.organizer||"").slice(0,100),
+  bundesland:String(raw.bundesland||"").slice(0,90),
+  category:String(raw.category||"").slice(0,100),level,
+  ages:[...new Set(ages)],
+  disciplines:Array.isArray(raw.disciplines)?raw.disciplines.filter(x=>["Einzel","Doppel","Mixed"].includes(x)):[],
+  deadline:DATE.test(String(raw.registration_deadline||""))?raw.registration_deadline:"",
+  url:safeUrl(raw.event_url)||"https://turniere.badminton.de/",
+  hasDirectLink:Boolean(safeUrl(raw.event_url)),
+  checked:String(raw.last_seen_at||"")
+ };
+}
+function safeUrl(value){
+ try{
+  const url=new URL(String(value||""));
+  return url.protocol==="https:"&&["turniere.badminton.de","dbv.turnier.de"].includes(url.hostname)?url.href:"";
+ }catch{return ""}
+}
+export function regionLabel(t){return t.bundesland||t.organizer||"Überregional"}
+export function filterCalendar(entries,{region="all",age="all",level="all",q="",period="upcoming",group="region",today=""}={}){
+ const search=String(q).normalize("NFKC").trim().toLocaleLowerCase("de");
+ const filtered=entries.filter(t=>{
+  if(region!=="all"&&regionLabel(t)!==region)return false;
+  if(age!=="all"&&!t.ages.includes(age))return false;
+  if(level!=="all"&&t.level!==level)return false;
+  if(period==="upcoming"&&today&&t.end<today)return false;
+  if(search&&!([t.title,t.place,t.organizer,t.category].join(" ")).normalize("NFKC").toLocaleLowerCase("de").includes(search))return false;
+  return true;
+ }).sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,"de"));
+ const groups=new Map();
+ for(const event of filtered){
+  const labels=group==="age"?(event.ages.length?event.ages:["Ohne Altersklasse"]):
+   group==="level"?[event.level]:group==="region"?[regionLabel(event)]:["Alle Termine"];
+  for(const label of labels){
+   if(!groups.has(label))groups.set(label,[]);
+   groups.get(label).push(event);
+  }
+ }
+ const sortByAge=(a,b)=>AGE_OPTIONS.indexOf(a)-AGE_OPTIONS.indexOf(b);
+ const labels=[...groups.keys()].sort(group==="age"?sortByAge:group==="level"?
+  (a,b)=>LEVEL_OPTIONS.indexOf(a)-LEVEL_OPTIONS.indexOf(b):(a,b)=>a.localeCompare(b,"de"));
+ return {total:filtered.length,groups:labels.map(label=>({label,items:groups.get(label)}))};
+}
