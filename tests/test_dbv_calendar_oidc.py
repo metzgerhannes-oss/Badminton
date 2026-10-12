@@ -41,6 +41,8 @@ class OIDCContractTests(unittest.TestCase):
   self.assertIn("repo:metzgerhannes-oss@326005713/Badminton@1412033492:ref:refs/heads/main",source)
   self.assertIn('payload.ref==="refs/heads/main"',source)
   self.assertIn("maxTokenAge:",source)
+  self.assertIn("last_seen_at:checkedAt",source)
+  self.assertIn("stamped.slice(n,n+40)",source)
   self.assertIn('source_url:SOURCE',source)
   self.assertNotIn("user_tournament_links?",source)
   self.assertIn('verify_jwt = false',(ROOT/"supabase/config.toml").read_text())
