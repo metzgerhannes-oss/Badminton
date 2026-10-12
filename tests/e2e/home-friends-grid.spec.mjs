@@ -10,11 +10,11 @@ async function seed(page,friends=FRIENDS){
   historyProfilesInitialized:true
  })),{own:OWN,friends});
 }
-test("Home previews four friends plus overflow, without horizontal clipping",async ({page})=>{
+test("Home previews three friends plus overflow, without horizontal clipping",async ({page})=>{
  await seed(page);
  await page.goto("/#start");
- await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(4);
- await expect(page.locator("#dashboard-friends .friend-quick-more")).toHaveText(/\+5 weitere/);
+ await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(3);
+ await expect(page.locator("#dashboard-friends .friend-quick-more")).toHaveText(/\+6 weitere/);
  await expect(page.locator("#dashboard-friends .friend-quick-name").first()).toHaveText("Sarah");
  const layout=await page.locator("#dashboard-friends").evaluate(root=>{
   const cards=[...root.querySelectorAll(".friend-quick")];
@@ -35,14 +35,14 @@ test("Home previews four friends plus overflow, without horizontal clipping",asy
  });
  await page.locator(".friend-quick-more").click();
  await expect(page).toHaveURL(/#spieler$/);
- await expect(page.locator("#friend-list .friend-card")).toHaveCount(9);
+ await expect(page.locator("#friend-list .friend-follow-item")).toHaveCount(9);
 });
 
 test("current followed profile remains visible among Home shortcuts; Home returns to own",async ({page})=>{
  await seed(page);
  await page.goto("/#start");
  await page.evaluate(id=>window.badmintonSelectViewer(id),FRIENDS[8].id);
- await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(4);
+ await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(3);
  await expect(page.locator("#dashboard-friends .friend-quick.is-current")).toHaveCount(1);
  await expect(page.locator("#dashboard-friends .friend-quick.is-current")).toHaveAttribute(
   "data-friend-quick",FRIENDS[8].id);
