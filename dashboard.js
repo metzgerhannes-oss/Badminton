@@ -126,6 +126,15 @@ function renderOtherKpis(){
  const trophies=summarizeTrophies(results);
  const friendNoHistory=viewMode==="friend"&&results.length===0;
  const years=new Set(results.map(r=>r.date+"|"+r.event));
+ const rankCounts=Object.entries(ranking?.players?.[selection]?.disciplines||{})
+  .filter(([,entry])=>Number.isSafeInteger(entry?.tournaments)&&entry.tournaments>=0);
+ // The official ranking counts rated tournaments by discipline, while the
+ // trophy cabinet counts only individually sourced placements. Never add them.
+ const countContext=rankCounts.length===1&&rankCounts[0][1].tournaments>years.size
+  ?" DBV-Rangliste: "+num(rankCounts[0][1].tournaments)+
+    " gewertete Turniere im "+(rankNames[rankCounts[0][0]]||rankCounts[0][0])+
+    "; hiervon sind "+num(years.size)+" mit Einzelplatzierungen belegt."
+  :"";
  const medals=trophies.counts;
  const trophySlots=[
   {place:1,label:"1. Platz",symbol:"🏆",style:"gold"},
@@ -139,8 +148,8 @@ function renderOtherKpis(){
    '<div class="home-trophy-slot '+slot.style+'"><span class="home-trophy-symbol" aria-hidden="true">'+slot.symbol+'</span>'+
    '<strong>'+(friendNoHistory?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
   ).join("")+
-  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(friendNoHistory?"–":num(years.size))+'</strong><small>Erfasste<br>Turniere</small></a></div>'+
-  '<p class="home-trophy-note">Nur belegte Platzierungen · die vollständige Turnierhistorie findest du unter Historie.</p></section>';
+  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(friendNoHistory?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
+  '<p class="home-trophy-note">Nur einzeln belegte Turnierplatzierungen.'+escape(countContext)+' Weitere Ergebnisse findest du unter Historie.</p></section>';
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
  const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){
