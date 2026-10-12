@@ -2,7 +2,7 @@
  * No provider scraping from the PWA and no official result-table writes. */
 import {SOURCE_KEY,parseBadhubLink,queryEvent,validateEventResult,renderSummary} from "./scripts/badhub-event.mjs";
 const $=id=>document.getElementById(id);
-const present=()=>!document.hidden&&(location.hash==="#turniere"||
+const present=()=>!document.hidden&&Boolean($("badhub-event-panel")?.open)&&(location.hash==="#turniere"||
  (location.hash==="#live"&&window.badmintonMatchdayMode==="all"));
 const root=()=> $("badhub-event-results");
 let sequence=0,abort=null,busy=false,loadedAt=0,activeKey="",eventUrl="",discipline="",sourceInfo=null;
@@ -24,7 +24,7 @@ function save(key,url){
 }
 function selectedKey(){
  const value=String($("tournament-live-select")?.value||"");
- return /^[0-9a-f-]{36}$/i.test(value)?value:"global";
+ return /^[0-9a-f-]{36}$/i.test(value)?value:null;
 }
 function paintNote(text){
  root()?.replaceChildren(elem("p","badhub-event-empty",text));
@@ -101,16 +101,22 @@ async function load(){
 function sync(){
  if(!present())return;
  const key=selectedKey();
+ if(!key){
+  paintNote("Wähle zuerst oben ein gespeichertes DBV-Turnier aus.");
+  return;
+ }
  if(key!==activeKey){
   activeKey=key;eventUrl=parseBadhubLink(mapping()[key])||"";
   discipline="";loadedAt=0;sequence++;abort?.abort();busy=false;
   const input=$("badhub-event-url");if(input)input.value=eventUrl;
   viewLink(eventUrl);
+  const controls=$("badhub-event-controls");if(controls)controls.hidden=!eventUrl;
+  const sourceLine=$("badhub-event-source-line");if(sourceLine)sourceLine.hidden=!eventUrl;
   const menu=$("badhub-event-discipline");
   if(menu){menu.replaceChildren();menu.disabled=true}
   if(!eventUrl){
    const label=$("badhub-event-count");if(label)label.textContent="";
-   paintNote("Badhub-Turnierlink einmalig verbinden, um die veröffentlichten Match-Ergebnisse abzurufen.");
+   paintNote("Für dieses DBV-Turnier ist noch keine eindeutig zugeordnete Badhub-Quelle bekannt. Der offizielle DBV-Spielplan ist oben direkt verlinkt.");
   }
  }
  if(eventUrl&&(!loadedAt||Date.now()-loadedAt>300000))load();
@@ -122,9 +128,14 @@ document.addEventListener("DOMContentLoaded",()=>{
   const url=parseBadhubLink(input?.value);
   if(!url){input?.setCustomValidity("Bitte einen Badhub-Turnierlink wie https://badhub.de/bvbb/turnier.php?id=4962 eingeben.");
    input?.reportValidity();return}
-  input.setCustomValidity("");activeKey=selectedKey();eventUrl=url;discipline="";
+  const key=selectedKey();
+  if(!key){input.setCustomValidity("Bitte zuerst oben ein DBV-Turnier auswählen.");input.reportValidity();return}
+  input.setCustomValidity("");activeKey=key;eventUrl=url;discipline="";
   loadedAt=0;sequence++;abort?.abort();busy=false;save(activeKey,url);viewLink(url);
   $("badhub-event-discipline")?.replaceChildren();
+  const controls=$("badhub-event-controls");if(controls)controls.hidden=false;
+  const sourceLine=$("badhub-event-source-line");if(sourceLine)sourceLine.hidden=false;
+  const manual=$("badhub-event-manual");if(manual)manual.open=false;
   load();
  });
  $("badhub-event-url")?.addEventListener("input",e=>e.currentTarget.setCustomValidity(""));
@@ -133,6 +144,9 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  $("badhub-event-refresh")?.addEventListener("click",()=>{loadedAt=0;load()});
  $("tournament-live-select")?.addEventListener("change",sync);
+ $("badhub-event-panel")?.addEventListener("toggle",()=>{
+  if(present())sync();else{sequence++;abort?.abort();busy=false}
+ });
  window.addEventListener("badminton:matchday-mode",()=>{if(present())sync();else{sequence++;abort?.abort();busy=false}});
  window.addEventListener("hashchange",()=>{if(present())sync();else{sequence++;abort?.abort();busy=false}});
  document.addEventListener("visibilitychange",()=>{if(present())sync();else{sequence++;abort?.abort();busy=false}});

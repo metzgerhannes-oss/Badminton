@@ -47,4 +47,12 @@ assert.doesNotMatch(client,/fetch\(["'`]https:\/\/badhub\.de|service_role|innerH
 assert.match(client,/!document\.hidden/);
 assert.match(css,/badhub-match-sides/);
 assert.match(workflow,/node tests\/badhub-event-ui\.mjs/);
+assert.ok(html.indexOf('id="tournament-live-select"')<html.indexOf('id="badhub-event-panel"'),
+ "Official DBV tournament picker precedes optional Badhub section");
+assert.match(html,/<details class="badhub-event-panel" id="badhub-event-panel">/);
+assert.match(html,/<details class="badhub-event-manual" id="badhub-event-manual">/);
+assert.match(client,/Boolean\(\$\("badhub-event-panel"\)\?\.open\)/,
+ "The optional Badhub feed is not fetched while collapsed");
+assert.ok(client.includes('return /^[0-9a-f-]{36}$/i.test(value)?value:null;'),
+ "Badhub source mapping cannot silently apply to an unknown global event");
 console.log("Event feed UI and model security: validated URLs, IDs, data, cache and source separation OK.");

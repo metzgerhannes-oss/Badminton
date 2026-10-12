@@ -54,5 +54,5 @@ assert.doesNotMatch(css,/@media\(max-width:500px\)\{\.dbv-reference-totals\{grid
  "Small iPhones must show four career totals in one row");
 assert.match(css,/v74: all four Badhub career figures share one compact/);
 assert.match(css,/#match-stats-note\[hidden\]/);
-assert.match(sw,/schmetterlinge-shell-v88/);
+assert.match(sw,/schmetterlinge-shell-v89/);
 console.log("v72: one sourced Badhub career balance, no duplicate DBV summary, filtered facts remain separate.");
