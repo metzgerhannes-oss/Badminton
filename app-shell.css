@@ -296,6 +296,13 @@
 .dbv-calendar-panel>.dbv-calendar-source{font-size:12px;margin-top:17px}
 @media(max-width:650px){.dbv-calendar-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.dbv-calendar-filters .dbv-calendar-search{grid-column:1/-1}}
 @media(max-width:390px){.dbv-calendar-panel{padding:12px}.dbv-calendar-entry{grid-template-columns:84px minmax(0,1fr);gap:8px}.dbv-calendar-detail h5{font-size:14px}}
+/* Avoid 320px WebKit horizontal scroll: calendar heading and action wrap within the panel. */
+@media(max-width:390px){
+ .dbv-calendar-panel>.section-heading{flex-wrap:wrap;justify-content:flex-start;gap:8px}
+ .dbv-calendar-panel>.section-heading h3{flex:1 1 100%;min-width:0;overflow-wrap:anywhere}
+ .dbv-calendar-panel>#dbv-calendar-status{overflow-wrap:anywhere}
+ .dbv-calendar-panel .dbv-calendar-source{overflow-wrap:anywhere}
+}
 
 /* DBV calendar quick-save: touch friendly without competing with the title. */
 .dbv-calendar-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;min-width:0}
