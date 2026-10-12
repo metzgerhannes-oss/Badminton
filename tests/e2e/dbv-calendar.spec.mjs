@@ -83,3 +83,21 @@ test("Calendar plans stay private to the active player",async ({page})=>{
  expect(saved).toHaveLength(2);
  expect(new Set(saved.map(t=>t.playerId)).size).toBe(2);
 });
+
+test("BW U13 C empty result explains source coverage and provides available D/E level buttons",async ({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#dbv-calendar-status")).toContainText("offiziellen Kalendereinträgen");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("0 von 109");
+ await expect(page.locator(".dbv-calendar-no-results")).toContainText("Keine passenden Turniere");
+ await expect(page.locator(".dbv-calendar-no-results")).toContainText("nicht automatisch alle Turniere");
+ await expect(page.locator('[data-calendar-alternative-level="D"]')).toHaveText("Level D (4)");
+ await expect(page.locator('[data-calendar-alternative-level="E"]')).toHaveText("Level E (6)");
+ await page.locator('[data-calendar-alternative-level="D"]').click();
+ await expect(page.locator("#dbv-calendar-level")).toHaveValue("D");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("4 von 109");
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
+});
