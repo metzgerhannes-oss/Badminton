@@ -15,6 +15,11 @@ test.beforeEach(async ({page})=>{
   const path=new URL(route.request().url()).pathname;
   let data=[];
   if(path.endsWith("/league_teams"))data=teams;
+  if(path.endsWith("/league_clubs"))data=[
+   {id:"10777",name:"SpVgg. Mössingen",region:"Bezirk Südwürttemberg",source_url:source,import_state:"imported"},
+   {id:"10858",name:"TSV Gomaringen",region:"Bezirk Südwürttemberg",
+    source_url:"https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/clubTeams?club=10858",import_state:"not_imported"}
+  ];
   if(path.endsWith("/league_fixtures"))data=[{id:"a",match_date:"2026-10-17T16:00:00+02:00",home_team:"SpVgg. Mössingen II",away_team:"TSG Heilbronn IV",status:"scheduled",home_score:null,away_score:null,source_url:source}];
   if(path.endsWith("/league_table_rows"))data=[{position:1,club_team:"Gäste I",played:2,won:2,drawn:0,lost:0,points_for:4,points_against:0}];
   return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(data),
@@ -59,4 +64,16 @@ test("A source outage is not presented as zero known teams",async ({page})=>{
  await page.goto("/#mannschaft");
  await expect(page.locator("#team-directory-status")).toContainText("nicht erreichbar");
  await expect(page.locator("#team-results")).toContainText("nicht erreichbar");
+});
+
+test("BWBV directory finds new clubs without inventing teams",async ({page})=>{
+ await page.goto("/#mannschaft");
+ await page.locator("#team-search").fill("Gomaringen");
+ await expect(page.locator("#team-results .team-card")).toHaveCount(0);
+ await expect(page.locator("#team-clubs-results")).toContainText("TSV Gomaringen");
+ await expect(page.locator("#team-clubs-results")).toContainText("Import ausstehend");
+ await expect(page.locator('#team-clubs-results a[href*="club=10858"]')).toHaveCount(1);
+ await page.locator("#team-search").fill("Mössingen");
+ await expect(page.locator("#team-clubs-results")).toContainText("Mannschaften verfügbar");
+ await expect(page.locator('#team-clubs-results [data-team-club-filter="SpVgg. Mössingen"]')).toHaveCount(1);
 });
