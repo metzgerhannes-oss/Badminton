@@ -52,3 +52,55 @@
 .team-club-entry small{color:#5b7586;font-size:11px}
 .team-club-entry button,.team-club-entry a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:7px;border:1px solid #9ec8da;border-radius:10px;color:#146f9a;background:#fff;font-weight:700;font-size:11px;text-align:center}
 @media(max-width:375px){.team-club-entry{flex-wrap:wrap}.team-club-entry>div{flex-basis:100%}}
+
+/* v98: Follow-first overview. Search is intentionally a secondary interaction. */
+#player-discover[hidden],#team-discover[hidden],#team-detail[hidden]{display:none!important}
+.follow-hub-header{align-items:center;gap:12px;margin-bottom:12px}
+.follow-hub-header h2{margin:0;min-width:0}
+.follow-add{flex:0 0 auto;min-height:44px;white-space:nowrap}
+.follow-hub,.follow-discovery{min-width:0}
+.follow-hub h3,.follow-hub-subheading h3,.follow-hub-subheading h4{font-size:16px;line-height:1.3;margin:0}
+.follow-hub>h3{margin:15px 0 10px}
+.follow-hub-subheading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 10px}
+.follow-hub-subheading a{display:inline-flex;align-items:center;min-height:44px;font-size:12px;color:#146a9c;font-weight:700;text-decoration:none}
+.follow-stack{display:grid;gap:9px}
+.friend-follow-item{display:flex;align-items:center;gap:11px;width:100%;min-height:72px;text-align:left;padding:12px;
+ border:1px solid #c4ddea;border-radius:15px;background:#fff;color:#173952;box-sizing:border-box}
+.friend-follow-item.is-own{background:#e9f5fc;border-color:#9fcce5}
+.friend-follow-item.is-current{border-color:#388ebc;background:#effaff}
+.friend-follow-item .friend-avatar{flex:none}
+.friend-follow-item .friend-details{min-width:0;flex:1;display:grid;gap:3px;overflow-wrap:anywhere}
+.friend-follow-item .friend-details strong{font-size:14px;line-height:1.3}
+.friend-follow-item .friend-details small{font-size:11px;line-height:1.4;color:#557387}
+.follow-item-arrow{font-size:24px;font-weight:500;color:#7293a7}
+.follow-discovery{padding:14px;margin:14px 0 18px;border:1px solid #bcd8e8;border-radius:18px;background:#f8fcff;scroll-margin-top:12px}
+.follow-discovery .library-section-heading{margin-top:0}
+.follow-discovery .supporting{font-size:12px;line-height:1.5}
+.follow-discovery .library-filters{margin-top:12px}
+.follow-discovery .team-controls{margin:10px 0}
+.team-controls-single{grid-template-columns:minmax(0,1fr)}
+.follow-season{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:7px 0}
+.follow-season label{font-size:12px;font-weight:750}
+.follow-season select{min-height:44px;border:1px solid #adcada;border-radius:10px;background:#fff;padding:7px;color:#183d56;font:inherit}
+.follow-season button{min-height:44px;margin-left:auto}
+#view-mannschaft .team-section{margin:12px 0 16px}
+#view-mannschaft .team-card{background:white}
+#view-mannschaft #team-detail{margin:10px 0 17px;scroll-margin-top:12px}
+#view-mannschaft #team-directory-status{font-size:11px;line-height:1.4;margin-top:16px}
+.follow-settings{margin-bottom:14px}
+.follow-settings .follow-hub-subheading{margin-top:18px}
+.follow-settings .follow-hub-subheading button{min-height:44px}
+.follow-manage-item{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+ border:1px solid #c5dce9;border-radius:13px;padding:11px;background:#fff;min-width:0}
+.follow-manage-label{min-width:0;flex:1 1 130px;display:grid;gap:4px;overflow-wrap:anywhere}
+.follow-manage-label strong{font-size:13px;line-height:1.4}
+.follow-manage-label small{font-size:11px;color:#5b7486}
+.follow-manage-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap}
+.follow-manage-actions button{min-width:42px;min-height:44px;border:1px solid #bfd9e7;border-radius:9px;background:#f5faff;
+ color:#155b80;font-size:12px;font-weight:700;padding:6px 9px}
+.follow-manage-actions button:disabled{opacity:.35}
+@media(max-width:360px){
+ .follow-hub-header{gap:5px}.follow-add{font-size:12px;padding-inline:7px}
+ .follow-discovery{padding:10px}
+ .follow-manage-actions{width:100%;justify-content:flex-start}
+}
