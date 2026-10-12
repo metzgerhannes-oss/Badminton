@@ -467,7 +467,7 @@ function setup(){
    welcome.close();location.hash="#start";render();
   }));
   el("first-run-new").addEventListener("click",()=>{
-   welcome.close();activatingNewProfile=true;openPlayerForm();
+   welcome.close();window.location.assign("./welcome.html?from=app");
   });
   welcome.showModal();
  }

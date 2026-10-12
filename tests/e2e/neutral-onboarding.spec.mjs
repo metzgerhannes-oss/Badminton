@@ -1,45 +1,72 @@
 import {test,expect} from "@playwright/test";
 
-test("Fresh device configures its own player without receiving another family's profile",async ({page})=>{
+test("Installed app searches DBV and returns with verified player ID",async ({page})=>{
  await page.route("**/*",route=>{
   const url=new URL(route.request().url());
+  if(url.pathname==="/rest/v1/players")return route.fulfill({
+   status:200,contentType:"application/json",
+   body:JSON.stringify([
+    {dbv_id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",birth_year:2010,age_class:"U17"},
+    {dbv_id:"05-051234",name:"Sarah Beispiel",club:"Anderer Verein",birth_year:2011,age_class:"U17"}
+   ]),headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer"}
+  });
   if(url.hostname==="127.0.0.1"||url.hostname==="localhost")return route.continue();
   return route.fulfill({status:200,contentType:"application/json",body:"[]",
    headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer"}});
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#first-run-dialog")).toBeVisible();
- await expect(page.locator("#first-run-choices")).toContainText("noch kein eigenes Profil");
- const savedBefore=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(savedBefore.players).toHaveLength(0);
- expect(savedBefore.activeProfileId).toBe("");
+ const before=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(before.players).toHaveLength(0);
  await page.locator("#first-run-new").click();
- await expect(page.locator("#player-dialog")).toBeVisible();
- await page.locator('#player-form input[name="name"]').fill("Testkind");
- await page.locator('#player-form input[name="id"]').fill("05-123456");
- await page.locator('#player-form button[type="submit"]').click();
- await expect(page.locator("#player-dialog")).not.toBeVisible();
- await expect(page.locator(".focused-profile")).toContainText("Testkind");
- const savedAfter=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(savedAfter.players.map(p=>p.name)).toEqual(["Testkind"]);
- expect(savedAfter.activeProfileId).toBe("05-123456");
+ await expect(page).toHaveURL(/\/welcome\.html\?from=app$/);
+ await expect(page.locator("#welcome-player-search")).toBeVisible();
+ await page.locator("#welcome-player-search").fill("Storz");
+ const hit=page.locator(".welcome-search-hit",{hasText:"Sarah Storz"});
+ await expect(hit).toContainText("DBV 05-061350");
+ await expect(hit).toContainText("SpVgg Mössingen");
+ await hit.click();
+ const unsaved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(unsaved.players).toHaveLength(0);
+ await page.locator("#welcome-selection-save").click();
+ await expect(page).toHaveURL(/\/index\.html#start$/);
+ await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toHaveLength(1);
+ expect(saved.players[0]).toMatchObject({id:"05-061350",name:"Sarah Storz",birthYear:2010,club:"SpVgg Mössingen"});
+ expect(saved.activeProfileId).toBe("05-061350");
  await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator("#first-run-dialog")).not.toBeVisible();
- await expect(page.locator(".focused-profile")).toContainText("Testkind");
+ await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
 });
 
-test("Canceled initial player form does not force another family's defaults",async ({page})=>{
+test("Cancel installed-app search without silently creating a profile",async ({page})=>{
  await page.route("**/*",route=>new URL(route.request().url()).hostname==="127.0.0.1"
   ?route.continue():route.fulfill({status:200,contentType:"application/json",body:"[]",
    headers:{"Access-Control-Allow-Origin":"*"}}));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await page.locator("#first-run-new").click();
- await page.locator("#cancel-dialog").click();
+ await expect(page.locator("#existing-app-link")).toBeVisible();
+ await page.locator("#existing-app-link").click();
  await expect(page.locator("#first-run-dialog")).toBeVisible();
- const profiles=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).players);
- expect(profiles).toHaveLength(0);
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toHaveLength(0);
 });
 
+test("Installed app offers local-only manual fallback without a DBV result",async ({page})=>{
+ await page.route("**/*",route=>new URL(route.request().url()).hostname==="127.0.0.1"
+  ?route.continue():route.fulfill({status:200,contentType:"application/json",body:"[]",
+   headers:{"Access-Control-Allow-Origin":"*"}}));
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.locator("#first-run-new").click();
+ await page.locator("#welcome-manual-panel summary").click();
+ await page.locator("#welcome-name").fill("Kind ohne Rangliste");
+ await page.locator('#welcome-form button[type="submit"]').click();
+ await expect(page).toHaveURL(/\/index\.html#start$/);
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toHaveLength(1);
+ expect(saved.players[0].id).toMatch(/^local-/);
+});
 
 test("Invitation link finds a verified player by name and saves only after confirmation",async ({page})=>{
  await page.route("**/*",route=>{
