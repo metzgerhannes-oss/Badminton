@@ -278,8 +278,8 @@
 .dbv-calendar-panel .section-heading h3{font-size:20px;line-height:1.2;margin:0}
 .dbv-calendar-panel>.settings-hint{margin:7px 0 12px;font-size:13px;line-height:1.5}
 .dbv-calendar-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
-.dbv-calendar-filters label{display:grid;gap:4px;font-size:12px;font-weight:700;color:#29465d;min-width:0}
-.dbv-calendar-filters select,.dbv-calendar-filters input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #c7d8e5;background:#f8fbfd;color:#18364e;padding:10px 8px;border-radius:10px;font:inherit;font-size:13px;min-height:44px}
+.dbv-calendar-filters label{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;font-size:12px;font-weight:700;color:#29465d;min-width:0;max-width:100%}
+.dbv-calendar-filters select,.dbv-calendar-filters input{width:100%;max-width:100%;min-width:0;min-inline-size:0;box-sizing:border-box;border:1px solid #c7d8e5;background:#f8fbfd;color:#18364e;padding:10px 8px;border-radius:10px;font:inherit;font-size:13px;min-height:44px}
 .dbv-calendar-cluster{margin:12px 0;border-top:1px solid #e2eaf0}
 .dbv-calendar-cluster h4{font-size:16px;margin:14px 0 8px;color:#173d59}
 .dbv-calendar-cluster h4 small{font-size:12px;font-weight:600;color:#698093;margin-left:5px}
