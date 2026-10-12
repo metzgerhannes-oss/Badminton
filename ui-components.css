@@ -88,6 +88,53 @@
 .friend-quick-avatar{background:#b0e0fb;color:#0e4169}
 .friend-quick-add{color:#176aab;border-color:#8ec3e6}
 .friend-quick-add-icon{background:#b9e8ff;color:#0e477d}
+
+/* Home friends v91: fixed, scannable shortcuts; never a clipped horizontal strip. */
+.dashboard-friends{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+ overflow:visible;overscroll-behavior:auto;scroll-snap-type:none;
+ padding:11px 0 3px;scrollbar-width:auto;
+}
+.dashboard-friends>.friend-quick,.dashboard-friends>.friend-quick-more{
+ box-sizing:border-box;display:flex;align-items:center;gap:9px;
+ width:100%;min-width:0;max-width:none;min-height:52px;
+ padding:9px 10px;border:1px solid #c6e2f2;border-radius:15px;
+ background:#fff;color:#143657;text-align:left;text-decoration:none;
+ scroll-snap-align:none;font:inherit;box-shadow:0 1px 2px rgba(20,54,87,.04);
+}
+.dashboard-friends>.friend-quick.is-current{
+ border-color:#60b5e5;background:#e6f6ff;
+}
+.dashboard-friends .friend-quick-avatar{
+ width:32px;height:32px;font-size:13px;flex:none;
+}
+.dashboard-friends .friend-quick-name{
+ display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;
+ white-space:nowrap;font-size:13px;font-weight:800;
+}
+.dashboard-friends .friend-quick-more-icon{
+ font-weight:900;font-size:19px;line-height:1;
+}
+.dashboard-friends .friend-quick-more{
+ color:#176aab;background:#f4fbff;
+}
+.dashboard-friends>.friend-quick:focus-visible,
+.dashboard-friends>.friend-quick-more:focus-visible{
+ outline:3px solid #118bd0;outline-offset:2px;
+}
+.dashboard-friends>.friend-quick-add{grid-column:1/-1}
+@media(max-width:350px){
+ .dashboard-friends{gap:8px}
+ .dashboard-friends>.friend-quick,.dashboard-friends>.friend-quick-more{
+  gap:6px;padding:8px;min-height:48px;
+ }
+ .dashboard-friends .friend-quick-avatar{width:29px;height:29px;font-size:12px}
+ .dashboard-friends .friend-quick-name{font-size:12px}
+}
+@media(min-width:760px){
+ .dashboard-friends{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
 /* Match statistics: verified outcomes only, with understandable empty state. */
 .match-stats{background:linear-gradient(140deg,#fff,#effaff);border:1px solid #d0e8f6;box-shadow:var(--shadow);
   border-radius:21px;margin:15px 0 20px;padding:18px 14px;}

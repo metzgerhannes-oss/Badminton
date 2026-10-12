@@ -21,7 +21,7 @@ assert.ok(welcome.indexOf('id="welcome-language"') < welcome.indexOf('id="welcom
 assert.match(welcome, /id="welcome-language-status"/);
 assert.match(languageCss, /min-height:46px/);
 assert.match(i18n, /schmetterlinge\.uiLanguage/);
-assert.match(serviceWorker, /schmetterlinge-shell-v90/);
+assert.match(serviceWorker, /schmetterlinge-shell-v91/);
 assert.match(serviceWorker, /club-branding\.js/);
 assert.match(serviceWorker, /club-branding\.css/);
 for (const code of ["en", "fr", "uk", "ru", "zh-Hans", "tr", "ar", "it", "es", "pl"]) {
