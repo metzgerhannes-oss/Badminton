@@ -32,7 +32,7 @@ var SchmetterlingeBookmarks=(function(){
    const name=String(value.name||"").trim().slice(0,100);
    const startDate=validDate(value.startDate),endDate=validDate(value.endDate);
    const playerId=String(value.playerId||"");
-   if(!/^dbv-calendar-\\d{2,12}$/.test(id)||!name||!startDate||!endDate||endDate<startDate||
+   if(!/^dbv-calendar-\d{2,12}$/.test(id)||!name||!startDate||!endDate||endDate<startDate||
       !playerId||playerId==="all"||value.url!=="https://turniere.badminton.de/")return null;
    return {id,url:"https://turniere.badminton.de/",name,playerId,startDate,endDate,source:"dbv-calendar"};
   }
