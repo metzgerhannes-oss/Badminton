@@ -12,11 +12,15 @@ on:
       - '.github/workflows/dbv-calendar-source.yml'
       - 'data/dbv-calendar.json'
       - 'scripts/publish-dbv-calendar-oidc.py'
+      - 'supabase/functions/dbv-calendar-publish/index.ts'
+      - 'supabase/config.toml'
   push:
     branches: [main]
     paths:
       - 'scripts/import-dbv-calendar.py'
       - 'scripts/publish-dbv-calendar-oidc.py'
+      - 'supabase/functions/dbv-calendar-publish/index.ts'
+      - 'supabase/config.toml'
       - 'tests/test_dbv_calendar.py'
       - 'tests/test_dbv_calendar_oidc.py'
       - '.github/workflows/dbv-calendar-source.yml'
