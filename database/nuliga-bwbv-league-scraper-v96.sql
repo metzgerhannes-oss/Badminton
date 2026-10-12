@@ -103,7 +103,7 @@ begin
    end if;
    for team_rec in select * from public.league_teams where source_url=grp and club_id=p_club_id and season=expected_season loop
      delete from public.league_table_rows where team_id=team_rec.id;
-     label:=team_rec.club_name||case when team_rec.team_label='I' then '' else ' '||team_rec.team_label end;
+     label:=(case team_rec.club_id when '10892' then 'SG Heilbronn/Leingarten' when '10869' then 'BSG Mannheim' else team_rec.club_name end)||case when team_rec.team_label='I' then '' else ' '||team_rec.team_label end;
      for splitrow in select part from regexp_split_to_table(table_html,'<tr[^>]*>') as src(part) loop
        vals:=private.nuliga_cells(splitrow);
        if cardinality(vals)<8 or vals[2] !~ '^[0-9]+$' or vals[3]='' or vals[8] !~ '^[0-9]+:[0-9]+$' then continue; end if;
