@@ -68,6 +68,16 @@ function render(){
  const more=$("dbv-calendar-more");
  if(more)more.hidden=selected.groups.reduce((n,g)=>n+g.items.length,0)<=batchLimit;
 }
+async function readSnapshot(){
+ const res=await fetch("./data/dbv-calendar.json",{cache:"no-store"});
+ if(!res.ok)throw Error("Kein DBV-Snapshot verfügbar");
+ const data=await res.json();
+ if(data.schemaVersion!==1||data.source!=="https://turniere.badminton.de/"||
+  !Array.isArray(data.entries)||!data.entries.length)throw Error("DBV-Snapshot ungültig");
+ const rows=data.entries.map(calendarEntry).filter(Boolean);
+ if(rows.length!==data.entries.length)throw Error("Unvollständiger DBV-Snapshot");
+ return {rows,timestamp:Date.parse(data.capturedAt)||0};
+}
 async function load(){
  if(loading)return;
  loading=true;problem="";message("Offizieller DBV-Kalender wird geladen …");
@@ -82,14 +92,20 @@ async function load(){
   entries=collected.map(calendarEntry).filter(Boolean);
   source="supabase";
   if(!entries.length)throw Error("DB ohne Kalendereinträge");
+  const dbChecked=Math.max(0,...entries.map(e=>Date.parse(e.checked)||0));
+  // A source-backed published snapshot may be newer if GitHub's secure DB writer is not configured.
+  if(Date.now()-dbChecked>12*3600000){
+   try{
+    const snapshot=await readSnapshot();
+    if(snapshot.timestamp>dbChecked+3600000){
+     entries=snapshot.rows;source="snapshot";
+    }
+   }catch{ /* keep valid Supabase data when snapshot is absent */ }
+  }
  }catch{
   try{
-   const res=await fetch("./data/dbv-calendar.json",{cache:"no-store"});
-   if(!res.ok)throw Error("Kein Snapshot");
-   const data=await res.json();
-   if(!Array.isArray(data.entries)||data.schemaVersion!==1)throw Error("Snapshot ungültig");
-   entries=data.entries.map(calendarEntry).filter(Boolean);
-   source="snapshot";
+   const snapshot=await readSnapshot();
+   entries=snapshot.rows;source="snapshot";
   }catch{entries=[];source="offline";problem="Der Kalender ist derzeit nicht erreichbar."}
  }
  loading=false;loaded=true;
