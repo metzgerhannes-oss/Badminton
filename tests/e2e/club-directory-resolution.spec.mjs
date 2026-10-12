@@ -1,5 +1,15 @@
 import {test,expect} from "@playwright/test";
 
+test.beforeEach(async ({page})=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"Testprofil",club:"SpVgg. Mössingen"}],
+   activeProfileId:"05-070879",chosen:"05-070879",
+   friends:[],officialLinks:[],historyProfilesInitialized:true
+  }));
+ });
+});
+
 // In the real DB, club 05-0148 is stored as "Sportvereinigung Mössingen 1904 e.V."
 // but each of its 13 player rows has club="SpVgg. Mössingen".
 test("official club full name resolves 13 DBV players by linked club ID",async ({page})=>{
