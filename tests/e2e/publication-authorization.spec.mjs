@@ -69,3 +69,31 @@ test("approved session can share only after a matching player grant",async ({pag
  const flags=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.communityShares.v1")||"{}"));
  expect(flags[DBV+"|"+EVENT]).toBe(true);
 });
+
+
+test("public sharing without an existing account stays local and creates no anonymous account",async ({page})=>{
+ let signups=0,writes=0,grants=0;
+ await page.route("**/auth/v1/signup",route=>{
+  signups++;
+  return route.fulfill({status:429,contentType:"application/json",body:'{"error":"unexpected_signup"}'});
+ });
+ await page.route("**/rest/v1/player_publication_grants?*",route=>{
+  grants++;
+  return route.fulfill({status:200,contentType:"application/json",body:"[]"});
+ });
+ await page.route("**/rest/v1/user_tournament_links?*",route=>{
+  writes++;
+  return route.fulfill({status:403,contentType:"application/json",body:'{"error":"unexpected_write"}'});
+ });
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.waitForFunction(()=>Boolean(window.badmintonCommunity));
+ await page.evaluate(()=>localStorage.removeItem("schmetterlinge.communitySession.v1"));
+ await page.evaluate(bookmark=>window.dispatchEvent(
+  new CustomEvent("badminton:share-tournament",{detail:{bookmark,publicShare:true}})
+ ),BOOKMARK);
+ await expect(page.locator("#community-sync-status")).toContainText("Das Turnier bleibt privat auf deinem Gerät");
+ expect(signups).toBe(0);
+ expect(grants).toBe(0);
+ expect(writes).toBe(0);
+ expect(await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"))).toBeNull();
+});
