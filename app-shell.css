@@ -296,3 +296,14 @@
 .dbv-calendar-panel>.dbv-calendar-source{font-size:12px;margin-top:17px}
 @media(max-width:650px){.dbv-calendar-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.dbv-calendar-filters .dbv-calendar-search{grid-column:1/-1}}
 @media(max-width:390px){.dbv-calendar-panel{padding:12px}.dbv-calendar-entry{grid-template-columns:84px minmax(0,1fr);gap:8px}.dbv-calendar-detail h5{font-size:14px}}
+
+/* DBV calendar quick-save: touch friendly without competing with the title. */
+.dbv-calendar-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;min-width:0}
+.dbv-calendar-card-head h5{min-width:0;flex:1;margin:0 0 4px;overflow-wrap:anywhere}
+.dbv-calendar-save{display:inline-flex;flex:0 0 44px;align-items:center;justify-content:center;
+ width:44px;height:44px;min-width:44px;min-height:44px;
+ border:1.5px solid #8ab4cb;border-radius:12px;background:#f1f8fd;color:#175d85;
+ font-weight:800;font-size:26px;line-height:1;cursor:pointer;touch-action:manipulation}
+.dbv-calendar-save.is-saved{background:#e5f4ef;border-color:#468e70;color:#196748;font-size:22px}
+.dbv-calendar-save:focus-visible{outline:3px solid #2b79ae;outline-offset:3px}
+.dbv-calendar-save:disabled{opacity:.45;cursor:not-allowed}
