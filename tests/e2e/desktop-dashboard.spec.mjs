@@ -30,7 +30,7 @@ test("wide dashboard uses vertical navigation and real dashboard sections withou
  await expect(page.locator("#match-stats")).toBeVisible();
  await expect(page.locator("#dashboard-rankings")).toBeVisible();
  const pos=await page.evaluate(()=>{
-  const box=id=>document.querySelector(id).getBoundingClientRect();
+  const box=id=>{const r=document.querySelector(id).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}};
   return {nav:box(".bottom-nav").right,main:box("#hauptinhalt").left,
     tournament:box("#dashboard-next"),friends:box(".dashboard-friends-section"),
     stats:box("#match-stats"),ranking:box(".home-ranking-section"),
@@ -51,9 +51,9 @@ test("tablet/mobile retains horizontal bottom navigation and original stacked ho
  await expect(page.locator(".bottom-nav")).toHaveCSS("flex-direction","row");
  await expect(page.locator("#view-start")).toHaveCSS("display","block");
  const measured=await page.evaluate(()=>({
-  nav:document.querySelector(".bottom-nav").getBoundingClientRect(),
+  navBottom:document.querySelector(".bottom-nav").getBoundingClientRect().bottom,
   viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth
  }));
- expect(measured.nav.bottom).toBeGreaterThan(790);
+ expect(measured.navBottom).toBeGreaterThan(790);
  expect(measured.scrollWidth).toBeLessThanOrEqual(measured.viewport+2);
 });
