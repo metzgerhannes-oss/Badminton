@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {calendarEntry,filterCalendar,regionLabel} from "../scripts/dbv-calendar-utils.mjs";
+import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels} from "../scripts/dbv-calendar-utils.mjs";
 
 const sample=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 assert.equal(sample.schemaVersion,1);
@@ -15,6 +15,12 @@ const withinBW=filterCalendar(rows,{region:"Baden-Württemberg",period:"all"});
 assert.ok(withinBW.total>0,"BW calendar should have source-backed entries");
 assert.ok(withinBW.groups.every(g=>g.label==="Baden-Württemberg"));
 assert.ok(withinBW.groups.flatMap(g=>g.items).every(t=>t.bundesland==="Baden-Württemberg"));
+const bwU13C={region:"Baden-Württemberg",age:"U13",level:"C",period:"upcoming",today:"2026-10-12"};
+assert.equal(filterCalendar(rows,bwU13C).total,0,"The reported triple-filter combination is legitimately empty in the published snapshot");
+assert.deepEqual(alternativeCalendarLevels(rows,bwU13C),[{level:"D",count:4},{level:"E",count:6}],
+ "Empty-result alternatives should point to matching source entries while preserving BW and U13");
+assert.deepEqual(alternativeCalendarLevels(rows,{...bwU13C,level:"all"}),[]);
+
 const age=filterCalendar(rows,{age:"U11",period:"all"});
 assert.ok(age.total>0);
 assert.ok(age.groups.flatMap(g=>g.items).every(t=>t.ages.includes("U11")));
@@ -43,6 +49,8 @@ assert.ok(sw.includes('"./scripts/dbv-calendar-utils.mjs"'));
 assert.ok(app.includes("dbv_calendar_entries?"),"Read-only Supabase data feed required");
 assert.ok(app.includes("./data/dbv-calendar.json"),"Source-backed snapshot fallback required");
 assert.ok(app.includes("Keine passenden Turniere"),"Missing data message required");
+assert.ok(app.includes("Erfasster Zeitraum:"),"DBV source coverage must be visible");
+assert.ok(app.includes("data-calendar-alternative-level"),"Empty state must offer one-tap source-backed alternate level");
 assert.ok(app.includes("data-calendar-toggle"),"Every DBV calendar card should render an accessible plus/check toggle");
 assert.ok(app.includes("badmintonCalendarToggle"),"Quick action must connect to private local bookmark handler");
 assert.ok(app.includes('aria-pressed'),"Bookmark state needs accessible status");
