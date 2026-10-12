@@ -207,6 +207,12 @@ assert.match(cron,/private\.continue_external_match_import/);
 assert.match(fn,/parsePublicHistory/);
 assert.match(fn,/claim_external_match_import/);
 assert.match(fn,/on_conflict=dbv_id,source_key/);
+assert.match(fn,/all\.filter\(m=>m\.outcome_evidence==="badhub-bold-dash"\)/,
+ "An old cursor must not skip newly recognized unscored results");
+assert.match(fn,/const toStore=new Map\(selected\.concat\(scoreless\)/,
+ "Scoreless backfill must deduplicate against ordinary cursor batches");
+assert.match(fn,/written\.slice\(i,i\+25\)/,
+ "Backfill persists in the same bounded idempotent batches");
 assert.match(fn,/src=.+saison=all/);
 assert.doesNotMatch(fn,/insert into public.matches|update public.matches/,
  "Third-party matches must remain separate from DBV official facts");
