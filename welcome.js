@@ -230,7 +230,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  const known=readSaved()?.players;
  $("welcome-existing").hidden=!(Array.isArray(known)&&known.length);
  const fromInstalledApp=new URLSearchParams(location.search).get("from")==="app";
- $("welcome-app-back").hidden=!fromInstalledApp;
  $("progress-install").hidden=fromInstalledApp;
  updateMode("manual");
  if(location.hash==="#installation"){
