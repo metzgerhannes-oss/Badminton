@@ -107,15 +107,18 @@ Deno.serve(async (req:Request)=>{
  if(!key||!root||new URL(root).hostname!=="yadexibmjmnjfmfabrug.supabase.co")
    return response(503,"database_configuration");
  const url=root+"/rest/v1/dbv_calendar_entries?on_conflict=source_key";
+ // The server sets the sync timestamp, not the sender. Preserve first_seen_at on upsert.
+ const checkedAt=new Date().toISOString();
+ const stamped=rows.map(row=>({...row,last_seen_at:checkedAt}));
  // Upsert only official DBV rows. Do not touch private calendar or user tables.
- for(let n=0;n<rows.length;n+=40){
+ for(let n=0;n<stamped.length;n+=40){
   const tokenHeader=key.startsWith("eyJ")?{"Authorization":"Bearer "+key}:{};
   let res:Response;
   try{
    res=await fetch(url,{method:"POST",headers:{
     "apikey":key,...tokenHeader,"Content-Type":"application/json",
     "Prefer":"resolution=merge-duplicates,return=minimal"
-   },body:JSON.stringify(rows.slice(n,n+40)),signal:AbortSignal.timeout(14000)});
+   },body:JSON.stringify(stamped.slice(n,n+40)),signal:AbortSignal.timeout(14000)});
   }catch{return response(503,"database_unreachable")}
   if(!res.ok)return response(502,"database_upsert_failed");
  }
