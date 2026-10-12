@@ -158,7 +158,7 @@ function sync(){
 document.addEventListener("DOMContentLoaded",()=>{
  if(!root())return;
  $("tournament-live-select")?.addEventListener("change",e=>{
-  selected=e.currentTarget.value;items=[];status="all";court="all";loadedAt=0;refresh();
+  selected=e.currentTarget.value;items=[];status="all";court="all";loadedAt=0;choose();refresh();
  });
  $("tournament-live-refresh")?.addEventListener("click",()=>{
   window.dispatchEvent(new Event("badminton:followed-live-refresh"));
