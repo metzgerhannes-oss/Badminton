@@ -13,6 +13,7 @@ test("Private event invitation is opt-in, guest-readable, limited, and revocable
   historyProfilesInitialized:true};
  await a.addInitScript(data=>localStorage.setItem("shuttleboard-v1",JSON.stringify(data)),local);
  let signup=0,creation=0,revoke=0,publicWrites=0,guestCalls=0,revoked=false;
+ const expires=new Date(Date.now()+7*86400000).toISOString();
  const handler=async route=>{
   const req=route.request(),u=new globalThis.URL(req.url());
   if(u.hostname==="127.0.0.1"||u.hostname==="localhost")return route.continue();
@@ -27,14 +28,14 @@ test("Private event invitation is opt-in, guest-readable, limited, and revocable
    expect(data.p_title).toBe("Jugend-RLT");expect(data.p_source_url).toBe(SOURCE_URL);
    expect(JSON.stringify(data)).not.toContain(PLAYER);
    return route.fulfill({status:200,headers,body:JSON.stringify([{
-    invitation_id:ID,expires_at:"2026-12-10T12:00:00Z"}])});
+    invitation_id:ID,expires_at:expires}])});
   }
   if(u.pathname==="/rest/v1/rpc/private_tournament_invite_read"){guestCalls++;
    const data=JSON.parse(req.postData()||"{}");
    expect(data.p_token).toMatch(/^[a-f0-9]{64}$/);
    return route.fulfill({status:200,headers,body:revoked?"[]":JSON.stringify([{
     title:"Jugend-RLT",start_date:"2026-12-03",end_date:"2026-12-04",
-    source_url:SOURCE_URL,expires_at:"2026-12-10T12:00:00Z"}])});
+    source_url:SOURCE_URL,expires_at:expires}])});
   }
   if(u.pathname==="/rest/v1/rpc/private_tournament_invite_revoke"){revoke++;
    const data=JSON.parse(req.postData()||"{}");expect(data.p_invitation_id).toBe(ID);
@@ -62,8 +63,16 @@ test("Private event invitation is opt-in, guest-readable, limited, and revocable
   const guestSession=await guest.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
   expect(guestSession).toBeNull();
   expect(new URL(guest.url()).hash).toBe("");
+  await owner.locator("#private-share-close").click();
+  await owner.locator('[data-remove-id="'+EVENT+'"]').click();
+  await expect(owner.locator("#private-share-dialog")).toBeVisible();
+  await expect(owner.locator("#toast")).toContainText("zuerst den privaten Link widerrufen");
   await owner.locator("#private-share-revoke").click();
   await expect(owner.locator("#private-share-status")).toContainText("Link widerrufen");
+  await owner.locator("#private-share-close").click();
+  await owner.locator('[data-remove-id="'+EVENT+'"]').click();
+  const privateState=await owner.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+  expect(privateState.officialLinks).toHaveLength(0);
   expect(revoke).toBe(1);
   await guest.goto(link);
   await expect(guest.locator("#invite-page-status")).toContainText("abgelaufen, widerrufen");
