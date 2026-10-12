@@ -79,6 +79,11 @@ def year_probe():
    years=re.findall(r'<option[^>]*value="(20\\d{2})"[^>]*>',body)
    select=re.search(r'<select[^>]+(?:name|id)="(?:year|jws|remaining)"[^>]*>[\\s\\S]*?</select>',body,re.I)
    rows=StructuralProbe();rows.feed(body)
+   page=re.sub(r"\\s+"," ",body)
+   seen=[(match.start(),page[max(0,match.start()-120):match.start()+160]) for match in list(re.finditer(r"Turnier|gefunden|Ergebnisse|Kalender",page,re.I))[:150] if match]
+   print("YEAR_DETAIL",name,"bytes",len(body),"rows",len(trs),"allTableRows",len(rows.rows),
+    "tablePresent",("tournamenttable" in body),"textFragments",repr(seen[-8:])[:1600],
+    "year2027Near",repr(page[max(0,page.find("2027")-120):page.find("2027")+170])[:300],flush=True)
    print("YEAR_PROBE",name,"http",status,"final",final,"count",found.group(1) if found else "missing",
     "rows",len(trs),"year_options",years[:10],"has2027",("2027" in body),
     "first_row",repr(rows.rows[:2]),"select",re.sub(r"\\s+"," ",select.group(0))[:750] if select else "none",flush=True)
