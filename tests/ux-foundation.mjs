@@ -27,7 +27,7 @@ assert.match(stats,/Badhub · Teilbestand/);
 assert.doesNotMatch(stats,/note\.textContent="Einzeln belegte Badhub-Spiele · kein offizieller DBV-Matchimport\./);
 
 const nav=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
-assert.deepEqual(nav,["start","turniere","live","spieler","berichte"]);
+assert.deepEqual(nav,["start","turniere","live","spieler","mannschaft","berichte"]);
 assert.match(html,/href="#einstellungen" aria-label="Einstellungen öffnen"/);
 assert.match(app,/function navigateHome\(\)/);
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);\s*routeTo\("start"\)/);
