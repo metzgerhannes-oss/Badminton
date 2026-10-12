@@ -51,6 +51,7 @@ test("official club full name resolves 13 DBV players by linked club ID",async (
    headers:{...CORS,"Content-Range":"0-12/13"},body:JSON.stringify(rows)});
  });
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await page.locator("#player-add-open").click();
  await page.locator("#library-club").fill("Sportvereinigung Mössingen 1904 e.V.");
  await expect(page.locator("#library-count")).toContainText("13 passende Spieler");
  await expect(page.locator(".library-player")).toHaveCount(13);
