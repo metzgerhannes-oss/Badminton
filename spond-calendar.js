@@ -2,7 +2,7 @@
 /** Private, explicit import of Spond-compatible calendar events. No remote writes. */
 var SchmetterlingeSpond=(function(){
  const KEY="schmetterlinge.calendarEvents.v1", MAX_EVENTS=120, MAX_FILE=524288;
- const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+ const today=()=>dayParts(new Date());
  const dayParts=d=>{const p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);const o=Object.fromEntries(p.filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));return o.year+"-"+o.month+"-"+o.day};
  const dateOk=s=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(s||""))return false;const d=new Date(s+"T12:00:00Z");return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===s};
  function day(value){
@@ -136,7 +136,7 @@ var SchmetterlingeSpond=(function(){
  function render(state){
   const host=$("spond-events");if(!host)return;
   const own=state.players||[],viewing=state.viewingFriendId?null:state.activeProfileId;
-  const items=viewing?forPlayer(viewing).sort((a,b)=>a.startDate.localeCompare(b.startDate)).filter(x=>x.endDate>=previousDay(today())):[];
+  const items=viewing?forPlayer(viewing).sort((a,b)=>a.startDate.localeCompare(b.startDate)).filter(x=>x.endDate>=today()):[];
   const options=$("spond-import-player");
   if(options){
    const before=options.value;
