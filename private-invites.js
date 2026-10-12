@@ -8,6 +8,12 @@ const AUTH_URL=SUPABASE_ROOT.replace(/rest\/v1\/$/,"auth/v1/");
 const obj=(key)=>{try{return JSON.parse(localStorage.getItem(key)||"null")}catch{return null}};
 const registry=()=>{const r=obj(INVITES_KEY);return r&&typeof r==="object"&&!Array.isArray(r)?r:{}};
 const remember=records=>localStorage.setItem(INVITES_KEY,JSON.stringify(records));
+window.badmintonPrivateInvite={
+ hasActive:bookmark=>{
+  const r=registry()[localInviteKey(bookmark)];
+  return Boolean(r&&TOKEN_RE.test(r.token)&&Date.parse(r.expires)>Date.now());
+ }
+};
 let selected=null,busy=false;
 function notice(message){const node=$("private-share-status");if(node)node.textContent=message}
 function actionDisabled(on){for(const id of ["private-share-create","private-share-copy","private-share-revoke"])if($(id))$(id).disabled=on}
@@ -122,11 +128,5 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("private-share-copy")?.addEventListener("click",copy);
  $("private-share-revoke")?.addEventListener("click",revokeSelected);
  $("private-share-close")?.addEventListener("click",()=>dialog.close());
- window.addEventListener("badminton:private-invite-remove",async event=>{
-  const bookmark=event.detail?.bookmark;
-  const record=bookmark?registry()[localInviteKey(bookmark)]:null;
-  if(!record)return;
-  try{await revoke(record,bookmark,true)}
-  catch{notice("Ein alter privater Link bleibt bis zum Ablauf möglicherweise gültig. Öffne die Freigabe erneut, um ihn zu widerrufen.")}
- });
+
 });
