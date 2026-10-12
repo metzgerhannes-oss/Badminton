@@ -1,6 +1,9 @@
 import {test,expect} from "@playwright/test";
 import {readFile} from "node:fs/promises";
 const data=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
+const sourceTotal=data.entries.length;
+const entries2026=data.entries.filter(e=>e.start_date?.startsWith("2026"));
+const countBW2026=entries2026.filter(e=>e.bundesland==="Baden-Württemberg").length;
 const own={players:[{id:"05-070879",name:"Testprofil"}],friends:[],officialLinks:[],
  activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true};
 test.beforeEach(async ({page})=>{
@@ -17,16 +20,16 @@ test("Official calendar clusters by state, age and level without invented regist
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  const results=page.locator("#dbv-calendar-results");
  await page.locator("#dbv-calendar-year").selectOption("2026");
- await expect(page.locator("#dbv-calendar-status")).toContainText("109 von "+data.entries.length);
+ await expect(page.locator("#dbv-calendar-status")).toContainText(entries2026.length+" von "+sourceTotal);
  await expect(results.locator(".dbv-calendar-entry").first()).toBeVisible();
  const filter=page.locator("#dbv-calendar-region");
  await filter.selectOption("Baden-Württemberg");
- await expect(page.locator("#dbv-calendar-status")).toContainText("14 von "+data.entries.length);
+ await expect(page.locator("#dbv-calendar-status")).toContainText(countBW2026+" von "+sourceTotal);
  await expect(results.locator(".dbv-calendar-cluster h4")).toHaveCount(1);
  await expect(results).not.toContainText("bestätigte Anmeldung");
  await filter.selectOption("all");
  await page.locator("#dbv-calendar-age").selectOption("U11");
- await expect(page.locator("#dbv-calendar-status")).toContainText("von "+data.entries.length);
+ await expect(page.locator("#dbv-calendar-status")).toContainText("von "+sourceTotal);
  await expect(results.locator(".dbv-calendar-entry").first()).toBeVisible();
  await page.locator("#dbv-calendar-age").selectOption("all");
  await page.locator("#dbv-calendar-level").selectOption("C");
@@ -93,14 +96,14 @@ test("BW U13 C empty result explains source coverage and provides available D/E 
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-level").selectOption("C");
- await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+data.entries.length);
+ await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
  await expect(page.locator(".dbv-calendar-no-results")).toContainText("Keine passenden Turniere");
  await expect(page.locator(".dbv-calendar-no-results")).toContainText("nicht automatisch alle Turniere");
  await expect(page.locator('[data-calendar-alternative-level="D"]')).toHaveText("Level D (4)");
  await expect(page.locator('[data-calendar-alternative-level="E"]')).toHaveText("Level E (6)");
  await page.locator('[data-calendar-alternative-level="D"]').click();
  await expect(page.locator("#dbv-calendar-level")).toHaveValue("D");
- await expect(page.locator("#dbv-calendar-status")).toContainText("4 von "+data.entries.length);
+ await expect(page.locator("#dbv-calendar-status")).toContainText("4 von "+sourceTotal);
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
 });
 
@@ -109,7 +112,7 @@ test("2027 year selection shows official source-backed future tournaments",async
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await page.locator("#dbv-calendar-year").selectOption("2027");
  const count=data.entries.filter(e=>e.start_date?.startsWith("2027")).length;
- await expect(page.locator("#dbv-calendar-status")).toContainText(count+" von "+data.entries.length);
+ await expect(page.locator("#dbv-calendar-status")).toContainText(count+" von "+sourceTotal);
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry").first()).toBeVisible();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
 });
