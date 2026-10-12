@@ -1,0 +1,182 @@
+/* Schmetterlinge desktop workspace.
+   Additive wide-screen presentation: mobile/tablet markup, tab order,
+   data sources and all dashboard renderers remain untouched. */
+@media (min-width:1080px) {
+  .app {
+    width:100%;
+    max-width:1520px;
+    min-height:100vh;
+    padding:18px 30px 64px 254px;
+  }
+
+  /* The existing route links become a left navigation rail; there is
+     deliberately no duplicate desktop navigation or extra route state. */
+  .bottom-nav {
+    position:fixed;
+    top:104px;
+    bottom:auto;
+    right:auto;
+    left:max(16px, calc((100vw - 1520px) / 2 + 24px));
+    transform:none;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:5px;
+    width:214px!important;
+    max-width:214px;
+    max-height:calc(100vh - 122px);
+    overflow-y:auto;
+    padding:12px!important;
+    border:1px solid #bbd9ea;
+    border-radius:20px;
+    background:#f9fcffed;
+    box-shadow:0 12px 35px #32698820;
+    backdrop-filter:blur(14px);
+  }
+  .bottom-nav a,
+  .bottom-nav.has-live-tab a {
+    box-sizing:border-box;
+    flex:0 0 auto!important;
+    width:100%!important;
+    min-width:0;
+    min-height:48px;
+    display:flex;
+    flex-direction:row;
+    justify-content:flex-start;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px!important;
+    border-radius:12px;
+    color:#315d7d;
+    text-align:left;
+  }
+  .bottom-nav a>span {
+    display:grid;
+    flex:0 0 25px;
+    place-items:center;
+    width:25px;
+    height:25px;
+  }
+  .bottom-nav .nav-icon {width:23px;height:23px}
+  .bottom-nav a small {font-size:13px;font-weight:800;white-space:nowrap}
+  .bottom-nav a[aria-current="page"] {
+    background:#ddf1ff;
+    color:#08699e;
+    box-shadow:inset 0 0 0 1px #b0dcef;
+  }
+  .bottom-nav a:not([aria-current="page"]):hover {background:#e9f6ff;color:#0a6e9f}
+  .bottom-nav.has-live-tab .live-nav-tab {border:1px solid #f1b9c8}
+  .bottom-nav a:focus-visible {outline-offset:2px}
+
+  .topbar {
+    min-height:76px;
+    margin:0 0 18px;
+    padding:0 2px 14px;
+    border-bottom:1px solid #bcddef;
+  }
+  .topbar .brand>span {font-size:28px}
+  .topbar .brand small {font-size:10px;letter-spacing:.7px}
+  .topbar .brand-logo {width:62px!important;height:62px!important;min-width:62px!important;max-width:62px!important}
+  .topbar-actions {flex-direction:row;align-items:center;gap:12px;flex-basis:auto}
+  .topbar-actions .topbar-settings {order:2}
+  .topbar-actions .app-version-badge {font-size:11px}
+  #hauptinhalt {min-width:0}
+  #hauptinhalt>.page:not(#view-start) {max-width:1100px}
+  #focused-profile {max-width:100%;margin-bottom:18px}
+
+  /* Every desktop tile reuses the same existing widgets and verified values. */
+  #view-start.active {
+    display:grid;
+    grid-template-columns:minmax(0, 1.45fr) minmax(300px, 1fr);
+    grid-template-areas:
+      "heading heading"
+      "live live"
+      "next friends"
+      "shared friends"
+      "sync friends"
+      "stats rankings";
+    align-items:start;
+    column-gap:20px;
+    row-gap:15px;
+    min-width:0;
+  }
+  #view-start>.dashboard-heading {grid-area:heading;margin:0 0 2px}
+  #view-start>.home-live-peek {grid-area:live}
+  #view-start>#dashboard-next {grid-area:next;min-width:0;margin:0}
+  #view-start>#shared-tournaments {grid-area:shared;min-width:0}
+  #view-start>#community-sync-status {grid-area:sync;min-width:0}
+  #view-start>#match-stats {grid-area:stats;min-width:0;margin:0}
+  #view-start>.home-ranking-section {grid-area:rankings;min-width:0;margin:0}
+  #view-start>.dashboard-friends-section {grid-area:friends;min-width:0;margin:0}
+  #view-start .dashboard-heading h1 {font-size:31px;line-height:1.2}
+  #view-start .dashboard-heading .muted {font-size:13px}
+  #view-start .upcoming-tournaments-section {
+    margin:0;
+    padding:19px 20px 12px;
+    border-radius:20px;
+  }
+  #view-start .upcoming-tournaments-header h2 {font-size:19px}
+  #view-start .upcoming-tournament-row {min-height:77px}
+  #view-start .dashboard-friends-section {
+    border:1px solid #bddded;
+    border-radius:20px;
+    background:#f8fcff;
+    box-shadow:0 7px 26px #5488ab19;
+    padding:16px;
+  }
+  #view-start .dashboard-friends-section h2 {font-size:19px!important;color:#123b5e}
+  #view-start .dashboard-friends {
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:9px;
+    overflow:visible;
+    padding:12px 0 0;
+    scroll-snap-type:none;
+  }
+  #view-start .dashboard-friends .friend-quick,
+  #view-start .dashboard-friends .friend-quick-more {
+    box-sizing:border-box;
+    width:100%;
+    max-width:none;
+    min-width:0;
+    min-height:51px;
+    border-radius:13px;
+    padding:8px 10px;
+  }
+  #view-start .dashboard-friends .friend-quick-add {grid-column:1/-1;min-height:54px}
+  #view-start .dashboard-friends .friend-quick-name {min-width:0}
+  #view-start .home-ranking-section>.section-heading {margin:0 0 13px}
+  #view-start .dashboard-ranking-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+  #view-start .ranking-tile.ranking-compact {min-height:199px;padding:15px 11px 12px}
+  #view-start .ranking-bw-row strong {font-size:clamp(27px,2.7vw,37px)}
+  #view-start .ranking-bw-row .movement {font-size:11px}
+  #view-start .dashboard-kpi-grid {min-width:0}
+  #view-start .match-stats-values {grid-template-columns:repeat(4,minmax(0,1fr))}
+  #view-start #match-stats .section-heading h2 {font-size:20px}
+  #view-start .home-trophy-grid {min-width:0}
+  #view-start .dashboard-source {font-size:11px}
+  .toast {bottom:24px}
+}
+
+@media (min-width:1080px) and (max-width:1240px) {
+  .app {padding-left:238px;padding-right:22px}
+  .bottom-nav {width:202px!important;max-width:202px}
+  #view-start.active {grid-template-columns:minmax(0,1.35fr) minmax(288px,1fr);column-gap:14px}
+  #view-start .dashboard-friends-section {padding:13px}
+  #view-start .dashboard-friends {gap:7px}
+  #view-start .ranking-tile.ranking-compact {padding:12px 8px}
+  #view-start .ranking-bw-row strong {font-size:27px}
+}
+
+@media (min-width:1600px) {
+  #view-start.active {grid-template-columns:minmax(0,1.55fr) minmax(345px,1fr);column-gap:26px}
+  #view-start .dashboard-friends {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (min-width:1080px) and (prefers-reduced-motion:reduce) {
+  .bottom-nav a {transition:none!important}
+}
