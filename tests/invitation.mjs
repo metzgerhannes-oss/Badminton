@@ -120,6 +120,7 @@ assert.match(app,/href="\.\/welcome\.html#installation"/);
 assert.doesNotMatch(welcome,/<section class="welcome-hero"/,"Invitation begins directly with setup, not a marketing hero");
 assert.match(welcome,/id="progress-profile"[^>]*>1\. Schritt Profil anlegen<\/span>/);
 assert.match(welcome,/id="progress-install"[^>]*>2\. Schritt App hinzufügen<\/span>/);
+assert.match(welcome,/<h2 id="setup-title">Für wen möchtest du ein Profil anlegen\?<\/h2>/,"Invitation headline must use natural German");
 assert.match(welcome,/id="welcome-form"/);
 assert.match(welcome,/id="onboard-install"/);
 assert.match(welcome,/Zu Home-Bildschirm hinzufügen/);
