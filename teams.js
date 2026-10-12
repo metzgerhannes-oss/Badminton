@@ -1,6 +1,6 @@
 /** Mannschaft: official league seasons with private per-device following. */
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {TEAM_FOLLOWS_KEY,normalizeFollows,filterTeamRows,officialTeamUrl,
+import {TEAM_FOLLOWS_KEY,normalizeFollows,normalizeTeamText,filterTeamRows,officialTeamUrl,
   displayTeamName,tablePoints,confirmedResult} from "./scripts/team-directory-utils.mjs";
 
 const $=id=>document.getElementById(id);
@@ -17,7 +17,7 @@ const dateOnly=value=>{
  return Number.isNaN(dt.getTime())?"unbekannt":
  new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Europe/Berlin"}).format(dt);
 };
-let rows=[],loading=false,loadFailed=false,selectedId="",activeTab="games",detailsTicket=0,initialized=false;
+let rows=[],clubs=[],loading=false,loadFailed=false,selectedId="",activeTab="games",detailsTicket=0,initialized=false;
 let detail={games:[],table:[],error:false},follows=[];
 function readFollows(){
  try{follows=normalizeFollows(JSON.parse(localStorage.getItem(TEAM_FOLLOWS_KEY)||"[]"))}catch{follows=[]}
@@ -58,12 +58,40 @@ function wireCards(container){
   if(!saved)showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");
  }));
 }
+function renderClubDirectory(){
+ const container=$("team-clubs-results");if(!container)return;
+ const query=normalizeTeamText($("team-search")?.value||"");
+ if(query.length<2){
+  container.innerHTML='<p class="team-empty">Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.</p>';return;
+ }
+ const words=query.split(" ").filter(Boolean);
+ const matches=clubs.filter(c=>words.every(word=>normalizeTeamText(c.name).includes(word)));
+ container.innerHTML=matches.length?matches.slice(0,30).map(club=>{
+  const imported=rows.some(r=>r.club_id===club.id&&r.season===season());
+  const href=officialTeamUrl(club.source_url);
+  return '<article class="team-club-entry"><div><strong>'+esc(club.name)+'</strong><small>'+
+   esc(club.region)+(imported?' · Mannschaften verfügbar':' · Import ausstehend')+'</small></div>'+
+   (imported?'<button type="button" data-team-club-filter="'+esc(club.name)+'">Mannschaften anzeigen</button>':'')+
+   (href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">nuLiga ↗</a>':'')+'</article>';
+ }).join(""):'<p class="team-empty">Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.</p>';
+ container.querySelectorAll("[data-team-club-filter]").forEach(b=>b.addEventListener("click",()=>{
+   $("team-search").value=b.dataset.teamClubFilter;
+   renderSearchResults();$("team-find-heading")?.scrollIntoView({block:"start"});
+ }));
+}
 function renderSearchResults(){
  const container=$("team-results");if(!container)return;
  const visible=filterTeamRows(rows,$("team-search")?.value||"",season());
  const query=String($("team-search")?.value||"").trim();
+ renderClubDirectory();
  if(loadFailed){container.innerHTML='<p class="team-empty">Die Datenbank ist gerade nicht erreichbar. Bitte erneut laden.</p>';return}
  if(loading){container.innerHTML='<p class="team-empty">Mannschaften werden geladen …</p>';return}
+ if(!query){
+  container.innerHTML='<p class="team-empty">Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.</p>';
+  const count=$("team-count");
+  if(count)count.textContent=rows.filter(r=>r.season===season()).length+" Mannschaften in dieser Saison verfügbar";
+  return;
+ }
  container.innerHTML=visible.length?visible.slice(0,80).map(card).join(""):
  '<p class="team-empty">'+(query?'Keine bestätigten Mannschaften zu dieser Suche gefunden.':'Für diese Saison liegen noch keine Mannschaften vor.')+'</p>';
  wireCards(container);
@@ -140,14 +168,24 @@ async function load(){
  if(loading)return;
  loading=true;loadFailed=false;showStatus("Öffentliche nuLiga-Mannschaftsdaten werden geladen …");renderSearchResults();
  try{
-  const data=await readPublicRows("league_teams?select=id,follow_key,club_id,club_name,team_label,league_name,season,position,points_for,points_against,official_team_name,source_url,source_checked_at&order=club_name.asc,team_label.asc&limit=500",{count:false});
-  rows=data.rows.filter(t=>/^nuliga:[0-9]{3,7}:[1-9][0-9]?$/.test(t.follow_key)&&officialTeamUrl(t.source_url));
+  const fields="league_teams?select=id,follow_key,club_id,club_name,team_label,league_name,season,position,points_for,points_against,official_team_name,source_url,source_checked_at&order=club_name.asc,team_label.asc";
+  const [data,clubData]=await Promise.all([
+   readPublicRows(fields+"&limit=500&offset=0",{count:false}),
+   readPublicRows("league_clubs?select=id,name,region,source_url,import_state&order=name.asc&limit=500",{count:false})
+  ]);
+  let fetched=data.rows;
+  for(let offset=500;fetched.length===offset&&offset<1500;offset+=500){
+   const next=await readPublicRows(fields+"&limit=500&offset="+offset,{count:false});
+   fetched=[...fetched,...next.rows];
+  }
+  rows=fetched.filter(t=>/^nuliga:[0-9]{3,7}:[1-9][0-9]?$/.test(t.follow_key)&&officialTeamUrl(t.source_url));
+  clubs=clubData.rows.filter(t=>/^[0-9]{3,7}$/.test(t.id)&&officialTeamUrl(t.source_url));
   loadFailed=false;
   const seasons=[...new Set(rows.map(r=>r.season))].sort().reverse();
   const choice=$("team-season"),prior=choice.value||"2026/27";
   choice.innerHTML=seasons.map(s=>'<option value="'+esc(s)+'">'+esc(s)+'</option>').join("");
   if(seasons.includes(prior))choice.value=prior;
-  showStatus(rows.length+" Mannschaften aus bestätigten nuLiga-Quellen · Quellenstand jeweils in der Karte");
+  showStatus(rows.length+" Mannschaften · "+clubs.length+" offizielle BWBV-Vereine · Quellenstand jeweils in der Karte");
  }catch{
   loadFailed=true;showStatus("Öffentliche Mannschaftsdaten gerade nicht erreichbar. Bitte erneut versuchen.");
  }finally{loading=false;renderFollowed();renderSearchResults();renderDetail()}
