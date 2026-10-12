@@ -29,14 +29,18 @@ function showStatus(message){
  const n=$("team-directory-status");if(n)n.textContent=message;
 }
 function season(){return $("team-season")?.value||"2026/27"}
+function teamsForSeason(){
+ return follows.map(key=>rows.find(t=>t.follow_key===key&&t.season===season())).filter(Boolean);
+}
 function renderFollowed(){
  const container=$("team-followed");if(!container)return;
- const found=rows.filter(team=>follows.includes(team.follow_key)&&team.season===season());
- container.innerHTML=found.length?found.map(team=>card(team)).join(""):
-  '<p class="team-empty">Hier erscheinen die Mannschaften, denen du folgst. Wähle unten eine Mannschaft und tippe auf „Folgen“.</p>';
+ const found=teamsForSeason();
+ container.innerHTML=found.length?found.map(team=>card(team,"followed")).join(""):
+  '<p class="team-empty">'+(loading?'Mannschaften werden geladen …':follows.length?'In dieser Saison sind für deine gefolgten Mannschaften noch keine bestätigten Daten verfügbar.':'Du folgst noch keiner Mannschaft. Tippe auf „+ Hinzufügen“.')+'</p>';
  wireCards(container);
+ renderTeamSettings();
 }
-function card(team){
+function card(team,mode="search"){
  const followed=follows.includes(team.follow_key),selected=selectedId===team.id;
  return '<article class="team-card'+(selected?' is-selected':'')+'">'+
   '<button class="team-card-main" type="button" data-team-open="'+esc(team.id)+'">'+
@@ -44,18 +48,50 @@ function card(team){
    '<span>'+esc(team.league_name)+' · '+esc(team.season)+'</span>'+
    '<small>Platz '+(Number.isInteger(team.position)?team.position:"–")+
    ' · Tabellenpunkte '+esc(tablePoints(team))+' · Stand '+esc(dateOnly(team.source_checked_at))+'</small>'+
-  '</button><button type="button" class="team-follow-button" data-team-toggle="'+esc(team.follow_key)+'"'+
+  '</button>'+(mode==="followed"?'':'<button type="button" class="team-follow-button" data-team-toggle="'+esc(team.follow_key)+'"'+
   ' aria-label="'+(followed?"Nicht mehr folgen: ":"Folgen: ")+esc(displayTeamName(team))+'">'+
-   (followed?'✓ Gefolgt':'+ Folgen')+'</button></article>';
+   (followed?'✓ Gefolgt':'+ Folgen')+'</button>')+'</article>';
+}
+function renderTeamSettings(){
+ const container=$("team-settings-list");if(!container)return;
+ container.innerHTML=follows.length?follows.map((key,i)=>{
+  const team=rows.find(t=>t.follow_key===key&&t.season===season())||rows.find(t=>t.follow_key===key);
+  return '<article class="follow-manage-item"><div class="follow-manage-label"><strong>'+esc(team?displayTeamName(team):"Gespeicherte Mannschaft")+
+   '</strong><small>'+esc(team?team.league_name+" · "+team.season:key)+'</small></div>'+
+   '<div class="follow-manage-actions"><button type="button" data-team-move="'+esc(key)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="Mannschaft nach oben">↑</button>'+
+   '<button type="button" data-team-move="'+esc(key)+'" data-direction="1" '+(i===follows.length-1?'disabled':'')+' aria-label="Mannschaft nach unten">↓</button>'+
+   '<button type="button" data-team-toggle="'+esc(key)+'" aria-label="Mannschaft nicht mehr folgen">Entfolgen</button></div></article>';
+ }).join(""):'<p class="team-empty">Noch keine Mannschaften abonniert.</p>';
+ wireCards(container);
+ container.querySelectorAll("[data-team-move]").forEach(b=>b.addEventListener("click",()=>{
+  const i=follows.indexOf(b.dataset.teamMove),next=i+Number(b.dataset.direction);
+  if(i<0||next<0||next>=follows.length)return;
+  const [key]=follows.splice(i,1);follows.splice(next,0,key);
+  if(!saveFollows()){readFollows();showStatus("Reihenfolge konnte nicht gespeichert werden.");}
+  renderFollowed();
+ }));
+}
+function setTeamDiscover(open,focus=true){
+ const panel=$("team-discover"),button=$("team-add-open");if(!panel||!button)return;
+ panel.hidden=!open;button.setAttribute("aria-expanded",String(open));
+ button.textContent=open?"Suche schließen":"+ Hinzufügen";
+ if(open&&focus){
+  if(location.hash!=="#mannschaft")location.hash="#mannschaft";
+  requestAnimationFrame(()=>{
+   panel.scrollIntoView({block:"start",behavior:"smooth"});
+   $("team-search")?.focus({preventScroll:true});
+  });
+ }
 }
 function wireCards(container){
  container.querySelectorAll("[data-team-open]").forEach(b=>b.addEventListener("click",()=>selectTeam(b.dataset.teamOpen)));
  container.querySelectorAll("[data-team-toggle]").forEach(b=>b.addEventListener("click",()=>{
-  const id=b.dataset.teamToggle;
+  const id=b.dataset.teamToggle,old=follows.slice();
   if(follows.includes(id))follows=follows.filter(x=>x!==id);
-  else follows=normalizeFollows([...follows,id]);
-  const saved=saveFollows();renderFollowed();renderSearchResults();
-  if(!saved)showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");
+  else follows=normalizeFollows([id,...follows]);
+  if(!saveFollows()){follows=old;showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");}
+  else if(!old.includes(id))setTeamDiscover(false,false);
+  renderFollowed();renderSearchResults();
  }));
 }
 function renderClubDirectory(){
@@ -148,7 +184,7 @@ function renderDetail(){
 }
 async function selectTeam(id){
  if(!rows.some(row=>row.id===id))return;
- selectedId=id;activeTab="games";detail={games:[],table:[],error:false};
+ selectedId=id;setTeamDiscover(false,false);activeTab="games";detail={games:[],table:[],error:false};
  renderFollowed();renderSearchResults();renderDetail();
  const target=$("team-detail");target?.scrollIntoView({block:"start",behavior:"smooth"});
  const ticket=++detailsTicket;
@@ -192,6 +228,9 @@ async function load(){
 }
 function init(){
  if(initialized||!$("view-mannschaft"))return;initialized=true;readFollows();
+ $("team-add-open").addEventListener("click",()=>setTeamDiscover($("team-discover").hidden));
+ $("team-discover-close").addEventListener("click",()=>setTeamDiscover(false,false));
+ $("settings-teams-add").addEventListener("click",()=>setTeamDiscover(true));
  $("team-search").addEventListener("input",renderSearchResults);
  $("team-season").addEventListener("change",()=>{
   if(selectedId&&!rows.some(r=>r.id===selectedId&&r.season===season())){
