@@ -25,6 +25,7 @@ assert.equal(confirmedResult({status:"finished",home_score:null,away_score:null}
 assert.equal(officialTeamUrl("https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/clubTeams?club=10777").includes("club=10777"),true);
 assert.equal(officialTeamUrl("https://evil.example/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/clubTeams?club=10777"),"");
 assert.equal(officialTeamUrl("javascript:alert(1)"),"");
+assert.ok(officialTeamUrl("https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/groupMeetingReport?meeting=378760&championship=BWBV+26%2F27&group=40136"));
 const [html,css,script,sw,router,sql]=await Promise.all([
  "index.html","teams.css","teams.js","sw.js","router.js","database/team-league-public-directory-v95.sql"
 ].map(p=>readFile(p,"utf8")));
