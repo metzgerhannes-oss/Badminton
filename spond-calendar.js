@@ -166,6 +166,7 @@ var SchmetterlingeSpond=(function(){
   select.innerHTML=state.players.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join("");
   select.value=state.activeProfileId||state.players[0]?.id||"";
   $("spond-import-accept").disabled=!state.players.length;
+  if($("spond-source-dialog")?.open)$("spond-source-dialog").close();
   dlg.showModal();
  }
  function hashImport(){
@@ -179,18 +180,35 @@ var SchmetterlingeSpond=(function(){
  function mount(opts={}){
   if(typeof opts.getState==="function")getState=opts.getState;
   if(typeof opts.onChange==="function")onChange=opts.onChange;
+  const sourceDialog=$("spond-source-dialog");
+  const message=text=>{const p=$("spond-source-error");if(p)p.textContent=text;};
+  const fromClipboard=async()=>{
+   try{
+    if(!navigator.clipboard?.readText)throw Error("Zwischenablage auf diesem Gerät nicht verfügbar.");
+    const text=await navigator.clipboard.readText();
+    if(!text.trim())throw Error("Die Zwischenablage ist leer.");
+    preview(parseSource(text));
+    status("Kalenderdaten aus der Zwischenablage geprüft.");
+   }catch(error){
+    if(!sourceDialog?.open)sourceDialog?.showModal();
+    message("Noch keine passenden Termine gefunden. Nutze die iPhone-Anleitung oder die weiteren Importmöglichkeiten.");
+   }
+  };
+  $("spond-quick-import")?.addEventListener("click",()=>{message("");void fromClipboard()});
+  $("spond-read-clipboard")?.addEventListener("click",()=>{message("");void fromClipboard()});
+  $("spond-source-close")?.addEventListener("click",()=>sourceDialog?.close());
   $("spond-ics-file")?.addEventListener("change",async e=>{
    const file=e.target.files?.[0];if(!file)return;
    try{
     if(file.size>MAX_FILE)throw Error("Datei zu groß (maximal 512 KB).");
     preview(parseSource(await file.text()));status("Kalenderdatei geprüft.");
-   }catch(err){status(err.message)}
+   }catch(err){message(err.message);status(err.message)}
    e.target.value="";
   });
   $("spond-paste-form")?.addEventListener("submit",e=>{
    e.preventDefault();
    try{preview(parseSource($("spond-paste-data").value));status("Kalenderdaten geprüft.")}
-   catch(err){status(err.message)}
+   catch(err){message(err.message);status(err.message)}
   });
   $("spond-import-accept")?.addEventListener("click",()=>{
    try{

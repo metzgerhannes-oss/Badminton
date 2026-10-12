@@ -248,3 +248,24 @@
 .spond-preview-event span{display:grid;gap:.2rem;min-width:0}
 .spond-preview-event strong{color:var(--text,#24384b);font-size:.9rem}
 .spond-preview-event small{font-size:.78rem}
+
+/* v100 · reduced Spond entry: no import forms on the main tournament page */
+.spond-panel{padding:14px 16px;margin-top:16px}
+.spond-simple-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.spond-simple-head>div{flex:1;min-width:150px}
+.spond-simple-head h3{margin:0 0 3px;font-size:18px}
+.spond-simple-head .settings-hint{margin:0;font-size:13px}
+.spond-simple-head .primary-button{flex:none;min-height:44px;white-space:nowrap;font-size:14px}
+.spond-panel .spond-events{margin:10px 0 0}
+.spond-panel .spond-events:has(.settings-hint){margin:0}
+.spond-panel .spond-events>.settings-hint{margin:8px 0 0;font-size:12px}
+.spond-panel #spond-status:empty{display:none}
+.spond-source{width:min(90vw,480px);max-height:80dvh;overflow-y:auto;padding:20px}
+.spond-source-top{display:flex;justify-content:space-between;align-items:start;gap:8px}
+.spond-source-top h2{font-size:20px;line-height:1.2;margin:0 0 10px}
+.spond-source .primary-button{min-height:46px;width:100%;margin:8px 0}
+.spond-source .spond-import-details{margin:18px 0 12px}
+.spond-source .spond-import-details summary{font-size:14px}
+.spond-source p{line-height:1.5}
+.spond-source .spond-guide-link{font-size:13px;font-weight:700}
+@media(max-width:440px){.spond-simple-head{align-items:stretch}.spond-simple-head .primary-button{width:100%}}

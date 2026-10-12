@@ -3,12 +3,12 @@
 ## Was funktioniert
 Du hast Spond bereits mit dem iPhone-Kalender synchronisiert. Schmetterlinge kann **nicht direkt** auf die iPhone-Kalenderdaten zugreifen (Safari-/PWA-Datenschutzgrenze). Deshalb erfolgt die Übergabe bewusst über eine Kalenderdatei oder einen Apple-Kurzbefehl.
 
-- `Turniere → Meine gespeicherten Turniere → Spond-Kalender → Termine aus Spond importieren` öffnen.
-- Eine `.ics`-Datei aus dem Spond-Kalender wählen, **oder** vorbereitete Kalenderdaten aus einem Apple-Kurzbefehl einfügen.
+- In Schmetterlinge `Turniere → Spond-Turniere → Termine übernehmen` antippen. Wenn der Kalendertext bereits in der Zwischenablage ist, öffnet sich sofort die Vorschau. Sonst erscheint ein kurzes Fenster mit Anleitung und weiteren Importmöglichkeiten.
+- Einmalig einen iPhone-Kurzbefehl einrichten, der Termine aus dem von Spond genutzten Kalender in die Zwischenablage kopiert. Alternativ eine `.ics`-Datei oder vorbereitete Kalenderdaten über „Weitere Importmöglichkeiten“ verwenden.
 - Vorschau prüfen und einem eigenen Spieler zuordnen. Erst mit „Termine übernehmen“ wird lokal gespeichert.
 - Erneuter Import aktualisiert Termine mit gleicher Kalender-UID. Bereits importierte, danach in Spond gelöschte Termine müssen vorerst in Schmetterlinge einzeln entfernt werden.
 
-**Wichtig:** Kalenderdaten sind keine offizielle Meldung, Teilnahmebestätigung oder Matchbelege. Es erfolgt kein Upload nach Supabase, kein Spond-Login und keine öffentliche Veröffentlichung. Der private Kalenderimport wird separat auf dem verwendeten Gerät gespeichert und ist aktuell **nicht** Bestandteil der bestehenden Familiensicherung.
+**Wichtig:** Spond erstellt nach den derzeitigen Herstellerangaben Kalendertermine direkt in einem ausgewählten Telefon-/Onlinekalender und stellt hierfür keinen frei nutzbaren privaten API-Zugriff bereit. Eine iPhone-Web-App kann den iPhone-Kalender nicht selbst abfragen. Google-Kalender oder eine eigene native iOS-Anwendung wären gesondert zu prüfende Integrationen. Kalenderdaten sind keine offizielle Meldung, Teilnahmebestätigung oder Matchbelege. Es erfolgt kein Upload nach Supabase, kein Spond-Login und keine öffentliche Veröffentlichung. Der private Kalenderimport wird separat auf dem verwendeten Gerät gespeichert und ist aktuell **nicht** Bestandteil der bestehenden Familiensicherung.
 
 ## Apple-Kurzbefehl (ohne zusätzliche App / ohne API)
 1. Auf dem iPhone die App **Kurzbefehle** öffnen und einen neuen Kurzbefehl „Spond nach Schmetterlinge“ erstellen.
