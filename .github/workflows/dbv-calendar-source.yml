@@ -16,7 +16,9 @@ on:
     branches: [main]
     paths:
       - 'scripts/import-dbv-calendar.py'
+      - 'scripts/publish-dbv-calendar-oidc.py'
       - 'tests/test_dbv_calendar.py'
+      - 'tests/test_dbv_calendar_oidc.py'
       - '.github/workflows/dbv-calendar-source.yml'
 permissions:
   contents: read
