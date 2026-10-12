@@ -28,6 +28,14 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
    return route.fulfill({status:200,headers,body:JSON.stringify({
     access_token:"test.token.session",refresh_token:"test.refresh",expires_in:3600,user:{id:AUTH_USER}
    })});
+  // This positive two-device scenario simulates a prior independent guardian/club approval.
+  // A separate negative test proves that missing grants block the POST entirely.
+  if(url.pathname==="/rest/v1/player_publication_grants"){
+   const allowed=url.searchParams.get("user_id")==="eq."+AUTH_USER&&
+    url.searchParams.get("player_dbv_id")==="eq."+PLAYER;
+   return route.fulfill({status:200,headers,
+    body:JSON.stringify(allowed?[{player_dbv_id:PLAYER}]:[])});
+  }
   if(url.pathname==="/rest/v1/user_tournament_links"){
    if(method==="POST"){
     written=JSON.parse(request.postData()||"{}");

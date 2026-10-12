@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {communityPath,sharedItems,sharedRecord,sharePayload,sharedKey} from "../scripts/shared-tournaments.mjs";
+import {communityPath,sharedItems,sharedRecord,sharePayload,sharedKey,publicationGrantPath,hasPublicationGrant} from "../scripts/shared-tournaments.mjs";
 
 const player="05-070879",other="05-071969";
 assert.equal(communityPath("local-001"),null);
@@ -61,3 +61,31 @@ assert.match(projection,/REVOKE ALL ON SCHEMA private/);
 assert.match(db,/AS RESTRICTIVE FOR INSERT TO authenticated/);
 assert.doesNotMatch(db,/GRANT INSERT[^;]*TO anon/);
 console.log("v88 shared tournaments: validated links, opt-in, private-profile isolation, publisher ownership, safe follower read.");
+
+const accountId="2980046b-abd4-4056-b275-090a7364c4ac";
+const verifiedPath=publicationGrantPath(accountId,player);
+assert.ok(verifiedPath?.startsWith("player_publication_grants?"));
+const grantUrl=new URL("https://example.test/rest/v1/"+verifiedPath);
+assert.equal(grantUrl.searchParams.get("user_id"),"eq."+accountId);
+assert.equal(grantUrl.searchParams.get("player_dbv_id"),"eq."+player);
+assert.equal(grantUrl.searchParams.get("verified_at"),"not.is.null");
+assert.equal(grantUrl.searchParams.get("revoked_at"),"is.null");
+assert.equal(publicationGrantPath("invalid",player),null);
+assert.equal(publicationGrantPath(accountId,"invalid"),null);
+assert.equal(hasPublicationGrant([],player),false);
+assert.equal(hasPublicationGrant([{player_dbv_id:other}],player),false);
+assert.equal(hasPublicationGrant([{player_dbv_id:player}],player),true);
+const [grantSql,frontend]=await Promise.all([
+ readFile("database/verified-player-publication-v90.sql","utf8"),
+ readFile("shared-tournaments.js","utf8")
+]);
+assert.match(grantSql,/CREATE TABLE IF NOT EXISTS public\.player_publication_grants/);
+assert.match(grantSql,/REVOKE ALL ON public\.player_publication_grants FROM PUBLIC, anon, authenticated/);
+assert.match(grantSql,/AS RESTRICTIVE\s+FOR INSERT TO authenticated/);
+assert.match(grantSql,/AS RESTRICTIVE\s+FOR UPDATE TO authenticated/);
+assert.match(grantSql,/g\.user_id = \(SELECT auth\.uid\(\)\)/);
+assert.match(grantSql,/g\.revoked_at IS NULL/);
+assert.match(grantSql,/AFTER INSERT OR UPDATE OR DELETE ON public\.player_publication_grants/);
+assert.match(frontend,/hasPublicationGrant\(grants,bookmark.playerId\)/);
+assert.match(frontend,/noch keine geprüfte Veröffentlichungsberechtigung/);
+console.log("v90: verified per-player publisher authorization is required, denied sessions cannot post.");

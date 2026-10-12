@@ -2,7 +2,7 @@
  * anonymous Auth account with owner-only RLS. Never sync private family data.
  * Results are user reports, NOT official DBV registrations or matches. */
 import {readPublicRows,SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
-import {DBV_ID,communityPath,sharedItems,sharePayload,sharedKey} from "./scripts/shared-tournaments.mjs";
+import {DBV_ID,communityPath,sharedItems,sharePayload,sharedKey,publicationGrantPath,hasPublicationGrant} from "./scripts/shared-tournaments.mjs";
 
 const authRoot=SUPABASE_ROOT.replace(/rest\/v1\/$/,"auth/v1/");
 const KEY="schmetterlinge.communitySession.v1";
@@ -35,7 +35,7 @@ async function getSession(create=false){
   }catch{current=null;localStorage.removeItem(KEY)}
  }
  if(!create)return null;
- // GoTrue anonymous sign-up; no generated password, email, or private child data.
+ // A device-bound account is NOT a verified player manager. Publication additionally needs an approved grant.
  const res=await fetch(authRoot+"signup",{method:"POST",
   headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
   body:JSON.stringify({data:{},gotrue_meta_security:{}})});
@@ -49,6 +49,20 @@ async function getSession(create=false){
 async function publish(bookmark){
  const session=await getSession(true);
  const item=sharePayload(bookmark,session.user_id);
+ // The public DBV directory does NOT prove this account can manage that player.
+ // Check the independently approved grant before attempting any public write.
+ const grantUrl=publicationGrantPath(session.user_id,bookmark.playerId);
+ if(!grantUrl)throw Error("Die Spieler- oder Gerätekennung ist ungültig.");
+ const grantResponse=await fetch(SUPABASE_ROOT+grantUrl,{
+  method:"GET",headers:headers(session.access_token),cache:"no-store"
+ });
+ const grants=await asJson(grantResponse);
+ if(!hasPublicationGrant(grants,bookmark.playerId)){
+  setFlag(sharedKey(bookmark),false);
+  throw Error("Für dieses Spielerprofil liegt noch keine geprüfte Veröffentlichungsberechtigung vor. "+
+   "Bitte die Gerätekennung "+session.user_id+" zusammen mit der Spieler-ID "+bookmark.playerId+
+   " dem Betreiber auf privatem Weg für eine Prüfung mitteilen. Das Turnier bleibt lokal gespeichert.");
+ }
  const conflict="user_id,player_dbv_id,external_tournament_id";
  const res=await fetch(SUPABASE_ROOT+"user_tournament_links?on_conflict="+encodeURIComponent(conflict),{
   method:"POST",headers:{...headers(session.access_token),Prefer:"resolution=merge-duplicates,return=minimal"},

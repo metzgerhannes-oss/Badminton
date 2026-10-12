@@ -47,3 +47,20 @@ export function sharePayload(bookmark,userId){
   is_shared:true,shared_at:new Date().toISOString()};
 }
 export function sharedKey(item){return item.playerId+"|"+item.id;}
+
+/** Authorization is checked by Supabase RLS as well; this GET only provides a clear UX. */
+export function publicationGrantPath(userId,playerId){
+ if(!UUID.test(String(userId||""))||!DBV_ID.test(String(playerId||"")))return null;
+ const query=new URLSearchParams({
+  select:"player_dbv_id",
+  user_id:"eq."+userId,
+  player_dbv_id:"eq."+playerId,
+  verified_at:"not.is.null",
+  revoked_at:"is.null",
+  limit:"1"
+ });
+ return "player_publication_grants?"+query.toString();
+}
+export function hasPublicationGrant(rows,playerId){
+ return DBV_ID.test(playerId)&&Array.isArray(rows)&&rows.some(row=>row?.player_dbv_id===playerId);
+}
