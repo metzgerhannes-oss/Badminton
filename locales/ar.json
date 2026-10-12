@@ -95,7 +95,6 @@
     "DEIN PERSÖNLICHER START": "بدايتك الشخصية",
     "Willkommen bei den": "مرحبًا بك في",
     "Schmetterlingen.": "Schmetterlinge.",
-    "Wessen Badminton möchtest du verfolgen?": "أي لاعب بادمنتون تريد متابعته؟",
     "1 · Spielerprofil": "١ · ملف اللاعب",
     "2 · Zum Home-Bildschirm": "٢ · إضافة إلى الشاشة الرئيسية",
     "Diesen Spieler übernehmen": "اختيار هذا اللاعب",
@@ -113,6 +112,7 @@
     "Vereinslogo (PNG, JPG oder WebP, maximal 2 MB)": "شعار النادي (PNG أو JPG أو WebP، بحد أقصى 2 ميغابايت)",
     "Mindestens zwei Zeichen eingeben, um Spieler zu finden.": "أدخل حرفين على الأقل للبحث عن لاعبين.",
     "1. Schritt Profil anlegen": "الخطوة 1: إنشاء ملف شخصي",
-    "2. Schritt App hinzufügen": "الخطوة 2: إضافة التطبيق"
+    "2. Schritt App hinzufügen": "الخطوة 2: إضافة التطبيق",
+    "Für wen möchtest du ein Profil anlegen?": "لمن تريد إنشاء ملف شخصي؟"
   }
 }
