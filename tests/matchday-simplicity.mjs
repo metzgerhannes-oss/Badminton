@@ -22,6 +22,8 @@ assert.match(event,/sourceId=eventId\(chosen\?\.url\)/,"External source link mus
 assert.match(css,/data-matchday-mode="mine".*live-tournament-follow/);
 assert.match(css,/data-matchday-mode="all".*live-dbv/);
 assert.match(css,/data-current-view="turniere".*live-tournament-follow/);
+assert.match(css,/\.bottom-nav\.has-live-tab a\{width:calc\(100% \/ 6\)!important;flex:1 1 calc\(100% \/ 6\);min-width:0\}/,
+ "Six navigation slots must fit within a narrow iPhone viewport");
 assert.match(sw,/matchday-view\.js/);
 const events={},attributes={},calls=[];
 const buttons=["mine","all"].map(mode=>({

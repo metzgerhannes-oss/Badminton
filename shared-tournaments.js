@@ -17,7 +17,7 @@ function notify(message){for(const id of ["community-save-status","community-syn
  window.dispatchEvent(new CustomEvent("badminton:community-feedback",{detail:{message}}));}
 function headers(token){return {apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"}}
 async function asJson(res){const text=await res.text();let data;try{data=JSON.parse(text)}catch{data={}};if(!res.ok)throw Error(data.msg||data.error_description||data.message||"HTTP "+res.status);return data}
-async function getSession(create=false){
+async function getSession(){
  let current=read(KEY,null);
  if(current?.access_token&&current.expires_at>Date.now()+60000)return current;
  if(current?.refresh_token){
@@ -34,20 +34,17 @@ async function getSession(create=false){
    return current;
   }catch{current=null;localStorage.removeItem(KEY)}
  }
- if(!create)return null;
- // A device-bound account is NOT a verified player manager. Publication additionally needs an approved grant.
- const res=await fetch(authRoot+"signup",{method:"POST",
-  headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
-  body:JSON.stringify({data:{},gotrue_meta_security:{}})});
- const data=await asJson(res);
- if(!data.access_token||!data.refresh_token||!data.user?.id)throw Error("Anonyme Anmeldung ist für diese Datenbank nicht freigeschaltet.");
- current={access_token:data.access_token,refresh_token:data.refresh_token,
-  expires_at:Date.now()+Number(data.expires_in||0)*1000,user_id:data.user.id};
- localStorage.setItem(KEY,JSON.stringify(current));
- return current;
+ // Do not create a new anonymous Auth account merely to attempt a public
+ // player announcement. New accounts never have independently approved grants.
+ return null;
 }
 async function publish(bookmark){
- const session=await getSession(true);
+ const session=await getSession();
+ if(!session){
+  setFlag(sharedKey(bookmark),false);
+  throw Error("Öffentliche Meldung nur mit bereits geprüftem Verwalterzugang möglich. "+
+   "Das Turnier bleibt privat auf deinem Gerät.");
+ }
  const item=sharePayload(bookmark,session.user_id);
  // The public DBV directory does NOT prove this account can manage that player.
  // Check the independently approved grant before attempting any public write.
@@ -74,7 +71,7 @@ async function publish(bookmark){
 async function revoke(bookmark){
  const key=sharedKey(bookmark);
  if(!getFlags()[key])return;
- const session=await getSession(false);
+ const session=await getSession();
  if(!session)throw Error("Die alte Geräteanmeldung für diese Freigabe fehlt. Ein erneuter Zugang ist zum Widerruf nötig.");
  const q=new URLSearchParams({user_id:"eq."+session.user_id,player_dbv_id:"eq."+bookmark.playerId,
   external_tournament_id:"eq."+bookmark.id});

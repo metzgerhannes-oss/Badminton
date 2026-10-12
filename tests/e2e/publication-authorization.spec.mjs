@@ -17,6 +17,24 @@ test.beforeEach(async ({page})=>{
  },{dbv:DBV,user:USER});
 });
 
+test("guest trying public share never signs up and preserves local-only result",async ({page})=>{
+ let signups=0,grantReads=0,publicWrites=0;
+ await page.route("**/auth/v1/signup",route=>{signups++;return route.fulfill({status:429,body:"{}"});});
+ await page.route("**/rest/v1/player_publication_grants?*",route=>{grantReads++;return route.fulfill({status:200,body:"[]"});});
+ await page.route("**/rest/v1/user_tournament_links?*",route=>{publicWrites++;return route.fulfill({status:201,body:"{}"});});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>localStorage.removeItem("schmetterlinge.communitySession.v1"));
+ await page.evaluate(bookmark=>window.dispatchEvent(
+  new CustomEvent("badminton:share-tournament",{detail:{bookmark,publicShare:true}})
+ ),BOOKMARK);
+ await expect(page.locator("#community-sync-status")).toContainText("bereits geprüftem Verwalterzugang");
+ expect(signups).toBe(0);
+ expect(grantReads).toBe(0);
+ expect(publicWrites).toBe(0);
+ const state=await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
+ expect(state).toBeNull();
+});
+
 test("unverified session cannot send a public tournament hint",async ({page})=>{
  let inserts=0,grantChecks=0;
  await page.route("**/rest/v1/player_publication_grants?*",route=>{

@@ -45,7 +45,8 @@ assert.match(sw,/"\.\/shared-tournaments\.js"/);
 assert.match(sw,/"\.\/scripts\/shared-tournaments\.mjs"/);
 assert.match(app,/badminton:share-tournament/);
 assert.match(js,/auth\/v1\//);
-assert.match(js,/gotrue_meta_security/);
+assert.doesNotMatch(js,/gotrue_meta_security|authRoot\\+"signup"/,
+ "Public sharing must not create anonymous Auth accounts without an approved grant");
 assert.match(js,/bearer|Bearer/);
 assert.match(js,/Deine Follower können es sehen/);
 assert.match(js,/Nutzerhinweis \(unbestätigt\)/);

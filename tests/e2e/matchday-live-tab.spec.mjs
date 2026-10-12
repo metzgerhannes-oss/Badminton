@@ -4,6 +4,22 @@ const PLAYER="05-070879";
 const FRIEND="05-061350";
 const TOURNAMENT_ID="E24DC6EE-152A-454D-B00C-E625B751D7D5";
 const KEY="shuttleboard-v1";
+async function assertNoHorizontalOverflow(page){
+ const report=await page.evaluate(()=>{
+  const width=window.innerWidth;
+  const rect=el=>{const r=el.getBoundingClientRect();return {left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width)};};
+  const offenders=[...document.querySelectorAll("body *")].filter(el=>{
+   const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+   return r.width>0&&r.right>width+2&&style.display!=="none";
+  }).slice(0,25).map(el=>({tag:el.tagName.toLowerCase(),id:el.id,cls:String(el.className||"").slice(0,90),position:getComputedStyle(el).position,...rect(el)}));
+  const samples=[".bottom-nav",".app",".topbar","#view-turniere",".dbv-calendar-panel",
+   ".dbv-calendar-filters","#dbv-calendar-results","#badhub-event-panel"]
+   .map(selector=>{const el=document.querySelector(selector);return el?{selector,...rect(el),scroll:el.scrollWidth}:null;}).filter(Boolean);
+  return {overflow:document.documentElement.scrollWidth-width,viewport:{inner:width,client:document.documentElement.clientWidth,
+   html:rect(document.documentElement),body:rect(document.body),visual:window.visualViewport?.width},offenders,samples};
+ });
+ expect(report.overflow,JSON.stringify(report)).toBeLessThanOrEqual(2);
+}
 const today=()=>Object.fromEntries(
   new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"})
     .formatToParts(new Date()).map(p=>[p.type,p.value])
@@ -114,8 +130,7 @@ test("Tournament-wide browser shows only sourced matches and supports fields and
  await page.locator("#tournament-court-filter").selectOption("2");
  await expect(page.locator(".event-match-card")).toHaveCount(1);
  await expect(page.locator(".event-match-card")).toContainText("JE U11");
- const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
- expect(overflow).toBeLessThanOrEqual(2);
+ await assertNoHorizontalOverflow(page);
  await expect(page.locator('#live-tournament-links a').first()).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+TOURNAMENT_ID);
 });
 test("DBV event is immediately available; extra Badhub source stays optional",async ({page})=>{
@@ -208,8 +223,7 @@ test("Verified player snapshots produce real multi-player LIVE cards without cla
  await expect(page.locator(".followed-live-card").nth(1)).toContainText("Verfolgter Spieler");
  await expect(page.locator(".followed-live-card").nth(1)).toContainText("Noch ein Spiel davor");
  await expect(page.locator(".followed-live-note")).toContainText("Nicht sämtliche Spiele");
- const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
- expect(overflow).toBeLessThanOrEqual(2);
+ await assertNoHorizontalOverflow(page);
  await page.locator(".followed-live-card").nth(1).getByRole("button",{name:"Meine Spiele ansehen"}).click();
  await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
  await expect(page.locator("#live-player-select")).toHaveValue(FRIEND);
@@ -263,8 +277,7 @@ test("Real Badhub event results from verified Worker display winning doubles and
  await expect(page.locator(".badhub-match-card .badhub-winner")).toContainText("Fahed Islam");
  await expect(page.locator("#badhub-event-source")).toHaveAttribute("href",provider);
  await expect(page.locator("#badhub-event-note")).toContainText("Kein offizieller DBV-Livefeed");
- const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
- expect(overflow).toBeLessThanOrEqual(2);
+ await assertNoHorizontalOverflow(page);
  await page.reload({waitUntil:"domcontentloaded"});
  await page.locator('[data-matchday-view="all"]').click();
  await expect(page.locator("#badhub-event-form")).toBeHidden();

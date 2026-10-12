@@ -38,7 +38,9 @@
 
 /* v79: fifth LIVE destination is only shown on a confirmed tournament day. */
 .bottom-nav a[hidden]{display:none!important}
-.bottom-nav.has-live-tab a{width:20%!important;flex:1 1 20%}
+/* Six slots: five main pages plus the LIVE tab. Five widths at 20% plus LIVE
+   previously exceeded a 320px phone viewport by 75px in WebKit. */
+.bottom-nav.has-live-tab a{width:calc(100% / 6)!important;flex:1 1 calc(100% / 6);min-width:0}
 .bottom-nav.has-live-tab .live-nav-tab{color:#ac1743;background:#fff2f5;border:1px solid #f1b9c8;border-radius:12px}
 .bottom-nav.has-live-tab .live-nav-tab[aria-current="page"]{color:#fff;background:#b91f4d;border-color:#9f123b}
 .bottom-nav.has-live-tab .live-nav-tab .nav-icon{stroke-width:2.1}
@@ -276,8 +278,8 @@
 .dbv-calendar-panel .section-heading h3{font-size:20px;line-height:1.2;margin:0}
 .dbv-calendar-panel>.settings-hint{margin:7px 0 12px;font-size:13px;line-height:1.5}
 .dbv-calendar-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
-.dbv-calendar-filters label{display:grid;gap:4px;font-size:12px;font-weight:700;color:#29465d;min-width:0}
-.dbv-calendar-filters select,.dbv-calendar-filters input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #c7d8e5;background:#f8fbfd;color:#18364e;padding:10px 8px;border-radius:10px;font:inherit;font-size:13px;min-height:44px}
+.dbv-calendar-filters label{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;font-size:12px;font-weight:700;color:#29465d;min-width:0;max-width:100%}
+.dbv-calendar-filters select,.dbv-calendar-filters input{width:100%;max-width:100%;min-width:0;min-inline-size:0;box-sizing:border-box;border:1px solid #c7d8e5;background:#f8fbfd;color:#18364e;padding:10px 8px;border-radius:10px;font:inherit;font-size:13px;min-height:44px}
 .dbv-calendar-cluster{margin:12px 0;border-top:1px solid #e2eaf0}
 .dbv-calendar-cluster h4{font-size:16px;margin:14px 0 8px;color:#173d59}
 .dbv-calendar-cluster h4 small{font-size:12px;font-weight:600;color:#698093;margin-left:5px}
@@ -296,6 +298,21 @@
 .dbv-calendar-panel>.dbv-calendar-source{font-size:12px;margin-top:17px}
 @media(max-width:650px){.dbv-calendar-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.dbv-calendar-filters .dbv-calendar-search{grid-column:1/-1}}
 @media(max-width:390px){.dbv-calendar-panel{padding:12px}.dbv-calendar-entry{grid-template-columns:84px minmax(0,1fr);gap:8px}.dbv-calendar-detail h5{font-size:14px}}
+/* Very narrow iPhones cannot reliably fit two native WebKit select controls:
+   use one full-width field per row, including the long regional picker. */
+@media(max-width:350px){
+ .dbv-calendar-filters{grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+ .dbv-calendar-filters .dbv-calendar-search{grid-column:auto}
+ .dbv-calendar-filters label{display:block;min-width:0;max-width:100%}
+ .dbv-calendar-filters select,.dbv-calendar-filters input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;text-overflow:ellipsis}
+}
+/* Avoid 320px WebKit horizontal scroll: calendar heading and action wrap within the panel. */
+@media(max-width:390px){
+ .dbv-calendar-panel>.section-heading{flex-wrap:wrap;justify-content:flex-start;gap:8px}
+ .dbv-calendar-panel>.section-heading h3{flex:1 1 100%;min-width:0;overflow-wrap:anywhere}
+ .dbv-calendar-panel>#dbv-calendar-status{overflow-wrap:anywhere}
+ .dbv-calendar-panel .dbv-calendar-source{overflow-wrap:anywhere}
+}
 
 /* DBV calendar quick-save: touch friendly without competing with the title. */
 .dbv-calendar-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;min-width:0}
