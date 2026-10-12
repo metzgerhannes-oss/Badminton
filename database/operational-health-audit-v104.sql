@@ -20,6 +20,15 @@ SELECT
  (SELECT count(*) FROM public.dbv_calendar_entries) AS calendar_entries,
  (SELECT max(last_seen_at) FROM public.dbv_calendar_entries) AS calendar_last_seen_at,
  (SELECT count(*) FROM public.player_external_match_imports) AS history_requests,
+ (SELECT count(*) FROM private.external_match_attempts
+   WHERE attempted_at >= now()-interval '24 hours') AS history_import_attempts_24h,
+ (SELECT count(*) FROM private.external_match_attempts
+   WHERE attempted_at >= now()-interval '1 hour') AS history_import_attempts_1h,
+ (SELECT coalesce(max(per_player),0) FROM (
+   SELECT count(*) AS per_player FROM private.external_match_attempts
+   WHERE attempted_at >= now()-interval '24 hours'
+   GROUP BY dbv_id
+ ) AS aggregate_only) AS maximum_single_player_attempts_24h,
  (SELECT count(*) FROM public.player_external_match_imports WHERE status='error') AS history_errors,
  (SELECT count(*) FROM public.player_external_match_imports
    WHERE status='loading' AND lease_until < now()) AS expired_history_leases,
