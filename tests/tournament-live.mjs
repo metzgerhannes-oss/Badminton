@@ -66,4 +66,6 @@ assert.match(js,/window\.badmintonMatchdayMode==="all"/);
 assert.match(html,/data-matchday-view="mine"/);
 assert.match(html,/data-matchday-view="all"/);
 assert.match(sw,/scripts\/tournament-live\.mjs/);
+assert.match(js,/selected=e\.currentTarget\.value;items=\[\];status="all";court="all";loadedAt=0;choose\(\);refresh\(\);/,
+ "Official DBV link updates immediately on tournament selection even outside LIVE");
 console.log("Tournament live: URL provenance, read-only bounded queries, correct sets, stale-score guard, filtering and UI wiring.");
