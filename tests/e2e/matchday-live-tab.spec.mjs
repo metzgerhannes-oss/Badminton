@@ -118,6 +118,32 @@ test("Tournament-wide browser shows only sourced matches and supports fields and
  expect(overflow).toBeLessThanOrEqual(2);
  await expect(page.locator('#live-tournament-links a').first()).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+TOURNAMENT_ID);
 });
+test("DBV event is immediately available; extra Badhub source stays optional",async ({page})=>{
+ const eventRequests=[];
+ page.on("request",request=>{
+  if(request.url().includes("schmetterlinge-event-feed")&&request.url().includes("/v1/event"))
+   eventRequests.push(request.url());
+ });
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#tournament-live-select")).toHaveValue(TOURNAMENT_ID);
+ await expect(page.locator('#live-tournament-links a')).toHaveAttribute("href",
+  "https://dbv.turnier.de/tournament/"+TOURNAMENT_ID);
+ await expect(page.locator("#badhub-event-panel")).toBeVisible();
+ await expect(page.locator("#badhub-event-form")).toBeHidden();
+ expect(eventRequests).toHaveLength(0);
+ await page.locator("#badhub-event-panel > summary").click();
+ await expect(page.locator("#badhub-event-results")).toContainText("keine eindeutig zugeordnete Badhub-Quelle");
+ await expect(page.locator("#badhub-event-form")).toBeHidden();
+ await page.locator("#badhub-event-manual > summary").click();
+ await expect(page.locator("#badhub-event-form")).toBeVisible();
+ await expect(page.locator('#live-tournament-links a')).toHaveAttribute("href",
+  "https://dbv.turnier.de/tournament/"+TOURNAMENT_ID);
+ expect(eventRequests).toHaveLength(0);
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+ expect(overflow).toBeLessThanOrEqual(2);
+});
+
 test("No verified import is never presented as an empty official tournament",async ({page})=>{
  await page.goto("/#live",{waitUntil:"domcontentloaded"});
  await expect(page.locator(".live-tournament-follow")).toBeHidden();
