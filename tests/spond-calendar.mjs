@@ -31,6 +31,8 @@ const ics=[
 ].join("\r\n");
 const rows=api.parseSource(ics);
 assert.equal(rows.length,2);
+assert.equal(api.looksLikeTournament(rows[0].name),true);
+assert.equal(api.looksLikeTournament(rows[1].name),false);
 assert.equal(rows[0].endDate,"2026-10-25","all-day DTEND is exclusive");
 assert.equal(rows[0].location,"Sporthalle, Reutlingen");
 assert.equal(rows[1].startDate,"2026-10-25");
