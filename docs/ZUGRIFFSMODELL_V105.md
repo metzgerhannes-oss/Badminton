@@ -18,7 +18,7 @@ Die DBV-Spieler-ID weist nur auf eine öffentliche Sportidentität hin. Sie bewe
 - Öffentliche Lesefunktionen ohne Login und lokale Profile, Freunde, Favoriten ohne Cloud-Pflicht.
 - Bisherige Veröffentlichung mit ausdrücklichem Häkchen und v90-Grant bleibt unverändert abgesichert.
 - **v105 nur Nutzertext:** Das Häkchen wird ausdrücklich als **öffentliche** Meldung bezeichnet; ohne Häkchen bleibt das eigene Turnier lokal. Das Frontend fordert keine manuelle Account-Anlage an.
-- Die Auth-Sitzung wird nicht auf dem Willkommensbildschirm oder beim App-Start erzeugt. Der öffentliche Veröffentlichungsversuch löst sie ggf. erst durch `getSession(true)` aus.
+- Die Auth-Sitzung wird nicht auf dem Willkommensbildschirm oder beim App-Start erzeugt. Seit v107 fordert auch ein öffentlicher Veröffentlichungsversuch nur eine **bereits bestehende Sitzung** über `getSession(false)` an. Ein neues anonymes Konto wird nicht für voraussichtlich unberechtigte öffentliche Meldungen erzeugt. Der Versuch bleibt lokal.
 - V105 stellt **noch keinen** privaten Einladungslink und keine freiwillige persistente Kontosicherung bereit; entsprechende Buttons oder Zusagen dürfen nicht erscheinen.
 
 ## Reihenfolge der noch offenen Umsetzung
