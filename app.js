@@ -278,13 +278,14 @@ let lastNotifiedProfile="",lastNotifiedClub="";
 function render(){
  renderFocusHeader();
  renderTournaments();
+ SchmetterlingeSpond.render(state);
  window.dispatchEvent(new CustomEvent("badminton:tournament-bookmarks"));
  renderProfiles();
  renderFriends();
  renderFriendQuick();
  state.chosen=state.viewingFriendId||state.activeProfileId;
  const viewedProfiles=[...state.players,...state.friends];
- window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:state.officialLinks,{mode:state.viewingFriendId?"friend":"own"});
+ window.renderDashboard?.(state.chosen,viewedProfiles,state.viewingFriendId?[]:[...state.officialLinks,...SchmetterlingeSpond.dashboardItems(state.chosen,state.officialLinks)],{mode:state.viewingFriendId?"friend":"own"});
  window.renderHistory?.(state.chosen,viewedProfiles,{mode:state.viewingFriendId?"friend":"own"});
  // Read-only live viewer follows whichever public DBV profile is currently shown.
  window.badmintonActivePlayerId=state.chosen;
@@ -331,6 +332,7 @@ function setup(){
  let freshDevice=false;
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();
+ SchmetterlingeSpond.mount({getState:()=>state,onChange:render});
  state.page=(location.hash||"#start").slice(1);
  // Native anchor routing alone retains the viewed friend's profile. Home must reset it,
  // including a second tap while #start is already the active hash.
