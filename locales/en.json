@@ -95,7 +95,6 @@
     "DEIN PERSÖNLICHER START": "YOUR PERSONAL START",
     "Willkommen bei den": "Welcome to the",
     "Schmetterlingen.": "Schmetterlinge.",
-    "Wessen Badminton möchtest du verfolgen?": "Whose badminton journey would you like to follow?",
     "1 · Spielerprofil": "1 · Player profile",
     "2 · Zum Home-Bildschirm": "2 · Add to Home Screen",
     "Diesen Spieler übernehmen": "Select this player",
@@ -113,6 +112,7 @@
     "Vereinslogo (PNG, JPG oder WebP, maximal 2 MB)": "Club logo (PNG, JPG or WebP, max. 2 MB)",
     "Mindestens zwei Zeichen eingeben, um Spieler zu finden.": "Enter at least two characters to find players.",
     "1. Schritt Profil anlegen": "Step 1: Create a profile",
-    "2. Schritt App hinzufügen": "Step 2: Add the app"
+    "2. Schritt App hinzufügen": "Step 2: Add the app",
+    "Für wen möchtest du ein Profil anlegen?": "Who would you like to create a profile for?"
   }
 }
