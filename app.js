@@ -112,20 +112,43 @@ function renderProfiles(){
  el("current-account-label").textContent="Aktives Startprofil: "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"noch keines");
 }
 function renderFriendQuick(){
- const root=el("dashboard-friends"); if(!root)return;
- // Keep just one contextual action for the Home friends section.
+ const root=el("dashboard-friends");if(!root)return;
  const manage=el("dashboard-friends-manage");
  if(manage)manage.hidden=!state.friends.length;
  if(!state.friends.length){
   root.innerHTML='<a class="friend-quick-add" href="#spieler"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Spieler suchen und folgen</span><span aria-hidden="true">↗</span></a>';
   return;
  }
+ // Home is a quick overview, not a second complete friend-management screen.
+ // Never hide friends off-screen in a horizontal strip; keep at most four
+ // visible shortcuts, plus one explicit route to the full player list.
  const own=state.players.find(p=>p.id===state.activeProfileId);
- const links=(state.viewingFriendId&&own?[{...own,isOwn:true}]:[]).concat(state.friends.map(p=>({...p,isOwn:false})));
- root.innerHTML=links.map(p=>'<button type="button" class="friend-quick '+(state.viewingFriendId===p.id?'is-current':'')+'" data-friend-quick="'+esc(p.id)+'" data-is-own="'+(p.isOwn?'true':'false')+'" aria-label="'+esc(p.isOwn?'Zurück zu meinem Startprofil '+p.name:'KPIs von '+p.name)+'"><span class="friend-quick-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-quick-name">'+esc(p.isOwn?'Zu mir':p.name.split(" ")[0])+'</span></button>').join("");
- root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
-  if(b.dataset.isOwn==="true"){navigateHome();return;}
-  window.badmintonSelectViewer(b.dataset.friendQuick);
+ const includeOwn=Boolean(state.viewingFriendId&&own);
+ const slots=includeOwn?3:4;
+ const visibleFriends=state.friends.slice(0,slots);
+ // While viewing a followed player's statistics, keep that player visible
+ // even when the player is outside the first preview slots.
+ if(state.viewingFriendId&&!visibleFriends.some(p=>p.id===state.viewingFriendId)){
+  const selected=state.friends.find(p=>p.id===state.viewingFriendId);
+  if(selected&&visibleFriends.length)visibleFriends[visibleFriends.length-1]=selected;
+ }
+ const links=(includeOwn?[{...own,isOwn:true}]:[])
+  .concat(visibleFriends.map(p=>({...p,isOwn:false})));
+ const remaining=state.friends.length-visibleFriends.length;
+ root.innerHTML=links.map(p=>
+  '<button type="button" class="friend-quick'+(state.viewingFriendId===p.id?' is-current':'')+
+  '" data-friend-quick="'+esc(p.id)+'" data-is-own="'+(p.isOwn?'true':'false')+
+  '" aria-label="'+esc(p.isOwn?'Zu meinem Startprofil zurückkehren':'KPIs von '+p.name+' ansehen')+
+  '" title="'+esc(p.name)+'"'+(state.viewingFriendId===p.id?' aria-current="true"':'')+'>'+
+  '<span class="friend-quick-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>'+
+  '<span class="friend-quick-name">'+esc(p.isOwn?'Zu mir':p.name.trim().split(/\s+/)[0])+'</span></button>'
+ ).join("")+(remaining>0?
+  '<a class="friend-quick-more" href="#spieler" aria-label="'+remaining+' weitere Freunde ansehen">'+
+   '<span class="friend-quick-avatar friend-quick-more-icon" aria-hidden="true">···</span>'+
+   '<span class="friend-quick-name">+'+remaining+' weitere</span></a>':"");
+ root.querySelectorAll("[data-friend-quick]").forEach(button=>button.addEventListener("click",()=>{
+  if(button.dataset.isOwn==="true"){navigateHome();return;}
+  window.badmintonSelectViewer(button.dataset.friendQuick);
  }));
 }
 function renderFriends(){
