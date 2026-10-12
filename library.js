@@ -8,19 +8,34 @@ const safePattern=x=>String(x||"").trim().replace(/[*,().%:"\\]/g," ").slice(0,8
 async function dbGet(path){
  return readPublicRows(path);
 }
-function dbPath(offset){
+// Player records use the DBV abbreviation (e.g. "SpVgg. Mössingen"),
+// while the clubs directory contains the official full name.
+// Resolve the club relation instead of comparing these different labels.
+const safeClubPattern=x=>String(x||"").trim().replace(/[*,()%:"\\\\]/g," ").slice(0,85);
+async function dbClubIds(){
+ const term=safeClubPattern($("library-club")?.value);
+ if(!term)return [];
+ const qs=new URLSearchParams({select:"id",name:"ilike.*"+term+"*",limit:"100"});
+ const {rows}=await dbGet("clubs?"+qs);
+ return [...new Set(rows.map(row=>String(row.id||"")).filter(id=>/^[a-zA-Z0-9_-]{1,90}$/.test(id)))];
+}
+function dbPath(offset,clubIds=[]){
  const qs=new URLSearchParams({select:"dbv_id,name,birth_year,age_class,club,association,last_ranking_week",
   order:"club.asc.nullslast,name.asc,dbv_id.asc",limit:"40",offset:String(offset)});
  const age=$("library-age")?.value||"all",association=$("library-association")?.value||"all";
  const term=safePattern($("library-search")?.value),club=safePattern($("library-club")?.value);
  if(age!=="all")qs.set("age_class","eq."+age);
  if(association!=="all")qs.set("association","eq."+association);
- if(club)qs.set("club","ilike.*"+club+"*");
+ if(club){
+  if(clubIds.length)qs.set("club_id","in.("+clubIds.join(",")+")");
+  else qs.set("club","ilike.*"+safeClubPattern($("library-club")?.value)+"*");
+ }
  if(term)qs.set("or","(name.ilike.*"+term+"*,dbv_id.ilike.*"+term+"*)");
  return "players?"+qs;
 }
 async function dbPage(offset){
- const {rows,range}=await dbGet(dbPath(offset));
+ const clubIds=await dbClubIds();
+ const {rows,range}=await dbGet(dbPath(offset,clubIds));
  if(!Array.isArray(rows))throw Error("Invalid database response");
  const m=range.match(/\/(\d+)$/);
  return {people:rows.filter(p=>/^\d{2}-\d{6}$/.test(p.dbv_id)&&p.name&&p.age_class).map(p=>({
@@ -31,14 +46,15 @@ async function dbPage(offset){
 async function dbAssociations(){
  const {rows}=await dbGet("clubs?select=association&dbv_club_id=not.is.null&limit=1000");
  const box=$("library-association"),old=box.value;
- const values=[...new Set(rows.map(x=>x.association).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
+ const values=[...new Set(rows.map(x=>x.association==="BWBV"?"BAW-Baden-Württemberg":x.association).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b,"de"));
  box.innerHTML='<option value="all">Alle Landesverbände</option>'+values.map(v=>
   '<option value="'+escape(v)+'">'+escape(v)+'</option>').join("");
  box.value=values.includes(old)?old:"all";
  associationsLoaded=true;
 }
 async function dbClubs(){
- const term=safePattern($("library-club")?.value),list=$("library-club-suggestions");
+ const term=safeClubPattern($("library-club")?.value),list=$("library-club-suggestions");
  if(term.length<2){list.innerHTML="";return}
  const ticket=++suggestionTicket;
  try{
