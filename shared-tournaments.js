@@ -60,8 +60,8 @@ async function publish(bookmark){
  if(!hasPublicationGrant(grants,bookmark.playerId)){
   setFlag(sharedKey(bookmark),false);
   throw Error("Für dieses Spielerprofil liegt noch keine geprüfte Veröffentlichungsberechtigung vor. "+
-   "Bitte die Gerätekennung "+session.user_id+" zusammen mit der Spieler-ID "+bookmark.playerId+
-   " dem Betreiber auf privatem Weg für eine Prüfung mitteilen. Das Turnier bleibt lokal gespeichert.");
+   "Das Turnier bleibt privat auf deinem Gerät. Eine DBV-Spieler-ID oder ein technisches Konto "+
+   "berechtigen nicht automatisch zu einer öffentlichen Meldung im Namen dieser Person.");
  }
  const conflict="user_id,player_dbv_id,external_tournament_id";
  const res=await fetch(SUPABASE_ROOT+"user_tournament_links?on_conflict="+encodeURIComponent(conflict),{
