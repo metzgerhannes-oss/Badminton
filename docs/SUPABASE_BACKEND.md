@@ -1,3 +1,13 @@
+# Verbindlicher Live-Zugriff – bestätigt am 12.10.2026
+
+**Badminton-Supabase ist über ChatGPT direkt erreichbar.** Verwendbare Projekt-ID: `yadexibmjmnjfmfabrug`, Organisation `ulxwbtojkytbzuosftkg`, Frankfurt (`eu-central-1`). Der allgemeine Connector-Aufruf `list_projects` zeigte in der Prüfung nur `JohannasGartenwelt`; das ist **kein fehlendes Zugriffsrecht auf Badminton**. Die direkten Connector-Aufrufe `get_project({id:"yadexibmjmnjfmfabrug"})`, `list_tables({project_id:"yadexibmjmnjfmfabrug",schemas:["public"],verbose:false})`, `execute_sql`, `list_migrations` und `get_advisors` funktionieren. **Bei künftigen Badminton-Arbeiten stets die konkrete Badminton-Projekt-ID übergeben; nicht allein aus der Projektliste auf fehlenden Zugriff schließen.** Die Gartenwelt-Instanz `ilfblkqxbldkzmqczbgo` unter anderer Organisation niemals als Ersatz verwenden.
+
+**Ergebnis der nichtschreibenden Prüfung (12.10.2026):** Projekt ACTIVE_HEALTHY, PostgreSQL 17.11, 22 öffentliche Tabellen, alle RLS-aktiv; 9.246 Spieler, 916 Vereine, 835 externe Matchbelege; Security Advisor 0 Befunde. Produktive Migrationen `20261011194527 shared_tournament_links_v87` und `20261011200147 shared_tournament_projection_v88` sind vorhanden. In GitHub ist v88 auf `main` (`25888ad12e5f`) integriert; die regulären und mobilen CI-Prüfungen sowie das Pages-Deployment waren grün. Die zwei neuen Freigabetabellen waren bei der Prüfung leer, ebenso `auth.users`: **kein echter Geräte-zu-Geräte-Veröffentlichungstest belegt**.
+
+**Wichtige Abgrenzung:** Die bestehenden RLS-Policies begrenzen die privaten `user_tournament_links` auf `auth.uid() = user_id`, und `shared_tournament_hints` ist für `anon` ausschließlich lesbar. Das bestätigt **nicht**, dass ein Benutzer zum Veröffentlichen für eine bestimmte öffentliche DBV-Spieler-ID berechtigt ist: die aktuelle Prüfung nutzt `players.verified_at` (Quellidentität), nicht den Nachweis, dass der Auth-Benutzer dieses Spielerprofil verwalten darf. Gemeinschaftseinträge sind daher nur als unbestätigte Nutzerhinweise zu kennzeichnen. Für eine verbindliche Freigabe des in #101 verlangten Verwalter-Nachweises ist eine echte Berechtigungsbindung nötig; für Minderjährige besonders beachten. Die reale Zwei-Geräte- und Widerrufsabnahme bleibt ebenso offen. Die allgemeine Connector-Projektliste ist kein funktionaler Freigabeblocker mehr.
+
+---
+
 # Supabase-Backend – Badminton / Schmetterlinge
 
 Stand: 10.10.2026
