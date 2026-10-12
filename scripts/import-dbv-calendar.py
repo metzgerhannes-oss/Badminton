@@ -119,29 +119,11 @@ def write_snapshot(rows,path):
  path.parent.mkdir(parents=True,exist_ok=True)
  path.write_text(json.dumps(output,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
-def sync_db(rows):
- secret=os.environ.get("BADMINTON_SUPABASE_SERVICE_ROLE_KEY","")
- if not secret:
-  print("Supabase write secret not configured; snapshot only",flush=True)
-  return
- from urllib.error import HTTPError
- root="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/dbv_calendar_entries?on_conflict=source_key"
- for at in range(0,len(rows),40):
-  batch=rows[at:at+40]
-  req=Request(root,data=json.dumps(batch).encode("utf-8"),method="POST",
-   headers={"apikey":secret,"Authorization":"Bearer "+secret,"Content-Type":"application/json",
-    "Prefer":"resolution=merge-duplicates,return=minimal"})
-  try:
-   with urlopen(req,timeout=30) as resp:
-    if resp.status not in (200,201,204):raise RuntimeError("Supabase HTTP "+str(resp.status))
-  except HTTPError as err:
-   raise RuntimeError("Supabase write failed HTTP "+str(err.code)) from None
- print("Supabase official calendar rows upserted",len(rows),flush=True)
 
 def main():
  cli=argparse.ArgumentParser()
  cli.add_argument("--write-json",action="store_true")
- cli.add_argument("--sync-supabase",action="store_true")
+ cli.add_argument("--export-payload",type=Path,default=None)
  cli.add_argument("--emit-lines",action="store_true")
  cli.add_argument("--year",type=int,default=dt.datetime.now().year)
  cli.add_argument("--fixture",type=Path,default=None)
@@ -170,6 +152,7 @@ def main():
  if args.emit_lines:
   for x in rows:print("DBV_CALENDAR_ENTRY "+json.dumps(x,ensure_ascii=False,separators=(",",":")))
  if args.write_json:write_snapshot(rows,Path("data/dbv-calendar.json"))
- if args.sync_supabase:sync_db(rows)
+ if args.export_payload:
+  args.export_payload.write_text(json.dumps({"expectedCount":len(rows),"entries":rows},ensure_ascii=False,separators=(",",":"))+"\n",encoding="utf-8")
 
 if __name__=="__main__":main()

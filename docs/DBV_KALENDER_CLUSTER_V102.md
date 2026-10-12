@@ -1,4 +1,4 @@
-# Zentraler DBV-Turnierkalender in Schmetterlinge (v102)
+# Zentraler DBV-Turnierkalender in Schmetterlinge (v103)
 
 ## Datenquelle und Abdeckung
 
@@ -25,10 +25,20 @@ Offizieller öffentlicher Turnierkalender: https://turniere.badminton.de/
 
 ## Aktualisierung
 
-GitHub Actions prüft täglich und aktualisiert den öffentlichen Snapshot bei inhaltlicher Änderung oder nach sieben Tagen. Für automatisches Upsert **auch nach Supabase** wird ein einmalig im Repository hinterlegtes GitHub-Actions-Secret `BADMINTON_SUPABASE_SERVICE_ROLE_KEY` benötigt. Fehlt es, wird weiterhin der JSON-Snapshot aktualisiert, aber **kein** Datenbank-Sync behauptet. Ein Service-Role-Schlüssel wird niemals ins Frontend oder in die Repository-Dateien geschrieben.
+GitHub Actions prüft täglich und aktualisiert den öffentlichen Snapshot bei inhaltlicher Änderung oder nach sieben Tagen. Automatische Datenbankschreibzugriffe verwenden jetzt **GitHub OIDC**: Der Publisher-Job darf ein wenige Minuten gültiges signiertes Token für das Publikum `schmetterlinge-dbv-calendar-yadexibmjmnjfmfabrug` anfordern. Die Supabase Edge Function `dbv-calendar-publish` prüft Signatur, Aussteller, Ablaufzeit, Publikum, Repository-ID, Eigentümer-ID, `refs/heads/main` sowie den exakten Workflow-Pfad. Erst danach werden validierte DBV-Kalenderzeilen in Batches von höchstens 40 in die zentrale Tabelle geschrieben. **Kein GitHub-Service-Role-Secret** ist nötig. Die Supabase-eigene Schreibberechtigung verbleibt ausschließlich im Edge-Runtime-Kontext. Fehler beim Datenbank-Import lassen den GitHub-Workflow sichtbar fehlschlagen; sie werden nicht als erfolgreiche Synchronisation gemeldet.
 
 Das Source-Coverage-Signal ist der geprüfte Veröffentlichungsstand; fehlende Turniere können an fehlenden offiziellen Bekanntmachungen, Quelleinschränkungen oder einem nicht erfolgreichen Import liegen. Fehlende Daten sind keine bestätigte Absage.
 
 ## Ausblick
 
 Für eine echte Ausweitung über aktuell veröffentlichte Kalenderereignisse: Jahre und weitere Kalenderfenster getrennt vollständig abrufen und die jeweiligen angekündigten Trefferzahlen kontrollieren. Alte bestätigte Datensätze nicht blind löschen. Der Nutzer kann die DBV-Quelle jederzeit öffnen und vergleichen.
+
+
+## OIDC-Livebetrieb
+
+- Quellcode: `supabase/functions/dbv-calendar-publish/index.ts`, Konfiguration `supabase/config.toml` (`verify_jwt=false` ausschließlich wegen eigener, zwingender GitHub-JWT-Prüfung).
+- Deploy nur in das Badminton-Projekt `yadexibmjmnjfmfabrug`.
+- Zulässig sind signierte GitHub-Identitäten des Workflows `.github/workflows/dbv-calendar-source.yml` auf `main`. Kein anonymer Datenbank-Schreibzugriff.
+- Die Aktion `publish` benötigt `id-token: write` und `contents: write`. Kein API-Key als GitHub Secret.
+- Die öffentliche DBV-Datenbanktabelle behält RLS, der Browser ausschließlich SELECT; private Benutzer- oder Spond-Daten bleiben unberührt.
+- Kontrollprüfung: GitHub Actions Workflow `DBV-Kalender Import` manuell starten, Erfolg des OIDC-Upserts im Protokoll sowie Datenbank-`last_seen_at` und Anzahl kontrollieren. Anonyme Anfragen an die Edge Function müssen scheitern.

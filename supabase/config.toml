@@ -1,0 +1,3 @@
+[functions.dbv-calendar-publish]
+# GitHub OIDC is verified cryptographically by the function itself.
+verify_jwt = false
