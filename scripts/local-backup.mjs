@@ -2,8 +2,10 @@
  * No account, API, credentials, rankings or imported third-party matches.
  * Explicitly preserves the existing shuttleboard-v1 localStorage schema. */
 export const LOCAL_STORE_KEY="shuttleboard-v1";
+export const SPOND_STORE_KEY="schmetterlinge.calendarEvents.v1";
 export const BACKUP_KIND="schmetterlinge-local-backup";
-export const BACKUP_VERSION=1;
+export const BACKUP_VERSION=2;
+export const LEGACY_BACKUP_VERSION=1;
 export const MAX_BACKUP_BYTES=200_000;
 const DBV=/^\d{2}-\d{6}$/;
 const control=/[\u0000-\u001f\u007f]/;
@@ -95,27 +97,72 @@ export function normalizeLocalData(data){
  return {players,friends,officialLinks:links,activeProfileId,
   chosen:activeProfileId,historyProfilesInitialized:true};
 }
-export function createLocalBackup(stored,now=new Date()){
+/** Preserve only explicitly imported, locally owned calendar events. Spond IDs are
+ * regenerated using the same deterministic algorithm as spond-calendar.js. */
+function calendarId(event){
+ const raw=event.uid?"".concat(event.uid):
+  "fallback:"+event.name.toLocaleLowerCase("de")+"|"+event.startDate+"|"+event.location.toLocaleLowerCase("de");
+ let h=2166136261;
+ for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}
+ return "calendar-"+(h>>>0).toString(16).padStart(8,"0");
+}
+export function normalizeCalendarEvents(rows,ownIds){
+ if(!Array.isArray(rows)||rows.length>120)fail("Maximal 120 private Kalendertermine");
+ if(!(ownIds instanceof Set))fail("Spielerzuordnungen fehlen");
+ const result=[],seen=new Set();
+ for(const row of rows){
+  if(!record(row))fail("Ungültiger Kalendertermin");
+  const name=text(row.name,140,"Kalendername",true);
+  const startDate=isDate(row.startDate),endDate=isDate(row.endDate)||startDate;
+  if(!startDate||endDate<startDate)fail("Kalenderdatum ungültig");
+  const playerId=text(row.playerId,80,"Kalenderspieler",true);
+  if(!ownIds.has(playerId))fail("Kalendertermin verweist auf unbekanntes eigenes Profil");
+  const location=text(row.location,120,"Kalenderort");
+  const uid=text(row.uid,160,"Kalenderkennung");
+  const importedAt=text(row.importedAt,40,"Importdatum");
+  if(importedAt&&!Number.isFinite(Date.parse(importedAt)))fail("Importdatum ungültig");
+  const clean={name,startDate,endDate,location,uid,playerId,importedAt,source:"spond"};
+  clean.id=calendarId(clean);
+  const identity=clean.id+"|"+playerId;
+  if(seen.has(identity))fail("Doppelter Kalendertermin");
+  seen.add(identity);result.push(clean);
+ }
+ return result;
+}
+function parseCalendarStorage(value,ownIds){
+ if(value===null||value===undefined||value==="")return [];
+ if(typeof value!=="string"||value.length>MAX_BACKUP_BYTES)fail("Lokale Kalenderdaten sind zu groß");
+ let rows;try{rows=JSON.parse(value)}catch{fail("Lokale Kalenderdaten können nicht gelesen werden")}
+ return normalizeCalendarEvents(rows,ownIds);
+}
+export function createLocalBackup(stored,now=new Date(),calendarStored="[]"){
  if(typeof stored!=="string"||!stored)fail("Noch keine lokal gespeicherten Profile vorhanden");
  if(stored.length>MAX_BACKUP_BYTES)fail("Die lokalen Daten sind zu groß");
  let raw;
  try{raw=JSON.parse(stored)}catch{fail("Lokale Daten können nicht gelesen werden")}
  const data=normalizeLocalData(raw);
- return JSON.stringify({kind:BACKUP_KIND,schemaVersion:BACKUP_VERSION,
-  createdAt:now.toISOString(),data},null,2);
+ const calendarEvents=parseCalendarStorage(calendarStored,new Set(data.players.map(p=>p.id)));
+ const archive=JSON.stringify({kind:BACKUP_KIND,schemaVersion:BACKUP_VERSION,
+  createdAt:now.toISOString(),data,calendarEvents},null,2);
+ if(new TextEncoder().encode(archive).byteLength>MAX_BACKUP_BYTES)fail("Die Sicherung ist zu groß");
+ return archive;
 }
 export function inspectLocalBackup(content){
  if(typeof content!=="string"||content.length>MAX_BACKUP_BYTES)fail("Sicherungsdatei zu groß");
  let archive;
  try{archive=JSON.parse(content)}catch{fail("Die Datei enthält kein gültiges JSON")}
- if(!record(archive)||archive.kind!==BACKUP_KIND||archive.schemaVersion!==BACKUP_VERSION)
+ if(!record(archive)||archive.kind!==BACKUP_KIND||
+   ![LEGACY_BACKUP_VERSION,BACKUP_VERSION].includes(archive.schemaVersion))
   fail("Dies ist keine unterstützte Schmetterlinge-Sicherungsdatei");
  if(typeof archive.createdAt!=="string"||
   !Number.isFinite(Date.parse(archive.createdAt)))fail("Sicherungsdatum ungültig");
  const data=normalizeLocalData(archive.data);
+ const calendarEvents=archive.schemaVersion===LEGACY_BACKUP_VERSION
+  ?null:normalizeCalendarEvents(archive.calendarEvents,new Set(data.players.map(p=>p.id)));
  return {
-  data,createdAt:archive.createdAt,
+  data,calendarEvents,createdAt:archive.createdAt,
   summary:{players:data.players.length,friends:data.friends.length,
-   tournaments:data.officialLinks.length,activePlayer:data.players.find(x=>x.id===data.activeProfileId)?.name}
+   tournaments:data.officialLinks.length,calendarEvents:calendarEvents?.length??null,
+   activePlayer:data.players.find(x=>x.id===data.activeProfileId)?.name}
  };
 }
