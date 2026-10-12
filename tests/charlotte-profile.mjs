@@ -40,6 +40,16 @@ assert.equal(charlotteResult.ageGroup,"U13");
 assert.equal(charlotteResult.discipline,"Einzel");
 assert.equal(charlotteResult.place,5);
 assert.equal(charlotteResult.verified,true);
+const charlotteEvents=history.results.filter(x=>x.playerId==="05-071969"&&x.verified);
+assert.equal(new Set(charlotteEvents.map(x=>x.date+"|"+x.event)).size,2,
+ "A new device must see both source-verified Charlotte tournaments");
+const charlotteChampionship=charlotteEvents.find(x=>x.id==="cm-2026-10-03-bw-me-u13-17");
+assert.equal(charlotteChampionship?.place,17);
+assert.equal(charlotteChampionship?.ageGroup,"U13");
+assert.equal(charlotteChampionship?.discipline,"Einzel");
+assert.match(charlotteChampionship?.source?.url||"",/spvgg\.org\/abteilungen\/badminton\/aktuelles\/55-bwbv-meisterschaft/);
+assert.equal(charlotteChampionship?.verified,true);
+
 const freshStore=new Map();
 const fresh=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},localStorage:{
  getItem:k=>freshStore.get(k)??null,setItem:(k,v)=>freshStore.set(k,String(v))

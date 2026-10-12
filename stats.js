@@ -141,9 +141,15 @@ function render(){
  const lookup=$("match-stats-source-link");
  if(lookup){
   const validId=/^\d{2}-\d{6}$/.test(selected);
+  const awaitingMatchSource=progress?.status==="awaiting_source"&&!external.length&&!official.length;
   lookup.hidden=!validId;
-  if(validId)lookup.href="https://badhub.de/spieler/"+selected+"?saison=all&src=gesamt";
-  else lookup.removeAttribute("href");
+  if(validId){
+   // Do not send families to a known-unavailable Badhub profile.
+   // The DBV ranking is a reference, not evidence for individual matches.
+   lookup.href=awaitingMatchSource?"https://turniere.badminton.de/ranking":
+    "https://badhub.de/spieler/"+selected+"?saison=all&src=gesamt";
+   lookup.textContent=awaitingMatchSource?"DBV-Rangliste öffnen ↗":"Badhub-Spielerprofil öffnen ↗";
+  }else lookup.removeAttribute("href");
  }
  retry.hidden=true;
  if(status==="loading"||status==="idle"){
@@ -233,8 +239,13 @@ function render(){
     published+(availability.detail?" "+availability.detail:"")+
     " Externe Badhub-Spiele werden nicht zu diesen Werten addiert.";
  }else{
-  note.textContent=availability.emptyNote;
-  sourceDetails.textContent=(availability.detail?availability.detail+" ":"")+
+  const awaitingMatchSource=progress?.status==="awaiting_source"&&!officialError&&!externalError;
+  note.textContent=awaitingMatchSource
+   ?"Spieler erkannt, aber noch keine auswertbaren Einzelmatches importiert. Belegte Turnierergebnisse stehen unter Historie."
+   :availability.emptyNote;
+  sourceDetails.textContent=(awaitingMatchSource
+   ?"Für diese DBV-ID liefert die externe Quelle derzeit keine auswertbaren Matchkarten. Der Import wartet auf eine belastbare Quelle. "
+   :"")+(availability.detail?availability.detail+" ":"")+
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
  if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";

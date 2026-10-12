@@ -1025,6 +1025,25 @@
           }
         ]
       }
+    },
+    {
+      "id": "cm-2026-10-03-bw-me-u13-17",
+      "playerId": "05-071969",
+      "playerName": "Charlotte Metzger",
+      "date": "2026-10-03",
+      "event": "55. Baden-Württembergische Meisterschaft U11–U19",
+      "location": "Friedrichshafen",
+      "level": "Landesmeisterschaft",
+      "discipline": "Einzel",
+      "ageGroup": "U13",
+      "place": 17,
+      "partner": null,
+      "source": {
+        "name": "SpVgg Mössingen · Meisterschaftsbericht",
+        "url": "https://spvgg.org/abteilungen/badminton/aktuelles/55-bwbv-meisterschaft-u11-u19-am-03-04-oktober-2026"
+      },
+      "verified": true,
+      "verificationNote": "Namentlicher Vereinsbericht bestätigt Platz 17 im Einzel U13. Turnierbeginn 03.10.2026; kein vollständiger Einzelmatchbeleg."
     }
   ],
   "pendingResults": []
