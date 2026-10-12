@@ -8,8 +8,10 @@ on:
     paths:
       - 'scripts/import-dbv-calendar.py'
       - 'tests/test_dbv_calendar.py'
+      - 'tests/test_dbv_calendar_oidc.py'
       - '.github/workflows/dbv-calendar-source.yml'
       - 'data/dbv-calendar.json'
+      - 'scripts/publish-dbv-calendar-oidc.py'
   push:
     branches: [main]
     paths:
@@ -28,7 +30,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Offline calendar parsing tests
-        run: python3 -m unittest discover -s tests -p test_dbv_calendar.py -v
+        run: |
+          python3 -m unittest discover -s tests -p test_dbv_calendar.py -v
+          python3 -m unittest discover -s tests -p test_dbv_calendar_oidc.py -v
       - name: Validate official complete calendar table
         run: python3 scripts/import-dbv-calendar.py
   publish:
@@ -38,12 +42,13 @@ jobs:
     timeout-minutes: 8
     permissions:
       contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-      - name: Read verified official DBV calendar and optionally upsert Supabase
-        env:
-          BADMINTON_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BADMINTON_SUPABASE_SERVICE_ROLE_KEY }}
-        run: python3 scripts/import-dbv-calendar.py --write-json --sync-supabase
+      - name: Parse complete public DBV calendar and export restricted payload
+        run: python3 scripts/import-dbv-calendar.py --write-json --export-payload "$RUNNER_TEMP/dbv-calendar-payload.json"
+      - name: Publish official DBV calendar to Supabase with short-lived GitHub OIDC identity
+        run: python3 scripts/publish-dbv-calendar-oidc.py --payload "$RUNNER_TEMP/dbv-calendar-payload.json"
       - name: Publish updated public DBV calendar snapshot only if changed
         run: |
           set -euo pipefail
