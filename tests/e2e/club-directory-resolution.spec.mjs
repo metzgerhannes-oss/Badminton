@@ -70,6 +70,7 @@ test("zero results hide pagination button on mobile",async ({page})=>{
       headers:{...CORS,"Content-Range":"*/0"}}));
  }
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await page.locator("#player-add-open").click();
  await page.locator("#library-club").fill("Nirgendwo FC");
  await expect(page.locator("#library-count")).toContainText("0 passende Spieler");
  await expect(page.locator("#library-more")).toBeHidden();
