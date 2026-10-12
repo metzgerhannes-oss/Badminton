@@ -17,7 +17,15 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
  const storeB={players:[{id:FRIEND,name:"Charlotte Metzger",birthYear:2014}],
   activeProfileId:FRIEND,chosen:FRIEND,officialLinks:[],
   friends:[{id:PLAYER,name:"Philipp Metzger",birthYear:2016}]};
- await publisher.addInitScript(s=>localStorage.setItem("shuttleboard-v1",JSON.stringify(s)),storeA);
+ await publisher.addInitScript(s=>{
+  localStorage.setItem("shuttleboard-v1",JSON.stringify(s));
+  // This existing authenticated identity is independently approved for PLAYER.
+  // A guest visitor must not be automatically signed up merely to try a public write.
+  localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({
+   user_id:"2980046b-abd4-4056-b275-090a7364c4ac",
+   access_token:"test.token.session",refresh_token:"test.refresh",expires_at:Date.now()+3600000
+  }));
+ },storeA);
  await follower.addInitScript(s=>localStorage.setItem("shuttleboard-v1",JSON.stringify(s)),storeB);
  let written=null;
  const mock=async route=>{
@@ -25,9 +33,7 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
   if(url.hostname==="127.0.0.1")return route.continue();
   if(method==="OPTIONS")return route.fulfill({status:204,headers,body:""});
   if(url.pathname==="/auth/v1/signup"&&method==="POST")
-   return route.fulfill({status:200,headers,body:JSON.stringify({
-    access_token:"test.token.session",refresh_token:"test.refresh",expires_in:3600,user:{id:AUTH_USER}
-   })});
+   throw Error("Public sharing must never create a new anonymous Auth account");
   // This positive two-device scenario simulates a prior independent guardian/club approval.
   // A separate negative test proves that missing grants block the POST entirely.
   if(url.pathname==="/rest/v1/player_publication_grants"){
