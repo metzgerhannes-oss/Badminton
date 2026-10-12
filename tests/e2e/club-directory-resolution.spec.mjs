@@ -3,6 +3,15 @@ import {test,expect} from "@playwright/test";
 /** The public DBV ranking contains 13 players linked to the full club record;
  * individual player records abbreviate it as "SpVgg. Mössingen". */
 async function mockDirectory(page,{empty=false}={}){
+ await page.addInitScript(()=>{
+  // The player library belongs to the app, whose first-run profile dialog
+  // intentionally intercepts input on an unconfigured device.
+  localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"Philipp Metzger",club:"SpVgg. Mössingen",birthYear:2016}],
+   activeProfileId:"05-070879",chosen:"05-070879",
+   friends:[],officialLinks:[],historyProfilesInitialized:true
+  }));
+ });
  await page.addInitScript(({empty})=>{
   window.__libraryReads=[];
   const originalFetch=window.fetch.bind(window);
