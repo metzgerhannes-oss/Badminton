@@ -226,7 +226,7 @@ window.badmintonLibraryToggleFollow=player=>{
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
  });
- save();render();window.dispatchEvent(new Event("badminton:library-following"));
+ showPlayerDiscover(false,false);save();render();window.dispatchEvent(new Event("badminton:library-following"));
  window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
