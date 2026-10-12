@@ -45,7 +45,7 @@ async function queryExternal(id,signal){
  const rows=[];
  for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
   const qs=new URLSearchParams({
-   select:"source_key,category,competition,discipline,event,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,source_url",
+   select:"source_key,category,competition,discipline,event,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,outcome_evidence,source_name,source_kind,source_url",
    dbv_id:"eq."+id,order:"match_year.desc,match_date.desc.nullslast,source_key.asc",
    limit:String(PAGE_LIMIT),offset:String(offset)
   });
@@ -108,7 +108,9 @@ function externalProof(m){
   '</span><time>'+esc(when)+'</time><span>'+esc(m.discipline)+'</span>'+ageProof(m)+'</div>'+
   '<strong>'+esc(m.competition||"Öffentlich belegtes Turnier")+'</strong>'+
   '<p>Gegen '+esc(opp)+(partner?' · mit '+esc(partner):'')+
-  ' · Sätze aus Spielersicht '+esc(ownScore(m))+'</p>'+
+  ' · '+esc(m.scoring?.ruleSource==="badhub-bold-no-scores"
+   ?"Ergebnis laut Badhub-Hervorhebung, ohne Satzstände"
+   :"Sätze aus Spielersicht "+ownScore(m))+'</p>'+
   (u?'<a href="'+esc(u)+'" rel="noopener noreferrer" target="_blank">Badhub-Quellbeleg ↗</a>':'')+
   '</article>';
 }

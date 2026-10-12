@@ -74,13 +74,12 @@ function render(){
  }
  const playedUnscored=getReportedPlayedWithoutScores(selected,{year,discipline,category});
  if(playedUnscored){
-  info+=" Klärung vom "+playedUnscored.confirmedOn+": "+
-   playedUnscored.count+
-   " Badhub-Begegnungen wurden laut direkter Rückmeldung tatsächlich gespielt."+
-   " Ihre Satzergebnisse sind bei Badhub nicht vollständig auswertbar."+
-   " Keine davon wird als Rast/Freilos eingestuft."+
-   " Einzelne Siege oder Niederlagen werden ohne Ergebnisbeleg nicht zugeschrieben."+
-   " Die veröffentlichte Badhub-Karrierebilanz ist davon getrennt.";
+  const verifiedWithoutSets=rows.filter(r=>
+   Array.isArray(r.games)&&r.games.length===0&&
+   r.outcome_evidence==="badhub-bold-dash").length;
+  info+=verifiedWithoutSets
+   ?" "+verifiedWithoutSets+" Ergebnisse sind durch den von Badhub fett markierten Gewinner belegt; Satzstände fehlen."
+   :" Vier Badhub-Karten ohne Satzstände sind zur erneuten Einzelprüfung vorgemerkt. Nur eindeutig belegte Sieger werden beim Quellenimport berücksichtigt.";
  }
  progressEl.textContent=info;
  const options=sourceMatchYears(rows);
@@ -107,7 +106,9 @@ function render(){
    '<span>'+esc(r.discipline)+'</span></div>'+
    '<strong>'+esc(r.competition||"Historisches Turnier")+'</strong>'+
    '<p>Gegen '+esc(opponent)+(partner?' · mit '+esc(partner):'')+'</p>'+
-   '<div class="external-match-foot"><span>Sätze: '+esc(gameScore(r))+
+   '<div class="external-match-foot"><span>'+esc(r.scoring?.ruleSource==="badhub-bold-no-scores"
+     ?"Gewinner laut Badhub hervorgehoben · Satzstände nicht angegeben"
+     :"Sätze: "+gameScore(r))+
     (r.scoring?.ruleId?' · '+esc(MATCH_RULES[r.scoring.ruleId]?.label||r.scoring.ruleId)+
        (r.scoring.ruleSource==="explicit"?' · laut Quellenangabe':' · aus Ergebnis abgeleitet'):'')+
     (r.round_label?' · '+esc(r.round_label):'')+'</span>'+
@@ -130,7 +131,7 @@ async function load(id){
   const [status]=await readJSON("player_external_match_imports?select=dbv_id,status,cursor_offset,verified_count,rejected_count,source_count,detail,last_finished_at&dbv_id=eq."+id+"&limit=1",signal);
   const collected=[];
   for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
-   const route="player_external_match_facts?select=dbv_id,source_key,category,competition,event,discipline,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,source_url"+
+   const route="player_external_match_facts?select=dbv_id,source_key,category,competition,event,discipline,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,outcome_evidence,source_name,source_kind,source_url"+
     "&dbv_id=eq."+id+"&order=match_year.desc,match_date.desc.nullslast,source_key.asc&limit="+PAGE_LIMIT+"&offset="+offset;
    const batch=await readJSON(route,signal);
    collected.push(...batch);

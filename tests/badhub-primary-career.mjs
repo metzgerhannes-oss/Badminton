@@ -16,8 +16,8 @@ assert.equal(getReportedPlayedWithoutScores("05-070879",{discipline:"Einzel"}),n
 assert.equal(getReportedPlayedWithoutScores("05-070879",{category:"league"}),null);
 assert.equal(getReportedPlayedWithoutScores("05-061350"),null);
 assert.match(await readFile("external-matches.js","utf8"),/getReportedPlayedWithoutScores\(selected/);
-assert.match(await readFile("external-matches.js","utf8"),/Keine davon wird als Rast\/Freilos eingestuft/);
-assert.match(await readFile("external-matches.js","utf8"),/Einzelne Siege oder Niederlagen werden ohne Ergebnisbeleg nicht zugeschrieben/);
+assert.match(await readFile("external-matches.js","utf8"),/Vier Badhub-Karten ohne Satzstände/);
+assert.match(await readFile("external-matches.js","utf8"),/Nur eindeutig belegte Sieger werden beim Quellenimport berücksichtigt/);
 assert.equal(summary.capturedOn,"2026-10-11");
 assert.equal(summary.sourceType,"user-provided-screenshot");
 assert.equal(getBadhubMatchReference("05-070879",{discipline:"Einzel"}),null,
@@ -54,5 +54,5 @@ assert.doesNotMatch(css,/@media\(max-width:500px\)\{\.dbv-reference-totals\{grid
  "Small iPhones must show four career totals in one row");
 assert.match(css,/v74: all four Badhub career figures share one compact/);
 assert.match(css,/#match-stats-note\[hidden\]/);
-assert.match(sw,/schmetterlinge-shell-v91/);
+assert.match(sw,/schmetterlinge-shell-v92/);
 console.log("v72: one sourced Badhub career balance, no duplicate DBV summary, filtered facts remain separate.");

@@ -111,6 +111,39 @@ const byeCard=card.replace(games,'<div class="sp-result-col"><span>BYE</span></d
 const bye=parsePublicHistory(tour.replace(card,byeCard),player,"tournament");
 assert.equal(bye.items.length,0);
 assert.equal(bye.rejection_reasons.confirmed_bye_rast,1);
+// A source-declared winner is reliable outcome evidence even if no set scores
+// are published (Badhub renders a dash). The missing scores stay missing.
+const declaredLoss=card.replace(games,'<div class="sp-result-col">–</div>')
+ .replace('class="sp-side sp-side--winner"','class="sp-side"')
+ .replace('class="sp-side sp-side--away"','class="sp-side sp-side--away sp-side--winner"');
+const declaredLossRecord=parsePublicHistory(tour.replace(card,declaredLoss),player,"tournament");
+assert.equal(declaredLossRecord.items.length,1,"Source-bold winner should count");
+assert.deepEqual(declaredLossRecord.items[0].games,[],"No fake sets");
+assert.equal(declaredLossRecord.items[0].winning_side,2);
+const declaredWin=card.replace(games,'<div class="sp-result-col">–</div>');
+const declaredWinRecord=parsePublicHistory(tour.replace(card,declaredWin),player,"tournament");
+assert.equal(declaredWinRecord.items.length,1);
+assert.equal(declaredWinRecord.items[0].winning_side,1);
+assert.deepEqual(declaredWinRecord.items[0].games,[]);
+const noWinner=declaredWin.replace('sp-side sp-side--winner','sp-side');
+assert.equal(parsePublicHistory(tour.replace(card,noWinner),player,"tournament").items.length,0);
+const missingOpponent=declaredWin.replace('>Test Gegnerin<','><');
+assert.equal(parsePublicHistory(tour.replace(card,missingOpponent),player,"tournament").items.length,0);
+const dashBye=declaredWin.replace('>Test Gegnerin<','>BYE<');
+assert.equal(parsePublicHistory(tour.replace(card,dashBye),player,"tournament").items.length,0);
+
+
+assert.equal(declaredLossRecord.items[0].outcome_evidence,"badhub-bold-dash");
+assert.equal(declaredWinRecord.items[0].outcome_evidence,"badhub-bold-dash");
+assert.equal(result.items[0].outcome_evidence,null,"Scored matches need no alternate proof.");
+// Without a dash or with contradictory nonplay statuses, a CSS winner alone is insufficient.
+const fakeDash=card.replace(games,'<div class="sp-result-col"> </div>');
+assert.equal(parsePublicHistory(tour.replace(card,fakeDash),player,"tournament").items.length,0);
+const dashWalkover=declaredWin.replace('>Test Gegnerin<','>W.O.<');
+assert.equal(parsePublicHistory(tour.replace(card,dashWalkover),player,"tournament").items.length,0);
+const dashRetirement=declaredWin.replace('>Test Gegnerin<','>Aufgabe<');
+assert.equal(parsePublicHistory(tour.replace(card,dashRetirement),player,"tournament").items.length,0);
+
 const noScore=card.replace(games,'<div class="sp-result-col"></div>');
 const unresolved=parsePublicHistory(tour.replace(card,noScore),player,"tournament");
 assert.equal(unresolved.items.length,0);
@@ -174,6 +207,12 @@ assert.match(cron,/private\.continue_external_match_import/);
 assert.match(fn,/parsePublicHistory/);
 assert.match(fn,/claim_external_match_import/);
 assert.match(fn,/on_conflict=dbv_id,source_key/);
+assert.match(fn,/all\.filter\(m=>m\.outcome_evidence==="badhub-bold-dash"\)/,
+ "An old cursor must not skip newly recognized unscored results");
+assert.match(fn,/const toStore=new Map\(selected\.concat\(scoreless\)/,
+ "Scoreless backfill must deduplicate against ordinary cursor batches");
+assert.match(fn,/written\.slice\(i,i\+25\)/,
+ "Backfill persists in the same bounded idempotent batches");
 assert.match(fn,/src=.+saison=all/);
 assert.doesNotMatch(fn,/insert into public.matches|update public.matches/,
  "Third-party matches must remain separate from DBV official facts");
@@ -184,5 +223,5 @@ assert.match(js,/match_date/);
 assert.match(js,/Quellbeleg/);
 assert.match(bridge,/history-match-import/);
 assert.doesNotMatch(welcome,/history-match-import/);
-assert.match(sw,/schmetterlinge-shell-v91/);
+assert.match(sw,/schmetterlinge-shell-v92/);
 console.log("Sourced external match import: parser identifies winner/sides/scores, refuses mismatched profile, idempotent DB and queue contracts verified.");

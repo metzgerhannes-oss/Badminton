@@ -24,6 +24,26 @@ const one={...good,source_key:"one",games:[[21,17]],competition:"Jugendturnier"}
 assert.equal(computeExternalStats([one]).total,0,"One set without a source rule is not a match");
 assert.equal(computeExternalStats([{...one,competition:"Jugendturnier 1x21"}]).total,1,
  "Explicit single-game alternative must count");
+const noScores={...good,source_key:"unverified-empty",games:[],winning_side:2};
+assert.equal(computeExternalStats([noScores]).total,0,
+ "No-set results without explicit proof MUST NOT be counted");
+assert.equal(computeExternalStats([{...noScores,outcome_evidence:"badhub-bold-dash"}]).total,0,
+ "A proof label without the checked Badhub source and kind cannot be counted");
+const declaration={...noScores,source_name:"Badhub",
+ source_kind:"third-party-match-card",outcome_evidence:"badhub-bold-dash",
+ source_key:"tournament:4986:me-u17:finale:sarah-storz.test"};
+const verified=computeExternalStats([declaration]);
+assert.equal(verified.total,1);
+assert.equal(verified.losses,1);
+assert.deepEqual(verified.details[0].games,[]);
+assert.equal(verified.details[0].scoring.ruleSource,"badhub-bold-no-scores");
+assert.equal(computeExternalStats([{...declaration,source_key:"league:4986:test"}]).total,0);
+assert.equal(computeExternalStats([{...declaration,category:"league"}]).total,0);
+assert.equal(computeExternalStats([{...declaration,outcome_evidence:null}]).total,0);
+assert.equal(computeExternalStats([{...declaration,source_url:"https://invalid.example/"}]).total,0);
+assert.equal(computeExternalStats([{...declaration,games:[[21,12]]}]).total,0,
+ "Unscored proof must never replace an incomplete scored match.");
+
 const extended11={...good,source_key:"5x11",competition:"Bundesliga 5x11",
  games:[[11,9],[12,10],[15,14]]};
 assert.equal(computeExternalStats([extended11]).total,1);
@@ -45,5 +65,5 @@ assert.doesNotMatch(history,/fetch\(API\+/);
 assert.doesNotMatch(home,/fetch\(ROOT\+/);
 assert.match(history,/Der Datenstand kann derzeit nicht geprüft werden/);
 assert.match(history,/external-match-retry/);
-assert.match(sw,/schmetterlinge-shell-v91/);
+assert.match(sw,/schmetterlinge-shell-v92/);
 console.log("v43: Historie und Home validieren dieselben belegten Matches und Dubletten.");

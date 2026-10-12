@@ -108,10 +108,17 @@ Deno.serve(async req=>{
   // offset and silently skip verified matches from the accessible category.
   const start=sources.missing.length?0:Math.min(Number(claim.cursor)||0,all.length);
   const selected=all.slice(start,start+120);
-  for(let i=0;i<selected.length;i+=25){
+  // A newly recognized scoreless result may sort BEFORE the old cursor.
+  // Explicitly backfill just those independently evidenced outcomes, with
+  // source-key deduplication. Never reset a large player's ordinary cursor.
+  const scoreless=all.filter(m=>m.outcome_evidence==="badhub-bold-dash");
+  if(scoreless.length>120)throw Error("Unexpected scoreless source cardinality");
+  const toStore=new Map(selected.concat(scoreless).map(row=>[row.source_key,row]));
+  const written=[...toStore.values()];
+  for(let i=0;i<written.length;i+=25){
    await api("player_external_match_facts?on_conflict=dbv_id,source_key",{
     method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},
-    body:JSON.stringify(selected.slice(i,i+25))
+    body:JSON.stringify(written.slice(i,i+25))
    });
   }
   const progress=start+selected.length;
@@ -136,7 +143,7 @@ Deno.serve(async req=>{
    lease_until:null,last_finished_at:new Date().toISOString(),detail
   });
   return respond(200,{
-   queued:true,stored:selected.length,progress,eligible:all.length,
+   queued:true,stored:written.length,scoreless_evidence_count:scoreless.length,progress,eligible:all.length,
    source_cards:cardCount,excluded,completed:finished&&!sources.missing.length,
    unavailable_categories:sources.missing,
    provenance:"Badhub – public match cards, not official DBV match IDs"

@@ -38,11 +38,20 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
    &&Array.isArray(r.opponent_names)&&r.opponent_names.length>0
    &&r.opponent_names.every(x=>typeof x==="string"&&x.trim())
    &&validUrl(r.source_url)
-   &&Array.isArray(games)&&games.length>=1&&games.length<=5
+   &&Array.isArray(games)&&games.length<=5
+   &&(games.length>0||(
+    r.outcome_evidence==="badhub-bold-dash"&&
+    r.category==="tournament"&&
+    r.source_name==="Badhub"&&
+    r.source_kind==="third-party-match-card"&&
+    /^tournament:/.test(r.source_key)
+   ))
    &&games.every(g=>Array.isArray(g)&&g.length===2&&g.every(x=>Number.isInteger(x)&&x>=0&&x<=40)&&g[0]!==g[1]);
   if(!valid){excluded++;continue;}
   const rule=explicitScoringRule(String(r.competition||"")+" "+String(r.event||""));
-  const completion=completedMatchWinner(games,{year:r.match_year,rule});
+  const completion=games.length===0
+   ?{winningSide:r.winning_side,ruleId:null,ruleSource:"badhub-bold-no-scores",setsWon:null}
+   :completedMatchWinner(games,{year:r.match_year,rule});
   if(!completion||completion.winningSide!==r.winning_side){excluded++;continue;}
   const won=r.player_side===r.winning_side;
   won?wins++:losses++;
