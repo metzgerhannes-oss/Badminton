@@ -16,8 +16,8 @@ const SCOPES = new Set(["state","association","national","group","international"
 const DISCIPLINES = new Set(["Einzel","Doppel","Mixed"]);
 const DATE=/^\d{4}-\d{2}-\d{2}$/;
 const ID=/^dbv-calendar-\d{2,12}$/;
-const response=(status,code)=>Response.json({ok:false,error:code},{status,headers:{"Cache-Control":"no-store"}});
-function allowedToken(payload){
+const response=(status:number,code:string)=>Response.json({ok:false,error:code},{status,headers:{"Cache-Control":"no-store"}});
+function allowedToken(payload:Record<string,unknown>){
  return payload.repository===REPO &&
    payload.repository_id==="1412033492" &&
    payload.repository_owner_id==="326005713" &&
@@ -26,7 +26,7 @@ function allowedToken(payload){
    payload.sub==="repo:"+REPO+":ref:refs/heads/main" &&
    ["schedule","workflow_dispatch","push"].includes(String(payload.event_name||""));
 }
-async function authorize(req){
+async function authorize(req:Request){
  const auth=req.headers.get("authorization")||"";
  const match=/^Bearer ([A-Za-z0-9_.-]+)$/.exec(auth);
  if(!match||match[1].length>10000) return false;
@@ -35,14 +35,14 @@ async function authorize(req){
  });
  return allowedToken(payload);
 }
-function cleanText(value,max,optional=false){
+function cleanText(value:unknown,max:number,optional=false):string|null{
  if(value===null||value===undefined) return optional?null:null;
  if(typeof value!=="string"||value.length>max||/[\x00-\x08\x0b-\x1f]/.test(value))return null;
  return value.trim();
 }
-function validDate(s){if(typeof s!=="string"||!DATE.test(s))return false;
+function validDate(s:unknown):boolean{if(typeof s!=="string"||!DATE.test(s))return false;
  const ms=Date.parse(s+"T12:00:00Z");return Number.isFinite(ms)&&new Date(ms).toISOString().slice(0,10)===s}
-function validUrl(value){
+function validUrl(value:unknown):boolean{
  if(value===null)return true;
  if(typeof value!=="string"||value.length>500)return false;
  try{
@@ -50,30 +50,31 @@ function validUrl(value){
   return u.protocol==="https:"&&["turniere.badminton.de","dbv.turnier.de"].includes(u.hostname)&&!u.username&&!u.password;
  }catch{return false}
 }
-function normalize(raw){
+function normalize(raw:unknown):Record<string,unknown>{
  if(!raw||typeof raw!=="object"||Array.isArray(raw))throw Error("row");
- if(!ID.test(String(raw.source_key||""))||!validDate(raw.start_date)||!validDate(raw.end_date))throw Error("id_or_date");
- const days=(Date.parse(raw.end_date)-Date.parse(raw.start_date))/86400000;
+ const row=raw as Record<string,any>;
+ if(!ID.test(String(row.source_key||""))||!validDate(row.start_date)||!validDate(row.end_date))throw Error("id_or_date");
+ const days=(Date.parse(row.end_date)-Date.parse(row.start_date))/86400000;
  if(days<0||days>14)throw Error("duration");
- const title=cleanText(raw.title,240),organizer=cleanText(raw.organizer,100);
+ const title=cleanText(row.title,240),organizer=cleanText(row.organizer,100);
  if(!title||title.length<3||!organizer)throw Error("text");
- const location=cleanText(raw.location_text,180,true);
- const state=cleanText(raw.bundesland,90,true);
- const category=cleanText(raw.category,100);
- if(location===null&&raw.location_text!=null||state===null&&raw.bundesland!=null||!category)throw Error("fields");
- if(!SCOPES.has(raw.region_scope)||!LEVELS.has(raw.level_group))throw Error("facets");
- if(!Array.isArray(raw.age_groups)||raw.age_groups.length===0||raw.age_groups.length>9||
-    new Set(raw.age_groups).size!==raw.age_groups.length||raw.age_groups.some(a=>!AGES.has(a)))throw Error("ages");
- if(!Array.isArray(raw.disciplines)||raw.disciplines.length>3||
-    new Set(raw.disciplines).size!==raw.disciplines.length||raw.disciplines.some(d=>!DISCIPLINES.has(d)))throw Error("disciplines");
- if(raw.registration_deadline!==null&&!validDate(raw.registration_deadline))throw Error("deadline");
- if(!validUrl(raw.event_url)||raw.source_url!==SOURCE)throw Error("source");
- return {source_key:raw.source_key,title,start_date:raw.start_date,end_date:raw.end_date,
-   location_text:location,organizer,bundesland:state,region_scope:raw.region_scope,
-   category,level_group:raw.level_group,age_groups:raw.age_groups,disciplines:raw.disciplines,
-   registration_deadline:raw.registration_deadline,event_url:raw.event_url,source_url:SOURCE};
+ const location=cleanText(row.location_text,180,true);
+ const state=cleanText(row.bundesland,90,true);
+ const category=cleanText(row.category,100);
+ if(location===null&&row.location_text!=null||state===null&&row.bundesland!=null||!category)throw Error("fields");
+ if(!SCOPES.has(row.region_scope)||!LEVELS.has(row.level_group))throw Error("facets");
+ if(!Array.isArray(row.age_groups)||row.age_groups.length===0||row.age_groups.length>9||
+    new Set(row.age_groups).size!==row.age_groups.length||row.age_groups.some(a=>!AGES.has(a)))throw Error("ages");
+ if(!Array.isArray(row.disciplines)||row.disciplines.length>3||
+    new Set(row.disciplines).size!==row.disciplines.length||row.disciplines.some(d=>!DISCIPLINES.has(d)))throw Error("disciplines");
+ if(row.registration_deadline!==null&&!validDate(row.registration_deadline))throw Error("deadline");
+ if(!validUrl(row.event_url)||row.source_url!==SOURCE)throw Error("source");
+ return {source_key:row.source_key,title,start_date:row.start_date,end_date:row.end_date,
+   location_text:location,organizer,bundesland:state,region_scope:row.region_scope,
+   category,level_group:row.level_group,age_groups:row.age_groups,disciplines:row.disciplines,
+   registration_deadline:row.registration_deadline,event_url:row.event_url,source_url:SOURCE};
 }
-function databaseKey(){
+function databaseKey():string|null{
  const old=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
  if(old)return old;
  const raw=Deno.env.get("SUPABASE_SECRET_KEYS");
@@ -82,7 +83,7 @@ function databaseKey(){
  }
  return null;
 }
-Deno.serve(async req=>{
+Deno.serve(async (req:Request)=>{
  if(req.method!=="POST")return response(405,"method_not_allowed");
  let verified=false;
  try{verified=await authorize(req)}catch{return response(401,"invalid_oidc_token")}
@@ -109,7 +110,7 @@ Deno.serve(async req=>{
  // Upsert only official DBV rows. Do not touch private calendar or user tables.
  for(let n=0;n<rows.length;n+=40){
   const tokenHeader=key.startsWith("eyJ")?{"Authorization":"Bearer "+key}:{};
-  let res;
+  let res:Response;
   try{
    res=await fetch(url,{method:"POST",headers:{
     "apikey":key,...tokenHeader,"Content-Type":"application/json",
