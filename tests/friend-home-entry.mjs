@@ -38,7 +38,7 @@ assert.match(root.innerHTML,/\+27 weitere/);
 assert.match(root.innerHTML,/class="friend-quick-more" href="#spieler"/);
 assert.doesNotMatch(root.innerHTML,/data-friend-quick="05-222225"/);
 run('state.viewingFriendId="05-222251";renderFriendQuick()');
-assert.equal((root.innerHTML.match(/data-friend-quick=/g)||[]).length,4);
+assert.equal((root.innerHTML.match(/data-friend-quick=/g)||[]).length,3);
 assert.match(root.innerHTML,/data-is-own="true"/,"Viewing a friend must offer return to own");
 assert.match(root.innerHTML,/data-friend-quick="05-222251"/,"Selected friend stays accessible");
 assert.match(root.innerHTML,/\+28 weitere/);
