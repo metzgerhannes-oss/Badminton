@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://yadexibmjmnjfmfabrug.supabase.co; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#e9f5fb">
+<title>Privat geteiltes Turnier · Schmetterlinge</title>
+<link rel="stylesheet" href="./private-invite.css">
+<script type="module" src="./private-invite-page.js"></script>
+</head>
+<body>
+<main class="event-invitation">
+ <header><span class="eyebrow">Schmetterlinge · privater Turnierlink</span><h1>Turnierinformationen</h1></header>
+ <section class="invite-card" aria-live="polite">
+  <p id="invite-page-status">Freigabe wird geprüft …</p>
+  <div id="invite-page-event" hidden>
+   <h2 id="invite-page-title"></h2>
+   <p id="invite-page-date"></p>
+   <p class="info">Dieser Link zeigt nur einen veröffentlichten Turniertermin. Er bestätigt weder eine Anmeldung noch die Teilnahme einer bestimmten Person.</p>
+   <a id="invite-page-source" target="_blank" rel="noopener noreferrer">Offizielle Turnierquelle öffnen ↗</a>
+   <p class="expiry" id="invite-page-expiry"></p>
+  </div>
+ </section>
+ <p class="footnote">Der Link kann weitergegeben werden. Nach Widerruf oder Ablauf sind keine neuen Abrufe möglich; bereits kopierte Informationen bleiben beim Empfänger.</p>
+ <a href="./index.html#turniere" class="home">Schmetterlinge öffnen</a>
+</main>
+</body>
+</html>
