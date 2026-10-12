@@ -139,18 +139,17 @@ def main():
  rows=parse_page(text,args.year)
  if not rows:raise RuntimeError("Empty calendar is not a valid replacement")
  if args.fixture is None:
-  # Include next year only if the source explicitly advertises matching calendar rows.
+  # The DBV lists 2027 already. A malformed year must fail rather than be
+  # silently omitted from the published calendar.
   next_year=args.year+1
-  try:
-   future=read_page(calendar_url(next_year))
-   if "0 Turniere gefunden" in future and "Keine Turniere gefunden" in future:
-    print("DBV next year not yet published in this filter",flush=True)
-   else:
-    next_rows=parse_page(future,next_year)
-    if not next_rows:raise ValueError("Unexpected empty next-year source")
-    rows.extend(next_rows)
-  except Exception as error:
-   print("WARNING: next-year DBV calendar not confirmed: "+str(error)[:160],flush=True)
+  future=read_page(calendar_url(next_year))
+  if re.search(r"\\b0\\s+Turniere gefunden\\b",future) and "tournamenttable" not in future:
+   print(f"DBV {next_year}: no official calendar entries published yet",flush=True)
+  else:
+   next_rows=parse_page(future,next_year)
+   if not next_rows:raise RuntimeError(f"DBV {next_year} returned an unexpectedly empty calendar")
+   rows.extend(next_rows)
+   print(f"DBV {next_year}: {len(next_rows)} source-verified entries",flush=True)
   if len({x["source_key"] for x in rows})!=len(rows):
    raise ValueError("Duplicate event ID across DBV year windows")
  print(f"DBV calendar: {len(rows)} verified entries, first {rows[0]['start_date']}",flush=True)
