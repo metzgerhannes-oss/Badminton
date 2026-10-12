@@ -64,12 +64,13 @@ function renderFocusHeader(){
 function renderTournaments(){
  const sorted=SchmetterlingeBookmarks.sorted(state);
  const section=el("official-tournament-list");
- if(!sorted.length){section.innerHTML='<div class="empty"><h3>Noch keine Turniere gespeichert</h3><p>Füge einen DBV-Turnierlink hinzu, den du nach der Anmeldung erhalten hast.</p></div>';return}
+ if(!sorted.length){section.innerHTML='<div class="empty"><h3>Noch keine Turniere gespeichert</h3><p>Merke ein Turnier mit + aus dem DBV-Kalender vor oder füge einen offiziellen Turnierlink hinzu.</p></div>';return}
  section.innerHTML=sorted.map(t=>{
   const profile=t.playerId==="all"?"Alle Spieler":(state.players.find(p=>p.id===t.playerId)?.name||"Spieler");
   const [phase,tone]=bookmarkPhase(t);
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
-  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-id">Turnier-ID: '+esc(t.id)+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">Offizielle Turnierseite ↗</a><button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button><button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  const calendar=t.source==="dbv-calendar";
+  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-id">'+(calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
@@ -79,8 +80,8 @@ function renderTournaments(){
   const id=button.dataset.removeId,player=button.dataset.removePlayer;
   const removed=state.officialLinks.find(t=>t.id===id&&t.playerId===player);
   state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
-  save();render();toast("Turnierlink entfernt");
-  if(removed)window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
+  save();render();toast(removed?.source==="dbv-calendar"?"Vormerkung entfernt":"Turnierlink entfernt");
+  if(removed&&removed.source!=="dbv-calendar")window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
    detail:{bookmark:removed,publicShare:false,removed:true}
   }));
  }));
@@ -241,10 +242,37 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
   routeTo(destination);
  return true;
 };
+// A quick "+" is private device-only planning, never an official registration.
+// Source calendar IDs are not turnier.de tournament UUIDs.
+window.badmintonCalendarBookmarkState=()=>({
+ playerId:state.viewingFriendId?"":state.activeProfileId,
+ playerName:state.viewingFriendId?"":state.players.find(p=>p.id===state.activeProfileId)?.name||"",
+ savedKeys:state.officialLinks.filter(t=>t.source==="dbv-calendar"&&t.playerId===state.activeProfileId).map(t=>t.id)
+});
+window.badmintonCalendarToggle=item=>{
+ if(state.viewingFriendId||!state.players.some(p=>p.id===state.activeProfileId)){
+  return {ok:false,message:"Bitte zuerst ein eigenes Spielerprofil auswählen."};
+ }
+ const key=String(item?.key||"");
+ if(!/^dbv-calendar-\d{2,12}$/.test(key))return {ok:false,message:"Ungültige DBV-Kalenderkennung."};
+ const previous=state.officialLinks.find(t=>t.source==="dbv-calendar"&&t.id===key&&t.playerId===state.activeProfileId);
+ if(previous){
+  state.officialLinks=state.officialLinks.filter(t=>t!==previous);
+  save();render();toast("Vormerkung entfernt");
+  return {ok:true,saved:false};
+ }
+ if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
+ const entry=normalizeBookmark({id:key,source:"dbv-calendar",url:"https://turniere.badminton.de/",
+  playerId:state.activeProfileId,name:item?.title,startDate:item?.start,endDate:item?.end});
+ if(!entry)return {ok:false,message:"Turnier konnte nicht eindeutig zugeordnet werden."};
+ state.officialLinks.unshift(entry);
+ save();render();toast("Turnier für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
+ return {ok:true,saved:true};
+};
 window.badmintonTournamentOptions=()=>{
  // Shared event hints are never written to family bookmarks. Their DBV source
  // link can still open the already verified LIVE/tournament match views.
- const local=state.officialLinks.slice();
+ const local=state.officialLinks.filter(t=>t.source!=="dbv-calendar");
  const community=window.badmintonCommunityTournamentOptions?.()||[];
  const seen=new Set(local.map(t=>t.id));
  for(const t of community){if(!seen.has(t.id)){local.push(t);seen.add(t.id)}}

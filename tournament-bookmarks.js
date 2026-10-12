@@ -24,6 +24,18 @@ var SchmetterlingeBookmarks=(function(){
   return date.toISOString().slice(0,10)===value?value:"";
  }
  function normalizeBookmark(value){
+  // Source calendar rows have a DBV public calendar ID, not necessarily a
+  // verified turnier.de UUID. Keep them in the private local list without
+  // pretending that the calendar overview is an individual DBV match page.
+  if(value?.source==="dbv-calendar"){
+   const id=String(value.id||"");
+   const name=String(value.name||"").trim().slice(0,100);
+   const startDate=validDate(value.startDate),endDate=validDate(value.endDate);
+   const playerId=String(value.playerId||"");
+   if(!/^dbv-calendar-\d{2,12}$/.test(id)||!name||!startDate||!endDate||endDate<startDate||
+      !playerId||playerId==="all"||value.url!=="https://turniere.badminton.de/")return null;
+   return {id,url:"https://turniere.badminton.de/",name,playerId,startDate,endDate,source:"dbv-calendar"};
+  }
   const parsed=parseDbvTournamentLink(value?.url);
   if(!parsed)return null;
   const name=String(value.name||"").trim().slice(0,100)||"DBV-Turnier "+parsed.id.slice(0,8);
@@ -51,7 +63,7 @@ var SchmetterlingeBookmarks=(function(){
  }
  function hasTournamentToday(state,today=localDay()){
   const ownIds=new Set((state?.players||[]).map(p=>p.id));
-  return (state?.officialLinks||[]).some(t=>(t.playerId==="all"||ownIds.has(t.playerId))&&phase(t,today)[1]==="today");
+  return (state?.officialLinks||[]).some(t=>(t.playerId==="all"||ownIds.has(t.playerId))&&t.source!=="dbv-calendar"&&phase(t,today)[1]==="today");
  }
  function sorted(state,today=localDay()){
   const order={today:0,future:1,unknown:2,past:3};

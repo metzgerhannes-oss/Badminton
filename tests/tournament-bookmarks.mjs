@@ -24,6 +24,22 @@ assert.equal(normalized.name,"DBV-Turnier E24DC6EE");
 assert.equal(normalized.startDate,"","Invalid stored dates must be cleared on restore");
 assert.equal(normalized.endDate,"2028-02-29");
 assert.equal(bookmarks.normalizeBookmark({url:"http://dbv.turnier.de/tournament/"+id}),null);
+
+const calendar={
+ source:"dbv-calendar",id:"dbv-calendar-44094",url:"https://turniere.badminton.de/",
+ name:"Norddeutsche Meisterschaften U13-U19",playerId:"05-070879",
+ startDate:"2026-11-06",endDate:"2026-11-08"
+};
+assert.equal(bookmarks.normalizeBookmark(calendar).id,calendar.id,"Official calendar IDs may be bookmarked privately without inventing tournament UUIDs");
+assert.equal(bookmarks.normalizeBookmark(calendar).source,"dbv-calendar");
+assert.equal(bookmarks.normalizeBookmark({...calendar,id:"dbv-calendar-OTHER"}),null);
+assert.equal(bookmarks.normalizeBookmark({...calendar,url:"https://example.com/"}),null);
+assert.equal(bookmarks.normalizeBookmark({...calendar,playerId:"all"}),null,"Calendar entries must be linked to one real own profile");
+assert.equal(bookmarks.normalizeBookmark({...calendar,endDate:"2026-10-04"}),null);
+const withCalendar={players:[{id:"05-070879"}],officialLinks:[bookmarks.normalizeBookmark({...calendar,startDate:"2026-10-11",endDate:"2026-10-11"})]};
+assert.equal(bookmarks.hasTournamentToday(withCalendar,"2026-10-11"),false,
+ "Merely planning a calendar event must not unlock live matchday or imply confirmed participation");
+
 assert.equal(bookmarks.localDay(new Date("2026-10-10T22:30:00Z")),"2026-10-11","Berlin local day must be used for match dates");
 assert.equal(bookmarks.localDay(new Date("2026-12-31T23:30:00Z")),"2027-01-01");
 assert.equal(bookmarks.phase({startDate:"2026-10-11",endDate:"2026-10-12"},"2026-10-11")[1],"today");

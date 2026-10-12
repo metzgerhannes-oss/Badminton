@@ -165,14 +165,14 @@ function renderOtherKpis(){
   const active=t.startDate<=today&&end>=today;
   const range=t.endDate&&t.endDate!==t.startDate?date(t.startDate)+" – "+date(t.endDate):date(t.startDate);
   const owner=t.playerId==="all"?"Alle Spieler":(profiles.find(p=>p.id===t.playerId)?.name||"Mein Profil");
-  const calendar=t.source==="spond"||!t.url;
-  const label=calendar?"Kalender · nicht als Teilnahme bestätigt":"Offizielle DBV-Turnierseite ↗";
+  const calendar=t.source==="spond"||t.source==="dbv-calendar"||!t.url;
+  const label=t.source==="dbv-calendar"?"DBV-Kalender · vorgemerkt, nicht angemeldet":calendar?"Kalender · nicht als Teilnahme bestätigt":"Offizielle DBV-Turnierseite ↗";
   return (calendar?'<div class="upcoming-tournament-row" aria-label="'+escape(t.name)+', '+escape(range)+', privater Kalendertermin">':'<a class="upcoming-tournament-row" href="'+escape(t.url)+'" rel="noopener noreferrer" target="_blank" aria-label="'+escape(t.name)+', '+escape(range)+', offizielle DBV-Turnierseite öffnen">')+
    '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'">'+escape(date(t.startDate))+'</time>'+(active?'<small>Im Zeitraum</small>':'')+'</span>'+
    '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+escape(range)+' · '+escape(owner)+' · '+label+'</small></span>'+
    (calendar?'':'<span class="upcoming-tournament-arrow" aria-hidden="true">↗</span>')+
    (calendar?'</div>':'</a>');
- }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Für diesen Spieler sind noch keine zukünftigen Turniere mit Datum gespeichert. Die Anzeige nutzt gespeicherte Turnierlinks; künftige DBV-Meldungen werden hier noch nicht automatisch eingelesen.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
+ }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Für diesen Spieler sind noch keine zukünftigen Turniere mit Datum gespeichert. Du kannst Turniere mit + direkt aus dem DBV-Kalender vormerken. Eine Vormerkung bestätigt keine Anmeldung.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
  next.innerHTML='<section class="upcoming-tournaments-section" aria-labelledby="upcoming-tournaments-heading">'+
   '<div class="upcoming-tournaments-header"><h2 id="upcoming-tournaments-heading">Die nächsten Turniere</h2><a href="#turniere">Alle Turniere ↗</a></div>'+
   '<div class="upcoming-tournaments-list">'+list+'</div></section>';
