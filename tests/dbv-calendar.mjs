@@ -8,6 +8,15 @@ assert.ok(sample.entries.length>=100,"Observed DBV source set should not silentl
 const rows=sample.entries.map(calendarEntry).filter(Boolean);
 assert.equal(rows.length,sample.entries.length,"Every stored DBV record must normalize");
 assert.equal(new Set(rows.map(x=>x.key)).size,rows.length,"Official source keys must be unique");
+const year2026=rows.filter(t=>t.start.startsWith("2026"));
+const year2027=rows.filter(t=>t.start.startsWith("2027"));
+assert.ok(year2026.length>=100,"2026 source snapshot must remain");
+const synthetic2027={...rows[0],key:"dbv-calendar-999999",start:"2027-01-16",end:"2027-01-17"};
+assert.equal(filterCalendar([rows[0],synthetic2027],{year:"2027",period:"all"}).total,1,
+ "2027 filter must exclude 2026 and retain official published 2027 entries");
+assert.equal(filterCalendar([rows[0],synthetic2027],{year:"2026",period:"all"}).total,1);
+assert.equal(filterCalendar(rows,{year:"2026",period:"all"}).total,year2026.length);
+assert.equal(filterCalendar(rows,{year:"2027",period:"all"}).total,year2027.length);
 const grouped=filterCalendar(rows,{group:"region",period:"all"});
 assert.equal(grouped.total,rows.length);
 assert.equal(grouped.groups.reduce((n,g)=>n+g.items.length,0),rows.length);
@@ -15,7 +24,7 @@ const withinBW=filterCalendar(rows,{region:"Baden-Württemberg",period:"all"});
 assert.ok(withinBW.total>0,"BW calendar should have source-backed entries");
 assert.ok(withinBW.groups.every(g=>g.label==="Baden-Württemberg"));
 assert.ok(withinBW.groups.flatMap(g=>g.items).every(t=>t.bundesland==="Baden-Württemberg"));
-const bwU13C={region:"Baden-Württemberg",age:"U13",level:"C",period:"upcoming",today:"2026-10-12"};
+const bwU13C={year:"2026",region:"Baden-Württemberg",age:"U13",level:"C",period:"upcoming",today:"2026-10-12"};
 assert.equal(filterCalendar(rows,bwU13C).total,0,"The reported triple-filter combination is legitimately empty in the published snapshot");
 assert.deepEqual(alternativeCalendarLevels(rows,bwU13C),[{level:"D",count:4},{level:"E",count:6}],
  "Empty-result alternatives should point to matching source entries while preserving BW and U13");
@@ -43,6 +52,7 @@ const app=await readFile("dbv-calendar.js","utf8");
 for(const id of ["dbv-calendar-region","dbv-calendar-age","dbv-calendar-level","dbv-calendar-results","dbv-calendar-status"]){
  assert.ok(index.includes('id="'+id+'"'),"Missing source-driven filter "+id);
 }
+assert.ok(index.includes('id="dbv-calendar-year"'),"Users must be able to select 2027");
 assert.ok(index.includes('src="./dbv-calendar.js"'));
 assert.ok(sw.includes('"./dbv-calendar.js"'));
 assert.ok(sw.includes('"./scripts/dbv-calendar-utils.mjs"'));
