@@ -7,12 +7,16 @@ const KEY="shuttleboard-v1";
 async function assertNoHorizontalOverflow(page){
  const report=await page.evaluate(()=>{
   const width=window.innerWidth;
+  const rect=el=>{const r=el.getBoundingClientRect();return {left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width)};};
   const offenders=[...document.querySelectorAll("body *")].filter(el=>{
-   const rect=el.getBoundingClientRect(),style=getComputedStyle(el);
-   return rect.width>0&&rect.right>width+2&&style.display!=="none"&&style.position!=="fixed";
-  }).slice(0,15).map(el=>({tag:el.tagName.toLowerCase(),id:el.id,cls:String(el.className||"").slice(0,90),
-   right:Math.round(el.getBoundingClientRect().right),width:Math.round(el.getBoundingClientRect().width)}));
-  return {overflow:document.documentElement.scrollWidth-width,offenders};
+   const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+   return r.width>0&&r.right>width+2&&style.display!=="none";
+  }).slice(0,25).map(el=>({tag:el.tagName.toLowerCase(),id:el.id,cls:String(el.className||"").slice(0,90),position:getComputedStyle(el).position,...rect(el)}));
+  const samples=[".bottom-nav",".app",".topbar","#view-turniere",".dbv-calendar-panel",
+   ".dbv-calendar-filters","#dbv-calendar-results","#badhub-event-panel"]
+   .map(selector=>{const el=document.querySelector(selector);return el?{selector,...rect(el),scroll:el.scrollWidth}:null;}).filter(Boolean);
+  return {overflow:document.documentElement.scrollWidth-width,viewport:{inner:width,client:document.documentElement.clientWidth,
+   html:rect(document.documentElement),body:rect(document.body),visual:window.visualViewport?.width},offenders,samples};
  });
  expect(report.overflow,JSON.stringify(report)).toBeLessThanOrEqual(2);
 }
