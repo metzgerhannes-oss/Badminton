@@ -47,7 +47,11 @@ async function getSession(create=false){
  return current;
 }
 async function publish(bookmark){
- const session=await getSession(true);
+ // A newly created anonymous UID cannot have an independently verified player grant.
+ // Do not create accounts for public-share attempts that must fail authorization.
+ const session=await getSession(false);
+ if(!session)throw Error("Für öffentliche Meldungen ist eine bereits geprüfte Berechtigung nötig. "+
+  "Das Turnier bleibt privat auf deinem Gerät.");
  const item=sharePayload(bookmark,session.user_id);
  // The public DBV directory does NOT prove this account can manage that player.
  // Check the independently approved grant before attempting any public write.
