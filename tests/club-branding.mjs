@@ -27,7 +27,7 @@ assert.match(serviceWorker, /club-branding\.css/);
 for (const code of ["en", "fr", "uk", "ru", "zh-Hans", "tr", "ar", "it", "es", "pl"]) {
   const pack = JSON.parse(await readFile("locales/" + code + ".json", "utf8"));
   assert.equal(pack.meta.locale, code);
-  for (const key of ["Wessen Badminton möchtest du verfolgen?",
+  for (const key of ["Für wen möchtest du ein Profil anlegen?",
     "Erscheinungsbild & Verein", "Vereinsname", "Vereinsdesign speichern"]) {
     assert.ok(typeof pack.messages[key] === "string" && pack.messages[key].length > 0,
       "Missing locale string: " + code + " " + key);

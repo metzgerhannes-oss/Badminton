@@ -95,7 +95,6 @@
     "DEIN PERSÖNLICHER START": "ВАШ ЛИЧНЫЙ СТАРТ",
     "Willkommen bei den": "Добро пожаловать в",
     "Schmetterlingen.": "Schmetterlinge.",
-    "Wessen Badminton möchtest du verfolgen?": "За каким игроком в бадминтон вы хотите следить?",
     "1 · Spielerprofil": "1 · Профиль игрока",
     "2 · Zum Home-Bildschirm": "2 · На главный экран",
     "Diesen Spieler übernehmen": "Выбрать этого игрока",
@@ -113,6 +112,7 @@
     "Vereinslogo (PNG, JPG oder WebP, maximal 2 MB)": "Логотип клуба (PNG, JPG или WebP, до 2 МБ)",
     "Mindestens zwei Zeichen eingeben, um Spieler zu finden.": "Введите минимум два символа для поиска игроков.",
     "1. Schritt Profil anlegen": "Шаг 1: Создать профиль",
-    "2. Schritt App hinzufügen": "Шаг 2: Добавить приложение"
+    "2. Schritt App hinzufügen": "Шаг 2: Добавить приложение",
+    "Für wen möchtest du ein Profil anlegen?": "Для кого вы хотите создать профиль?"
   }
 }
