@@ -79,6 +79,12 @@ function renderDetail(){
  $("team-detail-title").textContent=displayTeamName(team);
  $("team-detail-meta").textContent=team.league_name+" · "+team.season+" · Stand "+dateOnly(team.source_checked_at);
  $("team-detail-summary").textContent="Tabellenplatz "+(team.position??"–")+" · Punkte "+tablePoints(team);
+ const alias=$("team-official-alias");
+ if(alias){
+  const official=String(team.official_team_name||"").trim();
+  alias.hidden=!official||official===displayTeamName(team);
+  alias.textContent=alias.hidden?"":"Bei nuLiga geführt als: "+official;
+ }
  const link=$("team-source-link");
  if(href){link.href=href;link.hidden=false}else link.hidden=true;
  $("team-detail-games").hidden=activeTab!=="games";
@@ -134,7 +140,7 @@ async function load(){
  if(loading)return;
  loading=true;loadFailed=false;showStatus("Öffentliche nuLiga-Mannschaftsdaten werden geladen …");renderSearchResults();
  try{
-  const data=await readPublicRows("league_teams?select=id,follow_key,club_id,club_name,team_label,league_name,season,position,points_for,points_against,source_url,source_checked_at&order=club_name.asc,team_label.asc&limit=500",{count:false});
+  const data=await readPublicRows("league_teams?select=id,follow_key,club_id,club_name,team_label,league_name,season,position,points_for,points_against,official_team_name,source_url,source_checked_at&order=club_name.asc,team_label.asc&limit=500",{count:false});
   rows=data.rows.filter(t=>/^nuliga:[0-9]{3,7}:[1-9][0-9]?$/.test(t.follow_key)&&officialTeamUrl(t.source_url));
   loadFailed=false;
   const seasons=[...new Set(rows.map(r=>r.season))].sort().reverse();

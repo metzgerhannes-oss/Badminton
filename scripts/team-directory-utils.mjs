@@ -20,7 +20,7 @@ export function officialTeamUrl(raw){
  try{
   const u=new URL(String(raw));
   if(u.protocol!=="https:"||!["bwbv-badminton.liga.nu","badminton.liga.nu"].includes(u.hostname))return "";
-  if(!/\/cgi-bin\/WebObjects\/nuLigaBADDE\.woa\/(?:[0-9]+\/)?wa\/(?:clubTeams|groupPage|clubMeetings|clubMeetingReport)$/.test(u.pathname))return "";
+  if(!/\/cgi-bin\/WebObjects\/nuLigaBADDE\.woa\/(?:[0-9]+\/)?wa\/(?:clubTeams|groupPage|clubMeetings|clubMeetingReport|groupMeetingReport)$/.test(u.pathname))return "";
   return u.href;
  }catch{return ""}
 }
