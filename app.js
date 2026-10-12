@@ -254,7 +254,7 @@ window.badmintonCalendarToggle=item=>{
   return {ok:false,message:"Bitte zuerst ein eigenes Spielerprofil auswählen."};
  }
  const key=String(item?.key||"");
- if(!/^dbv-calendar-\\d{2,12}$/.test(key))return {ok:false,message:"Ungültige DBV-Kalenderkennung."};
+ if(!/^dbv-calendar-\d{2,12}$/.test(key))return {ok:false,message:"Ungültige DBV-Kalenderkennung."};
  const previous=state.officialLinks.find(t=>t.source==="dbv-calendar"&&t.id===key&&t.playerId===state.activeProfileId);
  if(previous){
   state.officialLinks=state.officialLinks.filter(t=>t!==previous);
