@@ -51,7 +51,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v97" title="Version v97">v97</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v98" title="Version v98">v98</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -291,9 +291,17 @@
    </details>
   </section>
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
-   <div class="section-heading"><h2 id="heading-spieler">Spieler</h2></div>
-    <div class="section-heading library-section-heading"><h3>Spieler finden</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
-   <p class="supporting">Gemeinsames Verzeichnis öffentlich bestätigter DBV-Spielerinnen und Spieler. Gruppiert nach Verein, mit Filtern nach offizieller Altersklasse und Landesverband. Folge einem Spieler, um ihn in deiner persönlichen Liste wiederzufinden.</p>
+   <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2><button type="button" class="subtle-button follow-add" id="player-add-open" aria-expanded="false" aria-controls="player-discover">+ Hinzufügen</button></div>
+   <section class="follow-hub" aria-label="Meine Spieler">
+    <h3>Mein Startprofil</h3>
+    <div id="player-own-preview" class="follow-stack" aria-live="polite"></div>
+    <div class="follow-hub-subheading"><h3>Gefolgte Spieler</h3><a href="#einstellungen">Verwalten ↗</a></div>
+    <div id="friend-list" class="friends-list follow-stack" aria-live="polite"></div>
+   </section>
+   <section id="player-discover" class="follow-discovery" aria-labelledby="player-discover-heading" hidden>
+    <div class="follow-hub-subheading"><h3 id="player-discover-heading">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>
+   <div class="section-heading library-section-heading"><h3>DBV-Verzeichnis</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
+   <p class="supporting">Suche öffentlich bestätigte DBV-Spielerprofile und folge deinen Favoriten.</p>
    <div class="library-source" id="library-source" aria-live="polite">Offizielle DBV-Rangliste wird geladen.</div>
    <div class="library-filters">
     <label>Spielerin / Spieler suchen<input type="search" id="library-search" placeholder="Name oder DBV-Spieler-ID" autocomplete="off"></label>
@@ -305,43 +313,15 @@
    <div id="library-results" class="library-results" aria-live="polite"><div class="library-message library-idle"><strong>Spieler suchen</strong><span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div></div>
    <button id="library-more" type="button" class="outline-button library-more" hidden>Weitere Spieler anzeigen</button>
    <p class="library-data-note">Nur in der offiziellen DBV-Rangliste veröffentlichte Spieler werden zentral aufgenommen. Neu angelegte lokale Profile und private Favoritenlisten werden nicht automatisch veröffentlicht. Für andere Spieler können Ranglisten-KPIs noch fehlen.</p>
-   <section class="player-management" aria-label="Meine Spielerprofile und Freunde">
-    <div class="player-management-head"><h3>Mein Bereich</h3><p>Eigene Profile und Spieler, denen du folgst – nur auf diesem Gerät gespeichert.</p></div>
-    <div class="settings-section">
-    <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
-    <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
-    <div id="profile-list" class="profiles"></div>
-   </div>
-    <div class="settings-section">
-      <div class="section-heading"><h3>Freunde</h3><button id="add-friend" class="subtle-button" type="button">Spieler suchen</button></div>
-      <p class="settings-hint">Zum Folgen oben in der Bibliothek suchen. Bereits gespeicherte Freunde kannst du hier ansehen und bearbeiten.</p>
-      <div id="friend-list" class="friends-list"></div>
-      <button id="add-friend-manual" class="subtle-button friend-add-manual" type="button">Spieler mit DBV-ID manuell hinzufügen ↗</button>
-    </div>
-    <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
+
    </section>
   </section>
   <section class="page" id="view-mannschaft" aria-labelledby="heading-mannschaft">
-   <div class="section-heading"><h2 id="heading-mannschaft">Mannschaft</h2><button id="team-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
-   <p class="supporting">Vereinsmannschaften folgen, Ligapunkte ansehen und den Spielbetrieb einer Saison verfolgen. Öffentliche nuLiga-Daten getrennt von Einzelturnieren.</p>
-   <div class="team-controls">
-    <label>Mannschaft oder Verein suchen<input id="team-search" type="search" placeholder="Verein oder Liga" autocomplete="off"></label>
-    <label>Saison<select id="team-season"><option value="2026/27">2026/27</option></select></label>
-   </div>
-   <p id="team-directory-status" class="team-source-note" role="status" aria-live="polite">Mannschaften werden geladen …</p>
+   <div class="section-heading follow-hub-header"><h2 id="heading-mannschaft">Mannschaften</h2><button id="team-add-open" class="subtle-button follow-add" type="button" aria-expanded="false" aria-controls="team-discover">+ Hinzufügen</button></div>
+   <div class="follow-season"><label for="team-season">Saison</label><select id="team-season"><option value="2026/27">2026/27</option></select><button id="team-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
    <section class="team-section" aria-labelledby="team-followed-heading">
-    <h3 id="team-followed-heading">Meine Mannschaften</h3>
+    <div class="follow-hub-subheading"><h3 id="team-followed-heading">Meine Mannschaften</h3><a href="#einstellungen">Verwalten ↗</a></div>
     <div id="team-followed" class="team-stack" aria-live="polite"></div>
-   </section>
-   <section class="team-section" aria-labelledby="team-find-heading">
-    <h3 id="team-find-heading">Mannschaften finden</h3>
-    <p id="team-count" class="team-result-count" aria-live="polite"></p>
-    <div id="team-results" class="team-stack" aria-live="polite"></div>
-    <div class="team-club-directory" aria-labelledby="team-clubs-title">
-     <h3 id="team-clubs-title">Weitere Vereine im BWBV</h3>
-     <p class="team-source-note">Suche nach einem Verein. Importierte Mannschaften kannst du sofort verfolgen; bei weiteren Vereinen führt der Originallink direkt zu nuLiga.</p>
-     <div id="team-clubs-results" class="team-clubs-results" aria-live="polite"></div>
-    </div>
    </section>
    <section id="team-detail" class="team-detail" aria-labelledby="team-detail-title" hidden>
     <h3 id="team-detail-title"></h3>
@@ -355,11 +335,47 @@
     <div id="team-detail-table" role="tabpanel" aria-label="Ligatabelle" aria-live="polite" hidden></div>
     <a id="team-source-link" class="team-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Offizielle Saison bei nuLiga öffnen ↗</a>
    </section>
-   <p class="team-source-note">Die veröffentlichten Saisonspiele und Ligatabellen werden täglich aus nuLiga geprüft. Derzeit sind drei Pilotvereine verfügbar. Gefolgte Mannschaften bleiben nur auf diesem Gerät gespeichert.</p>
+
+   <section id="team-discover" class="follow-discovery team-discovery" aria-labelledby="team-find-heading" hidden>
+    <div class="follow-hub-subheading"><h3 id="team-find-heading">Mannschaften finden</h3><button type="button" id="team-discover-close" class="subtle-button">Schließen</button></div>
+    <div class="team-controls team-controls-single"><label>Mannschaft oder Verein suchen<input id="team-search" type="search" placeholder="Verein oder Liga" autocomplete="off"></label></div>
+    <p id="team-count" class="team-result-count" aria-live="polite"></p>
+    <div id="team-results" class="team-stack" aria-live="polite"></div>
+    <div class="team-club-directory" aria-labelledby="team-clubs-title"><h3 id="team-clubs-title">Weitere Vereine im BWBV</h3>
+     <p class="team-source-note">Nicht importierte Vereine können über den offiziellen nuLiga-Link geöffnet werden.</p>
+     <div id="team-clubs-results" class="team-clubs-results" aria-live="polite"></div>
+    </div>
+   </section>
+   <p id="team-directory-status" class="team-source-note" role="status" aria-live="polite">Mannschaften werden geladen …</p>
+   <p class="team-source-note">Spielpläne und Tabellen basieren auf datierten nuLiga-Quellen. Gefolgte Mannschaften bleiben auf diesem Gerät gespeichert.</p>
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v97 · Release-Informationen werden geladen</p>
+   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v98 · Release-Informationen werden geladen</p>
+   <section class="settings-card follow-settings" aria-labelledby="follow-settings-title">
+    <h3 id="follow-settings-title">Spieler und Mannschaften verwalten</h3>
+    <p class="settings-hint">Deine Folgen-Listen bleiben auf diesem Gerät. Hier kannst du die Reihenfolge ändern oder Einträge entfernen.</p>
+    <div class="follow-hub-subheading"><h4>Gefolgte Spieler</h4><button id="settings-players-add" class="subtle-button" type="button">+ Spieler</button></div>
+    <div id="friend-settings-list" class="friends-list follow-stack" aria-live="polite"></div>
+    <div class="follow-hub-subheading"><h4>Gefolgte Mannschaften</h4><button id="settings-teams-add" class="subtle-button" type="button">+ Mannschaft</button></div>
+    <div id="team-settings-list" class="team-stack" aria-live="polite"></div>
+   </section>
+   <section class="player-management" aria-label="Meine Spielerprofile und Freunde">
+    <div class="player-management-head"><h3>Profile und Familie</h3><p>Eigene Profile und Spieler, denen du folgst – nur auf diesem Gerät gespeichert.</p></div>
+    <div class="settings-section">
+    <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
+    <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
+    <div id="profile-list" class="profiles"></div>
+   </div>
+    <div class="settings-section">
+      <div class="section-heading"><h3>Weitere Spieleraktionen</h3><button id="add-friend" class="subtle-button" type="button">Spieler suchen</button></div>
+      <p class="settings-hint">Zum Folgen in der Spieleransicht auf „+ Hinzufügen“ tippen.</p>
+      <p class="settings-hint">Deine gefolgten Spieler verwaltest du oben.</p>
+      <button id="add-friend-manual" class="subtle-button friend-add-manual" type="button">Spieler mit DBV-ID manuell hinzufügen ↗</button>
+    </div>
+    <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
+   </section>
+
    <section class="settings-card language-settings" aria-labelledby="language-title">
     <h3 id="language-title">Sprache</h3>
     <label for="app-language">App-Sprache</label>

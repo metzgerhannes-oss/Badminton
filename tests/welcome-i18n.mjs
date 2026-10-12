@@ -12,12 +12,12 @@ assert.equal(required.size,keys.length,"Each canonical German key must be unique
 const keepGerman = new Set([
  "Schmetterlinge","Willkommen · Schmetterlinge Badminton","Deutsch",
  "English","Français","Türkçe","Italiano","Español","Polski",
- "iPhone / iPad","Android","v97"
+ "iPhone / iPad","Android"
 ]);
 const textNodes = [...new Set(html.split(/<[^>]*>/g)
  .map(x=>x.replaceAll("&amp;","&").trim())
  .filter(x=>x&&/[A-Za-zÄÖÜäöüß]/.test(x)&&!x.startsWith("<")))]
- .filter(x=>!keepGerman.has(x));
+ .filter(x=>!keepGerman.has(x)&&!/^v[1-9][0-9]*$/.test(x));
 for (const phrase of textNodes) {
   const files = await Promise.all(manifest.locales.filter(l=>l.code!=="de")
    .map(l=>readFile("locales/"+l.code+".json","utf8").then(JSON.parse)));

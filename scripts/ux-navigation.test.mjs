@@ -23,14 +23,21 @@ test("four usual destinations plus conditional LIVE; settings in header; history
  assert.match(shell,/\.bottom-nav a\{width:25%!important/);
 });
 
-test("single follow/search route; profiles live under Spieler, not Einstellungen",()=>{
+test("follow-first Spieler and Mannschaft tabs; profile and follow management in Einstellungen",()=>{
  assert.doesNotMatch(html,/src="\.\/friend-search\.js"/);
  assert.doesNotMatch(html,/id="friend-search"/);
  assert.equal((html.match(/id="library-search"/g)||[]).length,1);
- for(const id of ["add-player","add-friend","add-friend-manual","friend-list","profile-list"]){
+ for(const id of ["add-player","add-friend","add-friend-manual","friend-list","profile-list","friend-settings-list","team-settings-list"]){
   assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1);
-  assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'));
  }
+ for(const id of ["friend-list","player-discover","player-add-open","team-followed","team-discover","team-add-open"]){
+  assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'),id);
+ }
+ for(const id of ["profile-list","friend-settings-list","team-settings-list"]){
+  assert.ok(html.indexOf('id="'+id+'"')>html.indexOf('id="view-einstellungen"'),id);
+ }
+ assert.match(html,/id="player-discover"[^>]*hidden/);
+ assert.match(html,/id="team-discover"[^>]*hidden/);
  assert.match(html,/id="dashboard-friends-manage"[^>]*href="#spieler" hidden/);
  assert.doesNotMatch(html,/id="dashboard-add-friend"/);
 });
@@ -63,7 +70,7 @@ test("Home and friends use one profile navigation mechanism",()=>{
  assert.match(app,/function navigateHome\(\)/);
  assert.match(app,/routeTo\("start"\)/);
  assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.friendQuick\)/);
- assert.match(app,/window\.badmintonSelectViewer\(friend\.id\)/);
+ assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.viewFriend\)/);
  assert.match(app,/window\.badmintonSelectViewer\(button\.dataset\.switchProfile\)/);
  assert.match(router,/data-current-view/);
 });

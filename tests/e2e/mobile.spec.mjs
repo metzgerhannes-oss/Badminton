@@ -404,7 +404,8 @@ test("Search is empty before criteria and modal remains dismissible",async ({pag
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#library-results")).toContainText("Spieler suchen");
  await expect(page.locator("#library-count")).toContainText(/Suche starten|Spieler suchen/);
- await page.locator("#add-player").click();
+ await page.goto("/#einstellungen");
+  await page.locator("#add-player").click();
  await expect(page.locator("#player-dialog")).toBeVisible();
  await expect(page.locator("#cancel-dialog")).toBeVisible();
  await page.locator("#cancel-dialog").click();
