@@ -22,3 +22,9 @@
 .spond-preview select{display:block;width:100%;margin:.5rem 0 1rem;padding:.6rem}
 .spond-preview-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
 @media(max-width:430px){.spond-event{align-items:stretch;flex-direction:column}.spond-event button{align-self:flex-end}}
+
+.spond-preview-event{display:flex;align-items:flex-start;gap:.7rem;cursor:pointer;padding:.15rem}
+.spond-preview-event input{width:1.1rem;height:1.1rem;flex:none;margin:.2rem 0 0}
+.spond-preview-event span{display:grid;gap:.2rem;min-width:0}
+.spond-preview-event strong{color:var(--text,#24384b);font-size:.9rem}
+.spond-preview-event small{font-size:.78rem}
