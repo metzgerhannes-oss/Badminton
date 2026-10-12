@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/import-dbv-calendar.py'
+      - 'scripts/dbv-calendar-source.py'
       - 'tests/test_dbv_calendar.py'
       - 'tests/test_dbv_calendar_oidc.py'
       - '.github/workflows/dbv-calendar-source.yml'
@@ -18,6 +19,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/import-dbv-calendar.py'
+      - 'scripts/dbv-calendar-source.py'
       - 'scripts/publish-dbv-calendar-oidc.py'
       - 'supabase/functions/dbv-calendar-publish/index.ts'
       - 'supabase/config.toml'
@@ -41,6 +43,9 @@ jobs:
           python3 -m unittest discover -s tests -p test_dbv_calendar_oidc.py -v
       - name: Validate official complete calendar table
         run: python3 scripts/import-dbv-calendar.py
+      - name: Inspect official 2027 year selectors (diagnostic)
+        if: github.event_name == 'pull_request'
+        run: python3 scripts/dbv-calendar-source.py --year-probe
   publish:
     if: github.event_name != 'pull_request'
     needs: verify
