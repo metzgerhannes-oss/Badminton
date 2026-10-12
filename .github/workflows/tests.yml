@@ -125,6 +125,7 @@ jobs:
           node tests/css-cascade-consolidation.mjs
           node tests/ux-foundation.mjs
           node tests/team-directory.mjs
+          node tests/nuliga-season-import.mjs
           node tests/club-branding.mjs
           node tests/shared-tournaments.mjs
           node tests/release-version.mjs
