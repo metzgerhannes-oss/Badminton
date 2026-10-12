@@ -136,6 +136,7 @@ jobs:
           node tests/club-branding.mjs
           node tests/shared-tournaments.mjs
           node tests/access-model.mjs
+          node tests/private-invitation.mjs
           node tests/release-version.mjs
           node tests/welcome-i18n.mjs
           node tests/supabase-read.mjs
