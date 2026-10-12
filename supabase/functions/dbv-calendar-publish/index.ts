@@ -55,7 +55,10 @@ function normalize(raw:unknown):Record<string,unknown>{
  const row=raw as Record<string,any>;
  if(!ID.test(String(row.source_key||""))||!validDate(row.start_date)||!validDate(row.end_date))throw Error("id_or_date");
  const days=(Date.parse(row.end_date)-Date.parse(row.start_date))/86400000;
- if(days<0||days>14)throw Error("duration");
+ // The official DBV calendar sometimes publishes a multi-month series window.
+ // This is the sourced date interval, NOT invented individual tournament days.
+ // Keep the same <=366-day limit as the trusted GitHub source parser.
+ if(days<0||days>366)throw Error("duration");
  const title=cleanText(row.title,240),organizer=cleanText(row.organizer,100);
  if(!title||title.length<3||!organizer)throw Error("text");
  const location=cleanText(row.location_text,180,true);
