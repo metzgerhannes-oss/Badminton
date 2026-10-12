@@ -27,5 +27,5 @@ assert.match(grant,/g\.revoked_at IS NULL/);
 assert.match(grant,/AFTER INSERT OR UPDATE OR DELETE ON public\.player_publication_grants/);
 assert.match(plan,/#139/);
 assert.match(plan,/#140/);
-assert.match(plan,/v105 stellt[\\s\\S]*privaten Einladungslink/);
+assert.match(plan,/stellt \*\*noch keinen\*\* privaten Einladungslink/);
 console.log("Guest-first access: public/local use stays login-free, public write still needs independently verified grant.");
