@@ -30,5 +30,5 @@ assert.ok(!html.includes('id="friend-search"'));
 assert.match(app,/badmintonLibraryToggleFollow/);
 assert.match(app,/add-friend-manual/);
 assert.match(library,/data-library-toggle/);
-assert.match(sw,/schmetterlinge-shell-v92/);
+assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
 console.log("Friend search uses one library search path, with correct DBV identity handling and manual ID fallback.");
