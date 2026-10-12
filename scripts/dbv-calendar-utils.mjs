@@ -33,9 +33,10 @@ function safeUrl(value){
  }catch{return ""}
 }
 export function regionLabel(t){return t.bundesland||t.organizer||"Überregional"}
-export function filterCalendar(entries,{region="all",age="all",level="all",q="",period="upcoming",group="region",today=""}={}){
+export function filterCalendar(entries,{region="all",age="all",level="all",year="all",q="",period="upcoming",group="region",today=""}={}){
  const search=String(q).normalize("NFKC").trim().toLocaleLowerCase("de");
  const filtered=entries.filter(t=>{
+  if(year!=="all"&&t.start.slice(0,4)!==year)return false;
   if(region!=="all"&&regionLabel(t)!==region)return false;
   if(age!=="all"&&!t.ages.includes(age))return false;
   if(level!=="all"&&t.level!==level)return false;

@@ -43,6 +43,11 @@ class CalendarTests(unittest.TestCase):
   bad=HTML.replace("U13: E/D/M<br>U15: E/D/M<br>U17: E/D/M<br>U19: E/D/M","")
   with self.assertRaisesRegex(ValueError,"Unusable"):
    module.parse_page(bad,2026)
+ def test_long_source_published_2027_range(self):
+  self.assertEqual(module.date_pair("13.03. - 23.07.",2027),("2027-03-13","2027-07-23"))
+  self.assertEqual(module.date_pair("30.12. - 02.01.",2027),("2027-12-30","2028-01-02"))
+  with self.assertRaises(ValueError):
+   module.date_pair("31.02. - 01.03.",2027)
  def test_filters_include_categories_and_associations(self):
   qs=module.calendar_url(2026)
   self.assertIn("agegroup%5B%5D=U11",qs)

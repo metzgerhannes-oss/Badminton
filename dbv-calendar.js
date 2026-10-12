@@ -10,7 +10,7 @@ const localToday=()=>{
  return x.year+"-"+x.month+"-"+x.day;
 };
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
-const defaults={region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
+const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
 function readPreference(){
  try{const x=JSON.parse(localStorage.getItem(STORAGE)||"{}");return {...defaults,...Object.fromEntries(Object.entries(x).filter(([k,v])=>k in defaults&&typeof v==="string"))}}catch{return {...defaults}}
 }
@@ -22,10 +22,12 @@ function selectOptions(node,values,placeholder){
 }
 function updateControls(){
  const regions=[...new Set(entries.map(regionLabel))].sort((a,b)=>a.localeCompare(b,"de"));
+ const years=[...new Set(entries.map(t=>t.start.slice(0,4)))].sort();
+ selectOptions($("dbv-calendar-year"),years,"Alle Jahre");
  selectOptions($("dbv-calendar-region"),regions,"Alle Bundesländer / Verbände");
  selectOptions($("dbv-calendar-age"),AGE_OPTIONS,"Alle Altersklassen");
  selectOptions($("dbv-calendar-level"),LEVEL_OPTIONS,"Alle Level");
- for(const key of ["region","age","level","group","period","q"]){
+ for(const key of ["year","region","age","level","group","period","q"]){
   const node=$("dbv-calendar-"+key);
   if(!node)continue;
   if(key==="q"){node.value=settings.q;continue;}
@@ -46,11 +48,12 @@ function render(){
  message(selected.total+" von "+entries.length+" offiziellen Kalendereinträgen · Erfasster Zeitraum: "+coverage+" · Quelle DBV"+warning);
  if(!selected.total){
   const region=settings.region==="all"?"allen Regionen":settings.region;
+  const year=settings.year==="all"?"allen Jahren":"Jahr "+settings.year;
   const age=settings.age==="all"?"allen Altersklassen":settings.age;
   const level=settings.level==="all"?"allen Levels":"Level "+settings.level;
   const alternatives=alternativeCalendarLevels(entries,{...settings,today:localToday()});
   host.innerHTML='<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere im erfassten Zeitraum</h4>'+
-   '<p>Für '+esc(region)+' · '+esc(age)+' · '+esc(level)+' liegen im aktuellen Datenbestand ('+esc(coverage)+') keine passenden Termine vor.</p>'+
+   '<p>Für '+esc(year)+' · '+esc(region)+' · '+esc(age)+' · '+esc(level)+' liegen im aktuellen Datenbestand ('+esc(coverage)+') keine passenden Termine vor.</p>'+
    (alternatives.length?'<p>Mit denselben übrigen Filtern sind folgende Levels verfügbar:</p><div class="dbv-calendar-alternatives">'+
     alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
       'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
@@ -133,7 +136,7 @@ async function load(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("dbv-calendar-results"))return;
- for(const key of ["region","age","level","period","group","q"]){
+ for(const key of ["year","region","age","level","period","group","q"]){
   const node=$("dbv-calendar-"+key);
   node?.addEventListener(key==="q"?"input":"change",()=>{
    settings[key]=node.value;
