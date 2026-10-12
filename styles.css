@@ -528,5 +528,6 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 .library-own{background:#285d74;color:#d2eefa;font-size:9px;padding:7px}
 .library-message{background:#193e5a;color:#d7e8f3;border:1px dashed #5d8daa;border-radius:12px;padding:16px;font-size:12px;line-height:1.6}
 .library-more{display:block;width:100%;max-width:360px;margin:18px auto;font-weight:800;min-height:46px}
+.library-more[hidden]{display:none!important}
 .library-data-note{font-size:11px;line-height:1.6;color:#b4d4e6;margin:22px 0}
 @media(max-width:360px){.library-filters{grid-template-columns:1fr}.library-player{gap:7px;padding:10px 7px}.library-player-action{max-width:94px}.library-player-action button{padding:7px;font-size:9px}}
