@@ -58,3 +58,39 @@ test("bundled language catalog remains usable during a Cloudflare outage without
   await expect(page.locator("html")).toHaveAttribute("lang","it");
   expect(intercepted).toBe(0); // Bundled language files are served immediately, even offline.
 });
+
+
+test("Chinese onboarding has translated descriptions, search feedback and both install paths", async ({page}) => {
+  await page.goto("/welcome.html");
+  await page.locator("#welcome-language").selectOption("zh-Hans");
+  await expect(page.locator(".welcome-hero p")).toHaveText("排名、赛事和报道尽在掌中，记录你的羽毛球之路。");
+  await expect(page.locator(".welcome-pills")).toContainText("球员档案");
+  await expect(page.locator("#onboard-profile > p").first()).toContainText("在公开的 DBV 球员名录中搜索");
+  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
+  await page.locator("#welcome-player-search").fill("x");
+  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
+  await page.locator("#welcome-manual-panel summary").click();
+  await expect(page.locator("#mode-own")).toContainText("创建球员档案");
+  await expect(page.locator("#welcome-manual-panel")).toContainText("关联 DBV 编号后");
+  await page.goto("/welcome.html#installation");
+  await expect(page.locator("#install-title")).toHaveText("像应用一样打开 Schmetterlinge");
+  await expect(page.locator("#onboard-install > p").first()).toContainText("无需通过应用商店安装");
+  await expect(page.locator("#install-ios-steps")).toContainText("在 Safari 中打开");
+  await page.locator("#install-android").click();
+  await expect(page.locator("#install-android-steps")).toContainText("在 Google Chrome 中打开");
+  await expect(page.locator("#welcome-language")).toHaveValue("zh-Hans");
+  await page.locator("#welcome-language").selectOption("en");
+  await expect(page.locator("#onboard-install > p").first()).toContainText("No app store required");
+  await expect(page.locator("#install-android-steps")).toContainText("Open the page in Google Chrome");
+});
+
+test("Onboarding changes language even after asynchronous status was rendered", async ({page}) => {
+  await page.goto("/welcome.html");
+  await page.locator("#welcome-player-search").fill("x");
+  await page.locator("#welcome-language").selectOption("zh-Hans");
+  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
+  await page.locator("#welcome-language").selectOption("fr");
+  await expect(page.locator("#welcome-search-status")).toHaveText("Saisissez au moins deux caractères pour trouver des joueurs.");
+  await page.locator("#welcome-language").selectOption("de");
+  await expect(page.locator("#welcome-search-status")).toHaveText("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
+});
