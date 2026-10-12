@@ -35,7 +35,8 @@ test("unverified session cannot send a public tournament hint",async ({page})=>{
   new CustomEvent("badminton:share-tournament",{detail:{bookmark,publicShare:true}})
  ),BOOKMARK);
  await expect(page.locator("#community-sync-status")).toContainText("keine geprüfte Veröffentlichungsberechtigung");
- await expect(page.locator("#community-sync-status")).toContainText(DBV);
+ await expect(page.locator("#community-sync-status")).toContainText("Das Turnier bleibt privat auf deinem Gerät");
+ await expect(page.locator("#community-sync-status")).not.toContainText(USER);
  expect(grantChecks).toBe(1);
  expect(inserts).toBe(0);
  const flags=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.communityShares.v1")||"{}"));
