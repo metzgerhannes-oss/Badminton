@@ -13,7 +13,10 @@ const original={
  friends:[{id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen"}],
  officialLinks:[{id:"E24DC6EE-152A-454D-B00C-E625B751D7D5",
   url:tournament,name:"Turnier",playerId:"05-070879",
-  startDate:"2026-10-11",endDate:"2026-10-12"}],
+  startDate:"2026-10-11",endDate:"2026-10-12"},
+  {id:"dbv-calendar-44577",source:"dbv-calendar",url:"https://turniere.badminton.de/",
+   name:"D-RLT SAH Süd U11-U19",playerId:"05-071969",
+   startDate:"2027-03-13",endDate:"2027-07-23"}],
  activeProfileId:"05-070879",chosen:"05-061350",historyProfilesInitialized:true
 };
 const stored=JSON.stringify(original);
@@ -23,12 +26,18 @@ assert.equal(LOCAL_STORE_KEY,"shuttleboard-v1");
 assert.equal(JSON.parse(created).kind,BACKUP_KIND);
 assert.equal(JSON.parse(created).schemaVersion,BACKUP_VERSION);
 assert.deepEqual(parsed.summary,{
- players:2,friends:1,tournaments:1,activePlayer:"Philipp Metzger"
+ players:2,friends:1,tournaments:2,activePlayer:"Philipp Metzger"
 });
 assert.equal(parsed.data.activeProfileId,"05-070879");
 assert.equal(parsed.data.chosen,"05-070879","Viewing a friend must not replace the own Home profile");
 assert.deepEqual(parsed.data.friends,[{id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",url:""}]);
 assert.equal(parsed.data.officialLinks[0].url,tournament);
+assert.deepEqual(parsed.data.officialLinks[1],{
+ id:"dbv-calendar-44577",source:"dbv-calendar",url:"https://turniere.badminton.de/",
+ name:"D-RLT SAH Süd U11-U19",playerId:"05-071969",
+ startDate:"2027-03-13",endDate:"2027-07-23"
+});
+
 assert.equal(parsed.data.historyProfilesInitialized,true);
 assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(parsed.data))).data,parsed.data);
 
@@ -46,6 +55,14 @@ for(const bad of [
  damaged(b=>b.data.officialLinks[0].endDate="2026-01-01"),
  damaged(b=>b.data.activeProfileId="05-061350"),
  damaged(b=>b.data.officialLinks[0].playerId="05-061350"),
+ damaged(b=>b.data.officialLinks[1].id="dbv-calendar-not-id"),
+ damaged(b=>b.data.officialLinks[1].source="invented-source"),
+ damaged(b=>b.data.officialLinks[1].playerId="05-061350"),
+ damaged(b=>b.data.officialLinks[1].url="https://example.com/"),
+ damaged(b=>b.data.officialLinks[1].startDate=""),
+ damaged(b=>b.data.officialLinks[1].endDate="2027-02-01"),
+ damaged(b=>b.data.officialLinks[1].name="Bad\\nName"),
+ damaged(b=>b.data.officialLinks.push({...b.data.officialLinks[1]})),
  damaged(b=>b.data.players[0].name="<script>\n"),
 ])assert.throws(()=>inspectLocalBackup(bad));
 assert.throws(()=>inspectLocalBackup("{" ));
@@ -70,6 +87,10 @@ const restored=JSON.parse(vm.runInContext("JSON.stringify({players:state.players
 assert.equal(restored.players.length,2);
 assert.equal(restored.friends[0].id,"05-061350");
 assert.equal(restored.officialLinks[0].id,"E24DC6EE-152A-454D-B00C-E625B751D7D5");
+assert.equal(restored.officialLinks.length,2,"Device restore must not drop DBV calendar quick-saves");
+assert.equal(restored.officialLinks[1].id,"dbv-calendar-44577");
+assert.equal(restored.officialLinks[1].source,"dbv-calendar");
+assert.equal(restored.officialLinks[1].playerId,"05-071969");
 assert.equal(restored.activeProfileId,"05-070879");
 assert.equal(restored.viewingFriendId,null);
 const html=await readFile("index.html","utf8");
