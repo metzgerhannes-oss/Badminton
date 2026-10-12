@@ -213,7 +213,7 @@ async function load(){
   const {people,total}=await dbPage(0);
   if(ticket!==pending)return;
   entries=people;dbTotal=total;dbMode=true;loaded=true;
-  $("library-source").textContent="Supabase · offizieller DBV-Ranglistenbestand · "+total.toLocaleString("de-DE")+" Spieler";
+  $("library-source").textContent="Supabase · offizieller DBV-Ranglistenbestand";
   if(!associationsLoaded)dbAssociations().catch(e=>console.warn("Vereinsfilter:",e?.message));
   render();
  }catch(e){
