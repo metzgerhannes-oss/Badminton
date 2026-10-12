@@ -52,7 +52,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v98" title="Version v98">v99</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v100" title="Version v100">v100</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -273,21 +273,11 @@
     <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
     <div id="official-tournament-list" class="tournament-list"></div>
     <section class="spond-panel" aria-labelledby="spond-title">
-      <div class="section-heading"><h3 id="spond-title">Spond-Kalender</h3><span class="spond-source-pill">Privat · Kalenderimport</span></div>
-      <p class="settings-hint">Termine aus dem iPhone-Kalender übernehmen. Ein Kalendertermin bestätigt keine Meldung oder Teilnahme beim DBV. Keine automatische Veröffentlichung für Follower.</p>
+      <div class="spond-simple-head">
+        <div><h3 id="spond-title">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
+        <button id="spond-quick-import" class="primary-button" type="button">Termine übernehmen</button>
+      </div>
       <div id="spond-events" class="spond-events" aria-live="polite"></div>
-      <details class="spond-import-details">
-        <summary>Termine aus Spond importieren</summary>
-        <label for="spond-ics-file">Kalenderdatei (.ics) auswählen</label>
-        <input id="spond-ics-file" type="file" accept=".ics,text/calendar" aria-describedby="spond-import-help">
-        <p id="spond-import-help" class="settings-hint">Die Kalenderdaten werden nur auf diesem Gerät gelesen. Du entscheidest vor dem Speichern, welchem Spieler sie zugeordnet werden.</p>
-        <form id="spond-paste-form" class="spond-paste-form">
-          <label for="spond-paste-data">Oder Kalenderdaten aus einem iPhone-Kurzbefehl einfügen</label>
-          <textarea id="spond-paste-data" rows="3" placeholder="Turniername [Tab] 2026-10-24 [Tab] 2026-10-25"></textarea>
-          <button class="subtle-button" type="submit">Daten prüfen</button>
-        </form>
-        <a href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/SPOND_KALENDER_IMPORT.md" target="_blank" rel="noopener noreferrer">Anleitung für iPhone-Kurzbefehle ↗</a>
-      </details>
       <p id="spond-status" class="settings-hint" role="status" aria-live="polite"></p>
     </section>
     <a class="live-hub-official-link" href="https://dbv.turnier.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
@@ -370,7 +360,7 @@
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v99 · Release-Informationen werden geladen</p>
+   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v100 · Release-Informationen werden geladen</p>
    <section class="settings-card follow-settings" aria-labelledby="follow-settings-title">
     <h3 id="follow-settings-title">Spieler und Mannschaften verwalten</h3>
     <p class="settings-hint">Deine Folgen-Listen bleiben auf diesem Gerät. Hier kannst du die Reihenfolge ändern oder Einträge entfernen.</p>
@@ -535,6 +525,25 @@
   <p class="small muted">Keine automatische Ergebnisübertragung: Spiele erscheinen erst mit belegten DBV-/Badhub-Daten.</p>
   <button class="primary-button" id="tournament-save" type="submit">Turnier speichern</button>
  </form>
+</dialog>
+<dialog id="spond-source-dialog" aria-labelledby="spond-source-heading">
+ <div class="modal spond-source">
+  <div class="spond-source-top"><h2 id="spond-source-heading">Spond-Termine übernehmen</h2><button type="button" id="spond-source-close" class="icon-button" aria-label="Schließen">×</button></div>
+  <p>Dein iPhone-Kalender ist schon mit Spond verbunden. Schmetterlinge kann ihn als Web-App aber nicht direkt auslesen.</p>
+  <p class="settings-hint">Wenn du Termine über einen Kurzbefehl kopiert hast, übernimmt Schmetterlinge sie hier:</p>
+  <button type="button" id="spond-read-clipboard" class="primary-button">Kopierte Termine prüfen</button>
+  <details class="spond-import-details">
+    <summary>Weitere Importmöglichkeiten</summary>
+    <form id="spond-paste-form" class="spond-paste-form">
+      <label for="spond-paste-data">Kalenderdaten einfügen</label>
+      <textarea id="spond-paste-data" rows="3" placeholder="Kalenderdaten hier einfügen"></textarea>
+      <button class="subtle-button" type="submit">Daten prüfen</button>
+    </form>
+    <label for="spond-ics-file">Oder Kalenderdatei auswählen</label>
+    <input id="spond-ics-file" type="file" accept=".ics,text/calendar">
+  </details>
+  <a class="spond-guide-link" href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/SPOND_KALENDER_IMPORT.md" target="_blank" rel="noopener noreferrer">Einmalige iPhone-Einrichtung ansehen ↗</a>
+ </div>
 </dialog>
 <dialog id="spond-preview-dialog" aria-labelledby="spond-preview-heading">
  <div class="modal spond-preview">
