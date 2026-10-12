@@ -12,7 +12,7 @@ export function filterTeamRows(rows,search="",season=""){
  const words=normalizeTeamText(search).split(" ").filter(Boolean);
  return (Array.isArray(rows)?rows:[]).filter(row=>{
   if(season&&row.season!==season)return false;
-  const hay=normalizeTeamText([row.club_name,row.team_label,row.league_name].join(" "));
+  const hay=normalizeTeamText([row.club_name,row.official_team_name,row.team_label,row.league_name].join(" "));
   return words.every(word=>hay.includes(word));
  });
 }
