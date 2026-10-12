@@ -204,9 +204,14 @@ test("Club-confirmed win is displayed separately from scored matches",async ({pa
  await expect(note).toHaveCount(1);
  await expect(note).toContainText("mindestens 1 Sieg bestätigt");
  await expect(note).toContainText("nicht in der Spielstatistik enthalten");
- await expect(page.locator("#history-timeline .history-event")).toHaveCount(1);
- await expect(page.locator("#history-timeline .history-source-link")).toHaveAttribute("href",
+ // Both sourced Charlotte tournaments remain visible; only the older event contains the club-confirmed win.
+ await expect(page.locator("#history-timeline .history-event")).toHaveCount(2);
+ const witnessedEvent=page.locator("#history-timeline .history-event").filter({hasText:"4. E-Rangliste Südwürttemberg"});
+ await expect(witnessedEvent).toHaveCount(1);
+ await expect(witnessedEvent.locator(".history-match-evidence")).toHaveCount(1);
+ await expect(witnessedEvent.locator(".history-source-link")).toHaveAttribute("href",
   "https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026");
+ await expect(page.locator("#history-timeline .history-event").filter({hasText:"55. Baden-Württembergische Meisterschaft"})).toHaveCount(1);
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
 });
