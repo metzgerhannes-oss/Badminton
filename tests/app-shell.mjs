@@ -4,7 +4,7 @@ const [html,legacy,components,design,shell,cache,manifest]=await Promise.all([
  "index.html","styles.css","ui-components.css","design-v2.css","app-shell.css","sw.js","manifest.webmanifest"
 ].map(path=>readFile(path,"utf8")));
 const href=[...html.matchAll(/<link rel="stylesheet" href="\.\/([^"]+)"/g)].map(m=>m[1]);
-assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","spond-calendar.css","teams.css"],
+assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","teams.css"],
  "Application chrome must be the last CSS layer");
 const tabs=[...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]);
 assert.deepEqual(tabs,["start","turniere","live","spieler","mannschaft","berichte"]);
