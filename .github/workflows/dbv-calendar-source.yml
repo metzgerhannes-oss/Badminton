@@ -41,6 +41,9 @@ jobs:
           python3 -m unittest discover -s tests -p test_dbv_calendar_oidc.py -v
       - name: Validate official complete calendar table
         run: python3 scripts/import-dbv-calendar.py
+      - name: Export checked 2027 tournament rows for emergency recovery (PR only)
+        if: github.event_name == 'pull_request'
+        run: python3 scripts/import-dbv-calendar.py --emit-lines
   publish:
     if: github.event_name != 'pull_request'
     needs: verify
