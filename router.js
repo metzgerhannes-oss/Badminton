@@ -9,7 +9,7 @@ function routeTo(state,page,render){
 // Keyboard and assistive-technology users must land at the new screen heading,
 // not remain on a nav link while a different view is shown.
 function focusCurrentView(state){
- const page=["start","historie","turniere","live","berichte","spieler","einstellungen"].includes(state.page)
+ const page=["start","historie","turniere","live","berichte","spieler","mannschaft","einstellungen"].includes(state.page)
   ?state.page:"start";
  const view=page==="live"?"turniere":page;
   const heading=document.querySelector("#view-"+view+" h1, #view-"+view+" h2");
@@ -21,12 +21,12 @@ function focusCurrentView(state){
 }
 
  function renderPage(state){
- const page=["start","historie","turniere","live","berichte","spieler","einstellungen"].includes(state.page)?state.page:"start";
+ const page=["start","historie","turniere","live","berichte","spieler","mannschaft","einstellungen"].includes(state.page)?state.page:"start";
   const view=page==="live"?"turniere":page;
  document.querySelector(".app")?.setAttribute("data-current-view",page);
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+view));
  const routeTitles={start:"Übersicht",historie:"Turnierhistorie",turniere:"Turniertag",live:"Live-Matches",
-  spieler:"Spieler",berichte:"Berichte",einstellungen:"Einstellungen"};
+  spieler:"Spieler",mannschaft:"Mannschaft",berichte:"Berichte",einstellungen:"Einstellungen"};
  document.title=routeTitles[page]+" · Schmetterlinge";
  const liveHidden=document.querySelector("#live-nav-tab")?.hidden!==false;
   const activeTab=page==="historie"||(page==="live"&&liveHidden)?"turniere":page;
