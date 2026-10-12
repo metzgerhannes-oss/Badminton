@@ -17,6 +17,7 @@ jobs:
           node --check ui-feedback.js
           node --check state-storage.js
           node --check tournament-bookmarks.js
+          node --check spond-calendar.js
           node --check router.js
           node --check app.js
           node --check app-release.js
@@ -80,6 +81,7 @@ jobs:
           node tests/trophies.mjs
           node tests/bookmarks.mjs
           node tests/tournament-bookmarks.mjs
+          node tests/spond-calendar.mjs
           node tests/upcoming-tournaments.mjs
           node tests/friends.mjs
           node tests/friend-home-entry.mjs
