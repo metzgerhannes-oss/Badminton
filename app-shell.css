@@ -307,3 +307,11 @@
 .dbv-calendar-save.is-saved{background:#e5f4ef;border-color:#468e70;color:#196748;font-size:22px}
 .dbv-calendar-save:focus-visible{outline:3px solid #2b79ae;outline-offset:3px}
 .dbv-calendar-save:disabled{opacity:.45;cursor:not-allowed}
+
+/* Zero-result filters explain the imported scope and offer source-backed alternatives. */
+.dbv-calendar-no-results{border-top:1px solid #e2eaf0;padding:15px 0 7px}
+.dbv-calendar-no-results h4{margin:0 0 9px;font-size:16px;color:#193e59}
+.dbv-calendar-no-results p{font-size:13px;line-height:1.5;color:#4c677a;margin:8px 0}
+.dbv-calendar-alternatives{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.dbv-calendar-alternatives .subtle-button{min-height:44px;border-radius:10px;border:1px solid #8ab4cb;background:#eef8fc;padding:9px 14px;font-size:13px;font-weight:700;color:#155779}
+.dbv-calendar-no-results>a{display:inline-block;padding:9px 0;font-size:13px;font-weight:700}
