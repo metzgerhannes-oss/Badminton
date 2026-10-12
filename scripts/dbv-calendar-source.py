@@ -58,6 +58,33 @@ def inspect():
     print("MARK",term,"count",body.count(term),"excerpt",re.sub(r"\s+"," ",body[max(0,body.find(term)-150):body.find(term)+280])[:430] if term in body else "")
   except Exception as e:print("FETCH ERROR",str(e)[:400])
 
+
+def year_probe():
+ import html as h
+ from urllib.parse import urlencode
+ from urllib.request import Request, urlopen
+ variants={
+  "form_2027_remaining":BASE+"?"+urlencode({"form[search]":"1","year":"2027","remaining":"remaining"}),
+  "form_2027_all":BASE+"?"+urlencode({"form[search]":"1","year":"2027","remaining":"all"}),
+  "bare_2027":BASE+"?"+urlencode({"year":"2027"}),
+  "form_2027_nodate":BASE+"?"+urlencode({"form[search]":"1","year":"2027"}),
+  "full_2027":BASE+"?"+urlencode({**FILTER_PARAMS,"year":"2027"},doseq=True),
+  "full_2027_all":BASE+"?"+urlencode({**FILTER_PARAMS,"year":"2027","remaining":"all"},doseq=True),
+ }
+ for name,url in variants.items():
+  try:
+   status,final,body=request(url)
+   found=re.search(r"(\\d+)\\s+Turniere gefunden",body)
+   trs=re.findall(r'data-target="#collapse(\\d+)"',body)
+   years=re.findall(r'<option[^>]*value="(20\\d{2})"[^>]*>',body)
+   select=re.search(r'<select[^>]+(?:name|id)="(?:year|jws|remaining)"[^>]*>[\\s\\S]*?</select>',body,re.I)
+   rows=StructuralProbe();rows.feed(body)
+   print("YEAR_PROBE",name,"http",status,"final",final,"count",found.group(1) if found else "missing",
+    "rows",len(trs),"year_options",years[:10],"has2027",("2027" in body),
+    "first_row",repr(rows.rows[:2]),"select",re.sub(r"\\s+"," ",select.group(0))[:750] if select else "none",flush=True)
+  except Exception as error:print("YEAR_PROBE",name,"error",str(error)[:250],flush=True)
+
 if __name__=="__main__":
- parser=argparse.ArgumentParser();parser.add_argument("--inspect",action="store_true");a=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument("--inspect",action="store_true");parser.add_argument("--year-probe",action="store_true");a=parser.parse_args()
  if a.inspect:inspect()
+ if a.year_probe:year_probe()
