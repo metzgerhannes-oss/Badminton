@@ -162,7 +162,12 @@
 
 /* v85: sourced event-wide results, separated from live player ticker and official DBV import. */
 .badhub-event-panel{margin:18px 0 22px;border:1px solid #c6dfeb;border-radius:14px;background:#f9fcff;padding:12px}
-.badhub-event-panel>h4{margin:0 0 11px;font-size:16px;color:#143f60}
+.badhub-event-panel>summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;font-size:14px;font-weight:800;color:#143f60}
+.badhub-event-content{margin-top:10px}
+.badhub-event-manual{margin:12px 0;border:1px solid #d3e6f0;border-radius:10px;background:#fff;padding:7px 10px}
+.badhub-event-manual>summary{cursor:pointer;min-height:40px;align-content:center;color:#205779;font-size:12px;font-weight:750}
+.badhub-event-manual .badhub-event-form{margin-top:10px}
+.badhub-event-controls[hidden],.badhub-event-source-line[hidden]{display:none!important}
 .badhub-event-form{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}
 .badhub-event-form label,.badhub-event-controls label{min-width:0;display:grid;gap:5px;font-size:12px;font-weight:750;color:#315970}
 .badhub-event-form input,.badhub-event-controls select{display:block;width:100%;min-width:0;min-height:44px;padding:9px;border:1px solid #b8d3e4;border-radius:9px;background:#fff;color:#16405c;font-size:12px}
@@ -187,8 +192,8 @@
 
 /* Same verified event-result source is usable from Turniere on non-match days. */
 .app[data-current-view="turniere"] #view-turniere .live-tournament-follow{display:block!important;margin-top:14px}
-.app[data-current-view="turniere"] #view-turniere .live-tournament-follow >:not(.badhub-event-panel):not(.tournament-live-toolbar){display:none!important}
-.app[data-current-view="turniere"] #view-turniere .live-tournament-follow .badhub-event-panel{margin:4px 0 0}
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow >:not(.badhub-event-panel):not(.tournament-live-toolbar):not(.tournament-matches-heading):not(.live-tournament-links){display:none!important}
+.app[data-current-view="turniere"] #view-turniere .live-tournament-follow .badhub-event-panel{margin:10px 0 0}
 .app[data-current-view="turniere"] #view-turniere .live-tournament-follow .tournament-live-toolbar{margin:5px 0 9px}
 /* v88: compact, source-labelled public tournament hints and explicit opt-in. */
 .community-share-optin{display:flex;align-items:flex-start;gap:11px;padding:12px;
