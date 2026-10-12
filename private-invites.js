@@ -33,8 +33,14 @@ async function session(create){
    current={access_token:data.access_token,refresh_token:data.refresh_token,
     expires_at:Date.now()+Number(data.expires_in||0)*1000,user_id:data.user?.id||current.user_id};
    localStorage.setItem(AUTH_KEY,JSON.stringify(current));return current;
-  }catch{localStorage.removeItem(AUTH_KEY)}
+  }catch{
+   // Never replace an existing potentially verified identity with a new anonymous user
+   // because of transient network or refresh-token errors.
+   throw Error("Die bestehende Geräteanmeldung konnte nicht erneuert werden. Bitte die Verbindung prüfen.");
+  }
  }
+ if(current?.user_id||current?.access_token)
+  throw Error("Die vorhandene Anmeldung ist unvollständig und wird nicht automatisch ersetzt.");
  if(!create)return null;
  const res=await fetch(AUTH_URL+"signup",{method:"POST",cache:"no-store",headers:payloadHeaders(),
   body:JSON.stringify({data:{}})});
