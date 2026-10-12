@@ -131,6 +131,7 @@ var SchmetterlingeSpond=(function(){
  const $=id=>document.getElementById(id);
  const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const nice=s=>new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z"));
+ const looksLikeTournament=name=>/turnier|ranglist|meisterschaft|spieltag|bezirksliga|landesliga|rlt|cup|open/i.test(name||"");
  let pending=[],getState=()=>({players:[],activeProfileId:"",viewingFriendId:null,officialLinks:[]}),onChange=()=>{};
  function status(message){const node=$("spond-status");if(node)node.textContent=message}
  function render(state){
@@ -158,8 +159,8 @@ var SchmetterlingeSpond=(function(){
   pending=rows;
   const dlg=$("spond-preview-dialog"),list=$("spond-preview-list");
   if(!dlg||!list)return;
-  list.innerHTML=rows.slice(0,12).map(t=>'<li><strong>'+esc(t.name)+'</strong><span>'+esc(nice(t.startDate))+(t.location?" · "+esc(t.location):"")+'</span></li>').join("")+(rows.length>12?'<li>… und '+(rows.length-12)+' weitere Termine</li>':"");
-  $("spond-preview-count").textContent=rows.length+" Kalendertermine gefunden. Bitte Spielerzuordnung prüfen. Nur die angezeigten Daten werden auf diesem Gerät gespeichert.";
+  list.innerHTML=rows.map((t,i)=>'<li><label class="spond-preview-event"><input type="checkbox" data-spond-choose="'+i+'" '+(looksLikeTournament(t.name)?'checked':'')+'><span><strong>'+esc(t.name)+'</strong><small>'+esc(nice(t.startDate))+(t.location?" · "+esc(t.location):"")+'</small></span></label></li>').join("");
+  $("spond-preview-count").textContent=rows.length+" Kalendertermine gefunden. Mögliche Turniere sind vorausgewählt. Prüfe die Häkchen und den Spieler – Trainings bleiben standardmäßig abgewählt.";
   const state=getState();
   const select=$("spond-import-player");
   select.innerHTML=state.players.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join("");
@@ -195,7 +196,9 @@ var SchmetterlingeSpond=(function(){
    try{
     const id=$("spond-import-player").value;
     if(!getState().players.some(p=>p.id===id))throw Error("Ungültiges Spielerprofil.");
-    const result=importBatch(pending,id);pending=[];$("spond-preview-dialog").close();
+    const selected=[...$("spond-preview-list").querySelectorAll("[data-spond-choose]:checked")].map(box=>pending[Number(box.dataset.spondChoose)]).filter(Boolean);
+    if(!selected.length)throw Error("Bitte mindestens einen Turniertermin auswählen.");
+    const result=importBatch(selected,id);pending=[];$("spond-preview-dialog").close();
     status("Importiert: "+result.added+" neu, "+result.updated+" aktualisiert, "+result.unchanged+" unverändert. Alles bleibt privat auf diesem Gerät.");
     onChange();
    }catch(e){status(e.message)}
@@ -204,5 +207,5 @@ var SchmetterlingeSpond=(function(){
   window.addEventListener("hashchange",hashImport);
   hashImport();
  }
- return Object.freeze({KEY,day,normalize,parseIcs,parseSource,read,importBatch,remove,forPlayer,dashboardItems,render,mount});
+ return Object.freeze({KEY,day,normalize,parseIcs,parseSource,looksLikeTournament,read,importBatch,remove,forPlayer,dashboardItems,render,mount});
 })();
