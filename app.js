@@ -109,6 +109,12 @@ function renderProfiles(){
   if(!state.viewingFriendId)state.chosen=state.activeProfileId;
   save();render();
  }));
+ const preview=el("player-own-preview");
+ if(preview){
+  const p=state.players.find(p=>p.id===state.activeProfileId);
+  preview.innerHTML=p?'<button type="button" class="friend-follow-item is-own" id="player-own-open"><span class="friend-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-details"><strong>'+esc(p.name)+'</strong><small>Startprofil · '+esc(p.id.startsWith("local-")?"ohne DBV-ID":"DBV "+p.id)+'</small></span><span class="follow-item-arrow" aria-hidden="true">›</span></button>':'<a class="friend-quick-add" href="#einstellungen">Eigenes Spielerprofil einrichten ↗</a>';
+  preview.querySelector("#player-own-open")?.addEventListener("click",()=>window.badmintonSelectViewer(p.id));
+ }
  el("current-account-label").textContent="Aktives Startprofil: "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"noch keines");
 }
 function renderFriendQuick(){
@@ -120,11 +126,11 @@ function renderFriendQuick(){
   return;
  }
  // Home is a quick overview, not a second complete friend-management screen.
- // Never hide friends off-screen in a horizontal strip; keep at most four
+ // Never hide friends off-screen in a horizontal strip; keep at most three
  // visible shortcuts, plus one explicit route to the full player list.
  const own=state.players.find(p=>p.id===state.activeProfileId);
  const includeOwn=Boolean(state.viewingFriendId&&own);
- const slots=includeOwn?3:4;
+ const slots=includeOwn?2:3;
  const visibleFriends=state.friends.slice(0,slots);
  // While viewing a followed player's statistics, keep that player visible
  // even when the player is outside the first preview slots.
@@ -152,21 +158,51 @@ function renderFriendQuick(){
  }));
 }
 function renderFriends(){
- const root=el("friend-list");
- root.innerHTML=state.friends.length?state.friends.map(p=>{
-  const selected=state.viewingFriendId===p.id;
-  return '<article class="friend-card '+(selected?'friend-selected':'')+'"><button type="button" class="friend-open" data-view-friend="'+esc(p.id)+'"><span class="friend-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span><span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.birthYear?' · Jahrgang '+esc(p.birthYear):'')+'</small><em>Haupt-KPIs ansehen ↗</em></span></button><span class="friend-actions"><button type="button" class="remove-button" data-edit-friend="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button friend-remove" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></span></article>';
- }).join(""):'<div class="empty friends-empty">Du folgst noch niemandem. Suche oben nach einem Namen und tippe auf „+ Folgen“.</div>';
- root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>{
-  const friend=state.friends.find(p=>p.id===b.dataset.viewFriend);
-  if(!friend)return;
-  window.badmintonSelectViewer(friend.id);
+ const root=el("friend-list"),settings=el("friend-settings-list");
+ if(root){
+  root.innerHTML=state.friends.length?state.friends.map(p=>{
+   const current=state.viewingFriendId===p.id;
+   return '<button type="button" class="friend-follow-item'+(current?' is-current':'')+'" data-view-friend="'+esc(p.id)+'">'+
+    '<span class="friend-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>'+
+    '<span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.club?' · '+esc(p.club):'')+'</small></span>'+
+    '<span class="follow-item-arrow" aria-hidden="true">›</span></button>';
+  }).join(""):'<p class="team-empty">Du folgst noch keinen Spielern. Mit „+ Hinzufügen“ kannst du Spieler suchen.</p>';
+  root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend)));
+ }
+ if(!settings)return;
+ settings.innerHTML=state.friends.length?state.friends.map((p,i)=>
+  '<article class="follow-manage-item"><div class="follow-manage-label"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+'</small></div>'+
+  '<div class="follow-manage-actions"><button type="button" data-friend-move="'+esc(p.id)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="'+esc(p.name)+' nach oben">↑</button>'+
+  '<button type="button" data-friend-move="'+esc(p.id)+'" data-direction="1" '+(i===state.friends.length-1?'disabled':'')+' aria-label="'+esc(p.name)+' nach unten">↓</button>'+
+  '<button type="button" data-edit-friend="'+esc(p.id)+'" aria-label="'+esc(p.name)+' bearbeiten">Bearbeiten</button>'+
+  '<button type="button" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></div></article>'
+ ).join(""):'<p class="team-empty">Noch keine Spieler abonniert.</p>';
+ settings.querySelectorAll("[data-friend-move]").forEach(b=>b.addEventListener("click",()=>{
+  const index=state.friends.findIndex(p=>p.id===b.dataset.friendMove);
+  const target=index+Number(b.dataset.direction);
+  if(index<0||target<0||target>=state.friends.length)return;
+  const [friend]=state.friends.splice(index,1);
+  state.friends.splice(target,0,friend);save();render();
  }));
- root.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
- root.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>{
+ settings.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
+ settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>{
   if(!SchmetterlingeStorage.unfollow(state,b.dataset.unfollow))return;
-  save();render();toast("Freund entfernt");
+  save();render();window.dispatchEvent(new Event("badminton:library-following"));toast("Spieler entfolgt");
  }));
+}
+function showPlayerDiscover(open=true,focus=true){
+ const panel=el("player-discover"),trigger=el("player-add-open");
+ if(!panel||!trigger)return;
+ panel.hidden=!open;
+ trigger.setAttribute("aria-expanded",String(open));
+ trigger.textContent=open?"Suche schließen":"+ Hinzufügen";
+ if(open&&focus){
+  if(location.hash!=="#spieler")location.hash="#spieler";
+  requestAnimationFrame(()=>{
+   panel.scrollIntoView({block:"start",behavior:"smooth"});
+   el("library-search")?.focus({preventScroll:true});
+  });
+ }
 }
 // The verified shared DBV roster is public; following a player is only local.
 if(typeof window!=="undefined"){
@@ -185,7 +221,7 @@ window.badmintonLibraryToggleFollow=player=>{
   return {ok:true,message:"Spieler entfolgt."};
  }
  if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
- state.friends.push({
+ state.friends.unshift({
   id,name:String(player.name).trim().slice(0,80),
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
@@ -361,10 +397,11 @@ function setup(){
   friendDialog.showModal();
  }
  window.openFriendForm=openFriendForm;
- el("add-friend").addEventListener("click",()=>{
-  const input=el("library-search");input?.focus();input?.scrollIntoView({block:"center",behavior:"smooth"});
- });
- el("add-friend-manual").addEventListener("click",()=>openFriendForm());
+ el("player-add-open")?.addEventListener("click",()=>showPlayerDiscover(el("player-discover").hidden));
+  el("player-discover-close")?.addEventListener("click",()=>showPlayerDiscover(false,false));
+  el("settings-players-add")?.addEventListener("click",()=>showPlayerDiscover(true));
+  el("add-friend").addEventListener("click",()=>showPlayerDiscover(true));
+  el("add-friend-manual").addEventListener("click",()=>openFriendForm());
  el("cancel-friend").addEventListener("click",()=>friendDialog.close());
  friendForm.addEventListener("submit",event=>{
   event.preventDefault();
@@ -379,9 +416,10 @@ function setup(){
   const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club:String(data.get("club")||"").trim().slice(0,120),url:profileUrl};
   const isNewFriend=!editingFriendId;
   if(editingFriendId)state.friends=state.friends.map(p=>p.id===editingFriendId?friend:p);
-  else state.friends.push(friend);
+  else state.friends.unshift(friend);
   editingFriendId=null;
-  save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
+  if(isNewFriend)showPlayerDiscover(false,false);
+   save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
   if(isNewFriend)window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  });
  const tournamentDialog=el("tournament-dialog");
