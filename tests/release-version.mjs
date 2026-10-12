@@ -5,8 +5,8 @@ import {join, resolve} from "node:path";
 import {execFileSync} from "node:child_process";
 import vm from "node:vm";
 
-const [app, welcome, shell, sw, css, release, pageWorkflow] = await Promise.all([
-  "index.html","welcome.html","app-shell.css","sw.js","app-shell.css","app-release.js",".github/workflows/pages.yml"
+const [app, welcome, shell, sw, css, release] = await Promise.all([
+  "index.html","welcome.html","app-shell.css","sw.js","app-shell.css","app-release.js"
 ].map(p=>readFile(p,"utf8")));
 const r=release.match(/\{version:"(v[1-9][0-9]*)", build:"source", commit:""\}/);
 assert.ok(r, "Release source must have an explicit monotonically updated vNN number");
@@ -21,7 +21,7 @@ assert.match(app,/id="app-build-info"/);
 assert.match(app,/<div class="topbar-actions">/);
 assert.match(shell,/\.topbar-actions\{/);
 assert.match(css,/\.app-version-badge\{/);
-assert.match(pageWorkflow,/node scripts\/stamp-release\.mjs/);
+// Native branch-based GitHub Pages is the sole publisher; no competing Actions deployment.\nawait assert.rejects(readFile(".github/workflows/pages.yml","utf8"),{code:"ENOENT"});\n// Keep validating the optional version/commit stamping utility in isolation.\nassert.match(await readFile("scripts/stamp-release.mjs","utf8"),/GITHUB_SHA/);
 
 // Browser runtime: display precisely the JS shipped with the current shell,
 // without fetching a possibly newer network release on an older iPhone PWA.
