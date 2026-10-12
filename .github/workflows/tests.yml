@@ -54,6 +54,8 @@ jobs:
           node --check scripts/match-stats.mjs
           node --check scripts/library-utils.mjs
           node --check scripts/supabase-read.mjs
+          node --check teams.js
+          node --check scripts/team-directory-utils.mjs
           node --check welcome.js
           node --check scripts/invitation.mjs
           node --check live.js
@@ -122,6 +124,7 @@ jobs:
           node tests/legacy-css-prune.mjs
           node tests/css-cascade-consolidation.mjs
           node tests/ux-foundation.mjs
+          node tests/team-directory.mjs
           node tests/club-branding.mjs
           node tests/shared-tournaments.mjs
           node tests/release-version.mjs

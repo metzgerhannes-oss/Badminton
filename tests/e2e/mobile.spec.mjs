@@ -87,7 +87,7 @@ test("Home uses one Badhub career summary; filters retain separately evidenced m
  await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator(".focused-profile")).toContainText("Philipp");
  const mainTabs=page.locator(".bottom-nav a:visible");
- await expect(mainTabs).toHaveCount(4);
+ await expect(mainTabs).toHaveCount(5);
  await expect(page.locator("#match-stats-source")).toHaveText("Badhub · Karrierebilanz");
  const reference=page.locator("#match-stats-reference");
  await expect(reference).toBeVisible();

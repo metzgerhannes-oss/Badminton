@@ -77,6 +77,6 @@ assert.match(design,/#view-start \.match-stats-note\{font-size:12px/);
 assert.match(shell,/\.bottom-nav a\{width:25%!important/);
 assert.match(components,/\.focused-profile\{margin:5px 0 23px/);
 assert.deepEqual([...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]),
- ["start","turniere","live","spieler","berichte"]);
+ ["start","turniere","live","spieler","mannschaft","berichte"]);
 assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
 console.log("v70 CSS cascade: redundant same-scope declarations removed; app chrome, logo, cards and screens preserved.");

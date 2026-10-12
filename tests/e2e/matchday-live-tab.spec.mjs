@@ -33,7 +33,7 @@ test.beforeEach(async ({page})=>{
 test("Saved tournament makes LIVE a prominent fifth tab without duplicate score feeds",async ({page})=>{
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await expect(page.locator(".bottom-nav a:visible")).toHaveCount(5);
+ await expect(page.locator(".bottom-nav a:visible")).toHaveCount(6);
  await expect(page.locator("#live-nav-tab")).toBeVisible();
  const rect=await page.locator("#live-nav-tab").boundingBox();
  expect(rect?.width).toBeGreaterThanOrEqual(44);
@@ -63,7 +63,7 @@ test("Expired tournament removes LIVE tab but ordinary tournament route remains"
  },KEY);
  await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator("#live-nav-tab")).toBeHidden();
- await expect(page.locator(".bottom-nav a:visible")).toHaveCount(4);
+ await expect(page.locator(".bottom-nav a:visible")).toHaveCount(5);
  await page.locator('.bottom-nav a[data-page="turniere"]').click();
  await expect(page.locator("#live-radar-content")).toBeVisible();
 });

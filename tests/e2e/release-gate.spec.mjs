@@ -34,7 +34,7 @@ test("v64 app chrome keeps four readable, non-overlapping tabs from SE to tablet
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   const tabs=page.locator(".bottom-nav a:visible");
-  await expect(tabs).toHaveCount(4);
+  await expect(tabs).toHaveCount(5);
   await expect(page.locator(".topbar-settings")).toBeVisible();
   await expect(page.locator(".brand-logo")).toBeVisible();
   const frames=[];
@@ -126,7 +126,7 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   const tabs=page.locator(".bottom-nav a:visible");
-  await expect(tabs).toHaveCount(4);
+  await expect(tabs).toHaveCount(5);
   await expect(page.locator(".focused-profile")).toContainText("Philipp");
   const chrome=await page.evaluate(()=>{
    const nav=getComputedStyle(document.querySelector(".bottom-nav"));
