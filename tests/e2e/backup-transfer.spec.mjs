@@ -13,9 +13,12 @@ const makeEvent=(playerId,name,uid)=>({
 });
 async function setup(context,family,events){
  await context.addInitScript(({family,events})=>{
-  localStorage.setItem("shuttleboard-v1",JSON.stringify(family));
-  localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(events));
-  localStorage.setItem("keep-other-settings","yes");
+  if(localStorage.getItem("shuttleboard-v1")===null)
+   localStorage.setItem("shuttleboard-v1",JSON.stringify(family));
+  if(localStorage.getItem("schmetterlinge.calendarEvents.v1")===null)
+   localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(events));
+  if(localStorage.getItem("keep-other-settings")===null)
+   localStorage.setItem("keep-other-settings","yes");
  },{family,events});
  await context.route("**/*.supabase.co/**",route=>route.fulfill({
   status:200,contentType:"application/json",
@@ -60,7 +63,9 @@ test("private Spond appointments travel with the offline backup, restore needs c
   expect(prompt).toContain("privaten Kalendertermine");
   expect((await stored(to)).family.players[0].id).toBe(OTHER);
   to.once("dialog",dialog=>dialog.accept());
+  const restoredLoad=to.waitForEvent("load");
   await to.locator("#backup-restore").click();
+  await restoredLoad;
   await expect.poll(async()=>{const s=await stored(to);return s.family?.players?.[0]?.id}).toBe(PLAYER);
   const restored=await stored(to);
   expect(restored.events).toHaveLength(1);
@@ -78,8 +83,10 @@ test("legacy backups preserve the target's newer private calendar and invalid fi
  const family=makeFamily(OTHER,"Vorhandenes Profil");
  const retained=[makeEvent(OTHER,"Privater Termin","stay")];
  await page.addInitScript(({family,retained})=>{
-  localStorage.setItem("shuttleboard-v1",JSON.stringify(family));
-  localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(retained));
+  if(localStorage.getItem("shuttleboard-v1")===null)
+   localStorage.setItem("shuttleboard-v1",JSON.stringify(family));
+  if(localStorage.getItem("schmetterlinge.calendarEvents.v1")===null)
+   localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(retained));
  },{family,retained});
  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
  const legacy={kind:"schmetterlinge-local-backup",schemaVersion:1,
@@ -88,7 +95,9 @@ test("legacy backups preserve the target's newer private calendar and invalid fi
   buffer:Buffer.from(JSON.stringify(legacy))});
  await expect(page.locator("#backup-feedback")).toContainText("Ältere Sicherung");
  page.once("dialog",dialog=>dialog.accept());
+ const restoredLoad=page.waitForEvent("load");
  await page.locator("#backup-restore").click();
+ await restoredLoad;
  await expect.poll(async()=>((await stored(page)).family?.players?.[0]?.id)).toBe(PLAYER);
  expect((await stored(page)).events[0].name).toBe("Privater Termin");
  await page.locator("#backup-file").setInputFiles({name:"broken.json",mimeType:"application/json",
