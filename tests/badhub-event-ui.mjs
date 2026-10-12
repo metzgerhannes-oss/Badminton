@@ -53,6 +53,6 @@ assert.match(html,/<details class="badhub-event-panel" id="badhub-event-panel">/
 assert.match(html,/<details class="badhub-event-manual" id="badhub-event-manual">/);
 assert.match(client,/Boolean\(\$\("badhub-event-panel"\)\?\.open\)/,
  "The optional Badhub feed is not fetched while collapsed");
-assert.match(client,/return \^\[0-9a-f-\]\{36\}\$\/i\.test\(value\)\?value:null;/,
+assert.ok(client.includes('return /^[0-9a-f-]{36}$/i.test(value)?value:null;'),
  "Badhub source mapping cannot silently apply to an unknown global event");
 console.log("Event feed UI and model security: validated URLs, IDs, data, cache and source separation OK.");
