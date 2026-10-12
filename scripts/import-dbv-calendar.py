@@ -70,7 +70,10 @@ def normalize(entry,year):
  cells=entry["columns"]
  if len(cells)!=8:raise ValueError("Unexpected DBV table column count")
  dates,name,place,organizer,category,age_text,deadline,_=cells
- start,end=date_pair(dates,year)
+ try:
+  start,end=date_pair(dates,year)
+ except ValueError as error:
+  raise ValueError(f"DBV calendar {year} ID {entry['id']} {name[:80]!r}: {dates!r}: {error}") from error
  ages=sorted(set(re.findall(r"U(?:9|11|13|15|17|19|22)|O19|O35(?:ff\.)?",age_text,re.I)),key=lambda a:AGE.index("O35ff." if a.startswith("O35") else a.upper()) if ("O35ff." if a.startswith("O35") else a.upper()) in AGE else 99)
  ages=["O35ff." if a.startswith("O35") else a.upper() for a in ages]
  disciplines=[d for d in ("Einzel","Doppel","Mixed") if re.search(r"\b"+{"Einzel":"E","Doppel":"D","Mixed":"M"}[d]+r"\b",age_text)]
