@@ -57,3 +57,11 @@ export function filterCalendar(entries,{region="all",age="all",level="all",q="",
   (a,b)=>LEVEL_OPTIONS.indexOf(a)-LEVEL_OPTIONS.indexOf(b):(a,b)=>a.localeCompare(b,"de"));
  return {total:filtered.length,groups:labels.map(label=>({label,items:groups.get(label)}))};
 }
+
+/** Suggest only source-backed level alternatives without widening location/age unintentionally. */
+export function alternativeCalendarLevels(entries,settings){
+ if(!LEVEL_OPTIONS.includes(settings.level))return [];
+ return LEVEL_OPTIONS.filter(level=>level!==settings.level).map(level=>({
+  level,count:filterCalendar(entries,{...settings,level}).total
+ })).filter(x=>x.count>0);
+}
