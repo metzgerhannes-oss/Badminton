@@ -38,6 +38,7 @@ class OIDCContractTests(unittest.TestCase):
   self.assertIn("jwtVerify(",source)
   self.assertIn("payload.repository_id",source)
   self.assertIn("payload.workflow_ref===WORKFLOW",source)
+  self.assertIn("repo:metzgerhannes-oss@326005713/Badminton@1412033492:ref:refs/heads/main",source)
   self.assertIn('payload.ref==="refs/heads/main"',source)
   self.assertIn("maxTokenAge:",source)
   self.assertIn('source_url:SOURCE',source)

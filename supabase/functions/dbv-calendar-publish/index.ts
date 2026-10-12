@@ -23,7 +23,7 @@ function allowedToken(payload:Record<string,unknown>){
    payload.repository_owner_id==="326005713" &&
    payload.ref==="refs/heads/main" &&
    payload.workflow_ref===WORKFLOW &&
-   payload.sub==="repo:"+REPO+":ref:refs/heads/main" &&
+   payload.sub==="repo:metzgerhannes-oss@326005713/Badminton@1412033492:ref:refs/heads/main" &&
    ["schedule","workflow_dispatch","push"].includes(String(payload.event_name||""));
 }
 async function authorize(req:Request){
