@@ -192,6 +192,14 @@
     "Offizielle Saison bei nuLiga öffnen ↗": "Открыть официальный сезон в nuLiga ↗",
     "Mannschaften werden geladen …": "Загрузка команд …",
     "Ligatabelle": "Турнирная таблица",
-    "Spielplan": "Расписание игр"
+    "Spielplan": "Расписание игр",
+    "Weitere Vereine im BWBV": "Другие клубы BWBV",
+    "Suche nach einem Verein. Importierte Mannschaften kannst du sofort verfolgen; bei weiteren Vereinen führt der Originallink direkt zu nuLiga.": "Найдите клуб. За уже загруженными командами можно следить сразу; для остальных доступна официальная ссылка nuLiga.",
+    "Mannschaften anzeigen": "Показать команды",
+    "· Import ausstehend": "· Импорт ожидается",
+    "· Mannschaften verfügbar": "· Команды доступны",
+    "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Введите название клуба выше для поиска в официальном справочнике BWBV.",
+    "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Клуб с таким названием не найден в справочнике BWBV.",
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Введите название команды или клуба. Команды, за которыми вы следите, показаны выше."
   }
 }
