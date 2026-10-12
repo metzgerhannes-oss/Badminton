@@ -53,6 +53,11 @@ function persistAndContinue(profile,{confirmed=false}={}){
  lastSavedProfile={confirmed,id:profile.id};
  if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
  // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
+ // Installed PWAs must return directly to the app, not repeat the installation tutorial.
+ if(new URLSearchParams(location.search).get("from")==="app"){
+  window.location.replace("./index.html#start");
+  return;
+ }
  $("onboard-profile").hidden=true;
  $("onboard-install").hidden=false;
  $("progress-profile").classList.remove("current");
@@ -224,6 +229,9 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("install-back").addEventListener("click",showProfileForm);
  const known=readSaved()?.players;
  $("welcome-existing").hidden=!(Array.isArray(known)&&known.length);
+ const fromInstalledApp=new URLSearchParams(location.search).get("from")==="app";
+ $("welcome-app-back").hidden=!fromInstalledApp;
+ $("progress-install").hidden=fromInstalledApp;
  updateMode("manual");
  if(location.hash==="#installation"){
   $("onboard-profile").hidden=true;
