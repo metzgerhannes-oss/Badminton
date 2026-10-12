@@ -192,6 +192,14 @@
     "Offizielle Saison bei nuLiga öffnen ↗": "Open official season on nuLiga ↗",
     "Mannschaften werden geladen …": "Loading teams …",
     "Ligatabelle": "League table",
-    "Spielplan": "Fixture list"
+    "Spielplan": "Fixture list",
+    "Weitere Vereine im BWBV": "More clubs in BWBV",
+    "Suche nach einem Verein. Importierte Mannschaften kannst du sofort verfolgen; bei weiteren Vereinen führt der Originallink direkt zu nuLiga.": "Search for a club. Follow imported teams immediately; for other clubs, open the official nuLiga link.",
+    "Mannschaften anzeigen": "Show teams",
+    "· Import ausstehend": "· Import pending",
+    "· Mannschaften verfügbar": "· Teams available",
+    "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Enter a club name above to search the official BWBV directory.",
+    "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "No club with this name was found in the BWBV directory.",
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Enter a team or club. Your followed teams are shown above."
   }
 }

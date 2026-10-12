@@ -41,3 +41,14 @@
 .team-league-table td,.team-league-table th{padding:9px 6px;border-bottom:1px solid #e2ecf2;text-align:left}
 .team-league-table td:last-child{font-variant-numeric:tabular-nums;font-weight:750}
 @media(max-width:360px){.team-card{flex-wrap:wrap}.team-follow-button{margin-left:auto}}
+
+/* v97: official BWBV club discovery; only verified import has follow actions. */
+.team-club-directory{margin-top:24px}
+.team-club-directory h3{font-size:16px;margin-bottom:7px}
+.team-clubs-results{display:grid;gap:8px;margin-top:10px}
+.team-club-entry{display:flex;align-items:center;gap:8px;min-width:0;padding:11px;border:1px solid #c8dce9;border-radius:12px;background:#f7fbfe}
+.team-club-entry>div{flex:1;min-width:0;display:grid;gap:3px}
+.team-club-entry strong{font-size:13px;overflow-wrap:anywhere}
+.team-club-entry small{color:#5b7586;font-size:11px}
+.team-club-entry button,.team-club-entry a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:7px;border:1px solid #9ec8da;border-radius:10px;color:#146f9a;background:#fff;font-weight:700;font-size:11px;text-align:center}
+@media(max-width:375px){.team-club-entry{flex-wrap:wrap}.team-club-entry>div{flex-basis:100%}}

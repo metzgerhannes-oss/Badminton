@@ -12,7 +12,7 @@ assert.equal(required.size,keys.length,"Each canonical German key must be unique
 const keepGerman = new Set([
  "Schmetterlinge","Willkommen · Schmetterlinge Badminton","Deutsch",
  "English","Français","Türkçe","Italiano","Español","Polski",
- "iPhone / iPad","Android","v96"
+ "iPhone / iPad","Android","v97"
 ]);
 const textNodes = [...new Set(html.split(/<[^>]*>/g)
  .map(x=>x.replaceAll("&amp;","&").trim())
