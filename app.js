@@ -146,9 +146,9 @@ function renderFriendQuick(){
   '<a class="friend-quick-more" href="#spieler" aria-label="'+remaining+' weitere Freunde ansehen">'+
    '<span class="friend-quick-avatar friend-quick-more-icon" aria-hidden="true">···</span>'+
    '<span class="friend-quick-name">+'+remaining+' weitere</span></a>':"");
- root.querySelectorAll("[data-friend-quick]").forEach(button=>button.addEventListener("click",()=>{
-  if(button.dataset.isOwn==="true"){navigateHome();return;}
-  window.badmintonSelectViewer(button.dataset.friendQuick);
+ root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.isOwn==="true"){navigateHome();return;}
+  window.badmintonSelectViewer(b.dataset.friendQuick);
  }));
 }
 function renderFriends(){
