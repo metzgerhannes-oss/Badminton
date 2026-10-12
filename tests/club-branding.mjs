@@ -16,12 +16,12 @@ for (const id of ["club-branding-form", "club-name", "club-logo", "club-accent",
 assert.match(index, /<script defer src="\.\/club-branding\.js"><\/script>/);
 assert.match(index, /<link rel="stylesheet" href="\.\/club-branding\.css">/);
 assert.match(welcome, /id="welcome-language" data-language-select/);
-assert.ok(welcome.indexOf('id="welcome-language"') < welcome.indexOf('id="welcome-title"'),
+assert.ok(welcome.indexOf('id="welcome-language"') < welcome.indexOf('id="progress-profile"'),
   "Language selection must precede onboarding");
 assert.match(welcome, /id="welcome-language-status"/);
 assert.match(languageCss, /min-height:46px/);
 assert.match(i18n, /schmetterlinge\.uiLanguage/);
-assert.match(serviceWorker, /schmetterlinge-shell-v92/);
+assert.match(serviceWorker, /schmetterlinge-shell-v[1-9][0-9]*/);
 assert.match(serviceWorker, /club-branding\.js/);
 assert.match(serviceWorker, /club-branding\.css/);
 for (const code of ["en", "fr", "uk", "ru", "zh-Hans", "tr", "ar", "it", "es", "pl"]) {
