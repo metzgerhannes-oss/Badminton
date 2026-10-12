@@ -1,6 +1,6 @@
 /** Public DBV calendar from Badminton Supabase, with static source fallback. */
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar} from "./scripts/dbv-calendar-utils.mjs";
+import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels} from "./scripts/dbv-calendar-utils.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const formatDate=s=>new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z"));
@@ -41,9 +41,21 @@ function render(){
  const fresh=entries.map(e=>Date.parse(e.checked)).filter(Number.isFinite);
  const newest=fresh.length?Math.max(...fresh):0;
  const warning=source==="supabase"&&newest&&Date.now()-newest>8*86400000?" · Letzter DB-Abgleich vor über 8 Tagen":"";
- message(selected.total+" von "+entries.length+" offiziellen Kalendereinträgen · Quelle DBV"+warning);
+ const coverage=entries.length?formatDate(entries.reduce((earliest,t)=>t.start<earliest?t.start:earliest,entries[0].start))+
+  "–"+formatDate(entries.reduce((latest,t)=>t.end>latest?t.end:latest,entries[0].end)):"";
+ message(selected.total+" von "+entries.length+" offiziellen Kalendereinträgen · Erfasster Zeitraum: "+coverage+" · Quelle DBV"+warning);
  if(!selected.total){
-  host.innerHTML='<p class="settings-hint">Keine passenden Turniere im aktuell importierten Zeitraum. Filter anpassen oder den <a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">DBV-Kalender öffnen ↗</a>.</p>';
+  const region=settings.region==="all"?"allen Regionen":settings.region;
+  const age=settings.age==="all"?"allen Altersklassen":settings.age;
+  const level=settings.level==="all"?"allen Levels":"Level "+settings.level;
+  const alternatives=alternativeCalendarLevels(entries,{...settings,today:localToday()});
+  host.innerHTML='<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere im erfassten Zeitraum</h4>'+
+   '<p>Für '+esc(region)+' · '+esc(age)+' · '+esc(level)+' liegen im aktuellen Datenbestand ('+esc(coverage)+') keine passenden Termine vor.</p>'+
+   (alternatives.length?'<p>Mit denselben übrigen Filtern sind folgende Levels verfügbar:</p><div class="dbv-calendar-alternatives">'+
+    alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
+      'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
+   '<p class="settings-hint">Der Import umfasst nur den angegebenen Zeitraum, nicht automatisch alle Turniere eines Kalenderjahres. Weitere Termine können später veröffentlicht werden.</p>'+
+   '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>';
   return;
  }
  const bookmarkState=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
@@ -130,6 +142,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
  }
  $("dbv-calendar-results")?.addEventListener("click",event=>{
+  const alternative=event.target.closest("button[data-calendar-alternative-level]");
+  if(alternative&&LEVEL_OPTIONS.includes(alternative.dataset.calendarAlternativeLevel)){
+   settings.level=alternative.dataset.calendarAlternativeLevel;
+   $("dbv-calendar-level").value=settings.level;
+   try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
+   batchLimit=36;render();return;
+  }
   const button=event.target.closest("button[data-calendar-toggle]");
   if(!button)return;
   const found=entries.find(t=>t.key===button.dataset.calendarToggle);
