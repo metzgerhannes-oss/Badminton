@@ -46,8 +46,8 @@ test("Cancel installed-app search without silently creating a profile",async ({p
    headers:{"Access-Control-Allow-Origin":"*"}}));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await page.locator("#first-run-new").click();
- await expect(page.locator("#welcome-app-back")).toBeVisible();
- await page.locator("#welcome-app-back").click();
+ await expect(page.locator("#existing-app-link")).toBeVisible();
+ await page.locator("#existing-app-link").click();
  await expect(page.locator("#first-run-dialog")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(0);
