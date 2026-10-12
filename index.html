@@ -44,6 +44,7 @@
 <script type="module" src="./dashboard.js"></script>
 <script type="module" src="./dbv-calendar.js"></script>
 <script type="module" src="./shared-tournaments.js"></script>
+<script type="module" src="./private-invites.js"></script>
 <script type="module" src="./teams.js"></script>
 </head>
 <body>
@@ -576,6 +577,22 @@
    <button id="spond-import-cancel" type="button" class="outline-button">Abbrechen</button>
    <button id="spond-import-accept" type="button" class="primary-button">Termine übernehmen</button>
   </div>
+ </div>
+</dialog>
+<dialog id="private-share-dialog" aria-labelledby="private-share-heading">
+ <div class="modal">
+  <div class="section-heading"><h2 id="private-share-heading">Turnier privat teilen</h2>
+   <button id="private-share-close" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <strong id="private-share-title"></strong>
+  <p class="small muted">Der Empfänger braucht kein Konto. Geteilt werden nur Turniername, Datum und offizieller Turnierlink. Es wird <strong>keine Anmeldung oder Teilnahme</strong> bestätigt. Linkempfänger können ihn weiterleiten.</p>
+  <p id="private-share-status" class="small" role="status" aria-live="polite"></p>
+  <div id="private-share-link-wrap" hidden>
+   <label>Privater Link<input type="text" readonly id="private-share-link" autocomplete="off" spellcheck="false"></label>
+  </div>
+  <button id="private-share-create" type="button" class="primary-button">Link erstellen (7 Tage)</button>
+  <button id="private-share-copy" type="button" class="primary-button" hidden>Link kopieren</button>
+  <button id="private-share-revoke" type="button" class="outline-button" hidden>Link widerrufen</button>
+  <p class="small muted">Erst beim Erstellen wird bei Bedarf ein anonymes technisches Konto angelegt. Ohne Kontosicherung kann es beim Geräteverlust nicht wiederhergestellt werden; der Link läuft spätestens nach sieben Tagen ab.</p>
  </div>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
