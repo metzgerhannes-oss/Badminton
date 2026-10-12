@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Publish source-verified DBV calendar rows through GitHub OIDC (no stored DB secret)."""
 import argparse
+import base64
 import json
 import os
 from pathlib import Path
@@ -46,6 +47,15 @@ def send(payload,token):
    if res.status!=200 or reply.get("ok") is not True or reply.get("count")!=len(payload["entries"]):
     raise RuntimeError("Supabase calendar writer did not confirm all rows")
  except HTTPError as error:
+  if error.code==403:
+   # Public GitHub identity metadata only, never print the signed credential.
+   try:
+    encoded=token.split(".")[1]
+    claims=json.loads(base64.urlsafe_b64decode(encoded+"="*((-len(encoded))%4)))
+    allowed=("repository","repository_id","repository_owner_id","sub","ref","workflow_ref","event_name")
+    print("OIDC rejected metadata",json.dumps({k:claims.get(k) for k in allowed},ensure_ascii=False),flush=True)
+   except (ValueError,IndexError,KeyError):
+    pass
   raise RuntimeError("Supabase calendar writer HTTP "+str(error.code)) from None
  except URLError as error:
   raise RuntimeError("Supabase calendar writer unreachable") from None
