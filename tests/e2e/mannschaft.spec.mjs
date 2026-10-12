@@ -32,7 +32,10 @@ test("Mannschaft has its own mobile tab, persistent following, fixtures and offi
  await expect(page.locator("#view-mannschaft")).toBeVisible();
  await expect(page.locator(".bottom-nav a:visible")).toHaveCount(5);
  await expect(page.locator(".bottom-nav a[data-page=mannschaft]")).toHaveAttribute("aria-current","page");
- await expect(page.locator("#team-results .team-card")).toHaveCount(0);
+ await expect(page.locator("#team-discover")).toBeHidden();
+  await expect(page.locator("#team-results .team-card")).toHaveCount(0);
+  await page.locator("#team-add-open").click();
+  await expect(page.locator("#team-discover")).toBeVisible();
  await page.locator("#team-search").fill("mossingen");
  await expect(page.locator("#team-results .team-card")).toHaveCount(2);
  await page.locator("#team-search").fill("heilbronn");
@@ -40,7 +43,8 @@ test("Mannschaft has its own mobile tab, persistent following, fixtures and offi
  await page.locator("#team-search").fill("mossingen");
  await page.locator('#team-results [data-team-toggle="nuliga:10777:2"]').click();
  await expect(page.locator("#team-followed .team-card")).toHaveCount(1);
- await page.locator('#team-results [data-team-open="nuliga:10777:2026-27:2"]').click();
+ await page.locator('#team-followed [data-team-open="nuliga:10777:2026-27:2"]').click();
+  await expect(page.locator("#team-discover")).toBeHidden();
  await expect(page.locator("#team-detail")).toBeVisible();
  await expect(page.locator("#team-detail-games")).toContainText("TSG Heilbronn IV");
  await expect(page.locator("#team-detail-games")).toContainText("Angesetzt");
@@ -63,12 +67,14 @@ test("A source outage is not presented as zero known teams",async ({page})=>{
  }));
  await page.goto("/#mannschaft");
  await expect(page.locator("#team-directory-status")).toContainText("nicht erreichbar");
- await expect(page.locator("#team-results")).toContainText("nicht erreichbar");
+ await page.locator("#team-add-open").click();
+  await expect(page.locator("#team-results")).toContainText("nicht erreichbar");
 });
 
 test("BWBV directory finds new clubs without inventing teams",async ({page})=>{
  await page.goto("/#mannschaft");
- await page.locator("#team-search").fill("Gomaringen");
+ await page.locator("#team-add-open").click();
+  await page.locator("#team-search").fill("Gomaringen");
  await expect(page.locator("#team-results .team-card")).toHaveCount(0);
  await expect(page.locator("#team-clubs-results")).toContainText("TSV Gomaringen");
  await expect(page.locator("#team-clubs-results")).toContainText("Import ausstehend");
