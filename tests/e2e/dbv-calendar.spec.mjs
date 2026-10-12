@@ -4,7 +4,7 @@ const data=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 const own={players:[{id:"05-070879",name:"Testprofil"}],friends:[],officialLinks:[],
  activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true};
 test.beforeEach(async ({page})=>{
- await page.addInitScript(value=>localStorage.setItem("shuttleboard-v1",JSON.stringify(value)),own);
+ await page.addInitScript(value=>{if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify(value));},own);
  await page.route("**/*.supabase.co/**",route=>{
   const url=new URL(route.request().url());
   const rows=url.pathname.endsWith("/dbv_calendar_entries")?data.entries:[];
@@ -65,12 +65,13 @@ test("Plus saves the official calendar date for the own profile and check remove
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry").first().locator("[data-calendar-toggle]")).toHaveText("+");
 });
 test("Calendar plans stay private to the active player",async ({page})=>{
- await page.addInitScript(()=>{
-  const value=JSON.parse(localStorage.getItem("shuttleboard-v1")||"{}");
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>{
+  const value=JSON.parse(localStorage.getItem("shuttleboard-v1"));
   value.players.push({id:"05-071969",name:"Zweites Spielerprofil"});
   localStorage.setItem("shuttleboard-v1",JSON.stringify(value));
  });
- await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.reload({waitUntil:"domcontentloaded"});
  const first=page.locator("#dbv-calendar-results .dbv-calendar-entry").first();
  await expect(first).toBeVisible();
  await first.locator("[data-calendar-toggle]").click();
