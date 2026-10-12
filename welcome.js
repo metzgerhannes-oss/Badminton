@@ -2,11 +2,15 @@ import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scri
 import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
 import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
 const $=id=>document.getElementById(id);
+const t=key=>window.SchmetterlingeI18n?.t(key)||key;
+const format=(key,params={})=>t(key).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??""));
+
 let mode="manual",searchTimer=null,searchController=null,searchTicket=0,selectedCandidate=null;
+let lastSearchStatus=null,lastSearchPlayers=null,lastSearchSource=null,lastSavedProfile=null;
 
 function showError(message){
  const error=$("welcome-error");
- error.textContent=message;
+ error.textContent=t(message);
  error.hidden=false;
 }
 function clearError(){
@@ -46,7 +50,8 @@ function persistAndContinue(profile,{confirmed=false}={}){
  if(confirmed&&(!stored?.players?.some(p=>p.id===profile.id)||stored.activeProfileId!==profile.id))
   throw Error("Die DBV-ID konnte nicht als aktives Profil gespeichert werden. Bitte erneut versuchen.");
  const savedStatus=$("welcome-success");
- if(savedStatus)savedStatus.textContent=confirmed?"✓ DBV-Profil "+profile.id+" übernommen":"✓ Profil auf diesem Gerät gespeichert";
+ lastSavedProfile={confirmed,id:profile.id};
+ if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
  // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
  $("onboard-profile").hidden=true;
  $("onboard-install").hidden=false;
@@ -54,7 +59,7 @@ function persistAndContinue(profile,{confirmed=false}={}){
  $("progress-profile").classList.add("done");
  $("progress-install").classList.add("current");
  showPlatform(preferredPlatform());
- document.title="App zum Home-Bildschirm hinzufügen · Schmetterlinge";
+ document.title=t("App zum Home-Bildschirm hinzufügen · Schmetterlinge");
  window.scrollTo?.(0,0);
 }
 function saveProfile(e){
@@ -89,9 +94,18 @@ function clearSelection(){
  $("welcome-selection").hidden=true;
 }
 function setSearchStatus(message){
- $("welcome-search-status").textContent=message;
+ lastSearchStatus={kind:"message",message};
+ $("welcome-search-status").textContent=t(message);
+}
+function setResultsStatus(count,source){
+ lastSearchStatus={kind:"results",count,source};
+ $("welcome-search-status").textContent=format("{count} passende Spieler",{count})+
+  (count===30?t(" (maximal 30; Suche eingrenzen)"):"")+
+  (source==="backup"?t(" · GitHub-Ausfallsicherung"):"")+t(". Wähle den richtigen Spieler aus.");
 }
 function showSearchResults(players,source){
+ lastSearchPlayers=players;
+ lastSearchSource=source;
  const root=$("welcome-search-results");
  root.replaceChildren();
  const existing=new Set((readSaved()?.players||[]).map(p=>p.id));
@@ -102,11 +116,11 @@ function showSearchResults(players,source){
   const name=document.createElement("strong");
   name.textContent=player.name;
   const detail=document.createElement("span");
-  detail.textContent=[player.club||"Verein unbekannt",player.birthYear?"Jg. "+player.birthYear:player.ageClass,player.id?"DBV "+player.id:""].filter(Boolean).join(" · ");
+  detail.textContent=[player.club||t("Verein unbekannt"),player.birthYear?format("Jg. {year}",{year:player.birthYear}):player.ageClass,player.id?"DBV "+player.id:""].filter(Boolean).join(" · ");
   button.append(name,detail);
   if(existing.has(player.id)){
    const note=document.createElement("small");
-   note.textContent="Bereits angelegt · als Startprofil auswählen";
+   note.textContent=t("Bereits angelegt · als Startprofil auswählen");
    button.append(note);
   }
   button.addEventListener("click",()=>{
@@ -124,8 +138,7 @@ function showSearchResults(players,source){
   root.append(button);
  }
  if(!players.length)setSearchStatus("Kein passender DBV-Spieler gefunden. Versuche einen anderen Namen oder richte das Profil manuell ein.");
- else setSearchStatus(players.length+" passende Spieler"+(players.length===30?" (maximal 30; Suche eingrenzen)":"")+
-  (source==="backup"?" · GitHub-Ausfallsicherung":"")+". Wähle den richtigen Spieler aus.");
+ else setResultsStatus(players.length,source);
 }
 async function searchPlayers(value){
  const current=++searchTicket;
@@ -133,6 +146,7 @@ async function searchPlayers(value){
  searchController=new AbortController();
  clearSelection();
  $("welcome-search-results").replaceChildren();
+ lastSearchPlayers=null;
  const term=normalizeFriendSearch(value);
  if(term.length<2){
   setSearchStatus("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
@@ -155,6 +169,7 @@ function onSearchInput(){
  searchController?.abort();
  clearSelection();
  $("welcome-search-results").replaceChildren();
+ lastSearchPlayers=null;
  const value=$("welcome-player-search").value;
  if(normalizeFriendSearch(value).length<2){
   setSearchStatus("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
@@ -177,6 +192,22 @@ function showProfileForm(){
  window.scrollTo?.(0,0);
 }
 window.addEventListener("schmetterlinge:language-change", event => {
+ // Re-render texts already generated by asynchronous search or a prior locale.
+ if(lastSearchPlayers&&!selectedCandidate)showSearchResults(lastSearchPlayers,lastSearchSource);
+ else if(lastSearchStatus?.kind==="results")setResultsStatus(lastSearchStatus.count,lastSearchStatus.source);
+ else if(lastSearchStatus?.kind==="message")setSearchStatus(lastSearchStatus.message);
+ if(selectedCandidate){
+  const detail=[selectedCandidate.club||t("Verein unbekannt"),
+   selectedCandidate.birthYear?format("Jg. {year}",{year:selectedCandidate.birthYear}):selectedCandidate.ageClass,
+   selectedCandidate.id?"DBV "+selectedCandidate.id:""].filter(Boolean).join(" · ");
+  $("welcome-selection-detail").textContent=detail;
+ }
+ if(lastSavedProfile){
+  $("welcome-success").textContent=lastSavedProfile.confirmed
+   ?format("✓ DBV-Profil {id} übernommen",{id:lastSavedProfile.id})
+   :t("✓ Profil auf diesem Gerät gespeichert");
+  document.title=t("App zum Home-Bildschirm hinzufügen · Schmetterlinge");
+ }
  const notice=$("welcome-language-status");
  if(notice)notice.textContent=event.detail?.fallback
   ?"Dieses Sprachpaket ist derzeit nicht verfügbar. Die deutschen Texte bleiben lesbar.":"";
