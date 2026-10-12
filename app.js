@@ -84,9 +84,13 @@ function renderTournaments(){
  section.querySelectorAll("[data-remove-id]").forEach(button=>button.addEventListener("click",()=>{
   const id=button.dataset.removeId,player=button.dataset.removePlayer;
   const removed=state.officialLinks.find(t=>t.id===id&&t.playerId===player);
+  if(removed&&window.badmintonPrivateInvite?.hasActive(removed)){
+   toast("Bitte zuerst den privaten Link widerrufen, bevor du dieses Turnier entfernst.");
+   window.dispatchEvent(new CustomEvent("badminton:private-invite",{detail:{bookmark:removed}}));
+   return;
+  }
   state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
   save();render();toast(removed?.source==="dbv-calendar"?"Vormerkung entfernt":"Turnierlink entfernt");
-  if(removed)window.dispatchEvent(new CustomEvent("badminton:private-invite-remove",{detail:{bookmark:removed}}));
   if(removed&&removed.source!=="dbv-calendar")window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
    detail:{bookmark:removed,publicShare:false,removed:true}
   }));
