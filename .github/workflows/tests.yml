@@ -90,6 +90,7 @@ jobs:
           node tests/router.mjs
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
+          node tests/desktop-dashboard.mjs
           node tests/ranking-points.mjs
           node tests/source-register.mjs
           node tests/invitation.mjs
