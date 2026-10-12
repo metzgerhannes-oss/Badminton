@@ -63,7 +63,9 @@ def date_pair(label,year):
  start=dt.date(year,m1,d1)
  # December -> January crossover.
  end=dt.date(year+(1 if m2<m1 else 0),m2,d2)
- if end<start or (end-start).days>14:raise ValueError("Unexpected DBV date interval")
+ # The official 2027 DBV source includes series with multi-month published date spans.
+ # Keep that source range without inventing individual tournament days.
+ if end<start or (end-start).days>366:raise ValueError("Unexpected DBV date interval")
  return start.isoformat(),end.isoformat()
 
 def normalize(entry,year):
