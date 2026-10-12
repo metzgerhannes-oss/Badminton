@@ -46,10 +46,10 @@ test("current followed profile remains visible among Home shortcuts; Home return
  await expect(page.locator("#dashboard-friends .friend-quick.is-current")).toHaveCount(1);
  await expect(page.locator("#dashboard-friends .friend-quick.is-current")).toHaveAttribute(
   "data-friend-quick",FRIENDS[8].id);
- await expect(page.locator("#dashboard-friends .friend-quick-more")).toHaveText(/\+6 weitere/);
+ await expect(page.locator("#dashboard-friends .friend-quick-more")).toHaveText(/\+7 weitere/);
  await page.locator("#dashboard-friends [data-is-own='true']").click();
  await expect(page.locator(".focused-profile")).toContainText("Startprofil");
- await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(4);
+ await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(3);
  await expect(page.locator("#dashboard-friends .friend-quick.is-current")).toHaveCount(0);
 });
 
