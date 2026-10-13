@@ -46,6 +46,7 @@
 <script type="module" src="./shared-tournaments.js"></script>
 <script type="module" src="./private-invites.js"></script>
 <script type="module" src="./player-access.js"></script>
+<script type="module" src="./owner-admin.js"></script>
 <script type="module" src="./teams.js"></script>
 </head>
 <body>
@@ -407,6 +408,20 @@
     <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
    </section>
 
+   <section class="settings-card" id="owner-admin-panel" aria-labelledby="owner-admin-title" hidden>
+    <h3 id="owner-admin-title">Eigentümerverwaltung – private Spieler</h3>
+    <p class="settings-hint">Nur der bestätigte App-Eigentümer kann eigene Spieler freigeben. Für andere Besucher bleibt dieser Bereich unsichtbar. Die DBV-ID ist kein Berechtigungsnachweis.</p>
+    <form id="owner-admin-form">
+      <label for="owner-admin-player">Eigener Spieler (DBV-ID)</label>
+      <input id="owner-admin-player" type="text" pattern="[0-9]{2}-[0-9]{6}" inputmode="text" list="owner-admin-my-players" autocomplete="off" placeholder="00-000000" required>
+      <datalist id="owner-admin-my-players"></datalist>
+      <label><input type="checkbox" id="owner-admin-confirm" required> Ich bestätige ausdrücklich, dass ich als Sorgeberechtigter oder sonst zur Verwaltung berechtigte Person dieses Spielerprofil privat freigeben darf.</label>
+      <button class="primary-button" type="submit">Diesen Spieler freigeben</button>
+    </form>
+    <p id="owner-admin-status" class="settings-hint" role="status" aria-live="polite"></p>
+    <h4>Meine bestätigten Spieler</h4>
+    <ul id="owner-admin-grants"></ul>
+   </section>
    <section class="settings-card language-settings" aria-labelledby="language-title">
     <h3 id="language-title">Sprache</h3>
     <label for="app-language">App-Sprache</label>
