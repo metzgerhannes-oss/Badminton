@@ -45,16 +45,16 @@ function updateCandidates(){
   const confirmed=verifiedIds.has(item.id);
   const button=document.createElement("button");button.type="button";
   button.className=confirmed?"primary-button":"outline-button";
-  button.textContent=confirmed?"Privat teilen":"Berechtigung bestätigen";
+  button.textContent=confirmed?"Privaten Link prüfen":"Selbstauskunft erfassen";
   button.addEventListener("click",()=>{
    if(confirmed){
     window.dispatchEvent(new CustomEvent("badminton:player-private-share",{detail:{player:item}}));
    }else{
     manual.open=true;player.value=item.id;verify.focus();
-    status.textContent="Bestätige deine Berechtigung für "+(item.name||item.id)+".";
+    status.textContent="Erfasse deine Selbstauskunft für "+(item.name||item.id)+". Sie ersetzt keine unabhängige Freigabeprüfung.";
    }
   });
-  if(confirmed){const mark=document.createElement("small");mark.textContent="Berechtigung bestätigt";entry.append(title,mark,button);}
+  if(confirmed){const mark=document.createElement("small");mark.textContent="Selbstauskunft hinterlegt – externer Nachweis für neue Archivlinks erforderlich";entry.append(title,mark,button);}
   else entry.append(title,button);
   candidates.append(entry);
  }
@@ -87,7 +87,7 @@ async function loadOwner(){
   const info=await rpc("private_owner_status");
   if(info?.owner!==true)return;
   panel.hidden=false;
-  status.textContent="Eigentümerzugang bestätigt. Nur du kannst deine persönlich berechtigten Spieler verwalten.";
+  status.textContent="Betreiberzugang erkannt. Neue Spieler-Archivfreigaben erfordern zusätzlich eine unabhängige Vereins-/Elternbestätigung.";
   updateCandidates();
   updateGrants(Array.isArray(info.granted_players)?info.granted_players:[]);
  }catch{if(!panel.hidden)status.textContent="Administratorsitzung derzeit nicht erreichbar. Bitte erneut öffnen."}
@@ -106,7 +106,7 @@ form.addEventListener("submit",async event=>{
   verify.checked=false;player.value="";
   const state=await rpc("private_owner_status");
   updateGrants(Array.isArray(state?.granted_players)?state.granted_players:[]);
-  status.textContent="Berechtigung bestätigt. Wähle in „Meine Spielerprofile“ beim entsprechenden Profil „Profil privat teilen“.";
+  status.textContent="Selbstauskunft gespeichert. Eine neue Archivfreigabe ist erst nach unabhängiger Prüfung unter Profile & Familie möglich.";
  }catch{status.textContent="Berechtigung nicht erstellt. Prüfe, ob die DBV-ID existiert und die Eigentümersitzung gültig ist."}
  finally{button.disabled=false}
 });
