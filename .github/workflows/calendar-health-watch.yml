@@ -3,6 +3,12 @@ on:
   schedule:
     - cron: '23 8 * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/calendar-health-watch.yml'
+      - 'scripts/calendar-health-watch.mjs'
+      - 'tests/calendar-health-watch.mjs'
 permissions:
   contents: read
   actions: read
