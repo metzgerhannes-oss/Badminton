@@ -42,7 +42,7 @@ assert.match(view,/no-referrer/);
 assert.match(view,/id="player-invite-accept"/);
 assert.match(view,/id="player-invite-accepted"/);
 assert.match(acceptSql,/accepted_by uuid references auth\.users\(id\)/i);
-assert.match(acceptSql,/or accepted_by is not null\)\)>=20/i,"Persistent owner quota must include accepted shares");
+assert.match(acceptSql,/or accepted_at is not null\)\)>=20/i,"Persistent owner quota must include accepted shares");
 assert.match(acceptSql,/and i\.accepted_by is null/);
 assert.match(acceptSql,/and i\.expires_at>now\(\)/);
 assert.match(acceptSql,/and i\.revoked_at is null/);
