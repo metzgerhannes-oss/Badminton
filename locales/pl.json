@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Drużyny dostępne",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Wpisz nazwę klubu powyżej, aby przeszukać oficjalny katalog BWBV.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Nie znaleziono klubu o tej nazwie w katalogu BWBV.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Wpisz nazwę drużyny lub klubu. Obserwowane drużyny są widoczne powyżej."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Wpisz nazwę drużyny lub klubu. Obserwowane drużyny są widoczne powyżej.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Zaakceptowane zaproszenia zawodników są dodawane automatycznie. Możesz wybrać innych zawodników zapisanych na tym urządzeniu lub dodać ich po nazwisku i identyfikatorze DBV.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Dodaj zawodnika według nazwiska lub identyfikatora DBV",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Publiczne wyszukiwanie nazwisk w DBV jest obecnie wyłączone ze względów ochrony danych. Zaakceptowane zaproszenia są dodawane automatycznie. Poniżej możesz dodać inne własne profile za pomocą nazwiska i identyfikatora DBV.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Wyszukiwanie nazwisk w DBV jest obecnie niedostępne. Użyj ręcznej konfiguracji z nazwiskiem i identyfikatorem DBV.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Na tym urządzeniu nie znaleziono pasującego zawodnika. Inne profile możesz dodać ręcznie za pomocą identyfikatora DBV.",
+    " · Auf diesem Gerät gespeichert": " · Zapisano na tym urządzeniu"
   }
 }
