@@ -1,5 +1,6 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
 import {assessSourceAvailability,importStatusForBatch} from "./source-availability.mjs";
+import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const PUBLIC="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
@@ -47,8 +48,15 @@ Deno.serve(async req=>{
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:headers(origin)});
  if(req.method!=="POST")return respond(405,{error:"post_required"},origin);
  if(origin&&origin!==ORIGIN)return respond(403,{error:"disallowed_origin"},origin);
+ // The publishable key is not authentication: reject oversized input
+ // BEFORE allocating an unbounded JSON body or touching the database.
  let data:any;
- try{data=await req.json()}catch{return respond(400,{error:"invalid_json"},origin)}
+ try{data=await readBoundedJson(req,1024)}
+ catch(error){
+  if(error instanceof PayloadTooLargeError)
+   return respond(413,{error:"payload_too_large"},origin);
+  return respond(400,{error:"invalid_json"},origin);
+ }
  const id=String(data?.dbv_id||"");
  if(!/^\d{2}-\d{6}$/.test(id))return respond(400,{error:"invalid_id"},origin);
  if((req.headers.get("apikey")||data?.public_key)!==PUBLIC)
