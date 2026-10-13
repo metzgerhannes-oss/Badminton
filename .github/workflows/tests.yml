@@ -80,6 +80,7 @@ jobs:
           node --check scripts/live-links.mjs
       - name: Run tests
         run: |
+          node tests/private-publication-gate.mjs
           node tests/security-gate.mjs
           node tests/operations-audit.mjs
           node tests/calendar-health-watch.mjs
