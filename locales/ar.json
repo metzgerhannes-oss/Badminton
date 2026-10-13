@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· الفرق متاحة",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "أدخل اسم النادي أعلاه للبحث في الدليل الرسمي لاتحاد BWBV.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "لم يُعثر على نادٍ بهذا الاسم في دليل BWBV.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "أدخل اسم فريق أو نادٍ. تظهر الفرق التي تتابعها أعلاه."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "أدخل اسم فريق أو نادٍ. تظهر الفرق التي تتابعها أعلاه.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "تُضاف دعوات اللاعبين المقبولة تلقائيًا. يمكنك اختيار لاعبين آخرين محفوظين على هذا الجهاز أو إضافتهم بالاسم ومعرّف DBV.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "إضافة لاعب آخر بالاسم أو معرّف DBV",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "البحث العام في DBV بالاسم متوقف حاليًا لحماية الخصوصية. تُضاف الدعوات المقبولة تلقائيًا. يمكنك إضافة ملفاتك الشخصية الأخرى أدناه بالاسم ومعرّف DBV.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "البحث في DBV بالاسم غير متاح حاليًا. استخدم الإعداد اليدوي بالاسم ومعرّف DBV.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "لم يُعثر على لاعب مطابق على هذا الجهاز. يمكنك إضافة ملفات أخرى يدويًا بمعرّف DBV.",
+    " · Auf diesem Gerät gespeichert": " · محفوظ على هذا الجهاز"
   }
 }

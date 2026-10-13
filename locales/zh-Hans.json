@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· 球队已收录",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "在上方输入俱乐部名称，搜索 BWBV 官方名录。",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "BWBV 官方名录中未找到该俱乐部。",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "输入球队或俱乐部名称。已关注的球队显示在上方。"
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "输入球队或俱乐部名称。已关注的球队显示在上方。",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "已接受的球员邀请会自动添加。你可以选择本设备保存的其他球员，或通过姓名和 DBV 编号添加。",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "通过姓名或 DBV 编号添加其他球员",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "为保护隐私，DBV 公共姓名搜索目前已关闭。已接受的邀请会自动添加。你可以在下方通过姓名和 DBV 编号添加自己的其他档案。",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV 姓名搜索目前不可用。请通过姓名和 DBV 编号手动设置。",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "本设备未找到匹配的球员。你可以使用 DBV 编号手动添加其他档案。",
+    " · Auf diesem Gerät gespeichert": " · 已保存在本设备"
   }
 }

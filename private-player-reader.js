@@ -2,6 +2,7 @@
  * No credential is logged, cached in HTML or stored after redemption. */
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {getPrivateSession} from "./private-invites.js";
+import {addAcceptedPlayerToLocalStore} from "./scripts/invited-player-local.mjs";
 const $=id=>document.getElementById(id);
 const status=$("player-invite-status"),panel=$("player-invite-data");
 const STORE="schmetterlinge.acceptedPlayerInvite.v3";
@@ -52,8 +53,15 @@ function show(data){
  if(!data?.player||!/^[0-9]{2}-[0-9]{6}$/.test(data.player.dbv_id)||typeof data.player.name!=="string")
   return false;
  $("player-invite-name").textContent=data.player.name;
- $("player-invite-club").textContent=[data.player.club,data.player.age_class].filter(Boolean).join(" · ");
- panel.hidden=false;status.textContent="Privater Zugriff aktiv – gültig bis zum Widerruf.";return true;
+ $("player-invite-club").textContent=[data.player.club,data.player.birth_year?"Jahrgang "+data.player.birth_year:"",data.player.age_class].filter(Boolean).join(" · ");
+ // The read was authenticated and scoped by the accepted invitation.
+ // Only save a local followed-player entry, never an own/verified-owner profile.
+ try{
+  const stored=JSON.parse(localStorage.getItem("shuttleboard-v1")||"null");
+  const next=addAcceptedPlayerToLocalStore(stored,data.player);
+  if(next)localStorage.setItem("shuttleboard-v1",JSON.stringify(next));
+ }catch{/* A full/disabled browser storage must not block viewing the invite. */}
+ panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
 $("player-invite-accepted").addEventListener("change",event=>{activeId=event.target.value;reload()});

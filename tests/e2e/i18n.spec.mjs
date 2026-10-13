@@ -66,7 +66,7 @@ test("Chinese profile-first onboarding is fully localized, including installatio
   await expect(page.locator("html")).toHaveAttribute("lang","zh-Hans");
   await expect(page.locator(".welcome-steps")).toContainText("第 1 步");
   await expect(page.locator("#onboard-profile > p").first()).toHaveText(
-    "在公开的 DBV 球员名录中搜索。根据俱乐部、出生年份和 DBV 编号选择正确的球员。");
+    "已接受的球员邀请会自动添加。你可以选择本设备保存的其他球员，或通过姓名和 DBV 编号添加。");
   await expect(page.locator("#onboard-profile")).not.toContainText("Finde deinen Spieler");
   await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
   await page.locator("#welcome-manual-panel summary").click();

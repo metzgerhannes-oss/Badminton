@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Teams available",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Enter a club name above to search the official BWBV directory.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "No club with this name was found in the BWBV directory.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Enter a team or club. Your followed teams are shown above."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Enter a team or club. Your followed teams are shown above.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Accepted player invitations are added automatically. You can select other players saved on this device or add them by name and DBV ID.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Add another player by name or DBV ID",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Public DBV name search is currently unavailable for privacy reasons. Accepted invitations are added automatically. You can add other own profiles below using name and DBV ID.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV name search is currently unavailable. Use manual setup with name and DBV ID.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "No matching player saved on this device. You can manually add other profiles with a DBV ID.",
+    " · Auf diesem Gerät gespeichert": " · Saved on this device"
   }
 }
