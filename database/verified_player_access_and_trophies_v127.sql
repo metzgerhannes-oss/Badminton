@@ -182,9 +182,17 @@ $func$;
 REVOKE ALL ON FUNCTION private_content.player_access_invite_create(text,text) FROM PUBLIC,anon;
 -- authenticated retains explicit EXECUTE as in existing v125.
 
+-- The client must refuse to create old-scope links against a stale backend.
+CREATE OR REPLACE FUNCTION public.private_player_scope_capabilities()
+RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
+AS $func$ SELECT jsonb_build_object('scope_version',2,
+  'sections',jsonb_build_array('profile','trophies','matches')) $func$;
+REVOKE ALL ON FUNCTION public.private_player_scope_capabilities() FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.private_player_scope_capabilities() TO authenticated;
+
 -- All records originate from the private v126 hard archive. Only individual
 -- sourced Top-4 placements corroborated by the preserved verified chronology,
--- or newly documented independent verification notes, qualify.
+-- qualify. New results need the same curated verified evidence before being counted.
 CREATE OR REPLACE FUNCTION private_content.scoped_trophy_projection(p_dbv_id text)
 RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
 AS $func$
@@ -196,10 +204,12 @@ AS $func$
   WHERE e.dbv_id=p_dbv_id AND e.kind='placement'
    AND (e.payload->>'placement') ~ '^[1-4]$'
    AND (e.payload->>'source_url') ~ '^https://'
-   AND (
-    EXISTS (
+   AND EXISTS (
       SELECT 1 FROM private_content.source_snapshots s
-      CROSS JOIN LATERAL jsonb_array_elements(s.document->'results') v(result)
+      CROSS JOIN LATERAL jsonb_array_elements(
+        CASE WHEN s.source_key='data/history.json'
+          AND jsonb_typeof(s.document->'results')='array'
+        THEN s.document->'results' ELSE '[]'::jsonb END) v(result)
       WHERE s.source_key='data/history.json'
        AND v.result->>'verified'='true'
        AND v.result->>'playerId'=p_dbv_id
@@ -207,9 +217,6 @@ AS $func$
        AND v.result->>'discipline'=e.payload->>'discipline'
        AND v.result->>'place'=e.payload->>'placement'
        AND v.result->'source'->>'url'=e.payload->>'source_url'
-    )
-    OR (nullif(e.payload->>'verification_note','') IS NOT NULL
-        AND (e.payload->>'source_url') ~ '^https://')
    )
   ORDER BY (e.payload->>'source_url'),(e.payload->>'event_date'),
            (e.payload->>'discipline'),(e.payload->>'age_group'),
