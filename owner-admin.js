@@ -8,7 +8,11 @@ const player=document.getElementById("owner-admin-player");
 const verify=document.getElementById("owner-admin-confirm");
 const list=document.getElementById("owner-admin-grants");
 const ownList=document.getElementById("owner-admin-my-players");
+const search=document.getElementById("owner-admin-search");
+const candidates=document.getElementById("owner-admin-candidates");
+const manual=document.querySelector(".owner-admin-manual");
 const TOKEN=/^[0-9]{2}-[0-9]{6}$/;
+let verifiedIds=new Set();
 let session=null,loading=false;
 async function rpc(name,args={}){
  if(!session?.access_token)throw Error("no owner session");
@@ -26,13 +30,44 @@ function localProfiles(){
  }catch{return []}
 }
 function updateCandidates(){
- ownList.replaceChildren();
- for(const item of localProfiles()){
+ ownList.replaceChildren();candidates.replaceChildren();
+ const profiles=localProfiles();
+ const q=String(search?.value||"").trim().normalize("NFKC").toLocaleLowerCase("de");
+ let count=0;
+ for(const item of profiles){
   const opt=document.createElement("option");opt.value=item.id;
-  opt.label=(item.name||"Lokales Profil")+" · "+item.id;ownList.append(opt);
+  opt.label=(item.name||"Eigenes Profil")+" · "+item.id;ownList.append(opt);
+  if(q&&!((item.name||"")+" "+item.id).normalize("NFKC").toLocaleLowerCase("de").includes(q))continue;
+  count++;
+  const entry=document.createElement("div");entry.className="owner-admin-candidate";
+  const title=document.createElement("span");
+  title.textContent=(item.name||"Eigenes Profil")+" · "+item.id;
+  const confirmed=verifiedIds.has(item.id);
+  const button=document.createElement("button");button.type="button";
+  button.className=confirmed?"primary-button":"outline-button";
+  button.textContent=confirmed?"Privat teilen":"Berechtigung bestätigen";
+  button.addEventListener("click",()=>{
+   if(confirmed){
+    window.dispatchEvent(new CustomEvent("badminton:player-private-share",{detail:{player:item}}));
+   }else{
+    manual.open=true;player.value=item.id;verify.focus();
+    status.textContent="Bestätige deine Berechtigung für "+(item.name||item.id)+".";
+   }
+  });
+  if(confirmed){const mark=document.createElement("small");mark.textContent="Berechtigung bestätigt";entry.append(title,mark,button);}
+  else entry.append(title,button);
+  candidates.append(entry);
+ }
+ if(!count){
+  const hint=document.createElement("p");
+  hint.textContent=profiles.length?"Kein passendes eigenes Profil gefunden.":"Keine eigenen Profile auf diesem Gerät gefunden.";
+  candidates.append(hint);
  }
 }
+search.addEventListener("input",updateCandidates);
 function updateGrants(grants){
+ verifiedIds=new Set(grants.filter(id=>TOKEN.test(id)));
+ updateCandidates();
  list.replaceChildren();
  if(!grants.length){const li=document.createElement("li");li.textContent="Noch keine eigenen Spieler freigegeben.";list.append(li);return}
  for(const id of grants){
