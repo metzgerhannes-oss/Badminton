@@ -57,8 +57,9 @@ test("Seven-day invite must be accepted, then persistent scoped session works un
  // A previously accepted one-time link must reopen the existing device grant
  // without attempting a second redemption of the already consumed token.
  await page.goto("/private-player.html#token="+token,{waitUntil:"load"});
- expect(new URL(page.url()).hash).toBe("");
+ // The JS module is deferred; wait until it actually removes the sensitive fragment.
  await expect(page.locator("#player-invite-data")).toBeVisible();
+ await expect.poll(()=>new URL(page.url()).hash).toBe("");
  await expect(page.locator("#player-invite-status")).toContainText("Gespeicherter Spielerzugang aktiv");
  await expect(page.locator("#player-invite-accept")).toHaveText("Weitere Einladung annehmen");
  expect(accepted).toBe(1,"Reopening must not consume the token again");
