@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#d9ecfb">
+<title>Schmetterlinge · Eigentümer aktivieren</title>
+<style>:root{font-family:system-ui,-apple-system,sans-serif;color:#123950;background:#edf5fc}
+*{box-sizing:border-box}main{max-width:620px;margin:clamp(15px,7vh,85px) auto;padding:26px;background:#fff;border-radius:17px;box-shadow:0 4px 28px #173f5d18}
+p{line-height:1.6}button{border:0;border-radius:9px;background:#07638e;color:white;font:inherit;padding:13px 18px;min-height:48px}button:disabled{opacity:.5}
+a{color:#065f89}small{color:#576d7a}</style>
+<!-- Clear URL-fragment bearer token before third-party requests, extensions or navigation. -->
+<script>window.__ownerHash=window.location.hash;history.replaceState(null,"",location.pathname+location.search);</script>
+<script type="module" src="./owner-activate.js"></script></head>
+<body><main>
+<h1>Schmetterlinge – Eigentümer aktivieren</h1>
+<p>Diese einmalige Aktivierung verbindet deine technische Gerätesitzung mit der Administratorrolle. Keine E-Mail-Adresse und kein Passwort erforderlich.</p>
+<p>Aktiviere diesen Link ausschließlich auf <strong>deinem eigenen iPhone</strong>. Wer den noch unbenutzten Link besitzt, könnte die einmalige Aktivierung sonst zuerst durchführen.</p>
+<label for="owner-token-input">Einmaliger Aktivierungscode (alternativ zum direkten Link)</label><input id="owner-token-input" type="text" inputmode="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="64" placeholder="64-stelligen Code hier einfügen" style="display:block;width:100%;max-width:100%;padding:12px;margin:12px 0 16px;border:1px solid #7d9fb2;border-radius:8px"><button type="button" id="owner-claim" disabled>Als Administrator aktivieren</button>
+<p id="owner-claim-status" role="status" aria-live="polite">Aktivierungslink wird geprüft.</p>
+<p><small>Der Aktivierungscode wird nicht in der App gespeichert. Danach wird der Zugriff an die technisch anonyme Sitzung dieses Geräts gebunden. Bei Gerätewechsel ist ein gesonderter, sicherer Wiederherstellungsprozess erforderlich.</small></p>
+<a href="./index.html#einstellungen">Zu den Einstellungen</a>
+</main></body></html>

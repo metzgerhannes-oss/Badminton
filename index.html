@@ -46,6 +46,7 @@
 <script type="module" src="./shared-tournaments.js"></script>
 <script type="module" src="./private-invites.js"></script>
 <script type="module" src="./player-access.js"></script>
+<script type="module" src="./owner-admin.js"></script>
 <script type="module" src="./teams.js"></script>
 </head>
 <body>
@@ -55,7 +56,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v116" title="Version v116">v116</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v117" title="Version v117">v117</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -407,6 +408,25 @@
     <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
    </section>
 
+   <section class="settings-card" id="owner-admin-panel" aria-labelledby="owner-admin-title" hidden>
+    <h3 id="owner-admin-title">Eigentümerverwaltung – private Spieler</h3>
+    <p class="settings-hint">Nur der bestätigte App-Eigentümer kann eigene Spieler freigeben. Für andere Besucher bleibt dieser Bereich unsichtbar. Die DBV-ID ist kein Berechtigungsnachweis.</p>
+    <form id="owner-admin-form">
+      <label for="owner-admin-player">Eigener Spieler (DBV-ID)</label>
+      <input id="owner-admin-player" type="text" pattern="[0-9]{2}-[0-9]{6}" inputmode="text" list="owner-admin-my-players" autocomplete="off" placeholder="00-000000" required>
+      <datalist id="owner-admin-my-players"></datalist>
+      <label><input type="checkbox" id="owner-admin-confirm" required> Ich bestätige ausdrücklich, dass ich als Sorgeberechtigter oder sonst zur Verwaltung berechtigte Person dieses Spielerprofil privat freigeben darf.</label>
+      <button class="primary-button" type="submit">Diesen Spieler freigeben</button>
+    </form>
+    <p id="owner-admin-status" class="settings-hint" role="status" aria-live="polite"></p>
+    <h4>Meine bestätigten Spieler</h4>
+    <ul id="owner-admin-grants"></ul>
+   </section>
+   <details class="settings-card" id="owner-activation-setup">
+    <summary>Eigentümeraktivierung (nur Betreiber)</summary>
+    <p class="settings-hint">Der erste App-Eigentümer kann sich mit einem einmaligen Aktivierungscode auf diesem Gerät legitimieren. Besucher benötigen keine Anmeldung.</p>
+    <p><a href="./owner-activate.html">Einmaligen Eigentümercode auf diesem Gerät eingeben ↗</a></p>
+   </details>
    <section class="settings-card language-settings" aria-labelledby="language-title">
     <h3 id="language-title">Sprache</h3>
     <label for="app-language">App-Sprache</label>
