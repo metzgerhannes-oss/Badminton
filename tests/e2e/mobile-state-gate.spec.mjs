@@ -13,6 +13,7 @@ test("Keyboard, navigation, and Escape retain a consistent profile",async ({page
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await expect(page.locator(".bottom-nav a[aria-current='page']")).toHaveCount(1);
  await page.goto("/#einstellungen");
+  await page.locator('a[data-settings-target="profile"]').click();
   const add=page.locator("#add-player");
  await add.focus();
  await add.click();
