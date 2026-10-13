@@ -79,6 +79,7 @@ jobs:
         run: |
           node tests/security-gate.mjs
           node tests/operations-audit.mjs
+          node tests/public-import-payload.mjs
           node tests/validate.mjs
           node tests/history.mjs
           node tests/trophies.mjs
