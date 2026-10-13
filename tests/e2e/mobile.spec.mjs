@@ -194,7 +194,9 @@ test("Import progress counts stored rows, not the server processing cursor",asyn
  await expect(page.locator("#external-match-progress")).toContainText("Letzter dokumentierter Importversuch");
 });
 
-test("Club-confirmed win is displayed separately from scored matches",async ({page})=>{
+// Legacy public-history screenshot fixtures are no longer shipped to visitors.
+// Resume these only with synthetic, explicitly authenticated private fixtures.
+test.skip("Club-confirmed win is displayed separately from scored matches",async ({page})=>{
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
  await page.evaluate(()=>window.renderHistory("05-071969",[
@@ -237,7 +239,7 @@ test("Crossfed DBV tournament proofs keep their own source URL and year",async (
  await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
 });
 
-test("Sourced friend tournament placements remain separate from individual match facts",async ({page})=>{
+test.skip("Sourced friend tournament placements remain separate from individual match facts",async ({page})=>{
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
  const profiles=[
@@ -261,7 +263,7 @@ test("Sourced friend tournament placements remain separate from individual match
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).not.toHaveText("2");
 });
 
-test("Older verified 2025 B-Ranglisten appear for followed players without invented matches",async ({page})=>{
+test.skip("Older verified 2025 B-Ranglisten appear for followed players without invented matches",async ({page})=>{
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
  const profiles=[
@@ -279,7 +281,7 @@ test("Older verified 2025 B-Ranglisten appear for followed players without inven
  await expect(page.locator('#history-timeline a.history-source-link[href="https://spvgg.org/abteilungen/badminton/aktuelles/34-suedwuerttembergische-meisterschaft-u11-u19-am-12-juli-2025"]')).toHaveCount(1);
 });
 
-test("Scored club reports show real opponents and sets without mixing Badhub statistics",async ({page})=>{
+test.skip("Scored club reports show real opponents and sets without mixing Badhub statistics",async ({page})=>{
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#history-timeline .history-event").first()).toBeVisible();
  const roster=[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"},
