@@ -12,7 +12,7 @@ await assert.rejects(readBoundedJson(make("x".repeat(1025))),PayloadTooLargeErro
 await assert.rejects(readBoundedJson(make("x",{"content-length":"1025"})),PayloadTooLargeError);
 await assert.rejects(readBoundedJson(make("x",{"content-length":"bad"})),SyntaxError);
 await assert.rejects(readBoundedJson(make("not json")),SyntaxError);
-await assert.rejects(readBoundedJson(make("{}",{"content-length":"1"})),SyntaxError);
+assert.deepEqual(await readBoundedJson(make("{}",{"content-length":"1"})),{}); // Validate actual streamed bytes, not the hint.
 // Streaming uploads with no Content-Length cannot circumvent the byte limit.
 let cancelled=false;
 const stream=new ReadableStream({
