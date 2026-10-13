@@ -54,6 +54,48 @@ assert.equal(legacy.summary.calendarEvents,null);
 assert.equal(parsed.data.historyProfilesInitialized,true);
 assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(parsed.data))).data,parsed.data);
 
+// Regression: offline v2 must keep DBV calendar '+' bookmarks AND private Spond events.
+const dbvCalendarSave={
+ id:"dbv-calendar-44577",source:"dbv-calendar",url:"https://turniere.badminton.de/",
+ name:"Beispiel DBV-Kalender",playerId:"99-100001",
+ startDate:"2027-03-13",endDate:"2027-07-23"
+};
+const mixedFamily={...original,officialLinks:[...original.officialLinks,dbvCalendarSave]};
+const mixedArchive=createLocalBackup(JSON.stringify(mixedFamily),
+ new Date("2026-10-12T12:00:00Z"),JSON.stringify(privateCalendar));
+const mixed=inspectLocalBackup(mixedArchive);
+assert.deepEqual(mixed.data.officialLinks[1],dbvCalendarSave);
+assert.equal(mixed.summary.tournaments,2);
+assert.equal(mixed.summary.calendarEvents,1);
+const roundtrip=inspectLocalBackup(createLocalBackup(
+ JSON.stringify(mixed.data),new Date("2026-10-13T12:00:00Z"),
+ JSON.stringify(mixed.calendarEvents)));
+assert.deepEqual(roundtrip.data.officialLinks,mixed.data.officialLinks);
+assert.deepEqual(roundtrip.calendarEvents,mixed.calendarEvents);
+const invalidQuickSave=mutate=>{
+ const data=JSON.parse(JSON.stringify(mixedFamily));
+ mutate(data.officialLinks[1],data);
+ return JSON.stringify(data);
+};
+for(const invalid of [
+ invalidQuickSave(q=>q.url="https://turniere.badminton.de.evil.example/"),
+ invalidQuickSave(q=>q.url="https://turniere.badminton.de/?next=evil"),
+ invalidQuickSave(q=>q.id="dbv-calendar-abc"),
+ invalidQuickSave(q=>q.id="dbv-calendar-1"),
+ invalidQuickSave(q=>q.id="dbv-calendar-1234567890123"),
+ invalidQuickSave(q=>q.playerId="99-100003"),
+ invalidQuickSave(q=>q.playerId="all"),
+ invalidQuickSave(q=>q.startDate="2027-02-30"),
+ invalidQuickSave(q=>q.endDate="2026-03-01"),
+ invalidQuickSave(q=>q.name=""),
+ invalidQuickSave((q,d)=>d.officialLinks.push({...q}))
+])assert.throws(()=>createLocalBackup(invalid,new Date(),JSON.stringify(privateCalendar)));
+const mixedLegacy=JSON.parse(mixedArchive);
+mixedLegacy.schemaVersion=LEGACY_BACKUP_VERSION;
+delete mixedLegacy.calendarEvents;
+assert.equal(inspectLocalBackup(JSON.stringify(mixedLegacy)).calendarEvents,null,
+ "v1 archives must leave locally stored private Spond dates untouched");
+
 const damaged=change=>{
  const b=JSON.parse(created);change(b);return JSON.stringify(b);
 };
