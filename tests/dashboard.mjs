@@ -56,4 +56,5 @@ const workflow=await readFile(".github/workflows/ranking.yml","utf8");
 assert.ok(workflow.includes("cron: '0 15 * * 4'"),"Schedule Thursday only");
 assert.ok(workflow.includes("scripts/update-ranking.py"));
 assert.ok(workflow.includes("scripts/test-ranking.py"));
-assert.equal(snapshot.privacyMode,"private");\nconsole.log("Dashboard layout and private no-ranking state verified; public ranked player export disabled.");
+assert.equal(snapshot.privacyMode,"private");
+console.log("Dashboard layout and private no-ranking state verified; public ranked player export disabled.");
