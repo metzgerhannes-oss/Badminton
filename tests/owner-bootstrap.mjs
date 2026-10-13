@@ -46,6 +46,6 @@ assert.match(index,/id="owner-admin-confirm" required/);
 assert.match(index,/owner-admin\.js/);
 assert.match(sw,/owner-activate\.html/);
 assert.match(sw,/owner-admin\.js/);
-assert.match(sw,/schmetterlinge-shell-v(?:117|119|120|121|122|123|124|125)/);
+assert.match(sw,/schmetterlinge-shell-v(?:117|119|120|121|122|123|124|125|126)/);
 assert.match(ci,/node tests\/owner-bootstrap\.mjs/);
 console.log("Owner bootstrap: device claim, consent-only attestation and secret handling verified.");
