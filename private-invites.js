@@ -43,16 +43,22 @@ export async function getPrivateSession(create=false){
  let current=read(SESSION_STORE,null);
  if(current?.access_token&&current.expires_at>Date.now()+60000)return current;
  if(current?.refresh_token){
-  try{
-   const r=await fetch(API+"token?grant_type=refresh_token",{method:"POST",cache:"no-store",
-    headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify({refresh_token:current.refresh_token})});
+  // Keep the stored refresh token on network outage, rate limit or server errors.
+  // Only a definitive 400/401/403 from auth indicates the credential was rejected.
+  const r=await fetch(API+"token?grant_type=refresh_token",{method:"POST",cache:"no-store",
+   headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
+   body:JSON.stringify({refresh_token:current.refresh_token})});
+  if([400,401,403].includes(r.status)){
+   localStorage.removeItem(SESSION_STORE);
+   if(!create)return null;
+  }else{
    const d=await asJson(r);
-   if(!d?.access_token||!d?.refresh_token||!(d?.user?.id||current.user_id))throw Error("Sitzung ungültig");
+   if(!d?.access_token||!d?.refresh_token||!(d?.user?.id||current.user_id))
+    throw Error("Sitzungsantwort unvollständig. Bitte erneut versuchen.");
    current={access_token:d.access_token,refresh_token:d.refresh_token,
     expires_at:Date.now()+Number(d.expires_in||0)*1000,user_id:d.user?.id||current.user_id};
    localStorage.setItem(SESSION_STORE,JSON.stringify(current));return current;
-  }catch{localStorage.removeItem(SESSION_STORE)}
+  }
  }
  if(!create)return null;
  // Explicit user interaction only. This identity does not authorize public publishing.

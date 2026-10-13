@@ -33,6 +33,14 @@ small,p{line-height:1.5;color:#526b7c}a{color:#12658a;overflow-wrap:anywhere}
 </section>
 <p><a href="./index.html#start" rel="noreferrer">Schmetterlinge öffnen</a></p>
 </main>
+<script>
+/* Existing visitors may still have an old, defective Safari worker.
+   Ask for an update without registering a worker for first-time invite guests. */
+if(location.protocol==="https:"&&"serviceWorker" in navigator){
+ navigator.serviceWorker.getRegistration("./")
+  .then(reg=>{if(reg)reg.update().catch(()=>{});}).catch(()=>{});
+}
+</script>
 <script type="module" src="./private-player-reader.js"></script>
 </body>
 </html>

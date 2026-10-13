@@ -73,3 +73,56 @@ test("Expired or previously accepted token cannot enroll another device",async({
  await expect(page.locator("#player-invite-data")).toBeHidden();
  await expect(page.locator("#player-invite-status")).toContainText("nicht mehr annehmbar");
 });
+
+
+test("Temporary accept/read failures retain the private invite token and accepted device access",async({page})=>{
+ let failAccept=true,failRead=false;
+ await page.route("**/*.supabase.co/auth/v1/signup",route=>cors(route,{
+  access_token:"test-access",refresh_token:"test-refresh",expires_in:86400,
+  user:{id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"}
+ }));
+ await page.route("**/*.supabase.co/rest/v1/rpc/private_player_invite_accept",route=>{
+  if(route.request().method()==="OPTIONS")return cors(route,null);
+  if(failAccept){failAccept=false;return route.abort("failed")}
+  return cors(route,id);
+ });
+ await page.route("**/*.supabase.co/rest/v1/rpc/private_player_access_read",route=>{
+  if(route.request().method()==="OPTIONS")return cors(route,null);
+  if(failRead)return route.abort("failed");
+  return cors(route,{player:{dbv_id:"99-000001",name:"Spieler nach Retry",club:"Testverein"},
+   matches:[]});
+ });
+ await page.goto("/private-player.html#token="+token,{waitUntil:"load"});
+ await expect(page.locator("#player-invite-accept")).toBeVisible();
+ await page.locator("#player-invite-accept").click();
+ await expect(page.locator("#player-invite-status")).toContainText("Annahme konnte nicht bestätigt");
+ await expect(page.locator("#player-invite-accept")).toBeEnabled();
+ await expect(page.locator("#player-invite-accept")).toBeVisible();
+ expect(new URL(page.url()).hash).toBe("");
+ await page.locator("#player-invite-accept").click();
+ await expect(page.locator("#player-invite-name")).toContainText("Spieler nach Retry");
+ failRead=true;
+ await page.reload({waitUntil:"load"});
+ await expect(page.locator("#player-invite-status")).toContainText("gespeicherte Freigabe bleibt");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3")));
+ expect(saved).toContain(id);
+ failRead=false;
+ await page.reload({waitUntil:"load"});
+ await expect(page.locator("#player-invite-name")).toContainText("Spieler nach Retry");
+});
+
+test("Transient session refresh failure must not erase accepted identity or refresh token",async({page})=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({
+   access_token:"old-access",refresh_token:"keep-refresh",user_id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",expires_at:Date.now()-1000
+  }));
+  localStorage.setItem("schmetterlinge.acceptedPlayerInvite.v3",JSON.stringify(["11111111-2222-4333-8444-555555555555"]));
+ });
+ await page.route("**/*.supabase.co/auth/v1/token?*",route=>route.abort("failed"));
+ await page.goto("/private-player.html",{waitUntil:"load"});
+ await expect(page.locator("#player-invite-status")).toContainText("gespeicherte Freigabe bleibt");
+ const session=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.communitySession.v1")));
+ expect(session.refresh_token).toBe("keep-refresh");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3")));
+ expect(saved).toContain(id);
+});
