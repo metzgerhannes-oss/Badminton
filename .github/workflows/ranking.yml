@@ -18,6 +18,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   ranking:
+    # Privacy cutover: never publish named DBV ranking/player exports to public GitHub.
+    # Re-enable only after protected storage and access controls have been verified.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
