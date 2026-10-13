@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Squadre disponibili",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Inserisci qui sopra il nome del club per cercare nell’elenco ufficiale BWBV.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Nessun club con questo nome nell’elenco BWBV.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Inserisci una squadra o un club. Le squadre seguite sono già mostrate sopra."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Inserisci una squadra o un club. Le squadre seguite sono già mostrate sopra.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Gli inviti ai giocatori accettati vengono aggiunti automaticamente. Puoi selezionare altri giocatori salvati su questo dispositivo o aggiungerli con nome e ID DBV.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Aggiungi un altro giocatore con nome o ID DBV",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "La ricerca pubblica per nome DBV è attualmente disattivata per motivi di privacy. Gli inviti accettati vengono aggiunti automaticamente. Puoi aggiungere altri profili personali qui sotto con nome e ID DBV.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "La ricerca per nome DBV non è al momento disponibile. Usa la configurazione manuale con nome e ID DBV.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Nessun giocatore corrispondente salvato su questo dispositivo. Puoi aggiungere altri profili manualmente con l'ID DBV.",
+    " · Auf diesem Gerät gespeichert": " · Salvato su questo dispositivo"
   }
 }
