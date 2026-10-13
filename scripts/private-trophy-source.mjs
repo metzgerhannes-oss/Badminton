@@ -73,10 +73,13 @@ export function requestPrivateTrophies(player,{force=false}={}){
  states.set(player,{state:"loading",results:[],checkedAt:Date.now(),pending});
  return pending;
 }
-export function clearPrivateTrophyCache(){
+export function clearPrivateTrophyCache({refresh=true}={}){
+ const current=[...states.keys()];
  states.clear();
+ if(refresh)current.forEach(player=>{requestPrivateTrophies(player,{force:true})});
 }
 if(typeof document!=="undefined"){
- document.addEventListener("visibilitychange",()=>{if(!document.hidden)states.clear()});
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)clearPrivateTrophyCache()});
+ window.addEventListener("badminton:private-player-revoked",()=>clearPrivateTrophyCache());
  window.addEventListener("pagehide",()=>states.clear());
 }
