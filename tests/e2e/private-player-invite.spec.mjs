@@ -145,3 +145,36 @@ test("Private invitation start has a prominent app link without requiring accept
  const after=await page.evaluate(()=>localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3"));
  expect(after).toBeNull();
 });
+
+
+test("Accepted invitation preloads one followed DBV player and bypasses fresh-own-profile onboarding",async({page})=>{
+ await page.route("**/*.supabase.co/auth/v1/signup",route=>cors(route,{
+  access_token:"test-access",refresh_token:"test-refresh",expires_in:86400,
+  user:{id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"}
+ }));
+ await page.route("**/*.supabase.co/rest/v1/rpc/private_player_invite_accept",route=>cors(route,id));
+ await page.route("**/*.supabase.co/rest/v1/rpc/private_player_access_read",route=>cors(route,{
+  player:{dbv_id:"05-070879",name:"Philipp Metzger",club:"SpVgg Mössingen",birth_year:2016,age_class:"U13"},
+  matches:[]
+ }));
+ await page.goto("/private-player.html#token="+token,{waitUntil:"load"});
+ await expect(page.locator("#player-invite-accept")).toBeVisible();
+ const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
+ expect(before).toBeNull();
+ await page.locator("#player-invite-accept").click();
+ await expect(page.locator("#player-invite-name")).toContainText("Philipp Metzger");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players??[]).toHaveLength(0);
+ expect(saved.friends).toHaveLength(1);
+ expect(saved.friends[0]).toMatchObject({
+  id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen"
+ });
+ await page.locator("#player-invite-open-app").click();
+ await expect(page).toHaveURL(/\/index\.html#start$/);
+ await expect(page.locator(".focused-profile")).toContainText("Philipp Metzger");
+ await expect(page.locator(".focused-profile")).toContainText("Du folgst");
+ await expect(page.locator("#first-run-dialog")).not.toBeVisible();
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator(".focused-profile")).toContainText("Philipp Metzger");
+ await expect(page.locator("#first-run-dialog")).not.toBeVisible();
+});
