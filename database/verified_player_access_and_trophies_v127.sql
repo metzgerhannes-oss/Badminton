@@ -113,11 +113,12 @@ BEGIN
  IF p_approve THEN
   INSERT INTO public.player_publication_grants
    (user_id,player_dbv_id,verification_method,reviewed_by,verified_at,revoked_at)
-  VALUES(req.applicant_user_id,req.player_dbv_id,'independent_club_or_parent_confirmation',
+  VALUES(req.applicant_user_id,req.player_dbv_id,
+    CASE WHEN req.preferred_channel='parent_confirmed' THEN 'adult_player_review' ELSE 'club_review' END,
     'reviewer:'||actor::text,now(),NULL)
   ON CONFLICT(user_id,player_dbv_id) DO UPDATE SET
-   verification_method='independent_club_or_parent_confirmation',
-   reviewed_by='reviewer:'||actor::text,verified_at=now(),revoked_at=NULL;
+   verification_method=EXCLUDED.verification_method,
+   reviewed_by=EXCLUDED.reviewed_by,verified_at=now(),revoked_at=NULL;
  END IF;
  RETURN true;
 END
