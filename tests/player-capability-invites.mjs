@@ -68,14 +68,15 @@ assert.match(acceptSql,/revoke all on function public\.private_player_invite_rea
 assert.doesNotMatch(acceptSql,/grant select on public\.(players|player_external_match_facts)/i);
 assert.match(creator,/selectedInviteId/);
 assert.match(creator,/records\(\)\.filter\(r=>r\.id!==rec\.id\)/);
-assert.match(creator,/Link sieben Tage zur Annahme/);
+assert.match(creator,/innerhalb von sieben Tagen einmal angenommen/);
 
 assert.match(creator,/getPrivateSession\(true\)/);
 assert.match(creator,/getPrivateSession\(false\)/);
 assert.match(creator,/private_player_invite_create/);
 assert.match(creator,/private_player_invite_revoke/);
 assert.match(creator,/freshToken\(\)/);
-assert.match(creator,/Eine DBV-ID oder ein lokales Profil genügt nicht/);
+assert.match(creator,/Berechtigung wird auf dem Server geprüft/);
+assert.doesNotMatch(creator,/rpc\("private_owner_player_attest"/,"Private share must not grant local profile ownership");
 assert.match(html,/player-access\.js/);
 assert.match(sw,/private-player-reader\.js/);
 assert.match(app,/data-share-player/);

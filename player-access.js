@@ -37,9 +37,9 @@ function listInvites(){
 let selected=null,selectedInviteId="",busy=false;
 function dialog(){
  if($("private-player-dialog"))return $("private-player-dialog");
- const dlg=document.createElement("dialog");dlg.id="private-player-dialog";
+ const dlg=document.createElement("dialog");dlg.id="private-player-dialog";dlg.className="private-player-share-dialog";
  dlg.innerHTML='<div class="modal"><h2>Spielerprofil privat teilen</h2>'+
- '<p class="small">Nur ein ausdrücklich freigegebener Spieler mit bis zu 30 belegten Matchkarten. Link sieben Tage zur Annahme, danach auf dem bestätigten Gerät bis zum Widerruf gültig. Ein lokales Profil allein ist kein Berechtigungsnachweis.</p>'+
+ '<p class="small">Teile die jüngsten dokumentierten Einzelspiele dieses Spielers (derzeit höchstens 30). Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
  '<p id="private-player-status" role="status" aria-live="polite"></p>'+
  '<label for="private-player-links">Meine Einladungen (auch angenommene)</label><select id="private-player-links" hidden></select>'+
  '<label for="private-player-url">Einladungslink (nur bis Annahmefrist)</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
@@ -71,7 +71,12 @@ async function rpc(name,body,token=null){
    apikey:PUBLIC_KEY,"Content-Type":"application/json",
    ...(token?{Authorization:"Bearer "+token}:{})
   },body:JSON.stringify(body)});
- if(!response.ok)throw Error("RPC "+response.status);
+ if(!response.ok){
+  const error=await response.json().catch(()=>({}));
+  const e=new Error("Einladung fehlgeschlagen");
+  e.status=response.status;e.code=String(error?.code||"");
+  throw e;
+ }
  return response.json();
 }
 function open(player){
@@ -80,9 +85,23 @@ function open(player){
  const dlg=dialog();
  listInvites();
  message(records().length?
-  "Angenommene Einladungen bleiben auch nach der Annahmefrist aktiv, bis du sie widerrufst. Wähle einen Link zum Widerruf.":
-  "Nur unabhängig verifizierte Profilverwalter können Einladungen erstellen. Eine DBV-ID oder ein lokales Profil genügt nicht.");
+  "Du kannst bestehende Einladungen auswählen und jederzeit widerrufen.":
+  "Deine Berechtigung wird auf dem Server geprüft. Bereits bestätigte eigene Profile können direkt geteilt werden.");
  if(!dlg.open)dlg.showModal();
+ checkVerifiedPlayer(selected);
+}
+async function checkVerifiedPlayer(dbvId){
+ try{
+  const session=await getPrivateSession(false);
+  if(!session||selected!==dbvId)return;
+  const status=await rpc("private_owner_status",{},session.access_token);
+  if(selected!==dbvId)return;
+  if(status?.owner===true&&Array.isArray(status.granted_players)){
+   if(status.granted_players.includes(dbvId))
+    message("Berechtigung für diesen Spieler bereits bestätigt. Du kannst jetzt den Einladungslink erstellen.");
+   else message("Für diesen Spieler fehlt noch die Bestätigung unter Einstellungen → Eigentümerverwaltung.");
+  }
+ }catch{/* Read failure must not create or revoke any sharing rights. */}
 }
 async function create(){
  if(!selected||busy)return;
@@ -99,8 +118,13 @@ async function create(){
   map[selected]=[...previous,recordForStore].slice(-30);
   selectedInviteId=recordForStore.id;save(map);listInvites();
   message("Link erstellt: sieben Tage zur Annahme, danach Zugriff bis zum Widerruf. Nur für eine Person, nicht weitergeben.");
- }catch{
-  message("Freigabe nicht möglich. Zuerst muss deine Verwaltungsberechtigung für diesen Spieler unabhängig bestätigt werden. Die Daten bleiben geschützt.");
+ }catch(error){
+  if(error?.status===403||error?.code==="42501")
+   message("Keine Freigabeberechtigung für diesen Spieler. Prüfe Einstellungen → Eigentümerverwaltung.");
+  else if(error?.code==="22023")
+   message("Zu viele aktive Einladungen oder Tageslimit erreicht. Widerrufe einen alten Link oder versuche es später.");
+  else
+   message("Technischer Fehler beim Erstellen (HTTP "+(error?.status||"Netzwerk")+"). Deine vorhandene Berechtigung bleibt erhalten.");
  }finally{busy=false;$("private-player-create").disabled=false}
 }
 async function copy(){
