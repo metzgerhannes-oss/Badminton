@@ -1,4 +1,4 @@
-/** Consent-only invitation for ONE verified player's stored match cards.
+/** Consent-only invitation for ONE verified player's profile, trophies and match cards.
  * A local DBV profile is NOT an ownership grant. All checks are server-side. */
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {freshToken} from "./scripts/private-invite-utils.mjs";
@@ -39,7 +39,7 @@ function dialog(){
  if($("private-player-dialog"))return $("private-player-dialog");
  const dlg=document.createElement("dialog");dlg.id="private-player-dialog";dlg.className="private-player-share-dialog";
  dlg.innerHTML='<div class="modal"><h2>Spielerprofil privat teilen</h2>'+
- '<p class="small">Lade eine Person ein, diesem Spieler einen privaten Lesezugang zu geben. Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
+ '<p class="small">Die Freigabe umfasst ausdrücklich Spielerprofil, belegte Trophäen (Plätze 1–4) und vorhandene Matchstatistiken. Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
  '<p id="private-player-status" role="status" aria-live="polite"></p>'+
  '<label for="private-player-links">Meine Einladungen (auch angenommene)</label><select id="private-player-links" hidden></select>'+
  '<label for="private-player-url">Einladungslink (nur bis Annahmefrist)</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
@@ -86,7 +86,7 @@ function open(player){
  listInvites();
  message(records().length?
   "Du kannst bestehende Einladungen auswählen und jederzeit widerrufen.":
-  "Deine Berechtigung wird auf dem Server geprüft. Bereits bestätigte eigene Profile können direkt geteilt werden.");
+  "Deine Berechtigung wird auf dem Server geprüft. Neue Archivfreigaben erfordern einen unabhängig geprüften Spielernachweis.");
  if(!dlg.open)dlg.showModal();
  checkVerifiedPlayer(selected);
 }
@@ -98,7 +98,7 @@ async function checkVerifiedPlayer(dbvId){
   if(selected!==dbvId)return;
   if(status?.owner===true&&Array.isArray(status.granted_players)){
    if(status.granted_players.includes(dbvId))
-    message("Berechtigung für diesen Spieler bereits bestätigt. Du kannst jetzt den Einladungslink erstellen.");
+    message("Technische Zuordnung vorhanden. Für den neuen Archivlink ist zusätzlich der unabhängige Spielernachweis erforderlich.");
    else message("Für diesen Spieler fehlt noch die Bestätigung unter Einstellungen → Eigentümerverwaltung.");
   }
  }catch{/* Read failure must not create or revoke any sharing rights. */}
@@ -109,18 +109,18 @@ async function create(){
  try{
   // User actively requested a private cloud action. No account for browsing.
   const session=await getPrivateSession(true),token=freshToken();
-  const result=await rpc("private_player_invite_create",{p_token:token,p_player_dbv_id:selected},session.access_token);
+  const result=await rpc("private_player_invite_create_v2",{p_token:token,p_player_dbv_id:selected},session.access_token);
   const record=Array.isArray(result)?result[0]:null;
   if(!record?.invitation_id||!record?.expires_at)throw Error("not confirmed");
   const map=read();
   const previous=records();
-  const recordForStore={id:record.invitation_id,token,expires:record.expires_at};
+  const recordForStore={id:record.invitation_id,token,expires:record.expires_at,scopeVersion:2};
   map[selected]=[...previous,recordForStore].slice(-30);
   selectedInviteId=recordForStore.id;save(map);listInvites();
-  message("Link erstellt: sieben Tage zur Annahme, danach Zugriff bis zum Widerruf. Nur für eine Person, nicht weitergeben.");
+  message("Link erstellt. Nach Annahme erscheinen Spielerprofil, belegte Trophäen und vorhandene Matchkarten automatisch. Sieben Tage zur Annahme, danach bis zum Widerruf.");
  }catch(error){
   if(error?.status===403||error?.code==="42501")
-   message("Keine Freigabeberechtigung für diesen Spieler. Prüfe Einstellungen → Eigentümerverwaltung.");
+   message("Für neue Archivfreigaben ist eine unabhängig bestätigte Spieler-Verwalterberechtigung erforderlich. Betreiberstatus und DBV-ID allein reichen nicht.");
   else if(error?.code==="22023")
    message("Zu viele aktive Einladungen oder Tageslimit erreicht. Widerrufe einen alten Link oder versuche es später.");
   else
