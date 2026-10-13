@@ -143,8 +143,10 @@ function showSearchResults(players,source){
   root.append(button);
  }
  if(!players.length){
-  if(source==="restricted")
+  if(source==="restricted"){
    setSearchStatus("Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.");
+   $("welcome-manual-panel").open=true;
+  }
   else if(source==="unavailable")
    setSearchStatus("Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.");
   else setSearchStatus("Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.");
