@@ -1,0 +1,27 @@
+name: DBV calendar daily health watch
+on:
+  schedule:
+    - cron: '23 8 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/calendar-health-watch.yml'
+      - 'scripts/calendar-health-watch.mjs'
+      - 'tests/calendar-health-watch.mjs'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  calendar-source-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline guard and simulated failure cases
+        run: node tests/calendar-health-watch.mjs
+      - name: Check last source import and calendar age without exposing personal data
+        run: node scripts/calendar-health-watch.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
