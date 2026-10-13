@@ -70,15 +70,24 @@ function renderTournaments(){
   const [phase,tone]=bookmarkPhase(t);
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
   const calendar=t.source==="dbv-calendar";
-  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-id">'+(calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-id">'+(calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button><button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
   if(item)openTournamentForm(item);
  }));
+ section.querySelectorAll("[data-private-invite-id]").forEach(button=>button.addEventListener("click",()=>{
+  const item=state.officialLinks.find(t=>t.id===button.dataset.privateInviteId&&t.playerId===button.dataset.privateInvitePlayer);
+  if(item)window.dispatchEvent(new CustomEvent("badminton:private-invite",{detail:{bookmark:item}}));
+ }));
  section.querySelectorAll("[data-remove-id]").forEach(button=>button.addEventListener("click",()=>{
   const id=button.dataset.removeId,player=button.dataset.removePlayer;
   const removed=state.officialLinks.find(t=>t.id===id&&t.playerId===player);
+  if(removed&&window.badmintonPrivateInvite?.hasActive(removed)){
+   toast("Zuerst den privaten Einladungslink widerrufen.");
+   window.dispatchEvent(new CustomEvent("badminton:private-invite",{detail:{bookmark:removed}}));
+   return;
+  }
   state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
   save();render();toast(removed?.source==="dbv-calendar"?"Vormerkung entfernt":"Turnierlink entfernt");
   if(removed&&removed.source!=="dbv-calendar")window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
