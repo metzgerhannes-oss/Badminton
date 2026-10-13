@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import {trophyAccessState,trophyAccessMessage} from "../scripts/trophy-access-state.mjs";
+assert.equal(trophyAccessState(null),"loading");
+assert.equal(trophyAccessState(null,true),"unavailable");
+assert.equal(trophyAccessState({schemaVersion:1,privacyMode:"private",results:[]}),"protected");
+assert.equal(trophyAccessState({results:[]}),"ready");
+assert.equal(trophyAccessState({results:[{id:"synthetic"}]}),"ready");
+assert.equal(trophyAccessState({status:"bad"}),"unavailable");
+assert.match(trophyAccessMessage("protected"),/nicht 0/);
+assert.match(trophyAccessMessage("unavailable"),/keine Anzahl/);
+assert.equal(trophyAccessMessage("ready"),"");
+console.log("Private trophy placeholder is never treated as a verified zero.");
