@@ -122,3 +122,8 @@ async function revoke(){
  finally{busy=false;$("private-invite-revoke").disabled=false}
 }
 window.addEventListener("badminton:private-invite",event=>{if(event.detail?.bookmark)open(event.detail.bookmark)});
+
+window.badmintonPrivateInvite={hasActive:bookmark=>{
+ const rec=entries()[inviteKey(bookmark)];
+ return Boolean(rec&&Date.parse(rec.expires)>Date.now());
+}};
