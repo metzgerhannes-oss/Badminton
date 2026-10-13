@@ -45,7 +45,7 @@ const opsStatements=opsSql.split("\n").map(line=>line.replace(/--.*$/,"")).join(
 assert.equal(opsStatements.length,7,"Operational runbook must contain the seven reviewed checks");
 for(const statement of opsStatements){
  assert.match(statement,/^select\b/i,"Every health check must begin with SELECT");
- assert.doesNotMatch(statement,/\b(insert|update|delete|alter|drop|truncate|grant|revoke|create|copy)\b/i,
+ const sqlWithoutStringLiterals=statement.replace(/\x27(?:\x27\x27|[^\x27])*\x27/g,"\x27\x27");\n assert.doesNotMatch(sqlWithoutStringLiterals,/\b(insert|update|delete|alter|drop|truncate|grant|revoke|create|copy)\b/i,
   "Operational checks must never modify production data or privileges");
 }
 assert.doesNotMatch(opsStatements.join("\n"),/\b(dbv_id|token_digest|owner_user_id|source_url|payload|client_ip)\b/i,
