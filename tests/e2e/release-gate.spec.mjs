@@ -21,6 +21,7 @@ test("Compact iPhone layout and dialog buttons remain operable",async ({page},in
   expect(box.height).toBeGreaterThanOrEqual(44);
  }
  await page.goto("/#einstellungen");
+   await page.locator('a[data-settings-target="profile"]').click();
   await page.locator("#add-player").click();
  await expect(page.locator("#player-dialog")).toBeVisible();
  await page.locator("#player-dialog button[type=submit]").scrollIntoViewIfNeeded();
@@ -76,6 +77,7 @@ test("v65 extracted home cards and dialogs retain readable component styling",as
   expect(shape.background).toContain("linear-gradient");
   await page.locator('.bottom-nav a[data-page="spieler"]').click();
   await page.goto("/#einstellungen");
+   await page.locator('a[data-settings-target="profile"]').click();
   await page.locator("#add-player").click();
   await expect(page.locator("#player-dialog")).toBeVisible();
   const dialogStyle=await page.locator("#player-dialog").evaluate(el=>{
@@ -114,6 +116,7 @@ test("v68 legacy cleanup preserves active app views and dialog on narrow layouts
   }
   await page.locator('.bottom-nav a[data-page="spieler"]').click();
   await page.goto("/#einstellungen");
+   await page.locator('a[data-settings-target="profile"]').click();
   await page.locator("#add-player").click();
   await expect(page.locator("#player-dialog")).toBeVisible();
   await page.locator("#cancel-dialog").click();
@@ -155,6 +158,7 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
   await page.locator('.bottom-nav a[data-page="spieler"]').click();
   await expect(page.locator("#view-spieler")).toBeVisible();
   await page.goto("/#einstellungen");
+   await page.locator('a[data-settings-target="profile"]').click();
   await page.locator("#add-player").click();
   await expect(page.locator("#player-dialog")).toBeVisible();
   await page.locator("#cancel-dialog").click();
