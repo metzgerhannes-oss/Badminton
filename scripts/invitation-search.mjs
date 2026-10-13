@@ -40,10 +40,16 @@ async function backupCandidates(term,fetchImpl,signal){
 }
 
 /** Returns only public DBV identities. An aborted request never triggers a fallback. */
-export async function searchInvitationPlayers(raw,{fetchImpl=fetch,signal}={}){
+export async function searchInvitationPlayers(raw,{fetchImpl=fetch,signal,savedCandidates=[]}={}){
  const term=normalizeFriendSearch(raw);
  const url=friendSearchUrl(term);
  if(!url)return {players:[],source:"none"};
+ // Previously accepted invitations and locally chosen profiles can be found
+ // without asking a public service for information about arbitrary people.
+ const needle=fold(term);
+ const onDevice=invitationCandidates(savedCandidates).filter(player=>
+  fold(player.name).includes(needle)||player.id.includes(term));
+ if(onDevice.length)return {players:onDevice,source:"device"};
  const parsed=new URL(url);
  const path=parsed.pathname.replace(/^\/rest\/v1\//,"")+parsed.search;
  try{
@@ -51,6 +57,16 @@ export async function searchInvitationPlayers(raw,{fetchImpl=fetch,signal}={}){
   return {players:invitationCandidates(rows),source:"dbv"};
  }catch(error){
   if(signal?.aborted||error?.kind==="aborted")throw error;
-  return {players:await backupCandidates(term,fetchImpl,signal),source:"backup"};
+  // The v114 privacy cutover intentionally revoked browser SELECT on players.
+  // Do not misreport this access denial as "No matching DBV player".
+  if(error?.status===401||error?.status===403)
+   return {players:[],source:"restricted"};
+  try{
+   const players=await backupCandidates(term,fetchImpl,signal);
+   return {players,source:players.length?"backup":"unavailable"};
+  }catch(fallbackError){
+   if(signal?.aborted)throw fallbackError;
+   return {players:[],source:"unavailable"};
+  }
  }
 }
