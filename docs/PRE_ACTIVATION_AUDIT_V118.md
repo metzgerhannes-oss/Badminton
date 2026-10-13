@@ -36,6 +36,7 @@ Keine Daten-, Branch- oder Git-Historien-Löschungen durchgeführt. Das Schließ
 - **Echter Ende-zu-Ende-Test auf zwei iPhones** (Eigentümer aktivieren, eigenen DBV-Spieler nach bewusstem Berechtigungsnachweis freigeben, Freundeslink sieben Tage zur Annahme, Wiederaufruf, Widerruf) noch nicht erfolgt.
 - **Alte öffentliche Git-Historie:** eine technische Auslieferungssperre bereinigt keine historischen Commits; separate, sorgfältig geplante Historien- und Kopienbewertung nötig.
 - **Supabase Advisor:** 17 INFO zu Tabellen mit RLS ohne Policy (bei absichtlichen Privat-Tabellen erwartbar); weitere Index- und Primary-Key-Hinweise sind zunächst Performance-/Wartungsthemen, keine bestätigten Sicherheitslecks.
+- **P1 Default-Rechte für `supabase_admin` – #177:** Im Schema `public` bestehen zu breite Standard-ACLs für künftige, durch `supabase_admin` angelegte Objekte. Das ist **kein nachgewiesener aktueller Zugriff**. Der verbundene Projektzugang darf die interne Rolle weder übernehmen noch ihre Default Privileges ändern (beide Versuche endeten mit `42501`). Keine Eskalation von Rollenrechten, keine globalen Supabase-Änderungen. Bis zur plattformseitigen Klärung jede neue eigene Tabelle per RLS/REVOKE gesondert testen.
 - **Kosten:** Die v118-Änderung benötigt weder neues Hosting noch Premiumdienste. Eine tatsächliche Abrechnungsbestätigung für den aktuellen Supabase-/Cloudflare-Account ist aus diesem Code-/Datenbankaudit nicht ableitbar.
 
 ## Aktivierungsgrenze
