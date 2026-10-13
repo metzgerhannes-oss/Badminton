@@ -22,4 +22,14 @@ for(const workflow of [".github/workflows/ranking.yml",".github/workflows/report
 const sw=await readFile("sw.js","utf8");
 assert.doesNotMatch(sw,/\.\/data\/player-history\/05-061350\.json/);
 assert.match(sw,/schmetterlinge-shell-v114/);
+const cutoverSql=await readFile("database/private_player_read_cutover_v114.sql","utf8");
+for(const table of ["players","ranking_entries","tournament_placements","article_player_mentions",
+ "player_external_match_facts","player_history_overviews","shared_tournament_hints",
+ "match_participants","player_live_snapshots"]){
+ assert.ok(cutoverSql.includes("public."+table),"Sensitive dataset needs explicit server-side removal: "+table);
+}
+assert.match(cutoverSql,/revoke select on[\s\S]+from public,anon,authenticated/i);
+assert.match(cutoverSql,/revoke select \(dbv_id,status,[\s\S]+on public\.player_history_imports/i);
+assert.match(cutoverSql,/revoke execute on function public\.request_player_history_demand\(text\) from public,anon,authenticated/i);
+assert.match(cutoverSql,/has_table_privilege\('anon','public\.dbv_calendar_entries','SELECT'\)/);
 console.log("Private-mode release gate: no public personal archives, no scheduled name re-publication, old SW cache invalidated.");
