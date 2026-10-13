@@ -32,7 +32,9 @@ function setActiveProfile(id){
 function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 function navigateHome(){
- SchmetterlingeStorage.showOwn(state);
+ if(!state.players.length&&state.friends.length)
+  SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
+ else SchmetterlingeStorage.showOwn(state);
  routeTo("start");
 }
 function renderFocusHeader(){
@@ -373,6 +375,9 @@ function setup(){
  let freshDevice=false;
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();
+ // An accepted private invitation is a followed player, not an own profile.
+ if(!state.players.length&&state.friends.length)
+  SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
  SchmetterlingeSpond.mount({getState:()=>state,onChange:render});
  state.page=(location.hash||"#start").slice(1).split("/")[0];
  // Native anchor routing alone retains the viewed friend's profile. Home must reset it,
@@ -499,7 +504,7 @@ function setup(){
  render();
  // Also recover from empty/corrupted legacy state without restoring a
  // hardcoded family. Existing valid stored profiles remain untouched.
- if(freshDevice||!state.players.length){
+ if(!state.players.length&&!state.friends.length){
   const welcome=el("first-run-dialog");
   const chooser=el("first-run-choices");
   chooser.innerHTML=state.players.length?state.players.map(p=>'<button class="first-run-choice" type="button" data-initial-player="'+esc(p.id)+'"><span>'+esc(p.name.charAt(0).toUpperCase())+'</span><strong>'+esc(p.name)+'</strong><span aria-hidden="true">›</span></button>').join(""):'<p class="settings-hint">Auf diesem Gerät ist noch kein eigenes Profil eingerichtet.</p>';
