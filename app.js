@@ -100,7 +100,7 @@ function renderProfiles(){
  list.innerHTML=state.players.length?state.players.map(p=>{
  const active=state.activeProfileId===p.id;
  const birth=p.birthYear?" · Jg. "+esc(p.birthYear):"";
- return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(p.club?'<p class="profile-club">Verein: '+esc(p.club)+'</p>':"")+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button><button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
+ return '<article class="profile-card own-profile '+(active?'profile-active':'')+'"><div class="profile-main"><span class="profile-initial">'+esc(p.name.charAt(0).toUpperCase())+'</span><div><h3>'+esc(p.name)+'</h3><p>DBV-ID: '+esc(/^\d{2}-\d{6}$/.test(p.id)?p.id:"nicht hinterlegt")+birth+'</p>'+(p.club?'<p class="profile-club">Verein: '+esc(p.club)+'</p>':"")+(active?'<small class="active-profile-chip">Startprofil</small>':'')+(safeUrl(p.url)?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">DBV-Profil ↗</a>':'')+'</div></div><div class="profile-actions">'+(!active?'<button type="button" class="outline-button" data-set-active="'+esc(p.id)+'">Als Startprofil</button>':'')+'<button type="button" class="remove-button" data-edit-own="'+esc(p.id)+'">Bearbeiten</button>'+(/^\\d{2}-\\d{6}$/.test(p.id)?'<button type="button" class="outline-button" data-share-player="'+esc(p.id)+'">Profil privat teilen</button>':'')+'<button type="button" class="remove-button" data-remove-profile="'+esc(p.id)+'">Entfernen</button></div></article>';
  }).join(""):'<div class="empty">Noch kein eigenes Spielerprofil hinterlegt.</div>';
  list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
   if(!setActiveProfile(b.dataset.setActive))return;
@@ -109,6 +109,10 @@ function renderProfiles(){
  list.querySelectorAll("[data-edit-own]").forEach(b=>b.addEventListener("click",()=>{
   const p=state.players.find(x=>x.id===b.dataset.editOwn);
   if(p)window.openPlayerForm?.(p);
+ }));
+ list.querySelectorAll("[data-share-player]").forEach(b=>b.addEventListener("click",()=>{
+  const player=state.players.find(p=>p.id===b.dataset.sharePlayer);
+  if(player)window.dispatchEvent(new CustomEvent("badminton:player-private-share",{detail:{player}}));
  }));
  list.querySelectorAll("[data-remove-profile]").forEach(b=>b.addEventListener("click",()=>{
   const id=b.dataset.removeProfile;
