@@ -40,6 +40,7 @@ function dialog(){
  const dlg=document.createElement("dialog");dlg.id="private-player-dialog";dlg.className="private-player-share-dialog";
  dlg.innerHTML='<div class="modal"><h2>Spielerprofil privat teilen</h2>'+
  '<p class="small">Lade eine Person ein, diesem Spieler einen privaten Lesezugang zu geben. Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
+ '<p class="small"><strong>Bei neuen Links freigegeben:</strong> Spielerprofil · belegte Trophäen (Platz 1–4) · vorhandene Matchstatistiken. Nur für den ausgewählten Spieler und erst nach unabhängiger Verwalterprüfung. Bereits bestehende Links behalten ihren bisherigen Umfang.</p>'+
  '<p id="private-player-status" role="status" aria-live="polite"></p>'+
  '<label for="private-player-links">Meine Einladungen (auch angenommene)</label><select id="private-player-links" hidden></select>'+
  '<label for="private-player-url">Einladungslink (nur bis Annahmefrist)</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
@@ -108,18 +109,26 @@ async function create(){
  busy=true;$("private-player-create").disabled=true;
  try{
   // User actively requested a private cloud action. No account for browsing.
-  const session=await getPrivateSession(true),token=freshToken();
+  const session=await getPrivateSession(true);
+  // Never advertise the v2 bundle while a stale v1 backend may issue an older-scope link.
+  const capability=await rpc("private_player_scope_capabilities",{},session.access_token);
+  if(capability?.scope_version!==2||
+   !["profile","trophies","matches"].every(section=>capability?.sections?.includes(section)))
+   throw Object.assign(new Error("scope backend missing"),{scopeMissing:true});
+  const token=freshToken();
   const result=await rpc("private_player_invite_create",{p_token:token,p_player_dbv_id:selected},session.access_token);
   const record=Array.isArray(result)?result[0]:null;
   if(!record?.invitation_id||!record?.expires_at)throw Error("not confirmed");
   const map=read();
   const previous=records();
-  const recordForStore={id:record.invitation_id,token,expires:record.expires_at};
+  const recordForStore={id:record.invitation_id,token,expires:record.expires_at,scopeVersion:2};
   map[selected]=[...previous,recordForStore].slice(-30);
   selectedInviteId=recordForStore.id;save(map);listInvites();
-  message("Link erstellt: sieben Tage zur Annahme, danach Zugriff bis zum Widerruf. Nur für eine Person, nicht weitergeben.");
+  message("Neuer Berechtigungslink erstellt: Profil, Trophäen und vorhandene Matchstatistiken. Sieben Tage zur Annahme, danach bis zum Widerruf.");
  }catch(error){
-  if(error?.status===403||error?.code==="42501")
+  if(error?.scopeMissing||error?.status===404)
+   message("Neue gemeinsame Freigaben sind serverseitig noch nicht aktiviert. Es wurde kein alter Link erstellt.");
+  else if(error?.status===403||error?.code==="42501")
    message("Keine Freigabeberechtigung für diesen Spieler. Prüfe Einstellungen → Eigentümerverwaltung.");
   else if(error?.code==="22023")
    message("Zu viele aktive Einladungen oder Tageslimit erreicht. Widerrufe einen alten Link oder versuche es später.");
