@@ -119,6 +119,7 @@ list.addEventListener("click",async e=>{
   if(await rpc("private_owner_player_revoke",{p_player_dbv_id:id})!==true)throw Error("no grant");
   const state=await rpc("private_owner_status");
   updateGrants(Array.isArray(state?.granted_players)?state.granted_players:[]);
+  window.dispatchEvent(new Event("badminton:private-player-revoked"));
   status.textContent="Berechtigung widerrufen; bestehende private Lesezugriffe sind damit gesperrt.";
  }catch{button.disabled=false;status.textContent="Widerruf derzeit fehlgeschlagen."}
 });
