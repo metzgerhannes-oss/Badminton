@@ -43,13 +43,16 @@ test("Seven-day invite must be accepted, then persistent scoped session works un
  expect(new URL(page.url()).hash).toBe("");
  await expect(page.locator("#player-invite-data")).toBeHidden();
  await expect(page.locator("#player-invite-accept")).toBeVisible();
+ await expect(page.locator("#player-invite-open-app")).toBeVisible();
  expect(accepted).toBe(0);
  await page.locator("#player-invite-accept").click();
  await expect(page.locator("#player-invite-data")).toBeVisible();
  await expect(page.locator("#player-invite-name")).toContainText("Muster <img");
  expect(await page.locator("#player-invite-name img").count()).toBe(0);
- expect(await page.locator("#player-invite-matches li").count()).toBe(30);
- expect(await page.locator("#player-invite-matches a").count()).toBe(29);
+ await expect(page.locator("#player-invite-open-app")).toBeVisible();
+ await expect(page.locator("#player-invite-open-app")).toHaveAttribute("href","./index.html#start");
+ await expect(page.locator("#player-invite-data")).not.toContainText("Belegte Spiele");
+ await expect(page.locator("#player-invite-matches")).toHaveCount(0);
  expect(accepted).toBe(1);
  await page.reload();
  await expect(page.locator("#player-invite-data")).toBeVisible();
@@ -125,4 +128,20 @@ test("Transient session refresh failure must not erase accepted identity or refr
  expect(session.refresh_token).toBe("keep-refresh");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3")));
  expect(saved).toContain(id);
+});
+
+
+test("Private invitation start has a prominent app link without requiring acceptance or transferring a grant",async({page})=>{
+ await page.goto("/private-player.html#token=not-a-token",{waitUntil:"load"});
+ const entry=page.locator("#player-invite-open-app");
+ await expect(entry).toBeVisible();
+ await expect(entry).toContainText("Schmetterlinge-App öffnen");
+ await expect(page.getByText("Belegte Spiele")).toHaveCount(0);
+ await expect(page.locator("#player-invite-data")).toBeHidden();
+ const before=await page.evaluate(()=>localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3"));
+ expect(before).toBeNull();
+ await entry.click();
+ await expect(page).toHaveURL(/\/index\.html#start$/);
+ const after=await page.evaluate(()=>localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3"));
+ expect(after).toBeNull();
 });

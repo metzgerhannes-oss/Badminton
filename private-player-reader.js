@@ -21,11 +21,12 @@ function storedIds(){
 function saveIds(ids){localStorage.setItem(STORE,JSON.stringify([...new Set(ids)].slice(-20)))}
 function syncSelector(){
  const chooser=$("player-invite-accepted");chooser.replaceChildren();
- const ids=storedIds();chooser.hidden=ids.length<=1;
+ const ids=storedIds();
+ $("player-invite-selection").hidden=ids.length<=1;
  ids.forEach((id,i)=>{const opt=document.createElement("option");opt.value=id;opt.textContent="Gespeicherter Zugang "+(i+1);chooser.append(opt)});
  chooser.value=activeId;
 }
-function hide(msg){panel.hidden=true;panel.querySelector("#player-invite-matches").replaceChildren();status.textContent=msg}
+function hide(msg){panel.hidden=true;status.textContent=msg}
 function requestHeaders(session){return {apikey:PUBLIC_KEY,"Content-Type":"application/json",Accept:"application/json",Authorization:"Bearer "+session.access_token}}
 async function rpc(path,args,session){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
@@ -52,26 +53,6 @@ function show(data){
   return false;
  $("player-invite-name").textContent=data.player.name;
  $("player-invite-club").textContent=[data.player.club,data.player.age_class].filter(Boolean).join(" · ");
- const list=$("player-invite-matches");list.replaceChildren();
- for(const m of (Array.isArray(data.matches)?data.matches:[]).slice(0,30)){
-  const li=document.createElement("li"),title=document.createElement("strong");
-  title.textContent=[m.match_date,m.discipline,m.competition].filter(Boolean).join(" · ");
-  li.append(title);
-  const detail=document.createElement("p");
-  detail.textContent=([1,2].includes(m.player_side)&&[1,2].includes(m.winning_side)
-   ?(m.player_side===m.winning_side?"Sieg":"Niederlage"):"Ergebnis nicht eindeutig")+
-   " · "+String(m.source_name||"Quellenbeleg");
-  li.append(detail);
-  try{
-   const url=new URL(m.source_url);
-   if(url.protocol==="https:"&&["badhub.de","www.badhub.de","dbv.turnier.de"].includes(url.hostname)){
-    const a=document.createElement("a");a.href=url.href;a.target="_blank";a.rel="noopener noreferrer";
-    a.referrerPolicy="no-referrer";a.textContent="Originalquelle öffnen";li.append(a);
-   }
-  }catch{}
-  list.append(li);
- }
- if(!list.children.length){const li=document.createElement("li");li.textContent="Keine belegten Matchkarten gespeichert.";list.append(li)}
  panel.hidden=false;status.textContent="Privater Zugriff aktiv – gültig bis zum Widerruf.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();

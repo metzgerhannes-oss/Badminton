@@ -26,7 +26,7 @@ assert.match(share,/status\.granted_players\.includes\(dbvId\)/);
 assert.match(share,/error\?\.code==="42501"/);
 assert.match(share,/error\?\.code==="22023"/);
 assert.match(share,/Technischer Fehler beim Erstellen/);
-assert.match(share,/dokumentierten Einzelspiele/);
+assert.match(share,/privaten Lesezugang/);
 assert.match(css,/#private-player-dialog\.private-player-share-dialog/);
 assert.match(css,/overflow-y:auto/);
 assert.match(html,/private-sharing\.css/);

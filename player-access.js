@@ -39,7 +39,7 @@ function dialog(){
  if($("private-player-dialog"))return $("private-player-dialog");
  const dlg=document.createElement("dialog");dlg.id="private-player-dialog";dlg.className="private-player-share-dialog";
  dlg.innerHTML='<div class="modal"><h2>Spielerprofil privat teilen</h2>'+
- '<p class="small">Teile die jüngsten dokumentierten Einzelspiele dieses Spielers (derzeit höchstens 30). Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
+ '<p class="small">Lade eine Person ein, diesem Spieler einen privaten Lesezugang zu geben. Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
  '<p id="private-player-status" role="status" aria-live="polite"></p>'+
  '<label for="private-player-links">Meine Einladungen (auch angenommene)</label><select id="private-player-links" hidden></select>'+
  '<label for="private-player-url">Einladungslink (nur bis Annahmefrist)</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
