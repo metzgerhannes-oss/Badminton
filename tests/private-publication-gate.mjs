@@ -21,7 +21,7 @@ for(const workflow of [".github/workflows/ranking.yml",".github/workflows/report
 }
 const sw=await readFile("sw.js","utf8");
 assert.doesNotMatch(sw,/\.\/data\/player-history\/05-061350\.json/);
-assert.match(sw,/schmetterlinge-shell-v(?:109|115|116|117|119|120|121|122|123|124)/);
+assert.match(sw,/schmetterlinge-shell-v(?:109|115|116|117|119|120|121|122|123|124|125)/);
 const cutoverSql=await readFile("database/private_player_read_cutover_v114.sql","utf8");
 for(const table of ["players","ranking_entries","tournament_placements","article_player_mentions",
  "player_external_match_facts","player_history_overviews","shared_tournament_hints",
