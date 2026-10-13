@@ -40,7 +40,7 @@ test("private Spond appointments travel with the offline backup, restore needs c
   await setup(original,makeFamily(PLAYER,"Beispiel Spieler"),[makeEvent(PLAYER,"Spond Jugendturnier","test-private-event")]);
   await setup(target,makeFamily(OTHER,"Altes Gerät"),[makeEvent(OTHER,"Bestehender Kalendereintrag","old-event")]);
   const from=await original.newPage(),to=await target.newPage();
-  await from.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+  await from.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
    await from.locator('a[data-settings-target="daten"]').click();
   const save=from.waitForEvent("download");
   await from.locator("#backup-export").click();
@@ -54,7 +54,7 @@ test("private Spond appointments travel with the offline backup, restore needs c
   expect(archive.calendarEvents).toHaveLength(1);
   expect(archive.calendarEvents[0]).toMatchObject({name:"Spond Jugendturnier",playerId:PLAYER});
   expect(archive).not.toHaveProperty("access_token");
-  await to.goto("/#einstellungen",{waitUntil:"load"});
+  await to.goto("/#einstellungen/daten",{waitUntil:"load"});
    await to.locator('a[data-settings-target="daten"]').click();
   await to.locator("#backup-file").setInputFiles({name:"test-backup.json",mimeType:"application/json",buffer:bytes});
   await expect(to.locator("#backup-feedback")).toContainText("Private Kalendertermine: 1");
@@ -90,7 +90,7 @@ test("legacy backups preserve the target's newer private calendar and invalid fi
   if(localStorage.getItem("schmetterlinge.calendarEvents.v1")===null)
    localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(retained));
  },{family,retained});
- await page.goto("/#einstellungen",{waitUntil:"load"});
+ await page.goto("/#einstellungen/daten",{waitUntil:"load"});
   await page.locator('a[data-settings-target="daten"]').click();
  const legacy={kind:"schmetterlinge-local-backup",schemaVersion:1,
   createdAt:"2026-10-10T12:00:00.000Z",data:makeFamily(PLAYER,"Importiertes Profil")};
