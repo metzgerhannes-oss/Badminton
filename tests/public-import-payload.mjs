@@ -3,7 +3,7 @@ import {readFile} from "node:fs/promises";
 import {PayloadTooLargeError,readBoundedJson} from "../supabase/functions/history-match-import/bounded-request.mjs";
 
 const url="https://example.invalid/functions/v1/history-match-import";
-const make=(body,headers={})=>new Request(url,{method:"POST",body,headers});
+const make=(body,headers={})=>new Request(url,{method:"POST",body,headers,...(body instanceof ReadableStream?{duplex:"half"}:{})});
 assert.deepEqual(await readBoundedJson(make('{"dbv_id":"05-070879"}')),{dbv_id:"05-070879"});
 const exact=JSON.stringify({value:"x".repeat(1024-12)});
 assert.equal(Buffer.byteLength(exact),1024);
