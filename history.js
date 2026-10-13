@@ -1,9 +1,10 @@
 import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
+import {trophyAccessState,trophyAccessMessage} from "./scripts/trophy-access-state.mjs";
 "use strict";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
  const feedUrl="./data/history.json";
- let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own";
+ let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own",accessState="loading";
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -103,6 +104,21 @@ function render(){
   source.hidden=true;
   source.textContent="";
   if(!loaded)return;
+  if(accessState!=="ready"){
+   const text=trophyAccessMessage(accessState);
+   source.hidden=false;source.textContent=text;
+   const section=$("trophy-shelf")?.closest(".trophy-section");
+   if(section)section.hidden=true;
+   summary.innerHTML="";
+   $("history-trends").innerHTML="";
+   $("history-pending").innerHTML="";
+   $("trophy-shelf").innerHTML="";
+   $("trophy-awards").innerHTML="";
+   $("trophy-awards-heading").textContent="Auszeichnungen";
+   yearSelect.innerHTML='<option value="all">Alle Jahre</option>';
+   timeline.innerHTML='<div class="empty" role="status"><h3>Geschützte Platzierungen</h3><p>'+escape(text)+'</p></div>';
+   return;
+  }
   const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
   renderTrophies(playerRecords);
@@ -163,12 +179,13 @@ function render(){
    if(!resp.ok)throw Error("HTTP "+resp.status);
    const data=await resp.json();
    if(data?.schemaVersion!==1||!Array.isArray(data.results))throw Error("Unerwartetes Datenformat");
+   accessState=trophyAccessState(data);
    records=data.results.filter(r=>r&&typeof r.id==="string"&&typeof r.playerId==="string"&&
     /^\d{4}-\d\d-\d\d$/.test(r.date)&&typeof r.place==="number"&&r.place>0&&
     typeof r.playerName==="string"&&safeUrl(r.source?.url)&&r.verified===true);
    pendingResults=Array.isArray(data.pendingResults)?data.pendingResults.filter(r=>r&&r.verified===false&&r.verificationStatus==="unverified-family-recollection"&&typeof r.date==="string"&&typeof r.discipline==="string"&&Number.isInteger(r.place)&&safeUrl(r.source?.url)):[];
    loaded=true;
-  }catch(e){error="Quelle derzeit nicht verfügbar.";}
+  }catch(e){accessState="unavailable";error="Quelle derzeit nicht verfügbar."; }
   render();
  }
  document.addEventListener("DOMContentLoaded",()=>{
