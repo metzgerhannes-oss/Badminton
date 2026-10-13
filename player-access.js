@@ -158,6 +158,7 @@ async function revoke(){
   if(result!==true)throw Error("not revoked");
   const map=read();map[selected]=records().filter(r=>r.id!==rec.id);
   selectedInviteId="";save(map);listInvites();
+  window.dispatchEvent(new Event("badminton:private-player-revoked"));
   message("Zugriff serverseitig widerrufen – auch nach Ablauf der Annahmefrist. Bereits kopierte Informationen können nicht zurückgeholt werden.");
  }catch{message("Widerruf fehlgeschlagen. Die bestehende Sitzung wird benötigt.");}
  finally{busy=false;$("private-player-revoke").disabled=false}
