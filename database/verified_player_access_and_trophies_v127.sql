@@ -48,6 +48,9 @@ AS $func$
    JOIN private_content.player_management_reviewers v
      ON v.user_id=r.reviewer_user_id AND v.revoked_at IS NULL
    WHERE g.user_id=p_user_id AND g.player_dbv_id=p_dbv_id AND g.revoked_at IS NULL
+     AND g.verification_method IN ('club_review','adult_player_review')
+     AND g.reviewed_by='reviewer:'||r.reviewer_user_id::text
+     AND g.verified_at>=r.reviewed_at
      AND r.reviewer_user_id <> r.applicant_user_id
      AND r.reviewed_at IS NOT NULL AND length(r.review_reference)>=8
  );
@@ -65,6 +68,11 @@ BEGIN
  IF NOT EXISTS(SELECT 1 FROM public.players p WHERE p.dbv_id=p_player_dbv_id)
  THEN RETURN NULL; END IF;
  PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(actor::text,127));
+ IF (SELECT count(*) FROM private_content.player_management_requests r
+      WHERE r.created_at>now()-interval '24 hours')>=100
+   OR (SELECT count(*) FROM private_content.player_management_requests r
+      WHERE r.player_dbv_id=p_player_dbv_id AND r.created_at>now()-interval '24 hours')>=8
+ THEN RAISE EXCEPTION 'global verification request quota' USING errcode='22023'; END IF;
  IF (SELECT count(*) FROM private_content.player_management_requests r
       WHERE r.applicant_user_id=actor AND r.created_at>now()-interval '24 hours')>=5
  THEN RAISE EXCEPTION 'verification request quota' USING errcode='22023'; END IF;
