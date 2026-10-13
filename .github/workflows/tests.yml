@@ -69,6 +69,7 @@ jobs:
           node --check scripts/team-directory-utils.mjs
           node --check welcome.js
           node --check scripts/invitation.mjs
+          node --check scripts/invited-player-local.mjs
           node --check live.js
           node --check live-links.js
           node --check matchday-view.js
@@ -110,6 +111,7 @@ jobs:
           node tests/ranking-points.mjs
           node tests/source-register.mjs
           node tests/invitation.mjs
+          node tests/invited-player-v125.mjs
           node tests/player-library.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
