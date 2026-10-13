@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Privater Spielerzugang · Schmetterlinge</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;padding:22px;background:#f0f5fa;color:#18384f}
+main{max-width:660px;margin:35px auto;background:white;border:1px solid #cbdfea;border-radius:18px;padding:24px}
+h1{font-size:25px;margin:0 0 10px}h2{font-size:20px}
+li{margin:12px 0;border-bottom:1px solid #e2edf4;padding-bottom:12px;overflow-wrap:anywhere}
+small,p{line-height:1.5;color:#526b7c}a{color:#12658a;overflow-wrap:anywhere}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Privater Spielerzugang</h1>
+<p>Dieser Link gibt ausschließlich ein bestätigtes Spielerprofil und bis zu 30 belegte Matchkarten frei. Er ist widerrufbar, maximal sieben Tage gültig und kann weitergeleitet werden.</p>
+<p id="player-invite-status" role="status" aria-live="polite">Einladung wird geprüft …</p>
+<section id="player-invite-data" hidden>
+<h2 id="player-invite-name"></h2>
+<p id="player-invite-club"></p>
+<h2>Belegte Spiele</h2>
+<ol id="player-invite-matches"></ol>
+</section>
+<p><a href="./index.html#start" rel="noreferrer">Schmetterlinge öffnen</a></p>
+</main>
+<script type="module" src="./private-player-reader.js"></script>
+</body>
+</html>
