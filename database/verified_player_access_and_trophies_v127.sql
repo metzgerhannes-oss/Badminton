@@ -191,6 +191,158 @@ $func$;
 REVOKE ALL ON FUNCTION private_content.player_access_invite_create(text,text) FROM PUBLIC,anon;
 -- authenticated retains explicit EXECUTE as in existing v125.
 
+-- A version-2 recipient must retain a valid independent issuer review for ALL
+-- private data types, not just trophies. Existing version-1 grants keep their
+-- original non-expanded read/accept semantics.
+CREATE OR REPLACE FUNCTION private_content.player_access_invite_accept(p_token text)
+RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $func$
+DECLARE visitor uuid:=auth.uid(); invite uuid;
+BEGIN
+ IF visitor IS NULL THEN RAISE EXCEPTION 'technical anonymous session required'
+   USING errcode='42501'; END IF;
+ IF p_token IS NULL OR p_token !~ '^[a-f0-9]{64}
+CREATE OR REPLACE FUNCTION public.private_player_scope_capabilities()
+RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
+AS $func$ SELECT jsonb_build_object('scope_version',2,
+  'sections',jsonb_build_array('profile','trophies','matches')) $func$;
+REVOKE ALL ON FUNCTION public.private_player_scope_capabilities() FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.private_player_scope_capabilities() TO authenticated;
+
+-- All records originate from the private v126 hard archive. Only individual
+-- sourced Top-4 placements corroborated by the preserved verified chronology,
+-- qualify. New results need the same curated verified evidence before being counted.
+CREATE OR REPLACE FUNCTION private_content.scoped_trophy_projection(p_dbv_id text)
+RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
+AS $func$
+ WITH filtered AS (
+  SELECT DISTINCT ON ((e.payload->>'source_url'),(e.payload->>'event_date'),
+      (e.payload->>'discipline'),(e.payload->>'age_group'),(e.payload->>'placement'))
+   e.source_key,e.payload
+  FROM private_content.spvgg_archive_evidence e
+  WHERE e.dbv_id=p_dbv_id AND e.kind='placement'
+   AND (e.payload->>'placement') ~ '^[1-4]$'
+   AND (e.payload->>'source_url') ~ '^https://'
+   AND EXISTS (
+      SELECT 1 FROM private_content.source_snapshots s
+      CROSS JOIN LATERAL jsonb_array_elements(
+        CASE WHEN s.source_key='data/history.json'
+          AND jsonb_typeof(s.document->'results')='array'
+        THEN s.document->'results' ELSE '[]'::jsonb END) v(result)
+      WHERE s.source_key='data/history.json'
+       AND v.result->>'verified'='true'
+       AND v.result->>'playerId'=p_dbv_id
+       AND v.result->>'date'=e.payload->>'event_date'
+       AND v.result->>'discipline'=e.payload->>'discipline'
+       AND v.result->>'place'=e.payload->>'placement'
+       AND v.result->'source'->>'url'=e.payload->>'source_url'
+   )
+  ORDER BY (e.payload->>'source_url'),(e.payload->>'event_date'),
+           (e.payload->>'discipline'),(e.payload->>'age_group'),
+           (e.payload->>'placement'),e.source_key
+ ), bounded AS (
+ SELECT * FROM filtered ORDER BY (payload->>'event_date') DESC,source_key LIMIT 200
+ )
+ SELECT jsonb_build_object(
+  'player_dbv_id',p_dbv_id,'coverage','partial_not_exhaustively_verified',
+  'results',coalesce(jsonb_agg(jsonb_build_object(
+    'id',b.source_key,'playerId',p_dbv_id,'verified',true,
+    'date',b.payload->>'event_date','event',b.payload->>'tournament_name',
+    'place',(b.payload->>'placement')::integer,
+    'discipline',b.payload->>'discipline',
+    'ageGroup',b.payload->>'age_group',
+    'source',jsonb_build_object('url',b.payload->>'source_url')
+  ) ORDER BY (b.payload->>'event_date') DESC,b.source_key),'[]'::jsonb))
+ FROM bounded b;
+$func$;
+REVOKE ALL ON FUNCTION private_content.scoped_trophy_projection(text) FROM PUBLIC,anon,authenticated;
+
+-- Invited recipient: v2 scope, same technical session, one exact player,
+-- current independent issuer proof, and immediate revocation checks.
+CREATE OR REPLACE FUNCTION public.private_player_trophies_read(p_invitation_id uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $func$
+DECLARE target_id text;
+BEGIN
+ IF auth.uid() IS NULL OR p_invitation_id IS NULL THEN RETURN NULL; END IF;
+ SELECT i.player_dbv_id INTO target_id
+ FROM private_content.player_access_invites i
+ WHERE i.id=p_invitation_id AND i.accepted_by=auth.uid()
+  AND i.accepted_at IS NOT NULL AND i.revoked_at IS NULL
+  AND i.scope_version=2 AND i.granted_sections@>ARRAY['trophies']::text[]
+  AND private_content.has_independent_player_grant(i.owner_user_id,i.player_dbv_id)
+ LIMIT 1;
+ IF target_id IS NULL THEN RETURN NULL; END IF;
+ RETURN private_content.scoped_trophy_projection(target_id);
+END
+$func$;
+
+-- Verified managing adult: requires independently reviewed player grant.
+-- Merely following, knowing an ID, owning the site or checking a box is never enough.
+CREATE OR REPLACE FUNCTION public.private_owner_trophies_read(p_player_dbv_id text)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $func$
+BEGIN
+ IF auth.uid() IS NULL OR p_player_dbv_id IS NULL
+  OR p_player_dbv_id !~ '^[0-9]{2}-[0-9]{6}$'
+  OR NOT private_content.has_independent_player_grant(auth.uid(),p_player_dbv_id)
+ THEN RETURN NULL; END IF;
+ RETURN private_content.scoped_trophy_projection(p_player_dbv_id);
+END
+$func$;
+REVOKE ALL ON FUNCTION public.private_player_trophies_read(uuid) FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON FUNCTION public.private_owner_trophies_read(text) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.private_player_trophies_read(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.private_owner_trophies_read(text) TO authenticated;
+COMMIT;
+ THEN RETURN NULL; END IF;
+ UPDATE private_content.player_access_invites i SET accepted_by=visitor,accepted_at=now()
+ WHERE i.token_digest=extensions.digest(pg_catalog.decode(p_token,'hex'),'sha256')
+  AND i.accepted_by IS NULL AND i.revoked_at IS NULL AND i.expires_at>now()
+  AND EXISTS(SELECT 1 FROM public.player_publication_grants g
+    WHERE g.user_id=i.owner_user_id AND g.player_dbv_id=i.player_dbv_id AND g.revoked_at IS NULL)
+  AND (i.scope_version=1 OR (i.scope_version=2
+       AND private_content.has_independent_player_grant(i.owner_user_id,i.player_dbv_id)))
+ RETURNING i.id INTO invite;
+ RETURN invite;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION private_content.player_access_session_read(p_invitation_id uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $func$
+DECLARE player_id text; result jsonb;
+BEGIN
+ IF auth.uid() IS NULL OR p_invitation_id IS NULL THEN RETURN NULL; END IF;
+ SELECT i.player_dbv_id INTO player_id FROM private_content.player_access_invites i
+ WHERE i.id=p_invitation_id AND i.accepted_by=auth.uid()
+  AND i.accepted_at IS NOT NULL AND i.revoked_at IS NULL
+  -- The seven days limit acceptance, not an accepted link's lifetime.
+  AND EXISTS(SELECT 1 FROM public.player_publication_grants g
+    WHERE g.user_id=i.owner_user_id AND g.player_dbv_id=i.player_dbv_id AND g.revoked_at IS NULL)
+  AND (i.scope_version=1 OR (i.scope_version=2
+       AND private_content.has_independent_player_grant(i.owner_user_id,i.player_dbv_id)))
+ LIMIT 1;
+ IF player_id IS NULL THEN RETURN NULL; END IF;
+ SELECT jsonb_build_object(
+  'player',jsonb_build_object(
+   'dbv_id',p.dbv_id,'name',p.name,'club',p.club,
+   'birth_year',p.birth_year,'age_class',p.age_class),
+  'matches',coalesce((
+   SELECT jsonb_agg(to_jsonb(m)) FROM (
+    SELECT f.match_date,f.discipline,f.competition,f.category,
+     f.player_side,f.winning_side,f.games,f.source_name,f.source_url
+    FROM public.player_external_match_facts f
+    WHERE f.dbv_id=p.dbv_id AND f.match_date IS NOT NULL
+    ORDER BY f.match_date DESC,f.source_key DESC LIMIT 30
+   ) m),'[]'::jsonb)
+ ) INTO result FROM public.players p WHERE p.dbv_id=player_id;
+ RETURN result;
+END
+$func$;
+REVOKE ALL ON FUNCTION private_content.player_access_invite_accept(text) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION private_content.player_access_session_read(uuid) FROM PUBLIC,anon;
+
 -- The client must refuse to create old-scope links against a stale backend.
 CREATE OR REPLACE FUNCTION public.private_player_scope_capabilities()
 RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
