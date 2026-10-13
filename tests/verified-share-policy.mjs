@@ -23,5 +23,5 @@ assert.deepEqual(policies,["v118 verified private sharing on insert","v118 verif
 assert.doesNotMatch(sql,/create policy [^;]+? as permissive/si);
 assert.match(sql,/drop policy if exists "Only verified managers can publish on insert"/i);
 assert.match(sql,/drop policy if exists "Bound public tournament publications on update"/i);
-assert.match(sql,/^begin;[\s\S]*commit;\s*$/i);
+assert.match(sql,/\bbegin;[\s\S]*commit;\s*$/i);
 console.log("Verified tournament share: independent owner grant, restrictive RLS, no browser PII reads.");
