@@ -1,19 +1,19 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
+import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
 "use strict";
 const rankUrl="./data/ranking.json";
-const historyUrl="./data/history.json";
+// The public historical JSON is deliberately blank. Never use it as a trophy source.
 const rankNames={HE:"Einzel",DE:"Einzel",HD:"Doppel",DD:"Doppel",HM:"Mixed",DM:"Mixed"};
-let ranking=null,history=null,rankError=false,historyError=false,selection="",profiles=[],bookmarks=[],viewMode="own";
+let ranking=null,rankError=false,selection="",profiles=[],bookmarks=[],viewMode="own";
 const $=id=>document.getElementById(id);
 const escape=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=x=>typeof x==="number"&&Number.isFinite(x)?new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(x):"–";
 const date=x=>x&&/^\d{4}-\d\d-\d\d$/.test(x)?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(x+"T12:00:00Z")):"";
 function relevantResults(){
- const rows=history?.results??[];
- if(!selection)return [];
- const p=profiles.find(x=>x.id===selection);
- return rows.filter(x=>x.playerId===selection||(p&&selection.startsWith("local-")&&x.playerId===p.name&&x.playerName===p.name));
+ // Only exact DBV identity from an independently authorized private response.
+ const snap=trophySnapshot(selection);
+ return snap.state==="ready"?snap.results.filter(x=>x.playerId===selection):[];
 }
 function displayMovement(change,previous){
  if(previous==null)return '<span class="movement movement-unknown"><span aria-hidden="true">–</span> Kein Vorwochenwert</span>';
@@ -123,8 +123,10 @@ function renderOtherKpis(){
  const root=$("dashboard-kpis"),next=$("dashboard-next");
  if(!root||!next)return;
  const results=relevantResults();
+ const access=trophySnapshot(selection);
  const trophies=summarizeTrophies(results);
  const friendNoHistory=viewMode==="friend"&&results.length===0;
+ const trophyUnknown=access.state!=="ready";
  const years=new Set(results.map(r=>r.date+"|"+r.event));
  const rankCounts=Object.entries(ranking?.players?.[selection]?.disciplines||{})
   .filter(([,entry])=>Number.isSafeInteger(entry?.tournaments)&&entry.tournaments>=0);
@@ -135,6 +137,13 @@ function renderOtherKpis(){
     " gewertete Turniere im "+(rankNames[rankCounts[0][0]]||rankCounts[0][0])+
     "; hiervon sind "+num(years.size)+" mit Einzelplatzierungen belegt."
   :"";
+ const trophyNote=access.state==="ready"
+  ?(results.length===0
+    ?"Keine belegten Top-4-Platzierungen in den bisher verfügbaren Quellen. Das Archiv ist nicht vollständig."
+    :"Nur belegte Platzierungen aus den bisher erfassten Quellen. Die Historie ist nicht vollständig."+countContext)
+  :access.state==="loading"?"Private Auszeichnungen werden geprüft. Noch keine Zahl verfügbar."
+  :access.state==="protected"?"Trophäen sind geschützt. Ein Berechtigungslink oder eine unabhängig bestätigte Verwalterberechtigung ist erforderlich."
+  :"Private Auszeichnungen sind momentan nicht abrufbar. Kein sportlicher Nullwert.";
  const medals=trophies.counts;
  const trophySlots=[
   {place:1,label:"1. Platz",symbol:"🏆",style:"gold"},
@@ -146,10 +155,10 @@ function renderOtherKpis(){
   '<div class="home-trophy-heading"><h2 id="home-trophy-heading">Trophäenschrank</h2><a href="#historie">Alle anzeigen ↗</a></div>'+
   '<div class="home-trophy-grid">'+trophySlots.map(slot=>
    '<div class="home-trophy-slot '+slot.style+'"><span class="home-trophy-symbol" aria-hidden="true">'+slot.symbol+'</span>'+
-   '<strong>'+(friendNoHistory?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
+   '<strong>'+(trophyUnknown?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
   ).join("")+
-  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(friendNoHistory?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
-  '<p class="home-trophy-note">Nur einzeln belegte Turnierplatzierungen.'+escape(countContext)+' Weitere Ergebnisse findest du unter Historie.</p></section>';
+  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(trophyUnknown?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
+  '<p class="home-trophy-note" role="status">'+escape(trophyNote)+'</p></section>';
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
  const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){
@@ -183,13 +192,18 @@ function renderDashboard(){
 }
 window.renderDashboard=(selected,ps,links,options={})=>{
  selection=selected||"";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
+ requestPrivateTrophies(selection);
  renderDashboard();
 };
 async function load(){
- await Promise.all([
-  fetch(rankUrl+"?v=2",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("ranking unavailable"))).then(d=>{if(d?.schemaVersion===2&&d?.type==="dbv-published-excel-derived-ageclass-rank")ranking=d;else rankError=true}).catch(()=>{rankError=true}),
-  fetch(historyUrl+"?v=2",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("history unavailable"))).then(d=>{if(d?.schemaVersion===1)history=d;else historyError=true}).catch(()=>{historyError=true})
- ]);
+ await fetch(rankUrl+"?v=2",{cache:"no-store"})
+  .then(r=>r.ok?r.json():Promise.reject(Error("ranking unavailable")))
+  .then(d=>{if(d?.schemaVersion===2&&d?.type==="dbv-published-excel-derived-ageclass-rank")ranking=d;else rankError=true})
+  .catch(()=>{rankError=true});
  renderDashboard();
 }
 document.addEventListener("DOMContentLoaded",load);
+
+window.addEventListener("badminton:private-trophies-updated",event=>{
+ if(event.detail?.playerId===selection)renderDashboard();
+});
