@@ -1,0 +1,24 @@
+/* v119: private invitation and owner-management controls, mobile-first. */
+#owner-admin-panel{min-width:0}
+#owner-admin-panel label{display:block;margin:12px 0 7px;overflow-wrap:anywhere}
+#owner-admin-search{width:100%;min-width:0;max-width:100%;padding:11px 12px;border:1px solid #80b4d0;border-radius:11px;background:#f5fbff;color:#113b59;font-size:16px}
+.owner-admin-candidates{display:grid;gap:10px;margin:12px 0 17px;min-width:0}
+.owner-admin-candidate{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-width:0;padding:12px;border:1px solid #a9cde0;border-radius:13px;background:#edf8ff}
+.owner-admin-candidate span{flex:1 1 180px;font-weight:700;overflow-wrap:anywhere;color:#173c58}
+.owner-admin-candidate small{font-size:12px;color:#245f45}
+.owner-admin-candidate button{flex:0 1 auto;min-height:44px;white-space:normal}
+.owner-admin-manual{margin:14px 0;border-top:1px solid #bdd6e4;padding-top:13px}
+.owner-admin-manual summary{cursor:pointer;line-height:1.5;font-weight:700;color:#146b95}
+.owner-admin-manual input[type="text"]{width:100%;min-width:0;max-width:100%;box-sizing:border-box;font-size:16px}
+#owner-admin-status,#owner-admin-grants{overflow-wrap:anywhere}
+#private-player-dialog.private-player-share-dialog{box-sizing:border-box;width:min(420px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px);margin:auto;overflow-y:auto;overflow-x:hidden}
+#private-player-dialog.private-player-share-dialog .modal{box-sizing:border-box;min-width:0;width:100%;padding:clamp(15px,4vw,22px);gap:13px}
+#private-player-dialog.private-player-share-dialog h2{margin:0;font-size:clamp(19px,5vw,24px);line-height:1.25;overflow-wrap:anywhere}
+#private-player-dialog.private-player-share-dialog p{margin:0;line-height:1.55;overflow-wrap:anywhere}
+#private-player-dialog.private-player-share-dialog .small{font-size:13px!important;line-height:1.5}
+#private-player-dialog.private-player-share-dialog label{font-size:13px;overflow-wrap:anywhere}
+#private-player-dialog.private-player-share-dialog input,
+#private-player-dialog.private-player-share-dialog select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font-size:16px}
+#private-player-dialog.private-player-share-dialog .private-invite-actions{display:flex;flex-wrap:wrap;gap:9px;min-width:0}
+#private-player-dialog.private-player-share-dialog .private-invite-actions button{flex:1 1 120px;min-width:0;min-height:44px;white-space:normal;overflow-wrap:anywhere}
+#private-player-dialog.private-player-share-dialog [hidden]{display:none!important}
