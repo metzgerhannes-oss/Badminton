@@ -49,6 +49,42 @@ document.addEventListener("DOMContentLoaded",()=>{
  const status=document.createElement("p");status.setAttribute("role","status");status.setAttribute("aria-live","polite");
  status.className="settings-hint";
  form.append(searchLabel,find,results,idLabel,channelLabel,submit,check,status);
+ const reviewer=document.createElement("details");reviewer.className="player-review-details";
+ const reviewerSummary=document.createElement("summary");reviewerSummary.textContent="Prüfstelle: Antrag unabhängig bestätigen";
+ const reviewerHelp=document.createElement("p");reviewerHelp.className="settings-hint";
+ reviewerHelp.textContent="Nur für zuvor unabhängig legitimierte Vereins-/Verbandspersonen. Den tatsächlichen Nachweis außerhalb der App prüfen; die Antragstellerin oder der Antragsteller darf nicht selbst freigeben.";
+ const reviewId=document.createElement("input");reviewId.placeholder="Antragsnummer (UUID)";
+ reviewId.autocomplete="off";reviewId.setAttribute("aria-label","Antragsnummer");
+ const reference=document.createElement("input");reference.placeholder="Interner Nachweiscode (ohne Klarnamen)";
+ reference.autocomplete="off";reference.setAttribute("aria-label","Interner Bestätigungsbeleg");
+ const approve=document.createElement("button");approve.type="button";approve.className="outline-button";approve.textContent="Berechtigung nach Prüfung bestätigen";
+ const reject=document.createElement("button");reject.type="button";reject.className="outline-button";reject.textContent="Antrag ablehnen";
+ reviewer.append(reviewerSummary,reviewerHelp,reviewId,reference,approve,reject);
+ for(const [button,decision] of [[approve,true],[reject,false]]){
+  button.addEventListener("click",async()=>{
+   if(busy)return;
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(reviewId.value.trim())){
+    escapeText(status,"Bitte die gültige Antragsnummer angeben.");return;
+   }
+   if(decision&&!/^[A-Za-z0-9._:/-]{8,100}$/.test(reference.value.trim())){
+    escapeText(status,"Eine kurze interne Belegreferenz (ohne Namen) ist erforderlich.");return;
+   }
+   busy=true;approve.disabled=true;reject.disabled=true;
+   try{
+    const session=await getPrivateSession(false);
+    if(!session)throw Error("missing review session");
+    const ok=await rpc("private_player_manage_review",{
+     p_request_id:reviewId.value.trim(),p_approve:decision,p_reference:decision?reference.value.trim():null
+    },session);
+    escapeText(status,ok===true
+      ?(decision?"Unabhängiger Prüfschritt serverseitig bestätigt.":"Antrag nach Prüfung abgelehnt.")
+      :"Keine Prüferberechtigung oder Antrag nicht mehr offen.");
+   }catch{escapeText(status,"Prüfung nicht gespeichert. Eine gültige verifizierte Prüfersitzung ist erforderlich.");}
+   finally{busy=false;approve.disabled=false;reject.disabled=false}
+  });
+ }
+
+ form.append(reviewer);
  section.append(heading,help,form);room.append(section);
  let busy=false,searchController=null;
  find.addEventListener("click",async()=>{
@@ -85,7 +121,7 @@ document.addEventListener("DOMContentLoaded",()=>{
    const session=await getPrivateSession(true);
    const result=await rpc("private_player_manage_request",{p_player_dbv_id:target,p_channel:channel.value},session);
    if(!result)throw Error("not found");
-   escapeText(status,"Antrag hinterlegt. Eine externe Prüfstelle muss die Berechtigung unabhängig bestätigen. Bis dahin werden keine neuen Archivfreigaben erteilt.");
+   escapeText(status,"Antrag "+result+" hinterlegt. Diese Antragsnummer an die unabhängig berechtigte Vereins-/Elternprüfstelle weitergeben. Bis zu deren Nachweisprüfung bleiben Archivfreigaben gesperrt.");
   }catch{escapeText(status,"Antrag konnte nicht gespeichert werden. Die bestehenden lokalen Profile bleiben unverändert.");}
   finally{busy=false;submit.disabled=false}
  });
