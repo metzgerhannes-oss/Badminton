@@ -38,8 +38,33 @@ begin
   -- No dump/empty scans, joker search, special characters or long queries.
   -- A true global per-client request quota is a separate mandatory gate.
   if char_length(q) < 3 or char_length(q) > 70
-     or q ~ '[%_\*\\]'
-     or q !~ '^[[:alnum:][:space:]-]+$' then
+     or q ~ '[%_]'
+     or q !~ '^[[:alnum:] -]+ then
+    return;
+  end if;
+
+  -- Restrict response to verified identity fields. No birth year, source URLs,
+  -- rankings, matches or trophies. No OFFSET/pagination or query logs.
+  return query
+    select p.dbv_id, p.name, p.club
+    from public.players p
+    where p.dbv_id ~ '^([0-9]{2})-([0-9]{6})$'
+      and nullif(btrim(p.name),'') is not null
+      and (
+        (q ~ '^[0-9]{2}-[0-9]{6}$' and p.dbv_id = q)
+        or (q !~ '^[0-9]{2}-[0-9]{6}$' and p.name ilike ('%' || q || '%'))
+      )
+    order by lower(p.name),p.dbv_id
+    limit 10;
+end;
+$$;
+
+-- Requires a deliberate, separately reviewed post-gate GRANT.
+-- The function is never callable by anonymous or authenticated browsers
+-- merely because this migration exists.
+revoke all on function public.search_dbv_name_v1(text) from public, anon, authenticated;
+commit;
+ then
     return;
   end if;
 
