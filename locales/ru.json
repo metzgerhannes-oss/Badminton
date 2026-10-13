@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Команды доступны",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Введите название клуба выше для поиска в официальном справочнике BWBV.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Клуб с таким названием не найден в справочнике BWBV.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Введите название команды или клуба. Команды, за которыми вы следите, показаны выше."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Введите название команды или клуба. Команды, за которыми вы следите, показаны выше.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Принятые приглашения игроков добавляются автоматически. Вы можете выбрать других игроков, сохранённых на устройстве, или добавить их по имени и ID DBV.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Добавить игрока по имени или ID DBV",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Общий поиск DBV по имени сейчас отключён для защиты персональных данных. Принятые приглашения добавляются автоматически. Ниже можно добавить собственные профили по имени и ID DBV.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Поиск DBV по имени сейчас недоступен. Используйте ручное добавление по имени и ID DBV.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "На устройстве не найден подходящий игрок. Другие профили можно добавить вручную по ID DBV.",
+    " · Auf diesem Gerät gespeichert": " · Сохранено на устройстве"
   }
 }
