@@ -212,8 +212,9 @@ function render(){
    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
  }
  retry.hidden=!availability.retry;
- source.textContent=!sourced&&!official.length&&availability.retry
-  ?"Datenabgleich unvollständig":sourced?"Badhub · Teilbestand":"Offizielle Einzelmatches";
+ source.textContent=privateMode?"Private Matchkarten · Teilbestand":
+  (!sourced&&!official.length&&availability.retry
+   ?"Datenabgleich unvollständig":sourced?"Badhub · Teilbestand":"Offizielle Einzelmatches");
  values.innerHTML=[
   [(sourced?"Quellkarten":"Gesamtspiele"),missing?"–":context.total,"matches"],
   ["Siege",missing?"–":context.wins,"wins"],
@@ -273,7 +274,7 @@ window.addEventListener("badminton:private-evidence",event=>{
  if(data.status!=="ready"){
   if(privateMode){
    controller?.abort();++seq;privateMode=false;official=[];external=[];
-   progress=null;status="loading";render();
+   progress=null;officialError=true;externalError=true;status="loaded";render();
   }
   return;
  }
