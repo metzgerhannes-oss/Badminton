@@ -374,7 +374,14 @@ function setup(){
  setInterval(()=>{if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state)},60_000);
  let freshDevice=false;
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
- restore();save();
+ restore();
+ try{
+  const pending=localStorage.getItem("schmetterlinge.pendingPrivatePlayer.v1");
+  localStorage.removeItem("schmetterlinge.pendingPrivatePlayer.v1");
+  if(pending&&state.friends.some(p=>p.id===pending))
+   SchmetterlingeStorage.selectFriend(state,pending);
+ }catch{}
+ save();
  // An accepted private invitation is a followed player, not an own profile.
  if(!state.players.length&&state.friends.length)
   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
