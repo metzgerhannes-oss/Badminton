@@ -13,19 +13,42 @@ const read=()=>{
  }catch{return {}}
 };
 const save=map=>localStorage.setItem(STORE,JSON.stringify(map));
-let selected=null,busy=false;
+const records=()=>{const value=read()[selected];return Array.isArray(value)?value:
+ value&&typeof value==="object"&&value.id?[value]:[]};
+function selectedRecord(){return records().find(r=>r.id===selectedInviteId)||null}
+function listInvites(){
+ const list=$("private-player-links");
+ list.replaceChildren();
+ const rs=records();
+ list.hidden=!rs.length;
+ for(const rec of rs){
+  if(!/^[0-9a-f-]{36}$/i.test(rec.id||""))continue;
+  const option=document.createElement("option");option.value=rec.id;
+  const stillOpen=Date.parse(rec.expires)>Date.now();
+  option.textContent=(stillOpen?"Annahme bis ":"Annahmefrist abgelaufen: ")+
+   new Date(rec.expires).toLocaleDateString("de-DE")+
+   " · Link "+String(rec.id).slice(0,8);
+  list.append(option);
+ }
+ if(!rs.some(r=>r.id===selectedInviteId))selectedInviteId=rs.at(-1)?.id||"";
+ list.value=selectedInviteId;
+ show(selectedRecord());
+}
+let selected=null,selectedInviteId="",busy=false;
 function dialog(){
  if($("private-player-dialog"))return $("private-player-dialog");
  const dlg=document.createElement("dialog");dlg.id="private-player-dialog";
  dlg.innerHTML='<div class="modal"><h2>Spielerprofil privat teilen</h2>'+
- '<p class="small">Nur ein ausdrücklich freigegebener Spieler mit bis zu 30 belegten Matchkarten. Zugang sieben Tage, jederzeit widerrufbar. Ein lokales Profil allein ist kein Berechtigungsnachweis.</p>'+
+ '<p class="small">Nur ein ausdrücklich freigegebener Spieler mit bis zu 30 belegten Matchkarten. Link sieben Tage zur Annahme, danach auf dem bestätigten Gerät bis zum Widerruf gültig. Ein lokales Profil allein ist kein Berechtigungsnachweis.</p>'+
  '<p id="private-player-status" role="status" aria-live="polite"></p>'+
- '<label for="private-player-url">Einladungslink</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
+ '<label for="private-player-links">Meine Einladungen (auch angenommene)</label><select id="private-player-links" hidden></select>'+
+ '<label for="private-player-url">Einladungslink (nur bis Annahmefrist)</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
  '<div class="private-invite-actions"><button id="private-player-create" type="button" class="primary-button">Link erstellen</button>'+
  '<button id="private-player-copy" type="button" class="outline-button" hidden>Kopieren</button>'+
  '<button id="private-player-revoke" type="button" class="outline-button" hidden>Widerrufen</button>'+
  '<button id="private-player-close" type="button" class="subtle-button">Schließen</button></div></div>';
  document.body.append(dlg);
+ $("private-player-links").addEventListener("change",e=>{selectedInviteId=e.target.value;show(selectedRecord())});
  $("private-player-create").addEventListener("click",create);
  $("private-player-copy").addEventListener("click",copy);
  $("private-player-revoke").addEventListener("click",revoke);
@@ -38,9 +61,9 @@ function show(record){
  const url=valid?new URL("./private-player.html",location.href):null;
  if(url)url.hash="token="+record.token;
  $("private-player-url").value=url?.href||"";
- $("private-player-create").hidden=Boolean(valid);
+ $("private-player-create").hidden=false;
  $("private-player-copy").hidden=!valid;
- $("private-player-revoke").hidden=!valid;
+ $("private-player-revoke").hidden=!record;
 }
 async function rpc(name,body,token=null){
  const response=await fetch(SUPABASE_ROOT+"rpc/"+name,{
@@ -54,9 +77,10 @@ async function rpc(name,body,token=null){
 function open(player){
  if(!DBV.test(player?.id||""))return;
  selected=player.id;
- const dlg=dialog(),rec=read()[selected];
- show(rec);
- message(rec&&Date.parse(rec.expires)>Date.now()?"Diese private Freigabe kann widerrufen werden.":
+ const dlg=dialog();
+ listInvites();
+ message(records().length?
+  "Angenommene Einladungen bleiben auch nach der Annahmefrist aktiv, bis du sie widerrufst. Wähle einen Link zum Widerruf.":
   "Nur unabhängig verifizierte Profilverwalter können Einladungen erstellen. Eine DBV-ID oder ein lokales Profil genügt nicht.");
  if(!dlg.open)dlg.showModal();
 }
@@ -70,9 +94,11 @@ async function create(){
   const record=Array.isArray(result)?result[0]:null;
   if(!record?.invitation_id||!record?.expires_at)throw Error("not confirmed");
   const map=read();
-  map[selected]={id:record.invitation_id,token,expires:record.expires_at};
-  save(map);show(map[selected]);
-  message("Privater Link erstellt. Empfänger benötigen kein Konto. Wer den Link besitzt, kann ihn weitergeben.");
+  const previous=records();
+  const recordForStore={id:record.invitation_id,token,expires:record.expires_at};
+  map[selected]=[...previous,recordForStore].slice(-30);
+  selectedInviteId=recordForStore.id;save(map);listInvites();
+  message("Link erstellt: sieben Tage zur Annahme, danach Zugriff bis zum Widerruf. Nur für eine Person, nicht weitergeben.");
  }catch{
   message("Freigabe nicht möglich. Zuerst muss deine Verwaltungsberechtigung für diesen Spieler unabhängig bestätigt werden. Die Daten bleiben geschützt.");
  }finally{busy=false;$("private-player-create").disabled=false}
@@ -90,15 +116,16 @@ async function copy(){
 }
 async function revoke(){
  if(!selected||busy)return;
- const rec=read()[selected];if(!rec)return;
+ const rec=selectedRecord();if(!rec)return;
  busy=true;$("private-player-revoke").disabled=true;
  try{
   const session=await getPrivateSession(false);
   if(!session)throw Error("session missing");
   const result=await rpc("private_player_invite_revoke",{p_invitation_id:rec.id},session.access_token);
   if(result!==true)throw Error("not revoked");
-  const map=read();delete map[selected];save(map);show(null);
-  message("Zugriff widerrufen. Bereits kopierte Informationen können nicht zurückgeholt werden.");
+  const map=read();map[selected]=records().filter(r=>r.id!==rec.id);
+  selectedInviteId="";save(map);listInvites();
+  message("Zugriff serverseitig widerrufen – auch nach Ablauf der Annahmefrist. Bereits kopierte Informationen können nicht zurückgeholt werden.");
  }catch{message("Widerruf fehlgeschlagen. Die bestehende Sitzung wird benötigt.");}
  finally{busy=false;$("private-player-revoke").disabled=false}
 }
