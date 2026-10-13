@@ -11,11 +11,8 @@ import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-so
  const dateFmt=new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"Europe/Berlin"});
  const niceDate=s=>{const t=new Date(s+"T12:00:00Z");return Number.isNaN(t.getTime())?s:dateFmt.format(t)};
  const rank=n=>n===1?"gold":n===2?"silver":n===3?"bronze":"standard";
- const playerMatch=(r,selected)=>{
-  if(selected==="all")return true;
-  const profile=lastProfiles.find(p=>p.id===selected);
-  return r.playerId===selected || (!!profile && selected.startsWith("local-") && r.playerId===profile.name && r.playerName===profile.name);
- };
+ const playerMatch=(r,selected)=>DBV_ID.test(selected)&&r?.playerId===selected;
+ const DBV_ID=/^[0-9]{2}-[0-9]{6}$/;
  function plotTrends(chosen){
  const root=$("history-trends");if(!root)return;
  const groups=new Map();
