@@ -61,6 +61,17 @@ function show(data){
   const next=addAcceptedPlayerToLocalStore(stored,data.player);
   if(next)localStorage.setItem("shuttleboard-v1",JSON.stringify(next));
  }catch{/* A full/disabled browser storage must not block viewing the invite. */}
+ // Store only the accepted invitation-to-DBV binding, never its secret token.
+ // This is a routing hint; every subsequent private read is checked server-side.
+ try{
+  if(UUID.test(activeId)){
+   const key="schmetterlinge.acceptedPlayerInviteBindings.v1";
+   const previous=JSON.parse(localStorage.getItem(key)||"{}");
+   const entries=Object.entries(previous&&typeof previous==="object"?previous:{}).filter(([id,dbv])=>UUID.test(id)&&/^[0-9]{2}-[0-9]{6}$/.test(dbv));
+   const next=Object.fromEntries([...entries,[activeId,data.player.dbv_id]].slice(-20));
+   localStorage.setItem(key,JSON.stringify(next));
+  }
+ }catch{/* Storage failure never changes server access. */}
  panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
@@ -76,6 +87,11 @@ async function reload(){
   if(!show(data))throw Error("invalid read response");
  }catch(error){
   if(error?.revoked){
+   try{
+    const key="schmetterlinge.acceptedPlayerInviteBindings.v1";
+    const entries=JSON.parse(localStorage.getItem(key)||"{}");
+    if(entries&&typeof entries==="object"){delete entries[activeId];localStorage.setItem(key,JSON.stringify(entries));}
+   }catch{/* Keep server revocation authoritative. */}
    saveIds(storedIds().filter(id=>id!==activeId));activeId="";syncSelector();
    hide("Kein Zugriff: Die Berechtigung wurde serverseitig widerrufen. Bitte einen neuen Einladungslink anfordern.");
   }else{
