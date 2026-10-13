@@ -79,6 +79,14 @@ async function runSearch(text){
  found=[];render();
  try{
   const response=await fetch(query,{signal:controller.signal,cache:"no-store",headers:{apikey:APIKEY,accept:"application/json"}});
+  if(response.status===401||response.status===403){
+   // v114 deliberately revoked direct SELECT on the public player table.
+   // Never translate access denial to an empty player directory.
+   if(current!==sequence)return;
+   found=[];source="restricted";render();
+   showMessage("Die DBV-Namenssuche in Schmetterlinge ist noch nicht freigeschaltet. Bereits gefolgte Spieler bleiben erhalten; weitere Spieler kannst du mit ihrer DBV-ID manuell hinzufügen.");
+   return;
+  }
   if(!response.ok)throw Error("Supabase HTTP "+response.status);
   const rows=await response.json();
   if(!Array.isArray(rows))throw Error("Ungültige Suchantwort");
