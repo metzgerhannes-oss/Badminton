@@ -32,4 +32,9 @@ assert.match(cutoverSql,/revoke select on[\s\S]+from public,anon,authenticated/i
 assert.match(cutoverSql,/revoke select \(dbv_id,status,[\s\S]+on public\.player_history_imports/i);
 assert.match(cutoverSql,/revoke execute on function public\.request_player_history_demand\(text\) from public,anon,authenticated/i);
 assert.match(cutoverSql,/has_table_privilege\('anon','public\.dbv_calendar_entries','SELECT'\)/);
+const importer=await readFile("supabase/functions/history-match-import/index.ts","utf8");
+assert.match(importer,/const PRIVATE_PLAYER_IMPORT_LOCKED=true/);
+assert.match(importer,/if\(PRIVATE_PLAYER_IMPORT_LOCKED\)return respond\(403,\{error:"private_access_required"\},origin\)/);
+assert.ok(importer.indexOf("readBoundedJson(req,1024)")<importer.indexOf("if(PRIVATE_PLAYER_IMPORT_LOCKED)"));
+assert.ok(importer.indexOf("if(PRIVATE_PLAYER_IMPORT_LOCKED)")<importer.indexOf('api("rpc/claim_external_match_import"'));
 console.log("Private-mode release gate: no public personal archives, no scheduled name re-publication, old SW cache invalidated.");
