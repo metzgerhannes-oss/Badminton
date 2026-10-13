@@ -1,33 +1,28 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {validateExternalCareer,chooseHistory,seasonYears,lifetimeRate,externalProfileLink} from "../scripts/external-history.mjs";
-const data=JSON.parse(await readFile("data/player-history/05-061350.json","utf8"));
 const index=JSON.parse(await readFile("data/player-history/index.json","utf8"));
 assert.equal(index.schemaVersion,1);
-assert.deepEqual(index.profiles.map(x=>x.dbvId),["05-061350"]);
-assert.equal(validateExternalCareer(data,"05-061350"),true);
-assert.equal(validateExternalCareer(data,"05-070879"),false,"never apply Sarahs figures to Philipp");
-assert.equal(validateExternalCareer({...data,totals:{...data.totals,wins:999}},"05-061350"),false,"inconsistent results cannot be published");
-assert.equal(data.totals.matches,678);
-assert.equal(data.totals.wins,388);
-assert.equal(data.totals.losses,290);
-assert.equal(data.totals.tournament.matches,634);
-assert.equal(data.totals.league.matches,44);
-assert.equal(lifetimeRate(data),57);
-assert.equal(seasonYears(data).length,8);
-assert.equal(seasonYears(data)[0],2026);
-assert.equal(seasonYears(data).at(-1),2019);
-assert.equal(data.earliestListedYear,2018);
-assert.equal(data.sourceStatus,"third-party-aggregated");
-const sum=chooseHistory(data);
-assert.equal(sum.years.length,8);
-assert.equal(sum.years.find(x=>x.year===2022).gold,15);
-assert.equal(sum.years.find(x=>x.year===2024).placements,34);
-assert.equal(chooseHistory(data,{year:"2024"}).years.length,1);
-assert.equal(chooseHistory(data,{year:"2024",discipline:"Einzel"}).highlights.length,1);
-assert.equal(chooseHistory(data,{year:"2020",discipline:"Doppel"}).highlights.length,1);
-assert.equal(chooseHistory(data,{year:"2018"}).years.length,0,"do not invent unknown 2018 annual totals");
-assert.equal(externalProfileLink("05-061350"),"https://badhub.de/spieler/05-061350?saison=all&src=gesamt");
+assert.equal(index.privacyMode,"private");
+assert.deepEqual(index.profiles,[],"Static named careers must no longer be public");
+const ID="99-123456";
+const data={schemaVersion:1,dbvId:ID,sourceStatus:"third-party-aggregated",
+ source:{name:"Badhub",url:"https://badhub.de/spieler/"+ID+"?saison=all&src=gesamt"},
+ totals:{matches:10,wins:6,losses:4,tournament:{matches:8,wins:5},league:{matches:2,wins:1}},
+ years:[{year:2026,tournaments:2,placements:3,gold:1,silver:1,bronze:0},
+        {year:2025,tournaments:1,placements:2,gold:0,silver:0,bronze:1}],
+ highlights:[{event:"Testturnier A",startDate:"2026-04-10",discipline:"Einzel",place:1},
+             {event:"Testturnier B",startDate:"2025-04-10",discipline:"Doppel",place:3}]};
+assert.equal(validateExternalCareer(data,ID),true);
+assert.equal(validateExternalCareer(data,"99-111111"),false,"Source must match the requested ID");
+assert.equal(validateExternalCareer({...data,totals:{...data.totals,wins:999}},ID),false);
+assert.equal(lifetimeRate(data),60);
+assert.deepEqual(seasonYears(data),[2026,2025]);
+assert.deepEqual(chooseHistory(data).years.map(x=>x.year),[2026,2025]);
+assert.equal(chooseHistory(data,{year:"2025"}).years.length,1);
+assert.equal(chooseHistory(data,{year:"2025",discipline:"Doppel"}).highlights.length,1);
+assert.equal(chooseHistory(data,{year:"2025",discipline:"Einzel"}).highlights.length,0);
+assert.equal(externalProfileLink(ID),"https://badhub.de/spieler/"+ID+"?saison=all&src=gesamt");
 assert.equal(externalProfileLink("local-test"),null);
 const [html,js,stats,history,css,sw]=await Promise.all([
  readFile("index.html","utf8"),readFile("career-history.js","utf8"),
@@ -52,4 +47,4 @@ assert.match(history,/externe historische Jahresübersichten/);
 assert.match(css,/\.career-year-card/);
 assert.match(sw,/career-history\.js/);
 assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
-console.log("Historical friend profile: 678/388 Badhub sourced aggregates, annual chronology, source separation, no cross-profile leak.");
+console.log("External career rules verified on synthetic data; named static career removed.");

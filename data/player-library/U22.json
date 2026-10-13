@@ -1,1 +1,6 @@
-{"schemaVersion":1,"ageClass":"U22","players":[]}
+{
+  "schemaVersion": 1,
+  "ageClass": "U22",
+  "privacyMode": "private",
+  "players": []
+}

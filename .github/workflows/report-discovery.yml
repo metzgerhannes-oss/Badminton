@@ -19,6 +19,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   discover:
+    # Privacy cutover: halt creation of public candidate branches/issues with player mentions.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:

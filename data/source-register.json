@@ -188,11 +188,11 @@
       "maySupplyOfficialFive": false
     },
     {
-      "id": "badhub-player-philipp",
+      "id": "badhub-generic-example-1",
       "tier": "C",
       "priority": 10,
-      "title": "Badhub – Philipp Metzger (übernommene Turnierergebnisse)",
-      "url": "https://badhub.de/spieler/05-070879?saison=2026&src=turnier",
+      "title": "Badhub – allgemeiner Hinweis auf Sekundärquellen",
+      "url": "https://badhub.de/",
       "data": [
         "SpielerID",
         "Turnierhistorie",
@@ -201,24 +201,24 @@
         "Partner",
         "aggregierte DBV-Ranglistenpunkte"
       ],
-      "observed": "Am 09.10.2026 programmgesteuert öffentlich lesbar; HE/HD/HM-Gesamtpunkte und Turnierhistorie nachweisbar, jedoch keine eindeutig belegten Wertungspunkte je Turnier.",
+      "observed": "Öffentlich zugängliches sekundäres Sportportal als Quellentyp geprüft; keine personenbezogene Beispiel-ID oder Ranglistenpunktzahl im statischen Register.",
       "state": "verified-for-results",
       "automatedAccess": "works",
       "maySupplyOfficialFive": false
     },
     {
-      "id": "badhub-player-charlotte",
+      "id": "badhub-generic-example-2",
       "tier": "C",
       "priority": 11,
-      "title": "Badhub – Charlotte Metzger Turnierhistorie",
-      "url": "https://badhub.de/spieler/05-071969?saison=2026&src=turnier",
+      "title": "Badhub – allgemeiner Hinweis auf Turnierhistorien",
+      "url": "https://badhub.de/",
       "data": [
         "SpielerID",
         "Turnierhistorie",
         "Disziplin",
         "Platzierung"
       ],
-      "observed": "Plausible Sekundärquelle für Einzelergebnisse; Einzelpunkte nicht geprüft.",
+      "observed": "Sekundäres Ergebnisportal als mögliche Quelle; ohne individualisierte Referenz oder geprüfte Einzeltabellenwerte.",
       "state": "candidate",
       "automatedAccess": "not-checked-now",
       "maySupplyOfficialFive": false

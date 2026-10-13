@@ -1,33 +1,32 @@
 {
   "schemaVersion": 1,
+  "privacyMode": "private",
   "source": "https://turniere.badminton.de/ranking",
-  "year": 2026,
-  "week": 41,
   "ageGroups": [
     {
       "age": "U11",
       "file": "U11.json",
-      "count": 1119
+      "count": 0
     },
     {
       "age": "U13",
       "file": "U13.json",
-      "count": 1967
+      "count": 0
     },
     {
       "age": "U15",
       "file": "U15.json",
-      "count": 2363
+      "count": 0
     },
     {
       "age": "U17",
       "file": "U17.json",
-      "count": 2277
+      "count": 0
     },
     {
       "age": "U19",
       "file": "U19.json",
-      "count": 1520
+      "count": 0
     },
     {
       "age": "U22",
@@ -35,5 +34,6 @@
       "count": 0
     }
   ],
-  "total": 9246
+  "total": 0,
+  "notice": "Personenbezogene Daten werden nicht mehr öffentlich aus dem Repository ausgeliefert; private Einladung vorausgesetzt."
 }

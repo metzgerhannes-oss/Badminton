@@ -18,6 +18,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   ranking:
+    # Privacy cutover: never publish named DBV ranking/player exports to public GitHub.
+    # Re-enable only after protected storage and access controls have been verified.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -37,7 +40,7 @@ jobs:
           python scripts/test-player-library.py
       - name: Load current official DBV ranking and latest archived week
         env:
-          BADMINTON_PLAYER_IDS: '05-070879,05-071969'
+          BADMINTON_PLAYER_IDS: ''
           DEBUG_RANKING_SCHEMA: '1'
         run: python scripts/update-ranking.py
       - name: Commit refreshed snapshot

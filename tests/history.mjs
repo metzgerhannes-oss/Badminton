@@ -2,6 +2,13 @@ import {readFile} from "node:fs/promises";
 import assert from "node:assert/strict";
 const history=JSON.parse(await readFile("data/history.json","utf8"));
 assert.equal(history.schemaVersion,1);
+// Personal verified historical records are no longer released in public GitHub.
+if(history.privacyMode==="private"){
+ assert.deepEqual(history.results,[]);
+ assert.deepEqual(history.players,{});
+ console.log("Privacy cutover: no historical player or match data is exposed by the static site.");
+ process.exit(0);
+}
 assert.equal(history.curation,"club-association-and-family-confirmed");
 assert.ok(history.results.length>=10,"Expected seeded historic results");
 const ids=new Set();
