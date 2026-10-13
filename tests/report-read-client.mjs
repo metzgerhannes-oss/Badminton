@@ -47,6 +47,6 @@ await new Promise(resolve=>setTimeout(resolve,35));
 assert.ok(networkRequests>=3,"The regular public DB checks were attempted");
 assert.doesNotMatch(elements.get("report-list").innerHTML,/55\. BWBV-Meisterschaft/);
 assert.ok(JSON.parse(articles).articles.length===0,"Public fallback must not expose named articles");
-assert.match(elements.get("report-source-list").innerHTML,/SpVgg Mössingen/);
+assert.doesNotMatch(elements.get("report-list").innerHTML,/05-0[0-9]{5}|Philipp Metzger|Charlotte Metzger/);
 assert.equal(elements.get("report-refresh").disabled,false);
 console.log("Reports public GET client: reviewed local articles stay visible during database outage.");
