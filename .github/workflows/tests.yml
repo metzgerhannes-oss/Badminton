@@ -148,6 +148,7 @@ jobs:
           node tests/access-model.mjs
           node tests/private-invites.mjs
           node tests/player-capability-invites.mjs
+          node tests/verified-share-policy.mjs
           node tests/owner-bootstrap.mjs
           node tests/release-version.mjs
           node tests/welcome-i18n.mjs
