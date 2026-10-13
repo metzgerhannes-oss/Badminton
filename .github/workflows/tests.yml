@@ -30,6 +30,7 @@ jobs:
           node --check shared-tournaments.js
           node --check private-invites.js
           node --check private-player-reader.js
+          node --check player-evidence.js
           node --check player-access.js
           node --check owner-activate.js
           node --check owner-admin.js
