@@ -72,6 +72,8 @@ function show(data){
    localStorage.setItem(key,JSON.stringify(next));
   }
  }catch{/* Storage failure never changes server access. */}
+ try{localStorage.setItem("schmetterlinge.invitedPlayerPendingView.v1",data.player.dbv_id)}
+ catch{/* Local preference is optional. */}
  panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
