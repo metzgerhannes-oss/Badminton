@@ -4,14 +4,27 @@ import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {getPrivateSession} from "./private-invites.js";
 const $=id=>document.getElementById(id);
 const status=$("player-invite-status"),panel=$("player-invite-data");
-const STORE="schmetterlinge.acceptedPlayerInvite.v2";
+const STORE="schmetterlinge.acceptedPlayerInvite.v3";
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[a-f0-9]{64}$/;
 const fragment=location.hash.slice(1);
 let pendingToken=fragment.startsWith("token=")&&TOKEN.test(fragment.slice(6))?fragment.slice(6):"";
 const reusable=fragment.startsWith("access=")&&UUID.test(fragment.slice(7))?fragment.slice(7):"";
 history.replaceState(null,"",location.pathname+location.search);
-function storedId(){try{const o=JSON.parse(localStorage.getItem(STORE)||"null");return UUID.test(o?.id||"")?o.id:""}catch{return ""}}
+function storedIds(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(STORE)||"[]");
+  const values=Array.isArray(raw)?raw:(raw?.id?[raw.id]:[]);
+  return [...new Set(values.filter(id=>UUID.test(id)))].slice(-20);
+ }catch{return []}
+}
+function saveIds(ids){localStorage.setItem(STORE,JSON.stringify([...new Set(ids)].slice(-20)))}
+function syncSelector(){
+ const chooser=$("player-invite-accepted");chooser.replaceChildren();
+ const ids=storedIds();chooser.hidden=ids.length<=1;
+ ids.forEach((id,i)=>{const opt=document.createElement("option");opt.value=id;opt.textContent="Gespeicherter Zugang "+(i+1);chooser.append(opt)});
+ chooser.value=activeId;
+}
 function hide(msg){panel.hidden=true;panel.querySelector("#player-invite-matches").replaceChildren();status.textContent=msg}
 function requestHeaders(session){return {apikey:PUBLIC_KEY,"Content-Type":"application/json",Accept:"application/json",Authorization:"Bearer "+session.access_token}}
 async function rpc(path,args,session){
@@ -50,7 +63,8 @@ function show(data){
  if(!list.children.length){const li=document.createElement("li");li.textContent="Keine belegten Matchkarten gespeichert.";list.append(li)}
  panel.hidden=false;status.textContent="Privater Zugriff aktiv – gültig bis zum Widerruf.";return true;
 }
-let busy=false;let activeId=reusable||storedId();
+let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
+$("player-invite-accepted").addEventListener("change",event=>{activeId=event.target.value;reload()});
 async function reload(){
  if(busy||!activeId)return;
  busy=true;panel.hidden=true;status.textContent="Private Berechtigung wird überprüft …";
@@ -60,7 +74,7 @@ async function reload(){
   const data=await rpc("private_player_access_read",{p_invitation_id:activeId},session);
   if(!show(data))throw Error("not authorized");
  }catch{
-  localStorage.removeItem(STORE);activeId="";
+  saveIds(storedIds().filter(id=>id!==activeId));activeId="";syncSelector();
   hide("Kein Zugriff: widerrufen oder auf diesem Gerät keine gültige Sitzung vorhanden. Bitte einen neuen Einladungslink anfordern.");
  }finally{busy=false}
 }
@@ -75,7 +89,7 @@ acceptBtn.addEventListener("click",async()=>{
   pendingToken="";
   if(!UUID.test(id||""))throw Error("expired/redeemed/revoked");
   activeId=id;
-  localStorage.setItem(STORE,JSON.stringify({id}));
+  saveIds([...storedIds(),id]);syncSelector();
   acceptBtn.hidden=true;status.textContent="Angenommen. Der Zugriff bleibt bis zum Widerruf auf diesem Gerät erhalten.";
  }catch{
   pendingToken="";acceptBtn.hidden=true;
