@@ -9,9 +9,11 @@ test("Invalid capability cannot display personal data or remain in the address b
 test("Scoped capability renders bounded synthetic matches without HTML or token leakage",async({page})=>{
  const requests=[];
  await page.route("**/*.supabase.co/rest/v1/rpc/private_player_invite_read",async route=>{
+  const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type,apikey","Access-Control-Allow-Methods":"POST,OPTIONS"};
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:cors,body:""});
   requests.push({method:route.request().method(),payload:JSON.parse(route.request().postData()||"{}"),url:route.request().url()});
   await route.fulfill({status:200,contentType:"application/json",
-   headers:{"Access-Control-Allow-Origin":"*"},
+   headers:cors,
    body:JSON.stringify({player:{dbv_id:"99-000001",name:"Muster <img src=x onerror=alert(1)>",club:"Musterverein",age_class:"U13"},
     matches:Array.from({length:35},(_,i)=>({match_date:"2026-10-10",discipline:"Einzel",
      competition:"Test",player_side:1,winning_side:2,source_name:"Beleg",
