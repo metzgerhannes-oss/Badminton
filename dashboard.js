@@ -5,12 +5,13 @@ const rankUrl="./data/ranking.json";
 const historyUrl="./data/history.json";
 const rankNames={HE:"Einzel",DE:"Einzel",HD:"Doppel",DD:"Doppel",HM:"Mixed",DM:"Mixed"};
 let ranking=null,history=null,rankError=false,historyError=false,selection="",profiles=[],bookmarks=[],viewMode="own";
+let privateEvidence={playerId:"",status:"checking",placements:[]};
 const $=id=>document.getElementById(id);
 const escape=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=x=>typeof x==="number"&&Number.isFinite(x)?new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(x):"–";
 const date=x=>x&&/^\d{4}-\d\d-\d\d$/.test(x)?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(x+"T12:00:00Z")):"";
 function relevantResults(){
- const rows=history?.results??[];
+ const rows=privateEvidence.playerId===selection&&privateEvidence.status==="ready"?privateEvidence.placements:[];
  if(!selection)return [];
  const p=profiles.find(x=>x.id===selection);
  return rows.filter(x=>x.playerId===selection||(p&&selection.startsWith("local-")&&x.playerId===p.name&&x.playerName===p.name));
@@ -124,7 +125,7 @@ function renderOtherKpis(){
  if(!root||!next)return;
  const results=relevantResults();
  const trophies=summarizeTrophies(results);
- const friendNoHistory=viewMode==="friend"&&results.length===0;
+ const friendNoHistory=!(privateEvidence.playerId===selection&&privateEvidence.status==="ready"&&results.length>0);
  const years=new Set(results.map(r=>r.date+"|"+r.event));
  const rankCounts=Object.entries(ranking?.players?.[selection]?.disciplines||{})
   .filter(([,entry])=>Number.isSafeInteger(entry?.tournaments)&&entry.tournaments>=0);
@@ -149,7 +150,7 @@ function renderOtherKpis(){
    '<strong>'+(friendNoHistory?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
   ).join("")+
   '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(friendNoHistory?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
-  '<p class="home-trophy-note">Nur einzeln belegte Turnierplatzierungen.'+escape(countContext)+' Weitere Ergebnisse findest du unter Historie.</p></section>';
+  '<p class="home-trophy-note">'+(friendNoHistory?'Belege noch nicht freigegeben oder nicht vollständig erfasst. Keine Null-Aussage.':'Nur einzeln belegte Turnierplatzierungen.'+escape(countContext)+' Weitere Ergebnisse findest du unter Historie.')+'</p></section>';
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
  const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){
@@ -181,6 +182,13 @@ function renderOtherKpis(){
 function renderDashboard(){
  renderRank();renderOtherKpis();
 }
+window.addEventListener("badminton:private-evidence",event=>{
+ const data=event.detail||{};
+ if(typeof data.playerId!=="string")return;
+ privateEvidence={playerId:data.playerId,status:data.status,
+  placements:Array.isArray(data.placements)?data.placements:[]};
+ if(selection===data.playerId)renderDashboard();
+});
 window.renderDashboard=(selected,ps,links,options={})=>{
  selection=selected||"";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
  renderDashboard();
