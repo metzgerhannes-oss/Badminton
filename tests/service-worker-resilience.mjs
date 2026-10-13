@@ -3,7 +3,7 @@ import vm from "node:vm";
 import {readFile} from "node:fs/promises";
 
 const source=await readFile("sw.js","utf8");
-assert.match(source,/const CACHE="schmetterlinge-shell-v121"/);
+assert.match(source,/const CACHE="schmetterlinge-shell-v122"/);
 assert.doesNotMatch(source,/catch\(\)=>caches\.match\(e\.request\)/);
 
 const scope="https://example.test/Badminton/";
@@ -35,12 +35,14 @@ function harness({offline=false,hit=null,cacheFailure=false,failEssential=false,
  };
  const caches={
   async open(){if(cacheFailure)throw new Error("CacheStorage unavailable");return store;},
-  async match(request){
+  async match(request,options={}){
    if(cacheFailure)throw new Error("CacheStorage unavailable");
    const url=typeof request==="string"?request:request.href||request.url;
-   return hit && (hit==="all"||url===hit.url)?new Response("cached",{status:200}):undefined;
+   const found=hit && (hit==="all"||url===hit.url||(
+     options.ignoreSearch && hit.url && new URL(url).pathname===new URL(hit.url).pathname));
+   return found?new Response("cached",{status:200}):undefined;
   },
-  async keys(){return ["schmetterlinge-shell-v119","other-app-cache","schmetterlinge-shell-v121"];},
+  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","other-app-cache","schmetterlinge-shell-v122"];},
   async delete(key){deleted.push(key);return true;}
  };
  const self={
@@ -90,6 +92,23 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.equal(await response.text(),"cached");
 }
 {
+ const sw=harness({offline:true,hit:{url:scope+"welcome.html"}});
+ const response=await sw.fetchResult(makeReq("welcome.html?from=app"));
+ assert.equal(response.status,200,"Invitation link should show cached onboarding page");
+ assert.equal(await response.text(),"cached");
+}
+{
+ const sw=harness({offline:true,hit:{url:scope+"index.html"}});
+ const response=await sw.fetchResult(makeReq("welcome.html"));
+ assert.equal(response.status,503,"Invitation link must not show cached home instead");
+ assert.match(await response.text(),/Schmetterlinge ist momentan nicht erreichbar/);
+}
+{
+ const sw=harness({offline:true,hit:{url:scope+"index.html"}});
+ const response=await sw.fetchResult(makeReq("private-player.html"));
+ assert.equal(response.status,503,"Private invitation must never fall back to public home");
+}
+{
  const sw=harness({offline:true,cacheFailure:true});
  const response=await sw.fetchResult(makeReq("index.html"));
  assert.equal(response.status,503,"CacheStorage exceptions must not reject respondWith");
@@ -110,8 +129,11 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  await sw.lifecycle("install");
  assert.ok(sw.skipped,"Optional assets must not block installation");
  assert.ok(sw.accepted.includes("./index.html"));
+ assert.ok(sw.accepted.includes("./welcome.html"));
+ assert.ok(sw.accepted.includes("./welcome.js"));
+ assert.ok(sw.accepted.includes("./scripts/invitation-search.mjs"));
  await sw.lifecycle("activate");
- assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119"],
+ assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121"],
    "Worker must not delete caches belonging to other GitHub Pages apps");
  assert.equal(sw.claimed,true);
 }
@@ -127,4 +149,4 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.equal(await sw.fetchResult(makeReq("private-player.html","navigate","POST")),null);
  assert.equal(sw.networkCalls,0);
 }
-console.log("Safari PWA v121: no undefined responses, resilient install, scoped cleanup and no personal-data caching.");
+console.log("Safari PWA v122: no undefined responses, resilient install, scoped cleanup and no personal-data caching.");
