@@ -20,6 +20,7 @@ let selected="",official=[],external=[],progress=null,officialError=false,extern
 let selectedYear="all",selectedDiscipline="all",selectedAgeClass="all",birthYear=null;
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let controller;
+let privateMode=false;
 async function getPage(path,signal){
  const {rows}=await readPublicRows(path,{signal,count:false});
  return rows;
@@ -62,6 +63,8 @@ async function queryBirthYear(id,signal){
  return Number.isInteger(birth)&&birth>=1900&&birth<=2100?birth:null;
 }
 async function fetchProfile(id,force=false){
+ if(privateMode&&id===selected)return; 
+ if(id!==selected)privateMode=false;
  if(!/^\d{2}-\d{6}$/.test(id||"")){
   controller?.abort();++seq;selected=id||"";official=[];external=[];
   progress=null;birthYear=null;status="missing-id";render();return;
@@ -264,6 +267,23 @@ function render(){
  counter.textContent="("+context.total+")";
  list.innerHTML=context.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
 }
+window.addEventListener("badminton:private-evidence",event=>{
+ const data=event.detail||{};
+ if(data.playerId!==selected)return;
+ if(data.status!=="ready"){
+  if(privateMode){
+   controller?.abort();++seq;privateMode=false;official=[];external=[];
+   progress=null;status="loading";render();
+  }
+  return;
+ }
+ if(data.matchesLoading===true||!Array.isArray(data.matches))return;
+ controller?.abort();++seq;privateMode=true;
+ official=[];external=data.matches;officialError=false;externalError=false;
+ partialOfficial=false;partialExternal=false;
+ progress={status:"partial",verified_count:external.length,source_count:external.length};
+ status="loaded";lastLoadedAt=Date.now();render();
+});
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("match-stats"))return;
  $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;render()});
