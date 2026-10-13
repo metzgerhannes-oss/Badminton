@@ -374,14 +374,14 @@ function setup(){
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();
  SchmetterlingeSpond.mount({getState:()=>state,onChange:render});
- state.page=(location.hash||"#start").slice(1);
+ state.page=(location.hash||"#start").slice(1).split("/")[0];
  // Native anchor routing alone retains the viewed friend's profile. Home must reset it,
  // including a second tap while #start is already the active hash.
  document.querySelectorAll('.bottom-nav a[data-page="start"], .topbar .brand[href="#start"]').forEach(link=>{
   link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
  });
  window.addEventListener("hashchange",()=>{
-  state.page=(location.hash||"#start").slice(1);
+  state.page=(location.hash||"#start").slice(1).split("/")[0];
   render();
   focusCurrentView();
  });

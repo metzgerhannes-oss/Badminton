@@ -151,6 +151,7 @@ jobs:
           node tests/verified-share-policy.mjs
           node tests/owner-bootstrap.mjs
           node tests/private-share-ux-v119.mjs
+          node tests/settings-rooms-v120.mjs
           node tests/release-version.mjs
           node tests/welcome-i18n.mjs
           node tests/supabase-read.mjs

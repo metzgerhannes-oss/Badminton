@@ -4,7 +4,7 @@ const [html,components,design,legacy,cache]=await Promise.all([
  "index.html","ui-components.css","design-v2.css","styles.css","sw.js"
 ].map(path=>readFile(path,"utf8")));
 const order=[...html.matchAll(/<link rel="stylesheet" href="\.\/([^"]+)"/g)].map(x=>x[1]);
-assert.deepEqual(order,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","teams.css","private-sharing.css"]);
+assert.deepEqual(order,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","teams.css","private-sharing.css","settings-rooms.css"]);
 assert.match(components,/\.focused-profile\{margin:5px 0 23px/);
 assert.match(components,/\.dashboard-ranking-grid\{display:grid/);
 assert.match(components,/\.home-trophy\{/);
