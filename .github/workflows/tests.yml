@@ -28,6 +28,9 @@ jobs:
           node --check dbv-calendar.js
           node --check scripts/dbv-calendar-utils.mjs
           node --check shared-tournaments.js
+          node --check private-invites.js
+          node --check private-invite-reader.js
+          node --check scripts/private-invite-utils.mjs
           node --check scripts/shared-tournaments.mjs
           node --check history.js
           node --check scripts/trophy-stats.mjs
@@ -136,6 +139,7 @@ jobs:
           node tests/club-branding.mjs
           node tests/shared-tournaments.mjs
           node tests/access-model.mjs
+          node tests/private-invites.mjs
           node tests/release-version.mjs
           node tests/welcome-i18n.mjs
           node tests/supabase-read.mjs
