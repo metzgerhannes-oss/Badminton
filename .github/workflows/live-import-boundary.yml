@@ -1,0 +1,17 @@
+name: Public importer live boundary smoke
+on:
+  pull_request:
+    paths:
+      - "tests/live-import-boundary.sh"
+      - ".github/workflows/live-import-boundary.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safe-public-edge-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify only harmless import rejects
+        run: bash tests/live-import-boundary.sh
