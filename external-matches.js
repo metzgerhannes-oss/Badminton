@@ -10,6 +10,7 @@ const isValidId=id=>/^\d{2}-\d{6}$/.test(id||"");
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let selected="",rows=[],progress=null,loaded=false,failed=false,partial=false,seq=0,abortController;
 let year="all",discipline="all",category="all",show=20;
+let privateMode=false;
 function safeLink(raw){
  try{
   const u=new URL(raw);
@@ -55,7 +56,7 @@ function render(){
  }else if(rows.length){
   info=fmt(rows.length)+" einzelne Quellkarten geladen; Importvollständigkeit nicht bestätigt.";
  }else{
-  info="Für dieses Profil sind in der App noch keine Einzelmatchbelege importiert.";
+  info="Für dieses Profil sind noch keine einzelnen Matchbelege erfasst.";
  }
  if(all.excluded)info+=" "+fmt(all.excluded)+" unklare oder doppelte Quellkarten wurden nicht als Spiel gezählt.";
  if(partial)info+=" Es konnten höchstens "+fmt(MAX_ROWS)+" Quellkarten geladen werden; die Historie ist möglicherweise unvollständig.";
@@ -81,7 +82,8 @@ function render(){
    ?" "+verifiedWithoutSets+" Ergebnisse sind durch den von Badhub fett markierten Gewinner belegt; Satzstände fehlen."
    :" Vier Badhub-Karten ohne Satzstände sind zur erneuten Einzelprüfung vorgemerkt. Nur eindeutig belegte Sieger werden beim Quellenimport berücksichtigt.";
  }
- progressEl.textContent=info;
+ progressEl.textContent=privateMode?
+  fmt(rows.length)+" belegte Matchkarten aus der privaten Spielerfreigabe. Die Quellensammlung kann unvollständig sein.":info;
  const options=sourceMatchYears(rows);
  years.innerHTML='<option value="all">Alle Jahre</option>'+options.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
  if(year!=="all"&&!options.includes(year))year="all";
@@ -119,6 +121,8 @@ function render(){
  more.textContent="Weitere Spiele anzeigen ("+Math.max(0,filtered.length-show)+" übrig)";
 }
 async function load(id){
+ if(privateMode&&id===selected){render();return}
+ if(id!==selected)privateMode=false;
  abortController?.abort();
  const ticket=++seq;
  selected=id||"";rows=[];progress=null;loaded=false;failed=false;partial=false;
@@ -146,6 +150,21 @@ async function load(id){
   loaded=true;failed=true;render();
  }
 }
+window.addEventListener("badminton:private-evidence",event=>{
+ const data=event.detail||{};
+ if(data.playerId!==selected)return;
+ if(data.status!=="ready"){
+  if(privateMode){
+   abortController?.abort();++seq;privateMode=false;rows=[];
+   loaded=false;failed=false;progress=null;render();
+  }
+  return;
+ }
+ if(data.matchesLoading===true||!Array.isArray(data.matches))return;
+ abortController?.abort();++seq;
+ privateMode=true;rows=data.matches;progress={status:"partial",verified_count:rows.length};
+ loaded=true;failed=false;partial=false;show=20;render();
+});
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("external-match-history"))return;
  for(const [field,key] of [["external-match-year","year"],["external-match-discipline","discipline"],["external-match-category","category"]]){
