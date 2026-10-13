@@ -1,4 +1,5 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
+import {trophyAccessState,trophyAccessMessage} from "./scripts/trophy-access-state.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
 "use strict";
 const rankUrl="./data/ranking.json";
@@ -123,8 +124,13 @@ function renderOtherKpis(){
  const root=$("dashboard-kpis"),next=$("dashboard-next");
  if(!root||!next)return;
  const results=relevantResults();
- const trophies=summarizeTrophies(results);
+ const trophyState=trophyAccessState(history,historyError);
+ const trophies=summarizeTrophies(trophyState==="ready"?results:[]);
  const friendNoHistory=viewMode==="friend"&&results.length===0;
+ const trophyUnknown=trophyState!=="ready"||friendNoHistory;
+ const trophyNote=trophyState!=="ready"?trophyAccessMessage(trophyState):
+  friendNoHistory?"Für diesen gefolgten Spieler sind noch keine berechtigt abgerufenen Platzierungen verfügbar; der Strich ist keine Null.":
+  "Nur einzeln belegte Turnierplatzierungen."+countContext+" Weitere Ergebnisse findest du unter Historie.";
  const years=new Set(results.map(r=>r.date+"|"+r.event));
  const rankCounts=Object.entries(ranking?.players?.[selection]?.disciplines||{})
   .filter(([,entry])=>Number.isSafeInteger(entry?.tournaments)&&entry.tournaments>=0);
@@ -146,10 +152,10 @@ function renderOtherKpis(){
   '<div class="home-trophy-heading"><h2 id="home-trophy-heading">Trophäenschrank</h2><a href="#historie">Alle anzeigen ↗</a></div>'+
   '<div class="home-trophy-grid">'+trophySlots.map(slot=>
    '<div class="home-trophy-slot '+slot.style+'"><span class="home-trophy-symbol" aria-hidden="true">'+slot.symbol+'</span>'+
-   '<strong>'+(friendNoHistory?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
+   '<strong>'+(trophyUnknown?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
   ).join("")+
-  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(friendNoHistory?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
-  '<p class="home-trophy-note">Nur einzeln belegte Turnierplatzierungen.'+escape(countContext)+' Weitere Ergebnisse findest du unter Historie.</p></section>';
+  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(trophyUnknown?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
+  '<p class="home-trophy-note" role="status">'+escape(trophyNote)+'</p></section>';
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
  const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){
