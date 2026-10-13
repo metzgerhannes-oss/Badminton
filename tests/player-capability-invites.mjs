@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {freshToken} from "../scripts/private-invite-utils.mjs";
 
-const [sql,reader,creator,view,html,sw,app]=await Promise.all([
- "database/private_player_capability_v115.sql","private-player-reader.js",
+const [sql,acceptSql,reader,creator,view,html,sw,app]=await Promise.all([
+ "database/private_player_capability_v115.sql","database/private_player_accept_once_v116.sql","private-player-reader.js",
  "player-access.js","private-player.html","index.html","sw.js","app.js"
 ].map(file=>readFile(file,"utf8")));
 
@@ -27,11 +27,39 @@ assert.match(sql,/private_player_invite_read/i);
 assert.match(sql,/private_player_invite_revoke/i);
 assert.match(reader,/history\.replaceState\(null,"",location\.pathname\+location\.search\)/);
 assert.match(reader,/cache:"no-store"/);
-assert.match(reader,/rpc\/private_player_invite_read/);
+assert.match(reader,/rpc\("private_player_invite_accept"/);
+assert.match(reader,/rpc\("private_player_access_read"/);
+assert.match(reader,/getPrivateSession\(true\)/);
+assert.match(reader,/getPrivateSession\(false\)/);
+assert.match(reader,/player-invite-accept/);
+assert.match(reader,/schmetterlinge\.acceptedPlayerInvite\.v3/);
+assert.match(reader,/document\.addEventListener\("visibilitychange"/);
+assert.doesNotMatch(reader,/rpc\("private_player_invite_read"/);
 assert.match(reader,/textContent=/);
-assert.doesNotMatch(reader,/\.innerHTML|auth\/v1\/signup|localStorage/i);
+assert.doesNotMatch(reader,/\.innerHTML|auth\/v1\/signup/i);
 assert.match(view,/noindex,nofollow,noarchive/);
 assert.match(view,/no-referrer/);
+assert.match(view,/id="player-invite-accept"/);
+assert.match(view,/id="player-invite-accepted"/);
+assert.match(acceptSql,/accepted_by uuid references auth\.users\(id\)/i);
+assert.match(acceptSql,/and i\.accepted_by is null/);
+assert.match(acceptSql,/and i\.expires_at>now\(\)/);
+assert.match(acceptSql,/and i\.revoked_at is null/);
+assert.match(acceptSql,/i\.accepted_by=auth\.uid\(\)/);
+const readBlock=acceptSql.split("create or replace function private_content.player_access_session_read")[1]
+  ?.split("create or replace function public.private_player_invite_accept")[0]||"";
+assert.ok(readBlock.length>100,"Session-authorized read function exists");
+assert.doesNotMatch(readBlock,/i\.expires_at\s*[<>]=?\s*now\(\)/,
+ "Accepted access must survive the original invitation expiration");
+assert.match(readBlock,/i\.revoked_at is null/);
+assert.match(readBlock,/g\.revoked_at is null/);
+assert.match(acceptSql,/select null::jsonb/,"Legacy bearer-only read must be disabled");
+assert.match(acceptSql,/revoke all on function public\.private_player_invite_read\(text\)/i);
+assert.doesNotMatch(acceptSql,/grant select on public\.(players|player_external_match_facts)/i);
+assert.match(creator,/selectedInviteId/);
+assert.match(creator,/records\(\)\.filter\(r=>r\.id!==rec\.id\)/);
+assert.match(creator,/Link sieben Tage zur Annahme/);
+
 assert.match(creator,/getPrivateSession\(true\)/);
 assert.match(creator,/getPrivateSession\(false\)/);
 assert.match(creator,/private_player_invite_create/);
@@ -43,4 +71,4 @@ assert.match(sw,/private-player-reader\.js/);
 assert.match(app,/data-share-player/);
 assert.match(app,/badminton:player-private-share/);
 assert.ok(!sql.includes("set role supabase_admin"));
-console.log("Private player capability: verified ownership, scope, revocation, token handling, no browser table reads.");
+console.log("Private player capability: 7-day one-time redemption, persistent scoped session until revoke, no browser table reads.");
