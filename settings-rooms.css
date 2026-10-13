@@ -29,3 +29,19 @@
 #settings-followed-empty{margin:12px 0}
 @media(min-width:640px){.settings-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settings-room-link{gap:10px;padding:12px}.settings-room-icon{flex-basis:38px;height:38px}.settings-room-copy strong{font-size:14px}}
+
+/* Small on-demand player entitlement verification; no personal data in CSS. */
+.player-verify-card{min-width:0;max-width:100%}
+.player-verify-form{display:grid;gap:12px;min-width:0}
+.player-verify-form label{display:grid;gap:7px;font-size:13px;font-weight:750}
+.player-verify-form input,.player-verify-form select,.player-review-details input{
+ min-width:0;width:100%;box-sizing:border-box;min-height:44px;
+ padding:10px 12px;font:inherit;border:1px solid #b5cfe0;border-radius:10px;background:#fff}
+.player-verify-results{display:grid;gap:6px;max-height:280px;overflow:auto}
+.player-verify-results:empty{display:none}
+.player-verify-results>button{text-align:left;white-space:normal}
+.player-review-details{border-top:1px solid #d3e4ef;padding-top:10px;display:grid;gap:9px}
+.player-review-details summary{cursor:pointer;font-weight:750;min-height:44px;display:flex;align-items:center}
+.player-review-details[open]{display:grid}
+.player-review-details input,.player-review-details button{margin-bottom:10px}
+@media(max-width:390px){.player-verify-form button{white-space:normal}}
