@@ -9,7 +9,7 @@
   {id:"spieler",title:"Gefolgte Spieler",desc:"Suchen, sortieren, bearbeiten und entfolgen",group:"Spieler & Mannschaften",icon:"◉"},
   {id:"mannschaften",title:"Gefolgte Mannschaften",desc:"Deine Teams und ihre Reihenfolge",group:"Spieler & Mannschaften",icon:"▤"},
   {id:"darstellung",title:"Sprache & Vereinsdesign",desc:"Sprache, Name, Logo und Vereinsfarbe",group:"App & Daten",icon:"◐"},
-  {id:"einladungen",title:"Einladungen",desc:"Familie und Freunde zur App einladen",group:"App & Daten",icon:"↗"},
+  {id:"einladungen",title:"Einladungen & Freigaben",desc:"Spieler suchen und persönliche Zugänge verwalten",group:"App & Daten",icon:"↗"},
   {id:"daten",title:"Sicherung & Datenschutz",desc:"Gerätewechsel, Export und Datenschutz",group:"App & Daten",icon:"▣"},
   {id:"quellen",title:"Datenquellen",desc:"Herkunft und Qualität der Informationen",group:"App & Daten",icon:"◎"}
  ];
@@ -90,7 +90,12 @@
  appendTo("profile","#owner-activation-setup");
  appendTo("darstellung",".language-settings");
  appendTo("darstellung",".club-branding-card");
- appendTo("einladungen",".invitation-card");
+ // Public setup links are not player permissions: keep them outside the grants room.
+ const publicSetup=appendTo("daten",".invitation-card");
+ const setupDetails=document.createElement("details");setupDetails.className="settings-grant-setup-details";
+ const setupSummary=document.createElement("summary");setupSummary.textContent="App-Installationslink (ohne Spielerrechte)";
+ publicSetup.replaceWith(setupDetails);setupDetails.append(setupSummary,publicSetup);
+ publicSetup.querySelector("#invitation-title").textContent="App-Link weitergeben";
  appendTo("daten",".backup-card");
  const loose=[...view.children].filter(el=>el.classList?.contains("settings-card"));
  for(const element of loose){
@@ -113,6 +118,69 @@
  if(list){
   const observer=new MutationObserver(filterFollowed);
   observer.observe(list,{childList:true});
+ }
+ // Device-local overview only: no authentication, data writes or server-status claims.
+ const grantRoom=rooms.get("einladungen").room;
+ const grantHub=document.createElement("div");grantHub.className="settings-grants";grantHub.id="settings-grants-overview";
+ const make=(tag,cls,label)=>{const el=document.createElement(tag);el.className=cls||"";if(label)el.textContent=label;return el};
+ const searchCard=make("section","settings-card settings-grant-card");
+ searchCard.append(make("h4","","Spieler suchen"),make("p","settings-hint","Name oder DBV-ID auswählen, lokal folgen oder nach bestätigter Verwalterberechtigung einen privaten Link erstellen."));
+ const searchLink=make("a","settings-grant-action","Spieler suchen und hinzufügen ↗");searchLink.href="#spieler";
+ searchLink.addEventListener("click",()=>{
+  const button=document.getElementById("player-add-open");
+  if(button?.getAttribute("aria-expanded")!=="true")button?.click();
+ });
+ searchCard.append(searchLink);
+ const issuedCard=make("section","settings-card settings-grant-card");
+ issuedCard.append(make("h4","","Von mir erteilte Freigaben"));
+ const issuedInfo=make("p","settings-hint","Auf diesem Gerät gespeicherte Linkinformationen. Ob ein Link angenommen oder widerrufen wurde, wird hier noch nicht serverseitig geprüft.");
+ const issuedList=make("ul","settings-grant-list");issuedList.id="settings-grant-issued";
+ issuedCard.append(issuedInfo,issuedList);
+ const ownerLink=make("a","settings-grant-action","Spielerberechtigungen verwalten ↗");ownerLink.href="#einstellungen/profile";issuedCard.append(ownerLink);
+ const receivedCard=make("section","settings-card settings-grant-card");
+ receivedCard.append(make("h4","","Von mir angenommene Freigaben"),
+  make("p","settings-hint","Annahmen sind an die technische Sitzung dieses Geräts gebunden. Jeder Zugriff wird erst beim Öffnen auf dem Server geprüft."));
+ const receivedList=make("ul","settings-grant-list");receivedList.id="settings-grant-received";receivedCard.append(receivedList);
+ grantHub.append(searchCard,issuedCard,receivedCard);
+ grantRoom.append(grantHub);
+ const validDbv=id=>/^[0-9]{2}-[0-9]{6}$/.test(id);
+ const validUuid=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+ function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
+ function empty(list,message){const li=make("li","settings-grant-empty",message);list.append(li)}
+ function refreshGrants(){
+  issuedList.replaceChildren();receivedList.replaceChildren();
+  const local=readLocal("shuttleboard-v1",{}),own=Array.isArray(local?.players)?local.players:[];
+  const names=new Map(own.filter(p=>validDbv(p?.id)).map(p=>[p.id,p.name||p.id]));
+  const stored=readLocal("schmetterlinge.privatePlayerInvites.v1",{});
+  let issuedCount=0;
+  if(stored&&typeof stored==="object"&&!Array.isArray(stored)){
+   for(const [dbv,items] of Object.entries(stored)){
+    if(!validDbv(dbv))continue;
+    for(const invitation of (Array.isArray(items)?items:[items])){
+     if(!validUuid(invitation?.id)||issuedCount>=30)continue;
+     const li=make("li","settings-grant-entry");
+     li.append(make("strong","",names.get(dbv)||"Spieler "+dbv));
+     const expiration=Date.parse(invitation?.expires);
+     const expiry=Number.isFinite(expiration)?
+      (expiration>Date.now()?"Annahmefrist bis ":"Annahmefrist beendet am ")+new Date(expiration).toLocaleDateString("de-DE"):
+      "Annahmefrist unbekannt";
+     li.append(make("span","",expiry+" · Annahmestatus nicht geprüft"));
+     issuedList.append(li);issuedCount++;
+    }
+   }
+  }
+  if(!issuedCount)empty(issuedList,"Keine auf diesem Gerät gespeicherten Spielerlinks.");
+  const received=readLocal("schmetterlinge.acceptedPlayerInvite.v3",[]);
+  const ids=Array.isArray(received)?received:(received?.id?[received.id]:[]);
+  const unique=[...new Set(ids.filter(validUuid))].slice(-20);
+  unique.forEach((id,i)=>{
+   const li=make("li","settings-grant-entry");
+   li.append(make("strong","","Gespeicherter Spielerzugang "+(i+1)));
+   const anchor=make("a","settings-grant-action","Zugang sicher prüfen ↗");
+   anchor.href="./private-player.html#access="+id;
+   li.append(anchor);receivedList.append(li);
+  });
+  if(!unique.length)empty(receivedList,"Noch keine auf diesem Gerät angenommenen Spielerrechte.");
  }
  function updateCounts(){
   let friends=0,players=0;
@@ -138,7 +206,7 @@
   if(key===null)return;
   hub.hidden=Boolean(key);
   for(const [id,v] of rooms)v.room.hidden=id!==key;
-  updateCounts();filterFollowed();
+  updateCounts();filterFollowed();if(key==="einladungen")refreshGrants();
   if(key!==previous){
    previous=key;
    if(key){
@@ -154,6 +222,7 @@
  window.addEventListener("hashchange",sync);
  window.addEventListener("pageshow",sync);
  window.addEventListener("storage",updateCounts);
+ window.addEventListener("storage",()=>{if(resolve()==="einladungen")refreshGrants()});
  window.addEventListener("badminton:friend-followed",updateCounts);
  sync();
 })();
