@@ -1,9 +1,10 @@
 import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
+import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
 "use strict";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
- const feedUrl="./data/history.json";
- let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own";
+ // Public history.json is a deliberately empty privacy placeholder.
+ let records=[],pendingResults=[],loaded=true,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own";
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -103,13 +104,32 @@ function render(){
   source.hidden=true;
   source.textContent="";
   if(!loaded)return;
-  const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
+  const state=trophySnapshot(lastPlayer);
+  const trophySection=$("trophy-shelf")?.closest(".trophy-section");
+  if(state.state!=="ready"){
+   const notice=state.state==="loading"
+    ?"Private Platzierungen werden geprüft."
+    :state.state==="protected"
+    ?"Diese Auszeichnungen sind privat geschützt. Ein gültiger neuer Berechtigungslink oder ein unabhängig bestätigter Verwalternachweis ist erforderlich."
+    :"Die private Ergebnisquelle ist vorübergehend nicht abrufbar; das bedeutet nicht 0 Trophäen.";
+   if(trophySection)trophySection.hidden=true;
+   source.hidden=false;source.textContent=notice;
+   summary.innerHTML="";timeline.innerHTML='<div class="empty" role="status"><h3>Geschützte Turnierhistorie</h3><p>'+escape(notice)+'</p></div>';
+   $("history-trends").innerHTML="";$("history-pending").innerHTML="";
+   $("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";
+   $("trophy-awards-heading").textContent="Auszeichnungen";
+   return;
+  }
+  // Only top-four placements proved by the private server response are available.
+  // This source does not claim to be a full lifetime tournament history.
+  source.hidden=false;
+  source.textContent="Geschütztes Teilarchiv: Belegte Top-4-Platzierungen. Weitere Ergebnisse können fehlen.";
+  const playerRecords=state.results.filter(r=>r.playerId===lastPlayer);
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
   renderTrophies(playerRecords);
   const friendWithoutHistory=viewMode==="friend"&&playerRecords.length===0;
-  const trophySection=$("trophy-shelf")?.closest(".trophy-section");
-  if(trophySection)trophySection.hidden=friendWithoutHistory;
-  if(friendWithoutHistory){
+  if(trophySection)trophySection.hidden=false;
+  if(false&&friendWithoutHistory){
    summary.innerHTML="";$("history-trends").innerHTML="";$("history-pending").innerHTML="";
    timeline.innerHTML='<div class="empty"><h3>Historische Daten noch nicht verfügbar</h3><p>Für diesen Spieler sind in der App derzeit noch keine einzeln belegten Turnierplatzierungen hinterlegt. Soweit verfügbar, findest du externe historische Jahresübersichten oben mit eigenen Quellennachweisen.</p></div>';
    return;
@@ -155,26 +175,16 @@ function render(){
  }
  window.renderHistory=(selected,profiles,options={})=>{
    lastPlayer=selected||"";lastProfiles=Array.isArray(profiles)?profiles:[];viewMode=options.mode==="friend"?"friend":"own";
+   requestPrivateTrophies(lastPlayer);
    render();
  };
- async function load(){
-  try{
-   const resp=await fetch(feedUrl+"?v=2",{cache:"no-store"});
-   if(!resp.ok)throw Error("HTTP "+resp.status);
-   const data=await resp.json();
-   if(data?.schemaVersion!==1||!Array.isArray(data.results))throw Error("Unerwartetes Datenformat");
-   records=data.results.filter(r=>r&&typeof r.id==="string"&&typeof r.playerId==="string"&&
-    /^\d{4}-\d\d-\d\d$/.test(r.date)&&typeof r.place==="number"&&r.place>0&&
-    typeof r.playerName==="string"&&safeUrl(r.source?.url)&&r.verified===true);
-   pendingResults=Array.isArray(data.pendingResults)?data.pendingResults.filter(r=>r&&r.verified===false&&r.verificationStatus==="unverified-family-recollection"&&typeof r.date==="string"&&typeof r.discipline==="string"&&Number.isInteger(r.place)&&safeUrl(r.source?.url)):[];
-   loaded=true;
-  }catch(e){error="Quelle derzeit nicht verfügbar.";}
-  render();
- }
  document.addEventListener("DOMContentLoaded",()=>{
   $("history-year")?.addEventListener("change",e=>{year=e.target.value;render()});
   $("history-discipline")?.addEventListener("change",e=>{discipline=e.target.value;render()});
   $("trophy-show-all")?.addEventListener("click",()=>{trophyPlace="all";render();});
-  load();
+  render();
+ });
+ window.addEventListener("badminton:private-trophies-updated",event=>{
+  if(event.detail?.playerId===lastPlayer)render();
  });
 })();
