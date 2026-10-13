@@ -3,7 +3,7 @@ import vm from "node:vm";
 import {readFile} from "node:fs/promises";
 
 const source=await readFile("sw.js","utf8");
-assert.match(source,/const CACHE="schmetterlinge-shell-v125"/);
+assert.match(source,/const CACHE="schmetterlinge-shell-v126"/);
 assert.doesNotMatch(source,/catch\(\)=>caches\.match\(e\.request\)/);
 const privateHtml=await readFile("private-player.html","utf8");
 assert.match(privateHtml,/navigator\.serviceWorker\.getRegistration\("\.\/"\)/,
@@ -48,7 +48,7 @@ function harness({offline=false,hit=null,cacheFailure=false,failEssential=false,
      options.ignoreSearch && hit.url && new URL(url).pathname===new URL(hit.url).pathname));
    return found?new Response("cached",{status:200}):undefined;
   },
-  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","other-app-cache","schmetterlinge-shell-v125"];},
+  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","schmetterlinge-shell-v125","other-app-cache","schmetterlinge-shell-v126"];},
   async delete(key){deleted.push(key);return true;}
  };
  const self={
@@ -144,7 +144,7 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.ok(sw.accepted.includes("./welcome.js"));
  assert.ok(sw.accepted.includes("./scripts/invitation-search.mjs"));
  await sw.lifecycle("activate");
- assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124"],
+ assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","schmetterlinge-shell-v125"],
    "Worker must not delete caches belonging to other GitHub Pages apps");
  assert.equal(sw.claimed,true);
 }
@@ -160,4 +160,4 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.equal(await sw.fetchResult(makeReq("private-player.html","navigate","POST")),null);
  assert.equal(sw.networkCalls,0);
 }
-console.log("Safari PWA v125: no undefined responses, resilient install, scoped cleanup and no personal-data caching.");
+console.log("Safari PWA v126: no undefined responses, resilient install, scoped cleanup and no personal-data caching.");
