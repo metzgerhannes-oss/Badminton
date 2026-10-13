@@ -39,7 +39,7 @@ async function asJson(response){
  return data;
 }
 function sessionHeaders(token){return {apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"}}
-async function getPrivateSession(){
+async function getPrivateSession(create=false){
  let current=read(SESSION_STORE,null);
  if(current?.access_token&&current.expires_at>Date.now()+60000)return current;
  if(current?.refresh_token){
@@ -54,6 +54,7 @@ async function getPrivateSession(){
    localStorage.setItem(SESSION_STORE,JSON.stringify(current));return current;
   }catch{localStorage.removeItem(SESSION_STORE)}
  }
+ if(!create)return null;
  // Explicit user interaction only. This identity does not authorize public publishing.
  const response=await fetch(API+"signup",{method:"POST",cache:"no-store",
   headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
@@ -84,7 +85,7 @@ async function create(){
  if(!chosen||busy)return;
  busy=true;$("private-invite-create").disabled=true;
  try{
-  const item=safeEvent(chosen),s=await getPrivateSession(),token=freshToken();
+  const item=safeEvent(chosen),s=await getPrivateSession(true),token=freshToken();
   const r=await fetch(SUPABASE_ROOT+"rpc/private_tournament_invite_create",{
    method:"POST",cache:"no-store",headers:sessionHeaders(s.access_token),
    body:JSON.stringify({p_token:token,p_title:item.title,p_start_date:item.start_date,
@@ -110,7 +111,8 @@ async function revoke(){
  try{
   const current=read(SESSION_STORE,null);
   if(!current)throw Error("Die ursprüngliche Sitzung fehlt. Dieser Link läuft spätestens nach sieben Tagen ab.");
-  const s=await getPrivateSession();
+  const s=await getPrivateSession(false);
+  if(!s)throw Error("Die ursprüngliche Sitzung ist nicht mehr verfügbar. Der Link läuft nach sieben Tagen ab.");
   const response=await fetch(SUPABASE_ROOT+"rpc/private_tournament_invite_revoke",{
    method:"POST",cache:"no-store",headers:sessionHeaders(s.access_token),
    body:JSON.stringify({p_invitation_id:entry.id})});
