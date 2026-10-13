@@ -49,4 +49,36 @@ class OIDCContractTests(unittest.TestCase):
   self.assertNotIn("user_tournament_links?",source)
   self.assertIn('verify_jwt = false',(ROOT/"supabase/config.toml").read_text())
 
+
+ def test_long_running_calendar_payload_is_preserved_without_network(self):
+  """A 132-day test event must survive client serialisation; NO real publishing."""
+  from datetime import date
+  start,end="2027-03-13","2027-07-23"
+  self.assertGreater((date.fromisoformat(end)-date.fromisoformat(start)).days,14)
+  fixture={
+   "source_key":"dbv-calendar-123456","title":"Synthetic OIDC test fixture",
+   "start_date":start,"end_date":end,"location_text":"Testort",
+   "organizer":"Testorganisation","bundesland":None,"region_scope":"unknown",
+   "category":"C-Level","level_group":"C","age_groups":["U13"],
+   "disciplines":["Einzel"],"registration_deadline":None,
+   "event_url":None,"source_url":"https://turniere.badminton.de/"
+  }
+  payload={"entries":[fixture],"expectedCount":1}
+  class FakeResponse:
+   status=200
+   def __enter__(self):return self
+   def __exit__(self,*args):return False
+   def read(self):return b'{"ok":true,"count":1}'
+  with patch.object(oidc,"urlopen",return_value=FakeResponse()) as fake_network:
+   oidc.send(payload,"mock-github-oidc-token")
+  request=fake_network.call_args.args[0]
+  serialized=json.loads(request.data.decode("utf-8"))
+  self.assertEqual((serialized["entries"][0]["start_date"],serialized["entries"][0]["end_date"]),(start,end))
+  self.assertEqual(request.full_url,oidc.FUNCTION)
+  self.assertNotIn("SUPABASE_SERVICE_ROLE_KEY",request.headers)
+  # Future server changes must not silently restore the obsolete 14-day cap.
+  source=(ROOT/"supabase/functions/dbv-calendar-publish/index.ts").read_text()
+  self.assertIn("if(days<0||days>366)",source)
+  self.assertNotIn("if(days<0||days>14)",source)
+
 if __name__=="__main__":unittest.main()
