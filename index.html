@@ -64,7 +64,8 @@
  <main id="hauptinhalt" tabindex="-1">
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
-   <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">DBV-Rangliste wird geladen</span></div>
+   <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">Badminton-Termine</span></div>
+   <p class="settings-hint" role="status">Privatmodus: Spielergebnisse und Ranglisten werden nicht mehr öffentlich angezeigt. Eigene Profile und Turnierfavoriten bleiben lokal; persönliche Freigaben werden vorbereitet.</p>
    <a href="#live" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
    <div id="dashboard-next" class="dashboard-next"></div>
    <div id="shared-tournaments" class="shared-tournaments" hidden></div>
@@ -116,7 +117,7 @@
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
-   <p class="small muted">Hier wird bei Bedarf ein Historienabgleich für die ausgewählte öffentliche DBV-ID angefordert. Deine private Liste gefolgter Spieler bleibt auf dem Gerät.</p>
+   <p class="small muted">Privatmodus: Persönliche Historien sind ohne gesonderte Berechtigung nicht verfügbar. Deine privaten Spieler- und Freundeslisten bleiben auf dem Gerät.</p>
    <details id="history-source-details" class="history-source-details">
     <summary>Datenstand und Quellen</summary>
      <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
@@ -304,7 +305,7 @@
   </section>
   <section class="page" id="view-berichte" aria-labelledby="heading-berichte">
    <div class="section-heading"><h2 id="heading-berichte">Berichte &amp; Erwähnungen</h2><button id="report-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
-   <p class="supporting">Alle bisher nachgewiesenen Veröffentlichungen mit Namenserwähnung des gewählten Spielers – von Vereinsseiten über den Landesverband bis zu anderen Medien. Es werden nur Überschrift, kurze Einordnung und der Originallink gespeichert.</p>
+   <p class="supporting">Personenbezogene Spielererwähnungen werden im Privatmodus nicht öffentlich ausgeliefert. Allgemeine Quelleninformationen bleiben verfügbar; private Freigaben sind noch nicht aktiviert.</p>
    <div class="report-filters">
     <label>Ansicht<select id="report-scope"><option value="mentions">Spielererwähnungen</option><option value="club">Berichte zum Verein</option></select></label>
     <label>Quelle<select id="report-category"><option value="all">Alle Quellen</option><option value="club">Eigener Verein</option><option value="opponent_club">Andere Vereine</option><option value="association">Verbände</option><option value="regional_media">Regionalpresse</option><option value="media">Weitere Medien</option></select></label>
@@ -329,7 +330,7 @@
    <section id="player-discover" class="follow-discovery" aria-labelledby="player-discover-heading" hidden>
     <div class="follow-hub-subheading"><h3 id="player-discover-heading">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>
    <div class="section-heading library-section-heading"><h3>DBV-Verzeichnis</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
-   <p class="supporting">Suche öffentlich bestätigte DBV-Spielerprofile und folge deinen Favoriten.</p>
+   <p class="supporting">Die öffentliche Personensuche ist während der Umstellung auf geschützte Einladungen ausgesetzt. Bereits lokal gespeicherte Profile bleiben erhalten; der allgemeine Turnierkalender funktioniert weiterhin.</p>
    <div class="library-source" id="library-source" aria-live="polite">Offizielle DBV-Rangliste wird geladen.</div>
    <div class="library-filters">
     <label>Spielerin / Spieler suchen<input type="search" id="library-search" placeholder="Name oder DBV-Spieler-ID" autocomplete="off"></label>
@@ -476,8 +477,8 @@
    </section>
    <div class="settings-card"><h3>Daten & Datenschutz</h3>
     <p>Deine eigenen Profile, gefolgten Spieler und Turnierfavoriten bleiben auf diesem Gerät im Browser gespeichert. Es findet keine automatische Cloud-Synchronisierung der Familie statt. Eine lokale Sicherungsdatei wird nicht an uns hochgeladen.</p>
-     <p>Daneben stellt Schmetterlinge öffentlich lesbare DBV-Spielerstammdaten, Vereine, Turnierplatzierungen und einzelne Quellenbelege aus einer gemeinsamen Supabase-Datenbank bereit. Darunter können auch Daten von Minderjährigen sein.</p>
-     <p>Bei der Anzeige von Spielerergebnissen werden die jeweils angezeigten öffentlichen DBV-Spieler-IDs für schreibgeschützte Abfragen an die gemeinsame Supabase-Datenbank übermittelt. <strong>Erst beim Öffnen der Historie</strong> eines eigenen oder gefolgten DBV-Profils kann zusätzlich eine neue serverseitige Quellenprüfung angefordert werden. Hierbei können öffentliche Badhub-Matchkarten automatisch abgerufen und zentral zwischengespeichert werden. Das bloße Folgen, Einrichten oder Öffnen von Home löst keinen neuen Historienauftrag aus. Bereits früher angeforderte serverseitige Aktualisierungen können weiterhin laufen.</p>
+     <p>Schmetterlinge wechselt auf einen Privatmodus: Der allgemeine Turnierkalender und nicht personenbezogene Vereinsinformationen bleiben öffentlich. Spieleridentitäten, Ranglisten, Einzelresultate und Namensnennungen werden vom anonymen Datenbanklesen und aus öffentlichen GitHub-Dateien ausgeschlossen. Bereits veröffentlichte Git-Versionen und fremde Kopien können dadurch nicht rückwirkend gelöscht werden.</p>
+     <p>Eigene Spielerprofile, Freundeslisten und private Termine verbleiben lokal. Personenbezogene Datenbankabrufe sind bis zur späteren serverseitig geprüften Einladungsfreigabe gesperrt. Bereits vorhandene Server-Importjobs können noch Daten enthalten und werden getrennt datenschutzrechtlich geprüft.</p>
      <p>Historienquellen werden nach einer ausdrücklichen Nachfrage für maximal 14 Tage weiter auf Aktualisierungen geprüft. Danach ruhen automatische Prüfungen, bis die Historie wieder geöffnet wird. Diese 14 Tage sind <strong>keine Löschfrist</strong> für gemeinsam belegte Spielergebnisse. Nicht belegte oder fehlende Ergebnisse werden nicht als offizielle DBV-Matches ausgegeben.</p>
      <p>Öffentlich auffindbare Sportdaten sind nicht automatisch für jede Weiterverwendung freigegeben. Quellen, tatsächliche Speicherfristen, Rechtsgrundlage und Berichtigungs-/Löschwege werden weiter geprüft. Eine vollständige Datenschutzerklärung einschließlich verantwortlicher Kontaktstelle steht noch aus. Personenbezogene Meldungen sollen nicht über öffentliche GitHub-Issues erfolgen.</p>
      <p class="small muted">Datenkategorien, Nachweise und offene Betreiberpflichten: <a href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/DATENKATALOG_BERICHTIGUNG_V53.md" target="_blank" rel="noopener noreferrer">Datenkatalog und Berichtigungsprozess ↗</a>.</p>
