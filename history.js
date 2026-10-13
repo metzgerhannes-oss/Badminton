@@ -4,6 +4,7 @@ import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
 (() => {
  const feedUrl="./data/history.json";
  let records=[],pendingResults=[],loaded=false,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own";
+ let scopedEvidence={playerId:"",status:"checking",placements:[]};
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -98,15 +99,29 @@ function renderPending(){
 function render(){
   const source=$("history-source"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
-  if(error){source.hidden=false;source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
+  const authorized=scopedEvidence.playerId===lastPlayer&&scopedEvidence.status==="ready";
+  const shelfSection=$("trophy-shelf")?.closest(".trophy-section");
+  if(!authorized){
+   if(shelfSection)shelfSection.hidden=true;
+   $("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";
+   summary.innerHTML="";$("history-trends").innerHTML="";$("history-pending").innerHTML="";
+   const current=scopedEvidence.playerId===lastPlayer?scopedEvidence.status:"checking";
+   const notice=current==="checking"?"Spielerfreigabe wird geprüft …":
+     current==="unavailable"?"Die private Ergebnisquelle ist momentan nicht erreichbar. Bitte Verbindung prüfen.":
+     "Für dieses Profil besteht noch kein freigegebener Trophäen- und Matchkarten-Zugriff. Lokales Folgen vergibt keine privaten Rechte.";
+   source.hidden=false;source.textContent=notice;
+   timeline.innerHTML='<div class="empty"><p>'+escape(notice)+'</p></div>';
+   return;
+  }
+  if(shelfSection)shelfSection.hidden=false;
   // The history opens directly with the trophies. Show a notice only if loading fails.
   source.hidden=true;
   source.textContent="";
-  if(!loaded)return;
-  const playerRecords=records.filter(r=>playerMatch(r,lastPlayer));
+  if(!loaded&&!authorized)return;
+  const playerRecords=scopedEvidence.placements.filter(r=>r.playerId===lastPlayer&&r.verified===true);
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
   renderTrophies(playerRecords);
-  const friendWithoutHistory=viewMode==="friend"&&playerRecords.length===0;
+  const friendWithoutHistory=playerRecords.length===0;
   const trophySection=$("trophy-shelf")?.closest(".trophy-section");
   if(trophySection)trophySection.hidden=friendWithoutHistory;
   if(friendWithoutHistory){
@@ -153,6 +168,13 @@ function render(){
     return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(t.items.some(i=>i.confirmation==="family-confirmed")?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">'+(sourceUrl.includes("dbv.turnier.de")?'DBV-Turnierergebnisse ↗':'Originalbericht ansehen ↗')+'</a>':"")+(proofUrl?'<a href="'+escape(proofUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link history-verification-link">Namentlichen Ergebnisbeleg ↗</a>':"")+'</div></article>';
   }).join("");
  }
+ window.addEventListener("badminton:private-evidence",event=>{
+    const next=event.detail||{};
+    if(typeof next.playerId!=="string")return;
+    scopedEvidence={playerId:next.playerId,status:next.status,
+     placements:Array.isArray(next.placements)?next.placements:[]};
+    if(lastPlayer===next.playerId)render();
+  });
  window.renderHistory=(selected,profiles,options={})=>{
    lastPlayer=selected||"";lastProfiles=Array.isArray(profiles)?profiles:[];viewMode=options.mode==="friend"?"friend":"own";
    render();
