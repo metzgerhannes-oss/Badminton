@@ -94,6 +94,7 @@ jobs:
           node tests/validate.mjs
           node tests/history.mjs
           node tests/trophies.mjs
+          node tests/trophy-access-state.mjs
           node tests/bookmarks.mjs
           node tests/tournament-bookmarks.mjs
           node tests/spond-calendar.mjs
