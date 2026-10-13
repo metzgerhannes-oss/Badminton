@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Команди доступні",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Введіть назву клубу вище для пошуку в офіційному довіднику BWBV.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Клуб із такою назвою не знайдено у довіднику BWBV.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Введіть назву команди або клубу. Команди, за якими ви стежите, наведені вище."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Введіть назву команди або клубу. Команди, за якими ви стежите, наведені вище.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Прийняті запрошення гравців додаються автоматично. Ви можете вибрати інших гравців, збережених на цьому пристрої, або додати їх за ім’ям та ID DBV.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Додати іншого гравця за ім’ям або ID DBV",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "З міркувань захисту даних загальний пошук DBV за ім’ям наразі вимкнено. Прийняті запрошення додаються автоматично. Нижче можна додати власні профілі за ім’ям та ID DBV.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Пошук DBV за ім’ям зараз недоступний. Скористайтеся ручним налаштуванням за ім’ям та ID DBV.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "На цьому пристрої немає відповідного гравця. Інші профілі можна додати вручну за ID DBV.",
+    " · Auf diesem Gerät gespeichert": " · Збережено на цьому пристрої"
   }
 }
