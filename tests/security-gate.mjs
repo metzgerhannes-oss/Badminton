@@ -52,4 +52,17 @@ for(const statement of opsStatements){
 assert.doesNotMatch(opsStatements.join("\n"),/\b(dbv_id|token_digest|owner_user_id|source_url|payload|client_ip)\b/i,
  "Operational health reports must not select personal identifiers, secrets or source payloads");
 
+// Global PUBLIC EXECUTE comes from PostgreSQL built-in function privileges.
+// Per-schema REVOKE is insufficient; CI must never accept that false hardening.
+const fnDefaultsSql=await readFile("database/harden_postgres_global_function_execute_v112.sql","utf8");
+const withoutSqlComments=fnDefaultsSql.split("\n").map(line=>line.replace(/--.*$/,"")).join("\n").trim();
+assert.match(withoutSqlComments,/^alter default privileges for role postgres\s+revoke execute on functions from public\s*;$/i,
+ "Future postgres functions must lose built-in global PUBLIC EXECUTE; no IN SCHEMA here");
+assert.doesNotMatch(withoutSqlComments,/supabase_admin|set\s+role|grant/i,
+ "No escalation or managed supabase_admin ACL alteration in a customer migration");
+const adminRunbook=await readFile("docs/ADMIN_RIGHTS_HARDENING_20261013.md","utf8");
+assert.ok(adminRunbook.includes("pg_has_role(current_user,'supabase_admin','MEMBER')"));
+assert.ok(adminRunbook.includes("29"));
+assert.ok(adminRunbook.includes("PUBLIC EXECUTE"));
+
 console.log("Security contract gate: SQL privileges, invoker RPC and read-only production audit statements intact.");
