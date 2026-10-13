@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS private_content.owner_bootstrap(
 ALTER TABLE private_content.site_owners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE private_content.owner_bootstrap ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON private_content.site_owners,private_content.owner_bootstrap FROM PUBLIC,anon,authenticated;
-REVOKE ALL ON ALL SEQUENCES IN SCHEMA private_content FROM PUBLIC,anon,authenticated;
 
 CREATE OR REPLACE FUNCTION private_content.owner_bootstrap_claim(p_token text)
  RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
