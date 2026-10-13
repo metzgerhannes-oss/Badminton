@@ -61,7 +61,9 @@ function show(data){
   const next=addAcceptedPlayerToLocalStore(stored,data.player);
   if(next)localStorage.setItem("shuttleboard-v1",JSON.stringify(next));
  }catch{/* A full/disabled browser storage must not block viewing the invite. */}
- panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
+ panel.hidden=false;status.textContent=pendingToken
+  ?"Gespeicherter Spielerzugang aktiv. Wenn dies eine weitere Einladung ist, kannst du sie zusätzlich annehmen."
+  :"Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
 $("player-invite-accepted").addEventListener("change",event=>{activeId=event.target.value;reload()});
@@ -112,8 +114,17 @@ acceptBtn.addEventListener("click",async()=>{
  if(activeId)await reload();
 });
 if(pendingToken){
- activeId="";acceptBtn.hidden=false;
- status.textContent="Du kannst diese Einladung innerhalb von sieben Tagen nach Erstellung annehmen. Danach bleibt der Zugriff auf diesem Gerät bis zum Widerruf erhalten.";
+ acceptBtn.hidden=false;
+ if(activeId){
+  // A consumed link is still a usable entry point on the SAME receiving device.
+  // Reopen its already authorized local access without a second token redemption.
+  // Do not assume that a new token belongs to the previously saved player:
+  // the separate acceptance button remains available for additional invitations.
+  acceptBtn.textContent="Weitere Einladung annehmen";
+  await reload();
+ }else{
+  status.textContent="Du kannst diese Einladung innerhalb von sieben Tagen nach Erstellung annehmen. Danach bleibt der Zugriff auf diesem Gerät bis zum Widerruf erhalten.";
+ }
 }else if(activeId){acceptBtn.hidden=true;await reload()}
 else{acceptBtn.hidden=true;hide("Auf diesem Gerät ist keine angenommene Einladung vorhanden.")}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&activeId)reload()});
