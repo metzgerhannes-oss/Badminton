@@ -60,8 +60,9 @@ function show(data){
   const stored=JSON.parse(localStorage.getItem("shuttleboard-v1")||"null");
   const next=addAcceptedPlayerToLocalStore(stored,data.player);
   if(next)localStorage.setItem("shuttleboard-v1",JSON.stringify(next));
+  if(next)localStorage.setItem("schmetterlinge.pendingPrivatePlayer.v1",data.player.dbv_id);
  }catch{/* A full/disabled browser storage must not block viewing the invite. */}
- panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
+ panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler wird beim Öffnen der App automatisch ausgewählt.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
 $("player-invite-accepted").addEventListener("change",event=>{activeId=event.target.value;reload()});
