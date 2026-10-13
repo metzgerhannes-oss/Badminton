@@ -50,7 +50,7 @@ assert.deepEqual(v116Functions,[
 ],"Migration must contain exactly the six full functions, in declaration order");
 assert.equal((acceptSql.match(/\$function\$/g)||[]).length,12,
  "Six dollar-quoted function bodies must open and close cleanly");
-assert.match(acceptSql,/p_token !~ '\^\[a-f0-9\]\{64\}\
+assert.ok(acceptSql.includes("p_token !~ '^[a-f0-9]{64}$'"),"Creator must contain intact 256-bit token validation");
 assert.match(acceptSql,/or accepted_at is not null\)\)>=20/i,"Persistent owner quota must include accepted shares");
 assert.match(acceptSql,/and i\.accepted_by is null/);
 assert.match(acceptSql,/and i\.expires_at>now\(\)/);
