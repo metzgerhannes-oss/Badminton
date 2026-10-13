@@ -112,6 +112,7 @@ jobs:
           node tests/source-register.mjs
           node tests/invitation.mjs
           node tests/invited-player-v125.mjs
+          node tests/dbv-name-search-gate-v126.mjs
           node tests/player-library.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
