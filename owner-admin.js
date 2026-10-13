@@ -1,0 +1,91 @@
+/** Owner-only panel. The backend checks the owner identity on every request. */
+import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
+import {getPrivateSession} from "./private-invites.js";
+const panel=document.getElementById("owner-admin-panel");
+const status=document.getElementById("owner-admin-status");
+const form=document.getElementById("owner-admin-form");
+const player=document.getElementById("owner-admin-player");
+const verify=document.getElementById("owner-admin-confirm");
+const list=document.getElementById("owner-admin-grants");
+const ownList=document.getElementById("owner-admin-my-players");
+const TOKEN=/^[0-9]{2}-[0-9]{6}$/;
+let session=null,loading=false;
+async function rpc(name,args={}){
+ if(!session?.access_token)throw Error("no owner session");
+ const response=await fetch(SUPABASE_ROOT+"rpc/"+name,{
+  method:"POST",cache:"no-store",
+  headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},
+  body:JSON.stringify(args)});
+ if(!response.ok)throw Error("permission denied");
+ return response.json();
+}
+function localProfiles(){
+ try{
+  const data=JSON.parse(localStorage.getItem("shuttleboard-v1")||"{}");
+  return Array.isArray(data.players)?data.players.filter(x=>TOKEN.test(x?.id||"")).slice(0,12):[];
+ }catch{return []}
+}
+function updateCandidates(){
+ ownList.replaceChildren();
+ for(const item of localProfiles()){
+  const opt=document.createElement("option");opt.value=item.id;
+  opt.label=(item.name||"Lokales Profil")+" · "+item.id;ownList.append(opt);
+ }
+}
+function updateGrants(grants){
+ list.replaceChildren();
+ if(!grants.length){const li=document.createElement("li");li.textContent="Noch keine eigenen Spieler freigegeben.";list.append(li);return}
+ for(const id of grants){
+  if(!TOKEN.test(id))continue;
+  const li=document.createElement("li");li.textContent="DBV "+id+" · ";
+  const button=document.createElement("button");button.type="button";button.className="outline-button";
+  button.textContent="Berechtigung widerrufen";button.dataset.revoke=id;
+  li.append(button);list.append(li);
+ }
+}
+async function loadOwner(){
+ if(loading)return;
+ loading=true;
+ try{
+  session=await getPrivateSession(false);
+  if(!session)return; // Browsers do not create an account simply by opening settings.
+  const info=await rpc("private_owner_status");
+  if(info?.owner!==true)return;
+  panel.hidden=false;
+  status.textContent="Eigentümerzugang bestätigt. Nur du kannst deine persönlich berechtigten Spieler verwalten.";
+  updateCandidates();
+  updateGrants(Array.isArray(info.granted_players)?info.granted_players:[]);
+ }catch{if(!panel.hidden)status.textContent="Administratorsitzung derzeit nicht erreichbar. Bitte erneut öffnen."}
+ finally{loading=false}
+}
+form.addEventListener("submit",async event=>{
+ event.preventDefault();
+ const id=String(player.value||"").trim();
+ if(!TOKEN.test(id)||!verify.checked){
+  status.textContent="DBV-ID prüfen und Berechtigung ausdrücklich bestätigen.";return;
+ }
+ const button=form.querySelector('button[type="submit"]');button.disabled=true;
+ try{
+  const ok=await rpc("private_owner_player_attest",{p_player_dbv_id:id,p_guardian_attestation:true});
+  if(ok!==true)throw Error("not entitled");
+  verify.checked=false;player.value="";
+  const state=await rpc("private_owner_status");
+  updateGrants(Array.isArray(state?.granted_players)?state.granted_players:[]);
+  status.textContent="Berechtigung bestätigt. Wähle in „Meine Spielerprofile“ beim entsprechenden Profil „Profil privat teilen“.";
+ }catch{status.textContent="Berechtigung nicht erstellt. Prüfe, ob die DBV-ID existiert und die Eigentümersitzung gültig ist."}
+ finally{button.disabled=false}
+});
+list.addEventListener("click",async e=>{
+ const button=e.target.closest("button[data-revoke]");if(!button)return;
+ const id=button.dataset.revoke;
+ if(!TOKEN.test(id)||!confirm("Berechtigung für DBV "+id+" widerrufen? Alle zugehörigen privaten Einladungen verlieren sofort ihre Gültigkeit."))return;
+ button.disabled=true;
+ try{
+  if(await rpc("private_owner_player_revoke",{p_player_dbv_id:id})!==true)throw Error("no grant");
+  const state=await rpc("private_owner_status");
+  updateGrants(Array.isArray(state?.granted_players)?state.granted_players:[]);
+  status.textContent="Berechtigung widerrufen; bestehende private Lesezugriffe sind damit gesperrt.";
+ }catch{button.disabled=false;status.textContent="Widerruf derzeit fehlgeschlagen."}
+});
+document.addEventListener("DOMContentLoaded",loadOwner);
+window.addEventListener("hashchange",()=>{if(location.hash==="#einstellungen")loadOwner()});
