@@ -41,7 +41,7 @@ test("private Spond appointments travel with the offline backup, restore needs c
   await setup(target,makeFamily(OTHER,"Altes Gerät"),[makeEvent(OTHER,"Bestehender Kalendereintrag","old-event")]);
   const from=await original.newPage(),to=await target.newPage();
   await from.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
-   await from.locator('a[data-settings-target="daten"]').click();
+   await expect(from.locator("#settings-room-daten")).toBeVisible();
   const save=from.waitForEvent("download");
   await from.locator("#backup-export").click();
   const download=await save;
@@ -55,7 +55,7 @@ test("private Spond appointments travel with the offline backup, restore needs c
   expect(archive.calendarEvents[0]).toMatchObject({name:"Spond Jugendturnier",playerId:PLAYER});
   expect(archive).not.toHaveProperty("access_token");
   await to.goto("/#einstellungen/daten",{waitUntil:"load"});
-   await to.locator('a[data-settings-target="daten"]').click();
+   await expect(to.locator("#settings-room-daten")).toBeVisible();
   await to.locator("#backup-file").setInputFiles({name:"test-backup.json",mimeType:"application/json",buffer:bytes});
   await expect(to.locator("#backup-feedback")).toContainText("Private Kalendertermine: 1");
   let prompt="";
@@ -91,7 +91,7 @@ test("legacy backups preserve the target's newer private calendar and invalid fi
    localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(retained));
  },{family,retained});
  await page.goto("/#einstellungen/daten",{waitUntil:"load"});
-  await page.locator('a[data-settings-target="daten"]').click();
+  await expect(page.locator("#settings-room-daten")).toBeVisible();
  const legacy={kind:"schmetterlinge-local-backup",schemaVersion:1,
   createdAt:"2026-10-10T12:00:00.000Z",data:makeFamily(PLAYER,"Importiertes Profil")};
  await page.locator("#backup-file").setInputFiles({name:"older-backup.json",mimeType:"application/json",
