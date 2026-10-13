@@ -5,19 +5,21 @@ const pattern=/^#activate=([a-f0-9]{64})$/;
 const match=pattern.exec(window.__ownerHash||"");
 delete window.__ownerHash;
 let token=match?.[1]||"";
+const input=document.getElementById("owner-token-input");
 const button=document.getElementById("owner-claim");
 const status=document.getElementById("owner-claim-status");
 if(!token){
- status.textContent="Ungültiger oder fehlender Aktivierungslink. Fordere einen neuen Administratorlink beim Eigentümer an.";
+ status.textContent="Füge den einmaligen Aktivierungscode auf diesem Gerät ein oder öffne den direkten Aktivierungslink.";
 }else{
  button.disabled=false;
  status.textContent="Aktivierungslink bereit. Nur auf deinem eigenen Gerät aktivieren.";
 }
+input.addEventListener("input",()=>{const v=input.value.trim().toLowerCase();token=/^[a-f0-9]{64}$/.test(v)?v:"";button.disabled=!token});
 let running=false;
 button.addEventListener("click",async()=>{
  if(running||!token)return;
  running=true;button.disabled=true;status.textContent="Eigentümerberechtigung wird geprüft …";
- const secret=token;token="";
+ const secret=token;token="";input.value="";
  try{
   const session=await getPrivateSession(true);
   if(!session?.access_token)throw Error("no session");
