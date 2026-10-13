@@ -128,9 +128,6 @@ function renderOtherKpis(){
  const trophies=summarizeTrophies(trophyState==="ready"?results:[]);
  const friendNoHistory=viewMode==="friend"&&results.length===0;
  const trophyUnknown=trophyState!=="ready"||friendNoHistory;
- const trophyNote=trophyState!=="ready"?trophyAccessMessage(trophyState):
-  friendNoHistory?"Für diesen gefolgten Spieler sind noch keine berechtigt abgerufenen Platzierungen verfügbar; der Strich ist keine Null.":
-  "Nur einzeln belegte Turnierplatzierungen."+countContext+" Weitere Ergebnisse findest du unter Historie.";
  const years=new Set(results.map(r=>r.date+"|"+r.event));
  const rankCounts=Object.entries(ranking?.players?.[selection]?.disciplines||{})
   .filter(([,entry])=>Number.isSafeInteger(entry?.tournaments)&&entry.tournaments>=0);
@@ -141,6 +138,9 @@ function renderOtherKpis(){
     " gewertete Turniere im "+(rankNames[rankCounts[0][0]]||rankCounts[0][0])+
     "; hiervon sind "+num(years.size)+" mit Einzelplatzierungen belegt."
   :"";
+ const trophyNote=trophyState!=="ready"?trophyAccessMessage(trophyState):
+  friendNoHistory?"Für diesen gefolgten Spieler sind noch keine berechtigt abgerufenen Platzierungen verfügbar; der Strich ist keine Null.":
+  "Nur einzeln belegte Turnierplatzierungen."+countContext+" Weitere Ergebnisse findest du unter Historie.";
  const medals=trophies.counts;
  const trophySlots=[
   {place:1,label:"1. Platz",symbol:"🏆",style:"gold"},
