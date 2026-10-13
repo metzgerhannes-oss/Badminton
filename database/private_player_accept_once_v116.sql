@@ -7,7 +7,7 @@
 -- No client SELECT on personal tables, no new required account for public browsing.
 begin;
 alter table private_content.player_access_invites
-  add column if not exists accepted_by uuid references auth.users(id) on delete set null,
+  add column if not exists accepted_by uuid references auth.users(id) on delete cascade,
   add column if not exists accepted_at timestamptz;
 alter table private_content.player_access_invites
   drop constraint if exists player_access_accept_pair;
