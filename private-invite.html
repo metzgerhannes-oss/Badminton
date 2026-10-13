@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="referrer" content="no-referrer">
+ <meta name="robots" content="noindex,nofollow,noarchive">
+ <title>Privater Turnierlink · Schmetterlinge</title>
+ <style>
+ :root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light}
+ *{box-sizing:border-box}
+ body{margin:0;min-height:100vh;background:#f0f5fa;color:#18384f;padding:20px}
+ main{max-width:560px;margin:35px auto;background:white;border:1px solid #d0e2ee;border-radius:18px;padding:24px}
+ h1{margin:0 0 10px;font-size:24px}h2{font-size:19px}
+ p{line-height:1.6}.muted{color:#566f80;font-size:13px}
+ a{color:#12658a;overflow-wrap:anywhere}select,button{min-height:44px;font:inherit}
+ select{width:100%;padding:8px;border-radius:9px;border:1px solid #a5c1d3}
+ button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;background:#176992;color:white;font-weight:700}
+ button:disabled{opacity:.5;cursor:not-allowed}
+ .controls{display:grid;gap:9px;margin:16px 0}
+ #invite-data[hidden],#invite-save[hidden]{display:none}
+ </style>
+</head>
+<body>
+<main>
+ <h1>Privater Turnierlink</h1>
+ <p class="muted">Schmetterlinge · Dieser Link zeigt nur einen ausgewählten Turniertermin. Er bestätigt keine Anmeldung oder Teilnahme einer Person.</p>
+ <p id="invite-status" role="status" aria-live="polite">Einladung wird geprüft …</p>
+ <section id="invite-data" hidden>
+  <h2 id="invite-title"></h2>
+  <p id="invite-dates"></p>
+  <p id="invite-expiry" class="muted"></p>
+  <a id="invite-source" target="_blank" rel="noreferrer noopener">Offizielle DBV-Quelle öffnen ↗</a>
+  <div id="invite-save" class="controls" hidden>
+   <label for="invite-own-player">In eigener Turnierliste vormerken</label>
+   <select id="invite-own-player"></select>
+   <button id="invite-accept" type="button">Auf diesem Gerät speichern</button>
+  </div>
+  <p class="muted">Jeder mit dem Link kann diese Informationen lesen und weitergeben. Der Ersteller kann den Link widerrufen.</p>
+ </section>
+ <p><a href="./index.html#turniere" rel="noreferrer">Schmetterlinge öffnen</a></p>
+</main>
+<script type="module" src="./private-invite-reader.js"></script>
+</body>
+</html>
