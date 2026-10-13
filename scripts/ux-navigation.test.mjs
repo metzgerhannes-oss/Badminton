@@ -38,7 +38,7 @@ test("follow-first Spieler and Mannschaft tabs; profile and follow management in
  }
  assert.match(html,/id="player-discover"[^>]*hidden/);
  assert.match(html,/id="team-discover"[^>]*hidden/);
- assert.match(html,/id="dashboard-friends-manage"[^>]*href="#spieler" hidden/);
+ assert.match(html,/id="dashboard-friends-manage"[^>]*href="#einstellungen\\/spieler" hidden/);
  assert.doesNotMatch(html,/id="dashboard-add-friend"/);
 });
 
