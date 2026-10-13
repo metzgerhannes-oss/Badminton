@@ -30,10 +30,21 @@ function requestHeaders(session){return {apikey:PUBLIC_KEY,"Content-Type":"appli
 async function rpc(path,args,session){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
  try{
-  const response=await fetch(SUPABASE_ROOT+"rpc/"+path,{method:"POST",cache:"no-store",signal:controller.signal,
-   headers:requestHeaders(session),body:JSON.stringify(args)});
-  if(!response.ok)throw Error("not allowed");
-  return response.json();
+  let response;
+  try{
+   response=await fetch(SUPABASE_ROOT+"rpc/"+path,{method:"POST",cache:"no-store",signal:controller.signal,
+    headers:requestHeaders(session),body:JSON.stringify(args)});
+  }catch{
+   throw Object.assign(new Error("network unavailable"),{retryable:true});
+  }
+  if(!response.ok){
+   const error=new Error("request rejected");
+   error.status=response.status;
+   error.retryable=response.status===408||response.status===429||response.status>=500;
+   throw error;
+  }
+  try{return await response.json()}
+  catch{throw Object.assign(new Error("invalid response"),{retryable:true})}
  }finally{clearTimeout(timer)}
 }
 function show(data){
@@ -72,10 +83,17 @@ async function reload(){
   const session=await getPrivateSession(false);
   if(!session)throw Error("missing device session");
   const data=await rpc("private_player_access_read",{p_invitation_id:activeId},session);
-  if(!show(data))throw Error("not authorized");
- }catch{
-  saveIds(storedIds().filter(id=>id!==activeId));activeId="";syncSelector();
-  hide("Kein Zugriff: widerrufen oder auf diesem Gerät keine gültige Sitzung vorhanden. Bitte einen neuen Einladungslink anfordern.");
+  if(data===null)throw Object.assign(new Error("revoked"),{revoked:true});
+  if(!show(data))throw Error("invalid read response");
+ }catch(error){
+  if(error?.revoked){
+   saveIds(storedIds().filter(id=>id!==activeId));activeId="";syncSelector();
+   hide("Kein Zugriff: Die Berechtigung wurde serverseitig widerrufen. Bitte einen neuen Einladungslink anfordern.");
+  }else{
+   // A temporary network/authentication failure is not proof of revocation.
+   // Keep the saved ID so a later retry cannot erase the device-bound grant.
+   hide("Privater Zugriff momentan nicht prüfbar. Verbindung prüfen und Seite erneut öffnen. Deine gespeicherte Freigabe bleibt auf diesem Gerät erhalten.");
+  }
  }finally{busy=false}
 }
 const acceptBtn=$("player-invite-accept");
@@ -87,13 +105,20 @@ acceptBtn.addEventListener("click",async()=>{
   const session=await getPrivateSession(true);
   const id=await rpc("private_player_invite_accept",{p_token:pendingToken},session);
   pendingToken="";
-  if(!UUID.test(id||""))throw Error("expired/redeemed/revoked");
-  activeId=id;
+  if(!UUID.test(id||""))throw Object.assign(new Error("expired/redeemed/revoked"),{invalid:true});
+  activeId=id;pendingToken="";
   saveIds([...storedIds(),id]);syncSelector();
   acceptBtn.hidden=true;status.textContent="Angenommen. Der Zugriff bleibt bis zum Widerruf auf diesem Gerät erhalten.";
- }catch{
-  pendingToken="";acceptBtn.hidden=true;
-  hide("Einladung nicht mehr annehmbar: abgelaufen, bereits verwendet oder widerrufen.");
+ }catch(error){
+  if(error?.invalid||[400,403,404,409,410,422].includes(error?.status)){
+   pendingToken="";acceptBtn.hidden=true;
+   hide("Einladung nicht mehr annehmbar: abgelaufen, bereits verwendet oder widerrufen.");
+  }else{
+   // The server may have accepted while the connection failed. Keep the token
+   // in memory for a retry, but never claim that it was not consumed.
+   acceptBtn.hidden=false;
+   hide("Annahme konnte nicht bestätigt werden. Verbindung prüfen und erneut versuchen. Falls der Link inzwischen verwendet wurde, bitte eine neue Einladung anfordern.");
+  }
  }finally{busy=false;acceptBtn.disabled=false}
  if(activeId)await reload();
 });
