@@ -18,12 +18,12 @@ Die DBV-Spieler-ID weist nur auf eine öffentliche Sportidentität hin. Sie bewe
 - Öffentliche Lesefunktionen ohne Login und lokale Profile, Freunde, Favoriten ohne Cloud-Pflicht.
 - Bisherige Veröffentlichung mit ausdrücklichem Häkchen und v90-Grant bleibt unverändert abgesichert.
 - **v105 nur Nutzertext:** Das Häkchen wird ausdrücklich als **öffentliche** Meldung bezeichnet; ohne Häkchen bleibt das eigene Turnier lokal. Das Frontend fordert keine manuelle Account-Anlage an.
-- Die Auth-Sitzung wird nicht auf dem Willkommensbildschirm oder beim App-Start erzeugt. Der öffentliche Veröffentlichungsversuch löst sie ggf. erst durch `getSession(true)` aus.
-- V105 stellt **noch keinen** privaten Einladungslink und keine freiwillige persistente Kontosicherung bereit; entsprechende Buttons oder Zusagen dürfen nicht erscheinen.
+- Für öffentliches Lesen und lokale Favoriten entsteht keine Auth-Sitzung. Seit v107 erzeugt auch ein gesperrter öffentlicher Veröffentlichungsversuch **kein** anonymes Konto. Nur die ausdrücklich angeforderte private Linkerstellung kann eine anonyme Sitzung erzeugen.
+- v109 ergänzt die **ausdrücklich ausgelöste private Einzelturnier-Einladung** (sieben Tage, Widerruf, Empfänger ohne Konto). Eine freiwillige dauerhafte Kontosicherung oder Mehrgeräte-Synchronisierung bleibt #140 und darf nicht als fertig bezeichnet werden.
 
 ## Reihenfolge der noch offenen Umsetzung
 
-1. **#139 (P1)** Privater Einladungstoken: einzelne Turnierdaten, read-only ohne Empfängerkonto, serverseitig beschränkte TTL, Widerruf und Missbrauchsschutz. Ein Link kann weitergegeben und Inhalt kopiert werden; keine falsche Vertraulichkeitsgarantie. Keine DBV-Teilnahmebehauptung.
+1. **#139 (P1): v109 technisch implementiert, echte Geräteabnahme noch offen.** Privater Einzelturnier-Link ohne Empfängerkonto, 256-Bit-Token als Fragment, serverseitiger Hash, sieben Tage, Widerruf und Quoten 12 pro Tag / 8 aktiv je technischer Identität. Keine DBV-Teilnahmebehauptung. Der Empfänger kann den Link weitergeben oder Inhalte kopieren.
 2. **#140 (P2)** Freiwilliges dauerhaftes Konto (z.B. verifizierte E-Mail), sichere Übernahme vorhandener lokaler Daten, Zwei-Geräte-Synchronisation und Konfliktauflösung. Ohne optionales Konto bleibt lokale Nutzung vollständig erhalten. SMTP-/Free-Tarif-Kontingente vor Aktivierung bewerten.
 3. **#101 (P0)** Nur wer öffentlich für einen konkreten Spieler handeln darf, erhält nach unabhängiger Prüfung einen v90-Grant; kein automatischer Grant aus DBV-ID, Einladung oder technischem Account. Reale A/B-Geräteprüfung vor Pilot.
 4. **#53, #56 (P1)** Datenschutzinformationen, Nutzungsgrundlagen, Aufbewahrung für Einladungen/anonyme Auth-Benutzer, Korrektur/Löschung und Schutz von Minderjährigen.
@@ -44,4 +44,12 @@ Die DBV-Spieler-ID weist nur auf eine öffentliche Sportidentität hin. Sie bewe
 - Bestehende v90-RLS und Triggerprojektion unangetastet.
 - Für die späteren privaten Links gesonderter positiver/negativer Endgerätetest und Quoten-/Revocation-Prüfung.
 
-Das ist eine schrittweise Produktentscheidung. Die v105-Textkorrektur ist keine Behauptung, dass #139 oder #140 bereits verfügbar sind.
+Das Zugriffsmodell wird stufenweise umgesetzt; v109 private Einladungen sind von optionalen dauerhaften Konten (#140) strikt getrennt. Die DSGVO- und Geräteabnahmen bleiben offen.
+
+## v109 · Betreiberabnahme, keine automatische Kontopflicht
+
+Die Migrationen `private_tournament_invites_v108` und `private_tournament_invites_rpc_hardening_v108` sind bereits produktiv im korrekten Badminton-Supabase-Projekt `yadexibmjmnjfmfabrug`. Die v109-Oberfläche nutzt diese bestehenden, eigentümergebundenen RPCs; sie ändert keine RLS-Regel. Lesen funktioniert ohne Login. Der Ersteller fordert erst beim bewussten Tippen auf „Link erstellen“ ein anonymes Konto an. Bei deaktivierter Anonymous-Auth bleibt der lokal gespeicherte Termin unverändert und der Link kann nicht erstellt werden.
+
+Im Einladungssatz stehen lediglich Turniername, Beginn, Ende und offizielle DBV-Quelle. Der Link überträgt keine Spieler-ID, Familienliste, Geburtsdaten, Spond-Privattermine oder angebliche Turnierteilnahme. Das 256-Bit-Token wird nur im URL-Fragment weitergegeben und vor einem Netzabruf aus der Browseradresszeile entfernt. Die Empfängerseite erstellt kein Auth-Konto und gibt bei ungültigen, abgelaufenen oder widerrufenen Tokens dieselbe Rückmeldung. Der Ersteller kann ihn widerrufen, solange die ursprüngliche anonyme Sitzung verfügbar ist. Bei Geräteverlust gilt die serverseitige Ablaufgrenze von maximal sieben Tagen.
+
+**Offen vor endgültiger Betreiberfreigabe:** Produktive Endgerätabnahme der Anonymous-Auth-Aktivierung, tatsächliche Fristen für Einladungsmetadaten und anonyme Auth-Konten, Missbrauchsmuster bei wiederholten neuen anonymen Accounts, Datenschutz-/Quellenrechte (#53/#56) und Wiederherstellung auf zwei realen Geräten. Der Besitz eines Einladungstokens berechtigt nicht zu öffentlichen Einträgen im Namen eines Kindes.
