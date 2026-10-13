@@ -94,10 +94,10 @@
         if ((!response || !response.ok) && "caches" in window) response = await caches.match(url);
         if (!response || !response.ok) continue;
         const json = await response.json();
-        if (json.meta?.locale !== lang || !json.messages || typeof json.messages !== "object") continue;
+        if (json.meta?.locale !== lang || json.meta?.version !== 2 || !json.messages || typeof json.messages !== "object") continue;
         loaded.set(lang, json);
         // Explicit cache of cross-origin Cloudflare JSON, also on Safari without an active SW.
-        if ("caches" in window) caches.open("schmetterlinge-i18n-v1")
+        if ("caches" in window) caches.open("schmetterlinge-i18n-v2")
           .then(cache => cache.put(url, new Response(JSON.stringify(json),
             {headers:{"Content-Type":"application/json"}}))).catch(() => {});
         return json;

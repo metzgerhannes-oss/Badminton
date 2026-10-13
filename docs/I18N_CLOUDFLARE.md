@@ -2,9 +2,7 @@
 
 ## Scope
 Eleven language packs: de, en, fr, uk, ru, zh-Hans, tr, ar, it, es, pl.
-Each contains 87 translated common navigation and UI labels. This **does not
-yet translate every long UI sentence** or independently validate native
-language quality. Untranslated text falls back to German.
+The v2 baseline contains at least 342 shared translation keys per language, preserving the existing v117 translations and incorporating the expansion from PR #92. Five languages already have up to 387 keys. This remains **partial coverage**: new privacy, calendar, team, onboarding, owner and dynamic strings still need translations, with no mandatory external translation service. Untranslated text falls back to German.
 
 ## Free architecture
 
@@ -43,3 +41,7 @@ on 11 October 2026, with 12 static files uploaded (11 JSON catalogs and
 - Mobile and Arabic-RTL visual check before calling it fully accepted.
 - Expand translation coverage of legacy dynamic sentences incrementally.
 - Keep source attribution, result evidence and sport-data semantics intact.
+
+## Integration status
+
+This is a draft integration of the 11 catalogs only, not the release-complete translation. At least 147 current static UI strings were missing from the older PR #92 reference (including privacy, team, DBV calendar and owner activation); the language-key catalogs are not proof of full application coverage. Before resolving #176 all new static/dynamic strings must be reviewed, translated into all 11 languages, RTL tested and sensitive legal text editorially validated. The v2 runtime rejects outdated external v1 catalogs.
