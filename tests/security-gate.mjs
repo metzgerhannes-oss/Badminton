@@ -37,4 +37,19 @@ assert.match(audit,/has_column_privilege\('anon','public\.player_history_imports
 assert.doesNotMatch(audit,/\b(create|alter|delete|insert|update|drop|truncate|revoke|grant)\s+(table|function|schema|on|from|to)\b/i,
  "The release-audit file must remain read-only SQL");
 assert.match(workflow,/node tests\/security-gate\.mjs/);
+
+const opsSql=await readFile("database/operational-health-readonly.sql","utf8");
+// Explicitly opt-in, read-only health checks: never add a hidden write or personal-identifier export.
+const opsStatements=opsSql.split("\n").map(line=>line.replace(/--.*$/,"")).join("\n")
+ .split(";").map(statement=>statement.trim()).filter(Boolean);
+assert.equal(opsStatements.length,7,"Operational runbook must contain the seven reviewed checks");
+for(const statement of opsStatements){
+ assert.match(statement,/^select\b/i,"Every health check must begin with SELECT");
+ const sqlWithoutStringLiterals=statement.replace(/\x27(?:\x27\x27|[^\x27])*\x27/g,"\x27\x27");
+ assert.doesNotMatch(sqlWithoutStringLiterals,/\b(insert|update|delete|alter|drop|truncate|grant|revoke|create|copy)\b/i,
+  "Operational checks must never modify production data or privileges");
+}
+assert.doesNotMatch(opsStatements.join("\n"),/\b(dbv_id|token_digest|owner_user_id|source_url|payload|client_ip)\b/i,
+ "Operational health reports must not select personal identifiers, secrets or source payloads");
+
 console.log("Security contract gate: SQL privileges, invoker RPC and read-only production audit statements intact.");
