@@ -68,7 +68,7 @@ assert.match(acceptSql,/revoke all on function public\.private_player_invite_rea
 assert.doesNotMatch(acceptSql,/grant select on public\.(players|player_external_match_facts)/i);
 assert.match(creator,/selectedInviteId/);
 assert.match(creator,/records\(\)\.filter\(r=>r\.id!==rec\.id\)/);
-assert.match(creator,/Link sieben Tage zur Annahme/);
+assert.match(creator,/innerhalb von sieben Tagen einmal angenommen/);
 
 assert.match(creator,/getPrivateSession\(true\)/);
 assert.match(creator,/getPrivateSession\(false\)/);
