@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Equipos disponibles",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Introduce arriba el nombre del club para buscar en el directorio oficial BWBV.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "No se encontró ningún club con ese nombre en el directorio BWBV.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Introduce un equipo o club. Los equipos que sigues se muestran arriba."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Introduce un equipo o club. Los equipos que sigues se muestran arriba.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Las invitaciones de jugadores aceptadas se añaden automáticamente. Puedes elegir otros jugadores guardados en este dispositivo o añadirlos por nombre e ID DBV.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Añadir otro jugador por nombre o ID DBV",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "La búsqueda pública por nombre en DBV está desactivada por motivos de privacidad. Las invitaciones aceptadas se añaden automáticamente. Puedes añadir otros perfiles propios abajo con nombre e ID DBV.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "La búsqueda por nombre en DBV no está disponible. Utiliza la configuración manual con nombre e ID DBV.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "No se encontró ningún jugador coincidente en este dispositivo. Puedes añadir otros perfiles manualmente con el ID DBV.",
+    " · Auf diesem Gerät gespeichert": " · Guardado en este dispositivo"
   }
 }
