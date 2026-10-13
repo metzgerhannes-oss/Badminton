@@ -31,3 +31,17 @@ Nach erfolgreicher Freigabe wird ein kryptografisch zufälliger Link `private-pl
 5. DSGVO-Betreiberkontakt, Rechtsgrundlagen/Quellenrechte und Löschfristen (#53/#56) bleiben gesondert offen. Alte öffentliche Git-Historie/Cache-Kopien werden durch diesen neuen Link nicht gelöscht.
 
 **Keine Behauptung eines funktionierenden ersten Privatteilens ohne bestätigten Verwalter.** Der Server verweigert korrekt alle unautorisierten Erstellungsversuche.
+
+## v116 – Einladungsannahme einmalig, Zugriff bis zum Widerruf
+
+**Neue verbindliche Semantik:** Die sieben Tage ab Erstellung sind ausschließlich eine **Annahmefrist**. Nach einer einmaligen Annahme bleibt der Zugang für diese technische Supabase-Auth-Identität erhalten, auch nach Ablauf der Annahmefrist. Ein zweites Gerät kann denselben Link nach der Annahme nicht mehr einlösen; dazu muss eine separate Einladung ausgestellt werden.
+
+- Der Empfänger drückt ausdrücklich **Einladung annehmen**. Erst dann wird bei Bedarf eine technisch anonyme Supabase-Auth-Sitzung ohne E-Mail/Passwort erstellt. **Ohne diesen Klick kein Konto, keine personenbezogenen Daten**.
+- Die 256-Bit-Linkkennung wird nur zum **einmaligen serverseitigen Annehmen** genutzt. Die Datenbank bindet `accepted_by=auth.uid()` atomar an die konkrete Einladungs-ID; weitere Annahmeversuche, auch vor Ablauf, scheitern.
+- Danach liest nur die akzeptierte Sitzung mit der **nicht-geheimen Einladung-ID** über `private_player_access_read(uuid)`. Der Server überprüft bei **jedem** Abruf die Auth-UID, den Widerruf der Einladung und die weiterhin bestehende überprüfte Verwaltungsberechtigung des Erstellers. **Keine** `expires_at`-Prüfung nach der Annahme. Ohne authentifizierte Sitzung kein Zugriff, auch nicht mit der ID allein.
+- Der Ersteller kann **jede alte angenommene Einladung auch nach Ablauf ihrer siebentägigen Annahmefrist** widerrufen. Mehrere Einladungen bleiben im lokalen Verwaltungsverzeichnis erhalten. Auf dem Empfängergerät können mehrere angenommene Zugänge gespeichert/ausgewählt werden, ohne Token zu speichern.
+- Der alte reine Token-Lese-RPC `private_player_invite_read(text)` wird serverseitig gesperrt; davor vorhandene PWA-Versionen können keine personenbezogenen Daten mehr ohne Annahme abrufen.
+- Widerruf gilt für den **nächsten Serverabruf**; bereits gesehene oder extern kopierte Daten können nicht gelöscht werden. Auf Seitenrückkehr wird neu geprüft. Kein kostenpflichtiger Dienst oder Pflichtregistrierung zur allgemeinen Appnutzung.
+- Wird die anonyme Auth-Sitzung durch Geräteverlust, Löschung von Website-Daten oder Abmeldung gelöscht, lässt sich der Zugriff **nicht durch bloße Kenntnis der alten Einladung** wiederherstellen. Es wird eine neue Einladung oder ein späteres optionales Wiederherstellungsverfahren benötigt.
+
+Die v116-SQL-Migration ist separat unter `database/private_player_accept_once_v116.sql` dokumentiert und ändert keine Freigabe der Personen-Tabellen für Browserrollen. V115 war zunächst eine siebentägige Bearer-Lesefreigabe; nach v116 ist dies **nicht mehr** das Zugriffsschema. Echte iPhone-A/B- und Erstverwalter-Abnahme bleiben offen (#173).
