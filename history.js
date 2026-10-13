@@ -20,7 +20,8 @@ import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-so
  const root=$("history-trends");if(!root)return;
  const groups=new Map();
  for(const r of chosen.filter(x=>x.discipline==="Einzel")){
-   const group=r.playerName+"|"+r.ageGroup;
+   const playerLabel=r.playerName||lastProfiles.find(p=>p.id===r.playerId)?.name||"Spieler";
+   const group=playerLabel+"|"+r.ageGroup;
    if(!groups.has(group))groups.set(group,[]);
    groups.get(group).push(r);
  }
@@ -127,13 +128,7 @@ function render(){
   const playerRecords=state.results.filter(r=>r.playerId===lastPlayer);
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
   renderTrophies(playerRecords);
-  const friendWithoutHistory=viewMode==="friend"&&playerRecords.length===0;
   if(trophySection)trophySection.hidden=false;
-  if(false&&friendWithoutHistory){
-   summary.innerHTML="";$("history-trends").innerHTML="";$("history-pending").innerHTML="";
-   timeline.innerHTML='<div class="empty"><h3>Historische Daten noch nicht verfügbar</h3><p>Für diesen Spieler sind in der App derzeit noch keine einzeln belegten Turnierplatzierungen hinterlegt. Soweit verfügbar, findest du externe historische Jahresübersichten oben mit eigenen Quellennachweisen.</p></div>';
-   return;
-  }
   const years=[...new Set(playerRecords.map(r=>r.date.slice(0,4)))].sort((a,b)=>b.localeCompare(a));
   const old=year;
   yearSelect.innerHTML='<option value="all">Alle Jahre</option>'+years.map(v=>'<option value="'+escape(v)+'">'+escape(v)+'</option>').join("");
