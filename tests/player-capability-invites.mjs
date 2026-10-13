@@ -41,7 +41,7 @@ assert.match(view,/noindex,nofollow,noarchive/);
 assert.match(view,/no-referrer/);
 assert.match(view,/id="player-invite-accept"/);
 assert.match(view,/id="player-invite-accepted"/);
-assert.match(acceptSql,/accepted_by uuid references auth\.users\(id\)/i);
+assert.match(acceptSql,/accepted_by uuid references auth\.users\(id\) on delete cascade/i);
 assert.match(acceptSql,/or accepted_at is not null\)\)>=20/i,"Persistent owner quota must include accepted shares");
 assert.match(acceptSql,/and i\.accepted_by is null/);
 assert.match(acceptSql,/and i\.expires_at>now\(\)/);
