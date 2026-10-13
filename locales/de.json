@@ -113,6 +113,12 @@
     "· Mannschaften verfügbar": "· Mannschaften verfügbar",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Weiteren Spieler mit Name oder DBV-ID hinzufügen",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.",
+    " · Auf diesem Gerät gespeichert": " · Auf diesem Gerät gespeichert"
   }
 }
