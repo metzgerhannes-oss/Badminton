@@ -7,13 +7,13 @@ const token=tokenFromFragment(location.hash);
 history.replaceState(null,"",location.pathname+location.search);
 const fmt=d=>new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"long",year:"numeric",timeZone:"UTC"}).format(new Date(d+"T12:00:00Z"));
 function fail(){ $("invite-status").textContent="Der Einladungslink ist ungültig, abgelaufen oder wurde widerrufen."; }
-async function load(){
- if(!token){fail();return}
+async function load(currentToken){
+ if(!currentToken){fail();return}
  try{
   const r=await fetch(SUPABASE_ROOT+"rpc/private_tournament_invite_read",{
    method:"POST",cache:"no-store",
    headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
-   body:JSON.stringify({p_token:token})
+   body:JSON.stringify({p_token:currentToken})
   });
   if(!r.ok)throw Error("read");
   const data=await r.json();
@@ -62,4 +62,13 @@ function setupLocalSave(event){
   }catch{$("invite-status").textContent="Vormerken nicht möglich. Die Einladung bleibt lesbar."}
  });
 }
-load();
+// Same-tab fragment navigation does not reload a static page. Recheck the server
+// so a revoked link cannot be treated as still valid merely because of history.
+window.addEventListener("hashchange",()=>{
+ const next=tokenFromFragment(location.hash);
+ history.replaceState(null,"",location.pathname+location.search);
+ $("invite-data").hidden=true;
+ $("invite-status").textContent="Einladung wird geprüft …";
+ load(next);
+});
+load(token);
