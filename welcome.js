@@ -106,7 +106,7 @@ function setResultsStatus(count,source){
  lastSearchStatus={kind:"results",count,source};
  $("welcome-search-status").textContent=format("{count} passende Spieler",{count})+
   (count===30?t(" (maximal 30; Suche eingrenzen)"):"")+
-  (source==="backup"?t(" · GitHub-Ausfallsicherung"):"")+t(". Wähle den richtigen Spieler aus.");
+  (source==="backup"?t(" · GitHub-Ausfallsicherung"):source==="device"?t(" · Auf diesem Gerät gespeichert"):"")+t(". Wähle den richtigen Spieler aus.");
 }
 function showSearchResults(players,source){
  lastSearchPlayers=players;
@@ -142,8 +142,13 @@ function showSearchResults(players,source){
   });
   root.append(button);
  }
- if(!players.length)setSearchStatus("Kein passender DBV-Spieler gefunden. Versuche einen anderen Namen oder richte das Profil manuell ein.");
- else setResultsStatus(players.length,source);
+ if(!players.length){
+  if(source==="restricted")
+   setSearchStatus("Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.");
+  else if(source==="unavailable")
+   setSearchStatus("Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.");
+  else setSearchStatus("Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.");
+ }else setResultsStatus(players.length,source);
 }
 async function searchPlayers(value){
  const current=++searchTicket;
@@ -160,7 +165,10 @@ async function searchPlayers(value){
  clearError();
  setSearchStatus("Spieler werden im öffentlichen DBV-Verzeichnis gesucht …");
  try{
-  const {players,source}=await searchInvitationPlayers(term,{signal:searchController.signal});
+  const saved=readSaved();
+  const known=[...(Array.isArray(saved?.players)?saved.players:[]),
+   ...(Array.isArray(saved?.friends)?saved.friends:[])];
+  const {players,source}=await searchInvitationPlayers(term,{signal:searchController.signal,savedCandidates:known});
   if(current!==searchTicket)return;
   showSearchResults(players,source);
  }catch(error){
