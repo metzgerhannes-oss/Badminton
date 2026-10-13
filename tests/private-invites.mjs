@@ -39,5 +39,5 @@ assert.match(app,/data-private-invite-id/);
 assert.match(app,/badminton:private-invite/);
 assert.match(sw,/private-invite-reader\.js/);
 assert.match(root,/private-invites\.js/);
-assert.match(doc,/keinen\*\* privaten Einladungslink/); // Documentation must be updated when feature ships.
+assert.match(doc,/v109 ergänzt die \*\*ausdrücklich ausgelöste private Einzelturnier-Einladung/);
 console.log("Private invites: browser token entropy, privacy, read-only recipient and opt-in controls checked.");
