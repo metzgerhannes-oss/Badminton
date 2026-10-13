@@ -5,6 +5,12 @@ import {readFile} from "node:fs/promises";
 const source=await readFile("sw.js","utf8");
 assert.match(source,/const CACHE="schmetterlinge-shell-v123"/);
 assert.doesNotMatch(source,/catch\(\)=>caches\.match\(e\.request\)/);
+const privateHtml=await readFile("private-player.html","utf8");
+assert.match(privateHtml,/navigator\.serviceWorker\.getRegistration\("\.\/"\)/,
+ "Existing Safari clients should request worker update on private invite load");
+assert.doesNotMatch(privateHtml,/navigator\.serviceWorker\.register\(/,
+ "First-time invite recipients should not need to install a worker");
+
 
 const scope="https://example.test/Badminton/";
 const makeReq=(path,mode="navigate",method="GET")=>({
