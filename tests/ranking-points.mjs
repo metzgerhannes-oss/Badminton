@@ -19,7 +19,10 @@ const ctx=vm.createContext({
 });
 vm.runInContext(section,ctx,{filename:"dashboard-five-scores.js"});
 const format=entry=>vm.runInContext("renderFiveScores("+JSON.stringify(entry)+")",ctx);
-const snapshot=dataset.players["05-070879"].disciplines;
+assert.equal(dataset.privacyMode,"private");
+assert.deepEqual(dataset.players,{},"Private ranking snapshots must not be released publicly");
+const snapshot=Object.fromEntries([["HE",2670],["HD",1322],["HM",1469]]
+ .map(([key,points])=>[key,{points,countedLimit:5,topFive:[],topFiveStatus:"not-in-public-export"}]));
 for(const [key,total] of [["HE",2670],["HD",1322],["HM",1469]]){
  const row=snapshot[key];
  assert.equal(row.points,total,"Official aggregate points "+key);

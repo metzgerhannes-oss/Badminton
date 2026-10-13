@@ -1,44 +1,31 @@
-import {readFile} from "node:fs/promises";
 import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
 import {summarizeTrophies,TROPHY_PLACES} from "../scripts/trophy-stats.mjs";
-const {results}=JSON.parse(await readFile("data/history.json","utf8"));
-const philipp=results.filter(r=>r.playerId==="05-070879");
-const charlotte=results.filter(r=>r.playerName==="Charlotte Metzger");
-const p=summarizeTrophies(philipp);
+const archive=JSON.parse(await readFile("data/history.json","utf8"));
+assert.equal(archive.privacyMode,"private");
+assert.deepEqual(archive.results,[],"No named historical records shipped in public GitHub");
 assert.deepEqual(TROPHY_PLACES,[1,2,3,4]);
-assert.deepEqual(p.counts,{1:2,2:2,3:3,4:2});
-assert.equal(p.total,9);
-assert.equal(p.results.filter(r=>r.event.includes("Bezirksmeisterschaft")&&r.discipline==="Einzel"&&r.place===1).length,1);
-assert.equal(p.results.filter(r=>r.confirmation==="family-confirmed").length,1);
-assert.equal(p.results.filter(r=>r.event.includes("35. Bezirksmeisterschaft")).length,3);
-assert.ok(p.results.some(r=>r.id.includes("gaertringen")));
-const c=summarizeTrophies(charlotte);
-assert.deepEqual(c.counts,{1:0,2:0,3:0,4:0});
-assert.equal(c.total,0,"Charlotte's documented 5th place must remain in history, not the trophy cabinet");
-const family=summarizeTrophies(results.filter(r=>
- ["05-070879","05-071969"].includes(r.playerId)));
-assert.equal(family.total,9);
-const followedSarah=summarizeTrophies(results.filter(r=>r.playerId==="05-061350"));
-assert.deepEqual(followedSarah.counts,{1:6,2:2,3:2,4:1});
-const followedVinzent=summarizeTrophies(results.filter(r=>r.playerId==="05-070006"));
-assert.deepEqual(followedVinzent.counts,{1:0,2:1,3:3,4:0}, "Two new sourced U15 third places");
-assert.equal(summarizeTrophies(results).total,24,
- "Entire sourced dataset includes the extra friend's podium, not just family results");
-assert.equal(family.results.filter(r=>r.place===4).length,2);
-assert.deepEqual(summarizeTrophies(philipp.filter(r=>r.date.startsWith("2025"))).counts,{1:0,2:0,3:1,4:1});
-assert.deepEqual(summarizeTrophies([...philipp,philipp[0]]).counts,p.counts,"Duplicate sources must not add extra trophies");
-assert.deepEqual(summarizeTrophies([...philipp,{id:"made-up",place:1,verified:false}]).counts,p.counts,"Unverified results must not grant trophies");
+const synthetic=[
+ {id:"test-a",playerId:"99-000001",place:1,verified:true,date:"2026-04-10",event:"Turnier A"},
+ {id:"test-b",playerId:"99-000001",place:3,verified:true,date:"2026-06-10",event:"Turnier B"},
+ {id:"test-c",playerId:"99-000002",place:5,verified:true,date:"2026-06-10",event:"Turnier C"}
+];
+const own=summarizeTrophies(synthetic.filter(r=>r.playerId==="99-000001"));
+assert.deepEqual(own.counts,{1:1,2:0,3:1,4:0});
+assert.equal(own.total,2);
+assert.equal(summarizeTrophies(synthetic.filter(r=>r.playerId==="99-000002")).total,0);
+assert.equal(summarizeTrophies([...synthetic,synthetic[0]]).total,2);
+assert.equal(summarizeTrophies([...synthetic,{id:"test-unverified",place:1,verified:false}]).total,2);
 assert.deepEqual(summarizeTrophies(null).counts,{1:0,2:0,3:0,4:0});
 const html=await readFile("index.html","utf8");
+const ui=await readFile("history.js","utf8");
+const css=await readFile("styles.css","utf8");
+const sw=await readFile("sw.js","utf8");
 assert.ok(html.includes('id="trophy-shelf"')&&html.includes('id="trophy-awards"'));
 assert.ok(html.indexOf('id="trophy-shelf"')<html.indexOf('id="history-summary"'));
-
-assert.ok(html.includes('type="module" src="./history.js"'),"Browser must load ESM imports");
-const ui=await readFile("history.js","utf8");
+assert.ok(html.includes('type="module" src="./history.js"'));
 assert.ok(ui.includes("summarizeTrophies(chosen)")&&ui.includes("renderTrophies(playerRecords)"));
 assert.ok(ui.includes("trophyPlace")&&ui.includes("Turnierbericht ansehen"));
-const css=await readFile("styles.css","utf8");
 assert.ok(css.includes(".trophy-slot")&&css.includes(".trophy-award"));
-const sw=await readFile("sw.js","utf8");
 assert.ok(sw.includes("./scripts/trophy-stats.mjs"));
-console.log("Trophy cabinet passed: Philipp 2×1st, 2×2nd, 3×3rd, 2×4th; Charlotte 5th excluded.");
+console.log("Trophy cabinet verified against synthetic records; published archive remains private.");

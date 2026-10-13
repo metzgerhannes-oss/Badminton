@@ -1,12 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Manuell belegte, quellennah aggregierte externe Karriereübersichten – getrennt von offiziell einzeln nachgewiesenen Matchdaten.",
-  "profiles": [
-    {
-      "dbvId": "05-061350",
-      "path": "05-061350.json",
-      "source": "Badhub",
-      "updated": "2026-10-10"
-    }
-  ]
+  "privacyMode": "private",
+  "profiles": [],
+  "notice": "Personenbezogene Daten werden nicht mehr öffentlich aus dem Repository ausgeliefert; private Einladung vorausgesetzt."
 }
