@@ -136,6 +136,7 @@ jobs:
           node tests/match-availability.mjs
           node tests/design-v2.mjs
            node tests/app-shell.mjs
+          node tests/desktop-dashboard.mjs
           node tests/ui-components.mjs
           node tests/legacy-css-prune.mjs
           node tests/css-cascade-consolidation.mjs
