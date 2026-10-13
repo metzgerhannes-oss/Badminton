@@ -86,7 +86,7 @@ begin
   'matches',coalesce((
    select jsonb_agg(to_jsonb(m)) from (
     select f.match_date,f.discipline,f.competition,f.category,
-     f.player_side,f.winning_side,f.games,f.opponent_names,f.partner_names,
+     f.player_side,f.winning_side,f.games,
      f.source_name,f.source_url
     from public.player_external_match_facts f
     where f.dbv_id=p.dbv_id and f.match_date is not null
