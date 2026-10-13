@@ -200,6 +200,12 @@
     "· Mannschaften verfügbar": "· Takımlar mevcut",
     "Vereinsnamen oben eingeben, um das offizielle BWBV-Verzeichnis zu durchsuchen.": "Resmî BWBV kulüp rehberinde aramak için yukarıya kulüp adı yazın.",
     "Kein Verein mit diesem Namen im BWBV-Verzeichnis gefunden.": "Bu adla bir kulüp BWBV rehberinde bulunamadı.",
-    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Takım veya kulüp adı girin. Takip ettiğiniz takımlar yukarıda gösterilir."
+    "Mannschaft oder Verein eingeben. Deine gefolgten Mannschaften stehen bereits darüber.": "Takım veya kulüp adı girin. Takip ettiğiniz takımlar yukarıda gösterilir.",
+    "Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.": "Kabul edilen oyuncu davetleri otomatik olarak eklenir. Bu cihazdaki diğer oyuncuları seçebilir veya ad ve DBV kimliğiyle ekleyebilirsiniz.",
+    "Weiteren Spieler mit Name oder DBV-ID hinzufügen": "Ad veya DBV kimliğiyle başka oyuncu ekle",
+    "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Veri koruma nedeniyle genel DBV isim araması şu anda kapalıdır. Kabul edilen davetler otomatik eklenir. Aşağıdan ad ve DBV kimliğiyle başka kişisel profiller ekleyebilirsiniz.",
+    "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV isim araması şu anda kullanılamıyor. Ad ve DBV kimliğiyle manuel kurulum yapın.",
+    "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Bu cihazda eşleşen oyuncu bulunamadı. Diğer profilleri DBV kimliğiyle manuel ekleyebilirsiniz.",
+    " · Auf diesem Gerät gespeichert": " · Bu cihazda kayıtlı"
   }
 }
