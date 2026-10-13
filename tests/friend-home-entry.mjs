@@ -8,7 +8,7 @@ const [html,app,storage,bookmarks,css]=await Promise.all([
 const actions=html.match(/id="dashboard-friends-manage"/g)||[];
 assert.equal(actions.length,1,"Exactly one manage link in the Home friends header");
 assert.doesNotMatch(html,/id="dashboard-add-friend"/,"Duplicate Home action must be removed");
-assert.match(html,/id="dashboard-friends-manage"[^>]*href="#einstellungen\\/spieler" hidden/);
+assert.match(html,/id="dashboard-friends-manage"[^>]*href="#einstellungen\/spieler" hidden/);
 assert.match(css,/\.dashboard-friends-links a\[hidden\]\{display:none!important\}/);
 assert.doesNotMatch(app,/el\("dashboard-add-friend"\)/,"No event handler for removed element");
 const root={innerHTML:"",querySelectorAll(){return [];}},manage={hidden:true};
