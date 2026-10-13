@@ -144,7 +144,7 @@ function showSearchResults(players,source){
  }
  if(!players.length){
   if(source==="restricted"){
-   setSearchStatus("Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.");
+   setSearchStatus("Die öffentliche DBV-Namenssuche in Schmetterlinge ist noch nicht freigeschaltet. Angenommene Einladungen und lokal gespeicherte Spieler sind weiterhin verfügbar. Weitere Profile kannst du unten mit Name und DBV-ID ergänzen. Das DBV-Turnierportal ist unten verlinkt.");
    $("welcome-manual-panel").open=true;
   }
   else if(source==="unavailable")
@@ -165,7 +165,7 @@ async function searchPlayers(value){
   return;
  }
  clearError();
- setSearchStatus("Spieler werden im öffentlichen DBV-Verzeichnis gesucht …");
+ setSearchStatus("Gespeicherte Spieler werden gesucht; der Verzeichniszugriff wird geprüft …");
  try{
   const saved=readSaved();
   const known=[...(Array.isArray(saved?.players)?saved.players:[]),
