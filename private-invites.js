@@ -39,7 +39,7 @@ async function asJson(response){
  return data;
 }
 function sessionHeaders(token){return {apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"}}
-async function getPrivateSession(create=false){
+export async function getPrivateSession(create=false){
  let current=read(SESSION_STORE,null);
  if(current?.access_token&&current.expires_at>Date.now()+60000)return current;
  if(current?.refresh_token){

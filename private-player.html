@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Privater Spielerzugang · Schmetterlinge</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;padding:22px;background:#f0f5fa;color:#18384f}
+main{max-width:660px;margin:35px auto;background:white;border:1px solid #cbdfea;border-radius:18px;padding:24px}
+h1{font-size:25px;margin:0 0 10px}h2{font-size:20px}
+button{background:#166b92;color:#fff;padding:12px 18px;border:0;border-radius:9px;cursor:pointer;font:inherit}button:disabled{opacity:.5}li{margin:12px 0;border-bottom:1px solid #e2edf4;padding-bottom:12px;overflow-wrap:anywhere}
+small,p{line-height:1.5;color:#526b7c}a{color:#12658a;overflow-wrap:anywhere}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Privater Spielerzugang</h1>
+<p>Diese Einladung kann innerhalb von sieben Tagen angenommen werden. Danach bleibt der Zugriff auf diesem Gerät bis zum Widerruf bestehen. Nur ein freigegebener Spieler und höchstens 30 belegte Matchkarten.</p>
+<p id="player-invite-status" role="status" aria-live="polite">Einladung wird geprüft …</p>
+<button id="player-invite-accept" type="button" hidden>Einladung annehmen</button>
+<p><label for="player-invite-accepted">Meine freigegebenen Spieler</label> <select id="player-invite-accepted" hidden></select></p>
+<p><small>Der Link kann sieben Tage lang angenommen werden. Danach ist der Zugriff auf diesem Gerät bis zum Widerruf gültig. Wer den Link vor der Annahme besitzt, kann ihn verwenden; deshalb nur gezielt weitergeben. Bei Geräteverlust ist eine neue Einladung erforderlich.</small></p>
+<section id="player-invite-data" hidden>
+<h2 id="player-invite-name"></h2>
+<p id="player-invite-club"></p>
+<h2>Belegte Spiele</h2>
+<ol id="player-invite-matches"></ol>
+</section>
+<p><a href="./index.html#start" rel="noreferrer">Schmetterlinge öffnen</a></p>
+</main>
+<script type="module" src="./private-player-reader.js"></script>
+</body>
+</html>
