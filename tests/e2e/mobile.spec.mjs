@@ -412,7 +412,9 @@ test("Search is empty before criteria and modal remains dismissible",async ({pag
  await expect(page.locator("#library-results")).toContainText("Spieler suchen");
  await expect(page.locator("#library-count")).toContainText(/Suche starten|Spieler suchen/);
  await page.goto("/#einstellungen");
-  await page.locator("#add-player").click();
+ await page.locator('a[data-settings-target="profile"]').click();
+ await expect(page.locator("#settings-room-profile")).toBeVisible();
+ await page.locator("#add-player").click();
  await expect(page.locator("#player-dialog")).toBeVisible();
  await expect(page.locator("#cancel-dialog")).toBeVisible();
  await page.locator("#cancel-dialog").click();
@@ -432,6 +434,8 @@ test("Offline hint is informative and clears on reconnection",async ({page,conte
 
 test("Backup in Einstellungen creates a local JSON and restores only after confirmation",async ({page})=>{
  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#backup-title")).toBeHidden();
+ await page.locator('a[data-settings-target="daten"]').click();
  await expect(page.locator("#backup-title")).toBeVisible();
  const downloadPromise=page.waitForEvent("download");
  await page.locator("#backup-export").click();
@@ -466,8 +470,33 @@ test("Backup in Einstellungen creates a local JSON and restores only after confi
  expect(actual.activeProfileId).toBe(PLAYER);
 });
 
+test("Settings rooms: followed players have their own searchable page and deep link",async ({page})=>{
+ await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#settings-room-hub")).toBeVisible();
+ await expect(page.locator("#friend-settings-list")).toBeHidden();
+ await expect(page.locator("#team-settings-list")).toBeHidden();
+ await expect(page.locator("#backup-export")).toBeHidden();
+ await page.locator('a[data-settings-target="spieler"]').click();
+ await expect(page).toHaveURL(/#einstellungen\/spieler$/);
+ await expect(page.locator("#friend-settings-list")).toBeVisible();
+ await expect(page.locator("#friend-settings-list")).toContainText("Sarah Storz");
+ await page.locator("#settings-followed-player-search").fill("unbekannt");
+ await expect(page.locator("#settings-followed-empty")).toBeVisible();
+ await page.locator("#settings-followed-player-search").fill("Sarah");
+ await expect(page.locator("#settings-followed-empty")).toBeHidden();
+ await page.locator('#settings-room-spieler a[href="#einstellungen"]').click();
+ await expect(page.locator("#settings-room-hub")).toBeVisible();
+ await page.goto("/#einstellungen/mannschaften",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#settings-room-mannschaften")).toBeVisible();
+ await page.goto("/#einstellungen/darstellung",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-language")).toBeVisible();
+ await page.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#backup-export")).toBeVisible();
+});
+
 test("Invalid backup is rejected without changing local family state",async ({page})=>{
  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ await page.locator('a[data-settings-target="daten"]').click();
  const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
  const bad={
   kind:"schmetterlinge-local-backup",schemaVersion:1,
