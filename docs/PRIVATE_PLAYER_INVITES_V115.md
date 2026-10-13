@@ -15,7 +15,7 @@ Nach erfolgreicher Freigabe wird ein kryptografisch zufälliger Link `private-pl
 ## Ablauf und Schutz
 
 - Link maximal sieben Tage gültig, durch Ersteller widerrufbar; Widerruf/Frist sowie Wegfall der ursprünglichen Verwaltungsberechtigung werden bei **jedem** Lesen erneut geprüft.
-- Pro Eigentümer höchstens fünf gleichzeitig gültige und zehn neu erzeugte Links in 24 Stunden; Quoten-Zählung serialisiert via Transaktionssperre.
+- In v115 höchstens fünf noch nicht abgelaufene Links und zehn neue Links je 24 Stunden; die v116-Umstellung zählt **auch bereits angenommene, weiterhin aktive Zugänge** und begrenzt alle noch wirksamen Berechtigungen auf **20 pro Verwalter**. Die 24-Stunden-Quote bleibt bei zehn; Transaktionssperre verhindert parallele Quotenüberschreitung.
 - `private_content.player_access_invites` liegt in nicht via PostgREST exponiertem Schema, RLS aktiv, **kein** direkter SELECT/INSERT/UPDATE-Zugriff für `anon`/`authenticated`.
 - Privilegierte Funktionen nur in `private_content` mit `search_path=''`, öffentliche RPC-Fassaden laufen `SECURITY INVOKER`. Es gibt **keine Freigabe der gesamten Spieler-/Matchtabellen**.
 - Tokens in URL-Fragment, `no-referrer`, keine personenbezogenen Tokens oder Profile in GitHub-Actions-Logs. Andere Personen können Kopien oder Links weitergeben; Widerruf verhindert nur weitere Serverabrufe.
