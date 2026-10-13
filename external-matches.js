@@ -10,7 +10,7 @@ const isValidId=id=>/^\d{2}-\d{6}$/.test(id||"");
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let selected="",rows=[],progress=null,loaded=false,failed=false,partial=false,seq=0,abortController;
 let year="all",discipline="all",category="all",show=20;
-let privateMode=false;
+let privateMode=false,accessDenied=false;
 function safeLink(raw){
  try{
   const u=new URL(raw);
@@ -39,7 +39,7 @@ function render(){
   list.innerHTML="";count.textContent="";more.hidden=true;return;
  }
  if(failed){
-  progressEl.textContent="Die historischen Einzelspiele sind gerade nicht erreichbar. Bitte erneut laden.";
+  progressEl.textContent=accessDenied?"Kein gültiger Zugriff auf die privaten Matchkarten. Neue Berechtigung erforderlich.":"Die historischen Einzelspiele sind gerade nicht erreichbar. Bitte erneut laden.";
   count.textContent="Der Datenstand kann derzeit nicht geprüft werden.";
   years.innerHTML='<option value="all">Alle Jahre</option>';
   list.innerHTML="";more.hidden=true;return;
@@ -122,7 +122,7 @@ function render(){
 }
 async function load(id){
  if(privateMode&&id===selected){render();return}
- if(id!==selected)privateMode=false;
+ if(id!==selected){privateMode=false;accessDenied=false;}
  abortController?.abort();
  const ticket=++seq;
  selected=id||"";rows=[];progress=null;loaded=false;failed=false;partial=false;
@@ -156,13 +156,13 @@ window.addEventListener("badminton:private-evidence",event=>{
  if(data.status!=="ready"){
   if(privateMode){
    abortController?.abort();++seq;privateMode=false;rows=[];
-   loaded=false;failed=false;progress=null;render();
+   loaded=true;failed=true;accessDenied=true;progress=null;render();
   }
   return;
  }
  if(data.matchesLoading===true||!Array.isArray(data.matches))return;
  abortController?.abort();++seq;
- privateMode=true;rows=data.matches;progress={status:"partial",verified_count:rows.length};
+ privateMode=true;accessDenied=false;rows=data.matches;progress={status:"partial",verified_count:rows.length};
  loaded=true;failed=false;partial=false;show=20;render();
 });
 document.addEventListener("DOMContentLoaded",()=>{
