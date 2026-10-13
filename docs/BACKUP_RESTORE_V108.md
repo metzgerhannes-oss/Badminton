@@ -39,3 +39,9 @@ Der Export ist freiwillig und beinhaltet persönliche Spieler- und Kalenderdaten
 - [ ] Verbindliche Fristen/Kontakt für zentral gespeicherte öffentliche personenbezogene Sportdaten (separat #53/#56)
 
 **Keine Aussage über eine vollumfängliche Datensicherung der gesamten Plattform oder vollständig abgeschlossene DSGVO-Pflichten.**
+
+## DBV-Kalender-Quick-Saves auf aktuellem Backup-v2-Stand
+
+Der offline Export unterstützt jetzt auch DBV-Kalender-Vormerkungen mit `source=dbv-calendar` und Quell-ID, obwohl dafür noch keine einzelne Turnier-UUID existiert. Sie sind private Erinnerungen, **keine Turnieranmeldungen**. Validiert werden die eigene Profilzuordnung, die Kalender-ID, der exakte offizielle URL `https://turniere.badminton.de/`, Titel und Start-/Enddatum. Bestehende offizielle Turnierfavoriten und private Spond-Termine bleiben im **selben** v2-Archiv. Die Prüfung umfasst Unit-Roundtrips sowie den synthetischen Zwei-Geräte-Browsertest `tests/e2e/backup-dbv-calendar.spec.mjs`.
+
+Die physische Übertragung per iPhone-Dateien-App bleibt bis zum manuellen Nachweis in #153 offen. Kein Account, kein Cloud-Upload, keine zusätzliche Supabase-Tabelle und keine neuen Kosten.
