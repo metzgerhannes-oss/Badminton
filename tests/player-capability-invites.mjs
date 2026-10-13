@@ -82,37 +82,3 @@ assert.match(app,/data-share-player/);
 assert.match(app,/badminton:player-private-share/);
 assert.ok(!sql.includes("set role supabase_admin"));
 console.log("Private player capability: 7-day one-time redemption, persistent scoped session until revoke, no browser table reads.");
-/,
- "Creator must contain intact 256-bit token validation");
-
-assert.match(acceptSql,/or accepted_at is not null\)\)>=20/i,"Persistent owner quota must include accepted shares");
-assert.match(acceptSql,/and i\.accepted_by is null/);
-assert.match(acceptSql,/and i\.expires_at>now\(\)/);
-assert.match(acceptSql,/and i\.revoked_at is null/);
-assert.match(acceptSql,/i\.accepted_by=auth\.uid\(\)/);
-const readBlock=acceptSql.split("create or replace function private_content.player_access_session_read")[1]
-  ?.split("create or replace function public.private_player_invite_accept")[0]||"";
-assert.ok(readBlock.length>100,"Session-authorized read function exists");
-assert.doesNotMatch(readBlock,/i\.expires_at\s*[<>]=?\s*now\(\)/,
- "Accepted access must survive the original invitation expiration");
-assert.match(readBlock,/i\.revoked_at is null/);
-assert.match(readBlock,/g\.revoked_at is null/);
-assert.match(acceptSql,/select null::jsonb/,"Legacy bearer-only read must be disabled");
-assert.match(acceptSql,/revoke all on function public\.private_player_invite_read\(text\)/i);
-assert.doesNotMatch(acceptSql,/grant select on public\.(players|player_external_match_facts)/i);
-assert.match(creator,/selectedInviteId/);
-assert.match(creator,/records\(\)\.filter\(r=>r\.id!==rec\.id\)/);
-assert.match(creator,/Link sieben Tage zur Annahme/);
-
-assert.match(creator,/getPrivateSession\(true\)/);
-assert.match(creator,/getPrivateSession\(false\)/);
-assert.match(creator,/private_player_invite_create/);
-assert.match(creator,/private_player_invite_revoke/);
-assert.match(creator,/freshToken\(\)/);
-assert.match(creator,/Eine DBV-ID oder ein lokales Profil genügt nicht/);
-assert.match(html,/player-access\.js/);
-assert.match(sw,/private-player-reader\.js/);
-assert.match(app,/data-share-player/);
-assert.match(app,/badminton:player-private-share/);
-assert.ok(!sql.includes("set role supabase_admin"));
-console.log("Private player capability: 7-day one-time redemption, persistent scoped session until revoke, no browser table reads.");
