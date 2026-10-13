@@ -51,6 +51,22 @@ function isDate(value){
 }
 function bookmark(row,owns){
  if(!record(row))fail("Ungültiger Turnierfavorit");
+ // The official DBV calendar supplies a stable source_key but often no
+ // individual turnier.de UUID. Its private '+' bookmarks must survive backup
+ // without being misrepresented as an official registration or match page.
+ if(row.source==="dbv-calendar"){
+  const id=text(row.id,80,"DBV-Kalender-ID",true);
+  if(!/^dbv-calendar-\d{2,12}$/.test(id))fail("Ungültige DBV-Kalender-ID");
+  const name=text(row.name,100,"Turniername",true);
+  const playerId=text(row.playerId,80,"Turnierspieler",true);
+  if(!owns.has(playerId))fail("Kalenderfavorit verweist auf unbekannten eigenen Spieler");
+  if(row.url!=="https://turniere.badminton.de/")
+   fail("Kalenderfavorit benötigt den offiziellen DBV-Quelllink");
+  const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
+  if(!startDate||!endDate||endDate<startDate)fail("Ungültiger DBV-Kalenderzeitraum");
+  return {id,url:"https://turniere.badminton.de/",name,playerId,
+   startDate,endDate,source:"dbv-calendar"};
+ }
  const raw=text(row.url,1200,"Turnierlink",true);
  let parsed;
  try{parsed=new URL(raw)}catch{fail("Ungültiger DBV-Turnierlink")}
