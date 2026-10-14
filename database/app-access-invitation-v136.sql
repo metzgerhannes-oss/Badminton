@@ -124,7 +124,7 @@ drop policy if exists app_access_placements_read on public.tournament_placements
 create policy app_access_placements_read on public.tournament_placements
  for select to authenticated using ((select public.app_access_is_member()));
 
--- Player-scoped top-four proof view; never return an unverified award or ranking point.
+-- Player-scoped full sourced placement history; client awards remain top-four AND verified only.
 create or replace function public.app_access_trophies_read(p_player_dbv_id text)
 returns jsonb language plpgsql stable security definer set search_path = ''
 as $$
@@ -136,6 +136,7 @@ begin
  end if;
  return jsonb_build_object(
    'player_dbv_id',p_player_dbv_id,
+   'scope','app_archive',
    'results',coalesce((
      select jsonb_agg(jsonb_build_object(
        'id',p.id,'playerId',p_player_dbv_id,'playerName',pl.name,
@@ -143,12 +144,16 @@ begin
        'place',p.placement,'discipline',p.discipline,
        'ageGroup',p.age_group,'partner',p.partner,
        'source',jsonb_build_object('url',p.source_url,'level',p.source_level),
-       'verified',true
+       'verified',p.verification_note is distinct from
+         'Platz 3 von Familie bestätigt und zuvor anhand von Einzelmatches nachvollzogen; aktuelle namentliche Verbands-Resultatliste noch nicht abrufbar.',
+       'confirmation',case when p.verification_note =
+         'Platz 3 von Familie bestätigt und zuvor anhand von Einzelmatches nachvollzogen; aktuelle namentliche Verbands-Resultatliste noch nicht abrufbar.'
+         then 'family-confirmed' else 'source-backed' end
      ) order by p.event_date desc,p.id)
      from public.tournament_placements p
      join public.players pl on pl.id=p.player_id
      where pl.dbv_id=p_player_dbv_id
-       and p.placement between 1 and 4
+       and p.placement between 1 and 128
        and p.source_url like 'https://%'
    ),'[]'::jsonb)
  );
