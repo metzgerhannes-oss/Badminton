@@ -64,6 +64,7 @@ function persistAndContinue(profile,{confirmed=false}={}){
  document.title="Daten für das Spielerprofil abrufen · Schmetterlinge";
 }
 function showDataIntro(){
+ if(lastSavedProfile?.id)markImportPending(localStorage,lastSavedProfile.id);
  $("onboard-profile").hidden=true;
  $("onboard-install").hidden=true;
  $("onboard-data").hidden=false;
