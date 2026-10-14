@@ -9,6 +9,8 @@ const BWBV_J="https://bwbv.de/wp-content/uploads/2025/12/80-Jugendordnung.pdf";
 const FIFTEEN="https://www.badminton.de/news/badminton/neue-zaehlweise-dbv-praesidium-beschliesst-einfuehrung-von-3-x-15/";
 // [topic, question, answer, search terms, validity/scope, source, illustration]
 const DATA=[
+["grundlagen","Welche Maße darf ein Schläger haben?","Maximal 68 cm lang und 23 cm breit.","schläger schlaeger masse länge breite regel","Spielregel 4.1",DBV,"racket"],
+["grundlagen","Wie sieht ein Naturfederball aus?","Er hat 16 Federn und wiegt 4,74 bis 5,50 g.","spielball naturfeder federzahl gewicht kork federball","Spielregel 2.2",DBV,"shuttle"],
 ["grundlagen","Was wird vor Spielbeginn gewählt?","Die gewinnende Seite wählt Auf-/Rückschlag oder Feldseite. Die andere Seite wählt aus den übrigen Möglichkeiten.","wahl auslosung seitenwahl anfangen aufschlagen spielbeginn","Spielregel 6",DBV,"choice"],
 ["grundlagen","Wie groß ist das Spielfeld?","13,40 m lang; im Doppel 6,10 m und im Einzel 5,18 m breit.","feld größe spielfeld länge breite netz maß meter","Spielregeln 1",DBV,"court"],
 ["grundlagen","Welche Linien gelten im Einzel?","Die inneren Seitenlinien begrenzen das Einzelfeld. Die hintere Grundlinie zählt zum Feld.","einzel seitenaus grundlinie linie","Spielregeln 1",DBV,"single"],
@@ -29,7 +31,7 @@ const DATA=[
 ["spielsituationen","Darf man den Federball beim Aufschlag drehen?","Nein. Kein Spin beim Loslassen; der Schläger muss zuerst die Ballbasis treffen.","spin spinaufschlag ball drehen kork basis zuerst","Spielregel 9.1.5",DBV,"spin"],
 ["spielsituationen","Was, wenn man beim Aufschlag den Ball verfehlt?","Fehler. Ein begonnener Aufschlag gilt auch bei einem Fehlversuch als ausgeführt.","verfehlen miss erfolgloser aufschlag vorbei","Spielregeln 9.1.8 und 9.3",DBV,"missServe"],
 ["spielsituationen","Müssen beide Füße beim Aufschlag stehen?","Ja. Beide Füße müssen teilweise den Boden berühren und bis zum Treffpunkt stillstehen.","fuß aufschlagfehler standlinie treten abheben","Spielregel 9.1",DBV,"feet"],
-["spielsituationen","Wie hoch darf der Aufschlag sein?","International: Ball ganz unter 1,15 m. Bei nationalen DBV-Turnieren meist unter der Taille, Schläger abwärts.","aufschlaghöhe taillenhöhe 115 1,15 servicehöhe aufschlag zu hoch","Spielregel 9 / nationale Alternative",DBV,"height"],
+["spielsituationen","Wie hoch darf der Aufschlag sein?","Bei DBV-Turnieren ohne Messgerät: Ball unter der Taille, Schläger abwärts. Sonst: ganz unter 1,15 m.","aufschlaghöhe taillenhöhe 115 1,15 servicehöhe aufschlag zu hoch","Spielregel 9 / nationale Alternative",DBV,"height"],
 ["spielsituationen","Darf die Aufschlagbewegung stoppen?","Nein. Nach Beginn muss der Schläger bis zum Treffer weiter nach vorn gehen.","bewegung halt stoppen ausholen","Spielregel 9.1",DBV,"move"],
 ["spielsituationen","Was, wenn der Rückschläger nicht bereit ist?","War der Empfänger nicht bereit und versuchte keinen Rückschlag, wird wiederholt.","empfänger bereit wiederholung","Spielregel 14",DBV,"receiver"],
 ["spielsituationen","Wer nimmt den Aufschlag im Doppel?","Nur der diagonal gegenüberstehende richtige Rückschläger darf den Aufschlag annehmen.","doppel annahme falscher partner diagonal","Spielregel 11",DBV,"serve"],
@@ -43,14 +45,14 @@ const DATA=[
 ["spielsituationen","Darf man den Ball zweimal schlagen?","Zwei getrennte Schläge derselben Person sind ein Fehler. Rahmen und Saiten in einem Schlag sind erlaubt.","doppelschlag zweimal","Spielregel 13",DBV,"doubleHit"],
 ["spielsituationen","Was passiert bei falscher Aufschlagposition?","Die Stellung wird nach Entdeckung korrigiert. Der bisherige Spielstand bleibt bestehen.","stellung falscher empfänger fehler korrigieren","Spielregel 12",DBV,"wrongPosition"],
 ["spielsituationen","Was ist ein Let?","Ein Let ist eine Wiederholung. Der Punktestand bleibt unverändert, und der letzte Aufschläger serviert erneut.","let wiederholung unterbrechung","Spielregel 14",DBV,"let"],
-["spielsituationen","Was gilt bei einem Deckenball?","Halle unter 9 m: Berührt der Aufschlag die Decke, wird wiederholt. Bei späterem Deckenkontakt: Fehler.","decke hallendecke niedrige halle","Spielregel 13.3.3 – DBV-Sonderfall",DBV,"ceiling"],
+["spielsituationen","Was gilt bei einem Deckenball?","Bei DBV-Hallen von 5 bis unter 9 m: Aufschlag an Decke = Wiederholung. Danach im Ballwechsel: Fehler.","decke hallendecke niedrige halle","Spielregel 13.3.3 – DBV-Sonderfall",DBV,"ceiling"],
 ["spielsituationen","Darf man während des Spiels beraten?","Beratung ist zwischen Ballwechseln erlaubt, bevor Aufschläger und Rückschläger bereitstehen.","coaching trainer pause betreuer beraten","Spielregel 16.5.1",DBV,"coach"],
 ["spielsituationen","Was tun ohne Schiedsrichter?","Unklare Entscheidungen nach den Turnierregeln klären. Bei Streitfällen die Turnierleitung hinzuziehen.","schiedsrichter umpire selbstentscheid streit","Wettbewerbsregel und Turnierleitung maßgeblich",DBV,"decision"],
 ["spielsituationen","Wann ist der Ballwechsel vorbei?","Der Ballwechsel endet bei Bodenberührung, Fehler, Wiederholung oder wenn der Ball nach Netztreffer zurückfällt.","tot spielende punkt ball","Spielregel 15",DBV,"rallyEnd"],
 ["jugend","Welche Jugendaltersklassen gibt es?","BWBV-Turniere: meist U11 bis U19. In der DBV-Jugendrangliste gibt es auch U9.","alter altersklassen jugend geburtsjahr jahrgang","Jugend – Altersstichtag je Saison prüfen",BWBV_J,"ages"],
 ["jugend","Was bedeuten A- bis E-Turniere?","A = DBV, B = Gruppe, C = Landesverband, D = Bezirk, E = Region/Kreis. Einzelne Altersklassen haben Ausnahmen.","a rlt b rlt c rlt d rlt e rlt turnierklassen level","DBV-Jugendwettkampfsystem",FAQ,"levels"],
 ["jugend","Gibt es B-Turniere für U11?","In der regulären DBV-Jugendrangliste ist U11 den Kategorien A sowie C–E zugeordnet, nicht B.","u11 b rlt altersklasse möglich","DBV-Jugendrangliste – aktuelle Ausschreibung zählt",FAQ,"levelsU11"],
-["jugend","Wie viele Turniere zählen für die Jugendrangliste?","Die fünf besten Ergebnisse aus den letzten zwölf Monaten zählen.","rangliste beste fünf 5 turniere","DBV-Jugendrangliste",FAQ,"ranking"],
+["jugend","Wie viele Turniere zählen für die Jugendrangliste?","Je Disziplin zählen die fünf besten Wertungen der letzten zwölf Monate.","rangliste beste fünf 5 turniere","DBV-Jugendrangliste",FAQ,"ranking"],
 ["jugend","Wann verfallen Jugendranglistenpunkte?","Eine Turnierwertung bleibt zwölf Monate gültig.","punkte ablauf 12 monate verfallen","DBV-Jugendrangliste",FAQ,"months"],
 ["jugend","Wann wird die Jugendrangliste aktualisiert?","Die Jugendrangliste wird jeden Donnerstag aktualisiert.","ranking update wöchentlich donnerstag","DBV-Jugendrangliste",FAQ,"weekday"],
 ["jugend","Wie entstehen Ranglistenpunkte?","Turnierkategorie, Altersklasse und Platzierung bestimmen die Wertung. Die offizielle Punktetabelle ist maßgeblich.","punkteplatzierung punktetabelle punkte a b c d e","DBV-Jugendrangliste",RANK,"podium"],
@@ -159,7 +161,7 @@ function art(kind){
   +'<text x="297" y="71" text-anchor="middle" font-family="system-ui" font-size="17" font-weight="800" fill="white">DBV NATIONAL</text>'
   +'<text x="297" y="125" text-anchor="middle" font-family="system-ui" font-size="29" font-weight="850" fill="white">TAILLE</text>'
   +'<text x="297" y="175" text-anchor="middle" font-family="system-ui" font-size="13" fill="white">SCHLÄGER ABWÄRTS</text>'
-  +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-size="11" fill="#15516f">NATIONAL: AUSNAHME BEI MESSGERÄT</text>'+SVG_END;
+  +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-size="11" fill="#15516f">DBV OHNE MESSGERÄT: TAILLE</text>'+SVG_END;
  if(kind==="choice")return badgeArt("1","2","AUFSCHLAG ODER FELDSEITE");
  if(kind==="spin")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff4ff"/>'
   +'<path d="M119 118q-24-39 20-48t34 37" fill="none" stroke="#1683ad" stroke-width="9" stroke-linecap="round"/>'
@@ -186,7 +188,7 @@ function art(kind){
   +'<circle cx="114" cy="62" r="12" fill="white" stroke="#194d68" stroke-width="4"/>'
   +'<rect x="18" y="190" width="176" height="60" rx="12" fill="#178db4"/>'
   +'<rect x="206" y="190" width="176" height="60" rx="12" fill="#bd4554"/>'
-  +'<text x="106" y="215" text-anchor="middle" fill="white" font-family="system-ui" font-size="13" font-weight="800">AUFSCHLAG &lt;9 m</text>'
+  +'<text x="106" y="215" text-anchor="middle" fill="white" font-family="system-ui" font-size="13" font-weight="800">AUFSCHLAG 5–9 m</text>'
   +'<text x="106" y="239" text-anchor="middle" fill="white" font-family="system-ui" font-size="18" font-weight="800">WIEDERHOLEN</text>'
   +'<text x="294" y="215" text-anchor="middle" fill="white" font-family="system-ui" font-size="13" font-weight="800">BALLWECHSEL</text>'
   +'<text x="294" y="239" text-anchor="middle" fill="white" font-family="system-ui" font-size="18" font-weight="800">FEHLER</text>'+SVG_END;
