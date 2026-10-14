@@ -35,3 +35,13 @@
  font-size:11px;line-height:1.4;color:#c9e4f6;font-weight:750;
  font-variant-numeric:tabular-nums}
 
+
+/* Second onboarding step: explain the opt-in player-data retrieval. */
+.welcome-data-actions{display:grid;gap:11px;margin:20px 0 6px}
+.welcome-data-open-app{display:flex;align-items:center;justify-content:center;
+ min-height:52px;text-align:center;text-decoration:none}
+#welcome-data-skip{min-height:48px;white-space:normal;
+ padding:12px 15px;border:1px solid #b5d4e4;border-radius:12px;
+ background:#f6fbff;color:#175879;font:inherit;font-weight:750}
+#onboard-data[hidden]{display:none!important}
+@media(max-width:380px){.welcome-steps{flex-wrap:wrap;gap:6px}}
