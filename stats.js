@@ -4,7 +4,7 @@ import {getBadhubMatchReference} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
+import {matchArchiveSnapshot,requestPrivateMatches,hasPrivatePlayerContext} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const dateLabel=s=>{
@@ -29,6 +29,8 @@ async function getPage(path,signal){
  return rows;
 }
 async function queryOfficial(id,signal){
+ // Server-scoped archives are obtained through private RPCs, not public REST.
+ if(hasPrivatePlayerContext(id))return {rows:[],partial:false};
  const rows=[];
  for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
   const qs=new URLSearchParams({
@@ -43,6 +45,7 @@ async function queryOfficial(id,signal){
  return {rows,partial:true};
 }
 async function queryExternal(id,signal){
+ if(hasPrivatePlayerContext(id))return {rows:[],progress:null,partial:false};
  const [status]=await getPage("player_external_match_imports?"+
   new URLSearchParams({select:"status,cursor_offset,verified_count,rejected_count,detail,last_finished_at",
    dbv_id:"eq."+id,limit:"1"}),signal);
