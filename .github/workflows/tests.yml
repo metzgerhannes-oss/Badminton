@@ -41,6 +41,7 @@ jobs:
           node --check scripts/upcoming-tournaments.mjs
           node --check sw.js
           node --check tests/service-worker-resilience.mjs
+          node --check tests/e2e/player-v2-grant-integration.spec.mjs
           node --check reports.js
           node --check invite.js
           node --check club-branding.js
