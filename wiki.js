@@ -51,8 +51,8 @@ const DATA=[
 ["jugend","Wann wird die Jugendrangliste aktualisiert?","Die DBV-Jugendrangliste wird normalerweise donnerstags aktualisiert.","ranking update wöchentlich donnerstag","DBV-Jugendrangliste",FAQ,"calendar"],
 ["jugend","Wie entstehen Ranglistenpunkte?","Turnierkategorie, Altersklasse und Platzierung bestimmen die Wertung. Die offizielle Punktetabelle ist maßgeblich.","punkteplatzierung punktetabelle punkte a b c d e","DBV-Jugendrangliste",RANK,"podium"],
 ["jugend","Was sind Small Games?","Bei U11/U13 werden je nach Turnier kleinere Spielfelder verwendet. Die ausgeschriebene Spielform gilt für alle der Konkurrenz.","kleinfeld small games verkleinert u11 u13 box","BWBV-Jugendturniere 2026",BWBV,"small"],
-["jugend","Was bedeutet Einzel „Box“?","Gespielt wird auf einem verkleinerten Mittelfeld ohne Vorder- und Hinterfeld. Die genaue Feldmarkierung zeigt die Turnierausschreibung.","box small games einzel vorne hinten","BWBV-Spielform 1 · 2026",BWBV,"small"],
-["jugend","Was bedeutet „ohne Hinterfeld“?","Der hintere Feldstreifen gehört nicht zum gültigen Spielfeld. Das verändert die Länge der Ballwechsel.","small games feld ohne hinten u13","BWBV-Spielform 8 · 2026",BWBV,"small"],
+["jugend","Was bedeutet Einzel „Box“?","Gespielt wird auf einem verkleinerten Mittelfeld ohne Vorder- und Hinterfeld. Die genaue Feldmarkierung zeigt die Turnierausschreibung.","box small games einzel vorne hinten","BWBV-Spielform 1 · 2026",BWBV,"smallbox"],
+["jugend","Was bedeutet „ohne Hinterfeld“?","Der hintere Feldstreifen gehört nicht zum gültigen Spielfeld. Das verändert die Länge der Ballwechsel.","small games feld ohne hinten u13","BWBV-Spielform 8 · 2026",BWBV,"smallnoback"],
 ["jugend","Welche Small Games gelten beim C-RLT?","Beim BWBV gelten 2026 je nach Nummer des C-RLT unterschiedliche Spielformen. Die jeweilige Ausschreibung entscheidet.","c rangliste small games c rlt bwbv 2026","BWBV-Jugendordnung 2026, Anhang 3",BWBV_J,"calendar"],
 ["jugend","Darf man in einer höheren Altersklasse spielen?","Die Teilnahme hängt von den Regeln und der Ausschreibung des konkreten Turniers ab. Nicht allein vom Geburtsjahr.","hochmelden u13 u15 u17 höhere altersklasse","DBV/BWBV – konkrete Ausschreibung prüfen",BWBV_J,"ages"],
 ["jugend","Gilt ab 2027 überall die 15er-Zählweise?","Nein. Ab 4. Januar 2027 ist 3 × 15 für DBV-Individualturniere verbindlich; Landes- und Mannschaftswettbewerbe können abweichen.","2027 15 satz umstellung jugend","DBV-Individualturniere ab 04.01.2027",FIFTEEN,"score15"]
@@ -67,16 +67,17 @@ function court(kind){
  if(kind==="single")glow='<rect x="25" y="64" width="350" height="136" fill="#bbec50" opacity=".26"/>';
  if(kind==="double")glow='<rect x="25" y="52" width="350" height="160" fill="#72c8ff" opacity=".23"/>';
  if(kind==="service")glow='<rect x="148" y="52" width="104" height="160" fill="#aff5d2" opacity=".36"/>';
- if(kind==="small")glow='<rect x="73" y="78" width="254" height="108" fill="#edff57" opacity=".43"/>';
+ if(kind==="small"||kind==="smallbox")glow='<rect x="44" y="52" width="104" height="160" fill="#edff57" opacity=".43"/><rect x="252" y="52" width="104" height="160" fill="#edff57" opacity=".43"/>';
+ if(kind==="smallnoback")glow='<rect x="44" y="64" width="312" height="136" fill="#edff57" opacity=".43"/>';
  const diagram=(kind==="serve"||kind==="even"||kind==="odd")?'<path d="M85 166Q200 48 310 96" stroke="#ffdd52" stroke-width="6" stroke-dasharray="11 7" fill="none"/><path d="m295 83 21 9-16 17" fill="none" stroke="#ffdd52" stroke-width="6"/>':"";
- const note=kind==="even"?'GERADE · RECHTS':kind==="odd"?'UNGERADE · LINKS':kind==="single"?'EINZEL = INNERES FELD':kind==="double"?'DOPPEL = ÄUSSERES FELD':kind==="small"?'SMALL GAMES · KLEINFELD':'';
+ const note=kind==="even"?'GERADE · RECHTS':kind==="odd"?'UNGERADE · LINKS':kind==="single"?'EINZEL = INNERES FELD':kind==="double"?'DOPPEL = ÄUSSERES FELD':kind==="small"?'SMALL GAMES · KLEINFELD':kind==="smallbox"?'BOX':kind==="smallnoback"?'OHNE HINTERFELD':'';
  return SVG_START+'<rect width="400" height="264" rx="20" fill="#cfefff"/>'+courtBase+glow+diagram+(note?'<rect x="71" y="224" width="258" height="29" rx="9" fill="#fff"/><text x="200" y="244" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="13" fill="#15516f">'+note+'</text>':'')+SVG_END;
 }
 function badgeArt(left,right,sub){
  return SVG_START+'<rect width="400" height="264" rx="20" fill="#d9f1ff"/><rect x="25" y="40" width="164" height="150" rx="18" fill="#167ba9"/><rect x="211" y="40" width="164" height="150" rx="18" fill="#128c72"/><text x="107" y="131" text-anchor="middle" font-family="system-ui" font-size="45" font-weight="850" fill="white">'+left+'</text><text x="293" y="131" text-anchor="middle" font-family="system-ui" font-size="45" font-weight="850" fill="white">'+right+'</text><text x="200" y="229" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="750" fill="#165075">'+sub+'</text>'+SVG_END;
 }
 function art(kind){
- if(["court","single","double","service","serve","even","odd","small"].includes(kind))return court(kind);
+ if(["court","single","double","service","serve","even","odd","small","smallbox","smallnoback"].includes(kind))return court(kind);
  if(kind==="score21"||kind==="deuce21")return badgeArt(kind==="deuce21"?"20:20":"21",kind==="deuce21"?"29:29":"30","ZWEI PUNKTE VORSPRUNG");
  if(kind==="score15")return badgeArt("15","21","3 × 15 · MAX. 21");
  if(kind==="bestof")return badgeArt("2","3","ZWEI GEWINNSÄTZE");
