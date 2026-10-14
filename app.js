@@ -375,6 +375,13 @@ function setup(){
  let freshDevice=false;
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
  restore();save();
+ // One-time local navigation hint, never an ownership or private data grant.
+ try{
+  const invited=localStorage.getItem("schmetterlinge.invitedPlayerPendingView.v1");
+  if(/^[0-9]{2}-[0-9]{6}$/.test(invited||"")&&state.friends.some(p=>p.id===invited))
+   SchmetterlingeStorage.selectFriend(state,invited);
+  localStorage.removeItem("schmetterlinge.invitedPlayerPendingView.v1");
+ }catch{/* Not required to enter the app. */}
  // An accepted private invitation is a followed player, not an own profile.
  if(!state.players.length&&state.friends.length)
   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);

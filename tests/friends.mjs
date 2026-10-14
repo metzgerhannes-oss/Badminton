@@ -53,7 +53,10 @@ assert.ok(code.includes('data-friend-quick')&&code.includes('renderFriendQuick()
 assert.ok(code.includes("data-view-friend")&&code.includes("data-unfollow")&&code.includes("data-edit-friend"));
 assert.ok(code.includes("window.renderDashboard?.(state.chosen,viewedProfiles"));
 assert.ok(dashboard.includes('viewMode==="friend"')&&dashboard.includes('friendNoHistory'));
-assert.ok(history.includes('friendWithoutHistory')&&history.includes('selected.startsWith("local-")'));
+assert.ok(history.includes('trophySnapshot(lastPlayer)')&&history.includes('playerId===lastPlayer'),
+ "Private friend trophies require exact server-scoped player ID, never local name matching");
+assert.ok(!history.includes('selected.startsWith("local-")'),
+ "Local profiles must never impersonate a private DBV record");
 const ids=["05-123456","05-070879"];
 assert.ok(new Set(ids).size===2);
 console.log("Active profile and friend follow tests passed: local persistence, navigation scope, safe friend KPI empty states.");
