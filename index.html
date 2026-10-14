@@ -31,6 +31,7 @@
 <script defer src="./settings-rooms.js"></script>
 <script type="module" src="./invite.js"></script>
 <script type="module" src="./app-access.js"></script>
+<script type="module" src="./player-data-status.js"></script>
 <script type="module" src="./library.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
@@ -82,9 +83,14 @@
  </div>
  <main id="hauptinhalt" tabindex="-1">
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
+  <section id="player-data-status" class="player-data-status" aria-labelledby="player-data-heading" hidden>
+   <div class="player-data-status-head"><strong id="player-data-heading">Datenbestand</strong><a href="#historie">Alle Ergebnisse ansehen ↗</a></div>
+   <p id="player-data-counts" role="status" aria-live="polite">Datenstand wird geprüft …</p>
+   <small id="player-data-coverage-note"></small>
+  </section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">Badminton-Termine</span></div>
-   <p class="settings-hint" role="status">Privatmodus: Spielergebnisse und Ranglisten werden nicht mehr öffentlich angezeigt. Eigene Profile und Turnierfavoriten bleiben lokal; persönliche Freigaben werden vorbereitet.</p>
+   <p class="settings-hint" role="status">Für eingeladene Nutzer: Belegte Badminton-Ergebnisse, Ranglisten und Matchkarten. Eigene Profile und Turnierfavoriten bleiben auf diesem Gerät.</p>
    <a href="#live" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
    <div id="dashboard-next" class="dashboard-next"></div>
    <div id="shared-tournaments" class="shared-tournaments" hidden></div>
@@ -137,7 +143,7 @@
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
-   <p class="small muted">Privatmodus: Persönliche Historien sind ohne gesonderte Berechtigung nicht verfügbar. Deine privaten Spieler- und Freundeslisten bleiben auf dem Gerät.</p>
+   <p class="small muted">Alle belegten Einzelmatches und Turnierplatzierungen für eingeladene Nutzer. Nur bestätigte Top-4-Platzierungen zählen im Trophäenschrank.</p>
    <details id="history-source-details" class="history-source-details">
     <summary>Datenstand und Quellen</summary>
      <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
