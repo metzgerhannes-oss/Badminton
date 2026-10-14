@@ -21,12 +21,15 @@ assert.ok(!storage.getItem(KEY).includes("invitation"),"No private access tokens
 assert.equal(deletePlayerCopy(player,storage),true);
 assert.equal(loadPlayerCopy(player,storage),null);
 const {readFile}=await import("node:fs/promises");
-const [ui,index,worker,matches,trophies,welcome]=await Promise.all([
+const [ui,index,worker,matches,trophies,welcome,app]=await Promise.all([
  "consented-player-data.js","index.html","sw.js","scripts/private-match-source.mjs",
- "scripts/private-trophy-source.mjs","welcome.js"].map(p=>readFile(p,"utf8")));
+ "scripts/private-trophy-source.mjs","welcome.js","app.js"].map(p=>readFile(p,"utf8")));
 assert.match(ui,/requestPrivateMatches\(player,\{force:true\}\)/);
 assert.match(ui,/requestPrivateTrophies\(player,\{force:true\}\)/);
 assert.match(ui,/Daten jetzt übernehmen/);
+assert.match(ui,/badminton:profile-selected/);
+assert.doesNotMatch(ui,/addEventListener\("badminton:profile-change"/);
+assert.match(app,/badminton:profile-selected/);
 assert.match(ui,/!matchOk&&!trophyOk/,"Protected sources must not produce a new local copy");
 assert.match(index,/consented-player-data\.js/);
 assert.match(worker,/scripts\/consented-player-data\.mjs/);
