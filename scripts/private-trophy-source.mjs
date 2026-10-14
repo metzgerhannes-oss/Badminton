@@ -2,6 +2,7 @@
  * No personal results in public JSON, service workers, persistent caches or logs. */
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./supabase-read.mjs";
 import {getPrivateSession} from "../private-invites.js";
+import {loadPlayerCopy} from "./consented-player-data.mjs";
 const DBV=/^[0-9]{2}-[0-9]{6}$/;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const HOLD_MS=30000;
@@ -40,8 +41,13 @@ function validResult(response,player){
 export function trophySnapshot(player){
  if(!DBV.test(String(player||"")))return {state:"protected",results:[]};
  const state=states.get(player);
- if(!state)return {state:"loading",results:[]};
- if(Date.now()-state.checkedAt>HOLD_MS&&!state.pending)return {state:"loading",results:[]};
+ if(state?.state==="ready"&&Date.now()-state.checkedAt<=HOLD_MS)
+  return {state:"ready",results:state.results||[],coverage:state.coverage};
+ // The one-way user-approved local archive is display-only, not a server grant.
+ const saved=loadPlayerCopy(player);
+ if(Array.isArray(saved?.trophies))
+  return {state:"ready",results:saved.trophies,coverage:"device_snapshot",fetchedAt:saved.fetchedAt};
+ if(!state||Date.now()-state.checkedAt>HOLD_MS&&!state.pending)return {state:"loading",results:[]};
  return {state:state.state,results:state.results||[],coverage:state.coverage};
 }
 function announce(player){
@@ -82,5 +88,6 @@ export function clearPrivateTrophyCache({refresh=true}={}){
 if(typeof document!=="undefined"){
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)clearPrivateTrophyCache()});
  window.addEventListener("badminton:private-player-revoked",()=>clearPrivateTrophyCache());
+  window.addEventListener("badminton:local-data-copy-updated",e=>{const id=e.detail?.playerId;if(DBV.test(String(id||"")))announce(id)});
  window.addEventListener("pagehide",()=>states.clear());
 }
