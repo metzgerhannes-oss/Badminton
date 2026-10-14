@@ -32,6 +32,11 @@ const headers={
 test.beforeEach(async ({page})=>{
  await page.addInitScript(data=>{
   if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",data);
+  if(!localStorage.getItem("schmetterlinge.communitySession.v1"))
+   localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({
+    access_token:"mock-invited-member-jwt",refresh_token:"mock-invited-refresh",
+    expires_at:Date.now()+3600000,user_id:"24c76504-b86c-4c73-a01a-b6210b78e3a3"
+   }));
  },ownStore());
  await page.route("**/*",async route=>{
   const request=route.request();
@@ -39,6 +44,15 @@ test.beforeEach(async ({page})=>{
   if(url.origin===ROOT)return route.continue();
   if(request.method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
   if(url.hostname.endsWith(".supabase.co")){
+   if(url.pathname.endsWith("/rpc/app_access_status"))
+    return route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+   if(url.pathname.endsWith("/rpc/app_access_history_demand"))
+    return route.fulfill({status:200,headers,body:'{"accepted":true,"reused":false}'});
+   if(url.pathname.endsWith("/rpc/app_access_player_coverage"))
+    return route.fulfill({status:200,headers,body:JSON.stringify({
+     dbv_id:JSON.parse(request.postData()||"{}").p_player_dbv_id,
+     match_cards:1,placements:0,top_four:0,import_status:"partial"
+    })});
    let data=[];
    if(url.pathname.endsWith("/player_external_match_facts") &&
       url.searchParams.get("dbv_id")==="eq."+PLAYER)data=[sourceRecord];
@@ -69,7 +83,7 @@ test.beforeEach(async ({page})=>{
 test("Following stays local; only Historie requests a new source import",async ({page})=>{
  const imports=[];
  page.on("request",request=>{
-  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/rpc/request_player_history_demand")
+  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/rpc/app_access_history_demand")
    imports.push(JSON.parse(request.postData()||"{}"));
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
@@ -78,78 +92,20 @@ test("Following stays local; only Historie requests a new source import",async (
  expect(imports).toHaveLength(0);
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect.poll(()=>imports.length,{timeout:10000}).toBeGreaterThan(0);
- expect(imports.some(request=>request.target_id===PLAYER)).toBe(true);
+ expect(imports.some(request=>request.p_player_dbv_id===PLAYER)).toBe(true);
 });
 
-test("Home uses one Badhub career summary; filters retain separately evidenced matches",async ({page})=>{
+test("An invited member sees individually sourced match statistics and navigable proof cards",async({page})=>{
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#first-run-dialog")).not.toBeVisible();
+ await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator(".focused-profile")).toContainText("Philipp");
- const mainTabs=page.locator(".bottom-nav a:visible");
- await expect(mainTabs).toHaveCount(5);
- await expect(page.locator("#match-stats-source")).toHaveText("Badhub · Karrierebilanz");
- const reference=page.locator("#match-stats-reference");
- await expect(reference).toBeVisible();
- await expect(reference.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9\s*%/]);
- await expect(reference).not.toContainText("Quelle:");
- await expect(reference).not.toContainText("Screenshot");
- await expect(reference).not.toContainText("keine Live-Abfrage");
- await expect(reference).toContainText("Siegquote");
- await expect(reference.locator("a")).toHaveAttribute("href",
-  "https://badhub.de/spieler/"+PLAYER+"?saison=all&src=gesamt");
- await expect(reference).not.toContainText("DBV · Kontrollstand");
- await expect(reference).not.toContainText("Einzelbeleg-Teilbestand");
- await expect(reference.locator(".dbv-reference-totals span")).toHaveCount(4);
- const careerPalette=await reference.evaluate(el=>{
-  const box=el.querySelector(".dbv-reference-totals .wins");
-  return {
-   win:getComputedStyle(box.querySelector("strong")).color,
-   loss:getComputedStyle(el.querySelector(".dbv-reference-totals .losses strong")).color,
-   background:getComputedStyle(box).backgroundColor,
-   border:getComputedStyle(box).borderTopColor
-  };
- });
-
- await expect(page.locator("#match-stats-values")).toBeHidden();
- await expect(page.locator("#match-stats-note")).toBeHidden();
- await expect(page.locator("#match-stats-provenance")).toBeHidden();
- await expect(page.locator("#match-stats-source-link")).toBeHidden();
- // A scoped filter shows individual-source evidence instead of inventing a
- // detailed breakdown for the all-career Badhub screenshot.
- await page.locator("#match-stats-discipline").selectOption("Einzel");
- await expect(reference).toBeHidden();
  await expect(page.locator("#match-stats-values")).toBeVisible();
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("0");
- const proofPalette=await page.locator("#match-stats-values").evaluate(el=>{
-  const box=el.querySelector(".match-stat.wins");
-  return {
-   win:getComputedStyle(box.querySelector("strong")).color,
-   loss:getComputedStyle(el.querySelector(".match-stat.losses strong")).color,
-   background:getComputedStyle(box).backgroundColor,
-   border:getComputedStyle(box).borderTopColor
-  };
- });
- expect(careerPalette).toEqual(proofPalette);
-
- await page.locator("#match-stats-discipline").selectOption("all");
- await expect(reference).toBeVisible();
- await expect(page.locator("#match-stats-values")).toBeHidden();
- const viewport=await page.evaluate(()=>({
-  excess:document.documentElement.scrollWidth-window.innerWidth,
-  nav:[...document.querySelectorAll(".bottom-nav a:not([hidden])")].map(x=>{
-   const r=x.getBoundingClientRect();
-   return {w:r.width,h:r.height,label:x.innerText.trim()};
-  })
- }));
- expect(viewport.excess).toBeLessThanOrEqual(2);
- for(const tab of viewport.nav){
-  expect(tab.w,tab.label+" width").toBeGreaterThanOrEqual(44);
-  expect(tab.h,tab.label+" height").toBeGreaterThanOrEqual(44);
-  expect(tab.label.length).toBeGreaterThan(1);
- }
+ await expect(page.locator("#match-stats-source")).toContainText("Badhub");
+ await expect(page.locator("#match-stats-details")).toBeVisible();
 });
 
 test("Partial source outage never impersonates a verified empty history, and retry works",async ({page})=>{

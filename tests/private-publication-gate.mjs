@@ -34,8 +34,11 @@ assert.match(cutoverSql,/revoke select \(dbv_id,status,[\s\S]+on public\.player_
 assert.match(cutoverSql,/revoke execute on function public\.request_player_history_demand\(text\) from public,anon,authenticated/i);
 assert.match(cutoverSql,/has_table_privilege\('anon','public\.dbv_calendar_entries','SELECT'\)/);
 const importer=await readFile("supabase/functions/history-match-import/index.ts","utf8");
-assert.match(importer,/const PRIVATE_PLAYER_IMPORT_LOCKED=true/);
-assert.match(importer,/if\(PRIVATE_PLAYER_IMPORT_LOCKED\)return respond\(403,\{error:"private_access_required"\},origin\)/);
-assert.ok(importer.indexOf("readBoundedJson(req,1024)")<importer.indexOf("if(PRIVATE_PLAYER_IMPORT_LOCKED)"));
-assert.ok(importer.indexOf("if(PRIVATE_PLAYER_IMPORT_LOCKED)")<importer.indexOf('api("rpc/claim_external_match_import"'));
+assert.match(importer,/async function isInvitedMember/);
+assert.match(importer,/app_access_status/);
+assert.ok(importer.includes("data?.allowed===true"));
+assert.ok(importer.includes('if(!(await isInvitedMember(req)))return respond(403,{error:"app_invitation_required"},origin);'));
+assert.ok(importer.indexOf("readBoundedJson(req,1024)")<importer.indexOf("if(!(await isInvitedMember(req)))"));
+assert.ok(importer.indexOf("if(!(await isInvitedMember(req)))")<importer.indexOf('api("rpc/claim_external_match_import"'),
+ "No service-role import claim or third-party fetch without a verified app member");
 console.log("Private-mode release gate: no public personal archives, no scheduled name re-publication, old SW cache invalidated.");

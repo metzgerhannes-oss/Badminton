@@ -29,7 +29,9 @@
 <script defer src="./matchday-view.js"></script>
 <script defer src="./app.js"></script>
 <script defer src="./settings-rooms.js"></script>
-<script defer src="./invite.js"></script>
+<script type="module" src="./invite.js"></script>
+<script type="module" src="./app-access.js"></script>
+<script type="module" src="./player-data-status.js"></script>
 <script type="module" src="./library.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
@@ -55,13 +57,24 @@
 <script type="module" src="./teams.js"></script>
 </head>
 <body>
+<div id="app-access-gate" role="region" aria-label="Einladung für Schmetterlinge">
+ <section class="app-access-panel">
+  <h1>Schmetterlinge · Einladung</h1>
+  <p>Die App ist für eingeladene Badminton-Familien zugänglich. Mit einem gültigen Link siehst du belegte Matchkarten, Turnierergebnisse und Trophäen.</p>
+  <label for="app-access-code">Einladungslink oder Code</label>
+  <input id="app-access-code" type="password" autocomplete="off" spellcheck="false" placeholder="Einladungslink hier einfügen">
+  <button id="app-access-submit" type="button">Zugang freischalten</button>
+  <p id="app-access-status" role="status" aria-live="polite">Zugang wird geprüft …</p>
+  <small>Keine E-Mail-Adresse und kein Passwort erforderlich. Auf dem iPhone nach dem Hinzufügen zum Home-Bildschirm den Einladungslink bei Bedarf noch einmal hier einfügen.</small>
+ </section>
+</div>
 <a class="skip-link" href="#hauptinhalt">Zum Inhalt springen</a>
 <div class="app">
  <header class="topbar">
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v134" title="Version v134">v134</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v136" title="Version v134">v136</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -70,9 +83,14 @@
  </div>
  <main id="hauptinhalt" tabindex="-1">
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
+  <section id="player-data-status" class="player-data-status" aria-labelledby="player-data-heading" hidden>
+   <div class="player-data-status-head"><strong id="player-data-heading">Datenbestand</strong><a href="#historie">Alle Ergebnisse ansehen ↗</a></div>
+   <p id="player-data-counts" role="status" aria-live="polite">Datenstand wird geprüft …</p>
+   <small id="player-data-coverage-note"></small>
+  </section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1><span id="dashboard-week" class="muted">Badminton-Termine</span></div>
-   <p class="settings-hint" role="status">Privatmodus: Spielergebnisse und Ranglisten werden nicht mehr öffentlich angezeigt. Eigene Profile und Turnierfavoriten bleiben lokal; persönliche Freigaben werden vorbereitet.</p>
+   <p class="settings-hint" role="status">Für eingeladene Nutzer: Belegte Badminton-Ergebnisse, Ranglisten und Matchkarten. Eigene Profile und Turnierfavoriten bleiben auf diesem Gerät.</p>
    <a href="#live" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
    <div id="dashboard-next" class="dashboard-next"></div>
    <div id="shared-tournaments" class="shared-tournaments" hidden></div>
@@ -125,7 +143,7 @@
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
-   <p class="small muted">Privatmodus: Persönliche Historien sind ohne gesonderte Berechtigung nicht verfügbar. Deine privaten Spieler- und Freundeslisten bleiben auf dem Gerät.</p>
+   <p class="small muted">Alle belegten Einzelmatches und Turnierplatzierungen für eingeladene Nutzer. Nur bestätigte Top-4-Platzierungen zählen im Trophäenschrank.</p>
    <details id="history-source-details" class="history-source-details">
     <summary>Datenstand und Quellen</summary>
      <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
@@ -477,17 +495,18 @@
      <p class="club-branding-status" id="club-branding-status" role="status" aria-live="polite"></p>
     </form>
    </section>
-   <section class="settings-card invitation-card" aria-labelledby="invitation-title">
-    <h3 id="invitation-title">Familie &amp; Freunde einladen</h3>
-    <p>Teile den öffentlichen Einrichtungslink. Er führt auf eine Willkommensseite zum Anlegen des eigenen Spielers oder zum Eintragen einer DBV-Spieler-ID bzw. eines offiziellen Profil-Links.</p>
+   <section class="settings-card invitation-card" aria-labelledby="invitation-title" hidden>
+    <h3 id="invitation-title">App-Zugänge einladen</h3>
+    <p>Ein Link berechtigt zum Lesen aller belegten Spielergebnisse und Trophäen. Er erlaubt keine Verwaltung fremder Spieler.</p>
     <div class="invitation-actions">
-     <button class="primary-button" id="invite-share" type="button">Einladungslink teilen</button>
-     <button class="outline-button" id="invite-copy" type="button">Link kopieren</button>
+     <button class="primary-button" id="invite-share" type="button">Einladung erstellen & teilen</button>
+     <button class="outline-button" id="invite-copy" type="button">Einladungslink kopieren</button>
+     <button class="outline-button" id="invite-revoke" type="button" hidden>Aktuellen Zugang widerrufen</button>
     </div>
-    <a class="invitation-link" id="invite-link-preview" href="./welcome.html">Zur Willkommensseite ↗</a>
+    <a class="invitation-link" id="invite-link-preview" href="./welcome.html#installation">App-Installation ↗</a>
     <a class="invitation-guide" href="./welcome.html#installation">Anleitung: App auf iPhone oder Android hinzufügen ↗</a>
     <p class="invitation-status" id="invite-status" aria-live="polite"></p>
-    <p class="small muted">Die Einladung ist frei teilbar und enthält keine privaten Daten. Sie überträgt keine bestehenden Profile oder Favoriten und ist keine Einladung in einen Cloud-Account.</p>
+    <p class="small muted">Links sind bis zu 30 Tage einlösbar. Der Zugang bleibt danach bis zum Widerruf aktiv. Weitergeleitete Links können von weiteren Personen genutzt werden. Neue Geräte benötigen eine erneute Annahme.</p>
    </section>
    <div class="settings-card"><h3>Datenquellen & Nachweise</h3>
     <p>Wir bewerten die Datenquellen nach Verlässlichkeit: offizieller DBV, Verband, Vereinsbericht und Drittanbieter. Die aktuelle DBV-Excel-Rangliste enthält nur Gesamtpunkte; die fünf Turnier-Einzelwertungen werden separat geprüft.</p>

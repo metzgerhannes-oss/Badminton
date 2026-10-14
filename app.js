@@ -527,7 +527,10 @@ function setup(){
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
   });
-  welcome.showModal();
+  if(window.badmintonAppAccess?.allowed)welcome.showModal();
+  else window.addEventListener("badminton:app-access-granted",()=>{
+   if(!state.players.length&&!state.friends.length&&!welcome.open)welcome.showModal();
+  },{once:true});
  }
  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }

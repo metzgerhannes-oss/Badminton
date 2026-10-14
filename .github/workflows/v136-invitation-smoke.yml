@@ -1,0 +1,30 @@
+name: v136 invitation and results smoke
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app-access.js"
+      - "app-access.css"
+      - "invite.js"
+      - "index.html"
+      - "player-data-status.js"
+      - "tests/e2e/invite-only-access.spec.mjs"
+      - ".github/workflows/v136-invitation-smoke.yml"
+  workflow_dispatch:
+jobs:
+  invited-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install pinned dependencies
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Install mobile Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify invited entry and revocation
+        run: npx playwright test tests/e2e/invite-only-access.spec.mjs --workers=2 --retries=0 --reporter=line

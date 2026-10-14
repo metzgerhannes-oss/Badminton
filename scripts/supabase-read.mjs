@@ -35,9 +35,13 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   if(signal)signal.addEventListener("abort",onAbort,{once:true});
   const timer=setTimeout(()=>{timedOut=true;controller.abort()},timeoutMs);
   try{
+   const protectedRoute=/^(?:player_external_match_facts|tournament_placements)[?]/.test(path);
+   const sessionToken=protectedRoute&&typeof window!=="undefined"
+    ?await window.badmintonAppAccess?.getAccessToken?.():null;
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
-    headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{})}
+    headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),
+     ...(sessionToken?{Authorization:"Bearer "+sessionToken}:{})}
    });
    if(!response.ok){
     const status=response.status||0;
@@ -61,4 +65,30 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   }
  }
  throw new PublicReadError("offline","Network unavailable");
+}
+
+/** Match import progress for invited members. This is advisory: failure must not
+ * suppress backed, server-authorized match-card reads. */
+export async function readMatchImportProgress(id,{signal}={}){
+ if(typeof id!=="string"||!/^[0-9]{2}-[0-9]{6}$/.test(id))return null;
+ if(typeof window!=="undefined"&&window.badmintonAppAccess?.allowed){
+  const jwt=await window.badmintonAppAccess.getAccessToken();
+  if(!jwt)return null;
+  const response=await fetch(SUPABASE_ROOT+"rpc/app_access_player_coverage",{
+   method:"POST",cache:"no-store",signal,
+   headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+jwt,"Content-Type":"application/json"},
+   body:JSON.stringify({p_player_dbv_id:id})
+  });
+  if(!response.ok)return null;
+  const d=await response.json();
+  if(d?.dbv_id!==id)return null;
+  return {status:d.import_status||null,verified_count:Number(d.match_cards||0),
+   last_finished_at:d.last_import||null};
+ }
+ const path="player_external_match_imports?"+new URLSearchParams({
+  select:"status,verified_count,source_count,rejected_count,last_finished_at",
+  dbv_id:"eq."+id,limit:"1"
+ });
+ const data=await readPublicRows(path,{signal,count:false});
+ return data.rows[0]||null;
 }

@@ -57,8 +57,8 @@ assert.match(history,/const result=computeExternalStats\(subset,\{year,disciplin
 assert.match(history,/const filtered=result\.details/);
 assert.match(history,/const PAGE_LIMIT=400,MAX_ROWS=10000/);
 assert.match(history,/partial=collected\.length>=MAX_ROWS/);
-assert.match(history,/import \{readPublicRows\} from "\.\/scripts\/supabase-read\.mjs"/);
-assert.match(home,/import \{readPublicRows\} from "\.\/scripts\/supabase-read\.mjs"/);
+assert.match(history,/import \{readPublicRows,readMatchImportProgress\} from "\.\/scripts\/supabase-read\.mjs"/);
+assert.match(home,/import \{readPublicRows,readMatchImportProgress\} from "\.\/scripts\/supabase-read\.mjs"/);
 assert.match(history,/readPublicRows\(route,\{signal,count:false\}\)/);
 assert.match(home,/readPublicRows\(path,\{signal,count:false\}\)/);
 assert.doesNotMatch(history,/fetch\(API\+/);

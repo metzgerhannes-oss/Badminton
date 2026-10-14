@@ -5,8 +5,22 @@ const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const PUBLIC="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
 const ORIGIN="https://metzgerhannes-oss.github.io";
-// Private player cutover: disable unauthenticated external imports until scoped invites exist.
-const PRIVATE_PLAYER_IMPORT_LOCKED=true;
+// v136: PostgREST verifies the user JWT and the server-side invite membership.
+// Origin and publishable key are never accepted as a substitute for this.
+async function isInvitedMember(req:Request):Promise<boolean>{
+ const raw=req.headers.get("authorization")||"";
+ if(!/^Bearer [A-Za-z0-9._-]+$/.test(raw)||raw.length>4500)return false;
+ try{
+  const response=await fetch(API+"/rest/v1/rpc/app_access_status",{
+   method:"POST",
+   headers:{apikey:PUBLIC,Authorization:raw,"Content-Type":"application/json"},
+   body:"{}",redirect:"error"
+  });
+  if(!response.ok)return false;
+  const data=await response.json();
+  return data?.allowed===true;
+ }catch{return false}
+}
 const headers=(origin:string|null)=>({
  "Content-Type":"application/json","Cache-Control":"no-store","Vary":"Origin",
  "Access-Control-Allow-Origin":origin===ORIGIN?ORIGIN:"null",
@@ -63,9 +77,9 @@ Deno.serve(async req=>{
  if(!/^\d{2}-\d{6}$/.test(id))return respond(400,{error:"invalid_id"},origin);
  if((req.headers.get("apikey")||data?.public_key)!==PUBLIC)
   return respond(403,{error:"missing_public_key"},origin);
- // Retain 400/405/413 request validation, then deny *before* any lease, DB read or Badhub fetch.
- // A public publishable API key and Origin are NOT player authorization.
- if(PRIVATE_PLAYER_IMPORT_LOCKED)return respond(403,{error:"private_access_required"},origin);
+ // Membership is checked by PostgREST under the caller's JWT on every import.
+ // No lease, service-role query, or external fetch before this check passes.
+ if(!(await isInvitedMember(req)))return respond(403,{error:"app_invitation_required"},origin);
  let claimed=false;
  try{
   // This is NOT authenticated account access. The service-only RPC enforces
