@@ -9,6 +9,10 @@ on:
       - "index.html"
       - "player-data-status.js"
       - "tests/e2e/invite-only-access.spec.mjs"
+      - "tests/e2e/v138-player-shell.spec.mjs"
+      - "tests/e2e/v138-owner-invites.spec.mjs"
+      - "scripts/owner-invites-overview.mjs"
+      - "settings-rooms.js"
       - ".github/workflows/v136-invitation-smoke.yml"
   workflow_dispatch:
 jobs:
@@ -27,4 +31,4 @@ jobs:
       - name: Install mobile Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
       - name: Verify invited entry and revocation
-        run: npx playwright test tests/e2e/invite-only-access.spec.mjs --workers=2 --retries=0 --reporter=line
+        run: npx playwright test tests/e2e/invite-only-access.spec.mjs tests/e2e/v138-player-shell.spec.mjs tests/e2e/v138-owner-invites.spec.mjs --workers=2 --retries=0 --reporter=line
