@@ -1,6 +1,7 @@
 import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scripts/invitation.mjs";
 import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
 import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
+import {markImportPending,consumeImportPending,markImportIntroSeen} from "./scripts/profile-import-prompt.mjs";
 const $=id=>document.getElementById(id);
 const t=key=>window.SchmetterlingeI18n?.t(key)||key;
 const format=(key,params={})=>t(key).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??""));
@@ -51,6 +52,7 @@ function persistAndContinue(profile,{confirmed=false}={}){
   throw Error("Die DBV-ID konnte nicht als aktives Profil gespeichert werden. Bitte erneut versuchen.");
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};
+ markImportPending(localStorage,profile.id);
  if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
  // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
  // Installed PWAs must return directly to the app, not repeat the installation tutorial.
@@ -58,10 +60,29 @@ function persistAndContinue(profile,{confirmed=false}={}){
   window.location.replace("./index.html#start");
   return;
  }
+ showDataIntro();
+ document.title="Daten für das Spielerprofil abrufen · Schmetterlinge";
+}
+function showDataIntro(){
  $("onboard-profile").hidden=true;
- $("onboard-install").hidden=false;
+ $("onboard-install").hidden=true;
+ $("onboard-data").hidden=false;
  $("progress-profile").classList.remove("current");
  $("progress-profile").classList.add("done");
+ $("progress-data").classList.add("current");
+ $("progress-data").classList.remove("done");
+ $("progress-install").classList.remove("current");
+ window.scrollTo?.(0,0);
+}
+function continueToInstall(){
+ // The explicit "Später" choice is remembered only for this selected profile.
+ const skipped=consumeImportPending(localStorage);
+ if(skipped)markImportIntroSeen(localStorage,skipped);
+ $("onboard-data").hidden=true;
+ $("onboard-profile").hidden=true;
+ $("onboard-install").hidden=false;
+ $("progress-data").classList.remove("current");
+ $("progress-data").classList.add("done");
  $("progress-install").classList.add("current");
  showPlatform(preferredPlatform());
  document.title=t("App zum Home-Bildschirm hinzufügen · Schmetterlinge");
@@ -194,6 +215,8 @@ function onSearchInput(){
  searchTimer=setTimeout(()=>searchPlayers(value),280);
 }
 function showProfileForm(){
+ $("onboard-data").hidden=true;
+ $("progress-data").classList.remove("current","done");
  $("onboard-install").hidden=true;
  $("onboard-profile").hidden=false;
  $("progress-install").classList.remove("current");
@@ -236,13 +259,16 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("welcome-player-search").addEventListener("search",onSearchInput);
  $("install-ios").addEventListener("click",()=>showPlatform("ios"));
  $("install-android").addEventListener("click",()=>showPlatform("android"));
- $("install-back").addEventListener("click",showProfileForm);
+ $("install-back").addEventListener("click",showDataIntro);
+ $("welcome-data-skip").addEventListener("click",continueToInstall);
  const known=readSaved()?.players;
  $("welcome-existing").hidden=!(Array.isArray(known)&&known.length);
  const fromInstalledApp=new URLSearchParams(location.search).get("from")==="app";
  $("progress-install").hidden=fromInstalledApp;
  updateMode("manual");
  if(location.hash==="#installation"){
+  $("onboard-data").hidden=true;
+  $("progress-data").classList.add("done");
   $("onboard-profile").hidden=true;
   $("onboard-install").hidden=false;
   $("progress-profile").classList.remove("current");
