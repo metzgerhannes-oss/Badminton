@@ -118,11 +118,13 @@ function render(){
    $("trophy-awards-heading").textContent="Auszeichnungen";
    return;
   }
-  // Only top-four placements proved by the private server response are available.
-  // This source does not claim to be a full lifetime tournament history.
+  // All sourced placements are displayed in the chronology. Only verified
+  // top-four finishes produce trophies. Coverage may be incomplete.
   source.hidden=false;
   source.textContent=state.coverage==="device_snapshot"
     ?"Lokale Datenkopie vom "+new Date(state.fetchedAt).toLocaleDateString("de-DE")+": belegte Top-4-Platzierungen. Keine automatische Aktualisierung."
+    :state.coverage==="sourced_placements_partial"
+    ?"Belegte Platzierungen aller Ränge im aktuellen Quellenbestand. Im Trophäenschrank zählen nur bestätigte Top-4-Ergebnisse. Die Historie kann Lücken enthalten."
     :"Geschütztes Teilarchiv: Belegte Top-4-Platzierungen. Weitere Ergebnisse können fehlen.";
   const playerRecords=state.results.filter(r=>r.playerId===lastPlayer);
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
