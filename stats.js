@@ -319,3 +319,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  fetchProfile(window.badmintonActivePlayerId||"");
 });
+
+// A newly accepted app invitation unlocks server-authorized match reads.
+window.addEventListener("badminton:app-access-granted",()=>{if(selected)fetchProfile(selected,true)});
