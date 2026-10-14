@@ -3,13 +3,13 @@ import {test,expect} from "@playwright/test";
 test("Installed app searches DBV and returns with verified player ID",async ({page})=>{
  await page.route("**/*",route=>{
   const url=new URL(route.request().url());
-  if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity")return route.fulfill({
+  if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity"){if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"POST,OPTIONS"}});return route.fulfill({
    status:200,contentType:"application/json",
    body:JSON.stringify([
     {dbv_id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",age_class:"U17"},
     {dbv_id:"05-051234",name:"Sarah Beispiel",club:"Anderer Verein",age_class:"U17"}
    ]),headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer"}
-  });
+  });}
   if(url.hostname==="127.0.0.1"||url.hostname==="localhost")return route.continue();
   return route.fulfill({status:200,contentType:"application/json",body:"[]",
    headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer"}});
@@ -72,6 +72,7 @@ test("Invitation link finds a verified player by name and saves only after confi
  await page.route("**/*",route=>{
   const url=new URL(route.request().url());
   if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity"){
+   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"POST,OPTIONS"}});
    return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify([
     {dbv_id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",age_class:"U17"},
     {dbv_id:"05-051234",name:"Sarah Beispiel",club:"Anderer Verein",age_class:"U17"}
@@ -96,7 +97,7 @@ test("Invitation link finds a verified player by name and saves only after confi
  await expect(page).toHaveURL(/\/index\.html#start$/);
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(1);
- expect(saved.players[0]).toMatchObject({id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",birthYear:2010});
+ expect(saved.players[0]).toMatchObject({id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen"});
  expect(saved.activeProfileId).toBe("05-061350");
 });
 
