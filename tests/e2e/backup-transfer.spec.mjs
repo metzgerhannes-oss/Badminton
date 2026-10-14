@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./authorized-test.mjs";
 import {readFile} from "node:fs/promises";
 
 const FAMILY="shuttleboard-v1",CALENDAR="schmetterlinge.calendarEvents.v1";
