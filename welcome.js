@@ -141,7 +141,7 @@ function showSearchResults(players,source){
  }
  if(!players.length){
   if(source==="restricted"){
-   setSearchStatus("Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.");
+   setSearchStatus("Die Spielersuche in Schmetterlinge findet derzeit nur lokal gespeicherte und bereits eingeladene Spieler. Suche alternativ direkt beim DBV und trage die DBV-ID unten ein.");
    $("welcome-manual-panel").open=true;
   }
   else if(source==="unavailable")
