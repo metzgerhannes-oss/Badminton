@@ -18,7 +18,7 @@ test("Wiki: basic rule, service fault and local search",async({page})=>{
  await page.getByRole("searchbox").fill("Netzberührung");
  await expect(page.getByRole("button",{name:/Ist die Netzberührung ein Fehler/})).toBeVisible();
  await page.getByRole("searchbox").fill("Doppel");
- await expect(page.getByRole("button",{name:/Wer schlägt im Doppel als Nächstes auf/})).toBeVisible();
+ await expect(page.getByRole("button",{name:/Wer schlägt im Doppel nach eigenem Punkt auf/})).toBeVisible();
  await page.getByRole("searchbox").fill("Ranglistenpunkte");
  await expect(page.getByRole("button",{name:/Wie entstehen Ranglistenpunkte/})).toBeVisible();
 });
@@ -33,4 +33,15 @@ test("Wiki: all three groups accessible on smallest phone without horizontal ove
  }
  await page.locator(".wiki-entry").first().click();
  await expect(page.locator("#detail-art svg")).toBeVisible();
+});
+
+test("Wiki: Small Games and score changes use specific illustrations",async({page})=>{
+ await page.goto("/wiki.html");
+ await page.getByRole("searchbox").fill("Box");
+ await page.getByRole("button",{name:/Was bedeutet Einzel „Box“/}).click();
+ await expect(page.locator("#detail-art[data-kind='smallbox'] svg")).toBeVisible();
+ await page.getByRole("button",{name:"Regel schließen"}).click();
+ await page.getByRole("searchbox").fill("2027");
+ await page.getByRole("button",{name:/Gilt ab 2027 überall/}).click();
+ await expect(page.locator("#detail-answer")).toContainText("4. Januar 2027");
 });
