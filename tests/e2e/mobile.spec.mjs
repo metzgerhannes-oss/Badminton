@@ -104,7 +104,7 @@ test("An invited member sees individually sourced match statistics and navigable
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("0");
- await expect(page.locator("#match-stats-source")).toContainText("Badhub");
+ await expect(page.locator("#match-stats-source")).toContainText("Bisher belegte Spiele");
  await expect(page.locator("#match-stats-details")).toBeVisible();
 });
 
@@ -118,6 +118,7 @@ test("Partial source outage never impersonates a verified empty history, and ret
  // The published all-career snapshot is still valid when match-import
  // endpoints fail; use a scoped filter to verify the independent retry UX.
  await expect(page.locator("#match-stats-reference")).toBeVisible();
+ await page.locator("#home-match-filter-panel > summary").click();
  await page.locator("#match-stats-discipline").selectOption("Einzel");
  await expect(page.locator("#match-stats-note")).toContainText("nur teilweise abrufbar");
  await expect(page.locator("#match-stats-source")).toContainText("unvollständig");

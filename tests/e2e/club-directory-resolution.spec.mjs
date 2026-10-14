@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 
 const HEADERS={
  "Access-Control-Allow-Origin":"*",
@@ -20,6 +20,7 @@ test("Scoped name and club search succeeds while full player-roster API yields n
  await page.route("**/*.supabase.co/**",route=>{
   const url=new URL(route.request().url());
   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:HEADERS});
+   if(url.pathname.endsWith("/rpc/app_access_status"))return route.fulfill({status:200,headers:HEADERS,body:'{"allowed":true,"owner":false}'});
   if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity"){
    const args=JSON.parse(route.request().postData()||"{}");queries.push(args);
    const rows=Array.from({length:12},(_,index)=>({
@@ -45,6 +46,7 @@ test("No name or zero verified results means no silent bulk club export",async (
  await page.route("**/*.supabase.co/**",route=>{
   const url=new URL(route.request().url());
   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:HEADERS});
+   if(url.pathname.endsWith("/rpc/app_access_status"))return route.fulfill({status:200,headers:HEADERS,body:'{"allowed":true,"owner":false}'});
   if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity")
    queries.push(JSON.parse(route.request().postData()||"{}"));
   return route.fulfill({status:200,headers:HEADERS,body:"[]"});

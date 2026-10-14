@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 
 const player="99-123456";
 test("Profile choice offers optional local data import once; settings can reopen it",async ({page})=>{

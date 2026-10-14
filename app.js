@@ -54,10 +54,11 @@ function renderFocusHeader(){
    state.players.map(player=>'<button type="button" data-switch-profile="'+esc(player.id)+'" '+(player.id===state.activeProfileId?'aria-current="true"':'')+'><span class="switcher-avatar">'+esc(player.name.trim().charAt(0).toUpperCase())+'</span><span class="switcher-name">'+esc(player.name)+'</span>'+(player.id===state.activeProfileId?'<span class="switcher-check" aria-label="Aktiv">✓</span>':'')+'</button>').join("")+
    '</div></details>';
  }
+ const profileMeta=[isFriend?"Gefolgt":"",p.birthYear?esc(p.birthYear):"",p.club?esc(p.club):""].filter(Boolean).join(" · ");
  wrap.innerHTML='<div class="focus-profile-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</div>'+
- '<div class="focus-profile-copy"><small>'+(isFriend?"Du folgst":"Mein aktives Spielerprofil")+'</small><strong>'+esc(p.name)+'</strong>'+
- '<span>'+(p.birthYear?"Jahrgang "+esc(p.birthYear)+" · ":"")+(isFriend?"Freund · ":"")+( /^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span>'+
- (p.club?'<span class="focus-club">Verein: '+esc(p.club)+'</span>':"")+'</div>'+action;
+  '<div class="focus-profile-copy"><strong>'+esc(p.name)+'</strong>'+
+  (profileMeta?'<span class="focus-profile-meta">'+profileMeta+'</span>':"")+
+  '<span class="focus-profile-id">'+(/^\d{2}-\d{6}$/.test(p.id)?"DBV "+esc(p.id):"Ohne DBV-ID")+'</span></div>'+action;
  el("back-own")?.addEventListener("click",navigateHome);
  wrap.querySelectorAll("[data-switch-profile]").forEach(button=>button.addEventListener("click",()=>{
   window.badmintonSelectViewer(button.dataset.switchProfile);
