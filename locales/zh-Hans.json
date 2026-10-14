@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "为保护隐私，DBV 公共姓名搜索目前已关闭。已接受的邀请会自动添加。你可以在下方通过姓名和 DBV 编号添加自己的其他档案。",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV 姓名搜索目前不可用。请通过姓名和 DBV 编号手动设置。",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "本设备未找到匹配的球员。你可以使用 DBV 编号手动添加其他档案。",
-    " · Auf diesem Gerät gespeichert": " · 已保存在本设备"
+    " · Auf diesem Gerät gespeichert": " · 已保存在本设备",
+    "2. Schritt Daten abrufen": "第 2 步：获取数据",
+    "3. Schritt App hinzufügen": "第 3 步：添加应用",
+    "Deine Daten abrufen": "获取你的数据",
+    "Profil ausgewählt.": "已选择球员档案。",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "现在可以获取已有成绩：球员档案、已核实的奖杯以及可用的比赛统计数据。",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "只有在你主动请求且拥有该球员的有效授权时才会获取数据。没有邀请时，之前保存的数据不会改变。",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "以后可随时在“设置 → 我的数据”中获取这些数据。",
+    "Jetzt Daten abrufen →": "立即获取数据 →",
+    "Später · weiter zur Installation": "稍后 · 继续安装"
   }
 }
