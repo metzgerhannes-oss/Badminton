@@ -1,11 +1,13 @@
 /** v136: only a verified site owner issues revocable, shareable app invitations. */
 import {getPrivateSession} from "./private-invites.js";
 import {PUBLIC_KEY,SUPABASE_ROOT} from "./scripts/supabase-read.mjs";
+import {mountOwnerInviteOverview} from "./scripts/owner-invites-overview.mjs";
 const STORAGE="schmetterlinge.appIssuedInvite.v136";
 const el=id=>document.getElementById(id);
 const hex=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,"0")).join("");
 const read=()=>{try{return JSON.parse(localStorage.getItem(STORAGE)||"null")}catch{return null}};
-const write=value=>localStorage.setItem(STORAGE,JSON.stringify(value));
+const write=value=>{localStorage.setItem(STORAGE,JSON.stringify(value));
+ window.dispatchEvent(new Event("badminton:issued-invites-changed"));};
 const link=token=>{const url=new URL("./index.html",location.href);url.hash="appinvite="+token;return url.href};
 const active=record=>record&&/^[0-9a-f]{64}$/.test(record.secret)&&Date.parse(record.expires)>Date.now()&&!record.revoked;
 let session=null,owner=false,busy=false;
@@ -80,6 +82,7 @@ async function init(){
   if(!owner)return;
   card.hidden=false;
   draw();
+  mountOwnerInviteOverview({card,rpc,read,write,draw,status});
   el("invite-share").addEventListener("click",()=>execute("share"));
   el("invite-copy").addEventListener("click",()=>execute("copy"));
   el("invite-revoke").addEventListener("click",revoke);
