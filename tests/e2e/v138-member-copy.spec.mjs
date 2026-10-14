@@ -17,7 +17,6 @@ test("invited member explicitly copies sourced matches without separate player l
   player_side:1,winning_side:1,opponent_names:["Gegnerin"],
   partner_names:[],games:[[21,14],[21,18]],
   competition:"Test",discipline:"Einzel",source_kind:"external"};
- let playerOnlyCalls=0;
  await page.route(API+"/**",async route=>{
   const r=route.request(),p=new URL(r.url()).pathname;
   if(r.method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
@@ -30,7 +29,6 @@ test("invited member explicitly copies sourced matches without separate player l
     player_dbv_id:DBV,scope:"app_archive",results:[]
    })});
   if(p.includes("/rpc/private_player_")||p.includes("/rpc/private_owner_")){
-   playerOnlyCalls++;
    // Extra player grants are deliberately rejected; app membership alone
    // must still permit a complete sourced match copy.
    return route.fulfill({status:403,headers,body:'{"message":"player grant not provided"}'});
@@ -47,7 +45,6 @@ test("invited member explicitly copies sourced matches without separate player l
   return value[id]?.matches?.map(x=>x.source_key);
  },DBV);
  expect(saved).toEqual(["test:1"]);
- // Background components may probe owner-only endpoints, but they cannot
- // grant access. The copy above must succeed with all such calls denied.
- expect(playerOnlyCalls).toBeGreaterThanOrEqual(0);
+ // The mock denies all player-only grants, so this result proves that
+ // existing app membership suffices for the voluntary data copy.
 });
