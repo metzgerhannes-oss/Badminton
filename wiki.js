@@ -98,7 +98,7 @@ function court(kind){
  +'<rect width="400" height="264" rx="20" fill="#d8f1ff"/>'
  +fill+(overlays[kind]||"")+lines+arrow
  +'<rect x="19" y="222" width="362" height="33" rx="11" fill="#fff"/>'
- +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="12.5" fill="#15516f">'+caption+'</text>'
+ +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="14" fill="#15516f">'+caption+'</text>'
  +SVG_END;
 }
 function badgeArt(left,right,sub){
@@ -125,11 +125,11 @@ function art(kind){
   +Array.from({length:7},(_,i)=>'<rect x="'+(13+i*55)+'" y="86" width="46" height="64" rx="10" fill="'+(i<5?"#138eb6":"#b2bec5")+'"/><text x="'+(36+i*55)+'" y="128" font-size="22" fill="white" font-weight="800" font-family="system-ui" text-anchor="middle">'+(i+1)+'</text>').join('')
   +'<text x="200" y="194" font-size="16" fill="#15516f" font-weight="800" font-family="system-ui" text-anchor="middle">DIE FÜNF BESTEN ZÄHLEN</text>'+SVG_END;
  if(kind==="levels"||kind==="levelsU11")return SVG_START+'<rect width="400" height="264" fill="#dff4ff"/>'
-  +["A","B","C","D","E"].map((v,i)=>'<circle cx="'+(46+i*77)+'" cy="116" r="34" fill="'+(kind==="levelsU11"&&i===1?"#b2bec5":i<2?"#167eac":"#179787")+'"/><text x="'+(46+i*77)+'" y="129" font-size="34" font-weight="850" font-family="system-ui" text-anchor="middle" fill="white">'+(kind==="levelsU11"&&i===1?"×":v)+'</text><text x="'+(46+i*77)+'" y="176" font-size="11" font-weight="700" font-family="system-ui" text-anchor="middle" fill="#15516f">'+["DBV","Gruppe","Land","Bezirk","Region"][i]+'</text>').join('')
+  +["A","B","C","D","E"].map((v,i)=>'<circle cx="'+(46+i*77)+'" cy="116" r="34" fill="'+(kind==="levelsU11"&&i===1?"#b2bec5":i<2?"#167eac":"#179787")+'"/><text x="'+(46+i*77)+'" y="129" font-size="34" font-weight="850" font-family="system-ui" text-anchor="middle" fill="white">'+(kind==="levelsU11"&&i===1?"×":v)+'</text><text x="'+(46+i*77)+'" y="176" font-size="14" font-weight="700" font-family="system-ui" text-anchor="middle" fill="#15516f">'+["DBV","Gruppe","Land","Bezirk","Region"][i]+'</text>').join('')
   +'<text x="200" y="225" font-size="13" font-weight="700" font-family="system-ui" text-anchor="middle" fill="#15516f">'+(kind==="levelsU11"?"U11: KEINE B-WERTUNG":"TURNIEREBENEN A–E")+'</text>'+SVG_END;
  if(kind==="smallSchedule")return SVG_START+'<rect width="400" height="264" fill="#dff3ff"/>'
   +[['1.','BOX'],['2.','OHNE HINTERFELD'],['3.','STANDARD']].map((p,i)=>'<rect x="15" y="'+(22+i*68)+'" width="370" height="58" rx="12" fill="'+(i%2?"#147ca9":"#16947f")+'"/><text x="43" y="'+(59+i*68)+'" font-family="system-ui" font-size="22" font-weight="800" fill="white">'+p[0]+'</text><text x="214" y="'+(58+i*68)+'" font-family="system-ui" font-size="17" font-weight="750" text-anchor="middle" fill="white">'+p[1]+'</text>').join('')
-  +'<text x="200" y="245" font-family="system-ui" font-size="11" font-weight="750" text-anchor="middle" fill="#15516f">BWBV C-RLT 2026 · U13 4.: MIXED</text>'+SVG_END;
+  +'<text x="200" y="245" font-family="system-ui" font-size="14" font-weight="750" text-anchor="middle" fill="#15516f">BWBV C-RLT 2026 · U13 4.: MIXED</text>'+SVG_END;
  if(kind==="rotate"||kind==="serveAgain")return SVG_START+'<rect width="400" height="264" fill="#dcf2ff"/>'
   +'<text x="107" y="44" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="800" fill="#17516e">VOR DEM PUNKT</text>'
   +'<text x="294" y="44" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="800" fill="#17516e">NACH DEM PUNKT</text>'
@@ -161,7 +161,7 @@ function art(kind){
   +'<text x="297" y="71" text-anchor="middle" font-family="system-ui" font-size="17" font-weight="800" fill="white">DBV NATIONAL</text>'
   +'<text x="297" y="125" text-anchor="middle" font-family="system-ui" font-size="29" font-weight="850" fill="white">TAILLE</text>'
   +'<text x="297" y="175" text-anchor="middle" font-family="system-ui" font-size="13" fill="white">SCHLÄGER ABWÄRTS</text>'
-  +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-size="11" fill="#15516f">DBV OHNE MESSGERÄT: TAILLE</text>'+SVG_END;
+  +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-size="14" fill="#15516f">DBV OHNE MESSGERÄT: TAILLE</text>'+SVG_END;
  if(kind==="choice")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff4ff"/>'
  +'<rect x="17" y="54" width="174" height="141" rx="15" fill="#187fa9"/><rect x="209" y="54" width="174" height="141" rx="15" fill="#17947b"/>'
  +'<text x="104" y="118" text-anchor="middle" font-size="24" font-weight="800" fill="white" font-family="system-ui">AUFSCHLAG</text>'
