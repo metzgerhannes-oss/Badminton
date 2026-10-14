@@ -1,4 +1,4 @@
-import {PUBLIC_KEY,demandPost,importStatusPath,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
+import {SUPABASE_ROOT,PUBLIC_KEY,demandPost,importStatusPath,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 
 let shown="",requestSeq=0,timeout,controller;
@@ -28,11 +28,32 @@ function show(state,id=""){
   }
  }
 }
+async function memberRpc(name,body,signal){
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token)throw Error("App membership unavailable");
+ const response=await fetch(SUPABASE_ROOT+"/rpc/"+name,{
+  method:"POST",cache:"no-store",signal,
+  headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"},
+  body:JSON.stringify(body)
+ });
+ if(!response.ok)throw Error("Member history endpoint HTTP "+response.status);
+ return response.json();
+}
 async function callStatus(id,signal){
+ if(window.badmintonAppAccess?.allowed){
+  const coverage=await memberRpc("app_access_player_coverage",{p_player_dbv_id:id},signal);
+  return {dbv_id:id,status:coverage?.import_status||"awaiting_source",
+   last_checked_at:coverage?.last_import||null,
+   detail:"Nachgewiesene Einzelbelege: "+Number(coverage?.match_cards||0)};
+ }
  const {rows}=await readPublicRows(importStatusPath(id),{signal,count:false});
  return rows[0]||null;
 }
 async function requestDemand(id,signal){
+ if(window.badmintonAppAccess?.allowed){
+  const response=await memberRpc("app_access_history_demand",{p_player_dbv_id:id},signal);
+  return response?.accepted===true;
+ }
  const payload=demandPost(id);
  if(!payload)return false;
  const response=await fetch(payload.url,{
