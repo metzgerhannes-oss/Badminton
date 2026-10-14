@@ -22,9 +22,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
       - name: Install pinned dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-package-lock --no-audit --no-fund
       - name: Install mobile Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
       - name: Verify invited entry and revocation
