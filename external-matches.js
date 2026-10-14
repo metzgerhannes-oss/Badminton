@@ -122,7 +122,7 @@ function render(){
 async function load(id){
  if(privateMode&&id===selected){render();return}
  if(id!==selected)privateMode=false;
- if(isValidId(id))requestPrivateMatches(id);
+ if(isValidId(id)&&!window.badmintonAppAccess?.allowed)requestPrivateMatches(id);
  abortController?.abort();
  const ticket=++seq;
  selected=id||"";rows=[];progress=null;loaded=false;failed=false;partial=false;
@@ -152,7 +152,7 @@ async function load(id){
 }
 window.addEventListener("badminton:private-matches-updated",e=>{
  const id=String(e.detail?.playerId||"");
- if(id!==selected)return;
+ if(id!==selected||window.badmintonAppAccess?.allowed)return;
  const snap=matchArchiveSnapshot(id);
  if(snap.state==="ready"){
   abortController?.abort();++seq;privateMode=true;rows=snap.rows;
