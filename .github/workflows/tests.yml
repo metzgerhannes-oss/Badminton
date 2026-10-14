@@ -68,6 +68,8 @@ jobs:
           node --check teams.js
           node --check scripts/team-directory-utils.mjs
           node --check welcome.js
+          node --check profile-import.js
+          node --check scripts/profile-import-prompt.mjs
           node --check scripts/invitation.mjs
           node --check scripts/invited-player-local.mjs
           node --check live.js
@@ -152,6 +154,7 @@ jobs:
           node tests/private-invites.mjs
           node tests/player-capability-invites.mjs
           node tests/private-trophy-scope-v127.mjs
+          node tests/profile-import-onboarding-v128.mjs
           node tests/settings-grants-v125.mjs
           node tests/verified-share-policy.mjs
           node tests/owner-bootstrap.mjs
