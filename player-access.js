@@ -116,7 +116,7 @@ async function create(){
    !["profile","trophies","matches"].every(section=>capability?.sections?.includes(section)))
    throw Object.assign(new Error("scope backend missing"),{scopeMissing:true});
   const token=freshToken();
-  const result=await rpc("private_player_invite_create",{p_token:token,p_player_dbv_id:selected},session.access_token);
+  const result=await rpc("private_player_invite_create_v2",{p_token:token,p_player_dbv_id:selected,p_scope_confirmation:"profile+trophies+matches:v2"},session.access_token);
   const record=Array.isArray(result)?result[0]:null;
   if(!record?.invitation_id||!record?.expires_at)throw Error("not confirmed");
   const map=read();
