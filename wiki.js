@@ -1,7 +1,7 @@
 "use strict";
 // Schmetterlinge – compact editorial wiki. Search runs in the browser; no account or analytics.
 // All cards require subject-matter and graphical release review before merging this draft PR.
-const DBV="https://www.badminton.de/der-dbv/satzung-ordnungen-und-spielregeln/";
+const DBV="https://www.badminton.de/fileadmin/dateien_upload/dateien_2026/juli_2026/dbv_satzungswerk_2026-27_stand_13.06.2026.pdf";
 const FAQ="https://www.badminton.de/der-dbv/jugend-wettkampf/faq/";
 const RANK="https://www.badminton.de/der-dbv/jugend-wettkampf/allgemeine-ranglisten-bestimmungen/";
 const BWBV="https://bwbv.de/2025/12/25/small-games-bei-bwbv-jugendturnieren-in-2026/";
@@ -9,6 +9,7 @@ const BWBV_J="https://bwbv.de/wp-content/uploads/2025/12/80-Jugendordnung.pdf";
 const FIFTEEN="https://www.badminton.de/news/badminton/neue-zaehlweise-dbv-praesidium-beschliesst-einfuehrung-von-3-x-15/";
 // [topic, question, answer, search terms, validity/scope, source, illustration]
 const DATA=[
+["grundlagen","Was wird vor Spielbeginn gewählt?","Die gewinnende Seite wählt Auf-/Rückschlag oder Feldseite. Die andere Seite wählt aus den übrigen Möglichkeiten.","wahl auslosung seitenwahl anfangen aufschlagen spielbeginn","Spielregel 6",DBV,"choice"],
 ["grundlagen","Wie groß ist das Spielfeld?","13,40 m lang; im Doppel 6,10 m und im Einzel 5,18 m breit.","feld größe spielfeld länge breite netz maß meter","Spielregeln 1",DBV,"court"],
 ["grundlagen","Welche Linien gelten im Einzel?","Die inneren Seitenlinien begrenzen das Einzelfeld. Die hintere Grundlinie zählt zum Feld.","einzel seitenaus grundlinie linie","Spielregeln 1",DBV,"single"],
 ["grundlagen","Welche Linien gelten im Doppel?","Im Doppel gelten die äußeren Seitenlinien. Beim Aufschlag ist das hintere Feld um 76 cm kürzer.","doppel seitenaus hintere aufschlaglinie","Spielregeln 1",DBV,"double"],
@@ -25,26 +26,28 @@ const DATA=[
 ["grundlagen","Darf ein Ball die Linie berühren?","Ja. Berührt der Ball die gültige Linie, ist er im Feld.","aus in auf linie federn boden","Spielregeln 13",DBV,"line"],
 ["grundlagen","Wie lange sind die Pausen?","Bis 60 Sekunden im Satz beim Pausenpunkt und bis 120 Sekunden zwischen zwei Sätzen.","pause 60 120 sekunden unterbrechung","Spielregeln 16; Pausenpunkt abhängig von Zählweise",DBV,"clock"],
 ["grundlagen","Welche Spielarten gibt es?","Einzel: 1 gegen 1. Doppel und Mixed: 2 gegen 2, beim Mixed jeweils Frau und Mann pro Paar.","disziplin spielart einzel doppel mixed","Spielregeln 10–11",DBV,"teams"],
+["spielsituationen","Darf man den Federball beim Aufschlag drehen?","Nein. Kein Spin beim Loslassen; der Schläger muss zuerst die Ballbasis treffen.","spin spinaufschlag ball drehen kork basis zuerst","Spielregel 9.1.5",DBV,"spin"],
+["spielsituationen","Was, wenn man beim Aufschlag den Ball verfehlt?","Fehler. Ein begonnener Aufschlag gilt auch bei einem Fehlversuch als ausgeführt.","verfehlen miss erfolgloser aufschlag vorbei","Spielregeln 9.1.8 und 9.3",DBV,"missServe"],
 ["spielsituationen","Müssen beide Füße beim Aufschlag stehen?","Ja. Beide Füße müssen teilweise den Boden berühren und bis zum Treffpunkt stillstehen.","fuß aufschlagfehler standlinie treten abheben","Spielregel 9.1",DBV,"feet"],
-["spielsituationen","Wie hoch darf der Aufschlag sein?","International: der gesamte Ball unter 1,15 m. National gilt häufig die alternative Taille-Regel.","aufschlaghöhe taillenhöhe 115 1,15 servicehöhe aufschlag zu hoch","Spielregel 9 / nationale Alternative",DBV,"height"],
+["spielsituationen","Wie hoch darf der Aufschlag sein?","International: Ball ganz unter 1,15 m. Bei nationalen DBV-Turnieren meist unter der Taille, Schläger abwärts.","aufschlaghöhe taillenhöhe 115 1,15 servicehöhe aufschlag zu hoch","Spielregel 9 / nationale Alternative",DBV,"height"],
 ["spielsituationen","Darf die Aufschlagbewegung stoppen?","Nein. Nach Beginn muss der Schläger bis zum Treffer weiter nach vorn gehen.","bewegung halt stoppen ausholen","Spielregel 9.1",DBV,"move"],
 ["spielsituationen","Was, wenn der Rückschläger nicht bereit ist?","War der Empfänger nicht bereit und versuchte keinen Rückschlag, wird wiederholt.","empfänger bereit wiederholung","Spielregel 14",DBV,"receiver"],
 ["spielsituationen","Wer nimmt den Aufschlag im Doppel?","Nur der diagonal gegenüberstehende richtige Rückschläger darf den Aufschlag annehmen.","doppel annahme falscher partner diagonal","Spielregel 11",DBV,"serve"],
-["spielsituationen","Wer schlägt im Doppel nach eigenem Punkt auf?","Dieselbe Person schlägt von der anderen Seite erneut auf.","doppel aufschlagfolge rotation vier spieler","Spielregel 11",DBV,"serveAgain"],
+["spielsituationen","Wer schlägt im Doppel nach eigenem Aufschlagpunkt auf?","Dieselbe Person schlägt von der anderen Seite erneut auf.","doppel aufschlagfolge rotation vier spieler","Spielregel 11",DBV,"serveAgain"],
 ["spielsituationen","Wann wechseln Doppelpartner ihre Seiten?","Nur wenn sie bei eigenem Aufschlag punkten. Bei Rückschlaggewinn wechseln sie nicht sofort die Positionen.","doppel stellung partner wechseln rotation","Spielregel 11",DBV,"rotate"],
 ["spielsituationen","Darf der Ball das Netz berühren?","Ja. Fliegt er trotz Netzberührung ins gültige gegnerische Feld, läuft der Ballwechsel weiter.","netzroller netzkante über netz","Spielregel 13",DBV,"net"],
 ["spielsituationen","Ist die Netzberührung ein Fehler?","Ja, wenn Spieler oder Schläger während des Ballwechsels das Netz berühren.","netz netzberuehrung schläger berühren","Spielregel 13",DBV,"fault"],
 ["spielsituationen","Darf der Schläger übers Netz ragen?","Treffe den Ball auf deiner Seite. Danach darf der Schläger über das Netz schwingen.","über netz nachschwingen netzüberschreitung","Spielregel 13",DBV,"net"],
 ["spielsituationen","Aufschlag bleibt im Netz hängen?","Fehler. Der Gegner gewinnt den Ballwechsel.","ball hängt netz aufschlag","Spielregel 13",DBV,"hangServe"],
-["spielsituationen","Rückschlag bleibt im Netz hängen?","Hat der Ball das Netz überquert und bleibt daran hängen, wird wiederholt.","ball hängt netz rückschlag let","Spielregel 14",DBV,"hangReturn"],
-["spielsituationen","Darf man den Ball zweimal schlagen?","Nein. Zwei Schläge derselben Person nacheinander sind ein Fehler.","doppelschlag zweimal","Spielregel 13",DBV,"doubleHit"],
-["spielsituationen","Was passiert bei falscher Aufschlagposition?","Die Stellung wird nach Entdeckung korrigiert. Der bisherige Spielstand bleibt bestehen.","stellung falscher empfänger fehler korrigieren","Spielregel 12",DBV,"rotate"],
+["spielsituationen","Rückschlag bleibt im Netz hängen?","Bleibt der Rückschlag oben am Netz oder nach Überfliegen darin hängen, gibt es Wiederholung.","ball hängt netz rückschlag let","Spielregel 14",DBV,"hangReturn"],
+["spielsituationen","Darf man den Ball zweimal schlagen?","Zwei getrennte Schläge derselben Person sind ein Fehler. Rahmen und Saiten in einem Schlag sind erlaubt.","doppelschlag zweimal","Spielregel 13",DBV,"doubleHit"],
+["spielsituationen","Was passiert bei falscher Aufschlagposition?","Die Stellung wird nach Entdeckung korrigiert. Der bisherige Spielstand bleibt bestehen.","stellung falscher empfänger fehler korrigieren","Spielregel 12",DBV,"wrongPosition"],
 ["spielsituationen","Was ist ein Let?","Ein Let ist eine Wiederholung. Der Punktestand bleibt unverändert, und der letzte Aufschläger serviert erneut.","let wiederholung unterbrechung","Spielregel 14",DBV,"let"],
-["spielsituationen","Was gilt bei einem Deckenball?","Eine Deckenberührung ist grundsätzlich ein Fehler. Für niedrige Hallen kann es besondere nationale Regelungen geben.","decke hallendecke niedrige halle","DBV-Spielregeln und nationale Anlagen",DBV,"ceiling"],
-["spielsituationen","Darf man während des Spiels beraten?","Coaching ist nur zu den im Wettbewerb erlaubten Zeitpunkten zulässig.","coaching trainer pause betreuer beraten","Spielregel 16; Turnierbestimmungen beachten",DBV,"clock"],
+["spielsituationen","Was gilt bei einem Deckenball?","Halle unter 9 m: Berührt der Aufschlag die Decke, wird wiederholt. Bei späterem Deckenkontakt: Fehler.","decke hallendecke niedrige halle","Spielregel 13.3.3 – DBV-Sonderfall",DBV,"ceiling"],
+["spielsituationen","Darf man während des Spiels beraten?","Beratung ist zwischen Ballwechseln erlaubt, bevor Aufschläger und Rückschläger bereitstehen.","coaching trainer pause betreuer beraten","Spielregel 16.5.1",DBV,"coach"],
 ["spielsituationen","Was tun ohne Schiedsrichter?","Unklare Entscheidungen nach den Turnierregeln klären. Bei Streitfällen die Turnierleitung hinzuziehen.","schiedsrichter umpire selbstentscheid streit","Wettbewerbsregel und Turnierleitung maßgeblich",DBV,"decision"],
-["spielsituationen","Wann ist der Ballwechsel vorbei?","Bei Bodenberührung, Fehler oder Wiederholung sowie wenn der Ball nicht mehr im Spiel ist.","tot spielende punkt ball","Spielregel 15",DBV,"decision"],
-["jugend","Welche Jugendaltersklassen gibt es?","U11, U13, U15, U17 und U19 sind die üblichen Jugendklassen. Die Turnierausschreibung nennt den gültigen Jahrgang.","alter altersklassen jugend geburtsjahr jahrgang","Jugend – Altersstichtag je Saison prüfen",BWBV_J,"ages"],
+["spielsituationen","Wann ist der Ballwechsel vorbei?","Der Ballwechsel endet bei Bodenberührung, Fehler, Wiederholung oder wenn der Ball nach Netztreffer zurückfällt.","tot spielende punkt ball","Spielregel 15",DBV,"rallyEnd"],
+["jugend","Welche Jugendaltersklassen gibt es?","BWBV-Turniere: meist U11 bis U19. In der DBV-Jugendrangliste gibt es auch U9.","alter altersklassen jugend geburtsjahr jahrgang","Jugend – Altersstichtag je Saison prüfen",BWBV_J,"ages"],
 ["jugend","Was bedeuten A- bis E-Turniere?","A = DBV, B = Gruppe, C = Landesverband, D = Bezirk, E = Region/Kreis. Einzelne Altersklassen haben Ausnahmen.","a rlt b rlt c rlt d rlt e rlt turnierklassen level","DBV-Jugendwettkampfsystem",FAQ,"levels"],
 ["jugend","Gibt es B-Turniere für U11?","In der regulären DBV-Jugendrangliste ist U11 den Kategorien A sowie C–E zugeordnet, nicht B.","u11 b rlt altersklasse möglich","DBV-Jugendrangliste – aktuelle Ausschreibung zählt",FAQ,"levelsU11"],
 ["jugend","Wie viele Turniere zählen für die Jugendrangliste?","Die fünf besten Ergebnisse aus den letzten zwölf Monaten zählen.","rangliste beste fünf 5 turniere","DBV-Jugendrangliste",FAQ,"ranking"],
@@ -52,9 +55,9 @@ const DATA=[
 ["jugend","Wann wird die Jugendrangliste aktualisiert?","Die Jugendrangliste wird jeden Donnerstag aktualisiert.","ranking update wöchentlich donnerstag","DBV-Jugendrangliste",FAQ,"weekday"],
 ["jugend","Wie entstehen Ranglistenpunkte?","Turnierkategorie, Altersklasse und Platzierung bestimmen die Wertung. Die offizielle Punktetabelle ist maßgeblich.","punkteplatzierung punktetabelle punkte a b c d e","DBV-Jugendrangliste",RANK,"podium"],
 ["jugend","Was sind Small Games?","U11 und U13 spielen teilweise auf kleineren Feldern. Die Ausschreibung nennt die Spielform.","kleinfeld small games verkleinert u11 u13 box","BWBV-Jugendturniere 2026",BWBV,"small"],
-["jugend","Was bedeutet Einzel „Box“?","Nur das mittlere Einzelfeld zählt. Vorder- und Hinterfeld sind aus.","box small games einzel vorne hinten","BWBV-Spielform 1 · 2026",BWBV,"smallbox"],
-["jugend","Was bedeutet „ohne Hinterfeld“?","Der hintere Feldstreifen gehört nicht zum gültigen Spielfeld. Das verändert die Länge der Ballwechsel.","small games feld ohne hinten u13","BWBV-Spielform 8 · 2026",BWBV,"smallnoback"],
-["jugend","Welche Small Games gelten beim C-RLT?","BWBV 2026: 1. C-RLT Box, 2. ohne Hinterfeld, 3. Standardfeld. U13: 4. C-RLT Mixed statt Einzel.","c rangliste small games c rlt bwbv 2026","BWBV-Jugendordnung 2026, Anhang 3",BWBV_J,"smallSchedule"],
+["jugend","Was bedeutet Einzel „Box“?","Nur das Einzelfeld zwischen kurzer und hinterer Doppel-Aufschlaglinie zählt.","box small games einzel vorne hinten","BWBV-Spielform 1 · 2026",BWBV,"smallbox"],
+["jugend","Was bedeutet „ohne Hinterfeld“?","Im Einzel endet das Feld an der hinteren Doppel-Aufschlaglinie.","small games feld ohne hinten u13","BWBV-Spielform 8 · 2026",BWBV,"smallnoback"],
+["jugend","Welche Small Games gelten beim C-RLT?","BWBV 2026 (U11/U13): 1. C-RLT Box, 2. ohne Hinterfeld, 3. Standardfeld. U13: 4. Mixed statt Einzel.","c rangliste small games c rlt bwbv 2026","BWBV-Jugendordnung 2026, Anhang 3",BWBV_J,"smallSchedule"],
 ["jugend","Darf man in einer höheren Altersklasse spielen?","Entscheidend sind Altersklassenregel und Turnierausschreibung.","hochmelden u13 u15 u17 höhere altersklasse","DBV/BWBV – konkrete Ausschreibung prüfen",BWBV_J,"ages"],
 ["jugend","Gilt ab 2027 überall die 15er-Zählweise?","Nein. Ab 4. Januar 2027 ist 3 × 15 für DBV-Individualturniere verbindlich; Landes- und Mannschaftswettbewerbe können abweichen.","2027 15 satz umstellung jugend","DBV-Individualturniere ab 04.01.2027",FIFTEEN,"score15"]
 ];
