@@ -41,7 +41,8 @@ assert.match(css,/\.dbv-reference-totals span\.losses strong\{color:#9b4242\}/);
 assert.match(css,/background:#e9f6ff;color:var\(--muted/);
 
 assert.match(stats,/badhub\.sourceUrl/);
-assert.match(stats,/if\(badhub&&referenceSection&&!privateMode\)\{[\s\S]*?values\.hidden=true;/);
+assert.match(stats,/if\\(badhub&&referenceSection&&!privateMode&&!window\\.badmintonAppAccess\\?\\.allowed\\)\\{[\\s\\S]*?values\\.hidden=true;/,
+ "A member must see actual sourced match counters, while legacy screenshot-only visitors keep the career view");
 assert.match(stats,/if\(provenance\)provenance\.hidden=true;/);
 assert.match(stats,/values\.hidden=false;[\s\S]*?const badhub=getBadhubMatchReference/,
  "Filtering or switching profiles restores the individual-source view");
