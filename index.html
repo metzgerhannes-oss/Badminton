@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="./language.css">
 <link rel="stylesheet" href="./club-branding.css">
 <link rel="stylesheet" href="./app-shell.css">
+<link rel="stylesheet" href="./app-access.css">
 <link rel="stylesheet" href="./teams.css">
 <link rel="stylesheet" href="./private-sharing.css">
 <link rel="stylesheet" href="./settings-rooms.css">
@@ -30,6 +31,7 @@
 <script defer src="./app.js"></script>
 <script defer src="./settings-rooms.js"></script>
 <script defer src="./invite.js"></script>
+<script type="module" src="./app-access.js"></script>
 <script type="module" src="./library.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
@@ -55,6 +57,17 @@
 <script type="module" src="./teams.js"></script>
 </head>
 <body>
+<div id="app-access-gate" role="region" aria-label="Einladung für Schmetterlinge">
+ <section class="app-access-panel">
+  <h1>Schmetterlinge · Einladung</h1>
+  <p>Die App ist für eingeladene Badminton-Familien zugänglich. Mit einem gültigen Link siehst du belegte Matchkarten, Turnierergebnisse und Trophäen.</p>
+  <label for="app-access-code">Einladungscode</label>
+  <input id="app-access-code" type="password" autocomplete="off" spellcheck="false" placeholder="Code aus dem Einladungslink">
+  <button id="app-access-submit" type="button">Zugang freischalten</button>
+  <p id="app-access-status" role="status" aria-live="polite">Zugang wird geprüft …</p>
+  <small>Keine E-Mail-Adresse und kein Passwort erforderlich. Dein eigenes Spielerprofil bleibt auf diesem Gerät.</small>
+ </section>
+</div>
 <a class="skip-link" href="#hauptinhalt">Zum Inhalt springen</a>
 <div class="app">
  <header class="topbar">
@@ -477,17 +490,18 @@
      <p class="club-branding-status" id="club-branding-status" role="status" aria-live="polite"></p>
     </form>
    </section>
-   <section class="settings-card invitation-card" aria-labelledby="invitation-title">
-    <h3 id="invitation-title">Familie &amp; Freunde einladen</h3>
-    <p>Teile den öffentlichen Einrichtungslink. Er führt auf eine Willkommensseite zum Anlegen des eigenen Spielers oder zum Eintragen einer DBV-Spieler-ID bzw. eines offiziellen Profil-Links.</p>
+   <section class="settings-card invitation-card" aria-labelledby="invitation-title" hidden>
+    <h3 id="invitation-title">App-Zugänge einladen</h3>
+    <p>Ein Link berechtigt zum Lesen aller belegten Spielergebnisse und Trophäen. Er erlaubt keine Verwaltung fremder Spieler.</p>
     <div class="invitation-actions">
-     <button class="primary-button" id="invite-share" type="button">Einladungslink teilen</button>
-     <button class="outline-button" id="invite-copy" type="button">Link kopieren</button>
+     <button class="primary-button" id="invite-share" type="button">Einladung erstellen & teilen</button>
+     <button class="outline-button" id="invite-copy" type="button">Einladungslink kopieren</button>
+     <button class="outline-button" id="invite-revoke" type="button" hidden>Aktuellen Zugang widerrufen</button>
     </div>
-    <a class="invitation-link" id="invite-link-preview" href="./welcome.html">Zur Willkommensseite ↗</a>
+    <a class="invitation-link" id="invite-link-preview" href="./welcome.html#installation">App-Installation ↗</a>
     <a class="invitation-guide" href="./welcome.html#installation">Anleitung: App auf iPhone oder Android hinzufügen ↗</a>
     <p class="invitation-status" id="invite-status" aria-live="polite"></p>
-    <p class="small muted">Die Einladung ist frei teilbar und enthält keine privaten Daten. Sie überträgt keine bestehenden Profile oder Favoriten und ist keine Einladung in einen Cloud-Account.</p>
+    <p class="small muted">Links sind bis zu 30 Tage einlösbar. Der Zugang bleibt danach bis zum Widerruf aktiv. Weitergeleitete Links können von weiteren Personen genutzt werden. Neue Geräte benötigen eine erneute Annahme.</p>
    </section>
    <div class="settings-card"><h3>Datenquellen & Nachweise</h3>
     <p>Wir bewerten die Datenquellen nach Verlässlichkeit: offizieller DBV, Verband, Vereinsbericht und Drittanbieter. Die aktuelle DBV-Excel-Rangliste enthält nur Gesamtpunkte; die fünf Turnier-Einzelwertungen werden separat geprüft.</p>
