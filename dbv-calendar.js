@@ -9,6 +9,22 @@ const localToday=()=>{
  const x=Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
  return x.year+"-"+x.month+"-"+x.day;
 };
+// Official BWBV youth framework dates for 2027, not confirmed DBV event records.
+ // Ages, venue, registration and final disciplines require each event's invitation.
+const BWBV_C_FRAMEWORK_2027=[
+ {start:"2027-01-16",end:"2027-01-17",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel"},
+ {start:"2027-02-27",end:"2027-02-28",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed"},
+ {start:"2027-05-08",end:"2027-05-09",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel"},
+ {start:"2027-06-26",end:"2027-06-27",title:"4. BWBV/C-RLT Jugend · Hexen-Cup, Einzel/Doppel/Mixed"}
+];
+const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2026/01/bj-2025-12-web.pdf";
+function bwFrameworkDates(settings,today){
+ if(settings.region!=="Baden-Württemberg"||settings.level!=="C"||
+  !["all","U13"].includes(settings.age)||!["all","2027"].includes(settings.year))return [];
+ const text=String(settings.q||"").toLowerCase().trim();
+ return BWBV_C_FRAMEWORK_2027.filter(t=>(settings.period!=="upcoming"||t.end>=today)&&
+  (!text||(t.title+" 2027 BWBV C-RLT Rangliste").toLowerCase().includes(text)));
+}
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
 const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
 function readPreference(){
@@ -57,6 +73,13 @@ function render(){
   // may enter this list, so do not invent records from older PDF schedules.
   const bwU13C=settings.region==="Baden-Württemberg"&&
     (settings.age==="U13"||settings.age==="all")&&settings.level==="C";
+  const framework=bwFrameworkDates(settings,localToday());
+  const frameworkHTML=framework.length
+    ?'<section class="dbv-calendar-framework"><h4>BWBV · veröffentlichte C-Ranglisten-Rahmentermine 2027</h4>'+
+     '<p>Diese Termine stammen aus dem BWBV-Jugendrahmenkalender, <strong>nicht</strong> aus dem DBV-Turnierimport. Ob U13 bei jedem Termin angeboten wird, Ort und Anmeldung stehen erst in der jeweiligen Ausschreibung.</p>'+
+     '<ul>'+framework.map(t=>'<li><strong>'+esc(formatDate(t.start))+'–'+esc(formatDate(t.end))+'</strong> · '+esc(t.title)+'</li>').join("")+'</ul>'+
+     '<a href="'+BWBV_FRAMEWORK_SOURCE+'" target="_blank" rel="noopener noreferrer">Offizieller BWBV-Jugendrahmenkalender ↗</a></section>'
+    :"";
   const coverageNote=bwU13C
     ?'<p><strong>Quellenlücke möglich:</strong> Für Baden-Württemberg fehlen in unserem DBV-Import U13/C-Termine. Bitte den <a href="https://bwbv.de/kalender/" target="_blank" rel="noopener noreferrer">BWBV-Kalender ↗</a> als zweite offizielle Quelle prüfen.</p>'
     :'<p>Der Datenbestand kann unvollständig sein. Keine Treffer bedeuten nicht, dass keine Turniere stattfinden.</p>';
@@ -67,7 +90,7 @@ function render(){
    (alternatives.length?'<p>Mit denselben übrigen Filtern sind folgende Levels verfügbar:</p><div class="dbv-calendar-alternatives">'+
     alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
       'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
-   coverageNote+
+   coverageNote+frameworkHTML+
    '<p class="settings-hint">Der Import umfasst nur den angegebenen Zeitraum; nicht alle DBV-/BWBV-Veranstaltungen sind vollständig erfasst.</p>'+
    '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>';
   return;
