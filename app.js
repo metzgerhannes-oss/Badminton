@@ -522,7 +522,7 @@ function setup(){
   chooser.querySelectorAll("[data-initial-player]").forEach(b=>b.addEventListener("click",()=>{
    if(!setActiveProfile(b.dataset.initialPlayer))return;
    welcome.close();location.hash="#start";render();
-   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:b.dataset.initialPlayer}}));
+   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:b.dataset.initialPlayer,source:"onboarding"}}));
   }));
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
