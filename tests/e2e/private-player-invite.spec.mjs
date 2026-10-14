@@ -54,6 +54,13 @@ test("Seven-day invite must be accepted, then persistent scoped session works un
  await expect(page.locator("#player-invite-data")).not.toContainText("Belegte Spiele");
  await expect(page.locator("#player-invite-matches")).toHaveCount(0);
  expect(accepted).toBe(1);
+ // Opening the same accepted link on this device must not redeem its token again.
+ await page.goto("/private-player.html#token="+token,{waitUntil:"load"});
+ await expect(page.locator("#player-invite-data")).toBeVisible();
+ await expect(page.locator("#player-invite-status")).toContainText("bereits angenommener Spielerzugang");
+ await expect(page.locator("#player-invite-accept")).toHaveText("Weitere Einladung annehmen");
+ expect(new URL(page.url()).hash).toBe("");
+ expect(accepted).toBe(1);
  await page.reload();
  await expect(page.locator("#player-invite-data")).toBeVisible();
  expect(accepted).toBe(1);

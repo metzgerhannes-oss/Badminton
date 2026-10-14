@@ -74,7 +74,9 @@ function show(data){
  }catch{/* Storage failure never changes server access. */}
  try{localStorage.setItem("schmetterlinge.invitedPlayerPendingView.v1",data.player.dbv_id)}
  catch{/* Local preference is optional. */}
- panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
+ panel.hidden=false;status.textContent=pendingToken
+  ?"Dein bereits angenommener Spielerzugang ist auf diesem Gerät verfügbar. Eine neue Einladung kannst du getrennt annehmen."
+  :"Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
 }
 let busy=false;let activeId=reusable||storedIds().at(-1)||"";syncSelector();
 $("player-invite-accepted").addEventListener("change",event=>{activeId=event.target.value;reload()});
@@ -130,8 +132,25 @@ acceptBtn.addEventListener("click",async()=>{
  if(activeId)await reload();
 });
 if(pendingToken){
- activeId="";acceptBtn.hidden=false;
- status.textContent="Du kannst diese Einladung innerhalb von sieben Tagen nach Erstellung annehmen. Danach bleibt der Zugriff auf diesem Gerät bis zum Widerruf erhalten.";
+ acceptBtn.hidden=false;
+ if(activeId){
+  // Do not redeem a previously accepted one-time token again. Always validate
+  // the locally stored permission with the server before displaying data.
+  // The pending link may refer to ANOTHER player: it remains independently
+  // redeemable by pressing the dedicated button.
+  acceptBtn.textContent="Weitere Einladung annehmen";
+  await reload();
+ }else{
+  status.textContent="Du kannst diese Einladung innerhalb von sieben Tagen nach Erstellung annehmen. Danach bleibt der Zugriff auf diesem Gerät bis zum Widerruf erhalten.";
+ }
 }else if(activeId){acceptBtn.hidden=true;await reload()}
 else{acceptBtn.hidden=true;hide("Auf diesem Gerät ist keine angenommene Einladung vorhanden.")}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&activeId)reload()});
+// Safari may reuse an already open page when the same URL gets a new #token.
+// In that case the module is not rerun. A reload processes the token on the
+// receiving device and clears the fragment immediately as on initial load.
+window.addEventListener("hashchange",()=>{
+ const hash=location.hash.slice(1);
+ if((hash.startsWith("token=")&&TOKEN.test(hash.slice(6)))||
+    (hash.startsWith("access=")&&UUID.test(hash.slice(7))))location.reload();
+});
