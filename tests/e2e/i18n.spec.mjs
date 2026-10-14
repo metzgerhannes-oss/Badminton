@@ -70,7 +70,7 @@ test("Chinese installation-first onboarding is fully localized, including profil
   await expect(page.locator("#onboard-profile > p").first()).toHaveText(
     "已接受的球员邀请会自动添加。你可以选择本设备保存的其他球员，或通过姓名和 DBV 编号添加。");
   await expect(page.locator("#onboard-profile")).not.toContainText("Finde deinen Spieler");
-  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
+  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入三个字符以搜索球员。");
   await page.locator("#welcome-manual-panel summary").click();
   await expect(page.locator("#mode-own")).toContainText("创建球员档案");
   await expect(page.locator("#welcome-manual-panel")).toContainText("关联 DBV 编号后");
@@ -95,11 +95,11 @@ test("Asynchronous search status follows switching from Chinese to French to Ger
   await page.locator("#install-back").click();
   await page.locator("#welcome-player-search").fill("x");
   await page.locator("#welcome-language").selectOption("zh-Hans");
-  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
+  await expect(page.locator("#welcome-search-status")).toHaveText("至少输入三个字符以搜索球员。");
   await page.locator("#welcome-language").selectOption("fr");
   await expect(page.locator("#welcome-search-status")).toHaveText(
-    "Saisissez au moins deux caractères pour trouver des joueurs.");
+    "Saisissez au moins trois caractères pour trouver des joueurs.");
   await page.locator("#welcome-language").selectOption("de");
   await expect(page.locator("#welcome-search-status")).toHaveText(
-    "Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
+    "Mindestens drei Zeichen eingeben, um Spieler zu finden.");
 });
