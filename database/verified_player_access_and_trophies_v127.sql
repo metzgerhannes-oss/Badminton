@@ -8,6 +8,8 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS private_content.player_management_reviewers (
  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
  independent_channel text NOT NULL CHECK(independent_channel IN ('club_official','association_official','parent_confirmed')),
+ club_scope text NOT NULL CHECK (length(club_scope) BETWEEN 1 AND 120),
+ CONSTRAINT association_only_global_scope CHECK (club_scope<>'*' OR independent_channel='association_official'),
  enrolled_at timestamptz NOT NULL DEFAULT now(),
  revoked_at timestamptz
 );
@@ -47,6 +49,9 @@ AS $func$
       AND r.status='approved' AND r.revoked_at IS NULL
    JOIN private_content.player_management_reviewers v
      ON v.user_id=r.reviewer_user_id AND v.revoked_at IS NULL
+     AND v.independent_channel=r.preferred_channel
+   JOIN public.players p ON p.dbv_id=g.player_dbv_id
+     AND (v.club_scope=p.club OR (v.independent_channel='association_official' AND v.club_scope='*'))
    WHERE g.user_id=p_user_id AND g.player_dbv_id=p_dbv_id AND g.revoked_at IS NULL
      AND g.verification_method IN ('club_review','adult_player_review')
      AND g.reviewed_by='reviewer:'||r.reviewer_user_id::text
@@ -108,11 +113,16 @@ BEGIN
  IF actor IS NULL OR p_request_id IS NULL
   OR (p_approve AND (p_reference IS NULL OR p_reference !~ '^[A-Za-z0-9._:/-]{8,100}$'))
  THEN RETURN false; END IF;
- IF NOT EXISTS(SELECT 1 FROM private_content.player_management_reviewers v
-               WHERE v.user_id=actor AND v.revoked_at IS NULL) THEN RETURN false; END IF;
  SELECT * INTO req FROM private_content.player_management_requests
   WHERE id=p_request_id AND status='pending' FOR UPDATE;
  IF NOT FOUND OR req.applicant_user_id=actor THEN RETURN false; END IF;
+ IF NOT EXISTS(
+   SELECT 1 FROM private_content.player_management_reviewers v
+   JOIN public.players p ON p.dbv_id=req.player_dbv_id
+   WHERE v.user_id=actor AND v.revoked_at IS NULL
+    AND v.independent_channel=req.preferred_channel
+    AND (v.club_scope=p.club OR (v.independent_channel='association_official' AND v.club_scope='*'))
+ ) THEN RETURN false; END IF;
  UPDATE private_content.player_management_requests SET
   status=CASE WHEN p_approve THEN 'approved' ELSE 'rejected' END,
   reviewer_user_id=actor, reviewed_at=now(),
