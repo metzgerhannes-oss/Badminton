@@ -1,0 +1,15 @@
+/* Consent-only import step immediately after local profile choice. */
+.player-data-import-dialog{border:0;border-radius:19px;padding:0;
+ width:min(530px,calc(100vw - 28px));max-height:min(84vh,780px);
+ box-shadow:0 22px 75px #0d36554f;color:#143c5a;background:#fff}
+.player-data-import-dialog::backdrop{background:#08283e9c}
+.player-data-modal{padding:clamp(18px,5vw,29px);max-height:inherit;overflow-y:auto}
+.player-data-modal h2{font-size:clamp(20px,5vw,25px);line-height:1.2;margin:0 0 12px}
+.player-data-modal p{font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+.player-data-hint{color:#456980;margin:11px 0}
+.player-data-summary{border-top:1px solid #d1e4ee;padding-top:10px;font-weight:730}
+#player-data-import-status{color:#215d7e;font-weight:700;min-height:28px}
+.player-data-actions{display:grid;gap:10px;margin-top:16px}
+.player-data-actions button{min-height:46px;white-space:normal}
+.player-data-actions .subtle-button{text-decoration:underline;color:#326b8b}
+@media(max-width:350px){.player-data-modal{padding:15px}.player-data-modal p{font-size:13px}}
