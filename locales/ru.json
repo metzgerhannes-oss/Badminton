@@ -206,6 +206,16 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Общий поиск DBV по имени сейчас отключён для защиты персональных данных. Принятые приглашения добавляются автоматически. Ниже можно добавить собственные профили по имени и ID DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Поиск DBV по имени сейчас недоступен. Используйте ручное добавление по имени и ID DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "На устройстве не найден подходящий игрок. Другие профили можно добавить вручную по ID DBV.",
-    " · Auf diesem Gerät gespeichert": " · Сохранено на устройстве"
+    " · Auf diesem Gerät gespeichert": " · Сохранено на устройстве",
+    "1. Schritt App hinzufügen": "Шаг 1. Добавить приложение",
+    "2. Schritt Profil anlegen": "Шаг 2. Создать профиль",
+    "Profil speichern": "Сохранить профиль",
+    "Füge Schmetterlinge zum Home-Bildschirm hinzu. Öffne es danach über das Symbol und lege dein Profil dort an.": "Добавьте Schmetterlinge на главный экран. Затем откройте приложение через значок и создайте профиль там.",
+    "Ohne Installation im Browser fortfahren": "Продолжить в браузере без установки",
+    "Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen": "Сначала добавьте Schmetterlinge на главный экран",
+    "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Затем откройте Schmetterlinge через значок и создайте профиль там.",
+    "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Профили, уже сохранённые в Safari, не переносятся автоматически. Экспортируйте их через «Сохранить мои данные» и импортируйте в приложение.",
+    "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "После открытия через значок создайте профиль. Вход не требуется.",
+    "Profil anlegen": "Создать профиль"
   }
 }
