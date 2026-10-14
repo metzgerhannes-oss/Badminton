@@ -225,6 +225,10 @@ window.addEventListener("schmetterlinge:language-change", event => {
  if(lastSearchPlayers&&!selectedCandidate)showSearchResults(lastSearchPlayers,lastSearchSource);
  else if(lastSearchStatus?.kind==="results")setResultsStatus(lastSearchStatus.count,lastSearchStatus.source);
  else if(lastSearchStatus?.kind==="message")setSearchStatus(lastSearchStatus.message);
+ if(!$("onboard-install").hidden&&$("open-app").hidden){
+  const saved=readSaved()?.players;
+  showInstallFirst(Array.isArray(saved)&&saved.length>0);
+ }
  if(selectedCandidate){
   const detail=[selectedCandidate.club||t("Verein unbekannt"),
    selectedCandidate.birthYear?format("Jg. {year}",{year:selectedCandidate.birthYear}):selectedCandidate.ageClass,
