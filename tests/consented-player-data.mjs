@@ -14,6 +14,12 @@ assert.equal(cleanTrophy({...medal,verified:false},player),null);
 const many=Array.from({length:115},(_,i)=>({...match,source_key:"match-"+i}));
 const saved=savePlayerCopy(player,{matches:many,trophies:[medal,medal]},storage,"2026-10-14T11:00:00.000Z");
 assert.equal(saved.matches.length,115,"Do not revive 30-match restriction");
+assert.equal(saved.trophies.length,1);
+assert.equal(loadPlayerCopy(player,storage).trophies[0].place,2);
+assert.equal(loadPlayerCopy(other,storage),null);
+assert.ok(!storage.getItem(KEY).includes("should-not-copy"),"Only sanctioned fields in local snapshot");
+assert.ok(!storage.getItem(KEY).includes("invitation"),"No private access tokens/IDs in copy");
+
 // Reproduce a real, independently source-verified Badhub card. The local
 // round-trip must preserve every field required by the W/L evaluator.
 const sourceMatch={
@@ -41,11 +47,6 @@ const fiveSets={...sourceMatch,source_key:"tournament:five-set-proof",
  games:[[21,17],[17,21],[21,16],[16,21],[21,18]]};
 assert.equal(cleanMatch(fiveSets,player).games.length,5,"Never silently cut off two valid source sets");
 
-assert.equal(saved.trophies.length,1);
-assert.equal(loadPlayerCopy(player,storage).trophies[0].place,2);
-assert.equal(loadPlayerCopy(other,storage),null);
-assert.ok(!storage.getItem(KEY).includes("should-not-copy"),"Only sanctioned fields in local snapshot");
-assert.ok(!storage.getItem(KEY).includes("invitation"),"No private access tokens/IDs in copy");
 assert.equal(deletePlayerCopy(player,storage),true);
 assert.equal(loadPlayerCopy(player,storage),null);
 const {readFile}=await import("node:fs/promises");
