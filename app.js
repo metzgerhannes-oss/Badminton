@@ -107,6 +107,7 @@ function renderProfiles(){
  list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
   if(!setActiveProfile(b.dataset.setActive))return;
   render();toast("Startprofil geändert");
+  window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:b.dataset.setActive}}));
  }));
  list.querySelectorAll("[data-edit-own]").forEach(b=>b.addEventListener("click",()=>{
   const p=state.players.find(x=>x.id===b.dataset.editOwn);
@@ -255,6 +256,7 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
  }else return false;
  const destination=stayOnPage?(state.page==="live"?"live":"turniere"):"start";
   routeTo(destination);
+ window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}}));
  return true;
 };
 // A quick "+" is private device-only planning, never an official registration.
@@ -436,7 +438,10 @@ function setup(){
   }
   editingPlayerId=null;
   save();render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
-  if(isNewOwn)window.dispatchEvent(new CustomEvent("badminton:own-profile-added",{detail:{playerId:id}}));
+  if(isNewOwn){
+   window.dispatchEvent(new CustomEvent("badminton:own-profile-added",{detail:{playerId:id}}));
+   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}}));
+  }
  });
  const friendDialog=el("friend-dialog"),friendForm=el("friend-form");
  let editingFriendId=null;
@@ -518,6 +523,7 @@ function setup(){
   chooser.querySelectorAll("[data-initial-player]").forEach(b=>b.addEventListener("click",()=>{
    if(!setActiveProfile(b.dataset.initialPlayer))return;
    welcome.close();location.hash="#start";render();
+   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:b.dataset.initialPlayer}}));
   }));
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
