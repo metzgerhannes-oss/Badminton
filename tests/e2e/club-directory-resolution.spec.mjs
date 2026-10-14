@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./authorized-test.mjs";
 
 const HEADERS={
  "Access-Control-Allow-Origin":"*",
