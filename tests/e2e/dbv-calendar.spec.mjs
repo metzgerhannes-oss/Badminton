@@ -116,3 +116,20 @@ test("2027 year selection shows official source-backed future tournaments",async
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry").first()).toBeVisible();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
 });
+
+test("BWBV 2027 C framework dates are distinct from unavailable DBV U13 entries",async ({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
+ await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(4);
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("Ob U13");
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("nicht aus dem DBV-Turnierimport");
+ await expect(page.locator(".dbv-calendar-entry")).toHaveCount(0);
+ await expect(page.locator(".dbv-calendar-framework a")).toHaveAttribute("href",/bwbv\.de\/wp-content/);
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(0);
+});
