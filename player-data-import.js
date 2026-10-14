@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  // hint. It contains only a DBV ID; never a token or authority assertion.
  let id="";
  try{id=localStorage.getItem(pending)||"";localStorage.removeItem(pending)}catch{}
- if(DBV.test(id)){
+ if(id&&id.length<=60){
   const saved=read("shuttleboard-v1",{});
   if(saved?.activeProfileId===id||saved?.viewingFriendId===id)open(id,{force:true});
  }
