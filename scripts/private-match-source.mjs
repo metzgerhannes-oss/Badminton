@@ -109,7 +109,9 @@ export function clearPrivateMatchArchive({refresh=true}={}){
 if(typeof document!=="undefined"){
  window.addEventListener("badminton:profile-change",e=>{
   const next=String(e.detail?.playerId||"");
-  if(next&&next!==active){revision++;active=next;requestPrivateMatches(next)}
+  if(next&&next!==active){
+   revision++;states.clear();active=next;requestPrivateMatches(next);
+  }
  });
  window.addEventListener("badminton:private-player-revoked",()=>clearPrivateMatchArchive());
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)clearPrivateMatchArchive()});
