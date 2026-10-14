@@ -180,7 +180,7 @@ function art(kind){
  +'<path d="M93 14H190m-83-7-15 7 15 7m69-14 15 7-15 7" stroke="#1b739d" stroke-width="3" fill="none"/>'
  +'<text x="240" y="230" text-anchor="middle" font-size="16" font-weight="800" fill="#15516f" font-family="system-ui">MAX. 23 cm BREIT</text>'+SVG_END;
  if(kind==="shuttle")return SVG_START+'<rect width="400" height="264" rx="20" fill="#def4ff"/>'
- +'<path d="M137 183L84 42 M155 183L118 38 M175 183L153 34 M194 183L186 39 M214 183L225 43 M235 183L258 52" stroke="#f5f8fa" stroke-width="17" stroke-linecap="round"/>'
+ +Array.from({length:16},(_,i)=>{const x=91+i*13;const y=30+Math.round((i-7.5)**2*.65);return '<path d="M188 182L'+x+' '+y+'" stroke="#f5f9fc" stroke-width="8" stroke-linecap="round"/>';}).join('')
  +'<path d="M133 183Q188 197 242 183L224 221H149Z" fill="#edf5f5" stroke="#155471" stroke-width="4"/>'
  +'<ellipse cx="188" cy="226" rx="40" ry="16" fill="#e5c596" stroke="#155471" stroke-width="3"/>'
  +'<rect x="275" y="70" width="98" height="72" rx="11" fill="#197fa9"/>'
