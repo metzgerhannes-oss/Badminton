@@ -143,6 +143,12 @@ begin
        'date',p.event_date,'event',p.tournament_name,
        'place',p.placement,'discipline',p.discipline,
        'ageGroup',p.age_group,'partner',p.partner,
+       'matchEvidence',case
+         when p_player_dbv_id='05-071969' and p.event_date=date '2026-09-26'
+           and p.placement=5 and p.discipline='Einzel'
+           and p.source_url='https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026'
+         then jsonb_build_object('kind','club-report-at-least-one-win','minimumWins',1)
+         else null end,
        'source',jsonb_build_object('url',p.source_url,'level',p.source_level),
        'verified',p.verification_note is distinct from
          'Platz 3 von Familie bestätigt und zuvor anhand von Einzelmatches nachvollzogen; aktuelle namentliche Verbands-Resultatliste noch nicht abrufbar.',
