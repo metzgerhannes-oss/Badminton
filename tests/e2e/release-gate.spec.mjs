@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 const PLAYER="05-070879";
 test.beforeEach(async ({page})=>{
  await page.addInitScript(id=>{
@@ -8,7 +8,7 @@ test.beforeEach(async ({page})=>{
   }));
  },PLAYER);
  await page.route("https://**/*.supabase.co/**",route=>route.fulfill({
-  status:200,contentType:"application/json",body:"[]",
+  status:200,contentType:"application/json",body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':"[]",
   headers:{"Access-Control-Allow-Origin":"*"}
  }));
 });

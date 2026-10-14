@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 import {readFile} from "node:fs/promises";
 const data=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 const sourceTotal=data.entries.length;
@@ -10,7 +10,7 @@ test.beforeEach(async ({page})=>{
  await page.addInitScript(value=>{if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify(value));},own);
  await page.route("**/*.supabase.co/**",route=>{
   const url=new URL(route.request().url());
-  const rows=url.pathname.endsWith("/dbv_calendar_entries")?data.entries:[];
+  const rows=url.pathname.endsWith("/rpc/app_access_status")?{allowed:true,owner:false}:url.pathname.endsWith("/dbv_calendar_entries")?data.entries:[];
   return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(rows),
    headers:{"Access-Control-Allow-Origin":"*"}});
  });

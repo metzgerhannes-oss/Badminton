@@ -1,8 +1,9 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 
 test("Installed app searches DBV and returns with verified player ID",async ({page})=>{
  await page.route("**/*",route=>{
   const url=new URL(route.request().url());
+   if(url.pathname.endsWith("/rpc/app_access_status"))return route.fulfill({status:200,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:'{"allowed":true,"owner":false}'});
   if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity"){if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"POST,OPTIONS"}});return route.fulfill({
    status:200,contentType:"application/json",
    body:JSON.stringify([
@@ -41,7 +42,7 @@ test("Installed app searches DBV and returns with verified player ID",async ({pa
 });
 
 test("Cancel installed-app search without silently creating a profile",async ({page})=>{
- await page.route("**/*",route=>new URL(route.request().url()).hostname==="127.0.0.1"
+ await page.route("**/*",route=>new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?route.fulfill({status:200,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:'{"allowed":true,"owner":false}'}):new URL(route.request().url()).hostname==="127.0.0.1"
   ?route.continue():route.fulfill({status:200,contentType:"application/json",body:"[]",
    headers:{"Access-Control-Allow-Origin":"*"}}));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
@@ -54,7 +55,7 @@ test("Cancel installed-app search without silently creating a profile",async ({p
 });
 
 test("Installed app offers local-only manual fallback without a DBV result",async ({page})=>{
- await page.route("**/*",route=>new URL(route.request().url()).hostname==="127.0.0.1"
+ await page.route("**/*",route=>new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?route.fulfill({status:200,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:'{"allowed":true,"owner":false}'}):new URL(route.request().url()).hostname==="127.0.0.1"
   ?route.continue():route.fulfill({status:200,contentType:"application/json",body:"[]",
    headers:{"Access-Control-Allow-Origin":"*"}}));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
@@ -71,6 +72,7 @@ test("Installed app offers local-only manual fallback without a DBV result",asyn
 test("Invitation link finds a verified player by name and saves only after confirmation",async ({page})=>{
  await page.route("**/*",route=>{
   const url=new URL(route.request().url());
+   if(url.pathname.endsWith("/rpc/app_access_status"))return route.fulfill({status:200,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:'{"allowed":true,"owner":false}'});
   if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity"){
    if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"POST,OPTIONS"}});
    return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify([
@@ -104,6 +106,7 @@ test("Invitation link finds a verified player by name and saves only after confi
 test("Invitation still offers manual creation when no public DBV result exists",async ({page})=>{
  await page.route("**/*",route=>{
   const url=new URL(route.request().url());
+   if(url.pathname.endsWith("/rpc/app_access_status"))return route.fulfill({status:200,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:'{"allowed":true,"owner":false}'});
   if(url.hostname==="127.0.0.1"||url.hostname==="localhost")return route.continue();
   return route.fulfill({status:200,contentType:"application/json",body:"[]",
    headers:{"Access-Control-Allow-Origin":"*"}});

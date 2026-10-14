@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 const own={players:[{id:"05-070879",name:"Testprofil",club:"SpVgg Mössingen"}],
  friends:[],officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true};
 const source="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/clubTeams?club=10777";
@@ -14,6 +14,7 @@ test.beforeEach(async ({page})=>{
  await page.route("**/*.supabase.co/**",route=>{
   const path=new URL(route.request().url()).pathname;
   let data=[];
+   if(path.endsWith("/rpc/app_access_status"))data={allowed:true,owner:false};
   if(path.endsWith("/league_teams"))data=teams;
   if(path.endsWith("/league_clubs"))data=[
    {id:"10777",name:"SpVgg. Mössingen",region:"Bezirk Südwürttemberg",source_url:source,import_state:"imported"},

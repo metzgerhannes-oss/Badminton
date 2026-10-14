@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./invited-member.fixture.mjs";
 
 const PLAYER="05-070879";
 const FRIEND="05-061350";
@@ -43,7 +43,7 @@ test.beforeEach(async ({page})=>{
  },{player:PLAYER,friend:FRIEND,key:KEY,id:TOURNAMENT_ID});
  await page.route("**/*.supabase.co/**",route=>route.fulfill({
   status:200,headers:{"Access-Control-Allow-Origin":"*","Content-Type":"application/json"},
-  body:route.request().method()==="POST"?'{"queued":false}':"[]"
+  body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':route.request().method()==="POST"?'{"queued":false}':"[]"
  }));
 });
 test("Saved tournament makes LIVE a prominent fifth tab without duplicate score feeds",async ({page})=>{
