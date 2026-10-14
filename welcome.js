@@ -194,11 +194,11 @@ function showInstallFirst(hasProfiles=false){
  $("progress-profile").classList.remove("current");
  $("progress-install").classList.add("current");
  $("progress-install").classList.remove("done");
- $("install-title").textContent=t("Schmetterlinge zuerst zum Home-Bildschirm hinzufügen");
- $("install-intro").textContent=t("Öffne nach dem Hinzufügen Schmetterlinge über das neue Symbol. Lege dein Spielerprofil erst dort an, damit es in der App gespeichert bleibt.");
+ $("install-title").textContent=t("Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen");
+ $("install-intro").textContent=t("Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.");
  $("install-hint").textContent=hasProfiles
-  ?t("Hinweis: Bereits in Safari angelegte Profile werden nicht automatisch in eine getrennte Web-App übertragen. Du kannst sie in der bisherigen Browseransicht weiter nutzen oder über „Meine Daten sichern“ exportieren und in der App importieren.")
-  :t("Nach dem Öffnen über das Symbol wähle „Profil anlegen“. Eine Anmeldung ist nicht nötig.");
+  ?t("Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.")
+  :t("Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.");
  $("install-back").textContent=t("Ohne Installation im Browser fortfahren");
  $("open-app").hidden=true;
  showPlatform(preferredPlatform());
