@@ -3,6 +3,11 @@ const API="https://yadexibmjmnjfmfabrug.supabase.co";
 const id="11111111-2222-4333-8444-555555555555";
 const headers={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Content-Type":"application/json"};
 function seedSession(){
+ // Prevent an unrelated first-run dialog from covering the invitations controls.
+ localStorage.setItem("shuttleboard-v1",JSON.stringify({
+  players:[{id:"99-000001",name:"Testspielerin"}],friends:[],
+  activeProfileId:"99-000001",chosen:"99-000001",officialLinks:[]
+ }));
  localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({
   access_token:"owner-jwt",refresh_token:"owner-refresh",
   expires_at:Date.now()+3600000,user_id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
