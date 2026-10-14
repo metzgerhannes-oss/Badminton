@@ -46,7 +46,7 @@ const DATA=[
 ["spielsituationen","Wann ist der Ballwechsel vorbei?","Bei Bodenberührung, Fehler oder Wiederholung sowie wenn der Ball nicht mehr im Spiel ist.","tot spielende punkt ball","Spielregel 15",DBV,"decision"],
 ["jugend","Welche Jugendaltersklassen gibt es?","U11, U13, U15, U17 und U19 sind die üblichen Jugendklassen. Die Turnierausschreibung nennt den gültigen Jahrgang.","alter altersklassen jugend geburtsjahr jahrgang","Jugend – Altersstichtag je Saison prüfen",BWBV_J,"ages"],
 ["jugend","Was bedeuten A- bis E-Turniere?","A = DBV, B = Gruppe, C = Landesverband, D = Bezirk, E = Region/Kreis. Einzelne Altersklassen haben Ausnahmen.","a rlt b rlt c rlt d rlt e rlt turnierklassen level","DBV-Jugendwettkampfsystem",FAQ,"levels"],
-["jugend","Gibt es B-Turniere für U11?","In der regulären DBV-Jugendrangliste ist U11 den Kategorien A sowie C–E zugeordnet, nicht B.","u11 b rlt altersklasse möglich","DBV-Jugendrangliste – aktuelle Ausschreibung zählt",FAQ,"levels"],
+["jugend","Gibt es B-Turniere für U11?","In der regulären DBV-Jugendrangliste ist U11 den Kategorien A sowie C–E zugeordnet, nicht B.","u11 b rlt altersklasse möglich","DBV-Jugendrangliste – aktuelle Ausschreibung zählt",FAQ,"levelsU11"],
 ["jugend","Wie viele Turniere zählen für die Jugendrangliste?","Die fünf besten Ergebnisse aus den letzten zwölf Monaten zählen.","rangliste beste fünf 5 turniere","DBV-Jugendrangliste",FAQ,"ranking"],
 ["jugend","Wann verfallen Jugendranglistenpunkte?","Eine Turnierwertung bleibt zwölf Monate gültig.","punkte ablauf 12 monate verfallen","DBV-Jugendrangliste",FAQ,"months"],
 ["jugend","Wann wird die Jugendrangliste aktualisiert?","Die Jugendrangliste wird jeden Donnerstag aktualisiert.","ranking update wöchentlich donnerstag","DBV-Jugendrangliste",FAQ,"weekday"],
@@ -209,8 +209,8 @@ function findItems(){
    return {c:x.c,score,matched};
   }).filter(x=>x.matched).sort((a,b)=>b.score-a.score).map(x=>x.c);
  }else if(topic==="alle"){
-  const pinned=[0,4,5,9,20,22,34,36,39,40,42,46];
-  items=pinned.map(i=>CARDS[i]).filter(Boolean);
+  const popularTitles=["Wie groß ist das Spielfeld?","Wohin muss der Aufschlag?","Wer schlägt von rechts auf?","Wie zählt man bis 21?","Was ist ein Let?","Darf ein Ball die Linie berühren?","Was sind Small Games?","Was bedeuten A- bis E-Turniere?"];
+  items=popularTitles.map(title=>CARDS.find(c=>c.title===title)).filter(Boolean);
  }else items=items.map(x=>x.c);
  return items;
 }
