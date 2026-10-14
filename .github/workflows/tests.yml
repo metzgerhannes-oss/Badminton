@@ -155,6 +155,7 @@ jobs:
           node tests/private-invites.mjs
           node tests/player-capability-invites.mjs
           node tests/private-trophy-scope-v127.mjs
+          node tests/trusted-guardian-archive-v134.mjs
           node tests/private-match-connection-v128.mjs
           node tests/consented-player-data.mjs
           node tests/settings-grants-v125.mjs

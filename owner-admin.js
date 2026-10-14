@@ -54,7 +54,7 @@ function updateCandidates(){
     status.textContent="Erfasse deine Selbstauskunft für "+(item.name||item.id)+". Sie ersetzt keine unabhängige Freigabeprüfung.";
    }
   });
-  if(confirmed){const mark=document.createElement("small");mark.textContent="Selbstauskunft hinterlegt – externer Nachweis für neue Archivlinks erforderlich";entry.append(title,mark,button);}
+  if(confirmed){const mark=document.createElement("small");mark.textContent="Als eigener Spieler ausdrücklich bestätigt · Archivlinks können erstellt werden";entry.append(title,mark,button);}
   else entry.append(title,button);
   candidates.append(entry);
  }
@@ -87,7 +87,7 @@ async function loadOwner(){
   const info=await rpc("private_owner_status");
   if(info?.owner!==true)return;
   panel.hidden=false;
-  status.textContent="Betreiberzugang erkannt. Neue Spieler-Archivfreigaben erfordern zusätzlich eine unabhängige Vereins-/Elternbestätigung.";
+  status.textContent="Betreiberzugang erkannt. Ausdrücklich bestätigte eigene Spieler kannst du über einen Berechtigungslink teilen; für andere Spieler bleibt eine unabhängige Freigabe erforderlich.";
   updateCandidates();
   updateGrants(Array.isArray(info.granted_players)?info.granted_players:[]);
  }catch{if(!panel.hidden)status.textContent="Administratorsitzung derzeit nicht erreichbar. Bitte erneut öffnen."}
@@ -106,7 +106,7 @@ form.addEventListener("submit",async event=>{
   verify.checked=false;player.value="";
   const state=await rpc("private_owner_status");
   updateGrants(Array.isArray(state?.granted_players)?state.granted_players:[]);
-  status.textContent="Selbstauskunft gespeichert. Eine neue Archivfreigabe ist erst nach unabhängiger Prüfung unter Profile & Familie möglich.";
+  status.textContent="Bestätigung gespeichert. Für diesen eigenen Spieler kannst du nun den Link mit Profil, belegten Trophäen und vorhandenen Matchstatistiken erstellen.";
  }catch{status.textContent="Berechtigung nicht erstellt. Prüfe, ob die DBV-ID existiert und die Eigentümersitzung gültig ist."}
  finally{button.disabled=false}
 });

@@ -48,7 +48,7 @@ function harness({offline=false,hit=null,cacheFailure=false,failEssential=false,
      options.ignoreSearch && hit.url && new URL(url).pathname===new URL(hit.url).pathname));
    return found?new Response("cached",{status:200}):undefined;
   },
-  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","other-app-cache","schmetterlinge-shell-v125","schmetterlinge-shell-v127","schmetterlinge-shell-v128","schmetterlinge-shell-v129","schmetterlinge-shell-v130","schmetterlinge-shell-v131","schmetterlinge-shell-v132"];},
+  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","other-app-cache","schmetterlinge-shell-v125","schmetterlinge-shell-v127","schmetterlinge-shell-v128","schmetterlinge-shell-v129","schmetterlinge-shell-v130","schmetterlinge-shell-v131","schmetterlinge-shell-v132","schmetterlinge-shell-v133"];},
   async delete(key){deleted.push(key);return true;}
  };
  const self={
@@ -146,7 +146,7 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.ok(sw.accepted.includes("./scripts/consented-player-data.mjs"));
  assert.ok(sw.accepted.includes("./scripts/invitation-search.mjs"));
  await sw.lifecycle("activate");
- assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","schmetterlinge-shell-v125","schmetterlinge-shell-v127","schmetterlinge-shell-v128","schmetterlinge-shell-v129","schmetterlinge-shell-v130","schmetterlinge-shell-v131","schmetterlinge-shell-v132"],
+ assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","schmetterlinge-shell-v125","schmetterlinge-shell-v127","schmetterlinge-shell-v128","schmetterlinge-shell-v129","schmetterlinge-shell-v130","schmetterlinge-shell-v131","schmetterlinge-shell-v132","schmetterlinge-shell-v133"],
    "Worker must not delete caches belonging to other GitHub Pages apps");
  assert.equal(sw.claimed,true);
 }
