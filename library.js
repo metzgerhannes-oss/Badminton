@@ -4,7 +4,7 @@ import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {searchDbvIdentities,validDbvLookup} from "./scripts/targeted-player-search.mjs";
 
 const ROOT="./data/player-library/";
-let dbMode=false,localMode=false,rosterDenied=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
+let dbMode=false,localMode=false,rosterDenied=true,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
 const safePattern=x=>String(x||"").trim().replace(/[*,().%:"\\]/g," ").slice(0,85);
 async function dbGet(path){
  return readPublicRows(path);
@@ -96,7 +96,7 @@ function showIdle(){
  if(more)more.hidden=true;
  if(reset)reset.hidden=true;
  if($("library-message"))$("library-message").textContent="";
- if($("library-source"))$("library-source").textContent="Spielersuche · lokale Profile verfügbar; das zentrale DBV-Verzeichnis ist derzeit geschützt";
+ if($("library-source"))$("library-source").textContent="Spielersuche: Name oder DBV-ID ab 3 Zeichen; nur bestätigte Identitätstreffer";
 }
 function filtered(){
  return dbMode?entries:selectPlayers(entries,{
