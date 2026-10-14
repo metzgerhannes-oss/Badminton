@@ -442,7 +442,8 @@ function setup(){
   save();render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
   if(isNewOwn){
    window.dispatchEvent(new CustomEvent("badminton:own-profile-added",{detail:{playerId:id}}));
-   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id,source:"profile-created"}}));
+   if(state.activeProfileId===id&&!state.viewingFriendId)
+    window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id,source:"profile-created"}}));
   }
  });
  const friendDialog=el("friend-dialog"),friendForm=el("friend-form");
