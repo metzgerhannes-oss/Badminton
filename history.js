@@ -1,5 +1,5 @@
 import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
-import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
+import {trophySnapshot} from "./scripts/private-trophy-source.mjs";
 "use strict";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
@@ -105,7 +105,8 @@ function render(){
   const state=trophySnapshot(lastPlayer);
   const trophySection=$("trophy-shelf")?.closest(".trophy-section");
   if(state.state!=="ready"){
-   const notice=state.state==="loading"
+   const notice=state.state==="not_requested"?"Die privaten Auszeichnungen wurden noch nicht abgerufen. Unter „Meine Daten“ kannst du den Abruf starten."
+    :state.state==="loading"
     ?"Private Platzierungen werden geprüft."
     :state.state==="protected"
     ?"Diese Auszeichnungen sind privat geschützt. Ein gültiger neuer Berechtigungslink oder ein unabhängig bestätigter Verwalternachweis ist erforderlich."
@@ -167,7 +168,6 @@ function render(){
  }
  window.renderHistory=(selected,profiles,options={})=>{
    lastPlayer=selected||"";lastProfiles=Array.isArray(profiles)?profiles:[];viewMode=options.mode==="friend"?"friend":"own";
-   requestPrivateTrophies(lastPlayer);
    render();
  };
  document.addEventListener("DOMContentLoaded",()=>{
