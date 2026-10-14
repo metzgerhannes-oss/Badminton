@@ -56,6 +56,7 @@ function persistAndContinue(profile,{confirmed=false}={}){
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};
  if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
+ // Profile creation and invitation remain entirely local.
  // Save only in the browser/app context that is currently running.
  // Installation is offered BEFORE creating a profile, because iOS can isolate
  // Safari localStorage from an installed Home Screen web app.
