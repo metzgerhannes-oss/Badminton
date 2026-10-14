@@ -97,3 +97,15 @@ test("Wiki: four separate net rules get four different illustrations",async({pag
   await page.getByRole("button",{name:"Regel schließen"}).click();
  }
 });
+
+test("Wiki v140: up-to-date Home entry and offline PWA assets",async({page})=>{
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("a.wiki-home-link")).toHaveAttribute("href","./wiki.html");
+ const response=await page.request.get("/sw.js");
+ expect(response.ok()).toBe(true);
+ const script=await response.text();
+ for(const path of ["./wiki.html","./wiki.js","./wiki.css"]){
+  expect(script).toContain('"'+path+'"');
+ }
+ expect(script).toContain("schmetterlinge-shell-v140");
+});
