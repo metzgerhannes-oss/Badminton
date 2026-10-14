@@ -147,20 +147,35 @@ function renderOtherKpis(){
   :access.state==="protected"?"Trophäen sind geschützt. Ein Berechtigungslink oder eine unabhängig bestätigte Verwalterberechtigung ist erforderlich."
   :"Private Auszeichnungen sind momentan nicht abrufbar. Kein sportlicher Nullwert.";
  const medals=trophies.counts;
- const trophySlots=[
+ const slots=[
   {place:1,label:"1. Platz",symbol:"🏆",style:"gold"},
   {place:2,label:"2. Platz",symbol:"🏆",style:"silver"},
   {place:3,label:"3. Platz",symbol:"🏆",style:"bronze"},
   {place:4,label:"4. Platz",symbol:"◉",style:"fourth"}
  ];
+ const latest=trophyUnknown?[]:results.slice()
+  .sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))
+  .slice(0,3);
+ const total=slots.reduce((sum,slot)=>sum+(Number(medals[slot.place])||0),0);
+ const status=trophyUnknown
+  ?(access.state==="loading"?"Auszeichnungen werden geladen …":"Auszeichnungen derzeit nicht verfügbar.")
+  :results.length===0
+  ?"Im bisherigen Datenbestand sind noch keine Top-4-Platzierungen belegt."
+  :num(total)+" belegte Auszeichnungen";
  root.innerHTML='<section class="home-trophy" aria-labelledby="home-trophy-heading">'+
   '<div class="home-trophy-heading"><h2 id="home-trophy-heading">Trophäenschrank</h2><a href="#historie">Alle anzeigen ↗</a></div>'+
-  '<div class="home-trophy-grid">'+trophySlots.map(slot=>
+  '<div class="home-trophy-grid" aria-label="Belegte Plätze 1 bis 4">'+slots.map(slot=>
    '<div class="home-trophy-slot '+slot.style+'"><span class="home-trophy-symbol" aria-hidden="true">'+slot.symbol+'</span>'+
    '<strong>'+(trophyUnknown?"–":num(medals[slot.place]))+'</strong><small>'+slot.label+'</small></div>'
-  ).join("")+
-  '<a href="#historie" class="home-trophy-tournaments"><span aria-hidden="true">🏸</span><strong>'+(trophyUnknown?"–":num(years.size))+'</strong><small>Belegte<br>Turniere</small></a></div>'+
-  '<p class="home-trophy-note" role="status">'+escape(trophyNote)+'</p></section>';
+  ).join("")+'</div>'+
+  '<p class="home-trophy-status" role="status">'+escape(status)+'</p>'+
+  (latest.length?'<div class="home-trophy-latest" aria-label="Jüngste belegte Platzierungen">'+
+   latest.map(result=>'<a href="#historie" class="home-trophy-result">'+
+    '<span class="home-trophy-medal">'+escape(result.place)+'.</span>'+
+    '<span><strong>'+escape(result.event||"Turnier")+'</strong><small>'+escape(date(result.date))+
+    (result.discipline?' · '+escape(result.discipline):'')+'</small></span><span aria-hidden="true">›</span></a>').join("")+
+   '</div>':"")+
+  '<details class="home-trophy-coverage"><summary>Datenstand</summary><p>'+escape(trophyNote)+'</p></details></section>';
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
  const today=parts.year+"-"+parts.month+"-"+parts.day;
  if(viewMode==="friend"){
@@ -171,21 +186,27 @@ function renderOtherKpis(){
  }
  const upcoming=upcomingTournaments(bookmarks,selection,today);
  const undated=bookmarks.some(t=>(t.playerId==="all"||t.playerId===selection)&&!t.startDate);
- const list=upcoming.length?upcoming.map(t=>{
+ const list=upcoming.length?upcoming.slice(0,3).map(t=>{
   const end=t.endDate&&t.endDate>=t.startDate?t.endDate:t.startDate;
   const active=t.startDate<=today&&end>=today;
   const range=t.endDate&&t.endDate!==t.startDate?date(t.startDate)+" – "+date(t.endDate):date(t.startDate);
   const owner=t.playerId==="all"?"Alle Spieler":(profiles.find(p=>p.id===t.playerId)?.name||"Mein Profil");
   const calendar=t.source==="spond"||t.source==="dbv-calendar"||!t.url;
-  const label=t.source==="dbv-calendar"?"DBV-Kalender · vorgemerkt, nicht angemeldet":calendar?"Kalender · nicht als Teilnahme bestätigt":"Offizielle DBV-Turnierseite ↗";
-  return (calendar?'<div class="upcoming-tournament-row" aria-label="'+escape(t.name)+', '+escape(range)+', privater Kalendertermin">':'<a class="upcoming-tournament-row" href="'+escape(t.url)+'" rel="noopener noreferrer" target="_blank" aria-label="'+escape(t.name)+', '+escape(range)+', offizielle DBV-Turnierseite öffnen">')+
-   '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'">'+escape(date(t.startDate))+'</time>'+(active?'<small>Im Zeitraum</small>':'')+'</span>'+
-   '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+escape(range)+' · '+escape(owner)+' · '+label+'</small></span>'+
-   (calendar?'':'<span class="upcoming-tournament-arrow" aria-hidden="true">↗</span>')+
-   (calendar?'</div>':'</a>');
+  const label=t.source==="dbv-calendar"?"Vorgemerkt · keine Anmeldung":calendar?"Kalendertermin · keine Anmeldung":"Offizielle Turnierseite";
+  const location=typeof t.location==="string"&&t.location.trim()?t.location.trim():"";
+  const month=new Intl.DateTimeFormat("de-DE",{month:"short",timeZone:"UTC"})
+   .format(new Date(t.startDate+"T12:00:00Z")).replace(".","").toUpperCase();
+  return '<a class="upcoming-tournament-row" href="'+(calendar?'#turniere':escape(t.url))+'"'+
+   (calendar?'':' rel="noopener noreferrer" target="_blank"')+
+   ' aria-label="'+escape(t.name)+', '+escape(range)+', '+(calendar?'in meiner Turnierliste ansehen':'offizielle Turnierseite öffnen')+'">'+
+   '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'"><span class="upcoming-tournament-month">'+escape(month)+'</span><strong class="upcoming-tournament-day">'+escape(t.startDate.slice(8,10))+'</strong></time>'+(active?'<small>Läuft</small>':'')+'</span>'+
+   '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+
+   escape([range,location,owner].filter(Boolean).join(" · "))+'</small>'+
+   '<span class="upcoming-tournament-label">'+escape(label)+'</span></span>'+
+   '<span class="upcoming-tournament-arrow" aria-hidden="true">›</span></a>';
  }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Für diesen Spieler sind noch keine zukünftigen Turniere mit Datum gespeichert. Du kannst Turniere mit + direkt aus dem DBV-Kalender vormerken. Eine Vormerkung bestätigt keine Anmeldung.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
  next.innerHTML='<section class="upcoming-tournaments-section" aria-labelledby="upcoming-tournaments-heading">'+
-  '<div class="upcoming-tournaments-header"><h2 id="upcoming-tournaments-heading">Die nächsten Turniere</h2><a href="#turniere">Alle Turniere ↗</a></div>'+
+  '<div class="upcoming-tournaments-header"><h2 id="upcoming-tournaments-heading">Nächste Turniere</h2><a href="#turniere">Alle ansehen ↗</a></div>'+
   '<div class="upcoming-tournaments-list">'+list+'</div></section>';
 
 }
