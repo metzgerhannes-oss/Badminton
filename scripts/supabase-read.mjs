@@ -35,9 +35,13 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   if(signal)signal.addEventListener("abort",onAbort,{once:true});
   const timer=setTimeout(()=>{timedOut=true;controller.abort()},timeoutMs);
   try{
+   const protectedRoute=/^(?:player_external_match_facts|tournament_placements)\\?/.test(path);
+   const sessionToken=protectedRoute&&typeof window!=="undefined"
+    ?window.badmintonAppAccess?.accessToken:null;
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
-    headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{})}
+    headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),
+     ...(sessionToken?{Authorization:"Bearer "+sessionToken}:{})}
    });
    if(!response.ok){
     const status=response.status||0;
