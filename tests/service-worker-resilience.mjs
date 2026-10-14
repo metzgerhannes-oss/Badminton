@@ -3,7 +3,7 @@ import vm from "node:vm";
 import {readFile} from "node:fs/promises";
 
 const source=await readFile("sw.js","utf8");
-assert.match(source,/const CACHE="schmetterlinge-shell-v127"/);
+assert.match(source,/const CACHE="schmetterlinge-shell-v128"/);
 assert.doesNotMatch(source,/catch\(\)=>caches\.match\(e\.request\)/);
 const privateHtml=await readFile("private-player.html","utf8");
 assert.match(privateHtml,/navigator\.serviceWorker\.getRegistration\("\.\/"\)/,
@@ -48,7 +48,7 @@ function harness({offline=false,hit=null,cacheFailure=false,failEssential=false,
      options.ignoreSearch && hit.url && new URL(url).pathname===new URL(hit.url).pathname));
    return found?new Response("cached",{status:200}):undefined;
   },
-  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","other-app-cache","schmetterlinge-shell-v125","schmetterlinge-shell-v127"];},
+  async keys(){return ["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","other-app-cache","schmetterlinge-shell-v125","schmetterlinge-shell-v128"];},
   async delete(key){deleted.push(key);return true;}
  };
  const self={
