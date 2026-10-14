@@ -70,3 +70,7 @@ assert.ok(main.includes('source:"dbv-calendar"'),"Source type prevents false off
 assert.ok(main.includes('state.officialLinks.unshift(entry)'),"Private bookmark must appear in saved tournament list");
 assert.ok(main.includes('source!=="dbv-calendar"'),"Unverified calendar events must not be used for official live match options");
 console.log("DBV calendar: source IDs, 3-dimensional facets, BW, age/level, no fake tournament links and offline integration passed.");
+
+assert.ok(app.includes("Quellenlücke möglich"),"Empty U13/C listings need a coverage disclaimer");
+assert.ok(app.includes("https://bwbv.de/kalender/"),"Link to the official BWBV calendar rather than inventing entries");
+assert.ok(app.includes("Keine Treffer bedeuten nicht"),"Unverified completeness is never claimed");
