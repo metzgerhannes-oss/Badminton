@@ -144,7 +144,7 @@ function renderOtherKpis(){
     ?"Keine belegten Top-4-Platzierungen in den bisher verfügbaren Quellen. Das Archiv ist nicht vollständig."
     :"Nur belegte Platzierungen aus den bisher erfassten Quellen. Die Historie ist nicht vollständig."+countContext)
   :access.state==="loading"?"Private Auszeichnungen werden geprüft. Noch keine Zahl verfügbar."
-  :access.state==="protected"?"Trophäen sind geschützt. Ein Berechtigungslink oder eine unabhängig bestätigte Verwalterberechtigung ist erforderlich."
+  :access.state==="protected"?"Trophäen sind geschützt. Ein neuer Berechtigungslink oder eine bestätigte eigene Spielerberechtigung ist erforderlich."
   :"Private Auszeichnungen sind momentan nicht abrufbar. Kein sportlicher Nullwert.";
  const medals=trophies.counts;
  const trophySlots=[
