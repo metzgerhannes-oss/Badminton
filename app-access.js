@@ -45,7 +45,14 @@ function grant(){
 }
 function inform(message){status.textContent=message;}
 async function accept(raw){
- const token=String(raw||"").trim().toLowerCase();
+ const value=String(raw||"").trim();
+ let token=value.toLowerCase();
+ // iPhone Home Screen PWAs can have a different storage area than Safari.
+ // Pasting the complete shared link into the installed app must be sufficient.
+ if(value.includes("appinvite=")){
+  const match=value.match(/(?:^|[#?&])appinvite=([0-9a-f]{64})(?:$|[&])/i);
+  token=match?.[1]?.toLowerCase()||"";
+ }
  if(!TOKEN.test(token)){inform("Bitte den vollständigen Einladungslink öffnen oder den Code einfügen.");return}
  if(busy)return;
  busy=true;submit.disabled=true;
