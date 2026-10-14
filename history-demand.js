@@ -1,5 +1,5 @@
-import {SUPABASE_ROOT,PUBLIC_KEY,demandPost,importStatusPath,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
-import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {demandPost,importStatusPath,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
+import {SUPABASE_ROOT,PUBLIC_KEY,readPublicRows} from "./scripts/supabase-read.mjs";
 
 let shown="",requestSeq=0,timeout,controller;
 const $=id=>document.getElementById(id);
@@ -31,7 +31,7 @@ function show(state,id=""){
 async function memberRpc(name,body,signal){
  const token=await window.badmintonAppAccess?.getAccessToken?.();
  if(!token)throw Error("App membership unavailable");
- const response=await fetch(SUPABASE_ROOT+"/rpc/"+name,{
+ const response=await fetch(SUPABASE_ROOT+"rpc/"+name,{
   method:"POST",cache:"no-store",signal,
   headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"},
   body:JSON.stringify(body)
