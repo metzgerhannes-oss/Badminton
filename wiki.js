@@ -61,17 +61,39 @@ const TOPICS={grundlagen:"Grundregeln",spielsituationen:"Spielsituationen",jugen
 const CARDS=DATA.map((a,i)=>({id:"regel-"+String(i+1).padStart(2,"0"),topic:a[0],title:a[1],answer:a[2],terms:a[3],scope:a[4],source:a[5],kind:a[6]}));
 const SVG_START='<svg viewBox="0 0 400 264" xmlns="http://www.w3.org/2000/svg" role="presentation" aria-hidden="true">';
 const SVG_END='</svg>';
-const courtBase='<rect x="24" y="52" width="352" height="160" rx="2" fill="#139677" stroke="#fff" stroke-width="3"/><path d="M24 64H376 M24 200H376 M44 52V212 M148 52V212 M252 52V212 M356 52V212 M24 132H148 M252 132H376" fill="none" stroke="#fff" stroke-width="3"/><path d="M200 47V217" stroke="#194d68" stroke-width="5"/>';
+// Court drawn at a fixed scale. 352 px = 13.40m, 160 px = 6.10m.
+// Singles sidelines y=64/200, short service x=148/252, doubles back x=44/356.
 function court(kind){
- let glow="";
- if(kind==="single")glow='<rect x="25" y="64" width="350" height="136" fill="#bbec50" opacity=".26"/>';
- if(kind==="double")glow='<rect x="25" y="52" width="350" height="160" fill="#72c8ff" opacity=".23"/>';
- if(kind==="service")glow='<rect x="148" y="52" width="104" height="160" fill="#aff5d2" opacity=".36"/>';
- if(kind==="small"||kind==="smallbox")glow='<rect x="44" y="52" width="104" height="160" fill="#edff57" opacity=".43"/><rect x="252" y="52" width="104" height="160" fill="#edff57" opacity=".43"/>';
- if(kind==="smallnoback")glow='<rect x="44" y="64" width="312" height="136" fill="#edff57" opacity=".43"/>';
- const diagram=(kind==="serve"||kind==="even"||kind==="odd")?'<path d="M85 166Q200 48 310 96" stroke="#ffdd52" stroke-width="6" stroke-dasharray="11 7" fill="none"/><path d="m295 83 21 9-16 17" fill="none" stroke="#ffdd52" stroke-width="6"/>':"";
- const note=kind==="even"?'GERADE · RECHTS':kind==="odd"?'UNGERADE · LINKS':kind==="single"?'EINZEL = INNERES FELD':kind==="double"?'DOPPEL = ÄUSSERES FELD':kind==="small"?'SMALL GAMES · KLEINFELD':kind==="smallbox"?'BOX':kind==="smallnoback"?'OHNE HINTERFELD':'';
- return SVG_START+'<rect width="400" height="264" rx="20" fill="#cfefff"/>'+courtBase+glow+diagram+(note?'<rect x="71" y="224" width="258" height="29" rx="9" fill="#fff"/><text x="200" y="244" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="13" fill="#15516f">'+note+'</text>':'')+SVG_END;
+ const fill='<rect x="24" y="52" width="352" height="160" rx="2" fill="#0c9778"/>';
+ const overlays={
+  single:'<rect x="24" y="64" width="352" height="136" fill="#cef050" opacity=".50"/>',
+  double:'<rect x="24" y="52" width="352" height="160" fill="#a5dcff" opacity=".37"/>',
+  service:'<rect x="252" y="64" width="104" height="68" fill="#ffde54" opacity=".65"/>',
+  serve:'<rect x="252" y="64" width="104" height="68" fill="#ffde54" opacity=".65"/>',
+  even:'<rect x="252" y="64" width="104" height="68" fill="#ffde54" opacity=".65"/>',
+  odd:'<rect x="252" y="132" width="104" height="68" fill="#ffde54" opacity=".65"/>',
+  small:'<rect x="44" y="64" width="104" height="136" fill="#ffe55a" opacity=".65"/><rect x="252" y="64" width="104" height="136" fill="#ffe55a" opacity=".65"/>',
+  smallbox:'<rect x="44" y="64" width="104" height="136" fill="#ffe55a" opacity=".72"/><rect x="252" y="64" width="104" height="136" fill="#ffe55a" opacity=".72"/>',
+  smallnoback:'<rect x="44" y="64" width="156" height="136" fill="#ffe55a" opacity=".66"/><rect x="200" y="64" width="156" height="136" fill="#ffe55a" opacity=".66"/>'
+ };
+ const lines='<rect x="24" y="52" width="352" height="160" rx="1" fill="none" stroke="white" stroke-width="3"/>'
+ +'<path d="M24 64H376 M24 200H376 M44 52V212 M148 52V212 M252 52V212 M356 52V212 M24 132H148 M252 132H376" stroke="white" fill="none" stroke-width="3"/>'
+ +'<path d="M200 49V215" stroke="#194d68" stroke-width="6"/>';
+ const arrow=(kind==="serve"||kind==="even")?'<path d="M91 169Q200 48 308 97" stroke="#fee44c" stroke-width="6" fill="none" stroke-dasharray="10 7"/><path d="m292 87 17 12-19 11" fill="none" stroke="#fee44c" stroke-width="6"/>':
+ kind==="odd"?'<path d="M91 98Q200 216 307 166" stroke="#fee44c" stroke-width="6" fill="none" stroke-dasharray="10 7"/><path d="m290 156 19 10-17 12" fill="none" stroke="#fee44c" stroke-width="6"/>':'';
+ const caption={
+  court:"13,40 m · Breite Doppel: 6,10 m",single:"EINZEL · INNERE SEITENLINIE",
+  double:"DOPPEL · ÄUSSERE SEITENLINIE",service:"KURZE AUFSCHLAGLINIE: 1,98 m",
+  serve:"DIAGONAL AUFSCHLAGEN",even:"GERADE PUNKTE · RECHTS",
+  odd:"UNGERADE PUNKTE · LINKS",small:"BEISPIEL: VERKLEINERTES FELD",
+  smallbox:"BOX · OHNE VORDER-/HINTERFELD",smallnoback:"OHNE HINTERFELD"
+ }[kind]||"";
+ return SVG_START
+ +'<rect width="400" height="264" rx="20" fill="#d8f1ff"/>'
+ +fill+(overlays[kind]||"")+lines+arrow
+ +'<rect x="19" y="222" width="362" height="33" rx="11" fill="#fff"/>'
+ +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="12.5" fill="#15516f">'+caption+'</text>'
+ +SVG_END;
 }
 function badgeArt(left,right,sub){
  return SVG_START+'<rect width="400" height="264" rx="20" fill="#d9f1ff"/><rect x="25" y="40" width="164" height="150" rx="18" fill="#167ba9"/><rect x="211" y="40" width="164" height="150" rx="18" fill="#128c72"/><text x="107" y="131" text-anchor="middle" font-family="system-ui" font-size="45" font-weight="850" fill="white">'+left+'</text><text x="293" y="131" text-anchor="middle" font-family="system-ui" font-size="45" font-weight="850" fill="white">'+right+'</text><text x="200" y="229" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="750" fill="#165075">'+sub+'</text>'+SVG_END;
