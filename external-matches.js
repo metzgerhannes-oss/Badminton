@@ -2,7 +2,7 @@
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
 import {MATCH_RULES} from "./scripts/badminton-score-rules.mjs";
 import {getDbvMatchReference,getBadhubMatchReference,getReportedPlayedWithoutScores,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
-import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {readPublicRows,readMatchImportProgress} from "./scripts/supabase-read.mjs";
 import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -132,7 +132,7 @@ async function load(id){
  const signal=abortController.signal;
  render();
  try{
-  const [status]=await readJSON("player_external_match_imports?select=dbv_id,status,cursor_offset,verified_count,rejected_count,source_count,detail,last_finished_at&dbv_id=eq."+id+"&limit=1",signal);
+  const status=await readMatchImportProgress(id,{signal}).catch(()=>null);
   const collected=[];
   for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
    const route="player_external_match_facts?select=dbv_id,source_key,category,competition,event,discipline,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,outcome_evidence,source_name,source_kind,source_url"+
