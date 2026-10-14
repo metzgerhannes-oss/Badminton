@@ -40,8 +40,10 @@ assert.match(request,/getPrivateSession\(true\)/, "Only explicit request creates
 assert.match(request,/searchInvitationPlayers/, "Use existing filtered public player search");
 assert.match(home,/trophyUnknown\?"–":num\(medals\[slot\.place\]\)/);
 assert.match(history,/state\.state!=="ready"/);
-assert.match(home,/requestPrivateTrophies\(selection\)/);
-assert.match(history,/requestPrivateTrophies\(lastPlayer\)/);
+assert.doesNotMatch(home,/requestPrivateTrophies\(selection\)/,"No automatic protected download on profile selection");
+assert.doesNotMatch(history,/requestPrivateTrophies\(lastPlayer\)/);
+const importFlow=await readFile("profile-import.js","utf8");
+assert.match(importFlow,/requestPrivateTrophies\(selected\.id,\{force:true\}\)/,"Trophies are retrieved only on explicit import");
 assert.match(html,/player-verification\.js/);
 assert.match(sw,/scripts\/private-trophy-source\.mjs/);
 assert.match(sw,/player-verification\.js/);
