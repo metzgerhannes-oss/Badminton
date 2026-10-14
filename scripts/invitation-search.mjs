@@ -1,6 +1,6 @@
 /** Public, read-only player search for invitation onboarding; no personal data is uploaded. */
-import {friendSearchUrl,normalizeFriendSearch,asFriendCandidate,SEARCH_LIMIT} from "./friend-search.mjs";
-import {readPublicRows} from "./supabase-read.mjs";
+import {normalizeFriendSearch,asFriendCandidate,SEARCH_LIMIT} from "./friend-search.mjs";
+import {validDbvLookup,searchDbvIdentities} from "./targeted-player-search.mjs";
 
 const DIRECTORY="./data/player-library/";
 const VALID_AGE=/^U(?:11|13|15|17|19|22)$/;
@@ -42,18 +42,15 @@ async function backupCandidates(term,fetchImpl,signal){
 /** Returns only public DBV identities. An aborted request never triggers a fallback. */
 export async function searchInvitationPlayers(raw,{fetchImpl=fetch,signal,savedCandidates=[]}={}){
  const term=normalizeFriendSearch(raw);
- const url=friendSearchUrl(term);
- if(!url)return {players:[],source:"none"};
+ if(!validDbvLookup(term))return {players:[],source:"none"};
  // Previously accepted invitations and locally chosen profiles can be found
  // without asking a public service for information about arbitrary people.
  const needle=fold(term);
  const onDevice=invitationCandidates(savedCandidates).filter(player=>
   fold(player.name).includes(needle)||player.id.includes(term));
  if(onDevice.length)return {players:onDevice,source:"device"};
- const parsed=new URL(url);
- const path=parsed.pathname.replace(/^\/rest\/v1\//,"")+parsed.search;
  try{
-  const {rows}=await readPublicRows(path,{fetchImpl,signal,count:false,retries:0});
+  const rows=await searchDbvIdentities(term,{fetchImpl,signal});
   return {players:invitationCandidates(rows),source:"dbv"};
  }catch(error){
   if(signal?.aborted||error?.kind==="aborted")throw error;
