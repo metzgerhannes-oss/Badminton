@@ -153,13 +153,13 @@ function renderOtherKpis(){
   {place:3,label:"3. Platz",symbol:"🏆",style:"bronze"},
   {place:4,label:"4. Platz",symbol:"◉",style:"fourth"}
  ];
- const latest=trophyUnknown?[]:results.slice()
+ const latest=trophyUnknown?[]:results.filter(r=>[1,2,3,4].includes(Number(r.place)))
   .sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))
   .slice(0,3);
  const total=slots.reduce((sum,slot)=>sum+(Number(medals[slot.place])||0),0);
  const status=trophyUnknown
   ?(access.state==="loading"?"Auszeichnungen werden geladen …":"Auszeichnungen derzeit nicht verfügbar.")
-  :results.length===0
+  :total===0
   ?"Im bisherigen Datenbestand sind noch keine Top-4-Platzierungen belegt."
   :num(total)+" belegte Auszeichnungen";
  root.innerHTML='<section class="home-trophy" aria-labelledby="home-trophy-heading">'+
