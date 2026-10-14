@@ -52,12 +52,23 @@ function render(){
   const age=settings.age==="all"?"allen Altersklassen":settings.age;
   const level=settings.level==="all"?"allen Levels":"Level "+settings.level;
   const alternatives=alternativeCalendarLevels(entries,{...settings,today:localToday()});
+  // A missing imported result is not proof that an official event does not exist.
+  // BWBV publishes an independent youth calendar; only DBV source-backed rows
+  // may enter this list, so do not invent records from older PDF schedules.
+  const bwU13C=settings.region==="Baden-Württemberg"&&
+    (settings.age==="U13"||settings.age==="all")&&settings.level==="C";
+  const coverageNote=bwU13C
+    ?'<p><strong>Quellenlücke möglich:</strong> Für Baden-Württemberg fehlen in unserem DBV-Import U13/C-Termine. Bitte den <a href="https://bwbv.de/kalender/" target="_blank" rel="noopener noreferrer">BWBV-Kalender ↗</a> als zweite offizielle Quelle prüfen.</p>'
+    :'<p>Der Datenbestand kann unvollständig sein. Keine Treffer bedeuten nicht, dass keine Turniere stattfinden.</p>';
+  const more=document.getElementById("dbv-calendar-more");
+  if(more)more.hidden=true;
   host.innerHTML='<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere im erfassten Zeitraum</h4>'+
    '<p>Für '+esc(year)+' · '+esc(region)+' · '+esc(age)+' · '+esc(level)+' liegen im aktuellen Datenbestand ('+esc(coverage)+') keine passenden Termine vor.</p>'+
    (alternatives.length?'<p>Mit denselben übrigen Filtern sind folgende Levels verfügbar:</p><div class="dbv-calendar-alternatives">'+
     alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
       'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
-   '<p class="settings-hint">Der Import umfasst nur den angegebenen Zeitraum, nicht automatisch alle Turniere eines Kalenderjahres. Weitere Termine können später veröffentlicht werden.</p>'+
+   coverageNote+
+   '<p class="settings-hint">Der Import umfasst nur den angegebenen Zeitraum; nicht alle DBV-/BWBV-Veranstaltungen sind vollständig erfasst.</p>'+
    '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>';
   return;
  }
