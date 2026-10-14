@@ -80,5 +80,5 @@ assert.match(styles,/\.library-more\[hidden\]\{display:none!important\}/);
 assert.match(source,/import \{readPublicRows\} from "\.\/scripts\/supabase-read\.mjs"/);
 assert.doesNotMatch(source,/fetch\(API\+/);
 assert.match(source,/loadBackup\(\)/);
-assert.match(source,/Supabase nicht erreichbar/);
+assert.match(source,/rosterDenied=true/,"A forbidden remote roster should fall back to locally selected profiles, not blank GitHub data");
 console.log("Supabase player directory: full/abbreviated club names, association normalization, 13 club players and hidden paging tested.");
