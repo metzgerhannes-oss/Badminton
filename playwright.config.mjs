@@ -4,7 +4,8 @@ export default defineConfig({
   testDir:"./tests/e2e",
   timeout:30000,
   expect:{timeout:10000},
-  retries:process.env.CI?1:0,
+  retries:0,
+  maxFailures:process.env.CI?8:undefined,
   workers:process.env.CI?2:undefined,
   reporter:process.env.CI?[["list"],["html",{outputFolder:"playwright-report",open:"never"}]]:"list",
   use:{

@@ -17,12 +17,13 @@ async function setup(context,family,events){
    localStorage.setItem("shuttleboard-v1",JSON.stringify(family));
   if(localStorage.getItem("schmetterlinge.calendarEvents.v1")===null)
    localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(events));
-  if(localStorage.getItem("keep-other-settings")===null)
+  if(!localStorage.getItem("schmetterlinge.communitySession.v1"))localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({access_token:"backup-test-member",refresh_token:"backup-test-refresh",expires_at:Date.now()+3600000,user_id:"24c76504-b86c-4c73-a01a-b6210b78e3a3"}));
+   if(localStorage.getItem("keep-other-settings")===null)
    localStorage.setItem("keep-other-settings","yes");
  },{family,events});
  await context.route("**/*.supabase.co/**",route=>route.fulfill({
   status:200,contentType:"application/json",
-  headers:{"Access-Control-Allow-Origin":"*"},body:"[]"
+  headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"},body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':"[]"
  }));
 }
 async function stored(page){

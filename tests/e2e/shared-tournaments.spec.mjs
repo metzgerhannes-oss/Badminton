@@ -26,13 +26,14 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
    access_token:"test.token.session",refresh_token:"test.refresh",expires_at:Date.now()+3600000
   }));
  },storeA);
- await follower.addInitScript(s=>localStorage.setItem("shuttleboard-v1",JSON.stringify(s)),storeB);
+ await follower.addInitScript(s=>{localStorage.setItem("shuttleboard-v1",JSON.stringify(s));localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({user_id:"24c76504-b86c-4c73-a01a-b6210b78e3a3",access_token:"test.follower.member",refresh_token:"test.follower.refresh",expires_at:Date.now()+3600000}));},storeB);
  let written=null;
  const mock=async route=>{
   const request=route.request(),url=new URL(request.url()),method=request.method();
   if(url.hostname==="127.0.0.1")return route.continue();
   if(method==="OPTIONS")return route.fulfill({status:204,headers,body:""});
-  if(url.pathname==="/auth/v1/signup"&&method==="POST")
+  if(url.pathname==="/rest/v1/rpc/app_access_status")return route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+   if(url.pathname==="/auth/v1/signup"&&method==="POST")
    throw Error("Public sharing must never create a new anonymous Auth account");
   // This positive two-device scenario simulates a prior independent guardian/club approval.
   // A separate negative test proves that missing grants block the POST entirely.
