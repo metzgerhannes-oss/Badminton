@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./authorized-test.mjs";
 const PLAYER="05-070879";
 test.beforeEach(async ({page})=>{
  await page.addInitScript(id=>{
