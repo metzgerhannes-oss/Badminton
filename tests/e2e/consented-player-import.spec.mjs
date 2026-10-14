@@ -14,7 +14,7 @@ test("Profile choice offers optional local data import once; settings can reopen
  // import feature to mount before simulating a user selection.
  await expect(page.locator(".player-copy-entry button")).toHaveCount(1);
  const sent=await page.evaluate(id=>{
-  window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}}));
+  window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id,source:"onboarding"}}));
   return localStorage.getItem("schmetterlinge.consentedPlayerData.v1");
  },player);
  expect(sent,"Simply offering import must not copy private data").toBeNull();
