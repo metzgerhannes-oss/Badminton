@@ -1,5 +1,6 @@
 /* Lock the interface until server membership is confirmed. Static web assets stay public. */
-html:not([data-app-access="granted"]) body > .app { visibility:hidden !important; pointer-events:none !important; }
+html:not([data-app-access="granted"]) body > .app { display:none !important; pointer-events:none !important; }
+html:not([data-app-access="granted"]) dialog { display:none !important; }
 #app-access-gate[hidden] { display:none !important; }
 #app-access-gate {
  position:fixed; inset:0; z-index:30000; overflow:auto; background:#e8f4fb;
