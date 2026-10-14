@@ -49,6 +49,9 @@ function persistAndContinue(profile,{confirmed=false}={}){
  const stored=readSaved();
  if(confirmed&&(!stored?.players?.some(p=>p.id===profile.id)||stored.activeProfileId!==profile.id))
   throw Error("Die DBV-ID konnte nicht als aktives Profil gespeichert werden. Bitte erneut versuchen.");
+ // The app explains the optional one-way download immediately after profile choice.
+ // Only the player ID is handed over, never a token or a claim of authority.
+ try{localStorage.setItem("schmetterlinge.pendingProfileDataImport.v1",profile.id)}catch{}
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};
  if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
