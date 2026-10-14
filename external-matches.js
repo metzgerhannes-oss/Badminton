@@ -200,4 +200,4 @@ document.addEventListener("DOMContentLoaded",()=>{
  if(location.hash==="#historie")load(current());
 });
 
-window.addEventListener("badminton:app-access-granted",()=>{if(selected)load(selected)});
+window.addEventListener("badminton:app-access-granted",()=>{privateMode=false;if(selected)load(selected)});
