@@ -272,7 +272,9 @@ test("Historical source validation matches the Home statistics",async ({page})=>
  await expect(page.locator("#external-match-list .external-match-item")).toHaveCount(1);
  await page.locator('.bottom-nav a[data-page="start"]').click();
  await expect(page.locator("#match-stats-reference .dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9/]);
- await expect(page.locator("#match-stats-values")).toBeHidden();
+ await expect(page.locator("#match-stats-values")).toBeVisible();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await expect(page.locator("#match-stats-note")).toContainText("Bisher belegte Spiele");
 });
 
 test("Historical source failure has real retry and does not claim zero matches",async ({page})=>{
