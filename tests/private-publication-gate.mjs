@@ -37,7 +37,7 @@ const importer=await readFile("supabase/functions/history-match-import/index.ts"
 assert.match(importer,/async function isInvitedMember/);
 assert.match(importer,/app_access_status/);
 assert.ok(importer.includes("data?.allowed===true"));
-assert.match(importer,/if\\(\\!\\(await isInvitedMember\\(req\\)\\)\\)return respond\\(403,\\{error:"app_invitation_required"\\},origin\\)/);
+assert.ok(importer.includes('if(!(await isInvitedMember(req)))return respond(403,{error:"app_invitation_required"},origin);'));
 assert.ok(importer.indexOf("readBoundedJson(req,1024)")<importer.indexOf("if(!(await isInvitedMember(req)))"));
 assert.ok(importer.indexOf("if(!(await isInvitedMember(req)))")<importer.indexOf('api("rpc/claim_external_match_import"'),
  "No service-role import claim or third-party fetch without a verified app member");
