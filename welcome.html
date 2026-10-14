@@ -28,8 +28,8 @@
      </div>
    <p id="welcome-language-status" class="welcome-language-status" role="status" aria-live="polite"></p>
    <div class="welcome-steps" aria-label="Einrichtungsschritte">
-    <span id="progress-profile" class="welcome-step current">1. Schritt Profil anlegen</span>
-    <span id="progress-install" class="welcome-step">2. Schritt App hinzufügen</span>
+    <span id="progress-install" class="welcome-step">1. Schritt App hinzufügen</span>
+    <span id="progress-profile" class="welcome-step current">2. Schritt Profil anlegen</span>
    </div>
    <section id="onboard-profile" class="welcome-panel" aria-labelledby="setup-title">
     <h2 id="setup-title">Für wen möchtest du ein Profil anlegen?</h2>
@@ -67,7 +67,7 @@
       </div>
       <p id="dbv-reference-note" class="welcome-info">Eine DBV-Spieler-ID kannst du später jederzeit unter Einstellungen ergänzen.</p>
       <p class="welcome-info" id="dbv-manual-note" hidden>Ein DBV-Link kann eine UUID statt der DBV-ID enthalten. Bitte gib auch den Spielernamen ein. Die Angaben gelten zunächst als ungeprüft.</p>
-      <button class="welcome-primary" type="submit">Profil speichern &amp; weiter <span aria-hidden="true">→</span></button>
+      <button class="welcome-primary" type="submit">Profil speichern <span aria-hidden="true">→</span></button>
     </form>
     <p class="welcome-small">Ohne DBV-ID kannst du ein eigenes Profil anlegen. Ranglisten erscheinen erst, wenn eine DBV-ID verknüpft ist.</p>
     </details>
@@ -77,7 +77,7 @@
    <section id="onboard-install" class="welcome-panel" aria-labelledby="install-title" hidden>
      <span id="welcome-success" class="welcome-success">✓ Profil auf diesem Gerät gespeichert</span>
      <h2 id="install-title">Schmetterlinge wie eine App öffnen</h2>
-     <p>Du brauchst keinen App Store. Füge Schmetterlinge zum Home-Bildschirm hinzu und öffne die App über das Symbol.</p>
+     <p id="install-intro">Füge Schmetterlinge zum Home-Bildschirm hinzu und öffne die App über das Symbol. Lege erst dann dein Profil an.</p>
      <div class="platform-switch" role="group" aria-label="Gerät auswählen">
       <button type="button" id="install-ios" aria-pressed="false">iPhone / iPad</button>
       <button type="button" id="install-android" aria-pressed="false">Android</button>
@@ -94,14 +94,15 @@
       <li>Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“.</li>
       <li>Bestätige mit „Installieren“ beziehungsweise „Hinzufügen“.</li>
      </ol>
-     <div class="welcome-actions">
+     <p class="welcome-info" id="install-hint"></p>
+      <div class="welcome-actions">
       <a id="open-app" class="welcome-primary" href="./#start">Jetzt Schmetterlinge öffnen <span aria-hidden="true">→</span></a>
-      <button type="button" id="install-back" class="welcome-secondary">Weiteres Spielerprofil hinzufügen</button>
+      <button type="button" id="install-back" class="welcome-secondary">Ohne Installation im Browser fortfahren</button>
      </div>
      <p class="welcome-small">Profile und Favoriten bleiben auf diesem Gerät. Einladungslinks erstellen kein Online-Konto und synchronisieren keine Daten.</p>
    </section>
   </main>
-  <footer class="welcome-footer">Schmetterlinge · Badminton Jugend <span>Eine kostenlose Web-App für Badminton-Familien</span><span class="welcome-app-version" data-app-version aria-label="App-Version v128">v128</span></footer>
+  <footer class="welcome-footer">Schmetterlinge · Badminton Jugend <span>Eine kostenlose Web-App für Badminton-Familien</span><span class="welcome-app-version" data-app-version aria-label="App-Version v129">v129</span></footer>
  </div>
 </body>
 </html>
