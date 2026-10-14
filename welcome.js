@@ -157,7 +157,7 @@ async function searchPlayers(value){
  $("welcome-search-results").replaceChildren();
  lastSearchPlayers=null;
  const term=normalizeFriendSearch(value);
- if(term.length<2){
+ if(term.length<3){
   setSearchStatus("Mindestens drei Zeichen eingeben, um Spieler zu finden.");
   return;
  }
@@ -183,7 +183,7 @@ function onSearchInput(){
  $("welcome-search-results").replaceChildren();
  lastSearchPlayers=null;
  const value=$("welcome-player-search").value;
- if(normalizeFriendSearch(value).length<2){
+ if(normalizeFriendSearch(value).length<3){
   setSearchStatus("Mindestens drei Zeichen eingeben, um Spieler zu finden.");
   return;
  }
