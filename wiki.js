@@ -99,21 +99,76 @@ function court(kind){
 function badgeArt(left,right,sub){
  return SVG_START+'<rect width="400" height="264" rx="20" fill="#d9f1ff"/><rect x="25" y="40" width="164" height="150" rx="18" fill="#167ba9"/><rect x="211" y="40" width="164" height="150" rx="18" fill="#128c72"/><text x="107" y="131" text-anchor="middle" font-family="system-ui" font-size="45" font-weight="850" fill="white">'+left+'</text><text x="293" y="131" text-anchor="middle" font-family="system-ui" font-size="45" font-weight="850" fill="white">'+right+'</text><text x="200" y="229" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="750" fill="#165075">'+sub+'</text>'+SVG_END;
 }
+function diagramTitle(kind){
+ const names={height:"AUFSCHLAGHÖHE",hangServe:"AUFSCHLAG",hangReturn:"RÜCKSCHLAG",doubleHit:"DOPPELSCHLAG",feet:"BEIDE FÜSSE",receiver:"EMPFÄNGER",move:"AUFSCHLAGBEWEGUNG"};
+ return names[kind]||"";
+}
 function art(kind){
  if(["court","single","double","service","serve","even","odd","small","smallbox","smallnoback"].includes(kind))return court(kind);
- if(kind==="score21"||kind==="deuce21")return badgeArt(kind==="deuce21"?"20:20":"21",kind==="deuce21"?"29:29":"30","ZWEI PUNKTE VORSPRUNG");
- if(kind==="score15")return badgeArt("15","21","3 × 15 · MAX. 21");
+ if(kind==="score21")return badgeArt("21","30","ZIEL: 21 · MAXIMAL: 30");
+ if(kind==="deuce21")return badgeArt("20:20","29:29","+2 PUNKTE · MAXIMAL 30");
+ if(kind==="score15")return badgeArt("15","21","ZIEL: 15 · MAXIMAL: 21");
  if(kind==="bestof")return badgeArt("2","3","ZWEI GEWINNSÄTZE");
  if(kind==="teams")return badgeArt("1 : 1","2 : 2","EINZEL  /  DOPPEL");
- if(kind==="ages")return badgeArt("U11","U19","U13 · U15 · U17");
- if(kind==="ranking")return SVG_START+'<rect width="400" height="264" fill="#d7f2ff"/>'+Array.from({length:7},(_,i)=>'<rect x="'+(34+i*49)+'" y="'+(200-[107,134,80,160,115,56,38][i])+'" width="35" height="'+[107,134,80,160,115,56,38][i]+'" rx="6" fill="'+(i<5?"#1a89b9":"#94afbd")+'"/>').join("")+'<text x="200" y="239" font-size="16" fill="#155477" font-weight="800" text-anchor="middle" font-family="system-ui">DIE BESTEN 5</text>'+SVG_END;
- if(kind==="levels")return SVG_START+'<rect width="400" height="264" fill="#e1f5ff"/>'+["A","B","C","D","E"].map((v,i)=>'<circle cx="'+(48+i*76)+'" cy="'+(130+((i%2)?9:-9))+'" r="32" fill="'+(i<2?"#207fac":"#209c86")+'"/><text x="'+(48+i*76)+'" y="'+(142+((i%2)?9:-9))+'" font-size="33" font-weight="850" font-family="system-ui" text-anchor="middle" fill="white">'+v+'</text>').join("")+SVG_END;
- if(kind==="rotate")return SVG_START+'<rect width="400" height="264" fill="#dff2fc"/>'+["A1","A2","B1","B2"].map((v,i)=>'<circle cx="'+(110+(i%2)*180)+'" cy="'+(68+Math.floor(i/2)*132)+'" r="41" fill="'+(i<2?"#1888b2":"#189a82")+'"/><text x="'+(110+(i%2)*180)+'" y="'+(82+Math.floor(i/2)*132)+'" font-family="system-ui" font-size="31" font-weight="850" fill="white" text-anchor="middle">'+v+'</text>').join("")+'<path d="M152 68H246 M290 109V159 M248 200H152 M110 159V109" fill="none" stroke="#fbbf2c" stroke-width="6" stroke-dasharray="8 6"/>'+SVG_END;
- if(kind==="net")return SVG_START+'<rect width="400" height="264" fill="#d7f0ff"/><path d="M48 194V74 M352 194V74" stroke="#174763" stroke-width="9"/><path d="M48 82 Q200 106 352 82V177H48Z" fill="#78c0bc" stroke="#216575" stroke-width="4"/>'+Array.from({length:13},(_,i)=>'<path d="M'+(48+i*25)+' 88V177" stroke="#e8fbff" stroke-width="1"/>').join("")+'<text x="200" y="228" font-family="system-ui" font-size="19" font-weight="800" text-anchor="middle" fill="#175275">NETZ</text>'+SVG_END;
- if(kind==="clock"||kind==="calendar")return badgeArt(kind==="clock"?"60 s":"12",kind==="clock"?"120 s":"Do","PAUSE / WERTUNG");
+ if(kind==="months")return badgeArt("12","MON.","WERTUNGSFENSTER");
+ if(kind==="weekday")return badgeArt("DO","↻","JEDE WOCHE");
+ if(kind==="clock")return badgeArt("60 s","120 s","IM SATZ / ZWISCHEN SÄTZEN");
+ if(kind==="ages")return SVG_START+'<rect width="400" height="264" fill="#d9f2ff"/>'
+  +["U11","U13","U15","U17","U19"].map((v,i)=>'<rect x="'+(11+i*79)+'" y="79" width="73" height="95" rx="13" fill="'+(i%2?"#178e91":"#127da9")+'"/><text x="'+(47+i*79)+'" y="134" text-anchor="middle" font-family="system-ui" font-size="24" font-weight="800" fill="white">'+v+'</text>').join('')
+  +'<text x="200" y="211" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#15516f">ALTERSKLASSEN</text>'+SVG_END;
+ if(kind==="ranking")return SVG_START+'<rect width="400" height="264" fill="#dcf4ff"/>'
+  +Array.from({length:7},(_,i)=>'<rect x="'+(13+i*55)+'" y="86" width="46" height="64" rx="10" fill="'+(i<5?"#138eb6":"#b2bec5")+'"/><text x="'+(36+i*55)+'" y="128" font-size="22" fill="white" font-weight="800" font-family="system-ui" text-anchor="middle">'+(i+1)+'</text>').join('')
+  +'<text x="200" y="194" font-size="16" fill="#15516f" font-weight="800" font-family="system-ui" text-anchor="middle">DIE FÜNF BESTEN ZÄHLEN</text>'+SVG_END;
+ if(kind==="levels"||kind==="levelsU11")return SVG_START+'<rect width="400" height="264" fill="#dff4ff"/>'
+  +["A","B","C","D","E"].map((v,i)=>'<circle cx="'+(46+i*77)+'" cy="116" r="34" fill="'+(kind==="levelsU11"&&i===1?"#b2bec5":i<2?"#167eac":"#179787")+'"/><text x="'+(46+i*77)+'" y="129" font-size="34" font-weight="850" font-family="system-ui" text-anchor="middle" fill="white">'+(kind==="levelsU11"&&i===1?"×":v)+'</text><text x="'+(46+i*77)+'" y="176" font-size="11" font-weight="700" font-family="system-ui" text-anchor="middle" fill="#15516f">'+["DBV","Gruppe","Land","Bezirk","Region"][i]+'</text>').join('')
+  +'<text x="200" y="225" font-size="13" font-weight="700" font-family="system-ui" text-anchor="middle" fill="#15516f">'+(kind==="levelsU11"?"U11: KEINE B-WERTUNG":"TURNIEREBENEN A–E")+'</text>'+SVG_END;
+ if(kind==="smallSchedule")return SVG_START+'<rect width="400" height="264" fill="#dff3ff"/>'
+  +[['1.','BOX'],['2.','OHNE HINTERFELD'],['3.','STANDARD']].map((p,i)=>'<rect x="15" y="'+(22+i*68)+'" width="370" height="58" rx="12" fill="'+(i%2?"#147ca9":"#16947f")+'"/><text x="43" y="'+(59+i*68)+'" font-family="system-ui" font-size="22" font-weight="800" fill="white">'+p[0]+'</text><text x="214" y="'+(58+i*68)+'" font-family="system-ui" font-size="17" font-weight="750" text-anchor="middle" fill="white">'+p[1]+'</text>').join('')
+  +'<text x="200" y="245" font-family="system-ui" font-size="11" font-weight="750" text-anchor="middle" fill="#15516f">BWBV C-RLT 2026 · U13 4.: MIXED</text>'+SVG_END;
+ if(kind==="rotate"||kind==="serveAgain")return SVG_START+'<rect width="400" height="264" fill="#dcf2ff"/>'
+  +'<text x="107" y="44" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="800" fill="#17516e">VOR DEM PUNKT</text>'
+  +'<text x="294" y="44" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="800" fill="#17516e">NACH DEM PUNKT</text>'
+  +'<rect x="29" y="58" width="153" height="111" rx="11" fill="#149177"/>'
+  +'<path d="M105 58V169" stroke="white" stroke-width="3"/>'
+  +'<circle cx="146" cy="115" r="23" fill="#f9e263"/><text x="146" y="122" font-family="system-ui" text-anchor="middle" font-size="17" font-weight="800" fill="#15415c">A1</text>'
+  +'<circle cx="67" cy="115" r="17" fill="#d3efff"/><text x="67" y="121" font-family="system-ui" text-anchor="middle" font-size="12" font-weight="800" fill="#15415c">A2</text>'
+  +'<path d="M190 114h24m-10-10 10 10-10 10" stroke="#eb9d15" stroke-width="6" fill="none" stroke-linecap="round"/>'
+  +'<rect x="218" y="58" width="153" height="111" rx="11" fill="#149177"/>'
+  +'<path d="M294 58V169" stroke="white" stroke-width="3"/>'
+  +'<circle cx="258" cy="115" r="23" fill="#f9e263"/><text x="258" y="122" font-family="system-ui" text-anchor="middle" font-size="17" font-weight="800" fill="#15415c">A1</text>'
+  +'<circle cx="333" cy="115" r="17" fill="#d3efff"/><text x="333" y="121" font-family="system-ui" text-anchor="middle" font-size="12" font-weight="800" fill="#15415c">A2</text>'
+  +'<text x="200" y="209" font-family="system-ui" text-anchor="middle" font-size="16" font-weight="800" fill="#15516f">A1 BLEIBT AUFSCHLÄGER</text>'
+  +'<text x="200" y="233" font-family="system-ui" text-anchor="middle" font-size="13" font-weight="650" fill="#416781">TEAM PUNKTET BEI EIGENEM AUFSCHLAG</text>'+SVG_END;
+ if(["hangServe","hangReturn","net"].includes(kind)){
+  const result=kind==="hangServe"?"FEHLER":kind==="hangReturn"?"WIEDERHOLUNG":"NETZ";
+  const color=kind==="hangServe"?"#af3045":"#0b789e";
+  return SVG_START+'<rect width="400" height="264" fill="#d8f2ff"/><path d="M52 78H348" stroke="#184e6b" stroke-width="8"/>'
+   +Array.from({length:16},(_,i)=>'<path d="M'+(55+i*19)+' 84V169" stroke="#348498" stroke-width="1.8"/>').join('')
+   +Array.from({length:5},(_,i)=>'<path d="M52 '+(94+i*17)+'H348" stroke="#348498" stroke-width="1.8"/>').join('')
+   +(kind==="net"?"":'<circle cx="201" cy="82" r="15" fill="#fff" stroke="#184e6b" stroke-width="3"/>')
+   +'<rect x="85" y="185" width="230" height="52" rx="14" fill="'+color+'"/><text x="200" y="217" text-anchor="middle" font-family="system-ui" font-size="23" font-weight="800" fill="white">'+result+'</text>'+SVG_END;
+ }
+ if(kind==="height")return badgeArt("1,15m","Taille","BWF / NATIONALE ALTERNATIVE");
+ if(kind==="feet")return SVG_START+'<rect width="400" height="264" fill="#def4ff"/>'
+  +'<path d="M42 196H358" stroke="#1b6272" stroke-width="8"/>'
+  +'<path d="M101 74V175Q103 193 130 192h51V169h-27l-8-95" fill="#208cad" stroke="#15516f" stroke-width="4"/>'
+  +'<path d="M225 74V175Q227 193 254 192h51V169h-27l-8-95" fill="#208cad" stroke="#15516f" stroke-width="4"/>'
+  +'<text x="200" y="239" font-family="system-ui" font-weight="800" font-size="17" fill="#15516f" text-anchor="middle">BODENKONTAKT</text>'+SVG_END;
+ if(kind==="doubleHit")return badgeArt("1","2","ZWEI SCHLÄGE = FEHLER");
+ if(kind==="receiver")return badgeArt("NICHT","BEREIT","KEIN RÜCKSCHLAG: WIEDERHOLEN");
+ if(kind==="move")return SVG_START+'<rect width="400" height="264" fill="#e1f3ff"/>'
+  +'<path d="M80 174Q200 36 319 145" stroke="#1986b2" stroke-width="13" fill="none" stroke-linecap="round"/>'
+  +'<path d="M292 143 28 2-17 20" stroke="#1986b2" stroke-width="9" fill="none" stroke-linecap="round"/>'
+  +'<text x="200" y="234" font-family="system-ui" font-size="17" font-weight="800" text-anchor="middle" fill="#15516f">BEWEGUNG NACH VORN</text>'+SVG_END;
+ if(kind==="podium")return SVG_START+'<rect width="400" height="264" fill="#dff4ff"/>'
+  +'<rect x="78" y="142" width="78" height="66" fill="#55a8c9"/><rect x="162" y="99" width="78" height="109" fill="#f3bf4a"/><rect x="246" y="161" width="78" height="47" fill="#61af9d"/>'
+  +["2","1","3"].map((v,i)=>'<text x="'+(117+i*84)+'" y="'+([181,158,194][i])+'" font-size="31" text-anchor="middle" font-family="system-ui" font-weight="850" fill="#16466b">'+v+'</text>').join('')
+  +'<text x="200" y="238" font-size="16" font-weight="800" font-family="system-ui" text-anchor="middle" fill="#16516f">PLATZIERUNG</text>'+SVG_END;
  if(kind==="line")return SVG_START+'<rect width="400" height="264" fill="#d9f2ff"/><rect x="49" y="37" width="304" height="183" rx="8" fill="#0b956a"/><path d="M235 39V219" stroke="white" stroke-width="12"/><circle cx="239" cy="114" r="18" fill="#f5f9f9" stroke="#365a71" stroke-width="4"/><path d="m200 158 24 26 49-54" fill="none" stroke="#ffda3c" stroke-width="10" stroke-linecap="round"/>'+SVG_END;
- const symbol=kind==="let"?"↻":kind==="fault"?"×":kind==="decision"?"?":kind==="ceiling"?"↑":kind==="switch"?"⇄":kind==="feet"?"✓":kind==="podium"?"★":"🏸";
- return SVG_START+'<rect width="400" height="264" fill="#d6f1ff"/><circle cx="200" cy="129" r="90" fill="#167da9"/><circle cx="200" cy="129" r="70" fill="#229e9b"/><text x="200" y="169" font-family="system-ui" font-size="112" font-weight="850" fill="white" text-anchor="middle">'+symbol+'</text>'+SVG_END;
+ const symbol=kind==="let"?"↻":kind==="fault"?"×":kind==="decision"?"?":kind==="ceiling"?"↑":kind==="switch"?"⇄":"✓";
+ const subtitle=kind==="let"?"WIEDERHOLUNG":kind==="fault"?"FEHLER":kind==="ceiling"?"DECKENBERÜHRUNG":kind==="switch"?"SEITENWECHSEL":"ENTSCHEIDUNG";
+ return SVG_START+'<rect width="400" height="264" fill="#d6f1ff"/><circle cx="200" cy="119" r="78" fill="#197eaa"/><text x="200" y="160" font-family="system-ui" font-size="113" font-weight="850" fill="white" text-anchor="middle">'+symbol+'</text>'
+ +'<text x="200" y="239" font-family="system-ui" font-weight="800" font-size="16" text-anchor="middle" fill="#15516f">'+subtitle+'</text>'+SVG_END;
 }
 const normalize=(s)=>String(s||"").toLowerCase().replace(/ß/g,"ss").replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").normalize("NFKD").replace(/[\u0300-\u036f]/g,"");
 const search=document.getElementById("wiki-search");
