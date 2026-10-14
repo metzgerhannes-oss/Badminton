@@ -73,7 +73,7 @@ test("v65 extracted home cards and dialogs retain readable component styling",as
    const css=getComputedStyle(el);
    return {radius:css.borderTopLeftRadius,color:css.color,background:css.backgroundImage};
   });
-  expect(shape.radius).toBe("21px");
+  expect(shape.radius).toBe("16px");
   expect(shape.background).toContain("linear-gradient");
   await page.locator('.bottom-nav a[data-page="spieler"]').click();
   await page.goto("/#einstellungen/profile");
@@ -148,7 +148,7 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
   expect(chrome.navDisplay).toBe("flex");
   expect(chrome.logoClip).toBe("none");
   expect(chrome.logoMask).toBe("none");
-  expect(chrome.profileRadius).toBe("21px");
+  expect(chrome.profileRadius).toBe("16px");
   expect(chrome.profileGradient).toContain("linear-gradient");
   for(const tab of await tabs.all()){
    const box=await tab.boundingBox();
