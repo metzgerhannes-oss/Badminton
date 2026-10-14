@@ -1,4 +1,4 @@
-import {test,expect} from "./authorized-test.mjs";
+import {test,expect} from "@playwright/test";
 
 const player="99-123456";
 test("Profile choice offers optional local data import once; settings can reopen it",async ({page})=>{

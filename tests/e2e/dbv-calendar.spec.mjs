@@ -1,4 +1,4 @@
-import {test,expect} from "./authorized-test.mjs";
+import {test,expect} from "@playwright/test";
 import {readFile} from "node:fs/promises";
 const data=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 const sourceTotal=data.entries.length;

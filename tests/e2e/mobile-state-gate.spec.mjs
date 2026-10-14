@@ -1,4 +1,4 @@
-import {test,expect} from "./authorized-test.mjs";
+import {test,expect} from "@playwright/test";
 const PLAYER="05-070879",FRIEND="05-061350";
 test.beforeEach(async ({page})=>{
  await page.addInitScript(({id,friend})=>{

@@ -1,4 +1,4 @@
-import {test,expect} from "./authorized-test.mjs";
+import {test,expect} from "@playwright/test";
 
 const PLAYER="05-070879";
 const FRIEND="05-061350";

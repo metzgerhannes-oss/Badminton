@@ -1,4 +1,4 @@
-import {test,expect} from "./authorized-test.mjs";
+import {test,expect} from "@playwright/test";
 const own={players:[{id:"05-070879",name:"Testprofil",club:"SpVgg Mössingen"}],
  friends:[],officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true};
 const source="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/clubTeams?club=10777";

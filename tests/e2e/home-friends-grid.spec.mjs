@@ -1,4 +1,4 @@
-import {test,expect} from "./authorized-test.mjs";
+import {test,expect} from "@playwright/test";
 
 const OWN={id:"05-070879",name:"Startprofil",club:"SpVgg. Mössingen",birthYear:2016};
 const FRIENDS=["Sarah Storz","Vinzent Ott","Benjamin Belser","Anna Beispiel",
