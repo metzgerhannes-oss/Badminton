@@ -32,11 +32,12 @@ async function rpc(name,args,session){
 }
 function validResult(response,player){
  if(!response||response.player_dbv_id!==player||!Array.isArray(response.results))return null;
- const list=response.results.filter(r=>r?.playerId===player&&r.verified===true&&
+ const list=response.results.filter(r=>r?.playerId===player&&typeof r.verified==="boolean"&&
   typeof r.id==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(r.date)&&
-  Number.isInteger(r.place)&&r.place>=1&&r.place<=4&&
+  Number.isInteger(r.place)&&r.place>=1&&r.place<=128&&
   typeof r.source?.url==="string"&&r.source.url.startsWith("https://")).slice(0,200);
- return {state:"ready",results:list,coverage:"partial_not_exhaustively_verified"};
+ return {state:"ready",results:list,
+  coverage:response.scope==="app_archive"?"sourced_placements_partial":"partial_not_exhaustively_verified"};
 }
 export function trophySnapshot(player){
  if(!DBV.test(String(player||"")))return {state:"protected",results:[]};
