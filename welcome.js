@@ -53,7 +53,7 @@ function persistAndContinue(profile,{confirmed=false}={}){
  const stored=readSaved();
  if(confirmed&&(!stored?.players?.some(p=>p.id===profile.id)||stored.activeProfileId!==profile.id))
   throw Error("Die DBV-ID konnte nicht als aktives Profil gespeichert werden. Bitte erneut versuchen.");
- // A profile choice may offer an OPTIONAL one-way data copy. No remote read here.
+ // A selected player may explicitly authorize a one-way data copy after entry.
  try{localStorage.setItem("schmetterlinge.pendingPlayerDataCopy.v1",profile.id)}catch{}
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};
@@ -227,6 +227,10 @@ window.addEventListener("schmetterlinge:language-change", event => {
  if(lastSearchPlayers&&!selectedCandidate)showSearchResults(lastSearchPlayers,lastSearchSource);
  else if(lastSearchStatus?.kind==="results")setResultsStatus(lastSearchStatus.count,lastSearchStatus.source);
  else if(lastSearchStatus?.kind==="message")setSearchStatus(lastSearchStatus.message);
+ if(!$("onboard-install").hidden&&$("open-app").hidden){
+  const saved=readSaved()?.players;
+  showInstallFirst(Array.isArray(saved)&&saved.length>0);
+ }
  if(selectedCandidate){
   const detail=[selectedCandidate.club||t("Verein unbekannt"),
    selectedCandidate.birthYear?format("Jg. {year}",{year:selectedCandidate.birthYear}):selectedCandidate.ageClass,
