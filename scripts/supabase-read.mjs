@@ -37,7 +37,7 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   try{
    const protectedRoute=/^(?:player_external_match_facts|tournament_placements)[?]/.test(path);
    const sessionToken=protectedRoute&&typeof window!=="undefined"
-    ?window.badmintonAppAccess?.accessToken:null;
+    ?await window.badmintonAppAccess?.getAccessToken?.():null;
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
     headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),
