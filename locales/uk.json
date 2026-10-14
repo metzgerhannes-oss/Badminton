@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "З міркувань захисту даних загальний пошук DBV за ім’ям наразі вимкнено. Прийняті запрошення додаються автоматично. Нижче можна додати власні профілі за ім’ям та ID DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Пошук DBV за ім’ям зараз недоступний. Скористайтеся ручним налаштуванням за ім’ям та ID DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "На цьому пристрої немає відповідного гравця. Інші профілі можна додати вручну за ID DBV.",
-    " · Auf diesem Gerät gespeichert": " · Збережено на цьому пристрої"
+    " · Auf diesem Gerät gespeichert": " · Збережено на цьому пристрої",
+    "2. Schritt Daten abrufen": "Крок 2. Отримати дані",
+    "3. Schritt App hinzufügen": "Крок 3. Додати застосунок",
+    "Deine Daten abrufen": "Отримати свої дані",
+    "Profil ausgewählt.": "Профіль вибрано.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "Тепер можна отримати наявні результати: профіль гравця, підтверджені нагороди та доступну статистику матчів.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Дані завантажуються лише за вашим явним запитом і за наявності чинного дозволу для цього гравця. Без запрошення раніше збережені дані залишаються без змін.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "Отримати дані пізніше можна будь-коли в розділі Налаштування → Мої дані.",
+    "Jetzt Daten abrufen →": "Отримати дані зараз →",
+    "Später · weiter zur Installation": "Пізніше · перейти до встановлення"
   }
 }
