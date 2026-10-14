@@ -20,4 +20,17 @@ assert.ok(!storage.get(KEY).includes("should-not-copy"),"Only sanctioned fields 
 assert.ok(!storage.get(KEY).includes("invitation"),"No private access tokens/IDs in copy");
 assert.equal(deletePlayerCopy(player,storage),true);
 assert.equal(loadPlayerCopy(player,storage),null);
+const {readFile}=await import("node:fs/promises");
+const [ui,index,worker,matches,trophies,welcome]=await Promise.all([
+ "consented-player-data.js","index.html","sw.js","scripts/private-match-source.mjs",
+ "scripts/private-trophy-source.mjs","welcome.js"].map(p=>readFile(p,"utf8")));
+assert.match(ui,/requestPrivateMatches\(player,\{force:true\}\)/);
+assert.match(ui,/requestPrivateTrophies\(player,\{force:true\}\)/);
+assert.match(ui,/Daten jetzt übernehmen/);
+assert.match(ui,/!matchOk&&!trophyOk/,"Protected sources must not produce a new local copy");
+assert.match(index,/consented-player-data\.js/);
+assert.match(worker,/scripts\/consented-player-data\.mjs/);
+assert.match(matches,/coverage:"device_snapshot"/);
+assert.match(trophies,/coverage:"device_snapshot"/);
+assert.match(welcome,/pendingPlayerDataCopy\.v1/);
 console.log("Consented local data copy: full paginated source, deduplication, identity and no authorization material OK");
