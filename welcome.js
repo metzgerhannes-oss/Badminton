@@ -1,6 +1,7 @@
 import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scripts/invitation.mjs";
 import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
 import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
+import {shouldOfferInstallationFirst} from "./scripts/welcome-flow.mjs";
 const $=id=>document.getElementById(id);
 const t=key=>window.SchmetterlingeI18n?.t(key)||key;
 const format=(key,params={})=>t(key).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??""));
@@ -39,6 +40,9 @@ function showPlatform(value){
   $("install-"+name+"-steps").hidden=value!==name;
  }
 }
+function isStandaloneApp(){
+ return navigator.standalone===true||window.matchMedia?.("(display-mode: standalone)")?.matches===true;
+}
 function readSaved(){
  try{const value=localStorage.getItem(STORE);return value?JSON.parse(value):null}catch{return null}
 }
@@ -52,20 +56,10 @@ function persistAndContinue(profile,{confirmed=false}={}){
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};
  if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
- // Profile creation and invitation remain entirely local. Public directory lookup is read-only.
- // Installed PWAs must return directly to the app, not repeat the installation tutorial.
- if(new URLSearchParams(location.search).get("from")==="app"){
-  window.location.replace("./index.html#start");
-  return;
- }
- $("onboard-profile").hidden=true;
- $("onboard-install").hidden=false;
- $("progress-profile").classList.remove("current");
- $("progress-profile").classList.add("done");
- $("progress-install").classList.add("current");
- showPlatform(preferredPlatform());
- document.title=t("App zum Home-Bildschirm hinzufügen · Schmetterlinge");
- window.scrollTo?.(0,0);
+ // Save only in the browser/app context that is currently running.
+ // Installation is offered BEFORE creating a profile, because iOS can isolate
+ // Safari localStorage from an installed Home Screen web app.
+ window.location.replace("./index.html#start");
 }
 function saveProfile(e){
  e.preventDefault();
@@ -193,10 +187,29 @@ function onSearchInput(){
  setSearchStatus("Suche wird vorbereitet …");
  searchTimer=setTimeout(()=>searchPlayers(value),280);
 }
+function showInstallFirst(hasProfiles=false){
+ $("onboard-profile").hidden=true;
+ $("onboard-install").hidden=false;
+ $("welcome-success").hidden=true;
+ $("progress-profile").classList.remove("current");
+ $("progress-install").classList.add("current");
+ $("progress-install").classList.remove("done");
+ $("install-title").textContent=t("Schmetterlinge zuerst zum Home-Bildschirm hinzufügen");
+ $("install-intro").textContent=t("Öffne nach dem Hinzufügen Schmetterlinge über das neue Symbol. Lege dein Spielerprofil erst dort an, damit es in der App gespeichert bleibt.");
+ $("install-hint").textContent=hasProfiles
+  ?t("Hinweis: Bereits in Safari angelegte Profile werden nicht automatisch in eine getrennte Web-App übertragen. Du kannst sie in der bisherigen Browseransicht weiter nutzen oder über „Meine Daten sichern“ exportieren und in der App importieren.")
+  :t("Nach dem Öffnen über das Symbol wähle „Profil anlegen“. Eine Anmeldung ist nicht nötig.");
+ $("install-back").textContent=t("Ohne Installation im Browser fortfahren");
+ $("open-app").hidden=true;
+ showPlatform(preferredPlatform());
+ document.title=t("App zum Home-Bildschirm hinzufügen · Schmetterlinge");
+ window.scrollTo?.(0,0);
+}
 function showProfileForm(){
  $("onboard-install").hidden=true;
  $("onboard-profile").hidden=false;
  $("progress-install").classList.remove("current");
+ $("progress-install").classList.add("done");
  $("progress-profile").classList.remove("done");
  $("progress-profile").classList.add("current");
  $("welcome-form").reset();
@@ -238,17 +251,16 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("install-android").addEventListener("click",()=>showPlatform("android"));
  $("install-back").addEventListener("click",showProfileForm);
  const known=readSaved()?.players;
- $("welcome-existing").hidden=!(Array.isArray(known)&&known.length);
- const fromInstalledApp=new URLSearchParams(location.search).get("from")==="app";
- $("progress-install").hidden=fromInstalledApp;
+ const hasProfiles=Array.isArray(known)&&known.length>0;
+ $("welcome-existing").hidden=!hasProfiles;
+ const standalone=isStandaloneApp();
+ $("progress-install").hidden=standalone;
+ if(standalone)$("progress-profile").textContent=t("Profil anlegen");
  updateMode("manual");
- if(location.hash==="#installation"){
-  $("onboard-profile").hidden=true;
-  $("onboard-install").hidden=false;
-  $("progress-profile").classList.remove("current");
-  $("progress-install").classList.add("current");
-  $("welcome-success").hidden=true;
-  showPlatform(preferredPlatform());
+ if(shouldOfferInstallationFirst({
+  standalone,hasProfiles,installationRequested:location.hash==="#installation"
+ })){
+  showInstallFirst(hasProfiles);
  }
  if("serviceWorker" in navigator&&location.protocol==="https:"){
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
