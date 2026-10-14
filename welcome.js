@@ -254,7 +254,10 @@ document.addEventListener("DOMContentLoaded",()=>{
  const known=readSaved()?.players;
  const hasProfiles=Array.isArray(known)&&known.length>0;
  $("welcome-existing").hidden=!hasProfiles;
- const standalone=isStandaloneApp();
+ // A user coming from the app has already chosen to use its current
+ // browser/PWA context; do not send them back through installation advice.
+ const fromApp=new URLSearchParams(location.search).get("from")==="app";
+ const standalone=isStandaloneApp()||fromApp;
  $("progress-install").hidden=standalone;
  if(standalone)$("progress-profile").textContent=t("Profil anlegen");
  updateMode("manual");
