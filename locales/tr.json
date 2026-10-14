@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Veri koruma nedeniyle genel DBV isim araması şu anda kapalıdır. Kabul edilen davetler otomatik eklenir. Aşağıdan ad ve DBV kimliğiyle başka kişisel profiller ekleyebilirsiniz.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV isim araması şu anda kullanılamıyor. Ad ve DBV kimliğiyle manuel kurulum yapın.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Bu cihazda eşleşen oyuncu bulunamadı. Diğer profilleri DBV kimliğiyle manuel ekleyebilirsiniz.",
-    " · Auf diesem Gerät gespeichert": " · Bu cihazda kayıtlı"
+    " · Auf diesem Gerät gespeichert": " · Bu cihazda kayıtlı",
+    "2. Schritt Daten abrufen": "2. Adım: Verileri al",
+    "3. Schritt App hinzufügen": "3. Adım: Uygulamayı ekle",
+    "Deine Daten abrufen": "Verilerini al",
+    "Profil ausgewählt.": "Profil seçildi.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "Artık mevcut sonuçları alabilirsin: oyuncu profili, doğrulanmış kupalar ve kullanılabilir maç istatistikleri.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Veriler yalnızca açıkça talep ettiğinde ve bu oyuncu için geçerli iznin varsa alınır. Davet olmadan daha önce kaydedilen verilerin değişmez.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "Verileri daha sonra istediğin zaman Ayarlar → Verilerim bölümünden alabilirsin.",
+    "Jetzt Daten abrufen →": "Verileri şimdi al →",
+    "Später · weiter zur Installation": "Daha sonra · kuruluma devam et"
   }
 }
