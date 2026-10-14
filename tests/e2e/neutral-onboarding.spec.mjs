@@ -21,6 +21,7 @@ test("Installed app searches DBV and returns with verified player ID",async ({pa
  await page.locator("#first-run-new").click();
  await expect(page).toHaveURL(/\/welcome\.html\?from=app$/);
  await expect(page.locator("#welcome-player-search")).toBeVisible();
+ await expect(page.locator("html")).toHaveAttribute("data-welcome-ready","true");
  await page.locator("#welcome-player-search").fill("Storz");
  const hit=page.locator(".welcome-search-hit",{hasText:"Sarah Storz"});
  await expect(hit).toContainText("DBV 05-061350");
