@@ -72,7 +72,7 @@ function render(){
   // BWBV publishes an independent youth calendar; only DBV source-backed rows
   // may enter this list, so do not invent records from older PDF schedules.
   const bwU13C=settings.region==="Baden-Württemberg"&&
-    (settings.age==="U13"||settings.age==="all")&&settings.level==="C";
+    settings.age==="U13"&&settings.level==="C";
   const framework=bwFrameworkDates(settings,localToday());
   const frameworkHTML=framework.length
     ?'<section class="dbv-calendar-framework"><h4>BWBV · veröffentlichte C-Ranglisten-Rahmentermine 2027</h4>'+
@@ -81,7 +81,7 @@ function render(){
      '<a href="'+BWBV_FRAMEWORK_SOURCE+'" target="_blank" rel="noopener noreferrer">Offizieller BWBV-Jugendrahmenkalender ↗</a></section>'
     :"";
   const coverageNote=bwU13C
-    ?'<p><strong>Quellenlücke möglich:</strong> Für Baden-Württemberg fehlen in unserem DBV-Import U13/C-Termine. Bitte den <a href="https://bwbv.de/kalender/" target="_blank" rel="noopener noreferrer">BWBV-Kalender ↗</a> als zweite offizielle Quelle prüfen.</p>'
+    ?'<p><strong>Quellenlücke möglich:</strong> Für die gewählte Filterauswahl sind im DBV-Import derzeit keine U13/C-Termine erfasst; andere Zeiträume können Treffer enthalten. Bitte den <a href="https://bwbv.de/kalender/" target="_blank" rel="noopener noreferrer">BWBV-Kalender ↗</a> als zweite offizielle Quelle prüfen.</p>'
     :'<p>Der Datenbestand kann unvollständig sein. Keine Treffer bedeuten nicht, dass keine Turniere stattfinden.</p>';
   const more=document.getElementById("dbv-calendar-more");
   if(more)more.hidden=true;
