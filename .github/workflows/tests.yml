@@ -113,6 +113,7 @@ jobs:
           node tests/invitation.mjs
           node tests/invited-player-v125.mjs
           node tests/player-library.mjs
+          node tests/local-directory-fallback-v128.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
           node tests/external-match-parser.mjs
