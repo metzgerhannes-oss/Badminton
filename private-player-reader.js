@@ -146,3 +146,11 @@ if(pendingToken){
 }else if(activeId){acceptBtn.hidden=true;await reload()}
 else{acceptBtn.hidden=true;hide("Auf diesem Gerät ist keine angenommene Einladung vorhanden.")}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&activeId)reload()});
+// Safari may reuse an already open page when the same URL gets a new #token.
+// In that case the module is not rerun. A reload processes the token on the
+// receiving device and clears the fragment immediately as on initial load.
+window.addEventListener("hashchange",()=>{
+ const hash=location.hash.slice(1);
+ if((hash.startsWith("token=")&&TOKEN.test(hash.slice(6)))||
+    (hash.startsWith("access=")&&UUID.test(hash.slice(7))))location.reload();
+});
