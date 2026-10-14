@@ -2,6 +2,7 @@
  * No personal results in public JSON, service workers, persistent caches or logs. */
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./supabase-read.mjs";
 import {getPrivateSession} from "../private-invites.js";
+import {loadImportedSnapshot} from "./player-data-import.mjs";
 const DBV=/^[0-9]{2}-[0-9]{6}$/;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const HOLD_MS=30000;
@@ -40,6 +41,12 @@ function validResult(response,player){
 export function trophySnapshot(player){
  if(!DBV.test(String(player||"")))return {state:"protected",results:[]};
  const state=states.get(player);
+ if(state?.state==="ready")return {state:"ready",results:state.results||[],coverage:state.coverage};
+ // Deliberately downloaded copy: never represents a live, currently valid grant.
+ // A later revoke stops server reads but cannot remotely erase local snapshots.
+ const local=loadImportedSnapshot(player);
+ if(local?.trophies!==null&&Array.isArray(local?.trophies))
+  return {state:"ready",results:local.trophies,coverage:"device_snapshot",fetchedAt:local.fetchedAt};
  if(!state)return {state:"loading",results:[]};
  if(Date.now()-state.checkedAt>HOLD_MS&&!state.pending)return {state:"loading",results:[]};
  return {state:state.state,results:state.results||[],coverage:state.coverage};
