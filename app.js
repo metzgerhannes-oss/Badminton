@@ -107,6 +107,7 @@ function renderProfiles(){
  list.querySelectorAll("[data-set-active]").forEach(b=>b.addEventListener("click",()=>{
   if(!setActiveProfile(b.dataset.setActive))return;
   render();toast("Startprofil geändert");
+  window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:b.dataset.setActive}}));
  }));
  list.querySelectorAll("[data-edit-own]").forEach(b=>b.addEventListener("click",()=>{
   const p=state.players.find(x=>x.id===b.dataset.editOwn);
@@ -255,6 +256,7 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
  }else return false;
  const destination=stayOnPage?(state.page==="live"?"live":"turniere"):"start";
   routeTo(destination);
+ window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}}));
  return true;
 };
 // A quick "+" is private device-only planning, never an official registration.
@@ -378,8 +380,10 @@ function setup(){
  // One-time local navigation hint, never an ownership or private data grant.
  try{
   const invited=localStorage.getItem("schmetterlinge.invitedPlayerPendingView.v1");
-  if(/^[0-9]{2}-[0-9]{6}$/.test(invited||"")&&state.friends.some(p=>p.id===invited))
+  if(/^[0-9]{2}-[0-9]{6}$/.test(invited||"")&&state.friends.some(p=>p.id===invited)){
    SchmetterlingeStorage.selectFriend(state,invited);
+   localStorage.setItem("schmetterlinge.pendingPlayerDataCopy.v1",invited);
+  }
   localStorage.removeItem("schmetterlinge.invitedPlayerPendingView.v1");
  }catch{/* Not required to enter the app. */}
  // An accepted private invitation is a followed player, not an own profile.
@@ -518,6 +522,7 @@ function setup(){
   chooser.querySelectorAll("[data-initial-player]").forEach(b=>b.addEventListener("click",()=>{
    if(!setActiveProfile(b.dataset.initialPlayer))return;
    welcome.close();location.hash="#start";render();
+   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:b.dataset.initialPlayer,source:"onboarding"}}));
   }));
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");

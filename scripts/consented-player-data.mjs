@@ -1,0 +1,61 @@
+/** Explicit, one-way device copy of already server-authorized sport records.
+ * This is DATA ONLY. Never use it to authorize another server request. */
+export const KEY="schmetterlinge.consentedPlayerData.v1";
+const DBV=/^\d{2}-\d{6}$/;
+const safeText=(v,n=160)=>String(v??"").slice(0,n);
+const https=v=>typeof v==="string"&&v.length<=1000&&/^https:\/\/[^\s]+$/i.test(v)?v:"";
+const get=(storage,key,fallback)=>{try{return JSON.parse(storage?.getItem(key)||"null")??fallback}catch{return fallback}};
+export function cleanMatch(row,player){
+ if(!row||row.dbv_id!==player||!DBV.test(player)||!/^\d{4}-\d\d-\d\d$/.test(row.match_date||"")||
+  !https(row.source_url)||typeof row.source_key!=="string"||![1,2].includes(row.player_side)||
+  ![1,2].includes(row.winning_side)||!Array.isArray(row.opponent_names)||!Array.isArray(row.games))return null;
+ return {dbv_id:player,source_key:safeText(row.source_key,240),source_url:https(row.source_url),
+  match_date:row.match_date,player_side:row.player_side,winning_side:row.winning_side,
+  competition:safeText(row.competition),discipline:safeText(row.discipline,75),
+  category:safeText(row.category,75),source_name:safeText(row.source_name,100),
+  opponent_names:row.opponent_names.slice(0,4).map(x=>safeText(x,100)),
+  games:row.games.slice(0,3).filter(g=>Array.isArray(g)&&g.length===2&&g.every(n=>Number.isInteger(n)&&n>=0&&n<=40)).map(g=>[g[0],g[1]])};
+}
+export function cleanTrophy(row,player){
+ if(!row||!DBV.test(player)||row.playerId!==player||row.verified!==true||
+  ![1,2,3,4].includes(row.place)||!/^\d{4}-\d\d-\d\d$/.test(row.date||"")||
+  !https(row.source?.url)||!row.id)return null;
+ return {id:safeText(row.id,180),playerId:player,verified:true,place:row.place,date:row.date,
+  event:safeText(row.event,180),discipline:safeText(row.discipline,75),
+  ageGroup:safeText(row.ageGroup,30),source:{url:https(row.source.url)}};
+}
+export function loadPlayerCopy(player,storage=globalThis.localStorage){
+ if(!DBV.test(player))return null;
+ const item=get(storage,KEY,{})?.[player];
+ if(!item||item.version!==1||item.playerId!==player||!Number.isFinite(Date.parse(item.fetchedAt)))return null;
+ if(item.matches!==null&&(!Array.isArray(item.matches)||item.matches.length>10000||
+  item.matches.some(row=>row.dbv_id!==player)))return null;
+ if(item.trophies!==null&&(!Array.isArray(item.trophies)||item.trophies.length>200||
+  item.trophies.some(row=>row.playerId!==player)))return null;
+ return item;
+}
+export function savePlayerCopy(player,{matches=null,trophies=null},storage=globalThis.localStorage,now=new Date().toISOString()){
+ if(!DBV.test(player)||(!Array.isArray(matches)&&!Array.isArray(trophies))||!Number.isFinite(Date.parse(now)))return null;
+ const unique=new Set(),trophySeen=new Set();
+ const goodMatches=Array.isArray(matches)?matches.slice(0,10000).flatMap(row=>{
+  const value=cleanMatch(row,player);if(!value||unique.has(value.source_key))return [];
+  unique.add(value.source_key);return [value];
+ }):null;
+ const goodTrophies=Array.isArray(trophies)?trophies.slice(0,200).flatMap(row=>{
+  const value=cleanTrophy(row,player);if(!value||trophySeen.has(value.id))return [];
+  trophySeen.add(value.id);return [value];
+ }):null;
+ const old=get(storage,KEY,{});
+ const safe=Object.fromEntries(Object.entries(old&&typeof old==="object"&&!Array.isArray(old)?old:{})
+  .filter(([id,v])=>id!==player&&DBV.test(id)&&v?.version===1)
+  .sort((a,b)=>String(b[1]?.fetchedAt||"").localeCompare(String(a[1]?.fetchedAt||""))).slice(0,3));
+ const item={version:1,playerId:player,fetchedAt:now,coverage:"quellenabhaengiges_teilarchiv",
+  matches:goodMatches,trophies:goodTrophies};
+ safe[player]=item;
+ try{storage.setItem(KEY,JSON.stringify(safe));return item}catch{return null}
+}
+export function deletePlayerCopy(player,storage=globalThis.localStorage){
+ const old=get(storage,KEY,{});
+ if(!DBV.test(player)||!Object.hasOwn(old,player))return false;
+ delete old[player];try{storage.setItem(KEY,JSON.stringify(old));return true}catch{return false}
+}

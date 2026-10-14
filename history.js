@@ -121,7 +121,9 @@ function render(){
   // Only top-four placements proved by the private server response are available.
   // This source does not claim to be a full lifetime tournament history.
   source.hidden=false;
-  source.textContent="Geschütztes Teilarchiv: Belegte Top-4-Platzierungen. Weitere Ergebnisse können fehlen.";
+  source.textContent=state.coverage==="device_snapshot"
+    ?"Lokale Datenkopie vom "+new Date(state.fetchedAt).toLocaleDateString("de-DE")+": belegte Top-4-Platzierungen. Keine automatische Aktualisierung."
+    :"Geschütztes Teilarchiv: Belegte Top-4-Platzierungen. Weitere Ergebnisse können fehlen.";
   const playerRecords=state.results.filter(r=>r.playerId===lastPlayer);
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
   renderTrophies(playerRecords);

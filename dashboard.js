@@ -137,7 +137,9 @@ function renderOtherKpis(){
     " gewertete Turniere im "+(rankNames[rankCounts[0][0]]||rankCounts[0][0])+
     "; hiervon sind "+num(years.size)+" mit Einzelplatzierungen belegt."
   :"";
- const trophyNote=access.state==="ready"
+ const trophyNote=access.state==="ready"&&access.coverage==="device_snapshot"
+  ?"Lokal übernommene, belegte Platzierungen (Stand "+new Date(access.fetchedAt).toLocaleDateString("de-DE")+"). Teilarchiv, keine automatische Aktualisierung."
+  :access.state==="ready"
   ?(results.length===0
     ?"Keine belegten Top-4-Platzierungen in den bisher verfügbaren Quellen. Das Archiv ist nicht vollständig."
     :"Nur belegte Platzierungen aus den bisher erfassten Quellen. Die Historie ist nicht vollständig."+countContext)
