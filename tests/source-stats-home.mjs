@@ -49,7 +49,7 @@ assert.match(stats,/officialCount\.total===0&&external\.length>0/,
  "Never aggregate external and official matches into one total");
 assert.match(stats,/computeExternalStats/);
 assert.match(stats,/importCompleteness/);
-assert.match(stats,/last_finished_at/);
+assert.match(await readFile("scripts/supabase-read.mjs","utf8"),/last_finished_at/);
 assert.match(stats,/lastLoadedAt/);
 assert.match(stats,/visibilitychange/);
 assert.match(stats,/Badhub · Teilbestand/);
