@@ -18,7 +18,7 @@ test("Wiki: basic rule, service fault and local search",async({page})=>{
  await page.getByRole("searchbox").fill("Netzberührung");
  await expect(page.getByRole("button",{name:/Ist die Netzberührung ein Fehler/})).toBeVisible();
  await page.getByRole("searchbox").fill("Doppel");
- await expect(page.getByRole("button",{name:/Wer schlägt im Doppel nach eigenem Punkt auf/})).toBeVisible();
+ await expect(page.getByRole("button",{name:/Wer schlägt im Doppel nach eigenem Aufschlagpunkt auf/})).toBeVisible();
  await page.getByRole("searchbox").fill("Ranglistenpunkte");
  await expect(page.getByRole("button",{name:/Wie entstehen Ranglistenpunkte/})).toBeVisible();
 });
@@ -44,4 +44,39 @@ test("Wiki: Small Games and score changes use specific illustrations",async({pag
  await page.getByRole("searchbox").fill("2027");
  await page.getByRole("button",{name:/Gilt ab 2027 überall/}).click();
  await expect(page.locator("#detail-answer")).toContainText("4. Januar 2027");
+});
+
+test("Wiki: editorial release gate validates every card, source and SVG",async({page})=>{
+ await page.goto("/wiki.html");
+ const result=await page.evaluate(()=>{
+  const topics={grundlagen:0,spielsituationen:0,jugend:0};
+  const problems=[];
+  for(const c of CARDS){
+   topics[c.topic]=(topics[c.topic]||0)+1;
+   if(!c.source?.startsWith("https://"))problems.push(c.id+": source");
+   if(!c.title||!c.answer||c.answer.length>150)problems.push(c.id+": copy");
+   try{const svg=art(c.kind);if(!svg.startsWith("<svg")||!svg.endsWith("</svg>"))problems.push(c.id+": SVG");}
+   catch(e){problems.push(c.id+": "+String(e));}
+  }
+  return {length:CARDS.length,topics,problems};
+ });
+ expect(result).toEqual({length:53,topics:{grundlagen:19,spielsituationen:21,jugend:13},problems:[]});
+});
+test("Wiki: DBV/BWBV critical rule cases show correct short answers",async({page})=>{
+ await page.goto("/wiki.html");
+ const checks=[
+  ["Deckenball","Halle","ceiling"],
+  ["Spin","Ballbasis","spin"],
+  ["15er","15","score15"],
+  ["Jugendrangliste","fünf","ranking"]
+ ];
+ for(const [needle,answer,kind] of checks){
+  await page.getByRole("searchbox").fill(needle);
+  const entry=page.locator(".wiki-entry").first();
+  await expect(entry).toBeVisible();
+  await entry.click();
+  await expect(page.locator("#detail-answer")).toContainText(answer);
+  await expect(page.locator("#detail-art")).toHaveAttribute("data-kind",kind);
+  await page.getByRole("button",{name:"Regel schließen"}).click();
+ }
 });
