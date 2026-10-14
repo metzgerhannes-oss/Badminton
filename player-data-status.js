@@ -38,6 +38,8 @@ function setSelected(id){
    if(![matches,places,trophies].every(x=>Number.isSafeInteger(x)&&x>=0))throw Error("invalid coverage");
    summary.textContent=fmt(matches)+" belegte Matchkarten · "+fmt(places)+
      " Turnierplatzierungen · "+fmt(trophies)+" bestätigte Top-4-Ergebnisse";
+   if(selected==="05-071969" && matches===0 && places>0)
+    summary.textContent+=" · mindestens 1 Sieg durch Vereinsbericht belegt (keine Einzelmatchkarte)";
    const status=labels[data.import_status]||"Quellenumfang nicht abschließend geprüft";
    const last=data.last_import?Date.parse(data.last_import):NaN;
    const date=Number.isFinite(last)?" · Letzter Importversuch: "+
