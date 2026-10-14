@@ -3,8 +3,17 @@ import {readFile} from "node:fs/promises";
 
 const FAMILY="shuttleboard-v1",CALENDAR="schmetterlinge.calendarEvents.v1";
 const PLAYER="05-123456",OTHER="05-654321";
-const makeFamily=(id,name)=>({
- players:[{id,name,club:"Beispielverein"}],friends:[],officialLinks:[],
+const dbvQuickSave={
+ id:"dbv-calendar-44577",source:"dbv-calendar",url:"https://turniere.badminton.de/",
+ name:"DBV-Testkalender",playerId:PLAYER,startDate:"2027-03-13",endDate:"2027-07-23"
+};
+const classicTournament={
+ id:"11111111-2222-4333-8444-555555555555",
+ url:"https://dbv.turnier.de/tournament/11111111-2222-4333-8444-555555555555",
+ name:"Testturnier",playerId:PLAYER,startDate:"2027-02-20",endDate:"2027-02-21"
+};
+const makeFamily=(id,name,links=[])=>({
+ players:[{id,name,club:"Beispielverein"}],friends:[],officialLinks:links,
  activeProfileId:id,chosen:id,historyProfilesInitialized:true
 });
 const makeEvent=(playerId,name,uid)=>({
@@ -37,7 +46,7 @@ test("private Spond appointments travel with the offline backup, restore needs c
  const original=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block",acceptDownloads:true});
  const target=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});
  try{
-  await setup(original,makeFamily(PLAYER,"Beispiel Spieler"),[makeEvent(PLAYER,"Spond Jugendturnier","test-private-event")]);
+  await setup(original,makeFamily(PLAYER,"Beispiel Spieler",[dbvQuickSave,classicTournament]),[makeEvent(PLAYER,"Spond Jugendturnier","test-private-event")]);
   await setup(target,makeFamily(OTHER,"Altes Gerät"),[makeEvent(OTHER,"Bestehender Kalendereintrag","old-event")]);
   const from=await original.newPage(),to=await target.newPage();
   await from.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
@@ -52,6 +61,8 @@ test("private Spond appointments travel with the offline backup, restore needs c
   const archive=JSON.parse(bytes.toString("utf8"));
   expect(archive.schemaVersion).toBe(2);
   expect(archive.calendarEvents).toHaveLength(1);
+  expect(archive.data.officialLinks).toHaveLength(2);
+  expect(archive.data.officialLinks.find(x=>x.source==="dbv-calendar")).toMatchObject(dbvQuickSave);
   expect(archive.calendarEvents[0]).toMatchObject({name:"Spond Jugendturnier",playerId:PLAYER});
   expect(archive).not.toHaveProperty("access_token");
   await to.goto("/#einstellungen/daten",{waitUntil:"load"});
@@ -70,6 +81,8 @@ test("private Spond appointments travel with the offline backup, restore needs c
   await restoredLoad;
   await expect.poll(async()=>{const s=await stored(to);return s.family?.players?.[0]?.id}).toBe(PLAYER);
   const restored=await stored(to);
+  expect(restored.family.officialLinks).toHaveLength(2);
+  expect(restored.family.officialLinks.find(x=>x.source==="dbv-calendar")).toMatchObject(dbvQuickSave);
   expect(restored.events).toHaveLength(1);
   expect(restored.events[0].name).toBe("Spond Jugendturnier");
   expect(restored.events[0].playerId).toBe(PLAYER);
