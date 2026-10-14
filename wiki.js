@@ -151,7 +151,60 @@ function art(kind){
    +(kind==="net"?"":'<circle cx="201" cy="82" r="15" fill="#fff" stroke="#184e6b" stroke-width="3"/>')
    +'<rect x="85" y="185" width="230" height="52" rx="14" fill="'+color+'"/><text x="200" y="217" text-anchor="middle" font-family="system-ui" font-size="23" font-weight="800" fill="white">'+result+'</text>'+SVG_END;
  }
- if(kind==="height")return badgeArt("1,15m","Taille","BWF / NATIONALE ALTERNATIVE");
+ if(kind==="height")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff4ff"/>'
+  +'<rect x="14" y="36" width="178" height="183" rx="15" fill="#167ca9"/><rect x="208" y="36" width="178" height="183" rx="15" fill="#199780"/>'
+  +'<text x="103" y="71" text-anchor="middle" font-family="system-ui" font-size="17" font-weight="800" fill="white">BWF</text>'
+  +'<text x="103" y="129" text-anchor="middle" font-family="system-ui" font-size="35" font-weight="850" fill="white">1,15 m</text>'
+  +'<text x="103" y="173" text-anchor="middle" font-family="system-ui" font-size="14" fill="white">BALL DARUNTER</text>'
+  +'<text x="297" y="71" text-anchor="middle" font-family="system-ui" font-size="17" font-weight="800" fill="white">DBV NATIONAL</text>'
+  +'<text x="297" y="125" text-anchor="middle" font-family="system-ui" font-size="29" font-weight="850" fill="white">TAILLE</text>'
+  +'<text x="297" y="175" text-anchor="middle" font-family="system-ui" font-size="13" fill="white">SCHLÄGER ABWÄRTS</text>'
+  +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-size="11" fill="#15516f">NATIONAL: AUSNAHME BEI MESSGERÄT</text>'+SVG_END;
+ if(kind==="choice")return badgeArt("1","2","AUFSCHLAG ODER FELDSEITE");
+ if(kind==="spin")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff4ff"/>'
+  +'<path d="M119 118q-24-39 20-48t34 37" fill="none" stroke="#1683ad" stroke-width="9" stroke-linecap="round"/>'
+  +'<path d="m167 89 6 18-18-4" fill="none" stroke="#1683ad" stroke-width="6"/>'
+  +'<path d="M92 65L216 186 M216 65L92 186" stroke="#bd3448" stroke-width="10" stroke-linecap="round"/>'
+  +'<circle cx="299" cy="121" r="29" fill="#ecfaff" stroke="#16536f" stroke-width="5"/>'
+  +'<path d="M299 150V202" stroke="#1e7389" stroke-width="7"/>'
+  +'<text x="200" y="237" text-anchor="middle" font-family="system-ui" font-size="17" font-weight="800" fill="#15516f">KEIN SPIN · BASIS ZUERST</text>'+SVG_END;
+ if(kind==="missServe")return SVG_START+'<rect width="400" height="264" rx="20" fill="#def4ff"/>'
+  +'<path d="M80 204L195 106" stroke="#145c7b" stroke-width="11" stroke-linecap="round"/><ellipse cx="210" cy="94" rx="60" ry="28" transform="rotate(-34 210 94)" fill="none" stroke="#167dad" stroke-width="8"/>'
+  +'<circle cx="304" cy="72" r="18" fill="white" stroke="#1c5b75" stroke-width="4"/>'
+  +'<path d="M266 140l64 64 M330 140l-64 64" stroke="#c23244" stroke-width="9" stroke-linecap="round"/>'
+  +'<text x="200" y="241" text-anchor="middle" font-family="system-ui" font-size="17" font-weight="800" fill="#15516f">BALL VERFEHLT = FEHLER</text>'+SVG_END;
+ if(kind==="coach")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff3ff"/>'
+  +'<rect x="26" y="36" width="348" height="166" rx="15" fill="#158873"/>'
+  +'<path d="M200 36V202" stroke="white" stroke-width="6"/>'
+  +'<circle cx="105" cy="119" r="24" fill="#fff5ba"/><circle cx="295" cy="119" r="24" fill="#fff5ba"/>'
+  +'<path d="M144 108Q200 72 257 107" stroke="#f6df56" stroke-width="5" stroke-dasharray="7 7" fill="none"/>'
+  +'<rect x="91" y="205" width="216" height="43" rx="12" fill="#1678ad"/>'
+  +'<text x="200" y="232" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="800" fill="white">ZWISCHEN BALLWECHSELN</text>'+SVG_END;
+ if(kind==="ceiling")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff3ff"/>'
+  +'<path d="M25 51H375" stroke="#1c536b" stroke-width="11"/>'
+  +'<path d="M114 177Q95 97 114 54" fill="none" stroke="#edbd4c" stroke-width="7" stroke-dasharray="10 7"/>'
+  +'<circle cx="114" cy="62" r="12" fill="white" stroke="#194d68" stroke-width="4"/>'
+  +'<rect x="18" y="190" width="176" height="60" rx="12" fill="#178db4"/>'
+  +'<rect x="206" y="190" width="176" height="60" rx="12" fill="#bd4554"/>'
+  +'<text x="106" y="215" text-anchor="middle" fill="white" font-family="system-ui" font-size="13" font-weight="800">AUFSCHLAG &lt;9 m</text>'
+  +'<text x="106" y="239" text-anchor="middle" fill="white" font-family="system-ui" font-size="18" font-weight="800">WIEDERHOLEN</text>'
+  +'<text x="294" y="215" text-anchor="middle" fill="white" font-family="system-ui" font-size="13" font-weight="800">BALLWECHSEL</text>'
+  +'<text x="294" y="239" text-anchor="middle" fill="white" font-family="system-ui" font-size="18" font-weight="800">FEHLER</text>'+SVG_END;
+ if(kind==="wrongPosition")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff2ff"/>'
+  +'<rect x="45" y="52" width="310" height="159" rx="6" fill="#16967e"/>'
+  +'<path d="M200 52V211 M45 132H355" stroke="white" stroke-width="5"/>'
+  +'<circle cx="274" cy="88" r="24" fill="#f8e799"/><circle cx="275" cy="175" r="24" fill="#e0eef7"/>'
+  +'<text x="275" y="96" text-anchor="middle" fill="#15536d" font-family="system-ui" font-size="23" font-weight="850">×</text>'
+  +'<text x="275" y="183" text-anchor="middle" fill="#15536d" font-family="system-ui" font-size="23" font-weight="850">✓</text>'
+  +'<path d="M313 100V163m-10-12 10 13 10-13" stroke="#ffdc4a" stroke-width="6" fill="none"/>'
+  +'<text x="200" y="239" text-anchor="middle" fill="#15536d" font-family="system-ui" font-size="14" font-weight="800">STELLUNG KORRIGIEREN</text>'+SVG_END;
+ if(kind==="rallyEnd")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dcf3ff"/>'
+  +'<path d="M42 199H358" stroke="#f8fffe" stroke-width="8"/>'
+  +'<rect x="27" y="204" width="347" height="35" rx="5" fill="#149676"/>'
+  +'<path d="M95 58Q200 22 253 171" stroke="#1b85b2" stroke-dasharray="9 8" stroke-width="6" fill="none"/>'
+  +'<circle cx="256" cy="185" r="14" stroke="#1e556b" stroke-width="4" fill="#fff"/>'
+  +'<path d="M287 85l45 45 M332 85l-45 45" stroke="#bb354c" stroke-width="10" stroke-linecap="round"/>'
+  +'<text x="200" y="255" text-anchor="middle" fill="#15536d" font-family="system-ui" font-size="13" font-weight="800">BALL BODEN = ENDE</text>'+SVG_END;
  if(kind==="feet")return SVG_START+'<rect width="400" height="264" fill="#def4ff"/>'
   +'<path d="M42 196H358" stroke="#1b6272" stroke-width="8"/>'
   +'<path d="M101 74V175Q103 193 130 192h51V169h-27l-8-95" fill="#208cad" stroke="#15516f" stroke-width="4"/>'
