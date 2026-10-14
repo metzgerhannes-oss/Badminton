@@ -28,7 +28,7 @@ test("Installed app searches DBV and returns with verified player ID",async ({pa
  await expect(hit).toContainText("SpVgg Mössingen");
  await hit.click();
  const unsaved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(unsaved.players).toHaveLength(0);
+ expect(unsaved).toBeNull(); // Search selection alone is not a persisted player profile.
  await page.locator("#welcome-selection-save").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
  await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
