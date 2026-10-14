@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Общий поиск DBV по имени сейчас отключён для защиты персональных данных. Принятые приглашения добавляются автоматически. Ниже можно добавить собственные профили по имени и ID DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Поиск DBV по имени сейчас недоступен. Используйте ручное добавление по имени и ID DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "На устройстве не найден подходящий игрок. Другие профили можно добавить вручную по ID DBV.",
-    " · Auf diesem Gerät gespeichert": " · Сохранено на устройстве"
+    " · Auf diesem Gerät gespeichert": " · Сохранено на устройстве",
+    "2. Schritt Daten abrufen": "Шаг 2. Получить данные",
+    "3. Schritt App hinzufügen": "Шаг 3. Добавить приложение",
+    "Deine Daten abrufen": "Получить свои данные",
+    "Profil ausgewählt.": "Профиль выбран.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "Теперь можно получить имеющиеся результаты: профиль игрока, подтверждённые награды и доступную статистику матчей.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Данные загружаются только по вашему явному запросу и при наличии действующего разрешения для этого игрока. Без приглашения ранее сохранённые данные остаются без изменений.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "Позже вы сможете получить данные в разделе Настройки → Мои данные.",
+    "Jetzt Daten abrufen →": "Получить данные сейчас →",
+    "Später · weiter zur Installation": "Позже · продолжить установку"
   }
 }
