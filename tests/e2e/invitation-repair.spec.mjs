@@ -38,6 +38,8 @@ test("confirmed directory search reselects existing DBV account without making a
  await found.click();
  await expect(page.locator("#welcome-selection-detail")).toContainText("DBV 05-070879");
  await page.locator("#welcome-selection-save").click();
+ await expect(page.locator("#onboard-data")).toBeVisible();
+ await page.locator("#welcome-data-skip").click();
  await expect(page.locator("#onboard-install")).toBeVisible();
  await expect(page.locator(".welcome-success")).toContainText("05-070879");
  const current=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
