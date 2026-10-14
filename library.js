@@ -3,7 +3,7 @@ import {selectPlayers,clubGroups,normalizeText,sortClubs,localLibraryPlayers} fr
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 
 const ROOT="./data/player-library/";
-let dbMode=false,localMode=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
+let dbMode=false,localMode=false,rosterDenied=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
 const safePattern=x=>String(x||"").trim().replace(/[*,().%:"\\]/g," ").slice(0,85);
 async function dbGet(path){
  return readPublicRows(path);
@@ -223,6 +223,7 @@ async function loadBackup(){
 }
 async function load(){
  if(!hasCriteria()){showIdle();return;}
+ if(rosterDenied){loadLocalDirectory();return;}
  const ticket=++pending;
  loaded=false;$("library-more").hidden=true;
  error("Die Spielerbibliothek wird aus Supabase geladen …");
@@ -238,7 +239,7 @@ async function load(){
   // Privacy cutover revoked SELECT on personal rows. Never claim that the
   // deliberately blank static privacy stub is a functional roster backup.
   dbMode=false;
-  if(e?.status===401||e?.status===403){loadLocalDirectory();return;}
+  if(e?.status===401||e?.status===403){rosterDenied=true;loadLocalDirectory();return;}
   await loadBackup();
  }
 }
