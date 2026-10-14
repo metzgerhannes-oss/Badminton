@@ -3,7 +3,7 @@ import {computeExternalStats,sourceMatchYears,importCompleteness} from "./script
 import {getBadhubMatchReference} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
-import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {readPublicRows,readMatchImportProgress} from "./scripts/supabase-read.mjs";
 import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -43,9 +43,7 @@ async function queryOfficial(id,signal){
  return {rows,partial:true};
 }
 async function queryExternal(id,signal){
- const [status]=await getPage("player_external_match_imports?"+
-  new URLSearchParams({select:"status,cursor_offset,verified_count,rejected_count,detail,last_finished_at",
-   dbv_id:"eq."+id,limit:"1"}),signal);
+ const status=await readMatchImportProgress(id,{signal}).catch(()=>null);
  const rows=[];
  for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
   const qs=new URLSearchParams({
