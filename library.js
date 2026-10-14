@@ -204,6 +204,7 @@ async function loadBackup(){
    const period=Number.isInteger(summary.week)&&Number.isInteger(summary.year)?"KW "+summary.week+"/"+summary.year:"Stand nicht angegeben";
    $("library-source").textContent="Offizielle DBV-Rangliste · "+period+" · "+available.toLocaleString("de-DE")+" bestätigte Spieler";
   }
+  if(summary.privacyMode==="private"){loadLocalDirectory();return;}
   const chosen=ageChoice();
   const ages=chosen==="all"?ageNames:[chosen];
   const files=await Promise.all(ages.map(fetchAge));
