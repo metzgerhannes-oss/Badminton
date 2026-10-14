@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Publiczne wyszukiwanie nazwisk w DBV jest obecnie wyłączone ze względów ochrony danych. Zaakceptowane zaproszenia są dodawane automatycznie. Poniżej możesz dodać inne własne profile za pomocą nazwiska i identyfikatora DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Wyszukiwanie nazwisk w DBV jest obecnie niedostępne. Użyj ręcznej konfiguracji z nazwiskiem i identyfikatorem DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Na tym urządzeniu nie znaleziono pasującego zawodnika. Inne profile możesz dodać ręcznie za pomocą identyfikatora DBV.",
-    " · Auf diesem Gerät gespeichert": " · Zapisano na tym urządzeniu"
+    " · Auf diesem Gerät gespeichert": " · Zapisano na tym urządzeniu",
+    "2. Schritt Daten abrufen": "Krok 2: Pobierz dane",
+    "3. Schritt App hinzufügen": "Krok 3: Dodaj aplikację",
+    "Deine Daten abrufen": "Pobierz swoje dane",
+    "Profil ausgewählt.": "Wybrano profil.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "Możesz teraz pobrać dostępne wyniki: profil zawodnika, potwierdzone trofea i dostępne statystyki meczów.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Dane są pobierane wyłącznie na Twoje wyraźne żądanie i przy ważnym uprawnieniu do tego zawodnika. Bez zaproszenia wcześniej zapisane dane pozostają bez zmian.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "Dane możesz pobrać później w dowolnym momencie w Ustawienia → Moje dane.",
+    "Jetzt Daten abrufen →": "Pobierz dane teraz →",
+    "Später · weiter zur Installation": "Później · przejdź do instalacji"
   }
 }
