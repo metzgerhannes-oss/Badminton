@@ -63,8 +63,13 @@ export function requestPrivateTrophies(player,{force=false}={}){
   try{
    const session=await getPrivateSession(false);
    if(!session){states.set(player,{state:"protected",results:[],checkedAt:Date.now()});return;}
-   let response=await rpc("private_owner_trophies_read",{p_player_dbv_id:player},session);
+   let response=window.badmintonAppAccess?.allowed
+    ?await rpc("app_access_trophies_read",{p_player_dbv_id:player},session):null;
    let validated=validResult(response,player);
+   if(!validated){
+    response=await rpc("private_owner_trophies_read",{p_player_dbv_id:player},session);
+    validated=validResult(response,player);
+   }
    if(!validated){
     for(const id of acceptedIdsFor(player)){
      response=await rpc("private_player_trophies_read",{p_invitation_id:id},session);
@@ -88,6 +93,7 @@ export function clearPrivateTrophyCache({refresh=true}={}){
 if(typeof document!=="undefined"){
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)clearPrivateTrophyCache()});
  window.addEventListener("badminton:private-player-revoked",()=>clearPrivateTrophyCache());
+ window.addEventListener("badminton:app-access-granted",()=>clearPrivateTrophyCache());
   window.addEventListener("badminton:local-data-copy-updated",e=>{const id=e.detail?.playerId;if(DBV.test(String(id||"")))announce(id)});
  window.addEventListener("pagehide",()=>states.clear());
 }
