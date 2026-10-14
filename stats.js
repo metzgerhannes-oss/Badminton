@@ -197,8 +197,8 @@ function render(){
  }
  const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
- // The dated Badhub career header is the single displayed full-career total.
- // Individual match cards remain independent evidence for the filtered drill-down.
+ // Member views prioritize every individually sourced match card. A dated
+ // provider career summary remains informational and is not added to evidence.
  const badhub=getBadhubMatchReference(selected,{
   year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
  });
@@ -217,7 +217,7 @@ function render(){
    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
  }
  retry.hidden=!availability.retry;
- source.textContent=privateMode?"Private Matchkarten · Teilbestand":!sourced&&!official.length&&availability.retry
+ source.textContent=privateMode?"Matchkarten · nachgewiesener Teilbestand":!sourced&&!official.length&&availability.retry
   ?"Datenabgleich unvollständig":sourced?"Badhub · Teilbestand":"Offizielle Einzelmatches";
  values.innerHTML=[
   [(sourced?"Quellkarten":"Gesamtspiele"),missing?"–":context.total,"matches"],
@@ -259,7 +259,7 @@ function render(){
  if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
  // Do not display a second, partial set of career counters under Badhub's
  // published total. Filtering switches back to individually evidenced figures.
- if(badhub&&referenceSection&&!privateMode){
+ if(badhub&&referenceSection&&!privateMode&&!window.badmintonAppAccess?.allowed){
   values.hidden=true;
   note.hidden=true;
   ageSummary.hidden=true;
