@@ -252,7 +252,11 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("mode-dbv").addEventListener("click",()=>updateMode("dbv"));
  $("welcome-form").addEventListener("submit",saveProfile);
  $("welcome-selection-save").addEventListener("click",saveSelected);
- $("welcome-player-search").addEventListener("input",onSearchInput);
+ const playerSearch=$("welcome-player-search");
+ playerSearch.addEventListener("input",onSearchInput);
+ // Prevent iOS WebKit accepting text before the module listener is installed.
+ playerSearch.disabled=false;
+ playerSearch.dataset.ready="true";
  $("welcome-player-search").addEventListener("search",onSearchInput);
  $("install-ios").addEventListener("click",()=>showPlatform("ios"));
  $("install-android").addEventListener("click",()=>showPlatform("android"));
