@@ -46,6 +46,8 @@ test.beforeEach(async ({page})=>{
   if(url.hostname.endsWith(".supabase.co")){
    if(url.pathname.endsWith("/rpc/app_access_status"))
     return route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+   if(url.pathname.endsWith("/rpc/app_access_history_demand"))
+    return route.fulfill({status:200,headers,body:'{"accepted":true,"reused":false}'});
    if(url.pathname.endsWith("/rpc/app_access_player_coverage"))
     return route.fulfill({status:200,headers,body:JSON.stringify({
      dbv_id:JSON.parse(request.postData()||"{}").p_player_dbv_id,
@@ -81,7 +83,7 @@ test.beforeEach(async ({page})=>{
 test("Following stays local; only Historie requests a new source import",async ({page})=>{
  const imports=[];
  page.on("request",request=>{
-  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/rpc/request_player_history_demand")
+  if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/rpc/app_access_history_demand")
    imports.push(JSON.parse(request.postData()||"{}"));
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
@@ -90,7 +92,7 @@ test("Following stays local; only Historie requests a new source import",async (
  expect(imports).toHaveLength(0);
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect.poll(()=>imports.length,{timeout:10000}).toBeGreaterThan(0);
- expect(imports.some(request=>request.target_id===PLAYER)).toBe(true);
+ expect(imports.some(request=>request.p_player_dbv_id===PLAYER)).toBe(true);
 });
 
 test("An invited member sees individually sourced match statistics and navigable proof cards",async({page})=>{
