@@ -102,5 +102,5 @@ document.addEventListener("DOMContentLoaded",()=>{
  let pending="";try{pending=localStorage.getItem(PENDING)||"";localStorage.removeItem(PENDING)}catch{}
  if(DBV.test(pending)&&current()===pending)open(pending,{force:true});
 });
-window.addEventListener("badminton:profile-change",event=>{const id=event.detail?.playerId;if(DBV.test(String(id||"")))open(id)});
+window.addEventListener("badminton:profile-selected",event=>{const id=event.detail?.playerId;if(DBV.test(String(id||"")))open(id)});
 window.addEventListener("badminton:own-profile-added",event=>{const id=event.detail?.playerId;if(DBV.test(String(id||"")))open(id,{force:true})});
