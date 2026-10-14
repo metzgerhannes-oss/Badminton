@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "La recherche publique par nom DBV est actuellement désactivée pour protéger les données personnelles. Les invitations acceptées sont ajoutées automatiquement. Vous pouvez ajouter vos autres profils ci-dessous avec le nom et l'identifiant DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "La recherche par nom DBV est momentanément indisponible. Utilisez la configuration manuelle avec le nom et l'identifiant DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Aucun joueur correspondant enregistré sur cet appareil. Vous pouvez ajouter d'autres profils manuellement avec un identifiant DBV.",
-    " · Auf diesem Gerät gespeichert": " · Enregistré sur cet appareil"
+    " · Auf diesem Gerät gespeichert": " · Enregistré sur cet appareil",
+    "2. Schritt Daten abrufen": "Étape 2 : Récupérer les données",
+    "3. Schritt App hinzufügen": "Étape 3 : Ajouter l’application",
+    "Deine Daten abrufen": "Récupérer vos données",
+    "Profil ausgewählt.": "Profil sélectionné.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "Vous pouvez maintenant récupérer les résultats existants : profil du joueur, trophées vérifiés et statistiques de matchs disponibles.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Les données sont récupérées uniquement à votre demande explicite et avec une autorisation valable pour ce joueur. Sans invitation, vos données déjà enregistrées restent inchangées.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "Vous pourrez récupérer les données plus tard dans Paramètres → Mes données.",
+    "Jetzt Daten abrufen →": "Récupérer les données →",
+    "Später · weiter zur Installation": "Plus tard · poursuivre l’installation"
   }
 }
