@@ -1,6 +1,7 @@
 /** Shared DBV player directory, generated weekly from the official published Excel. */
 import {selectPlayers,clubGroups,normalizeText,sortClubs,localLibraryPlayers} from "./scripts/library-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {searchDbvIdentities,validDbvLookup} from "./scripts/targeted-player-search.mjs";
 
 const ROOT="./data/player-library/";
 let dbMode=false,localMode=false,rosterDenied=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
@@ -221,9 +222,37 @@ async function loadBackup(){
   loadLocalDirectory();
  }
 }
+async function loadIdentityDirectory(){
+ const name=String($("library-search")?.value||"").trim();
+ if(!validDbvLookup(name)){
+  loadLocalDirectory();
+  if($("library-message"))$("library-message").textContent="Für die zentrale DBV-Namenssuche mindestens drei Zeichen eingeben. Ohne Namen werden nur lokal gespeicherte Profile gesucht.";
+  return;
+ }
+ const ticket=++pending;
+ loaded=false;$("library-more").hidden=true;
+ error("Gezielte DBV-Spielersuche wird geladen …");
+ try{
+  const people=await searchDbvIdentities(name,{
+   ageClass:ageChoice()==="all"?null:ageChoice(),
+   club:$("library-club")?.value||null,
+   association:$("library-association")?.value||null
+  });
+  if(ticket!==pending)return;
+  entries=people;dbTotal=people.length;dbMode=false;localMode=false;
+  loaded=true;visible=40;
+  $("library-source").textContent="Gezielte offizielle DBV-Identitätssuche · maximal 12 Treffer · keine persönlichen Statistiken freigegeben";
+  render();
+ }catch(error){
+  if(ticket!==pending)return;
+  loadLocalDirectory();
+  const box=$("library-message");
+  if(box)box.textContent="Zentrale Spielersuche derzeit nicht verfügbar. Lokale Profile sind weiterhin nutzbar.";
+ }
+}
 async function load(){
  if(!hasCriteria()){showIdle();return;}
- if(rosterDenied){loadLocalDirectory();return;}
+ if(rosterDenied){loadIdentityDirectory();return;}
  const ticket=++pending;
  loaded=false;$("library-more").hidden=true;
  error("Die Spielerbibliothek wird aus Supabase geladen …");
@@ -239,7 +268,7 @@ async function load(){
   // Privacy cutover revoked SELECT on personal rows. Never claim that the
   // deliberately blank static privacy stub is a functional roster backup.
   dbMode=false;
-  if(e?.status===401||e?.status===403){rosterDenied=true;loadLocalDirectory();return;}
+  if(e?.status===401||e?.status===403){rosterDenied=true;await loadIdentityDirectory();return;}
   await loadBackup();
  }
 }
