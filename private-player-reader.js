@@ -3,11 +3,13 @@
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {getPrivateSession} from "./private-invites.js";
 import {addAcceptedPlayerToLocalStore} from "./scripts/invited-player-local.mjs";
+import {markImportPending} from "./scripts/profile-import-prompt.mjs";
 const $=id=>document.getElementById(id);
 const status=$("player-invite-status"),panel=$("player-invite-data");
 const STORE="schmetterlinge.acceptedPlayerInvite.v3";
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[a-f0-9]{64}$/;
+let justAccepted=false;
 const fragment=location.hash.slice(1);
 let pendingToken=fragment.startsWith("token=")&&TOKEN.test(fragment.slice(6))?fragment.slice(6):"";
 const reusable=fragment.startsWith("access=")&&UUID.test(fragment.slice(7))?fragment.slice(7):"";
@@ -72,6 +74,7 @@ function show(data){
    localStorage.setItem(key,JSON.stringify(next));
   }
  }catch{/* Storage failure never changes server access. */}
+ if(justAccepted){markImportPending(localStorage,data.player.dbv_id);justAccepted=false;}
  try{localStorage.setItem("schmetterlinge.invitedPlayerPendingView.v1",data.player.dbv_id)}
  catch{/* Local preference is optional. */}
  panel.hidden=false;status.textContent="Freigabe angenommen. Der Spieler ist für deine Schmetterlinge-App vorgemerkt.";return true;
@@ -113,7 +116,7 @@ acceptBtn.addEventListener("click",async()=>{
   const id=await rpc("private_player_invite_accept",{p_token:pendingToken},session);
   pendingToken="";
   if(!UUID.test(id||""))throw Object.assign(new Error("expired/redeemed/revoked"),{invalid:true});
-  activeId=id;pendingToken="";
+  activeId=id;pendingToken="";justAccepted=true;
   saveIds([...storedIds(),id]);syncSelector();
   acceptBtn.hidden=true;status.textContent="Angenommen. Der Zugriff bleibt bis zum Widerruf auf diesem Gerät erhalten.";
  }catch(error){
