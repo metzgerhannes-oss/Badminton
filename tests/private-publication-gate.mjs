@@ -36,7 +36,7 @@ assert.match(cutoverSql,/has_table_privilege\('anon','public\.dbv_calendar_entri
 const importer=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 assert.match(importer,/async function isInvitedMember/);
 assert.match(importer,/app_access_status/);
-assert.match(importer,/data\\?\\.allowed===true/);
+assert.ok(importer.includes("data?.allowed===true"));
 assert.match(importer,/if\\(\\!\\(await isInvitedMember\\(req\\)\\)\\)return respond\\(403,\\{error:"app_invitation_required"\\},origin\\)/);
 assert.ok(importer.indexOf("readBoundedJson(req,1024)")<importer.indexOf("if(!(await isInvitedMember(req)))"));
 assert.ok(importer.indexOf("if(!(await isInvitedMember(req)))")<importer.indexOf('api("rpc/claim_external_match_import"'),
