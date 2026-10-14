@@ -332,3 +332,23 @@
 .dbv-calendar-alternatives{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .dbv-calendar-alternatives .subtle-button{min-height:44px;border-radius:10px;border:1px solid #8ab4cb;background:#eef8fc;padding:9px 14px;font-size:13px;font-weight:700;color:#155779}
 .dbv-calendar-no-results>a{display:inline-block;padding:9px 0;font-size:13px;font-weight:700}
+
+/* Consent-first profile data retrieval after selecting a player. */
+.profile-import-dialog{box-sizing:border-box;width:min(92vw,490px);max-width:490px;
+ max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:0;
+ border:1px solid #b8d8ea;border-radius:20px;background:#fff;color:#173c59;
+ box-shadow:0 18px 50px #1c45634a}
+.profile-import-dialog::backdrop{background:#142f4d99}
+.profile-import-content{padding:clamp(18px,4.8vw,27px);display:grid;gap:12px}
+.profile-import-content h2{font-size:clamp(21px,5.4vw,26px);line-height:1.25;
+ color:#153e61;margin:0;overflow-wrap:anywhere}
+.profile-import-content p{font-size:14px;line-height:1.6;margin:0}
+#profile-import-detail{font-weight:650;color:#365b76}
+#profile-import-message{padding:11px 12px;border-left:3px solid #6ca8cd;
+ background:#f2f8fc;border-radius:8px;min-height:44px}
+.profile-import-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.profile-import-actions button{min-height:48px;white-space:normal;padding:10px}
+.profile-import-actions button:disabled{opacity:.5;cursor:not-allowed}
+.profile-import-content a{font-weight:750;font-size:13px;min-height:44px;display:inline-flex;
+ align-items:center;width:max-content;max-width:100%;color:#176891}
+@media(max-width:370px){.profile-import-actions{grid-template-columns:1fr}}
