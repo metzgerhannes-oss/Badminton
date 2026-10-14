@@ -199,3 +199,5 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  if(location.hash==="#historie")load(current());
 });
+
+window.addEventListener("badminton:app-access-granted",()=>{if(selected)load(selected)});
