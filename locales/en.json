@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Public DBV name search is currently unavailable for privacy reasons. Accepted invitations are added automatically. You can add other own profiles below using name and DBV ID.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV name search is currently unavailable. Use manual setup with name and DBV ID.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "No matching player saved on this device. You can manually add other profiles with a DBV ID.",
-    " · Auf diesem Gerät gespeichert": " · Saved on this device"
+    " · Auf diesem Gerät gespeichert": " · Saved on this device",
+    "2. Schritt Daten abrufen": "Step 2: Retrieve data",
+    "3. Schritt App hinzufügen": "Step 3: Add the app",
+    "Deine Daten abrufen": "Retrieve your data",
+    "Profil ausgewählt.": "Profile selected.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "You can now retrieve existing results: player profile, verified trophies and available match statistics.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Data is retrieved only when you explicitly request it and have valid permission for this player. Without an invitation, your previously saved data stays unchanged.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "You can retrieve the data later at any time in Settings → My Data.",
+    "Jetzt Daten abrufen →": "Retrieve data now →",
+    "Später · weiter zur Installation": "Later · continue to installation"
   }
 }
