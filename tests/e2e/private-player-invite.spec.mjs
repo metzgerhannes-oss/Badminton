@@ -154,7 +154,7 @@ test("Private invitation start has a prominent app link without requiring accept
 });
 
 
-test("Accepted invitation preloads one followed DBV player and bypasses fresh-own-profile onboarding",async({page})=>{
+test("Accepted player invitation stores a follower but cannot bypass the separate app invitation",async({page})=>{
  await page.route("**/*.supabase.co/auth/v1/signup",route=>cors(route,{
   access_token:"test-access",refresh_token:"test-refresh",expires_in:86400,
   user:{id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"}
@@ -178,10 +178,10 @@ test("Accepted invitation preloads one followed DBV player and bypasses fresh-ow
  });
  await page.locator("#player-invite-open-app").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
- await expect(page.locator(".focused-profile")).toContainText("Philipp Metzger");
- await expect(page.locator(".focused-profile")).toContainText("Du folgst");
- await expect(page.locator("#first-run-dialog")).not.toBeVisible();
+ await expect(page.locator("#app-access-gate")).toBeVisible();
+ await expect(page.locator("body > .app")).toBeHidden();
  await page.reload({waitUntil:"domcontentloaded"});
- await expect(page.locator(".focused-profile")).toContainText("Philipp Metzger");
- await expect(page.locator("#first-run-dialog")).not.toBeVisible();
+ await expect(page.locator("#app-access-gate")).toBeVisible();
+ const unchanged=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(unchanged.friends[0].name).toBe("Philipp Metzger");
 });

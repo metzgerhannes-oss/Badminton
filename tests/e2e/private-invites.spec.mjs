@@ -13,12 +13,13 @@ test("Private invitation is explicit, one event only, anonymous reader, revocabl
   activeProfileId:"05-000111",chosen:"05-000111",historyProfilesInitialized:true,
   officialLinks:[{id:DBV,url:SOURCE,name:"Testturnier",playerId:"05-000111",
    startDate:"2026-12-03",endDate:"2026-12-04"}]};
- await creator.addInitScript(data=>localStorage.setItem("shuttleboard-v1",JSON.stringify(data)),state);
+ await creator.addInitScript(data=>{localStorage.setItem("shuttleboard-v1",JSON.stringify(data));localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({access_token:"test.member",refresh_token:"test.refresh",expires_at:Date.now()+3600000,user_id:"a1111111-2222-4333-8444-555555555555"}));},state);
  const api=async route=>{
   const req=route.request(),url=new URL(req.url());
   if(url.hostname==="127.0.0.1")return route.continue();
   if(req.method()==="OPTIONS")return route.fulfill({status:204,headers});
-  if(url.pathname==="/auth/v1/signup"){
+  if(url.pathname==="/rest/v1/rpc/app_access_status")return route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+   if(url.pathname==="/auth/v1/signup"){
    auth++;
    return route.fulfill({status:200,headers,body:JSON.stringify({
     user:{id:"a1111111-2222-4333-8444-555555555555"},access_token:"test.jwt",
@@ -58,14 +59,14 @@ test("Private invitation is explicit, one event only, anonymous reader, revocabl
   expect(auth).toBe(0);
   await owner.locator("#private-invite-create").click();
   await expect(owner.locator("#private-invite-url")).toHaveValue(/private-invite\.html#invite=[0-9a-f]{64}$/);
-  expect(auth).toBe(1);expect(writes).toBe(1);
+  expect(auth).toBe(0);expect(writes).toBe(1);
   const link=await owner.locator("#private-invite-url").inputValue();
   await reader.goto(link);
   await expect(reader.locator("#invite-data")).toBeVisible();
   await expect(reader.locator("#invite-title")).toHaveText("Testturnier");
   await expect(reader.locator("#invite-status")).toContainText("Einladung geprüft");
   expect(new URL(reader.url()).hash).toBe("");
-  expect(auth).toBe(1);expect(reads).toBe(1);
+  expect(auth).toBe(0);expect(reads).toBe(1);
   expect(await reader.locator("body").innerText()).not.toContain("Testspieler");
   await owner.locator("#private-invite-revoke").click();
   await expect(owner.locator("#private-invite-status")).toContainText("widerrufen");
