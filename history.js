@@ -108,7 +108,7 @@ function render(){
    const notice=state.state==="loading"
     ?"Private Platzierungen werden geprüft."
     :state.state==="protected"
-    ?"Diese Auszeichnungen sind privat geschützt. Ein gültiger neuer Berechtigungslink oder ein unabhängig bestätigter Verwalternachweis ist erforderlich."
+    ?"Diese Auszeichnungen sind privat geschützt. Ein gültiger neuer Berechtigungslink oder die bestätigte Berechtigung für ein eigenes Familienprofil ist erforderlich."
     :"Die private Ergebnisquelle ist vorübergehend nicht abrufbar; das bedeutet nicht 0 Trophäen.";
    if(trophySection)trophySection.hidden=true;
    source.hidden=false;source.textContent=notice;
