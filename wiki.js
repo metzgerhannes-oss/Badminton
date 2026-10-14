@@ -180,8 +180,7 @@ function render(){
   const copy=document.createElement("span");copy.className="entry-copy";
   const cat=document.createElement("small");cat.textContent=TOPICS[c.topic];
   const title=document.createElement("strong");title.textContent=c.title;
-  const summary=document.createElement("em");summary.textContent=c.answer;
-  copy.append(cat,title,summary);
+  copy.append(cat,title);
   const arrow=document.createElement("span");arrow.className="entry-arrow";arrow.setAttribute("aria-hidden","true");arrow.textContent="›";
   b.append(image,copy,arrow);b.addEventListener("click",()=>openCard(c));output.append(b);
  }
