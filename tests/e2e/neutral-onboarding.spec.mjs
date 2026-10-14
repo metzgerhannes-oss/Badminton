@@ -31,6 +31,10 @@ test("Installed app searches DBV and returns with verified player ID",async ({pa
  await page.locator("#welcome-selection-save").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
  await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
+ await expect(page.locator("#player-data-import-dialog")).toBeVisible();
+ await expect(page.locator("#player-data-import-dialog")).toContainText("Deine Daten übernehmen");
+ await expect(page.locator("#player-data-import-now")).toBeEnabled();
+ await page.locator("#player-data-import-later").click();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(1);
  expect(saved.players[0]).toMatchObject({id:"05-061350",name:"Sarah Storz",birthYear:2010,club:"SpVgg Mössingen"});
@@ -63,6 +67,10 @@ test("Installed app offers local-only manual fallback without a DBV result",asyn
  await page.locator("#welcome-name").fill("Kind ohne Rangliste");
  await page.locator('#welcome-form button[type="submit"]').click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
+ await expect(page.locator("#player-data-import-dialog")).toBeVisible();
+ await expect(page.locator("#player-data-import-dialog")).toContainText("DBV-Spieler-ID fehlt");
+ await expect(page.locator("#player-data-import-now")).toBeDisabled();
+ await page.locator("#player-data-import-later").click();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(1);
  expect(saved.players[0].id).toMatch(/^local-/);
