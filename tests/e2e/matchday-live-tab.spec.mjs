@@ -42,7 +42,7 @@ test.beforeEach(async ({page})=>{
   }
  },{player:PLAYER,friend:FRIEND,key:KEY,id:TOURNAMENT_ID});
  await page.route("**/*.supabase.co/**",route=>route.fulfill({
-  status:200,headers:{"Access-Control-Allow-Origin":"*","Content-Type":"application/json"},
+  status:200,headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Content-Type":"application/json"},
   body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':route.request().method()==="POST"?'{"queued":false}':"[]"
  }));
 });

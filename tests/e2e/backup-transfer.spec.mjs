@@ -23,7 +23,7 @@ async function setup(context,family,events){
  },{family,events});
  await context.route("**/*.supabase.co/**",route=>route.fulfill({
   status:200,contentType:"application/json",
-  headers:{"Access-Control-Allow-Origin":"*"},body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':"[]"
+  headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"},body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':"[]"
  }));
 }
 async function stored(page){

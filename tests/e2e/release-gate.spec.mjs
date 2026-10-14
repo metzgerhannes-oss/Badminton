@@ -9,7 +9,7 @@ test.beforeEach(async ({page})=>{
  },PLAYER);
  await page.route("https://**/*.supabase.co/**",route=>route.fulfill({
   status:200,contentType:"application/json",body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':"[]",
-  headers:{"Access-Control-Allow-Origin":"*"}
+  headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}
  }));
 });
 test("Compact iPhone layout and dialog buttons remain operable",async ({page},info)=>{

@@ -17,9 +17,10 @@ export const test=base.extend({
    }
   });
   await page.route("**/*.supabase.co/rest/v1/rpc/app_access_status",route=>
-   route.fulfill({status:200,contentType:"application/json",
-    headers:{"Access-Control-Allow-Origin":"*"},
-    body:'{"allowed":true,"owner":false}'}));
+   route.fulfill({status:route.request().method()==="OPTIONS"?204:200,contentType:"application/json",
+    headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer",
+     "Access-Control-Allow-Methods":"POST,OPTIONS"},
+    body:route.request().method()==="OPTIONS"?"":'{"allowed":true,"owner":false}'}));
   await use(page);
  }
 });

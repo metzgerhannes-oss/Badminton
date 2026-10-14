@@ -12,7 +12,7 @@ test.beforeEach(async ({page})=>{
   const url=new URL(route.request().url());
   const rows=url.pathname.endsWith("/rpc/app_access_status")?{allowed:true,owner:false}:url.pathname.endsWith("/dbv_calendar_entries")?data.entries:[];
   return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(rows),
-   headers:{"Access-Control-Allow-Origin":"*"}});
+   headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}});
  });
 });
 test("Official calendar clusters by state, age and level without invented registrations",async ({page})=>{

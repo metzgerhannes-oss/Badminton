@@ -3,7 +3,7 @@ const DBV="E24DC6EE-152A-454D-B00C-E625B751D7D5";
 const SOURCE="https://dbv.turnier.de/tournament/"+DBV;
 const INV_ID="a10b0c0d-2e3f-4a5b-8c6d-7e8f9a0b1c2d";
 const headers={"Content-Type":"application/json","Access-Control-Allow-Origin":"*",
- "Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer"};
+ "Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"};
 test("Private invitation is explicit, one event only, anonymous reader, revocable",async ({browser})=>{
  const creator=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});
  const guest=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});

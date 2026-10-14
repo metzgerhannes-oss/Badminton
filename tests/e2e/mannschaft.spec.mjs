@@ -24,7 +24,7 @@ test.beforeEach(async ({page})=>{
   if(path.endsWith("/league_fixtures"))data=[{id:"a",match_date:"2026-10-17T16:00:00+02:00",home_team:"SpVgg. Mössingen II",away_team:"TSG Heilbronn IV",status:"scheduled",home_score:null,away_score:null,source_url:source}];
   if(path.endsWith("/league_table_rows"))data=[{position:1,club_team:"Gäste I",played:2,won:2,drawn:0,lost:0,points_for:4,points_against:0}];
   return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(data),
-   headers:{"Access-Control-Allow-Origin":"*"}});
+   headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}});
  });
 });
 test("Mannschaft has its own mobile tab, persistent following, fixtures and official table",async ({page})=>{
@@ -64,7 +64,7 @@ test("Mannschaft has its own mobile tab, persistent following, fixtures and offi
 test("A source outage is not presented as zero known teams",async ({page})=>{
  await page.route("**/*.supabase.co/rest/v1/league_teams?*",route=>route.fulfill({
   status:503,contentType:"application/json",body:'{"error":"source unavailable"}',
-  headers:{"Access-Control-Allow-Origin":"*"}
+  headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}
  }));
  await page.goto("/#mannschaft");
  await expect(page.locator("#team-directory-status")).toContainText("nicht erreichbar");
