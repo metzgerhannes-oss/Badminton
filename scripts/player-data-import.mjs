@@ -31,7 +31,9 @@ export function cleanImportedMatches(rows){
   category:txt(row.category,55),player_side:txt(row.player_side,70),
   winning_side:txt(row.winning_side,70),source_name:txt(row.source_name,90),
   source_url:url(row.source_url),
-  games:Array.isArray(row.games)?row.games.slice(0,3):null
+  games:Array.isArray(row.games)&&row.games.length<=3&&row.games.every(g=>
+    Array.isArray(g)&&g.length===2&&g.every(n=>Number.isInteger(n)&&n>=0&&n<=30))
+    ?row.games.map(g=>[g[0],g[1]]):null
  })).filter(x=>x.match_date);
 }
 export function cleanImportedTrophies(raw,playerId){
