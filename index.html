@@ -50,6 +50,7 @@
 <script type="module" src="./private-invites.js"></script>
 <script type="module" src="./player-access.js"></script>
 <script type="module" src="./player-verification.js"></script>
+<script type="module" src="./profile-import.js"></script>
 <script type="module" src="./owner-admin.js"></script>
 <script type="module" src="./teams.js"></script>
 </head>
@@ -525,6 +526,20 @@
   <a href="#berichte" data-page="berichte"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></span><small>Berichte</small></a>
  </nav>
 </div>
+<dialog id="profile-import-dialog" class="profile-import-dialog" aria-labelledby="profile-import-heading" aria-describedby="profile-import-detail">
+ <div class="profile-import-content">
+  <h2 id="profile-import-heading">Daten für <span id="profile-import-name"></span> abrufen?</h2>
+  <p>Nach der Profilwahl kannst du die freigegebenen Daten übernehmen: <strong>Spielerprofil, belegte Trophäen und vorhandene Matchstatistiken.</strong></p>
+  <p id="profile-import-detail"></p>
+  <p>Der Abruf erfolgt nur, wenn du ihn startest und der Server eine gültige Freigabe für genau diesen Spieler bestätigt. Eine Profilwahl allein gewährt keine zusätzlichen Rechte.</p>
+  <p id="profile-import-message" role="status" aria-live="polite"></p>
+  <div class="profile-import-actions">
+   <button id="profile-import-run" type="button" class="primary-button">Jetzt Daten abrufen</button>
+   <button id="profile-import-later" type="button" class="outline-button">Später</button>
+  </div>
+  <a id="profile-import-help" href="#einstellungen/einladungen">Freigaben verwalten ↗</a>
+ </div>
+</dialog>
 <dialog id="first-run-dialog" class="first-run-dialog" aria-label="Startprofil auswählen">
  <div class="first-run-header">
   <img src="./assets/spvgg-schmetterlinge.svg" alt="" width="50" height="50">
