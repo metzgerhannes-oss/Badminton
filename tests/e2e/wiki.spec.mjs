@@ -80,3 +80,20 @@ test("Wiki: DBV/BWBV critical rule cases show correct short answers",async({page
   await page.getByRole("button",{name:"Regel schließen"}).click();
  }
 });
+
+test("Wiki: four separate net rules get four different illustrations",async({page})=>{
+ await page.goto("/wiki.html");
+ const cases=[
+  ["Wie hoch ist das Netz?","netHeight"],
+  ["Darf der Ball das Netz berühren?","netRoller"],
+  ["Ist die Netzberührung ein Fehler?","netTouch"],
+  ["Darf der Schläger übers Netz ragen?","netFollow"]
+ ];
+ for (const [title,kind] of cases) {
+  await page.getByRole("searchbox").fill(title);
+  await page.locator(".wiki-entry").first().click();
+  await expect(page.locator("#detail-art")).toHaveAttribute("data-kind",kind);
+  await expect(page.locator("#detail-art svg")).toBeVisible();
+  await page.getByRole("button",{name:"Regel schließen"}).click();
+ }
+});
