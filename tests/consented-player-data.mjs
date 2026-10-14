@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {KEY,cleanMatch,cleanTrophy,savePlayerCopy,loadPlayerCopy,deletePlayerCopy} from "../scripts/consented-player-data.mjs";
+import {computeExternalStats,sourceMatchYears} from "../scripts/external-match-stats.mjs";
 const player="99-111111",other="99-222222",store=new Map();
 const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
 const match={dbv_id:player,source_key:"one",source_url:"https://dbv.turnier.de/match",
@@ -18,6 +19,34 @@ assert.equal(loadPlayerCopy(player,storage).trophies[0].place,2);
 assert.equal(loadPlayerCopy(other,storage),null);
 assert.ok(!storage.getItem(KEY).includes("should-not-copy"),"Only sanctioned fields in local snapshot");
 assert.ok(!storage.getItem(KEY).includes("invitation"),"No private access tokens/IDs in copy");
+
+// Reproduce a real, independently source-verified Badhub card. The local
+// round-trip must preserve every field required by the W/L evaluator.
+const sourceMatch={
+ ...match,source_key:"tournament:proof-123",source_url:"https://badhub.de/bwbv/turnier.php?id=123",
+ match_year:2026,category:"tournament",discipline:"Einzel",competition:"Belegtes Turnier",
+ event:"U13 Einzel",round_label:"Viertelfinale",source_name:"Badhub",
+ source_kind:"third-party-match-card",outcome_evidence:"badhub-scores",
+ partner_names:["Partner"],winning_side:1
+};
+const copied=savePlayerCopy(player,{matches:[sourceMatch],trophies:[]},storage,"2026-10-14T12:05:00.000Z");
+assert.equal(copied.matches[0].match_year,2026);
+assert.equal(copied.matches[0].source_kind,"third-party-match-card");
+assert.equal(copied.matches[0].outcome_evidence,"badhub-scores");
+assert.equal(copied.matches[0].round_label,"Viertelfinale");
+assert.deepEqual(copied.matches[0].partner_names,["Partner"]);
+assert.deepEqual(sourceMatchYears(loadPlayerCopy(player,storage).matches),["2026"]);
+const count=computeExternalStats(loadPlayerCopy(player,storage).matches);
+assert.equal(count.total,1,"Saved match must remain countable offline");
+assert.equal(count.wins,1);
+const withoutSets={...sourceMatch,source_key:"tournament:won-without-scores",games:[],
+ outcome_evidence:"badhub-bold-dash"};
+const noSets=savePlayerCopy(player,{matches:[withoutSets],trophies:[]},storage,"2026-10-14T12:06:00.000Z");
+assert.equal(computeExternalStats(noSets.matches).wins,1,"Documented winner without set points remains countable");
+const fiveSets={...sourceMatch,source_key:"tournament:five-set-proof",
+ games:[[21,17],[17,21],[21,16],[16,21],[21,18]]};
+assert.equal(cleanMatch(fiveSets,player).games.length,5,"Never silently cut off two valid source sets");
+
 assert.equal(deletePlayerCopy(player,storage),true);
 assert.equal(loadPlayerCopy(player,storage),null);
 const {readFile}=await import("node:fs/promises");

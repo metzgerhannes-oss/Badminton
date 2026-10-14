@@ -19,6 +19,9 @@ const ownScore=m=>(Array.isArray(m.games)?m.games:[])
 let selected="",official=[],external=[],progress=null,officialError=false,externalError=false,
  status="idle",partialOfficial=false,partialExternal=false,seq=0,lastLoadedAt=0;
 let selectedYear="all",selectedDiscipline="all",selectedAgeClass="all",birthYear=null;
+// Progressive details: never confuse a render limit with the number of matches.
+const DETAIL_PAGE=50;
+let detailLimit=DETAIL_PAGE;
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let controller,privateMode=false;
 async function getPage(path,signal){
@@ -73,6 +76,7 @@ async function fetchProfile(id,force=false){
  if(id===selected&&!force&&status==="loaded")return;
  if(id!==selected){
   selectedYear="all";selectedDiscipline="all";selectedAgeClass="all";
+  detailLimit=DETAIL_PAGE;
   if($("match-stats-discipline"))$("match-stats-discipline").value="all";
    if($("match-stats-age"))$("match-stats-age").value="all";
  }
@@ -265,8 +269,15 @@ function render(){
   source.textContent="Badhub · Karrierebilanz";
  }
  details.hidden=missing;
- counter.textContent="("+context.total+")";
- list.innerHTML=context.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
+ const available=context.details.length;
+ const visible=Math.min(detailLimit,available);
+ counter.textContent=available?"("+visible+" von "+available+" Belegen)":"(0)";
+ list.innerHTML=context.details.slice(0,visible).map(sourced?externalProof:officialProof).join("");
+ const more=$("match-stats-more");
+ if(more){
+  more.hidden=missing||visible>=available;
+  more.textContent="Weitere Matchkarten anzeigen ("+(available-visible)+" übrig)";
+ }
 }
 window.addEventListener("badminton:private-matches-updated",e=>{
  const id=String(e.detail?.playerId||"");
@@ -284,9 +295,10 @@ window.addEventListener("badminton:private-matches-updated",e=>{
 });
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("match-stats"))return;
- $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;render()});
- $("match-stats-year").addEventListener("change",e=>{selectedYear=e.target.value;render()});
- $("match-stats-age").addEventListener("change",e=>{selectedAgeClass=e.target.value;render()});
+ $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;detailLimit=DETAIL_PAGE;render()});
+ $("match-stats-year").addEventListener("change",e=>{selectedYear=e.target.value;detailLimit=DETAIL_PAGE;render()});
+ $("match-stats-age").addEventListener("change",e=>{selectedAgeClass=e.target.value;detailLimit=DETAIL_PAGE;render()});
+ $("match-stats-more")?.addEventListener("click",()=>{detailLimit+=DETAIL_PAGE;render()});
  $("match-stats-retry")?.addEventListener("click",()=>fetchProfile(selected,true));
  window.addEventListener("badminton:network-restored",()=>{
   if(location.hash==="#start"&&selected&&status==="loaded"&&(officialError||externalError))
