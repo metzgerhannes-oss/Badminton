@@ -218,6 +218,7 @@ function openCard(c){
  document.getElementById("detail-category").textContent=TOPICS[c.topic];
  document.getElementById("detail-title").textContent=c.title;
  document.getElementById("detail-art").innerHTML=art(c.kind);
+ document.getElementById("detail-art").dataset.kind=c.kind;
  document.getElementById("detail-art").setAttribute("aria-label","Grafik zur Regel: "+c.title);
  document.getElementById("detail-answer").textContent=c.answer;
  document.getElementById("detail-scope").textContent=c.scope;
