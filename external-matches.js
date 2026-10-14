@@ -3,13 +3,14 @@ import {computeExternalStats,sourceMatchYears,importCompleteness} from "./script
 import {MATCH_RULES} from "./scripts/badminton-score-rules.mjs";
 import {getDbvMatchReference,getBadhubMatchReference,getReportedPlayedWithoutScores,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n||0).toLocaleString("de-DE");
 const isValidId=id=>/^\d{2}-\d{6}$/.test(id||"");
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let selected="",rows=[],progress=null,loaded=false,failed=false,partial=false,seq=0,abortController;
-let year="all",discipline="all",category="all",show=20;
+let year="all",discipline="all",category="all",show=20,privateMode=false;
 function safeLink(raw){
  try{
   const u=new URL(raw);
@@ -81,7 +82,7 @@ function render(){
    ?" "+verifiedWithoutSets+" Ergebnisse sind durch den von Badhub fett markierten Gewinner belegt; Satzstände fehlen."
    :" Vier Badhub-Karten ohne Satzstände sind zur erneuten Einzelprüfung vorgemerkt. Nur eindeutig belegte Sieger werden beim Quellenimport berücksichtigt.";
  }
- progressEl.textContent=info;
+ progressEl.textContent=privateMode?fmt(rows.length)+" verifizierbare Quellkarten aus privater Spielerfreigabe (Teilbestand).":info;
  const options=sourceMatchYears(rows);
  years.innerHTML='<option value="all">Alle Jahre</option>'+options.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
  if(year!=="all"&&!options.includes(year))year="all";
@@ -119,6 +120,9 @@ function render(){
  more.textContent="Weitere Spiele anzeigen ("+Math.max(0,filtered.length-show)+" übrig)";
 }
 async function load(id){
+ if(privateMode&&id===selected){render();return}
+ if(id!==selected)privateMode=false;
+ if(isValidId(id))requestPrivateMatches(id);
  abortController?.abort();
  const ticket=++seq;
  selected=id||"";rows=[];progress=null;loaded=false;failed=false;partial=false;
@@ -146,6 +150,19 @@ async function load(id){
   loaded=true;failed=true;render();
  }
 }
+window.addEventListener("badminton:private-matches-updated",e=>{
+ const id=String(e.detail?.playerId||"");
+ if(id!==selected)return;
+ const snap=matchArchiveSnapshot(id);
+ if(snap.state==="ready"){
+  abortController?.abort();++seq;privateMode=true;rows=snap.rows;
+  progress={status:"partial",verified_count:rows.length};
+  loaded=true;failed=false;partial=false;show=20;render();
+ }else if(privateMode){
+  abortController?.abort();++seq;privateMode=false;rows=[];
+  progress=null;loaded=true;failed=true;render();
+ }
+});
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("external-match-history"))return;
  for(const [field,key] of [["external-match-year","year"],["external-match-discipline","discipline"],["external-match-category","category"]]){

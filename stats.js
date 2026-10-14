@@ -4,6 +4,7 @@ import {getBadhubMatchReference} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
 import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const dateLabel=s=>{
@@ -19,7 +20,7 @@ let selected="",official=[],external=[],progress=null,officialError=false,extern
  status="idle",partialOfficial=false,partialExternal=false,seq=0,lastLoadedAt=0;
 let selectedYear="all",selectedDiscipline="all",selectedAgeClass="all",birthYear=null;
 const PAGE_LIMIT=400,MAX_ROWS=10000;
-let controller;
+let controller,privateMode=false;
 async function getPage(path,signal){
  const {rows}=await readPublicRows(path,{signal,count:false});
  return rows;
@@ -62,6 +63,9 @@ async function queryBirthYear(id,signal){
  return Number.isInteger(birth)&&birth>=1900&&birth<=2100?birth:null;
 }
 async function fetchProfile(id,force=false){
+ if(privateMode&&id===selected&&!force)return;
+ if(id!==selected)privateMode=false;
+ if(/^\d{2}-\d{6}$/.test(id||""))requestPrivateMatches(id,{force});
  if(!/^\d{2}-\d{6}$/.test(id||"")){
   controller?.abort();++seq;selected=id||"";official=[];external=[];
   progress=null;birthYear=null;status="missing-id";render();return;
@@ -168,7 +172,7 @@ function render(){
  }
  const officialCount=computeMatchStats(official);
  // Never add official and third-party matches: same match may be in both sources.
- const sourced=officialCount.total===0&&external.length>0;
+ const sourced=privateMode||(officialCount.total===0&&external.length>0);
  const rows=sourced?external:official;
  const years=sourced?sourceMatchYears(rows):availableYears(rows);
  year.innerHTML='<option value="all">Gesamt</option>'+years.map(v=>
@@ -194,7 +198,7 @@ function render(){
  const badhub=getBadhubMatchReference(selected,{
   year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
  });
- if(referenceSection&&badhub){
+ if(referenceSection&&badhub&&!privateMode){
   referenceSection.hidden=false;
   referenceSection.innerHTML=
    '<div class="dbv-reference-heading"><strong>Badhub · veröffentlichte Karrierebilanz</strong>'+
@@ -209,7 +213,7 @@ function render(){
    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
  }
  retry.hidden=!availability.retry;
- source.textContent=!sourced&&!official.length&&availability.retry
+ source.textContent=privateMode?"Private Matchkarten · Teilbestand":!sourced&&!official.length&&availability.retry
   ?"Datenabgleich unvollständig":sourced?"Badhub · Teilbestand":"Offizielle Einzelmatches";
  values.innerHTML=[
   [(sourced?"Quellkarten":"Gesamtspiele"),missing?"–":context.total,"matches"],
@@ -251,7 +255,7 @@ function render(){
  if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
  // Do not display a second, partial set of career counters under Badhub's
  // published total. Filtering switches back to individually evidenced figures.
- if(badhub&&referenceSection){
+ if(badhub&&referenceSection&&!privateMode){
   values.hidden=true;
   note.hidden=true;
   ageSummary.hidden=true;
@@ -264,6 +268,20 @@ function render(){
  counter.textContent="("+context.total+")";
  list.innerHTML=context.details.slice(0,150).map(sourced?externalProof:officialProof).join("");
 }
+window.addEventListener("badminton:private-matches-updated",e=>{
+ const id=String(e.detail?.playerId||"");
+ if(id!==selected)return;
+ const snap=matchArchiveSnapshot(id);
+ if(snap.state==="ready"){
+  controller?.abort();++seq;privateMode=true;
+  official=[];external=snap.rows;progress={status:"partial",verified_count:external.length};
+  officialError=false;externalError=false;partialOfficial=false;partialExternal=false;
+  status="loaded";lastLoadedAt=Date.now();render();
+ }else if(privateMode){
+  controller?.abort();++seq;privateMode=false;official=[];external=[];
+  officialError=true;externalError=true;progress=null;status="loaded";render();
+ }
+});
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("match-stats"))return;
  $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;render()});
