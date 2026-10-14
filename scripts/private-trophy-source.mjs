@@ -74,9 +74,12 @@ export function requestPrivateTrophies(player,{force=false}={}){
  states.set(player,{state:"loading",results:[],checkedAt:Date.now(),pending});
  return pending;
 }
-export function clearPrivateTrophyCache({refresh=true}={}){
+export function clearPrivateTrophyCache({refresh=false}={}){
  const current=[...states.keys()];
  states.clear();
+ // A revoked or expired view must not keep displaying old personal results.
+ current.forEach(announce);
+ // Only an explicit caller may request a network refresh, never visibilitychange.
  if(refresh)current.forEach(player=>{requestPrivateTrophies(player,{force:true})});
 }
 if(typeof document!=="undefined"){
