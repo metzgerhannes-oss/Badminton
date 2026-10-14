@@ -95,7 +95,7 @@ function showIdle(){
  if(more)more.hidden=true;
  if(reset)reset.hidden=true;
  if($("library-message"))$("library-message").textContent="";
- if($("library-source"))$("library-source").textContent="Spielersuche · lokale Profile verfügbar; das zentrale DBV-Verzeichnis ist derzeit geschützt";
+ if($("library-source"))$("library-source").textContent="Lokale Spielersuche · offizielle Namenssuche bei dbv.turnier.de verfügbar";
 }
 function filtered(){
  return dbMode?entries:selectPlayers(entries,{
