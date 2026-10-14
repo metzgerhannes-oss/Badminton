@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "La búsqueda pública por nombre en DBV está desactivada por motivos de privacidad. Las invitaciones aceptadas se añaden automáticamente. Puedes añadir otros perfiles propios abajo con nombre e ID DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "La búsqueda por nombre en DBV no está disponible. Utiliza la configuración manual con nombre e ID DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "No se encontró ningún jugador coincidente en este dispositivo. Puedes añadir otros perfiles manualmente con el ID DBV.",
-    " · Auf diesem Gerät gespeichert": " · Guardado en este dispositivo"
+    " · Auf diesem Gerät gespeichert": " · Guardado en este dispositivo",
+    "2. Schritt Daten abrufen": "Paso 2: Recuperar datos",
+    "3. Schritt App hinzufügen": "Paso 3: Añadir la aplicación",
+    "Deine Daten abrufen": "Recupera tus datos",
+    "Profil ausgewählt.": "Perfil seleccionado.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "Ahora puedes recuperar los resultados disponibles: perfil del jugador, trofeos verificados y estadísticas de partidos disponibles.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "Los datos solo se recuperan si lo solicitas expresamente y tienes una autorización válida para este jugador. Sin invitación, los datos guardados anteriormente no cambian.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "Puedes recuperar los datos más adelante desde Ajustes → Mis datos.",
+    "Jetzt Daten abrufen →": "Recuperar datos ahora →",
+    "Später · weiter zur Installation": "Más tarde · continuar con la instalación"
   }
 }
