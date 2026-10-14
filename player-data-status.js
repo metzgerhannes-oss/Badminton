@@ -20,11 +20,11 @@ function setSelected(id){
  root.hidden=false;
  summary.textContent="Datenbestand wird geprüft …";
  detail.textContent="Nur belegte Quellen werden ausgewertet.";
- const token=window.badmintonAppAccess.accessToken;
- if(!token){root.hidden=true;return}
  controller=new AbortController();
  (async()=>{
   try{
+   const token=await window.badmintonAppAccess?.getAccessToken?.();
+   if(!token)throw Error("session expired");
    const response=await fetch(SUPABASE_ROOT+"rpc/app_access_player_coverage",{
     method:"POST",signal:controller.signal,cache:"no-store",
     headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"},
