@@ -158,7 +158,7 @@ async function searchPlayers(value){
  lastSearchPlayers=null;
  const term=normalizeFriendSearch(value);
  if(term.length<2){
-  setSearchStatus("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
+  setSearchStatus("Mindestens drei Zeichen eingeben, um Spieler zu finden.");
   return;
  }
  clearError();
@@ -184,7 +184,7 @@ function onSearchInput(){
  lastSearchPlayers=null;
  const value=$("welcome-player-search").value;
  if(normalizeFriendSearch(value).length<2){
-  setSearchStatus("Mindestens zwei Zeichen eingeben, um Spieler zu finden.");
+  setSearchStatus("Mindestens drei Zeichen eingeben, um Spieler zu finden.");
   return;
  }
  setSearchStatus("Suche wird vorbereitet …");

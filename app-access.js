@@ -11,6 +11,7 @@ const status=document.getElementById("app-access-status");
 window.badmintonAppAccess=Object.freeze({
  get accessToken(){return allowed?session?.access_token||null:null;},
  get allowed(){return allowed},
+ get shellAllowed(){return root.dataset.appAccess==="granted"},
  async getAccessToken(){
   if(!allowed)return null;
   const fresh=await getPrivateSession(false);
@@ -32,8 +33,8 @@ async function rpc(name,body,token){
   return response.json();
  }finally{clearTimeout(timeout)}
 }
-function grant(){
- allowed=true;
+function grant({member=true}={}){
+ allowed=member;
  root.dataset.appAccess="granted";
  gate.hidden=true;
  const params=new URLSearchParams(location.hash.slice(1));
@@ -41,9 +42,26 @@ function grant(){
   history.replaceState(null,"",location.pathname+location.search+"#start");
   window.dispatchEvent(new Event("hashchange"));
  }
- window.dispatchEvent(new CustomEvent("badminton:app-access-granted"));
+ window.dispatchEvent(new CustomEvent(member?"badminton:app-access-granted":"badminton:player-shell-granted"));
 }
 function inform(message){status.textContent=message;}
+async function hasAcceptedPlayerLink(token){
+ // The server validates the accepted player invitation on every opening.
+ // A device-local invitation id alone never proves access.
+ let saved;
+ try{saved=JSON.parse(localStorage.getItem("schmetterlinge.acceptedPlayerInvite.v3")||"[]")}
+ catch{return false}
+ const ids=Array.isArray(saved)?saved:(saved?.id?[saved.id]:[]);
+ const unique=[...new Set(ids.filter(id=>typeof id==="string"&&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)))].slice(-20);
+ for(const id of unique){
+  try{
+   const result=await rpc("private_player_access_read",{p_invitation_id:id},token);
+   if(result?.player?.dbv_id)return true;
+  }catch{/* A revoked, expired-session or unrelated link does not unlock the app. */}
+ }
+ return false;
+}
 async function accept(raw){
  const value=String(raw||"").trim();
  let token=value.toLowerCase();
@@ -79,6 +97,9 @@ async function initialize(){
   if(session){
    const result=await rpc("app_access_status",{},session.access_token);
    if(result?.allowed===true){grant();return;}
+   if(await hasAcceptedPlayerLink(session.access_token)){
+    grant({member:false});return;
+   }
   }
  }catch{/* Fail closed; never interpret a network error as valid membership. */}
  root.dataset.appAccess="denied";

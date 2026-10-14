@@ -90,12 +90,10 @@
  appendTo("profile","#owner-activation-setup");
  appendTo("darstellung",".language-settings");
  appendTo("darstellung",".club-branding-card");
- // Public setup links are not player permissions: keep them outside the grants room.
- const publicSetup=appendTo("daten",".invitation-card");
- const setupDetails=document.createElement("details");setupDetails.className="settings-grant-setup-details";
- const setupSummary=document.createElement("summary");setupSummary.textContent="App-Installationslink (ohne Spielerrechte)";
- publicSetup.replaceWith(setupDetails);setupDetails.append(setupSummary,publicSetup);
- publicSetup.querySelector("#invitation-title").textContent="App-Link weitergeben";
+ // A v136 app invitation grants entry to the sourced sport archive.
+ // Put issuance, server status and revocation in the invitations room,
+ // never under a generic installation link or backup.
+ appendTo("einladungen",".invitation-card");
  appendTo("daten",".backup-card");
  const loose=[...view.children].filter(el=>el.classList?.contains("settings-card"));
  for(const element of loose){
