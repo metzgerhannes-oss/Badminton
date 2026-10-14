@@ -9,12 +9,22 @@ export function cleanMatch(row,player){
  if(!row||row.dbv_id!==player||!DBV.test(player)||!/^\d{4}-\d\d-\d\d$/.test(row.match_date||"")||
   !https(row.source_url)||typeof row.source_key!=="string"||![1,2].includes(row.player_side)||
   ![1,2].includes(row.winning_side)||!Array.isArray(row.opponent_names)||!Array.isArray(row.games))return null;
+ // Keep the evidence fields used by computeExternalStats. Dropping match_year,
+ // source_kind or outcome_evidence makes locally copied matches silently vanish
+ // from the win/loss statistics, even though the cards are still present.
+ const matchYear=Number.isInteger(row.match_year)?row.match_year:Number(row.match_date.slice(0,4));
+ if(matchYear<2000||matchYear>2100)return null;
  return {dbv_id:player,source_key:safeText(row.source_key,240),source_url:https(row.source_url),
-  match_date:row.match_date,player_side:row.player_side,winning_side:row.winning_side,
-  competition:safeText(row.competition),discipline:safeText(row.discipline,75),
-  category:safeText(row.category,75),source_name:safeText(row.source_name,100),
+  match_date:row.match_date,match_year:matchYear,
+  player_side:row.player_side,winning_side:row.winning_side,
+  competition:safeText(row.competition),event:safeText(row.event),
+  round_label:safeText(row.round_label,120),
+  discipline:safeText(row.discipline,75),category:safeText(row.category,75),
+  source_name:safeText(row.source_name,100),source_kind:safeText(row.source_kind,100),
+  outcome_evidence:safeText(row.outcome_evidence,75),
   opponent_names:row.opponent_names.slice(0,4).map(x=>safeText(x,100)),
-  games:row.games.slice(0,3).filter(g=>Array.isArray(g)&&g.length===2&&g.every(n=>Number.isInteger(n)&&n>=0&&n<=40)).map(g=>[g[0],g[1]])};
+  partner_names:(Array.isArray(row.partner_names)?row.partner_names:[]).slice(0,4).map(x=>safeText(x,100)),
+  games:row.games.slice(0,5).filter(g=>Array.isArray(g)&&g.length===2&&g.every(n=>Number.isInteger(n)&&n>=0&&n<=40)).map(g=>[g[0],g[1]])};
 }
 export function cleanTrophy(row,player){
  if(!row||!DBV.test(player)||row.playerId!==player||row.verified!==true||
