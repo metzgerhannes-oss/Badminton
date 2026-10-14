@@ -59,6 +59,7 @@ assert.match(stats,/awaitingMatchSource\?"https:\/\/turniere\.badminton\.de\/ran
 assert.match(stats,/Spieler erkannt, aber noch keine auswertbaren Einzelmatches importiert/);
 const dashboard=await readFile("dashboard.js","utf8");
 assert.match(dashboard,/home-trophy-latest/);
+assert.match(dashboard,/results\.filter\(r=>\[1,2,3,4\]\.includes\(Number\(r\.place\)\)\)/,"Home trophy preview only includes confirmed top-four placements");
 assert.match(dashboard,/DBV-Rangliste: /);
 assert.match(dashboard,/rankCounts\.length===1/);
 assert.match(stats,/Sätze aus Spielersicht/);
