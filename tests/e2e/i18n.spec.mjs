@@ -60,11 +60,13 @@ test("bundled language catalog remains usable during a Cloudflare outage without
 });
 
 
-test("Chinese profile-first onboarding is fully localized, including installation", async ({page}) => {
+test("Chinese installation-first onboarding is fully localized, including profile setup", async ({page}) => {
   await page.goto("/welcome.html");
   await page.locator("#welcome-language").selectOption("zh-Hans");
   await expect(page.locator("html")).toHaveAttribute("lang","zh-Hans");
   await expect(page.locator(".welcome-steps")).toContainText("第 1 步");
+  await expect(page.locator("#onboard-install")).toBeVisible();
+  await page.locator("#install-back").click();
   await expect(page.locator("#onboard-profile > p").first()).toHaveText(
     "已接受的球员邀请会自动添加。你可以选择本设备保存的其他球员，或通过姓名和 DBV 编号添加。");
   await expect(page.locator("#onboard-profile")).not.toContainText("Finde deinen Spieler");
@@ -76,20 +78,21 @@ test("Chinese profile-first onboarding is fully localized, including installatio
   // Same-document hash navigation does not re-fire DOMContentLoaded.
   await page.reload();
   await expect(page.locator("#onboard-install")).toBeVisible();
-  await expect(page.locator("#install-title")).toHaveText("像应用一样打开 Schmetterlinge");
-  await expect(page.locator("#onboard-install > p").first()).toContainText("无需通过应用商店安装");
+  await expect(page.locator("#install-title")).toHaveText("请先将 Schmetterlinge 添加到主屏幕");
+  await expect(page.locator("#install-intro")).toContainText("然后通过图标打开 Schmetterlinge");
   await expect(page.locator("#install-ios-steps")).toContainText("在 Safari 中打开");
   await page.locator("#install-android").click();
   await expect(page.locator("#install-android-steps")).toContainText("在 Google Chrome 中打开");
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   expect(overflow).toBeLessThanOrEqual(2);
   await page.locator("#welcome-language").selectOption("en");
-  await expect(page.locator("#onboard-install > p").first()).toContainText("No app store required");
+  await expect(page.locator("#install-intro")).toContainText("Then open Schmetterlinge using the icon");
   await expect(page.locator("#install-android-steps")).toContainText("Open the page in Google Chrome");
 });
 
 test("Asynchronous search status follows switching from Chinese to French to German", async ({page}) => {
   await page.goto("/welcome.html");
+  await page.locator("#install-back").click();
   await page.locator("#welcome-player-search").fill("x");
   await page.locator("#welcome-language").selectOption("zh-Hans");
   await expect(page.locator("#welcome-search-status")).toHaveText("至少输入两个字符以搜索球员。");
