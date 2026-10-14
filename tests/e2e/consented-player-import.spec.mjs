@@ -10,6 +10,9 @@ test("Profile choice offers optional local data import once; settings can reopen
  },player);
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#focused-profile")).toContainText("Testspielerin");
+ // The app shell can paint before ES modules finish loading: wait for the
+ // import feature to mount before simulating a user selection.
+ await expect(page.locator(".player-copy-entry button")).toHaveCount(1);
  const sent=await page.evaluate(id=>{
   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}}));
   return localStorage.getItem("schmetterlinge.consentedPlayerData.v1");
