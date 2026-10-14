@@ -206,6 +206,16 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "La búsqueda pública por nombre en DBV está desactivada por motivos de privacidad. Las invitaciones aceptadas se añaden automáticamente. Puedes añadir otros perfiles propios abajo con nombre e ID DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "La búsqueda por nombre en DBV no está disponible. Utiliza la configuración manual con nombre e ID DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "No se encontró ningún jugador coincidente en este dispositivo. Puedes añadir otros perfiles manualmente con el ID DBV.",
-    " · Auf diesem Gerät gespeichert": " · Guardado en este dispositivo"
+    " · Auf diesem Gerät gespeichert": " · Guardado en este dispositivo",
+    "1. Schritt App hinzufügen": "Paso 1: Añadir la aplicación",
+    "2. Schritt Profil anlegen": "Paso 2: Crear un perfil",
+    "Profil speichern": "Guardar perfil",
+    "Füge Schmetterlinge zum Home-Bildschirm hinzu. Öffne es danach über das Symbol und lege dein Profil dort an.": "Añade Schmetterlinge a la pantalla de inicio. Después, ábrelo desde el icono y crea allí tu perfil.",
+    "Ohne Installation im Browser fortfahren": "Continuar en el navegador sin instalar",
+    "Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen": "Primero añade Schmetterlinge a la pantalla de inicio",
+    "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Después, abre Schmetterlinge desde el icono y crea allí tu perfil.",
+    "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Los perfiles ya guardados en Safari no se transfieren automáticamente. Expórtalos desde «Guardar mis datos» e impórtalos en la aplicación.",
+    "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "Después de abrir desde el icono, crea un perfil. No necesitas iniciar sesión.",
+    "Profil anlegen": "Crear perfil"
   }
 }
