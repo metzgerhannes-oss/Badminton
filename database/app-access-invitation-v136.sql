@@ -161,3 +161,36 @@ end;
 $$;
 revoke all on function public.app_access_trophies_read(text) from public,anon,authenticated;
 grant execute on function public.app_access_trophies_read(text) to authenticated;
+
+
+-- Bounded player coverage for the invited app, not a lifetime-completeness claim.
+create or replace function public.app_access_player_coverage(p_player_dbv_id text)
+returns jsonb language plpgsql stable security definer set search_path = ''
+as $$
+declare result jsonb;
+begin
+ if p_player_dbv_id is null or p_player_dbv_id !~ '^[0-9]{2}-[0-9]{6}$' then return null; end if;
+ if not public.app_access_is_member() then
+   raise exception 'not_authorized' using errcode='42501';
+ end if;
+ select jsonb_build_object(
+   'dbv_id',p_player_dbv_id,
+   'match_cards',(select count(*) from public.player_external_match_facts f
+                  where f.dbv_id=p_player_dbv_id),
+   'placements',(select count(*) from public.tournament_placements t
+      join public.players p on p.id=t.player_id where p.dbv_id=p_player_dbv_id),
+   'top_four',(select count(*) from public.tournament_placements t
+      join public.players p on p.id=t.player_id
+      where p.dbv_id=p_player_dbv_id and t.placement between 1 and 4
+        and t.verification_note is distinct from
+          'Platz 3 von Familie bestätigt und zuvor anhand von Einzelmatches nachvollzogen; aktuelle namentliche Verbands-Resultatliste noch nicht abrufbar.'),
+   'import_status',(select i.status from public.player_external_match_imports i
+                    where i.dbv_id=p_player_dbv_id limit 1),
+   'last_import',(select i.last_finished_at from public.player_external_match_imports i
+                  where i.dbv_id=p_player_dbv_id limit 1)
+ ) into result;
+ return result;
+end;
+$$;
+revoke all on function public.app_access_player_coverage(text) from public,anon,authenticated;
+grant execute on function public.app_access_player_coverage(text) to authenticated;
