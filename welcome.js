@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("welcome-player-search").addEventListener("search",onSearchInput);
  $("install-ios").addEventListener("click",()=>showPlatform("ios"));
  $("install-android").addEventListener("click",()=>showPlatform("android"));
- $("install-back").addEventListener("click",showDataIntro);
+ $("install-back").addEventListener("click",()=>lastSavedProfile?showDataIntro():showProfileForm());
  $("welcome-data-skip").addEventListener("click",continueToInstall);
  const known=readSaved()?.players;
  $("welcome-existing").hidden=!(Array.isArray(known)&&known.length);
