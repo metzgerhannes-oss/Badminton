@@ -321,4 +321,4 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 // A newly accepted app invitation unlocks server-authorized match reads.
-window.addEventListener("badminton:app-access-granted",()=>{if(selected)fetchProfile(selected,true)});
+window.addEventListener("badminton:app-access-granted",()=>{privateMode=false;if(selected)fetchProfile(selected,true)});
