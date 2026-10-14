@@ -144,7 +144,7 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.ok(sw.accepted.includes("./welcome.js"));
  assert.ok(sw.accepted.includes("./scripts/invitation-search.mjs"));
  await sw.lifecycle("activate");
- assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","schmetterlinge-shell-v125","schmetterlinge-shell-v127"],
+ assert.deepEqual(sw.deleted,["schmetterlinge-shell-v119","schmetterlinge-shell-v121","schmetterlinge-shell-v122","schmetterlinge-shell-v123","schmetterlinge-shell-v124","schmetterlinge-shell-v125","schmetterlinge-shell-v127","schmetterlinge-shell-v128"],
    "Worker must not delete caches belonging to other GitHub Pages apps");
  assert.equal(sw.claimed,true);
 }

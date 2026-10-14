@@ -206,6 +206,16 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Public DBV name search is currently unavailable for privacy reasons. Accepted invitations are added automatically. You can add other own profiles below using name and DBV ID.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV name search is currently unavailable. Use manual setup with name and DBV ID.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "No matching player saved on this device. You can manually add other profiles with a DBV ID.",
-    " · Auf diesem Gerät gespeichert": " · Saved on this device"
+    " · Auf diesem Gerät gespeichert": " · Saved on this device",
+    "1. Schritt App hinzufügen": "Step 1: Add the app",
+    "2. Schritt Profil anlegen": "Step 2: Create a profile",
+    "Profil speichern": "Save profile",
+    "Füge Schmetterlinge zum Home-Bildschirm hinzu. Öffne es danach über das Symbol und lege dein Profil dort an.": "Add Schmetterlinge to the Home Screen. Then open it using the icon and create your profile there.",
+    "Ohne Installation im Browser fortfahren": "Continue in browser without installing",
+    "Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen": "First add Schmetterlinge to the Home Screen",
+    "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Then open Schmetterlinge using the icon and create your profile there.",
+    "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Profiles already saved in Safari are not transferred automatically. Export them using 'Back up my data' and import them into the app.",
+    "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "After opening from the icon: create a profile. No sign-in required.",
+    "Profil anlegen": "Create profile"
   }
 }

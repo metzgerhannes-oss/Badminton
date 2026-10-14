@@ -38,8 +38,8 @@ test("confirmed directory search reselects existing DBV account without making a
  await found.click();
  await expect(page.locator("#welcome-selection-detail")).toContainText("DBV 05-070879");
  await page.locator("#welcome-selection-save").click();
- await expect(page.locator("#onboard-install")).toBeVisible();
- await expect(page.locator(".welcome-success")).toContainText("05-070879");
+ await expect(page).toHaveURL(/\/index\.html#start$/);
+ await expect(page.locator(".focused-profile")).toContainText("Philipp Metzger");
  const current=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(current.players).toHaveLength(1);
  expect(current.players[0].id).toBe("05-070879");

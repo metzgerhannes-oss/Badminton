@@ -206,6 +206,16 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "为保护隐私，DBV 公共姓名搜索目前已关闭。已接受的邀请会自动添加。你可以在下方通过姓名和 DBV 编号添加自己的其他档案。",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "DBV 姓名搜索目前不可用。请通过姓名和 DBV 编号手动设置。",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "本设备未找到匹配的球员。你可以使用 DBV 编号手动添加其他档案。",
-    " · Auf diesem Gerät gespeichert": " · 已保存在本设备"
+    " · Auf diesem Gerät gespeichert": " · 已保存在本设备",
+    "1. Schritt App hinzufügen": "第 1 步：添加应用",
+    "2. Schritt Profil anlegen": "第 2 步：创建个人资料",
+    "Profil speichern": "保存个人资料",
+    "Füge Schmetterlinge zum Home-Bildschirm hinzu. Öffne es danach über das Symbol und lege dein Profil dort an.": "将 Schmetterlinge 添加到主屏幕，然后点击图标打开应用并在其中创建个人资料。",
+    "Ohne Installation im Browser fortfahren": "不安装，继续在浏览器中使用",
+    "Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen": "请先将 Schmetterlinge 添加到主屏幕",
+    "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "然后通过图标打开 Schmetterlinge，并在应用中创建个人资料。",
+    "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Safari 中已保存的个人资料不会自动转移。请通过“备份我的数据”导出，再在应用中导入。",
+    "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "通过图标打开后创建个人资料，无需登录。",
+    "Profil anlegen": "创建个人资料"
   }
 }

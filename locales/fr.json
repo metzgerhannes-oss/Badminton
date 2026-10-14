@@ -206,6 +206,16 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "La recherche publique par nom DBV est actuellement désactivée pour protéger les données personnelles. Les invitations acceptées sont ajoutées automatiquement. Vous pouvez ajouter vos autres profils ci-dessous avec le nom et l'identifiant DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "La recherche par nom DBV est momentanément indisponible. Utilisez la configuration manuelle avec le nom et l'identifiant DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Aucun joueur correspondant enregistré sur cet appareil. Vous pouvez ajouter d'autres profils manuellement avec un identifiant DBV.",
-    " · Auf diesem Gerät gespeichert": " · Enregistré sur cet appareil"
+    " · Auf diesem Gerät gespeichert": " · Enregistré sur cet appareil",
+    "1. Schritt App hinzufügen": "Étape 1 : Ajouter l’application",
+    "2. Schritt Profil anlegen": "Étape 2 : Créer un profil",
+    "Profil speichern": "Enregistrer le profil",
+    "Füge Schmetterlinge zum Home-Bildschirm hinzu. Öffne es danach über das Symbol und lege dein Profil dort an.": "Ajoutez Schmetterlinge à l’écran d’accueil. Ouvrez ensuite l’icône et créez votre profil dans l’application.",
+    "Ohne Installation im Browser fortfahren": "Continuer dans le navigateur sans installer",
+    "Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen": "Ajoutez d’abord Schmetterlinge à l’écran d’accueil",
+    "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Ouvrez ensuite Schmetterlinge depuis l’icône et créez votre profil.",
+    "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Les profils déjà enregistrés dans Safari ne sont pas transférés automatiquement. Exportez-les via « Sauvegarder mes données », puis importez-les dans l’application.",
+    "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "Après ouverture via l’icône : créez un profil. Aucune connexion nécessaire.",
+    "Profil anlegen": "Créer un profil"
   }
 }
