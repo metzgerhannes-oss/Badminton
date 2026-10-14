@@ -102,5 +102,10 @@ document.addEventListener("DOMContentLoaded",()=>{
  let pending="";try{pending=localStorage.getItem(PENDING)||"";localStorage.removeItem(PENDING)}catch{}
  if(DBV.test(pending)&&current()===pending)open(pending,{force:true});
 });
-window.addEventListener("badminton:profile-selected",event=>{const id=event.detail?.playerId;if(DBV.test(String(id||"")))open(id)});
+// Routine switches among already-configured players must never cover the app.
+ // Only explicit first-time onboarding creates the one-time prompt.
+window.addEventListener("badminton:profile-selected",event=>{
+ const id=event.detail?.playerId;
+ if(event.detail?.source==="onboarding"&&DBV.test(String(id||"")))open(id);
+});
 window.addEventListener("badminton:own-profile-added",event=>{const id=event.detail?.playerId;if(DBV.test(String(id||"")))open(id,{force:true})});
