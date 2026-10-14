@@ -40,8 +40,8 @@ function validResult(response,player){
 export function trophySnapshot(player){
  if(!DBV.test(String(player||"")))return {state:"protected",results:[]};
  const state=states.get(player);
- if(!state)return {state:"loading",results:[]};
- if(Date.now()-state.checkedAt>HOLD_MS&&!state.pending)return {state:"loading",results:[]};
+ if(!state)return {state:"not_requested",results:[]};
+ if(Date.now()-state.checkedAt>HOLD_MS&&!state.pending)return {state:"not_requested",results:[]};
  return {state:state.state,results:state.results||[],coverage:state.coverage};
 }
 function announce(player){
