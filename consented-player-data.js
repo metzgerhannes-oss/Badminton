@@ -2,7 +2,7 @@
  * No new permissions, cloud writes, background polling or mandatory account. */
 import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
-import {loadPlayerCopy,savePlayerCopy,deletePlayerCopy} from "./scripts/consented-player-data.mjs";
+import {loadPlayerCopy,savePlayerCopy,deletePlayerCopy,serializePlayerDataExport} from "./scripts/consented-player-data.mjs";
 const DBV=/^\d{2}-\d{6}$/;
 const SEEN="schmetterlinge.playerCopyPrompted.v1",PENDING="schmetterlinge.pendingPlayerDataCopy.v1";
 const $=id=>document.getElementById(id);
@@ -21,11 +21,13 @@ function dialog(){
   '<div class="player-copy-actions">'+
   '<button type="button" id="player-copy-now" class="primary-button">Daten jetzt übernehmen</button>'+
   '<button type="button" id="player-copy-later" class="outline-button">Später</button>'+
+   '<button type="button" id="player-copy-download" class="outline-button" hidden>Matchkarten und Trophäen herunterladen</button>'+
   '<button type="button" id="player-copy-remove" class="subtle-button" hidden>Lokale Kopie löschen</button>'+
   '</div></section>';
  document.body.append(d);
  $("player-copy-now").addEventListener("click",importNow);
  $("player-copy-later").addEventListener("click",()=>d.close());
+ $("player-copy-download").addEventListener("click",downloadCopy);
  $("player-copy-remove").addEventListener("click",()=>{
   if(busy||!target)return;
   if(deletePlayerCopy(target))window.dispatchEvent(new CustomEvent("badminton:local-data-copy-updated",{detail:{playerId:target}}));
@@ -37,6 +39,7 @@ function updateSummary(){
  const item=loadPlayerCopy(target),el=$("player-copy-summary"),remove=$("player-copy-remove");
  if(!el)return;
  remove.hidden=!item;
+ const download=$("player-copy-download");if(download)download.hidden=!item;
  el.textContent=item
   ?"Lokal gespeichert: "+new Date(item.fetchedAt).toLocaleString("de-DE")+" · "+(item.matches===null?"Matches nicht freigegeben":item.matches.length+" Matchkarten")+
    " · "+(item.trophies===null?"Trophäen nicht freigegeben":item.trophies.length+" Platzierungen")+" (Teilarchiv)."
@@ -55,6 +58,22 @@ function open(player,{force=false}={}){
  $("player-copy-now").disabled=false;
  updateSummary();
  if(!d.open)d.showModal();
+}
+function downloadCopy(){
+ if(busy||!DBV.test(target))return;
+ const status=$("player-copy-status");
+ const exported=serializePlayerDataExport(target);
+ if(!exported){status.textContent="Noch keine gespeicherte, freigegebene Datenkopie vorhanden.";return}
+ let link=null,url="";
+ try{
+  const blob=new Blob([exported],{type:"application/json;charset=utf-8"});
+  url=URL.createObjectURL(blob);
+  link=document.createElement("a");
+  link.href=url;link.download="schmetterlinge-daten-"+target+"-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.append(link);link.click();
+  status.textContent="Dateidownload gestartet. Die Datei enthält nur die zuvor auf diesem Gerät gespeicherten Matchkarten und Trophäen.";
+ }catch{status.textContent="Dateidownload fehlgeschlagen. Die lokale Kopie bleibt unverändert."}
+ finally{link?.remove();if(url)setTimeout(()=>URL.revokeObjectURL(url),60000)}
 }
 async function importNow(){
  if(busy||!DBV.test(target))return;
