@@ -89,5 +89,9 @@ export function clearPrivateTrophyCache({refresh=true}={}){
 if(typeof document!=="undefined"){
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)clearPrivateTrophyCache()});
  window.addEventListener("badminton:private-player-revoked",()=>clearPrivateTrophyCache());
+ window.addEventListener("badminton:data-import-updated",event=>{
+  const player=event.detail?.playerId;
+  if(DBV.test(String(player||""))){states.delete(player);announce(player)}
+ });
  window.addEventListener("pagehide",()=>states.clear());
 }
