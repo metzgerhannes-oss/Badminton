@@ -1,5 +1,5 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
-import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
+import {trophySnapshot} from "./scripts/private-trophy-source.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
 "use strict";
 const rankUrl="./data/ranking.json";
@@ -141,6 +141,7 @@ function renderOtherKpis(){
   ?(results.length===0
     ?"Keine belegten Top-4-Platzierungen in den bisher verfügbaren Quellen. Das Archiv ist nicht vollständig."
     :"Nur belegte Platzierungen aus den bisher erfassten Quellen. Die Historie ist nicht vollständig."+countContext)
+  :access.state==="not_requested"?"Private Auszeichnungen wurden noch nicht abgerufen. Öffne „Meine Daten“ für den Datenabruf."
   :access.state==="loading"?"Private Auszeichnungen werden geprüft. Noch keine Zahl verfügbar."
   :access.state==="protected"?"Trophäen sind geschützt. Ein Berechtigungslink oder eine unabhängig bestätigte Verwalterberechtigung ist erforderlich."
   :"Private Auszeichnungen sind momentan nicht abrufbar. Kein sportlicher Nullwert.";
@@ -192,7 +193,6 @@ function renderDashboard(){
 }
 window.renderDashboard=(selected,ps,links,options={})=>{
  selection=selected||"";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
- requestPrivateTrophies(selection);
  renderDashboard();
 };
 async function load(){
