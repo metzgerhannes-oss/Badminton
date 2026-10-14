@@ -40,7 +40,7 @@ function dialog(){
  const dlg=document.createElement("dialog");dlg.id="private-player-dialog";dlg.className="private-player-share-dialog";
  dlg.innerHTML='<div class="modal"><h2>Spielerprofil privat teilen</h2>'+
  '<p class="small">Lade eine Person ein, diesem Spieler einen privaten Lesezugang zu geben. Der Link kann innerhalb von sieben Tagen einmal angenommen werden. Danach bleibt der Zugang auf dem Empfängergerät bis zu deinem Widerruf bestehen.</p>'+
- '<p class="small"><strong>Bei neuen Links freigegeben:</strong> Spielerprofil · belegte Trophäen (Platz 1–4) · vorhandene Matchstatistiken. Nur für den ausgewählten Spieler und erst nach unabhängiger Verwalterprüfung. Bereits bestehende Links behalten ihren bisherigen Umfang.</p>'+
+ '<p class="small"><strong>Bei neuen Links freigegeben:</strong> Spielerprofil · belegte Trophäen (Platz 1–4) · vorhandene Matchstatistiken. Nur für den ausgewählten Spieler nach serverseitig bestätigter Berechtigung (beispielsweise eigene Familienprofile). Bereits bestehende Links behalten ihren bisherigen Umfang.</p>'+
  '<p id="private-player-status" role="status" aria-live="polite"></p>'+
  '<label for="private-player-links">Meine Einladungen (auch angenommene)</label><select id="private-player-links" hidden></select>'+
  '<label for="private-player-url">Einladungslink (nur bis Annahmefrist)</label><input id="private-player-url" type="text" readonly autocomplete="off" spellcheck="false">'+
