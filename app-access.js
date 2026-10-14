@@ -10,7 +10,14 @@ const submit=document.getElementById("app-access-submit");
 const status=document.getElementById("app-access-status");
 window.badmintonAppAccess=Object.freeze({
  get accessToken(){return allowed?session?.access_token||null:null;},
- get allowed(){return allowed}
+ get allowed(){return allowed},
+ async getAccessToken(){
+  if(!allowed)return null;
+  const fresh=await getPrivateSession(false);
+  if(!fresh)return null;
+  session=fresh;
+  return fresh.access_token;
+ }
 });
 async function rpc(name,body,token){
  const controller=new AbortController();
