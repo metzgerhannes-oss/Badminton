@@ -24,7 +24,7 @@ const DATA=[
 ["grundlagen","Was passiert bei 20:20?","Es wird bis zum Zwei-Punkte-Vorsprung weitergespielt. Bei 29:29 gewinnt der 30. Punkt.","20 20 verlängerung 30 29","Standardzählweise 3 × 21",DBV,"deuce21"],
 ["grundlagen","Wie funktioniert 3 × 15?","Zwei Gewinnsätze bis 15; bei 14:14 mit zwei Punkten Abstand, höchstens bis 21.","2027 umstellung 15 14 20 21 zaehlweise","DBV-Individualturniere ab 04.01.2027; regional abweichend",FIFTEEN,"score15"],
 ["grundlagen","Wann werden die Seiten gewechselt?","Nach Satz 1 und vor Satz 3; im dritten Satz bei 11 Punkten (21er) bzw. 8 Punkten (15er).","seite wechseln pause dritter entscheidungssatz","Abhängig von der geltenden Zählweise",DBV,"switch"],
-["grundlagen","Wie hoch ist das Netz?","An den Pfosten 1,55 m, in der Mitte 1,524 m.","netzhöhe netz mitte 1.55 1.524","Spielregeln 1",DBV,"net"],
+["grundlagen","Wie hoch ist das Netz?","An den Pfosten 1,55 m, in der Mitte 1,524 m.","netzhöhe netz mitte 1.55 1.524","Spielregeln 1",DBV,"netHeight"],
 ["grundlagen","Darf ein Ball die Linie berühren?","Ja. Berührt der Ball die gültige Linie, ist er im Feld.","aus in auf linie federn boden","Spielregeln 13",DBV,"line"],
 ["grundlagen","Wie lange sind die Pausen?","Bis 60 Sekunden im Satz beim Pausenpunkt und bis 120 Sekunden zwischen zwei Sätzen.","pause 60 120 sekunden unterbrechung","Spielregeln 16; Pausenpunkt abhängig von Zählweise",DBV,"clock"],
 ["grundlagen","Welche Spielarten gibt es?","Einzel: 1 gegen 1. Doppel und Mixed: 2 gegen 2, beim Mixed jeweils Frau und Mann pro Paar.","disziplin spielart einzel doppel mixed","Spielregeln 10–11",DBV,"teams"],
@@ -37,9 +37,9 @@ const DATA=[
 ["spielsituationen","Wer nimmt den Aufschlag im Doppel?","Nur der diagonal gegenüberstehende richtige Rückschläger darf den Aufschlag annehmen.","doppel annahme falscher partner diagonal","Spielregel 11",DBV,"serve"],
 ["spielsituationen","Wer schlägt im Doppel nach eigenem Aufschlagpunkt auf?","Dieselbe Person schlägt von der anderen Seite erneut auf.","doppel aufschlagfolge rotation vier spieler","Spielregel 11",DBV,"serveAgain"],
 ["spielsituationen","Wann wechseln Doppelpartner ihre Seiten?","Nur wenn sie bei eigenem Aufschlag punkten. Bei Rückschlaggewinn wechseln sie nicht sofort die Positionen.","doppel stellung partner wechseln rotation","Spielregel 11",DBV,"rotate"],
-["spielsituationen","Darf der Ball das Netz berühren?","Ja. Fliegt er trotz Netzberührung ins gültige gegnerische Feld, läuft der Ballwechsel weiter.","netzroller netzkante über netz","Spielregel 13",DBV,"net"],
-["spielsituationen","Ist die Netzberührung ein Fehler?","Ja, wenn Spieler oder Schläger während des Ballwechsels das Netz berühren.","netz netzberuehrung schläger berühren","Spielregel 13",DBV,"fault"],
-["spielsituationen","Darf der Schläger übers Netz ragen?","Treffe den Ball auf deiner Seite. Danach darf der Schläger über das Netz schwingen.","über netz nachschwingen netzüberschreitung","Spielregel 13",DBV,"net"],
+["spielsituationen","Darf der Ball das Netz berühren?","Ja. Fliegt er trotz Netzberührung ins gültige gegnerische Feld, läuft der Ballwechsel weiter.","netzroller netzkante über netz","Spielregel 13",DBV,"netRoller"],
+["spielsituationen","Ist die Netzberührung ein Fehler?","Ja, wenn Spieler oder Schläger während des Ballwechsels das Netz berühren.","netz netzberuehrung schläger berühren","Spielregel 13",DBV,"netTouch"],
+["spielsituationen","Darf der Schläger übers Netz ragen?","Treffe den Ball auf deiner Seite. Danach darf der Schläger über das Netz schwingen.","über netz nachschwingen netzüberschreitung","Spielregel 13",DBV,"netFollow"],
 ["spielsituationen","Aufschlag bleibt im Netz hängen?","Fehler. Der Gegner gewinnt den Ballwechsel.","ball hängt netz aufschlag","Spielregel 13",DBV,"hangServe"],
 ["spielsituationen","Rückschlag bleibt im Netz hängen?","Bleibt der Rückschlag oben am Netz oder nach Überfliegen darin hängen, gibt es Wiederholung.","ball hängt netz rückschlag let","Spielregel 14",DBV,"hangReturn"],
 ["spielsituationen","Darf man den Ball zweimal schlagen?","Zwei getrennte Schläge derselben Person sind ein Fehler. Rahmen und Saiten in einem Schlag sind erlaubt.","doppelschlag zweimal","Spielregel 13",DBV,"doubleHit"],
@@ -144,6 +144,43 @@ function art(kind){
   +'<circle cx="333" cy="115" r="17" fill="#d3efff"/><text x="333" y="121" font-family="system-ui" text-anchor="middle" font-size="12" font-weight="800" fill="#15415c">A2</text>'
   +'<text x="200" y="209" font-family="system-ui" text-anchor="middle" font-size="16" font-weight="800" fill="#15516f">A1 BLEIBT AUFSCHLÄGER</text>'
   +'<text x="200" y="233" font-family="system-ui" text-anchor="middle" font-size="13" font-weight="650" fill="#416781">TEAM PUNKTET BEI EIGENEM AUFSCHLAG</text>'+SVG_END;
+ 
+ if(kind==="netHeight")return SVG_START+'<rect width="400" height="264" rx="20" fill="#ddf4ff"/>'
+  +'<path d="M35 201V50 M365 201V50" stroke="#225b7d" stroke-width="9"/>'
+  +'<path d="M35 53Q200 73 365 53V198H35Z" fill="#8dc9bd" stroke="#2d8395" stroke-width="3"/>'
+  +Array.from({length:9},(_,i)=>'<path d="M'+(38+i*41)+' 65V198" stroke="#eafafb" stroke-width="1.8"/>').join('')
+  +'<path d="M47 47V195 M40 53h14M40 193h14 M200 68V195 M193 73h14M193 193h14" stroke="#e0a431" stroke-width="5"/>'
+  +'<rect x="48" y="216" width="126" height="37" rx="10" fill="#127faa"/>'
+  +'<rect x="218" y="216" width="156" height="37" rx="10" fill="#198e81"/>'
+  +'<text x="111" y="240" text-anchor="middle" font-size="17" font-weight="800" fill="white" font-family="system-ui">1,55 m</text>'
+  +'<text x="296" y="240" text-anchor="middle" font-size="17" font-weight="800" fill="white" font-family="system-ui">1,524 m</text>'+SVG_END;
+ if(kind==="netRoller")return SVG_START+'<rect width="400" height="264" rx="20" fill="#e1f4ff"/>'
+  +'<path d="M198 45V205" stroke="#184e6b" stroke-width="7"/>'
+  +'<path d="M161 91H238" stroke="#184e6b" stroke-width="10"/>'
+  +'<path d="M169 101V201 M186 101V201 M207 101V201 M226 101V201" stroke="#55a1aa" stroke-width="2"/>'
+  +'<path d="M55 167Q120 41 194 75Q236 40 330 154" stroke="#e9ae41" fill="none" stroke-width="7" stroke-dasharray="9 6"/>'
+  +'<circle cx="200" cy="76" r="16" fill="white" stroke="#1c5e7e" stroke-width="4"/>'
+  +'<rect x="87" y="210" width="227" height="42" rx="12" fill="#148e7e"/>'
+  +'<text x="200" y="237" text-anchor="middle" font-size="19" font-weight="800" fill="white" font-family="system-ui">WEITERSPIELEN</text>'+SVG_END;
+ if(kind==="netTouch")return SVG_START+'<rect width="400" height="264" rx="20" fill="#e0f4ff"/>'
+  +'<path d="M200 43V195" stroke="#194e6c" stroke-width="7"/>'
+  +'<path d="M169 86H230" stroke="#194e6c" stroke-width="9"/>'
+  +'<path d="M177 94V193 M191 94V193 M210 94V193 M223 94V193" stroke="#8dbabd" stroke-width="2"/>'
+  +'<path d="M80 185L178 96" stroke="#145e82" stroke-width="10"/>'
+  +'<ellipse cx="174" cy="95" rx="32" ry="14" transform="rotate(-42 174 95)" fill="none" stroke="#145e82" stroke-width="6"/>'
+  +'<path d="M263 103l54 55 M317 103l-54 55" stroke="#c4354c" stroke-width="9" stroke-linecap="round"/>'
+  +'<rect x="111" y="209" width="177" height="41" rx="10" fill="#bb4650"/>'
+  +'<text x="200" y="236" text-anchor="middle" font-size="19" font-weight="800" fill="white" font-family="system-ui">FEHLER</text>'+SVG_END;
+ if(kind==="netFollow")return SVG_START+'<rect width="400" height="264" rx="20" fill="#e0f4ff"/>'
+  +'<path d="M200 43V203" stroke="#174f6c" stroke-width="7"/>'
+  +'<path d="M175 97H224" stroke="#174f6c" stroke-width="10"/>'
+  +'<path d="M174 107V202 M188 107V202 M211 107V202 M224 107V202" stroke="#7fb4b9" stroke-width="2"/>'
+  +'<path d="M74 192Q125 70 171 88Q211 48 296 99" stroke="#e9b040" stroke-width="7" fill="none" stroke-dasharray="9 6"/>'
+  +'<circle cx="157" cy="97" r="14" fill="white" stroke="#235873" stroke-width="4"/>'
+  +'<path d="M52 196L162 100" stroke="#185f80" stroke-width="7"/>'
+  +'<rect x="94" y="211" width="212" height="39" rx="11" fill="#168d7b"/>'
+  +'<text x="200" y="236" text-anchor="middle" font-size="17" font-weight="800" fill="white" font-family="system-ui">TREFFPUNKT EIGENE SEITE</text>'+SVG_END;
+ 
  if(["hangServe","hangReturn","net"].includes(kind)){
   const result=kind==="hangServe"?"FEHLER":kind==="hangReturn"?"WIEDERHOLUNG":"NETZ";
   const color=kind==="hangServe"?"#af3045":"#0b789e";
