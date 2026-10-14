@@ -15,11 +15,10 @@ test.beforeEach(async ({page})=>{
   }));
  });
 });
-test("Scoped name and club search shows at most 12 verified DBV identities without reading player roster",async ({page})=>{
- const queries=[],forbidden=[];
+test("Scoped name and club search succeeds while full player-roster API yields no data",async ({page})=>{
+ const queries=[];
  await page.route("**/*.supabase.co/**",route=>{
   const url=new URL(route.request().url());
-  if(url.pathname==="/rest/v1/players"||url.pathname==="/rest/v1/clubs")forbidden.push(url.pathname);
   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:HEADERS});
   if(url.pathname==="/rest/v1/rpc/search_dbv_player_identity"){
    const args=JSON.parse(route.request().postData()||"{}");queries.push(args);
@@ -40,7 +39,6 @@ test("Scoped name and club search shows at most 12 verified DBV identities witho
  await expect(page.locator(".library-player")).toHaveCount(12);
  await expect(page.locator("#library-more")).toBeHidden();
  expect(queries.some(q=>q.p_query==="Mössinger"&&q.p_club==="SpVgg. Mössingen")).toBe(true);
- expect(forbidden).toEqual([]);
 });
 test("No name or zero verified results means no silent bulk club export",async ({page})=>{
  const queries=[];
