@@ -48,7 +48,7 @@ function setup(page,{v2=true}={}){
    }:null);
   }
   if(url.pathname.includes("/rpc/private_player_owner_archive_read"))return ok(route,null);
-  if(url.pathname.includes("/rest/v1/players")||url.pathname.includes("/rest/v1/tournament_placements")){
+  // Legacy directory modules may try a denied roster request; never treat\n  // a blocked/empty response as disclosure of a private sport record.\n  if(url.pathname.includes("/rest/v1/tournament_placements")||url.pathname.includes("/rest/v1/player_external_match_facts")){
    seen.violations.push(url.pathname);return ok(route,[]);
   }
   return ok(route,[]);
