@@ -108,47 +108,39 @@ test("An invited member sees individually sourced match statistics and navigable
  await expect(page.locator("#match-stats-details")).toBeVisible();
 });
 
-test("Partial source outage never impersonates a verified empty history, and retry works",async ({page})=>{
- let externalUnavailable=true;
- await page.route("**/player_external_match_imports?*",route=>{
-  if(externalUnavailable)return route.fulfill({status:503,headers,body:'{"error":"temporary"}'});
+test("Coverage RPC outage must not hide individually verified match cards",async ({page})=>{
+ let coverageUnavailable=true;
+ await page.route("**/rpc/app_access_player_coverage",route=>{
+  if(coverageUnavailable)return route.fulfill({status:503,headers,body:'{"error":"temporary"}'});
   return route.fallback();
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- // The published all-career snapshot is still valid when match-import
- // endpoints fail; use a scoped filter to verify the independent retry UX.
- await expect(page.locator("#match-stats-reference")).toBeVisible();
- await page.locator("#home-match-filter-panel > summary").click();
- await page.locator("#match-stats-discipline").selectOption("Einzel");
- await expect(page.locator("#match-stats-note")).toContainText("nur teilweise abrufbar");
- await expect(page.locator("#match-stats-source")).toContainText("unvollständig");
- await expect(page.locator("#match-stats-retry")).toBeVisible();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await expect(page.locator("#match-stats-note")).toContainText("Bisher belegte Spiele");
+ await expect(page.locator("#match-stats-source")).toContainText("Bisher belegte Spiele");
+ await expect(page.locator("#match-stats-retry")).toBeHidden();
  await expect(page.locator("#match-stats-source-link")).toHaveAttribute("href",
   "https://badhub.de/spieler/"+PLAYER+"?saison=all&src=gesamt");
- await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("–");
- externalUnavailable=false;
- await page.locator("#match-stats-retry").click();
+ coverageUnavailable=false;
+ await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
- await expect(page.locator("#match-stats-retry")).toBeHidden();
 });
 
-test("Import progress counts stored rows, not the server processing cursor",async ({page})=>{
- await page.route("**/player_external_match_imports?*",route=>{
-  const url=new URL(route.request().url());
-  if(url.searchParams.get("dbv_id")==="eq."+PLAYER)return route.fulfill({
-   status:200,headers,body:JSON.stringify([{
-    dbv_id:PLAYER,status:"partial",cursor_offset:4,verified_count:5,
-    rejected_count:1,last_finished_at:"2026-10-10T12:00:00Z"
-   }])
+test("Import coverage counts stored rows, never invents a processing cursor",async ({page})=>{
+ await page.route("**/rpc/app_access_player_coverage",route=>{
+  const body=JSON.parse(route.request().postData()||"{}");
+  if(body.p_player_dbv_id===PLAYER)return route.fulfill({
+   status:200,headers,body:JSON.stringify({dbv_id:PLAYER,
+    match_cards:5,placements:0,top_four:0,import_status:"partial",
+    last_import:"2026-10-10T12:00:00Z"})
   });
   return route.fallback();
  });
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#external-match-progress")).toContainText("1 von 5");
- await expect(page.locator("#external-match-progress")).toContainText("4 Quellkarten verarbeitet");
  await expect(page.locator("#external-match-progress")).not.toContainText("4 von 5");
- await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
  await expect(page.locator("#external-match-progress")).toContainText("Letzter dokumentierter Importversuch");
+ await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
 });
 
 // Legacy public-history screenshot fixtures are no longer shipped to visitors.
