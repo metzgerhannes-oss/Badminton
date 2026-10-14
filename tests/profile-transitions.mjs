@@ -61,3 +61,9 @@ assert.ok(html.indexOf('src="./state-storage.js"')<html.indexOf('src="./app.js"'
  "State transitions must load before the classic controller");
 assert.doesNotMatch(source,/\bfetch\s*\(|XMLHttpRequest/);
 console.log("Local profile transition contract: Home, friend switching, invalid IDs and unfollow preserved.");
+
+assert.match(app,/restore\(\);\s*\/\/ iOS Safari and an installed Home Screen PWA/,
+ "The app must not write an empty profile on first start");
+const welcome=await readFile("welcome.js","utf8");
+assert.equal((welcome.match(/length<3/g)||[]).length,2,
+ "Search requires at least three characters before invoking the DBV API");

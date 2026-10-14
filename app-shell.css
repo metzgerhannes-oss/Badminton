@@ -333,3 +333,11 @@
 .dbv-calendar-alternatives{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .dbv-calendar-alternatives .subtle-button{min-height:44px;border-radius:10px;border:1px solid #8ab4cb;background:#eef8fc;padding:9px 14px;font-size:13px;font-weight:700;color:#155779}
 .dbv-calendar-no-results>a{display:inline-block;padding:9px 0;font-size:13px;font-weight:700}
+
+/* v139: explicit BWBV youth framework dates, never mislabelled as DBV entries. */
+.dbv-calendar-framework{margin:14px 0;padding:13px;border:1px solid #b7d5e5;border-radius:13px;background:#f1f9fe;overflow-wrap:anywhere}
+.dbv-calendar-framework h4{margin:0 0 8px;font-size:15px;line-height:1.35;color:#174668}
+.dbv-calendar-framework p{margin:5px 0 9px;line-height:1.5}
+.dbv-calendar-framework ul{list-style:disc;padding-left:20px;margin:9px 0;display:grid;gap:8px}
+.dbv-calendar-framework li{font-size:13px;line-height:1.5;padding-left:2px;overflow-wrap:anywhere}
+.dbv-calendar-framework a{display:inline-block;min-height:44px;padding:10px 0;color:#105a86;font-weight:700}

@@ -85,12 +85,7 @@ test("private Spond appointments travel with the offline backup, restore needs c
 test("legacy backups preserve the target's newer private calendar and invalid files cannot restore",async ({page})=>{
  const family=makeFamily(OTHER,"Vorhandenes Profil");
  const retained=[makeEvent(OTHER,"Privater Termin","stay")];
- await page.addInitScript(({family,retained})=>{
-  if(localStorage.getItem("shuttleboard-v1")===null)
-   localStorage.setItem("shuttleboard-v1",JSON.stringify(family));
-  if(localStorage.getItem("schmetterlinge.calendarEvents.v1")===null)
-   localStorage.setItem("schmetterlinge.calendarEvents.v1",JSON.stringify(retained));
- },{family,retained});
+ await setup(page.context(),family,retained); // Synthetic member session / RPC fixture required for invitation-only app.\n
  await page.goto("/#einstellungen/daten",{waitUntil:"load"});
   await expect(page.locator("#settings-room-daten")).toBeVisible();
  const legacy={kind:"schmetterlinge-local-backup",schemaVersion:1,

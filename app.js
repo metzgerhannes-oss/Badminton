@@ -377,7 +377,11 @@ function setup(){
  setInterval(()=>{if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state)},60_000);
  let freshDevice=false;
  try{freshDevice=!localStorage.getItem(STORE)}catch{}
- restore();save();
+ restore();
+ // iOS Safari and an installed Home Screen PWA can have different local stores.
+ // Do not manufacture an empty saved profile on a brand-new app installation.
+ // Only persist an existing state here; a new profile is saved after consent.
+ if(!freshDevice)save();
  // One-time local navigation hint, never an ownership or private data grant.
  try{
   const invited=localStorage.getItem("schmetterlinge.invitedPlayerPendingView.v1");

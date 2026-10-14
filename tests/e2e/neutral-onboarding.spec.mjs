@@ -18,17 +18,19 @@ test("Installed app searches DBV and returns with verified player ID",async ({pa
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#first-run-dialog")).toBeVisible();
  const before=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(before.players).toHaveLength(0);
+ expect(before).toBeNull(); // No empty user profile is written to fresh PWA storage.
  await page.locator("#first-run-new").click();
  await expect(page).toHaveURL(/\/welcome\.html\?from=app$/);
  await expect(page.locator("#welcome-player-search")).toBeVisible();
+ await expect(page.locator("#welcome-player-search")).toHaveAttribute("data-ready","true");
+ await expect(page.locator("#welcome-player-search")).toBeEnabled();
  await page.locator("#welcome-player-search").fill("Storz");
  const hit=page.locator(".welcome-search-hit",{hasText:"Sarah Storz"});
  await expect(hit).toContainText("DBV 05-061350");
  await expect(hit).toContainText("SpVgg Mössingen");
  await hit.click();
  const unsaved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(unsaved.players).toHaveLength(0);
+ expect(unsaved).toBeNull(); // Search selection alone is not a persisted player profile.
  await page.locator("#welcome-selection-save").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
  await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
@@ -51,7 +53,7 @@ test("Cancel installed-app search without silently creating a profile",async ({p
  await page.locator("#existing-app-link").click();
  await expect(page.locator("#first-run-dialog")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(saved.players).toHaveLength(0);
+ expect(saved).toBeNull(); // Cancel leaves the new PWA profile store untouched.
 });
 
 test("Installed app offers local-only manual fallback without a DBV result",async ({page})=>{

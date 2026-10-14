@@ -98,7 +98,7 @@ test("BW U13 C empty result explains source coverage and provides available D/E 
  await page.locator("#dbv-calendar-level").selectOption("C");
  await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
  await expect(page.locator(".dbv-calendar-no-results")).toContainText("Keine passenden Turniere");
- await expect(page.locator(".dbv-calendar-no-results")).toContainText("nicht automatisch alle Turniere");
+ await expect(page.locator(".dbv-calendar-no-results")).toContainText("Quellenlücke möglich");
  await expect(page.locator('[data-calendar-alternative-level="D"]')).toHaveText("Level D (4)");
  await expect(page.locator('[data-calendar-alternative-level="E"]')).toHaveText("Level E (6)");
  await page.locator('[data-calendar-alternative-level="D"]').click();
@@ -115,4 +115,21 @@ test("2027 year selection shows official source-backed future tournaments",async
  await expect(page.locator("#dbv-calendar-status")).toContainText(count+" von "+sourceTotal);
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry").first()).toBeVisible();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
+});
+
+test("BWBV 2027 C framework dates are distinct from unavailable DBV U13 entries",async ({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
+ await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(4);
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("Ob U13");
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("nicht aus dem DBV-Turnierimport");
+ await expect(page.locator(".dbv-calendar-entry")).toHaveCount(0);
+ await expect(page.locator(".dbv-calendar-framework a")).toHaveAttribute("href",/bwbv\.de\/wp-content/);
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(0);
 });

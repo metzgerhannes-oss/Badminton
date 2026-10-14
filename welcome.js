@@ -157,7 +157,7 @@ async function searchPlayers(value){
  $("welcome-search-results").replaceChildren();
  lastSearchPlayers=null;
  const term=normalizeFriendSearch(value);
- if(term.length<2){
+ if(term.length<3){
   setSearchStatus("Mindestens drei Zeichen eingeben, um Spieler zu finden.");
   return;
  }
@@ -183,7 +183,7 @@ function onSearchInput(){
  $("welcome-search-results").replaceChildren();
  lastSearchPlayers=null;
  const value=$("welcome-player-search").value;
- if(normalizeFriendSearch(value).length<2){
+ if(normalizeFriendSearch(value).length<3){
   setSearchStatus("Mindestens drei Zeichen eingeben, um Spieler zu finden.");
   return;
  }
@@ -252,7 +252,11 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("mode-dbv").addEventListener("click",()=>updateMode("dbv"));
  $("welcome-form").addEventListener("submit",saveProfile);
  $("welcome-selection-save").addEventListener("click",saveSelected);
- $("welcome-player-search").addEventListener("input",onSearchInput);
+ const playerSearch=$("welcome-player-search");
+ playerSearch.addEventListener("input",onSearchInput);
+ // Prevent iOS WebKit accepting text before the module listener is installed.
+ playerSearch.disabled=false;
+ playerSearch.dataset.ready="true";
  $("welcome-player-search").addEventListener("search",onSearchInput);
  $("install-ios").addEventListener("click",()=>showPlatform("ios"));
  $("install-android").addEventListener("click",()=>showPlatform("android"));
