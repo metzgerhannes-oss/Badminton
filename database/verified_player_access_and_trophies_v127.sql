@@ -162,12 +162,23 @@ ALTER TABLE private_content.player_access_invites
   OR (scope_version=2 AND granted_sections=ARRAY['profile','trophies','matches']::text[])
  );
 -- Replace only creation. Acceptance/revocation/legacy session reads remain unchanged.
+-- Disabled after the migration: old cached clients must not create
+-- v2 links without first disclosing their complete scope.
 CREATE OR REPLACE FUNCTION private_content.player_access_invite_create(p_token text,p_player_dbv_id text)
+RETURNS TABLE(invitation_id uuid,expires_at timestamptz)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $fn$
+BEGIN
+ RAISE EXCEPTION 'Updated client with explicit sharing scope required' USING errcode='42501';
+END
+$fn$;
+CREATE OR REPLACE FUNCTION private_content.player_access_invite_create_v2(p_token text,p_player_dbv_id text,p_scope_confirmation text)
 RETURNS TABLE(invitation_id uuid,expires_at timestamptz)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $func$
 DECLARE actor uuid:=auth.uid();
 BEGIN
+ IF p_scope_confirmation IS DISTINCT FROM 'profile+trophies+matches:v2' THEN RAISE EXCEPTION 'explicit v2 scope required' USING errcode='22023'; END IF;
  IF actor IS NULL OR p_token IS NULL OR p_token !~ '^[a-f0-9]{64}$'
   OR p_player_dbv_id IS NULL OR p_player_dbv_id !~ '^[0-9]{2}-[0-9]{6}$'
  THEN RAISE EXCEPTION 'invalid invitation input' USING errcode='22023'; END IF;
@@ -188,113 +199,26 @@ BEGIN
  RETURNING id,private_content.player_access_invites.expires_at;
 END
 $func$;
-REVOKE ALL ON FUNCTION private_content.player_access_invite_create(text,text) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION private_content.player_access_invite_create_v2(text,text) FROM PUBLIC,anon;
 -- authenticated retains explicit EXECUTE as in existing v125.
 
--- A version-2 recipient must retain a valid independent issuer review for ALL
--- private data types, not just trophies. Existing version-1 grants keep their
--- original non-expanded read/accept semantics.
+GRANT EXECUTE ON FUNCTION private_content.player_access_invite_create_v2(text,text,text) TO authenticated;
+CREATE OR REPLACE FUNCTION public.private_player_invite_create_v2(p_token text,p_player_dbv_id text,p_scope_confirmation text)
+RETURNS TABLE(invitation_id uuid,expires_at timestamptz)
+LANGUAGE sql SECURITY INVOKER SET search_path=''
+AS $fn$ SELECT * FROM private_content.player_access_invite_create_v2(p_token,p_player_dbv_id,p_scope_confirmation) $fn$;
+REVOKE ALL ON FUNCTION public.private_player_invite_create_v2(text,text,text) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.private_player_invite_create_v2(text,text,text) TO authenticated;
+
+-- A version-2 recipient must retain a valid independently reviewed issuer
+-- for acceptance, profile and match reads; v1 stays unchanged.
 CREATE OR REPLACE FUNCTION private_content.player_access_invite_accept(p_token text)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $func$
 DECLARE visitor uuid:=auth.uid(); invite uuid;
 BEGIN
- IF visitor IS NULL THEN RAISE EXCEPTION 'technical anonymous session required'
-   USING errcode='42501'; END IF;
- IF p_token IS NULL OR p_token !~ '^[a-f0-9]{64}
-CREATE OR REPLACE FUNCTION public.private_player_scope_capabilities()
-RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
-AS $func$ SELECT jsonb_build_object('scope_version',2,
-  'sections',jsonb_build_array('profile','trophies','matches')) $func$;
-REVOKE ALL ON FUNCTION public.private_player_scope_capabilities() FROM PUBLIC,anon,authenticated;
-GRANT EXECUTE ON FUNCTION public.private_player_scope_capabilities() TO authenticated;
-
--- All records originate from the private v126 hard archive. Only individual
--- sourced Top-4 placements corroborated by the preserved verified chronology,
--- qualify. New results need the same curated verified evidence before being counted.
-CREATE OR REPLACE FUNCTION private_content.scoped_trophy_projection(p_dbv_id text)
-RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
-AS $func$
- WITH filtered AS (
-  SELECT DISTINCT ON ((e.payload->>'source_url'),(e.payload->>'event_date'),
-      (e.payload->>'discipline'),(e.payload->>'age_group'),(e.payload->>'placement'))
-   e.source_key,e.payload
-  FROM private_content.spvgg_archive_evidence e
-  WHERE e.dbv_id=p_dbv_id AND e.kind='placement'
-   AND (e.payload->>'placement') ~ '^[1-4]$'
-   AND (e.payload->>'source_url') ~ '^https://'
-   AND EXISTS (
-      SELECT 1 FROM private_content.source_snapshots s
-      CROSS JOIN LATERAL jsonb_array_elements(
-        CASE WHEN s.source_key='data/history.json'
-          AND jsonb_typeof(s.document->'results')='array'
-        THEN s.document->'results' ELSE '[]'::jsonb END) v(result)
-      WHERE s.source_key='data/history.json'
-       AND v.result->>'verified'='true'
-       AND v.result->>'playerId'=p_dbv_id
-       AND v.result->>'date'=e.payload->>'event_date'
-       AND v.result->>'discipline'=e.payload->>'discipline'
-       AND v.result->>'place'=e.payload->>'placement'
-       AND v.result->'source'->>'url'=e.payload->>'source_url'
-   )
-  ORDER BY (e.payload->>'source_url'),(e.payload->>'event_date'),
-           (e.payload->>'discipline'),(e.payload->>'age_group'),
-           (e.payload->>'placement'),e.source_key
- ), bounded AS (
- SELECT * FROM filtered ORDER BY (payload->>'event_date') DESC,source_key LIMIT 200
- )
- SELECT jsonb_build_object(
-  'player_dbv_id',p_dbv_id,'coverage','partial_not_exhaustively_verified',
-  'results',coalesce(jsonb_agg(jsonb_build_object(
-    'id',b.source_key,'playerId',p_dbv_id,'verified',true,
-    'date',b.payload->>'event_date','event',b.payload->>'tournament_name',
-    'place',(b.payload->>'placement')::integer,
-    'discipline',b.payload->>'discipline',
-    'ageGroup',b.payload->>'age_group',
-    'source',jsonb_build_object('url',b.payload->>'source_url')
-  ) ORDER BY (b.payload->>'event_date') DESC,b.source_key),'[]'::jsonb))
- FROM bounded b;
-$func$;
-REVOKE ALL ON FUNCTION private_content.scoped_trophy_projection(text) FROM PUBLIC,anon,authenticated;
-
--- Invited recipient: v2 scope, same technical session, one exact player,
--- current independent issuer proof, and immediate revocation checks.
-CREATE OR REPLACE FUNCTION public.private_player_trophies_read(p_invitation_id uuid)
-RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
-AS $func$
-DECLARE target_id text;
-BEGIN
- IF auth.uid() IS NULL OR p_invitation_id IS NULL THEN RETURN NULL; END IF;
- SELECT i.player_dbv_id INTO target_id
- FROM private_content.player_access_invites i
- WHERE i.id=p_invitation_id AND i.accepted_by=auth.uid()
-  AND i.accepted_at IS NOT NULL AND i.revoked_at IS NULL
-  AND i.scope_version=2 AND i.granted_sections@>ARRAY['trophies']::text[]
-  AND private_content.has_independent_player_grant(i.owner_user_id,i.player_dbv_id)
- LIMIT 1;
- IF target_id IS NULL THEN RETURN NULL; END IF;
- RETURN private_content.scoped_trophy_projection(target_id);
-END
-$func$;
-
--- Verified managing adult: requires independently reviewed player grant.
--- Merely following, knowing an ID, owning the site or checking a box is never enough.
-CREATE OR REPLACE FUNCTION public.private_owner_trophies_read(p_player_dbv_id text)
-RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
-AS $func$
-BEGIN
- IF auth.uid() IS NULL OR p_player_dbv_id IS NULL
-  OR p_player_dbv_id !~ '^[0-9]{2}-[0-9]{6}$'
-  OR NOT private_content.has_independent_player_grant(auth.uid(),p_player_dbv_id)
- THEN RETURN NULL; END IF;
- RETURN private_content.scoped_trophy_projection(p_player_dbv_id);
-END
-$func$;
-REVOKE ALL ON FUNCTION public.private_player_trophies_read(uuid) FROM PUBLIC,anon,authenticated;
-REVOKE ALL ON FUNCTION public.private_owner_trophies_read(text) FROM PUBLIC,anon,authenticated;
-GRANT EXECUTE ON FUNCTION public.private_player_trophies_read(uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.private_owner_trophies_read(text) TO authenticated;
-COMMIT;
+ IF visitor IS NULL THEN RAISE EXCEPTION 'technical anonymous session required' USING errcode='42501'; END IF;
+ IF p_token IS NULL OR p_token !~ '^[a-f0-9]{64}$'
  THEN RETURN NULL; END IF;
  UPDATE private_content.player_access_invites i SET accepted_by=visitor,accepted_at=now()
  WHERE i.token_digest=extensions.digest(pg_catalog.decode(p_token,'hex'),'sha256')
