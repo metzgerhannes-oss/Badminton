@@ -68,7 +68,7 @@ async function queryBirthYear(id,signal){
 async function fetchProfile(id,force=false){
  if(privateMode&&id===selected&&!force)return;
  if(id!==selected)privateMode=false;
- if(/^\d{2}-\d{6}$/.test(id||""))requestPrivateMatches(id,{force});
+ if(/^\d{2}-\d{6}$/.test(id||"")&&!window.badmintonAppAccess?.allowed)requestPrivateMatches(id,{force});
  if(!/^\d{2}-\d{6}$/.test(id||"")){
   controller?.abort();++seq;selected=id||"";official=[];external=[];
   progress=null;birthYear=null;status="missing-id";render();return;
@@ -281,7 +281,7 @@ function render(){
 }
 window.addEventListener("badminton:private-matches-updated",e=>{
  const id=String(e.detail?.playerId||"");
- if(id!==selected)return;
+ if(id!==selected||window.badmintonAppAccess?.allowed)return;
  const snap=matchArchiveSnapshot(id);
  if(snap.state==="ready"){
   controller?.abort();++seq;privateMode=true;
