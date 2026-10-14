@@ -69,3 +69,19 @@ export function deletePlayerCopy(player,storage=globalThis.localStorage){
  if(!DBV.test(player)||!Object.hasOwn(old,player))return false;
  delete old[player];try{storage.setItem(KEY,JSON.stringify(old));return true}catch{return false}
 }
+
+/** User-requested portable export of the already-consented, local data copy.
+ * Never include auth, device sessions or unknown extra storage fields. */
+export function serializePlayerDataExport(player,storage=globalThis.localStorage){
+ const saved=loadPlayerCopy(player,storage);
+ if(!saved)return null;
+ const matches=Array.isArray(saved.matches)?saved.matches
+  .map(row=>cleanMatch(row,player)).filter(Boolean):null;
+ const trophies=Array.isArray(saved.trophies)?saved.trophies
+  .map(row=>cleanTrophy(row,player)).filter(Boolean):null;
+ return JSON.stringify({
+  format:"schmetterlinge-player-data-export",
+  version:1,playerId:player,fetchedAt:saved.fetchedAt,
+  coverage:"quellenabhaengiges_teilarchiv",matches,trophies
+ },null,2);
+}
