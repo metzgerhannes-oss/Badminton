@@ -3,7 +3,7 @@ import {computeExternalStats,sourceMatchYears,importCompleteness} from "./script
 import {MATCH_RULES} from "./scripts/badminton-score-rules.mjs";
 import {getDbvMatchReference,getBadhubMatchReference,getReportedPlayedWithoutScores,dbvReferenceMessage} from "./scripts/dbv-match-reference.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
+import {matchArchiveSnapshot,requestPrivateMatches,hasPrivatePlayerContext} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n||0).toLocaleString("de-DE");
@@ -131,6 +131,14 @@ async function load(id){
  abortController=new AbortController();
  const signal=abortController.signal;
  render();
+ if(hasPrivatePlayerContext(id)){
+  // Only the server-scoped RPC can supply matches for these profiles.
+  const snap=matchArchiveSnapshot(id);
+  if(snap.state==="ready"){
+   privateMode=true;rows=snap.rows;progress={status:"partial",verified_count:rows.length};
+  }
+  loaded=true;render();return;
+ }
  try{
   const [status]=await readJSON("player_external_match_imports?select=dbv_id,status,cursor_offset,verified_count,rejected_count,source_count,detail,last_finished_at&dbv_id=eq."+id+"&limit=1",signal);
   const collected=[];
