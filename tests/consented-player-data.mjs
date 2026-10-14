@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {KEY,cleanMatch,cleanTrophy,savePlayerCopy,loadPlayerCopy,deletePlayerCopy} from "../scripts/consented-player-data.mjs";
+import {KEY,cleanMatch,cleanTrophy,savePlayerCopy,loadPlayerCopy,deletePlayerCopy,serializePlayerDataExport} from "../scripts/consented-player-data.mjs";
 import {computeExternalStats,sourceMatchYears} from "../scripts/external-match-stats.mjs";
 const player="99-111111",other="99-222222",store=new Map();
 const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
@@ -17,6 +17,16 @@ assert.equal(saved.matches.length,115,"Do not revive 30-match restriction");
 assert.equal(saved.trophies.length,1);
 assert.equal(loadPlayerCopy(player,storage).trophies[0].place,2);
 assert.equal(loadPlayerCopy(other,storage),null);
+const portable=serializePlayerDataExport(player,storage);
+const payload=JSON.parse(portable);
+assert.equal(payload.format,"schmetterlinge-player-data-export");
+assert.equal(payload.playerId,player);
+assert.equal(payload.matches.length,115,"Export must keep all cached matches, not just 30");
+assert.equal(payload.trophies.length,1);
+assert.ok(!portable.includes("should-not-copy"),"Portable data must drop unknown/private fields");
+assert.ok(!portable.includes("invitation"),"No invitation credentials in export");
+assert.equal(serializePlayerDataExport(other,storage),null,"No export without matching local data");
+
 assert.ok(!storage.getItem(KEY).includes("should-not-copy"),"Only sanctioned fields in local snapshot");
 assert.ok(!storage.getItem(KEY).includes("invitation"),"No private access tokens/IDs in copy");
 
@@ -56,6 +66,9 @@ const [ui,index,worker,matches,trophies,welcome,app]=await Promise.all([
 assert.match(ui,/requestPrivateMatches\(player,\{force:true\}\)/);
 assert.match(ui,/requestPrivateTrophies\(player,\{force:true\}\)/);
 assert.match(ui,/Daten jetzt übernehmen/);
+assert.match(ui,/id="player-copy-download"/);
+assert.match(ui,/serializePlayerDataExport\(target\)/);
+assert.match(ui,/application\/json/);
 assert.match(ui,/badminton:profile-selected/);
 assert.doesNotMatch(ui,/addEventListener\("badminton:profile-change"/);
 assert.match(app,/badminton:profile-selected/);
