@@ -6,9 +6,10 @@ const [rooms,css,reader,share]=await Promise.all([
 assert.match(rooms,/title:"Einladungen & Freigaben"/);
 for(const label of ["Spieler suchen","Von mir erteilte Freigaben","Von mir angenommene Freigaben"])
  assert.ok(rooms.includes(label),"Missing grant section: "+label);
-assert.match(rooms,/appendTo\("daten","\.invitation-card"\)/,
- "Public installation must not be presented as a player grant");
-assert.match(rooms,/const setupDetails=document.createElement\("details"\)/);
+assert.match(rooms,/appendTo\("einladungen","\.invitation-card"\)/,
+ "App-issued invitations and revocation belong in the grant management room");
+assert.doesNotMatch(rooms,/App-Installationslink \(ohne Spielerrechte\)/,
+ "An invitation granting sourced results must not be mislabeled as a bare installation link");
 assert.match(rooms,/searchLink.href="#spieler"/);
 assert.match(rooms,/ownerLink.href="#einstellungen\/profile"/);
 assert.match(rooms,/schmetterlinge\.privatePlayerInvites\.v1/);
@@ -24,4 +25,4 @@ assert.doesNotMatch(rooms,/invitation\.token|token_digest/,
 assert.match(reader,/private_player_access_read/);
 assert.match(share,/private_player_invite_revoke/);
 assert.match(css,/\.settings-grant-list/);
-console.log("Grant settings are device-local and make no authorization claims.");
+console.log("Grant settings separate device-local player links and owner-only server-issued app invitations.");
