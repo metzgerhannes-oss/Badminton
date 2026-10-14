@@ -19,6 +19,11 @@ function ownsLocalProfile(player){
  const local=read("shuttleboard-v1",{});
  return Array.isArray(local?.players)&&local.players.some(p=>p?.id===player);
 }
+/** Browser-only routing hint. Never used for server authorization. */
+export function hasPrivatePlayerContext(player){
+ return DBV.test(String(player||""))&&
+  (ownsLocalProfile(player)||acceptedIdsFor(player).length>0);
+}
 function announce(player){
  window.dispatchEvent(new CustomEvent("badminton:private-matches-updated",{detail:{playerId:player}}));
 }
