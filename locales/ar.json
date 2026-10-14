@@ -206,6 +206,15 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "البحث العام في DBV بالاسم متوقف حاليًا لحماية الخصوصية. تُضاف الدعوات المقبولة تلقائيًا. يمكنك إضافة ملفاتك الشخصية الأخرى أدناه بالاسم ومعرّف DBV.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "البحث في DBV بالاسم غير متاح حاليًا. استخدم الإعداد اليدوي بالاسم ومعرّف DBV.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "لم يُعثر على لاعب مطابق على هذا الجهاز. يمكنك إضافة ملفات أخرى يدويًا بمعرّف DBV.",
-    " · Auf diesem Gerät gespeichert": " · محفوظ على هذا الجهاز"
+    " · Auf diesem Gerät gespeichert": " · محفوظ على هذا الجهاز",
+    "2. Schritt Daten abrufen": "الخطوة ٢: استرداد البيانات",
+    "3. Schritt App hinzufügen": "الخطوة ٣: إضافة التطبيق",
+    "Deine Daten abrufen": "استرداد بياناتك",
+    "Profil ausgewählt.": "تم اختيار الملف الشخصي.",
+    "Jetzt kannst du vorhandene Spielergebnisse übernehmen: Spielerprofil, belegte Pokale und verfügbare Matchstatistiken.": "يمكنك الآن استرداد النتائج المتاحة: ملف اللاعب والجوائز المؤكدة وإحصاءات المباريات المتوفرة.",
+    "Die Daten werden nur nach deiner ausdrücklichen Anforderung und mit einer gültigen Spielerberechtigung abgerufen. Ohne Einladung bleiben die bisher gespeicherten Daten unverändert.": "لا تُسترد البيانات إلا بناءً على طلب صريح منك وبوجود إذن صالح لهذا اللاعب. من دون دعوة، تبقى البيانات المحفوظة سابقًا دون تغيير.",
+    "Du kannst den Abruf später jederzeit unter Einstellungen → Meine Daten starten.": "يمكنك استرداد البيانات لاحقًا في أي وقت من الإعدادات ← بياناتي.",
+    "Jetzt Daten abrufen →": "استرداد البيانات الآن ←",
+    "Später · weiter zur Installation": "لاحقًا · المتابعة إلى التثبيت"
   }
 }
