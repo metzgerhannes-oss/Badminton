@@ -26,7 +26,8 @@ test("Profile choice offers optional local data import once; settings can reopen
  // A normal profile switch or library selection never blocks the current task.
  await page.evaluate(id=>window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}})),player);
  await expect(dialog).toBeHidden();
- await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ await page.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#settings-room-daten")).toBeVisible();
  await page.getByRole("button",{name:"Daten für ausgewählten Spieler übernehmen"}).click();
  await expect(dialog).toBeVisible();
  await expect(page.locator("#player-copy-summary")).toContainText("Noch keine lokale Datenkopie");
