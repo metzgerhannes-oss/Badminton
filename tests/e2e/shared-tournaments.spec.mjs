@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./authorized-test.mjs";
 
 const PLAYER="05-070879",FRIEND="05-071969";
 const TOURNAMENT="E24DC6EE-152A-454D-B00C-E625B751D7D5";
