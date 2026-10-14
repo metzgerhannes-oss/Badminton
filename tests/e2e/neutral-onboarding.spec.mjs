@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./authorized-test.mjs";
 
 test("Installed app searches DBV and returns with verified player ID",async ({page})=>{
  await page.route("**/*",route=>{
