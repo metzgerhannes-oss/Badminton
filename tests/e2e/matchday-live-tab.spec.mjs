@@ -240,7 +240,7 @@ test("Stale player snapshots must not present old sets as live scores",async ({p
  }));
  await page.goto("/#live",{waitUntil:"domcontentloaded"});
  await page.locator('[data-matchday-view="all"]').click();
- await expect(page.locator(".followed-live-card").first()).not.toContainText("15:2");
+ await expect(page.locator(".followed-live-card").first().locator(".followed-live-score")).toHaveCount(0);
  await expect(page.locator(".followed-live-card").first()).not.toContainText("Spielt gerade");
 });
 

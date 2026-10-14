@@ -32,8 +32,8 @@ const local=await searchInvitationPlayers("Philipp",{savedCandidates:added.frien
 assert.equal(local.source,"device");
 assert.equal(local.players[0].id,person.dbv_id);
 const forbidden=await searchInvitationPlayers("Anderer Spieler",{fetchImpl:async(url)=>{
- if(String(url).includes("/rest/v1/players"))return {ok:false,status:403};
- throw Error("Blocked direct table read must not trigger GitHub name list fallback");
+ if(String(url).includes("/rpc/search_dbv_player_identity"))return {ok:false,status:403};
+ throw Error("Identity lookup must never read the restricted players table");
 }});
 assert.equal(forbidden.source,"restricted");
 assert.deepEqual(forbidden.players,[]);

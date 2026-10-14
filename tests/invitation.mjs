@@ -146,23 +146,23 @@ assert.equal(invitationCandidates([
 ]).length,1,"Search must deduplicate and reject unverified IDs");
 const responses=(value)=>({ok:true,json:async()=>value,headers:{get:()=>null}});
 const live=await searchInvitationPlayers("Sarah Storz",{
- fetchImpl:async (url,{method})=>{
-  assert.equal(method,"GET");
+ fetchImpl:async (url,{method,body})=>{
+  assert.equal(method,"POST");
   const parsed=new URL(url);
-  assert.equal(parsed.pathname,"/rest/v1/players");
-  assert.match(parsed.searchParams.get("or"),/Sarah Storz/);
-  return responses([{dbv_id:"05-061350",name:"Sarah Storz",birth_year:2010,club:"SpVgg Mössingen"}]);
+  assert.equal(parsed.pathname,"/rest/v1/rpc/search_dbv_player_identity");
+  assert.equal(JSON.parse(body).p_query,"Sarah Storz");
+  return responses([{dbv_id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",age_class:"U17"}]);
  }
 });
 assert.equal(live.source,"dbv");
 assert.equal(live.players[0].id,"05-061350");
-assert.equal(live.players[0].birthYear,2010);
+assert.equal(live.players[0].birthYear,undefined,"Public identity lookup must not return birth years");
 const empty=await searchInvitationPlayers("S");
 assert.deepEqual(empty,{players:[],source:"none"});
 const backedUp=await searchInvitationPlayers("Storz",{
  fetchImpl:async (url)=>{
   const path=String(url);
-  if(path.includes("/rest/v1/players"))throw Error("offline");
+  if(path.includes("/rpc/search_dbv_player_identity"))throw Error("offline");
   if(path.endsWith("/index.json"))return responses({schemaVersion:1,ageGroups:[{age:"U17"}]});
   if(path.endsWith("/U17.json"))return responses({players:[{id:"05-061350",name:"Sarah Storz",birthYear:2010,club:"SpVgg Mössingen"}]});
   throw Error("Unexpected request: "+path);
