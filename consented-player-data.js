@@ -87,7 +87,7 @@ async function importNow(){
   const matchOk=matches.state==="ready"&&matches.coverage!=="device_snapshot";
   const trophyOk=trophies.state==="ready"&&trophies.coverage!=="device_snapshot";
   if(!matchOk&&!trophyOk){
-   status.textContent="Keine gültige Datenfreigabe für dieses Profil auf diesem Gerät. Bitte zuerst den Spieler-Berechtigungslink annehmen. Bisherige Kopien bleiben erhalten.";
+   status.textContent="Für dieses Profil ist derzeit kein gültiger Datenabruf möglich. Bitte App-Zugang oder Spielerfreigabe prüfen. Bisherige Kopien bleiben erhalten.";
    return;
   }
   const old=loadPlayerCopy(player);
