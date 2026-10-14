@@ -14,13 +14,16 @@ test("Profile choice offers optional local data import once; settings can reopen
   window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}}));
   return localStorage.getItem("schmetterlinge.consentedPlayerData.v1");
  },player);
- expect(sent).toBeNull("Simply offering import must not copy private data");
+ expect(sent,"Simply offering import must not copy private data").toBeNull();
  const dialog=page.locator("#player-copy-dialog");
  await expect(dialog).toBeVisible();
  await expect(dialog).toContainText("Deine Daten übernehmen");
  await expect(page.locator("#player-copy-now")).toBeVisible();
  await page.locator("#player-copy-later").click();
  await expect(dialog).toBeHidden();
+ await page.evaluate(id=>window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id,source:"onboarding"}})),player);
+ await expect(dialog).toBeHidden();
+ // A normal profile switch or library selection never blocks the current task.
  await page.evaluate(id=>window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id}})),player);
  await expect(dialog).toBeHidden();
  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
