@@ -267,6 +267,8 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("progress-install").hidden=standalone;
  if(standalone)$("progress-profile").textContent=t("Profil anlegen");
  updateMode("manual");
+ // Signals that the modular onboarding script has attached the search handlers.
+ document.documentElement.dataset.welcomeReady="true";
  if(shouldOfferInstallationFirst({
   standalone,hasProfiles,installationRequested:location.hash==="#installation"
  })){
