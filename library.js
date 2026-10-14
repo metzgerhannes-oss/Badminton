@@ -1,9 +1,9 @@
 /** Shared DBV player directory, generated weekly from the official published Excel. */
-import {selectPlayers,clubGroups,normalizeText,sortClubs} from "./scripts/library-utils.mjs";
+import {selectPlayers,clubGroups,normalizeText,sortClubs,localLibraryPlayers} from "./scripts/library-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 
 const ROOT="./data/player-library/";
-let dbMode=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
+let dbMode=false,localMode=false,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
 const safePattern=x=>String(x||"").trim().replace(/[*,().%:"\\]/g," ").slice(0,85);
 async function dbGet(path){
  return readPublicRows(path);
@@ -95,7 +95,7 @@ function showIdle(){
  if(more)more.hidden=true;
  if(reset)reset.hidden=true;
  if($("library-message"))$("library-message").textContent="";
- if($("library-source"))$("library-source").textContent="Öffentliches DBV-Verzeichnis · Ergebnisse erst nach Suche oder Filterauswahl";
+ if($("library-source"))$("library-source").textContent="Spielersuche · lokale Profile verfügbar; das zentrale DBV-Verzeichnis ist derzeit geschützt";
 }
 function filtered(){
  return dbMode?entries:selectPlayers(entries,{
@@ -130,10 +130,10 @@ function render(){
  const own=new Set(localSelection().own),following=new Set(localSelection().following);
  const people=filtered(),count=$("library-count"),area=$("library-results");
  const shown=dbMode?people:people.slice(0,visible);
- if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+" passende Spieler · nach Verein gruppiert";
+ if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
-  error("Keine passenden bestätigten DBV-Spieler gefunden. Andere Filter wählen oder bei einem neuen Profil die DBV-ID ergänzen.");
+  error(localMode?"Auf diesem Gerät kein passendes gespeichertes Profil gefunden. Die allgemeine DBV-Spielersuche ist derzeit nicht verfügbar.":"Keine passenden bestätigten DBV-Spieler gefunden. Andere Filter wählen oder bei einem neuen Profil die DBV-ID ergänzen.");
   $("library-more").hidden=true;return;
  }
  area.innerHTML=clubGroups(shown).map(group=>
@@ -175,6 +175,20 @@ async function fetchAge(age){
  memory.set(age,records);
  return records;
 }
+function loadLocalDirectory(){
+ // Device-local data, previously explicitly selected by the user. Never imply a
+ // central roster search was successful, and never infer ownership from a DBV ID.
+ let storage={};
+ try{storage=JSON.parse(localStorage.getItem("shuttleboard-v1")||"{}")}catch{}
+ const candidates=localLibraryPlayers(storage);
+ const age=ageChoice();
+ entries=age==="all"?candidates:candidates.filter(p=>p.ageClass===age);
+ dbMode=false;localMode=true;dbTotal=entries.length;visible=40;loaded=true;
+ const source=$("library-source");
+ if(source)source.textContent="Nur gespeicherte Profile auf diesem Gerät · "+candidates.length+" vorhanden · die zentrale DBV-Spielersuche ist eingeschränkt";
+ updateClubSuggestions();updateAssociations();
+ render();
+}
 async function loadBackup(){
  if(!hasCriteria()){showIdle();return;}
  const ticket=++pending;
@@ -185,7 +199,10 @@ async function loadBackup(){
   if(!summary){
    summary=await fetchJson(ROOT+"index.json");
    if(summary.schemaVersion!==1||!Array.isArray(summary.ageGroups)||!summary.ageGroups.length)throw Error("Ungültiger Verzeichnisindex");
-   $("library-source").textContent="Offizielle DBV-Rangliste · KW "+summary.week+"/"+summary.year+" · "+summary.total.toLocaleString("de-DE")+" bestätigte Spieler";
+   if(summary.privacyMode==="private"){loadLocalDirectory();return;}
+   const available=Number.isInteger(summary.total)?summary.total:0;
+   const period=Number.isInteger(summary.week)&&Number.isInteger(summary.year)?"KW "+summary.week+"/"+summary.year:"Stand nicht angegeben";
+   $("library-source").textContent="Offizielle DBV-Rangliste · "+period+" · "+available.toLocaleString("de-DE")+" bestätigte Spieler";
   }
   const chosen=ageChoice();
   const ages=chosen==="all"?ageNames:[chosen];
@@ -200,8 +217,7 @@ async function loadBackup(){
   render();
  }catch(e){
   if(ticket!==pending)return;
-  error("Die Spielerbibliothek konnte derzeit nicht geladen werden. Internetverbindung prüfen und erneut versuchen.");
-  console.warn("DBV directory unavailable:",e?.message);
+  loadLocalDirectory();
  }
 }
 async function load(){
@@ -212,15 +228,17 @@ async function load(){
  try{
   const {people,total}=await dbPage(0);
   if(ticket!==pending)return;
-  entries=people;dbTotal=total;dbMode=true;loaded=true;
+  entries=people;dbTotal=total;dbMode=true;localMode=false;loaded=true;
   $("library-source").textContent="Supabase · offizieller DBV-Ranglistenbestand";
   if(!associationsLoaded)dbAssociations().catch(e=>console.warn("Vereinsfilter:",e?.message));
   render();
  }catch(e){
   if(ticket!==pending)return;
-  console.warn("Supabase nicht erreichbar – GitHub-Ausfallsicherung:",e?.message);
-  dbMode=false;await loadBackup();
-  if(loaded)$("library-source").textContent="GitHub-Ausfallsicherung · "+$("library-source").textContent;
+  // Privacy cutover revoked SELECT on personal rows. Never claim that the
+  // deliberately blank static privacy stub is a functional roster backup.
+  dbMode=false;
+  if(e?.status===401||e?.status===403){loadLocalDirectory();return;}
+  await loadBackup();
  }
 }
 async function nextPage(){
@@ -260,6 +278,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
  window.addEventListener("hashchange",()=>{if(location.hash==="#spieler"&&hasCriteria()&&!loaded)load();});
- window.addEventListener("badminton:library-following",()=>render());
+ window.addEventListener("badminton:library-following",()=>{if(localMode&&hasCriteria())loadLocalDirectory();else render()});
  // Initial page load deliberately does not fetch the full roster.
 });
