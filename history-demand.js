@@ -73,13 +73,16 @@ async function refresh(id,{enqueue=true}={}){
 }
 const sourceCheckAt=new Map();
 async function requestIndividualMatches(id){
- if(!allowed(id))return;
+ if(!allowed(id)||!window.badmintonAppAccess?.allowed)return;
  // One request per selected player per 15 minutes in this browser session.
  if(Date.now()-(sourceCheckAt.get(id)||0)<15*60000)return;
- sourceCheckAt.set(id,Date.now());
  try{
+  const jwt=await window.badmintonAppAccess.getAccessToken();
+  if(!jwt)return;
+  sourceCheckAt.set(id,Date.now());
   const response=await fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
-   method:"POST",headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json"},
+   method:"POST",headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+jwt,
+    "Content-Type":"application/json"},
    body:JSON.stringify({dbv_id:id})
   });
   if(response.ok){
