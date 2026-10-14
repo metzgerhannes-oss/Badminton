@@ -98,7 +98,7 @@ test("BW U13 C empty result explains source coverage and provides available D/E 
  await page.locator("#dbv-calendar-level").selectOption("C");
  await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
  await expect(page.locator(".dbv-calendar-no-results")).toContainText("Keine passenden Turniere");
- await expect(page.locator(".dbv-calendar-no-results")).toContainText("nicht automatisch alle Turniere");
+ await expect(page.locator(".dbv-calendar-no-results")).toContainText("Quellenlücke möglich");
  await expect(page.locator('[data-calendar-alternative-level="D"]')).toHaveText("Level D (4)");
  await expect(page.locator('[data-calendar-alternative-level="E"]')).toHaveText("Level E (6)");
  await page.locator('[data-calendar-alternative-level="D"]').click();
