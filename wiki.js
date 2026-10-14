@@ -162,7 +162,31 @@ function art(kind){
   +'<text x="297" y="125" text-anchor="middle" font-family="system-ui" font-size="29" font-weight="850" fill="white">TAILLE</text>'
   +'<text x="297" y="175" text-anchor="middle" font-family="system-ui" font-size="13" fill="white">SCHLÄGER ABWÄRTS</text>'
   +'<text x="200" y="243" text-anchor="middle" font-family="system-ui" font-size="11" fill="#15516f">DBV OHNE MESSGERÄT: TAILLE</text>'+SVG_END;
- if(kind==="choice")return badgeArt("1","2","AUFSCHLAG ODER FELDSEITE");
+ if(kind==="choice")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff4ff"/>'
+ +'<rect x="17" y="54" width="174" height="141" rx="15" fill="#187fa9"/><rect x="209" y="54" width="174" height="141" rx="15" fill="#17947b"/>'
+ +'<text x="104" y="118" text-anchor="middle" font-size="24" font-weight="800" fill="white" font-family="system-ui">AUFSCHLAG</text>'
+ +'<text x="104" y="156" text-anchor="middle" font-size="20" font-weight="800" fill="white" font-family="system-ui">↔ RÜCKSCHLAG</text>'
+ +'<text x="296" y="119" text-anchor="middle" font-size="26" font-weight="800" fill="white" font-family="system-ui">FELDSEITE</text>'
+ +'<text x="296" y="154" text-anchor="middle" font-size="33" fill="white" font-family="system-ui">↔</text>'
+ +'<text x="200" y="232" text-anchor="middle" font-size="13" font-weight="750" fill="#15516f" font-family="system-ui">DIE GEWINNERSEITE WÄHLT</text>'+SVG_END;
+ if(kind==="racket")return SVG_START+'<rect width="400" height="264" rx="20" fill="#def3ff"/>'
+ +'<ellipse cx="142" cy="104" rx="48" ry="74" fill="none" stroke="#176c95" stroke-width="8"/>'
+ +Array.from({length:5},(_,i)=>'<path d="M'+(108+i*17)+' 53V155" stroke="#64b1c9" stroke-width="1.5"/>').join('')
+ +Array.from({length:7},(_,i)=>'<path d="M103 '+(57+i*15)+'H181" stroke="#64b1c9" stroke-width="1.5"/>').join('')
+ +'<path d="M142 179V217" stroke="#176c95" stroke-width="9"/>'
+ +'<rect x="129" y="216" width="26" height="27" rx="4" fill="#20536d"/>'
+ +'<path d="M214 34V240m-8-195 8-14 8 14m-16 180 8 14 8-14" stroke="#1b739d" stroke-width="3" fill="none"/>'
+ +'<text x="228" y="133" font-size="19" font-weight="800" fill="#15516f" font-family="system-ui">68 cm</text>'
+ +'<path d="M93 14H190m-83-7-15 7 15 7m69-14 15 7-15 7" stroke="#1b739d" stroke-width="3" fill="none"/>'
+ +'<text x="240" y="230" text-anchor="middle" font-size="16" font-weight="800" fill="#15516f" font-family="system-ui">MAX. 23 cm BREIT</text>'+SVG_END;
+ if(kind==="shuttle")return SVG_START+'<rect width="400" height="264" rx="20" fill="#def4ff"/>'
+ +'<path d="M137 183L84 42 M155 183L118 38 M175 183L153 34 M194 183L186 39 M214 183L225 43 M235 183L258 52" stroke="#f5f8fa" stroke-width="17" stroke-linecap="round"/>'
+ +'<path d="M133 183Q188 197 242 183L224 221H149Z" fill="#edf5f5" stroke="#155471" stroke-width="4"/>'
+ +'<ellipse cx="188" cy="226" rx="40" ry="16" fill="#e5c596" stroke="#155471" stroke-width="3"/>'
+ +'<rect x="275" y="70" width="98" height="72" rx="11" fill="#197fa9"/>'
+ +'<text x="324" y="115" text-anchor="middle" font-size="36" font-weight="850" fill="white" font-family="system-ui">16</text>'
+ +'<text x="320" y="162" text-anchor="middle" font-size="13" font-weight="800" fill="#15516f" font-family="system-ui">FEDERN</text>'
+ +'<text x="199" y="254" text-anchor="middle" font-size="14" font-weight="800" fill="#15516f" font-family="system-ui">4,74–5,50 g</text>'+SVG_END;
  if(kind==="spin")return SVG_START+'<rect width="400" height="264" rx="20" fill="#dff4ff"/>'
   +'<path d="M119 118q-24-39 20-48t34 37" fill="none" stroke="#1683ad" stroke-width="9" stroke-linecap="round"/>'
   +'<path d="m167 89 6 18-18-4" fill="none" stroke="#1683ad" stroke-width="6"/>'
