@@ -215,17 +215,17 @@ function render(){
    '<a href="'+esc(badhub.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Aktuellen Badhub-Stand öffnen ↗</a>';
  }
  retry.hidden=!availability.retry;
- source.textContent=privateMode?"Matchkarten · nachgewiesener Teilbestand":!sourced&&!official.length&&availability.retry
-  ?"Datenabgleich unvollständig":sourced?"Badhub · Teilbestand":"Offizielle Einzelmatches";
+ source.textContent=privateMode?"Bisher belegte Spiele":!sourced&&!official.length&&availability.retry
+  ?"Datenabgleich unvollständig":sourced?"Bisher belegte Spiele":"Offizielle Einzelmatches";
  values.innerHTML=[
-  [(sourced?"Quellkarten":"Gesamtspiele"),missing?"–":context.total,"matches"],
+  ["Spiele",missing?"–":context.total,"matches"],
   ["Siege",missing?"–":context.wins,"wins"],
   ["Niederlagen",missing?"–":context.losses,"losses"],
   ["Siegquote",missing?"–":context.rate+" %","rate"]
  ].map(([name,value,key])=>'<div class="match-stat '+key+'"><span>'+esc(name)+'</span><strong>'+esc(value)+'</strong></div>').join("");
  if(sourced){
   note.textContent=context.total
-   ? "Auswertbare Badhub-Quellkarten · Teilbestand, keine vollständige Karrierebilanz."
+   ? "Bisher belegte Spiele. Weitere Ergebnisse können fehlen."
    : availability.retry?availability.emptyNote:"Für diese Auswahl liegen noch keine belegten Spiele vor.";
   sourceDetails.textContent="Die Werte stammen aus einzelnen Badhub-Matchkarten, nicht aus einer vollständigen offiziellen DBV-Karriere. "+
    importCompleteness(progress,external.length)+
