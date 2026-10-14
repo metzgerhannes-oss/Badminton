@@ -99,14 +99,40 @@ const count=document.getElementById("wiki-count");
 const heading=document.getElementById("results-title");
 const dialog=document.getElementById("wiki-detail");
 let topic="alle";
+// Once-built client-side index: no searches, names, or history leave the device.
+const INDEX=CARDS.map(c=>{
+ const flat=normalize([c.title,c.answer,c.terms,c.scope].join(" "));
+ return {c,flat,title:normalize(c.title),tokens:[...new Set(flat.match(/[a-z0-9]+/g)||[])]};
+});
+function editDistanceWithin(a,b,max){
+ if(Math.abs(a.length-b.length)>max)return false;
+ let prev=Array.from({length:b.length+1},(_,i)=>i);
+ for(let i=1;i<=a.length;i++){
+  const next=[i];
+  for(let j=1;j<=b.length;j++)next[j]=Math.min(next[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+  if(Math.min(...next)>max)return false;
+  prev=next;
+ }
+ return prev[b.length]<=max;
+}
 function findItems(){
  const words=normalize(search.value).trim().split(/\s+/).filter(Boolean);
- let items=CARDS.filter(c=>topic==="alle"||c.topic===topic);
- if(words.length)items=items.map(c=>{
-  const title=normalize(c.title),content=normalize([c.title,c.answer,c.terms,c.scope].join(" "));
-  return {c,weight:words.reduce((score,w)=>score+(title.includes(w)?4:0)+(content.includes(w)?1:0),0),all:words.every(w=>content.includes(w))}
- }).filter(o=>o.all).sort((a,b)=>b.weight-a.weight).map(o=>o.c);
- else if(topic==="alle"){const pinned=[0,4,5,9,20,22,34,36,39,40,42,46];items=pinned.map(i=>CARDS[i]).filter(Boolean);}
+ let items=INDEX.filter(x=>topic==="alle"||x.c.topic===topic);
+ if(words.length){
+  items=items.map(x=>{
+   let score=0;let matched=true;
+   for(const w of words){
+    const titleHit=x.title.includes(w), exact=x.flat.includes(w);
+    const fuzzy=!exact&&w.length>=4&&x.tokens.some(t=>t[0]===w[0]&&editDistanceWithin(w,t,w.length>=8?2:1));
+    if(!(exact||fuzzy)){matched=false;break;}
+    score+=titleHit?8:exact?4:1;
+   }
+   return {c:x.c,score,matched};
+  }).filter(x=>x.matched).sort((a,b)=>b.score-a.score).map(x=>x.c);
+ }else if(topic==="alle"){
+  const pinned=[0,4,5,9,20,22,34,36,39,40,42,46];
+  items=pinned.map(i=>CARDS[i]).filter(Boolean);
+ }else items=items.map(x=>x.c);
  return items;
 }
 function openCard(c){
