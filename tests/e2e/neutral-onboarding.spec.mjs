@@ -91,6 +91,8 @@ test("Invitation link finds a verified player by name and saves only after confi
  const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
  expect(before).toBeNull();
  await page.locator("#welcome-selection-save").click();
+ await expect(page.locator("#onboard-data")).toBeVisible();
+ await page.locator("#welcome-data-skip").click();
  await expect(page.locator("#onboard-install")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(1);
@@ -112,6 +114,8 @@ test("Invitation still offers manual creation when no public DBV result exists",
  await page.locator("#welcome-name").fill("Neues Kind");
  await page.locator('#welcome-form input[name="birthYear"]').fill("2016");
  await page.locator('#welcome-form button[type="submit"]').click();
+ await expect(page.locator("#onboard-data")).toBeVisible();
+ await page.locator("#welcome-data-skip").click();
  await expect(page.locator("#onboard-install")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(1);
