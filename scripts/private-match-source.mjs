@@ -1,6 +1,6 @@
 /** Private, in-memory Badhub match cards for independently verified own
  * players or explicitly accepted v2 player links. No local follow grants access. */
-import {SUPABASE_ROOT,PUBLIC_KEY} from "./supabase-read.mjs";
+import {SUPABASE_ROOT,PUBLIC_KEY,readPublicRows} from "./supabase-read.mjs";
 import {getPrivateSession} from "../private-invites.js";
 import {loadPlayerCopy} from "./consented-player-data.mjs";
 const DBV=/^[0-9]{2}-[0-9]{6}$/;
@@ -60,6 +60,21 @@ function safeRows(rows,player){
   [1,2].includes(row.player_side)&&[1,2].includes(row.winning_side)&&
   Array.isArray(row.games)&&Array.isArray(row.opponent_names));
 }
+async function readMemberMatches(player){
+ const output=[];
+ const size=400;
+ for(let offset=0;offset<MAX_ROWS;offset+=size){
+  const query=new URLSearchParams({
+   select:"dbv_id,source_key,category,competition,discipline,event,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,outcome_evidence,source_name,source_kind,source_url",
+   dbv_id:"eq."+player,order:"match_year.desc,match_date.desc.nullslast,source_key.asc",
+   limit:String(size),offset:String(offset)
+  });
+  const {rows}=await readPublicRows("player_external_match_facts?"+query,{count:false});
+  output.push(...rows);
+  if(rows.length<size)return safeRows(output,player);
+ }
+ throw Error("archive limit reached");
+}
 async function readAll(session,endpoint,base,player){
  let first=await rpc(session,endpoint,{...base,p_kind:"match_card",p_offset:0,p_limit:PAGE_SIZE});
  if(!first)return null;
@@ -77,7 +92,8 @@ async function readAll(session,endpoint,base,player){
 export function requestPrivateMatches(player,{force=false}={}){
  if(!DBV.test(String(player||"")))return Promise.resolve();
  active=player;
- if(!ownsLocalProfile(player)&&acceptedIdsFor(player).length===0){
+ const member=window.badmintonAppAccess?.allowed===true;
+ if(!member&&!ownsLocalProfile(player)&&acceptedIdsFor(player).length===0){
   states.set(player,{state:"protected",rows:[],checkedAt:Date.now()});
   announce(player);return Promise.resolve();
  }
@@ -93,8 +109,8 @@ export function requestPrivateMatches(player,{force=false}={}){
    if(ticket!==revision)return;
    if(!session){states.set(player,{state:"protected",rows:[],checkedAt:Date.now()});return}
    // Server checks the independent grant for this exact player on every page.
-   let rows=ownsLocalProfile(player)?
-    await readAll(session,"private_player_owner_archive_read",{p_player_dbv_id:player},player):null;
+   let rows=member?await readMemberMatches(player):null;
+   if(!rows&&ownsLocalProfile(player))rows=await readAll(session,"private_player_owner_archive_read",{p_player_dbv_id:player},player);
    if(!rows){
     for(const id of acceptedIdsFor(player)){
      rows=await readAll(session,"private_player_archive_read",
