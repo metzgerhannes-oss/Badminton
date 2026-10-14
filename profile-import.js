@@ -4,7 +4,7 @@
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {getPrivateSession} from "./private-invites.js";
 import {requestPrivateTrophies,trophySnapshot} from "./scripts/private-trophy-source.mjs";
-import {PENDING_KEY,acceptedInviteIds,consumeImportPending,markImportIntroSeen,
+import {acceptedInviteIds,consumeImportPending,markImportIntroSeen,
  shouldShowImportIntro} from "./scripts/profile-import-prompt.mjs";
 const $=id=>document.getElementById(id);
 const DBV=/^\d{2}-\d{6}$/;
