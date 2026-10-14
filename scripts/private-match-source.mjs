@@ -14,6 +14,10 @@ function acceptedIdsFor(player){
  const values=Array.isArray(raw)?raw:(raw?.id?[raw.id]:[]);
  return values.filter(id=>typeof id==="string"&&UUID.test(id)&&bindings?.[id]===player).slice(-20);
 }
+function ownsLocalProfile(player){
+ const local=read("shuttleboard-v1",{});
+ return Array.isArray(local?.players)&&local.players.some(p=>p?.id===player);
+}
 function announce(player){
  window.dispatchEvent(new CustomEvent("badminton:private-matches-updated",{detail:{playerId:player}}));
 }
@@ -67,6 +71,10 @@ async function readAll(session,endpoint,base,player){
 export function requestPrivateMatches(player,{force=false}={}){
  if(!DBV.test(String(player||"")))return Promise.resolve();
  active=player;
+ if(!ownsLocalProfile(player)&&acceptedIdsFor(player).length===0){
+  states.set(player,{state:"protected",rows:[],checkedAt:Date.now()});
+  announce(player);return Promise.resolve();
+ }
  const old=states.get(player);
  if(old?.pending)return old.pending;
  if(!force&&old&&Date.now()-old.checkedAt<CACHE_MS)return Promise.resolve();
@@ -79,8 +87,8 @@ export function requestPrivateMatches(player,{force=false}={}){
    if(ticket!==revision)return;
    if(!session){states.set(player,{state:"protected",rows:[],checkedAt:Date.now()});return}
    // Server checks the independent grant for this exact player on every page.
-   let rows=await readAll(session,"private_player_owner_archive_read",
-     {p_player_dbv_id:player},player);
+   let rows=ownsLocalProfile(player)?
+    await readAll(session,"private_player_owner_archive_read",{p_player_dbv_id:player},player):null;
    if(!rows){
     for(const id of acceptedIdsFor(player)){
      rows=await readAll(session,"private_player_archive_read",
