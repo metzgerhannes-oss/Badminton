@@ -29,7 +29,10 @@ jobs:
       - name: Offline parser and classification tests
         run: python3 -m unittest discover -s tests -p test_bw_youth_archive.py -v
       - name: Verify full-year DBV source (not remaining dates)
-        run: python3 scripts/import-bw-youth-archive.py
+        run: |
+          python3 scripts/import-bw-youth-archive.py --write-json
+          python3 -c 'import json; p=json.load(open("data/bw-youth-calendar-archive.json",encoding="utf-8")); print("PUBLIC_BW_ARCHIVE="+json.dumps(p,ensure_ascii=False,separators=(",",":")))'
+
   publish:
     if: github.event_name != 'pull_request'
     needs: check
