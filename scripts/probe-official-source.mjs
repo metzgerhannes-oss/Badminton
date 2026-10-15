@@ -75,3 +75,11 @@ if(page.html){
   console.log(JSON.stringify({nearTargetTags:elements.slice(0,85)}));
  }
 }
+
+for(const kind of ["turnier","liga"]){
+ const result=await fetchHtml("https://badhub.de/spieler/05-071969?src="+kind+"&saison=all");
+ const html=result.html||"";
+ console.log(JSON.stringify({targetProfileSource:kind,http:result.http||null,error:result.error,
+  matchCards:(html.match(/class="sp-match-item/g)||[]).length,
+  documentedSource:html.includes("Charlotte Metzger")&&html.includes("sp-tournament-card")}));
+}
