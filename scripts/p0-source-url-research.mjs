@@ -91,7 +91,7 @@ for(const [id,name] of women){
     item.opponent_names.some(n=>n.toLocaleLowerCase("de")==="charlotte metzger"));
    parsed={total:source.items.length,cards:source.cards_seen,meetings:found.map(m=>({
     tournament:m.competition,source:m.source_url,event:m.event,round:m.round_label,
-    opponent:m.opponent_names,score:m.games,resultForCharlotte:m.player_side===m.winning_side?"loss":"win"
+    opponent:m.opponent_names,score:m.games,opponentSide:m.player_side,winningSide:m.winning_side,resultForCharlotte:m.player_side===m.winning_side?"loss":"win"
    })).slice(0,10)};
   }catch(e){parsed={error:e.message.slice(0,60)}}
  }
