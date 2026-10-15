@@ -102,6 +102,7 @@ const me=await htmlGet("https://badhub.de/bwbv/turnier.php?id=4986");
 if(me.html){
  const plain=me.html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,"").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,"")
   .replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ");
- const at=plain.indexOf("ME U13"),until=plain.indexOf("ME U15",at);
+ const charlotte=plain.lastIndexOf("Charlotte Metzger");
+ const at=plain.lastIndexOf("ME U13",charlotte),until=plain.indexOf("ME U15",charlotte);
  console.log("FRIEDRICHSHAFEN_ME_U13 "+JSON.stringify({group:at>=0&&until>at?plain.slice(at,until).slice(0,3100):null}));
 }
