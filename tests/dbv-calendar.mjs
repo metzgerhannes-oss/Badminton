@@ -59,7 +59,7 @@ assert.ok(sw.includes('"./scripts/dbv-calendar-utils.mjs"'));
 assert.ok(app.includes("dbv_calendar_entries?"),"Read-only Supabase data feed required");
 assert.ok(app.includes("./data/dbv-calendar.json"),"Source-backed snapshot fallback required");
 assert.ok(app.includes("Keine passenden Turniere"),"Missing data message required");
-assert.ok(app.includes("Erfasster Zeitraum:"),"DBV source coverage must be visible");
+assert.ok(app.includes("passende Turniere"),"Source-backed tournament hits must be counted visibly");
 assert.ok(app.includes("data-calendar-alternative-level"),"Empty state must offer one-tap source-backed alternate level");
 assert.ok(app.includes("data-calendar-toggle"),"Every DBV calendar card should render an accessible plus/check toggle");
 assert.ok(app.includes("badmintonCalendarToggle"),"Quick action must connect to private local bookmark handler");
@@ -71,11 +71,11 @@ assert.ok(main.includes('state.officialLinks.unshift(entry)'),"Private bookmark 
 assert.ok(main.includes('source!=="dbv-calendar"'),"Unverified calendar events must not be used for official live match options");
 console.log("DBV calendar: source IDs, 3-dimensional facets, BW, age/level, no fake tournament links and offline integration passed.");
 
-assert.ok(app.includes("Quellenlücke möglich"),"Empty U13/C listings need a coverage disclaimer");
-assert.ok(app.includes("https://bwbv.de/kalender/"),"Link to the official BWBV calendar rather than inventing entries");
-assert.ok(app.includes("Keine Treffer bedeuten nicht"),"Unverified completeness is never claimed");
+assert.ok(app.includes("BW_U13_ARCHIVE_2026"),"Real verified historical U13 tournament results must be rendered");
+assert.ok(app.includes("bwFrameworkHTML"),"Official planning sources remain distinct from confirmed event IDs");
+assert.ok(app.includes("data-calendar-show-history"),"Users must be able to open actual past results directly");
 
 assert.ok(app.includes("2027-01-16"),"Official BWBV 2027 framework starts in January");
 assert.ok(app.includes("2027-06-27"),"Official BWBV 2027 framework includes June");
-assert.ok(app.includes("nicht</strong> aus dem DBV-Turnierimport"),
- "Never masquerade framework dates as confirmed DBV calendar entries");
+assert.ok(app.includes("dbv-calendar-external-plan")&&app.includes("dbv-calendar-external-result"),
+ "Official plans and completed real tournament results must be visually and technically distinct");

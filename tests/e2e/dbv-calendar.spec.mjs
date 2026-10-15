@@ -20,16 +20,16 @@ test("Official calendar clusters by state, age and level without invented regist
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  const results=page.locator("#dbv-calendar-results");
  await page.locator("#dbv-calendar-year").selectOption("2026");
- await expect(page.locator("#dbv-calendar-status")).toContainText(entries2026.length+" von "+sourceTotal);
+ await expect(page.locator("#dbv-calendar-status")).toContainText(entries2026.length+" passende Turniere");
  await expect(results.locator(".dbv-calendar-entry").first()).toBeVisible();
  const filter=page.locator("#dbv-calendar-region");
  await filter.selectOption("Baden-Württemberg");
- await expect(page.locator("#dbv-calendar-status")).toContainText(countBW2026+" von "+sourceTotal);
+ await expect(page.locator("#dbv-calendar-status")).toContainText(countBW2026+" passende Turniere");
  await expect(results.locator(".dbv-calendar-cluster h4")).toHaveCount(1);
  await expect(results).not.toContainText("bestätigte Anmeldung");
  await filter.selectOption("all");
  await page.locator("#dbv-calendar-age").selectOption("U11");
- await expect(page.locator("#dbv-calendar-status")).toContainText("von "+sourceTotal);
+ await expect(page.locator("#dbv-calendar-status")).toContainText("passende Turniere");
  await expect(results.locator(".dbv-calendar-entry").first()).toBeVisible();
  await page.locator("#dbv-calendar-age").selectOption("all");
  await page.locator("#dbv-calendar-level").selectOption("C");
@@ -88,132 +88,100 @@ test("Calendar plans stay private to the active player",async ({page})=>{
  expect(new Set(saved.map(t=>t.playerId)).size).toBe(2);
 });
 
-test("BW U13 C empty result explains source coverage and provides available D/E level buttons",async ({page})=>{
+test("v147: BW U13 C presents real 2026 tournament results instead of source explanation boxes",async({page})=>{
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#dbv-calendar-status")).toContainText("offiziellen Kalendereinträgen");
  await page.locator("#dbv-calendar-year").selectOption("2026");
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-level").selectOption("C");
- await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
- await expect(page.locator(".dbv-calendar-no-results")).toContainText("Keine passenden Turniere");
- await expect(page.locator(".dbv-calendar-no-results")).toContainText("Quellenlücke möglich");
- await expect(page.locator('[data-calendar-alternative-level="D"]')).toHaveText("Level D (4)");
- await expect(page.locator('[data-calendar-alternative-level="E"]')).toHaveText("Level E (6)");
- await page.locator('[data-calendar-alternative-level="D"]').click();
- await expect(page.locator("#dbv-calendar-level")).toHaveValue("D");
- await expect(page.locator("#dbv-calendar-status")).toContainText("4 von "+sourceTotal);
- await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
+ await page.locator("#dbv-calendar-period").selectOption("all");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("3 passende Turniere");
+ const cards=page.locator("#dbv-calendar-results .dbv-calendar-external-result");
+ await expect(cards).toHaveCount(3);
+ await expect(cards.nth(0)).toContainText("Reutlingen");
+ await expect(cards.nth(1)).toContainText("Friedrichshafen");
+ await expect(cards.nth(2)).toContainText("Mössingen");
+ await expect(cards.nth(0).locator("a")).toHaveAttribute("href",/dbv\.turnier\.de\/tournament/);
+ await expect(cards.nth(2).locator("a")).toHaveAttribute("href",/DBB7AC20/i);
+ await expect(page.locator(".dbv-calendar-archive,.dbv-calendar-framework,.dbv-calendar-no-results")).toHaveCount(0);
+ await expect(page.locator("#dbv-calendar-results [data-calendar-toggle]")).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
 });
 
-test("2027 year selection shows official source-backed future tournaments",async ({page})=>{
- test.skip(!data.entries.some(e=>e.start_date?.startsWith("2027")),"2027 data are published after this PR is merged");
- await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
- await page.locator("#dbv-calendar-year").selectOption("2027");
- const count=data.entries.filter(e=>e.start_date?.startsWith("2027")).length;
- await expect(page.locator("#dbv-calendar-status")).toContainText(count+" von "+sourceTotal);
- await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry").first()).toBeVisible();
- await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
-});
-
-test("BWBV 2027 C framework dates are distinct from unavailable DBV U13 entries",async ({page})=>{
- await page.setViewportSize({width:320,height:568});
- await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
- await page.locator("#dbv-calendar-year").selectOption("2027");
- await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
- await page.locator("#dbv-calendar-age").selectOption("U13");
- await page.locator("#dbv-calendar-level").selectOption("C");
- await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
- await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(4);
- await expect(page.locator(".dbv-calendar-framework")).toContainText("Ob U13");
- await expect(page.locator(".dbv-calendar-framework")).toContainText("nicht aus dem DBV-Turnierimport");
- await expect(page.locator(".dbv-calendar-entry")).toHaveCount(0);
- await expect(page.locator(".dbv-calendar-framework a").first()).toHaveAttribute("href",/bwbv\.de\/wp-content/);
- await page.locator("#dbv-calendar-year").selectOption("2026");
- await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(0);
-});
-
-test("v145: BW U13 calendar reveals verified 2027 A/B/C planning even when 2026 has D/E entries",async({page})=>{
- await page.setViewportSize({width:320,height:568});
+test("v147: BW U13 historic A/B/C results distinguish Hexen-Cup A from C",async({page})=>{
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await page.locator("#dbv-calendar-year").selectOption("2026");
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-period").selectOption("all");
+ for(const [level,count,venues] of [
+  ["C",3,["Reutlingen","Friedrichshafen","Mössingen"]],
+  ["A",2,["Eggenstein","Konstanz"]],
+  ["B",1,["Waghäusel"]]
+ ]){
+  await page.locator("#dbv-calendar-level").selectOption(level);
+  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(count);
+  const list=await page.locator(".dbv-calendar-external-result").allTextContents();
+  for(const venue of venues)expect(list.join(" ")).toContain(venue);
+  await expect(page.locator("#dbv-calendar-status")).toContainText(count+" passende Turniere");
+ }
  await page.locator("#dbv-calendar-level").selectOption("all");
- await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(10);
- await expect(page.locator(".dbv-calendar-next-year")).toContainText("2027");
- await expect(page.locator(".dbv-calendar-framework")).toHaveCount(0);
- await page.locator("[data-calendar-show-2027]").click();
- await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
- await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(6);
- await expect(page.locator(".dbv-calendar-framework")).toContainText("Eggenstein");
- await expect(page.locator(".dbv-calendar-framework")).toContainText("Gruppe SüdOst");
- await expect(page.locator(".dbv-calendar-framework")).toContainText("U13 noch nicht bestätigt");
- await expect(page.locator(".dbv-calendar-framework [data-calendar-toggle]")).toHaveCount(0);
- const r=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
- expect(r).toBeLessThanOrEqual(2);
+ await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(6);
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(16);
 });
 
-test("v145: BW U13 official A/B/C planning is filtered by level without presenting sign-ups",async({page})=>{
+test("v147: upcoming period has direct one-click access to past results",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await page.locator("#dbv-calendar-period").selectOption("upcoming");
+ await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(0);
+ await page.locator("[data-calendar-show-history]").click();
+ await expect(page.locator("#dbv-calendar-period")).toHaveValue("all");
+ await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(3);
+});
+
+test("v147: BWBV 2027 A/B/C announced dates are compact sourced cards, never fake registrations",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await page.locator("#dbv-calendar-year").selectOption("2027");
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-age").selectOption("U13");
  for(const [level,count,source] of [["A",1,"badminton.de"],["B",1,"bwbv.de"],["C",4,"bwbv.de"]]){
   await page.locator("#dbv-calendar-level").selectOption(level);
-  await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(count);
-  await expect(page.locator(".dbv-calendar-framework li a").first()).toHaveAttribute("href",new RegExp(source.replace(".","\\.")));
-  await expect(page.locator(".dbv-calendar-framework [data-calendar-toggle]")).toHaveCount(0);
+  await expect(page.locator("#dbv-calendar-status")).toContainText(count+" passende Turniere");
+  await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(count);
+  await expect(page.locator(".dbv-calendar-external-plan a").first()).toHaveAttribute("href",new RegExp(source.replace(".","\\.")));
+  await expect(page.locator(".dbv-calendar-external-plan [data-calendar-toggle]")).toHaveCount(0);
  }
-});
-
-test("v146: BW U13 C past 2026 event appears above misleading zero results on iPhone",async({page})=>{
- await page.setViewportSize({width:375,height:667});
- await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
- await page.locator("#dbv-calendar-year").selectOption("2026");
- await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
- await page.locator("#dbv-calendar-age").selectOption("U13");
- await page.locator("#dbv-calendar-level").selectOption("C");
- await page.locator("#dbv-calendar-period").selectOption("all");
- await expect(page.locator("#dbv-calendar-status")).toContainText("0 von "+sourceTotal);
- const top=page.locator("#dbv-calendar-results > .dbv-calendar-archive");
- await expect(top).toBeVisible();
- await expect(top).toContainText("25.04.2026");
- await expect(top).toContainText("Mössingen");
- await expect(top).toContainText("Level C");
- await expect(top.locator("li")).toHaveCount(1);
- await expect(top.locator("a")).toHaveAttribute("href",/bwbv\.de/);
- await expect(top.locator("[data-calendar-toggle]")).toHaveCount(0);
- await expect(page.locator("#dbv-calendar-results > .dbv-calendar-next-year")).toContainText("4 C-Rahmentermine");
- const panels=await page.evaluate(()=>{
-  const archive=document.querySelector(".dbv-calendar-archive");
-  const empty=document.querySelector(".dbv-calendar-no-results");
-  return {archiveBottom:archive.getBoundingClientRect().bottom,
-   emptyTop:empty.getBoundingClientRect().top,
-   overflow:document.documentElement.scrollWidth-window.innerWidth};
- });
- expect(panels.archiveBottom).toBeLessThanOrEqual(panels.emptyTop+1);
- expect(panels.overflow).toBeLessThanOrEqual(2);
-});
-
-test("v146: independent verified historical A/B/C dates are selectable without turning them into DBV imports",async({page})=>{
- await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
- await page.locator("#dbv-calendar-year").selectOption("2026");
- await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
- await page.locator("#dbv-calendar-age").selectOption("U13");
- await page.locator("#dbv-calendar-period").selectOption("all");
  await page.locator("#dbv-calendar-level").selectOption("all");
- await expect(page.locator(".dbv-calendar-archive li")).toHaveCount(3);
- for(const [level,venue] of [["A","Eggenstein"],["B","Waghäusel"],["C","Mössingen"]]){
-  await page.locator("#dbv-calendar-level").selectOption(level);
-  await expect(page.locator(".dbv-calendar-archive li")).toHaveCount(1);
-  await expect(page.locator(".dbv-calendar-archive")).toContainText(venue);
- }
- await page.locator("#dbv-calendar-period").selectOption("upcoming");
- await expect(page.locator(".dbv-calendar-archive")).toHaveCount(0);
- await expect(page.locator("#dbv-calendar-results > .dbv-calendar-next-year")).toContainText("2027");
- await page.locator("#dbv-calendar-results > .dbv-calendar-next-year [data-calendar-show-2027]").click();
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(6);
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Eggenstein");
+ await expect(page.locator("#dbv-calendar-results")).toContainText("U13 noch offen");
+ await expect(page.locator(".dbv-calendar-framework,.dbv-calendar-archive")).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test("v147: BW U13 2026 with other DBV results preserves calendar cards and quick switch to 2027",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("all");
+ await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(0);
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(10);
+ await page.locator("[data-calendar-show-2027]").click();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
- await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(4);
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(6);
+});
+
+test("2027 year selection still shows published DBV source-backed tournaments elsewhere",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ const n=data.entries.filter(e=>e.start_date?.startsWith("2027")).length;
+ await expect(page.locator("#dbv-calendar-status")).toContainText(n+" passende Turniere");
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry").first()).toBeVisible();
 });
