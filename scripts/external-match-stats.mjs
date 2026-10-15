@@ -14,7 +14,31 @@ export function sourceMatchYears(rows){
  return [...new Set((rows||[]).map(r=>String(r?.match_year??""))
   .filter(y=>/^20\d{2}$/.test(y)))].sort((a,b)=>b.localeCompare(a));
 }
+/** A player can have only one result in a particular knockout round of the
+ * same event. Prior imports contain impossible double/semifinal assignments.
+ * Quarantine the *entire* affected tournament event rather than arbitrarily
+ * selecting a victory. Group stages are exempt (multiple matches are normal).
+ * This applies to already archived records, without deleting evidence. */
+const ELIMINATION_ROUND=/^(?:achtelfinale|viertelfinale|halbfinale|finale|\d+[.]\/\d+[.]\s*platz)$/i;
+function sourceEventKey(row){
+ if(row?.category!=="tournament"||typeof row?.event!=="string"||!row.event.trim())return null;
+ const competition=/^tournament:([^:]+):/.exec(String(row.source_key||""));
+ return competition?competition[1]+"|"+row.event.trim().toLocaleLowerCase("de"):null;
+}
+export function conflictingTournamentEvents(rows){
+ const rounds=new Map(),conflicts=new Set();
+ for(const row of Array.isArray(rows)?rows:[]){
+  const event=sourceEventKey(row);
+  const phase=String(row?.round_label||"").trim().toLocaleLowerCase("de").replace(/\s+/g," ");
+  if(!event||!ELIMINATION_ROUND.test(phase))continue;
+  const key=event+"|"+phase;
+  rounds.set(key,(rounds.get(key)||0)+1);
+  if(rounds.get(key)>1)conflicts.add(event);
+ }
+ return conflicts;
+}
 export function computeExternalStats(rows,{discipline="all",year="all"}={}){
+ const conflicting=conflictingTournamentEvents(rows);
  const matching=(Array.isArray(rows)?rows:[]).filter(r=>
   (discipline==="all"||r?.discipline===discipline)&&
   (year==="all"||String(r?.match_year)===String(year)));
@@ -25,11 +49,14 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
   if(!grouped.has(key))grouped.set(key,[]);
   grouped.get(key).push(r);
  }
- let wins=0,losses=0,excluded=0;
+ let wins=0,losses=0,excluded=0,quarantined=0;
  const details=[];
  for(const versions of grouped.values()){
   if(versions.length!==1){excluded++;continue;}
   const r=versions[0];
+  if(conflicting.has(sourceEventKey(r))){
+   excluded++;quarantined++;continue;
+  }
   const games=r.games;
   const valid=[1,2].includes(r.player_side)&&[1,2].includes(r.winning_side)
    &&SOURCE_TYPES.includes(r.discipline)
@@ -61,7 +88,7 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
   String(b.match_date||"").localeCompare(String(a.match_date||""))||
   a.source_key.localeCompare(b.source_key));
  const total=wins+losses;
- return {total,wins,losses,excluded,rate:total?Math.round(wins/total*100):null,details};
+ return {total,wins,losses,excluded,quarantined,rate:total?Math.round(wins/total*100):null,details};
 }
 /**
  * Import cursor = source-processing position, never the number of persisted,
