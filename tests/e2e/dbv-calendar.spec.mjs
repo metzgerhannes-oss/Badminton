@@ -284,3 +284,37 @@ test("v150: U17 2026 C missing imported events suggests past verified events and
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
  await expect(results.locator(".dbv-calendar-external-plan")).toHaveCount(4);
 });
+
+
+test("v150: real source archive adds historical U13/C records and removes duplicate curated cards",async({page})=>{
+ const raw={
+  source_key:"dbv-calendar-999991",title:"SYNTHETISCHER TEST-C-RLT U13",start_date:"2026-06-06",
+  end_date:"2026-06-07",location_text:"Waiblingen",organizer:"Baden-Württemberg",
+  bundesland:"Baden-Württemberg",region_scope:"state",category:"C1-Level",
+  level_group:"C",age_groups:["U13"],disciplines:["Einzel"],registration_deadline:null,
+  event_url:null,source_url:"https://turniere.badminton.de/"
+ };
+ const copy={...raw,source_key:"dbv-calendar-999992",start_date:"2026-01-17",
+  end_date:"2026-01-18",location_text:"Reutlingen",title:"1. C-RLT BAW U11-U19",
+  age_groups:["U11","U13","U15","U17","U19"]};
+ await page.route("**/data/bw-youth-calendar-archive.json",route=>route.fulfill({
+  status:200,contentType:"application/json",body:JSON.stringify({
+   schemaVersion:1,scope:"historical-bw-youth-abc",source:"https://turniere.badminton.de/",
+   year:2026,years:[2026],entries:[raw,copy]
+  })
+ }));
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await page.locator("#dbv-calendar-period").selectOption("all");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("4 passende Turniere");
+ await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(3);
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Waiblingen");
+ await expect(page.locator("#dbv-calendar-results")).toContainText("SYNTHETISCHER TEST");
+ await expect(page.locator("#dbv-calendar-results")).not.toContainText("dbv-calendar-999992");
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
