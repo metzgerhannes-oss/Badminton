@@ -1,19 +1,31 @@
-name: P0 Fresh source survey (no database writes)
+name: P0 Reimport SpVgg - safe staging
 on:
   push:
-    branches: [fix/p0-fresh-results-import-v152]
-    paths: [scripts/p0-fresh-source-scan.mjs, .github/workflows/p0-fresh-scan.yml]
+    branches: [main, fix/p0-fresh-results-import-v152]
+    paths:
+      - scripts/p0-fresh-source-scan.mjs
+      - scripts/p0-stage-results-oidc.mjs
+      - .github/workflows/p0-fresh-scan.yml
+      - supabase/functions/spvgg-match-rebuild/index.ts
   workflow_dispatch:
 permissions:
   contents: read
+  id-token: write
 jobs:
-  read-originals:
+  source-inventory:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --check scripts/p0-fresh-source-scan.mjs
-      - name: Requery all club players at the original Badhub source
+      - name: Verify source and OIDC client syntax
+        run: |
+          node --check scripts/p0-fresh-source-scan.mjs
+          node --check scripts/p0-stage-results-oidc.mjs
+      - name: Read the 13 original public match sources without database writes
+        if: github.ref != 'refs/heads/main'
         run: node scripts/p0-fresh-source-scan.mjs
+      - name: Stage fresh source facts for 13 club players with ephemeral OIDC credentials
+        if: github.ref == 'refs/heads/main'
+        run: node scripts/p0-fresh-source-scan.mjs --stage
