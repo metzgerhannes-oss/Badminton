@@ -197,13 +197,13 @@ function render(){
    const closed=t.deadline&&t.deadline<localToday();
    return '<article class="dbv-calendar-entry'+(t.historicalArchive?' dbv-calendar-entry--history':'')+'"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
     '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
-    '<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
+    (t.historicalArchive?'':'<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
     ' aria-label="'+esc(bookmarkState.playerId?(savedKeys.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarkState.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
     (bookmarkState.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+
-    (savedKeys.has(t.key)?'✓':'+')+'</button></div><p>'+esc(t.place)+(t.organizer?' · '+esc(t.organizer):"")+'</p>'+
+    (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p>'+esc(t.place)+(t.organizer?' · '+esc(t.organizer):"")+'</p>'+
     '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+'</div>'+
-    (t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
+    (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
     '<a href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
   }).join("");
   html+='</section>';
