@@ -150,7 +150,7 @@ test("v148: BWBV 2027 A/B/C announced dates are compact sourced cards, never fak
  await page.locator("#dbv-calendar-year").selectOption("2027");
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-age").selectOption("U13");
- for(const [level,count,source] of [["A",1,"badminton.de"],["B",1,"bwbv.de"],["C",4,"bwbv.de"]]){
+ for(const [level,count,source] of [["A",2,"badminton.de"],["B",1,"bwbv.de"],["C",4,"bwbv.de"]]){
   await page.locator("#dbv-calendar-level").selectOption(level);
   await expect(page.locator("#dbv-calendar-status")).toContainText(count+" passende Turniere");
   await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(count);
@@ -158,7 +158,7 @@ test("v148: BWBV 2027 A/B/C announced dates are compact sourced cards, never fak
   await expect(page.locator(".dbv-calendar-external-plan [data-calendar-toggle]")).toHaveCount(0);
  }
  await page.locator("#dbv-calendar-level").selectOption("all");
- await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(6);
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(7);
  await expect(page.locator("#dbv-calendar-results")).toContainText("Eggenstein");
  await expect(page.locator("#dbv-calendar-results")).toContainText("U13 noch offen");
  await expect(page.locator(".dbv-calendar-framework,.dbv-calendar-archive")).toHaveCount(0);
@@ -175,7 +175,7 @@ test("v148: BW U13 2026 with other DBV results preserves calendar cards and quic
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(10);
  await page.locator("[data-calendar-show-2027]").click();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
- await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(6);
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(7);
 });
 
 test("2027 year selection still shows published DBV source-backed tournaments elsewhere",async({page})=>{
@@ -252,7 +252,7 @@ test("v150: BW youth A/B/C 2027 remains age-correct for U11 through U19",async({
  await page.locator("#dbv-calendar-year").selectOption("2027");
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  for(const [age,counts] of [
-  ["U11",{A:1,B:0,C:3}],["U13",{A:1,B:1,C:4}],
+  ["U11",{A:2,B:0,C:2}],["U13",{A:2,B:1,C:4}],
   ["U15",{A:0,B:1,C:4}],["U17",{A:0,B:1,C:4}],["U19",{A:0,B:1,C:4}]
  ]){
   await page.locator("#dbv-calendar-age").selectOption(age);
@@ -320,4 +320,19 @@ test("v150: real source archive adds historical U13/C records and removes duplic
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
  await expect(page.locator(".dbv-calendar-entry--history .dbv-calendar-save")).toBeHidden();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test("v151: verified BWBV plan includes Lörrach A and excludes U11 from second C",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("A");
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(2);
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Lörrach-Brombach");
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Eggenstein");
+ await page.locator("#dbv-calendar-age").selectOption("U11");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(2);
+ await expect(page.locator("#dbv-calendar-results")).not.toContainText("2. BWBV/C-RLT");
 });
