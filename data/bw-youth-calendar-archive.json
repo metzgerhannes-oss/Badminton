@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "source": "https://turniere.badminton.de/",
+  "scope": "historical-bw-youth-abc",
+  "year": 2026,
+  "entries": [
+    {
+      "source_key": "dbv-calendar-44014",
+      "title": "1. C-RLT BAW U11-U19",
+      "start_date": "2026-01-17",
+      "end_date": "2026-01-18",
+      "location_text": "Reutlingen",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-01-08",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44163",
+      "title": "C-RLT BAW U17 (2. Allianz-Oliver-Open)",
+      "start_date": "2026-02-07",
+      "end_date": "2026-02-08",
+      "location_text": "Waghäusel",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-01-13",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44018",
+      "title": "2. C-RLT BAW U11-U19",
+      "start_date": "2026-02-28",
+      "end_date": "2026-03-01",
+      "location_text": "Friedrichshafen",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-02-19",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44019",
+      "title": "3. C-RLT BAW U11-U19",
+      "start_date": "2026-04-25",
+      "end_date": "2026-04-26",
+      "location_text": "Mössingen",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-04-16",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44020",
+      "title": "C-RLT BAW U15-U19 (23. Hexen-Cup inkl. A-RLT U11/U13)",
+      "start_date": "2026-06-27",
+      "end_date": "2026-06-28",
+      "location_text": "Konstanz",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-06-02",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44463",
+      "title": "55. Landesmeisterschaften BAW U11-U19",
+      "start_date": "2026-10-03",
+      "end_date": "2026-10-04",
+      "location_text": "Friedrichshafen",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-09-24",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    }
+  ],
+  "years": [
+    2026
+  ],
+  "capturedAt": "2026-10-15T14:13:27.346465+00:00"
+}

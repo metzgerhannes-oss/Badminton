@@ -79,3 +79,7 @@ assert.ok(app.includes("2027-01-16"),"Official BWBV 2027 framework starts in Jan
 assert.ok(app.includes("2027-06-27"),"Official BWBV 2027 framework includes June");
 assert.ok(app.includes("dbv-calendar-external-plan")&&app.includes("dbv-calendar-external-result"),
  "Official plans and completed real tournament results must be visually and technically distinct");
+
+assert.ok(app.includes("readBWArchive"),"Full-year verified BW archive must be consumed by the calendar");
+assert.ok(app.includes("./data/bw-youth-calendar-archive.json"),"Historical BW archive must remain a separate verifiable source");
+assert.ok(app.includes("isCuratedDuplicate"),"Do not double count official source and result cards");

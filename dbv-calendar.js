@@ -139,7 +139,16 @@ function render(){
  const host=$("dbv-calendar-results");
  if(!host)return;
  const today=localToday();
- const selected=filterCalendar(entries,{...settings,today});
+ // Prefer direct result cards when DBV's archive contains the same tournament.
+ // Public events are not counted twice.
+ const normalizedPlace=x=>String(x||"").normalize("NFKD").replace(/\p{M}/gu,"").toLocaleLowerCase("de").replace(/[^a-z0-9]/g,"");
+ const isCuratedDuplicate=t=>BW_YOUTH_ARCHIVE_2026.some(curated=>{
+  const place=normalizedPlace(t.place),known=normalizedPlace(curated.place);
+  return t.start===curated.start&&t.level===curated.level&&
+   curated.ages.some(age=>t.ages.includes(age))&&
+   known.length>=6&&place.length>=6&&(place.includes(known)||known.includes(place));
+ });
+ const selected=filterCalendar(entries.filter(t=>!isCuratedDuplicate(t)),{...settings,today});
  const frameworkHTML=bwFrameworkHTML(settings,today);
  const nextYearHint=bwNextYearHint(settings);
  const archiveHTML=bwArchiveHTML(settings);
@@ -186,15 +195,15 @@ function render(){
   html+='<section class="dbv-calendar-cluster"><h4>'+esc(cluster.label)+' <small>'+cluster.items.length+'</small></h4>';
   html+=visible.map(t=>{
    const closed=t.deadline&&t.deadline<localToday();
-   return '<article class="dbv-calendar-entry"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
+   return '<article class="dbv-calendar-entry'+(t.historicalArchive?' dbv-calendar-entry--history':'')+'"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
     '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
-    '<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
+    (t.historicalArchive?'':'<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
     ' aria-label="'+esc(bookmarkState.playerId?(savedKeys.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarkState.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
     (bookmarkState.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+
-    (savedKeys.has(t.key)?'✓':'+')+'</button></div><p>'+esc(t.place)+(t.organizer?' · '+esc(t.organizer):"")+'</p>'+
+    (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p>'+esc(t.place)+(t.organizer?' · '+esc(t.organizer):"")+'</p>'+
     '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+'</div>'+
-    (t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
+    (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
     '<a href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
   }).join("");
   html+='</section>';
@@ -212,6 +221,23 @@ async function readSnapshot(){
  const rows=data.entries.map(calendarEntry).filter(Boolean);
  if(rows.length!==data.entries.length)throw Error("Unvollständiger DBV-Snapshot");
  return {rows,timestamp:Date.parse(data.capturedAt)||0};
+}
+// Independent DBV historical source archive (public only; no personal data).
+async function readBWArchive(){
+ const res=await fetch("./data/bw-youth-calendar-archive.json",{cache:"no-store"});
+ if(!res.ok)throw Error("Kein historisches BW-Archiv verfügbar");
+ const data=await res.json();
+ if(data.schemaVersion!==1||data.source!=="https://turniere.badminton.de/"||
+   data.scope!=="historical-bw-youth-abc"||!Array.isArray(data.entries))throw Error("Archiv-Metadaten ungültig");
+ const rows=data.entries.map(raw=>{const parsed=calendarEntry(raw);return parsed&&{...parsed,historicalArchive:true};});
+ if(rows.some(row=>!row||row.bundesland!=="Baden-Württemberg"||
+   !["A","B","C"].includes(row.level)||!row.ages.some(age=>BW_YOUTH_AGES.includes(age))||
+   !(Array.isArray(data.years)?data.years:[data.year]).map(String).includes(row.start.slice(0,4))||
+   row.end>=localToday())){
+  throw Error("Archiv enthält nicht passende oder zukünftige DBV-Daten");
+ }
+ if(new Set(rows.map(t=>t.key)).size!==rows.length)throw Error("Doppelte DBV-Archivkennungen");
+ return rows;
 }
 async function load(){
  if(loading)return;
@@ -243,6 +269,13 @@ async function load(){
    entries=snapshot.rows;source="snapshot";
   }catch{entries=[];source="offline";problem="Der Kalender ist derzeit nicht erreichbar."}
  }
+ // The archive is supplemental. Current DBV data and the six hand-verified
+ // source cards remain visible if the independent archive is unavailable.
+ try{
+  const historical=await readBWArchive();
+  entries=[...new Map([...entries,...historical].map(row=>[row.key,row])).values()]
+   .sort((a,b)=>a.start.localeCompare(b.start));
+ }catch{ /* keep current source and directly verified entries */ }
  loading=false;loaded=true;
  updateControls();render();
  if(!entries.length&&problem)message(problem+" Offiziellen DBV-Kalender bei Bedarf direkt öffnen.");
