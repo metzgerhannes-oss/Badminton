@@ -316,5 +316,6 @@ test("v150: real source archive adds historical U13/C records and removes duplic
  await expect(page.locator("#dbv-calendar-results")).toContainText("SYNTHETISCHER TEST");
  await expect(page.locator("#dbv-calendar-results")).not.toContainText("dbv-calendar-999992");
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
+ await expect(page.locator(".dbv-calendar-entry--history .dbv-calendar-save")).toBeHidden();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
 });
