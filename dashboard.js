@@ -74,6 +74,8 @@ function renderRankDetails(entry,discipline,cohort,url){
   '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwAgeClassRank!=null?'#'+num(entry.bwAgeClassRank):'–')+'</strong><small>'+(entry.bwAgeClassRank!=null?'Vorwoche '+(entry.previousBwAgeClassRank!=null?'#'+num(entry.previousBwAgeClassRank):'–')+' · '+move:'U17-Rang nicht verifiziert')+'</small></div>'+
   '<div><span>'+nationalTitle+'</span><strong>'+nationalValue+'</strong><small>'+(youthOverall?'Nicht U17-spezifisch':'Vorwoche '+(entry.previousAgeClassRank!=null?'#'+num(entry.previousAgeClassRank):'–'))+'</small></div></div>'+
   '<div class="ranking-score-total"><span>Gesamtpunkte</span><strong>'+num(entry.points)+'</strong><small>DBV · '+num(entry.tournaments)+' Turniere erfasst · beste 5 zählen</small></div>'+
+  (entry.bwAgeClassSize!=null&&entry.ageClassSize!=null?
+   '<p class="ranking-dialog-small">BW-Vergleichsgruppe: '+num(entry.bwAgeClassSize)+' · Deutschland: '+num(entry.ageClassSize)+'</p>':'')+
   renderFiveScores(entry)+
   '<a class="ranking-dialog-link" href="'+escape(url)+'" rel="noopener noreferrer" target="_blank">Offizielle Excel-Rangliste ansehen ↗</a>';
  modal.showModal();
