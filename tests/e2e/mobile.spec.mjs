@@ -120,6 +120,7 @@ test("v153: screenshot regression – own AK totals survive restricted official 
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await page.locator("#home-match-filter-panel > summary").click();
  await page.locator("#match-stats-age").selectOption("own");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-retry")).toBeHidden();
