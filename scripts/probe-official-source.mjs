@@ -59,3 +59,19 @@ if(peer.html){
    sourceId:id}));
  }
 }else console.log(JSON.stringify({badhubPeer:peer.http||null,error:peer.error}));
+
+const page=await fetchHtml("https://badhub.de/bwbv/turnier.php?id=4986");
+if(page.html){
+ const html=page.html;
+ const indexes=[...html.matchAll(/Charlotte Metzger/g)].map(m=>m.index);
+ console.log(JSON.stringify({tournamentSource:"4986",occurrences:indexes.length,
+  allTables:(html.match(/<table\b/gi)||[]).length,
+  rows:(html.match(/<tr\b/gi)||[]).length,
+  matchesInMarkup:(html.match(/(?:match|spiel|ergebnis|result|score|satz)/gi)||[]).length}));
+ for(const index of indexes.slice(0,3)){
+  const frag=html.slice(Math.max(0,index-1100),index+1400);
+  const elements=[...frag.matchAll(/<(\/?)([a-z0-9]+)([^>]*)>/gi)]
+   .map(m=>{const c=m[3].match(/\bclass="([^"]+)"/);return (m[1]?"/":"")+m[2]+(c? "."+c[1].replace(/\s+/g,".").slice(0,65):"")});
+  console.log(JSON.stringify({nearTargetTags:elements.slice(0,85)}));
+ }
+}
