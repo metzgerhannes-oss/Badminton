@@ -21,3 +21,11 @@ Quelle → Einzelmatchbeleg → kanonischer Datensatz → berechtigte App-Ansich
 4. V1 nicht als fachlich vollständig abnehmen, bevor die echten Daten und der Leseweg nachgewiesen sind. Keine neue Funktion, kein Redesign, kein Security-Ausbau.
 
 Die Skripte dieser isolierten Untersuchung sind ausschließlich diagnostisch. Sie sind **keine** Implementierung eines vollständigen Matchimports und nicht zur Freigabe vorgesehen.
+
+## Nachtrag 15.10.2026: ChatGPT-Supabase-Zugriff wiederhergestellt
+
+Der frühere Befund „keine Berechtigung“ war ein Fehler der Kontoauswahl, **kein dauerhafter Badminton-Projektfehler**. Unter ChatGPT sind zwei verbundene Supabase-Konten erreichbar: **„Supabase“** enthält nur Johannas Gartenwelt, **„Backup“** enthält das korrekte Projekt `yadexibmjmnjfmfabrug`. Alle Datenbankabfragen müssen explizit die Badminton-Verbindung wählen.
+
+Direkt geprüft: 13 registrierte Vereinsprofile, 839 externe Matchkarten nur bei 3 Profilen, 85 Turnierplatzierungen, 60 davon Top 4. Charlotte: 2 Platzierungen, 0 Einzelmatchkarten, Importstatus `awaiting_source`. Die Datenbank ist erreichbar und es fehlen tatsächlich Quellkarten – der bisherige 401-Fehler im anonymen CI-Audit war keine Aussage über den direkten Supabase-Connector.
+
+**Weiterer P0 Datenfehler**: In den 839 Karten stecken widersprüchliche K.-o.-Rundenzuordnungen; die 703/74/62 Rohkartenzahlen dürfen nicht pauschal als korrekte Karriere-Spielanzahl veröffentlicht werden. Vorläufiger konservativer Quarantänefilter für unverifizierte Turniergruppen in separatem PR #246. Keine automatischen Zahlenkorrekturen und keine Quellkarten gelöscht.
