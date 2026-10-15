@@ -44,7 +44,7 @@ function bwFrameworkHTML(filters,today){
  if(!planned.length)return "";
  return '<section class="dbv-calendar-framework" aria-label="Offizielle A-B-C-Planung 2027">'+
   '<h4>A-/B-/C-Termine 2027 · zusätzlich zu den DBV-Einträgen</h4>'+
-  '<p>Offiziell veröffentlichte Vergaben und Rahmentermine, <strong>nicht aus dem DBV-Turnierimport</strong>.'+
+  '<p>Offiziell veröffentlichte Vergaben und Rahmentermine, <strong>nicht</strong> aus dem DBV-Turnierimport.'+
   ' Diese Einträge sind noch keine bestätigten Ausschreibungen oder Anmeldungen. Ob U13 bei jedem C-Termin angeboten wird, ist erst mit der Ausschreibung sicher.</p>'+
   '<ul>'+planned.map(t=>'<li><strong>'+esc(formatDate(t.start))+'–'+esc(formatDate(t.end))+'</strong>'+
    ' · <strong>'+esc(t.level)+'</strong> · '+esc(t.title)+
