@@ -1,0 +1,48 @@
+name: Audit DBV BW-U17 rankings (no data published)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/bw-u17-audit.yml'
+permissions:
+  contents: read
+jobs:
+  official-ranking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Official spreadsheet parser dependency
+        run: python -m pip install --disable-pip-version-check openpyxl==3.1.5
+      - name: Audit Sarah's U17 Baden-Wuerttemberg and Germany ranks
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location("ranking_import",Path("scripts/update-ranking.py"))
+          module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+          snapshot=module.current_public_export()
+          if snapshot is None:
+              raise SystemExit("Official live Excel unavailable: do not assign ranks")
+          year,week,url,rows,publication=snapshot
+          if (year,week)!=(2026,42):
+              raise SystemExit("Unverified ranking week: "+str((year,week)))
+          national=module.cohort_ranks(rows)
+          regional=module.cohort_ranks([r for r in rows if r.get("association")==module.BW_ASSOCIATION])
+          for discipline,points in (("DE",61077),("DD",67117),("DM",44521)):
+              expected=( "05-061350",discipline)
+              player=national.get(expected)
+              state=regional.get(expected)
+              if not player or not state or player["ageClass"]!="U17" or state["ageClass"]!="U17" or player["points"]!=points or state["points"]!=points:
+                  raise SystemExit("Source verification failed for "+discipline)
+              if player["gender"]!="F" or player["birthYear"]!=2010:
+                  raise SystemExit("Wrong player or age group")
+              print("AUDIT",year,week,publication,discipline,
+                    "points",points,
+                    "deU17Rank",player["ageClassRank"],
+                    "deU17Size",player["ageClassSize"],
+                    "bwU17Rank",state["ageClassRank"],
+                    "bwU17Size",state["ageClassSize"])
+          PY
