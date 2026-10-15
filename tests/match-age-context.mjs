@@ -66,7 +66,7 @@ test("frontend consumes database birth year and marks individual proofs",()=>{
  const js=readFileSync(new URL("../stats.js",import.meta.url),"utf8");
  const sw=readFileSync(new URL("../sw.js",import.meta.url),"utf8");
  assert.match(html,/id="match-stats-age"/);
- assert.match(html,/id="match-stats-age-summary"/);
+ assert.doesNotMatch(html,/id="match-stats-age-summary"/);
  assert.match(js,/queryBirthYear/);
  assert.match(js,/ageContextBreakdown/);
  assert.match(js,/match-stats-age.*addEventListener/);

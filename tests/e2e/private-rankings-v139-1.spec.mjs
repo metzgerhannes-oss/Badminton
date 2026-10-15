@@ -43,7 +43,9 @@ test("v140: official member rankings replace three empty placeholders on a small
  await expect(page.locator("#dashboard-rankings")).toContainText("#4");
  await expect(page.locator("#dashboard-rankings")).toContainText("#9");
  await expect(page.locator("#dashboard-rankings")).toContainText("#1");
- await expect(page.locator("#app-version-badge")).toContainText("v140");
+ await expect(page.locator("#app-version-badge")).toContainText("v141");
+ await expect(page.locator("#match-stats-age-summary")).toHaveCount(0);
+ await expect(page.locator("body")).not.toContainText("Niederlagen nach gespielter AK");
  const bounds=await page.locator(".topbar").boundingBox();
  expect(bounds).toBeTruthy();
  expect(bounds.x+bounds.width).toBeLessThanOrEqual(322);
