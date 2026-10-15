@@ -53,3 +53,22 @@ for(const [label,url] of [
  console.log("BADHUB_RESEARCH "+JSON.stringify({label,status,htmlSize:html.length,matchItems:(html.match(/class="sp-match-item/g)||[]).length,
   uniquePlayerLinks:[...new Set(profiles)].length,tournamentLinks:[...new Set(tourney)].slice(0,12),targetContexts:targets}));
 }
+
+const peer=await htmlGet("https://badhub.de/spieler/05-071497?src=turnier&saison=all");
+if(peer.html){
+ const needle="4. E-RLT BAW U11-U19 SW Ehingen 2026",idx=peer.html.indexOf(needle);
+ const before=idx>=0?peer.html.slice(Math.max(0,idx-350),idx+100):"";
+ const linked=before.match(/href="([^"]*\/(?:bwbv|dbv)\/turnier\.php\?id=\d+)"/i);
+ console.log("EHINGEN_SOURCE "+JSON.stringify({found:idx>=0,linked:linked?.[1]||null}));
+ if(linked){
+  const path=linked[1].replace(/&amp;/g,"&"),url=new URL(path,"https://badhub.de");
+  const event=await htmlGet(url.toString());
+  const plain=event.html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,"").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,"").replace(/<[^>]*>/g," ").replace(/\s+/g," ");
+  const idxC=plain.indexOf("Charlotte Metzger");
+  const idxB=plain.indexOf("Benjamin Belser");
+  console.log("EHINGEN_OVERVIEW "+JSON.stringify({url:url.toString(),status:event.status,
+   containsCharlotte:idxC>=0,containsBenjamin:idxB>=0,
+   charlotteContext:idxC>=0?plain.slice(Math.max(0,idxC-230),idxC+170):null,
+   scoreRows:(event.html.match(/sp-match-item/g)||[]).length}));
+ }
+}
