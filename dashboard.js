@@ -62,12 +62,20 @@ function renderRankDetails(entry,discipline,cohort,url){
  const modal=$("ranking-dialog"),body=$("ranking-detail-content");
  if(!modal||!body)return;
  const move=shortMovement(entry.bwAgeClassChange,entry.previousBwAgeClassRank,"BW-Plätze");
+ const nationalYouth=Number.isInteger(entry.nationalYouthOverallRank)?entry.nationalYouthOverallRank:null;
+ const youthOverall=nationalYouth!=null&&entry.ageClassRank==null;
+ const nationalTitle=youthOverall?"Jugend-Gesamtliste (DE)":"Deutschland";
+ const nationalValue=entry.ageClassRank!=null?'#'+num(entry.ageClassRank):youthOverall?'#'+num(nationalYouth):'–';
+ const lead=youthOverall
+  ?"Belegte DBV-Jugend-Gesamtliste über mehrere Altersklassen. Ein DE-U17- oder BW-U17-Platz ist daraus nicht abgeleitet."
+  :"Bestätigte Altersklassenplätze aus offiziellen DBV-Ranglistenwerten.";
  body.innerHTML='<h2>'+escape(discipline)+' · '+escape(cohort)+'</h2>'+
-  '<p class="ranking-dialog-lead">Altersklassenplätze (z. B. U11 mit mehreren Geburtsjahrgängen), aus den offiziellen DBV-Punkten errechnet.</p>'+
-  '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwAgeClassRank!=null?'#'+num(entry.bwAgeClassRank):'–')+'</strong><small>Vorwoche '+(entry.previousBwAgeClassRank!=null?'#'+num(entry.previousBwAgeClassRank):'–')+' · '+move+'</small></div>'+
-  '<div><span>Deutschland</span><strong>'+(entry.ageClassRank!=null?'#'+num(entry.ageClassRank):'–')+'</strong><small>Vorwoche '+(entry.previousAgeClassRank!=null?'#'+num(entry.previousAgeClassRank):'–')+'</small></div></div>'+
+  '<p class="ranking-dialog-lead">'+lead+'</p>'+
+  '<div class="ranking-dialog-stats"><div><span>Baden-Württemberg</span><strong>'+(entry.bwAgeClassRank!=null?'#'+num(entry.bwAgeClassRank):'–')+'</strong><small>'+(entry.bwAgeClassRank!=null?'Vorwoche '+(entry.previousBwAgeClassRank!=null?'#'+num(entry.previousBwAgeClassRank):'–')+' · '+move:'U17-Rang nicht verifiziert')+'</small></div>'+
+  '<div><span>'+nationalTitle+'</span><strong>'+nationalValue+'</strong><small>'+(youthOverall?'Nicht U17-spezifisch':'Vorwoche '+(entry.previousAgeClassRank!=null?'#'+num(entry.previousAgeClassRank):'–'))+'</small></div></div>'+
   '<div class="ranking-score-total"><span>Gesamtpunkte</span><strong>'+num(entry.points)+'</strong><small>DBV · '+num(entry.tournaments)+' Turniere erfasst · beste 5 zählen</small></div>'+
-  '<p class="ranking-dialog-small">BW-Vergleichsgruppe: '+num(entry.bwAgeClassSize)+' · Deutschland: '+num(entry.ageClassSize)+'</p>'+
+  (entry.bwAgeClassSize!=null&&entry.ageClassSize!=null?
+   '<p class="ranking-dialog-small">BW-Vergleichsgruppe: '+num(entry.bwAgeClassSize)+' · Deutschland: '+num(entry.ageClassSize)+'</p>':'')+
   renderFiveScores(entry)+
   '<a class="ranking-dialog-link" href="'+escape(url)+'" rel="noopener noreferrer" target="_blank">Offizielle Excel-Rangliste ansehen ↗</a>';
  modal.showModal();
@@ -85,13 +93,15 @@ function renderRank(){
  const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
  const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
  label.textContent=working?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
- source.innerHTML=working?'<span>Bestätigte DBV-Ranglistenwerte · BW und Deutschland</span>':
+ source.innerHTML=working?'<span>Bestätigte DBV-Ranglistenwerte</span>':
  rankStatus==="loading"?'<span>Bestätigte DBV-Werte werden geladen …</span>':
  rankStatus==="protected"?'<span>Ranglistenwerte nach gültiger App-Einladung verfügbar</span>':
  rankStatus==="unavailable"?'<span>Ranglistenwerte momentan nicht abrufbar</span>':
  '<span>Für dieses Profil liegen noch keine bestätigten Ranglistenwerte vor</span>';
  if(archiveBehind)source.innerHTML+='<a class="ranking-stale-link" href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuellere Webwerte möglich · DBV ansehen ↗</a>';
- const chosen=profiles.find(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
+ const own=profiles.find(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
+ // Followed profiles are viewed without becoming a device's own profiles.
+ const chosen=own||(viewMode==="friend"&&/^\d{2}-\d{6}$/.test(selection)?{id:selection}:null);
  if(!chosen){
   root.innerHTML='<a class="dashboard-empty-tile" href="#einstellungen"><strong>Rangliste einrichten</strong><small>Für deine Altersklassenränge bitte die DBV-Spieler-ID in den Einstellungen hinterlegen.</small><span>Einrichten ↗</span></a>';
   return;
@@ -112,13 +122,17 @@ function renderRank(){
  const keys=["HE","HD","HM","DE","DD","DM"].filter(key=>discs[key]);
  root.innerHTML=keys.map(key=>{
   const e=discs[key],title=rankNames[key],cohort=birth?(e?.ageClass||ageLabel(birth))+" · Jg. "+birth:"Jahrgang offen";
-  const bw=e?.bwAgeClassRank!=null?'#'+num(e.bwAgeClassRank):"–",de=e?.ageClassRank!=null?'#'+num(e.ageClassRank):"–";
+  const bw=e?.bwAgeClassRank!=null?'#'+num(e.bwAgeClassRank):"–";
+  const nationalYouth=Number.isInteger(e?.nationalYouthOverallRank)?e.nationalYouthOverallRank:null;
+  const youthOverall=nationalYouth!=null&&e?.ageClassRank==null;
+  const de=e?.ageClassRank!=null?'#'+num(e.ageClassRank):youthOverall?'#'+num(nationalYouth):"–";
+  const deLabel=youthOverall?"DE Jugend gesamt":"DE";
   const movement=e?shortMovement(e.bwAgeClassChange,e.previousBwAgeClassRank,"BW-Plätze"):'<span class="movement movement-unknown">–</span>';
-  return '<button class="ranking-tile ranking-compact" type="button" data-rank-discipline="'+escape(key)+'" '+(e?'':'disabled')+' aria-label="'+escape(title)+': BW '+bw+', Deutschland '+de+'">'+
+  return '<button class="ranking-tile ranking-compact" type="button" data-rank-discipline="'+escape(key)+'" '+(e?'':'disabled')+' aria-label="'+escape(title)+': BW '+bw+', '+deLabel+' '+de+'">'+
   '<span class="ranking-top"><span>'+escape(title)+'</span></span>'+
   '<span class="ranking-bw-title">BW · '+escape(e?.ageClass||"AK")+'</span>'+
   '<span class="ranking-bw-row"><strong>'+bw+'</strong>'+movement+'</span>'+
-  '<span class="ranking-de-row"><span title="Deutschland">DE</span><strong>'+de+'</strong></span>'+
+  '<span class="ranking-de-row"><span title="'+(youthOverall?'Bundesweite Jugendliste über alle Altersklassen':'Deutschland')+'">'+deLabel+'</span><strong>'+de+'</strong></span>'+
   '<span class="ranking-compact-points">'+(e&&Number.isFinite(e.points)?num(e.points)+' <small>Pts.</small>':'– <small>Pts.</small>')+'</span>'+
   '<span class="ranking-compact-footer">'+escape(cohort)+' <span aria-hidden="true">›</span></span></button>';
  }).join("");
