@@ -37,7 +37,7 @@ async function authorize(req:Request):Promise<boolean>{
   payload.repository_owner_id==="326005713"&&
   payload.ref==="refs/heads/main"&&payload.workflow_ref===WORKFLOW&&
   payload.sub==="repo:metzgerhannes-oss@326005713/Badminton@1412033492:ref:refs/heads/main"&&
-  ["push","workflow_dispatch"].includes(String(payload.event_name||""));
+  ["push","workflow_dispatch","schedule"].includes(String(payload.event_name||""));
 }
 function secret(){
  const old=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");if(old)return old;
@@ -52,6 +52,33 @@ Deno.serve(async (req:Request)=>{
   const text=await req.text();if(text.length>220000)return error(413,"size");
   body=JSON.parse(text);
  }catch{return error(400,"json")}
+ if(body?.mode==="reconcile"){
+  if(!/^run-[0-9]{8,20}$/.test(body.run||"")||
+     !Number.isInteger(body.expected_count)||body.expected_count<1700||body.expected_count>10000||
+     !Number.isInteger(body.sources_ok)||!Number.isInteger(body.sources_missing))
+     return error(422,"invalid_reconcile_summary");
+  const url=Deno.env.get("SUPABASE_URL")||"",key=secret();
+  if(!key||!url||new URL(url).hostname!==REF+".supabase.co")return error(503,"dbconfig");
+  const headers={apikey:key,...(key.startsWith("eyJ")?{"Authorization":"Bearer "+key}:{}),
+    "Content-Type":"application/json"};
+  let result:Response;
+  try{
+   result=await fetch(url+"/rest/v1/rpc/reconcile_spvgg_match_sources",{
+    method:"POST",headers,
+    body:JSON.stringify({p_source_run:body.run,p_expected_count:body.expected_count,
+     p_sources_ok:body.sources_ok,p_sources_missing:body.sources_missing}),
+    signal:AbortSignal.timeout(22000)
+   });
+  }catch{return error(503,"reconciliation_unavailable")}
+  if(!result.ok)return error(409,"source_reconciliation_rejected");
+  let answer:any;
+  try{answer=await result.json()}catch{return error(502,"invalid_db_reply")}
+  if(answer?.ok!==true||answer.staged!==body.expected_count)return error(502,"reconciliation_mismatch");
+  // Respond only with counts, never identities or underlying match rows.
+  return Response.json({ok:true,new_matches:answer.new_matches,quarantined:answer.quarantined,
+   source_rows:answer.staged,sources_ok:answer.sources_ok,sources_missing:answer.sources_missing},
+   {headers:{"Cache-Control":"no-store"}});
+ }
  if(!/^run-[0-9]{8,20}$/.test(body?.run||"")||
     !Array.isArray(body?.rows)||body.rows.length<1||body.rows.length>75||
     body.rows.some((x:any)=>!validFact(x)))return error(422,"facts");
