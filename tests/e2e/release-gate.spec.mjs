@@ -169,32 +169,20 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
  }
 });
 
-test("v74 four compact Badhub career tiles on every mobile width",async ({page})=>{
+test("v142 member statistics appear only once on all mobile widths",async ({page})=>{
  for(const width of [320,375,390,768]){
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
-  const panel=page.locator("#match-stats-reference");
-  await expect(panel).toBeVisible();
-  await expect(panel.locator(".dbv-reference-totals strong")).toHaveText(["62","26","36",/41,9/]);
-  await expect(panel).not.toContainText("Quelle:");
-  await expect(panel.locator("a")).toContainText("Aktuellen Badhub-Stand öffnen");
-  const metrics=await panel.evaluate(el=>({
-   columns:getComputedStyle(el.querySelector(".dbv-reference-totals")).gridTemplateColumns.split(" ").length,
-   right:el.getBoundingClientRect().right,
-   contentRight:Math.max(...[...el.querySelectorAll(".dbv-reference-totals span")].map(x=>x.getBoundingClientRect().right))
-  }));
-  expect(metrics.columns).toBe(4);
-  expect(metrics.right).toBeLessThanOrEqual(width+1);
-  expect(metrics.contentRight).toBeLessThanOrEqual(metrics.right+1);
-  const color=await panel.evaluate(el=>({
-   win:getComputedStyle(el.querySelector(".dbv-reference-totals .wins strong")).color,
-   loss:getComputedStyle(el.querySelector(".dbv-reference-totals .losses strong")).color,
-   tile:getComputedStyle(el.querySelector(".dbv-reference-totals .wins")).backgroundColor
-  }));
-  expect(color).toEqual({
-   win:"rgb(7, 134, 76)",
-   loss:"rgb(155, 66, 66)",
-   tile:"rgb(233, 246, 255)"
-  });
+  await expect.poll(()=>page.evaluate(()=>window.badmintonAppAccess?.allowed)).toBe(true);
+  await expect(page.locator("#match-stats-reference")).toBeHidden();
+  const tiles=page.locator("#match-stats-values .match-stat");
+  await expect(tiles).toHaveCount(4);
+  for(const tile of await tiles.all()){
+   const frame=await tile.boundingBox();
+   expect(frame).toBeTruthy();
+   expect(frame.width).toBeGreaterThan(35);
+   expect(frame.x+frame.width).toBeLessThanOrEqual(width+1);
+  }
+  await expect(page.locator("#match-stats-source-link")).toContainText("Badhub");
  }
 });
