@@ -16,6 +16,23 @@ const data=[
  fixture("f","Einzel",1,1,2026,{games:[[21,10],[19,21]]}),
  fixture("z","Einzel",1,1),fixture("z","Einzel",1,1)
 ];
+// Contradictory knockout bracket claims must never inflate actual W/L totals.
+const bracket=(id,competition,event,round,opponent)=>fixture(
+ id,"Einzel",1,1,2026,{source_key:"tournament:"+competition+":"+event+":"+round+":"+opponent,
+  competition_id:competition,event,round_label:round,opponent_names:[opponent]});
+const suspicious=[
+ bracket("x1","4184","JE U15","Halbfinale","Opponent One"),
+ bracket("x2","4184","JE U15","Halbfinale","Opponent Two"),
+ bracket("x3","4184","JE U15","Finale","Opponent Three"),
+ bracket("x4","4190","JE U15","Finale","Opponent Four")
+];
+const contradiction=computeExternalStats(suspicious);
+assert.equal(contradiction.total,1,"Only the independent event is countable");
+assert.equal(contradiction.quarantined,3,"All conflicting-event facts are held for re-verification");
+assert.equal(computeExternalStats(suspicious,{discipline:"Einzel"}).quarantined,3);
+const groupStage=[bracket("g1","5000","ME U13","Gruppe A","O1"),
+ bracket("g2","5000","ME U13","Gruppe A","O2")];
+assert.equal(computeExternalStats(groupStage).total,2,"Round-robin group matches are valid");
 assert.deepEqual(sourceMatchYears(data),["2026","2025"]);
 const total=computeExternalStats(data);
 assert.equal(total.total,4);
