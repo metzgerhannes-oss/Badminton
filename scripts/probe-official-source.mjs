@@ -41,3 +41,21 @@ for(const [i,url] of [...official].entries()){
    tableTags:count(/<table\b/gi),scriptTags:count(/<script\b/gi)}));
  }
 }
+
+const peer=await fetchHtml("https://badhub.de/spieler/05-067838?saison=2026&src=turnier");
+if(peer.html){
+ const cards=peer.html.split(/<div class="card sp-tournament-card(?: [^"]*)?">/).slice(1);
+ const ev=cards.filter(c=>/Friedrichshafen 2026/i.test(c.slice(0,1400))&&/BWBV-Meisterschaft/i.test(c.slice(0,1400)));
+ const links=ev.flatMap(c=>[...c.matchAll(/href="\/(?:bwbv|dbv)\/turnier\.php\?id=(\d+)"/g)].map(m=>m[1]));
+ console.log(JSON.stringify({badhubPeer:peer.http,tournamentCards:cards.length,matchedEventCards:ev.length,eventIdCount:links.length}));
+ for(const id of [...new Set(links)].slice(0,2)){
+  const event=await fetchHtml("https://badhub.de/bwbv/turnier.php?id="+id);
+  const html=event.html||"";
+  console.log(JSON.stringify({badhubTournament:1,http:event.http||null,bytes:html.length,
+   matchCards:(html.match(/sp-match-item/g)||[]).length,
+   matchRows:(html.match(/sp-match-body/g)||[]).length,
+   scoreSets:(html.match(/sp-set-score/g)||[]).length,
+   targetMention:html.includes("Charlotte Metzger"),
+   sourceId:id}));
+ }
+}else console.log(JSON.stringify({badhubPeer:peer.http||null,error:peer.error}));
