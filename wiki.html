@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d9ecfb">
+<title>Regeln & Wissen · Schmetterlinge</title>
+<meta name="description" content="Badminton-Regeln kurz, bebildert und durchsuchbar. Grundlagen, Spielsituationen und Jugendturniere.">
+<link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
+<link rel="stylesheet" href="./wiki.css">
+<script defer src="./wiki.js"></script>
+</head>
+<body>
+<a href="#wiki-main" class="skip-link">Zum Inhalt springen</a>
+<header class="wiki-header">
+ <a class="back" href="./#start" aria-label="Zur Schmetterlinge-Startseite">‹ <span>Zurück</span></a>
+ <div class="wiki-brand"><img src="./assets/spvgg-schmetterlinge.svg" width="38" height="38" alt=""><span>Schmetterlinge<small>BADMINTON-WIKI</small></span></div>
+</header>
+<main id="wiki-main" tabindex="-1">
+ <div class="intro"><div class="eyebrow">Regeln & Wissen</div><h1>Schnell erklärt.</h1><p>Eine Grafik. Eine klare Antwort.</p></div>
+ <div class="search-wrap">
+  <label for="wiki-search">Was möchtest du wissen?</label>
+  <input type="search" id="wiki-search" placeholder="z. B. Aufschlag, Rangliste, U13 …" autocomplete="off" spellcheck="false" enterkeyhint="search">
+ </div>
+ <nav class="filters" aria-label="Wiki-Themen">
+  <button type="button" class="active" data-topic="alle" aria-pressed="true">Alle</button>
+  <button type="button" data-topic="grundlagen" aria-pressed="false">Grundregeln</button>
+  <button type="button" data-topic="spielsituationen" aria-pressed="false">Spielsituationen</button>
+  <button type="button" data-topic="jugend" aria-pressed="false">Jugend & Turniere</button>
+ </nav>
+ <div class="result-head"><h2 id="results-title">Beliebte Regeln</h2><span id="wiki-count" aria-live="polite"></span></div>
+ <div id="wiki-results" class="wiki-results" aria-live="polite"></div>
+ <p id="wiki-empty" class="empty" hidden>Keine passende Regel gefunden. Probiere einen anderen Begriff.</p>
+ <p class="wiki-footer">Hinweise für den Spielalltag. Entscheidend sind die gültige Ausschreibung und die offiziellen Verbandsregeln.</p>
+</main>
+<dialog id="wiki-detail" aria-labelledby="detail-title">
+ <div class="detail-top"><span id="detail-category"></span><button id="detail-close" type="button" aria-label="Regel schließen">×</button></div>
+ <h2 id="detail-title"></h2>
+ <div id="detail-art" class="detail-art" role="img"></div>
+ <p id="detail-answer" class="detail-answer"></p>
+ <div class="detail-bottom"><span id="detail-scope"></span><a id="detail-source" target="_blank" rel="noopener noreferrer">Offizielle Quelle ↗</a></div>
+</dialog>
+</body>
+</html>
