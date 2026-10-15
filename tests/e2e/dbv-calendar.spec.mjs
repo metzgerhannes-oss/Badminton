@@ -221,3 +221,66 @@ test("v148: BW U13 C 2026 zero upcoming puts 2027 jump before no-results",async(
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
  await expect(results.locator(".dbv-calendar-external-plan")).toHaveCount(4);
 });
+
+test("v149: BW U11/U13/U15/U17/U19 C histories are source-backed and age-filtered",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await page.locator("#dbv-calendar-period").selectOption("all");
+ for(const [age,count,hexen] of [["U11",3,false],["U13",3,false],["U15",4,true],["U17",4,true],["U19",4,true]]){
+  await page.locator("#dbv-calendar-age").selectOption(age);
+  const results=page.locator("#dbv-calendar-results");
+  await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(count);
+  await expect(results).toContainText("Reutlingen");
+  await expect(results).toContainText("Friedrichshafen");
+  await expect(results).toContainText("Mössingen");
+  if(hexen)await expect(results).toContainText("C-RLT U15/U17/U19");
+  else await expect(results).not.toContainText("C-RLT U15/U17/U19");
+  await expect(results.locator(".dbv-calendar-external-result [data-calendar-toggle]")).toHaveCount(0);
+ }
+ await page.locator("#dbv-calendar-age").selectOption("U9");
+ await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test("v149: BW youth A/B/C 2027 remains age-correct for U11 through U19",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ for(const [age,counts] of [
+  ["U11",{A:1,B:0,C:3}],["U13",{A:1,B:1,C:4}],
+  ["U15",{A:0,B:1,C:4}],["U17",{A:0,B:1,C:4}],["U19",{A:0,B:1,C:4}]
+ ]){
+  await page.locator("#dbv-calendar-age").selectOption(age);
+  for(const [level,count] of Object.entries(counts)){
+   await page.locator("#dbv-calendar-level").selectOption(level);
+   await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(count);
+   if(count)await expect(page.locator(".dbv-calendar-external-plan [data-calendar-toggle]")).toHaveCount(0);
+  }
+ }
+ await page.locator("#dbv-calendar-age").selectOption("U9");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(0);
+});
+
+test("v149: U17 2026 C missing imported events suggests past verified events and 2027 framework",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U17");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await page.locator("#dbv-calendar-period").selectOption("upcoming");
+ const results=page.locator("#dbv-calendar-results");
+ await expect(results.locator("[data-calendar-show-2027]")).toBeVisible();
+ await expect(results.locator("[data-calendar-show-history]")).toBeVisible();
+ await results.locator("[data-calendar-show-history]").click();
+ await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(4);
+ await expect(results.locator("[data-calendar-show-2027]")).toBeVisible();
+ await results.locator("[data-calendar-show-2027]").click();
+ await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
+ await expect(results.locator(".dbv-calendar-external-plan")).toHaveCount(4);
+});
