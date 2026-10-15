@@ -96,7 +96,7 @@ test("v148: BW U13 C presents real 2026 tournament results instead of source exp
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-level").selectOption("C");
  await page.locator("#dbv-calendar-period").selectOption("all");
- await expect(page.locator("#dbv-calendar-status")).toContainText("3 passende Turniere");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("4 passende Turniere");
  const cards=page.locator("#dbv-calendar-results .dbv-calendar-external-result");
  await expect(cards).toHaveCount(3);
  await expect(cards.nth(0)).toContainText("Reutlingen");
@@ -115,20 +115,20 @@ test("v148: BW U13 historic A/B/C results distinguish Hexen-Cup A from C",async(
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-period").selectOption("all");
- for(const [level,count,venues] of [
-  ["C",3,["Reutlingen","Friedrichshafen","Mössingen"]],
-  ["A",2,["Eggenstein","Konstanz"]],
-  ["B",1,["Waghäusel"]]
+ for(const [level,count,curated,venues] of [
+  ["C",4,3,["Reutlingen","Friedrichshafen","Mössingen"]],
+  ["A",2,2,["Eggenstein","Konstanz"]],
+  ["B",1,1,["Waghäusel"]]
  ]){
   await page.locator("#dbv-calendar-level").selectOption(level);
-  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(count);
+  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(curated);
   const list=await page.locator(".dbv-calendar-external-result").allTextContents();
   for(const venue of venues)expect(list.join(" ")).toContain(venue);
   await expect(page.locator("#dbv-calendar-status")).toContainText(count+" passende Turniere");
  }
  await page.locator("#dbv-calendar-level").selectOption("all");
  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(6);
- await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(16);
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(17);
 });
 
 test("v148: upcoming period has direct one-click access to past results",async({page})=>{
@@ -229,10 +229,11 @@ test("v150: BW U11/U13/U15/U17/U19 C histories are source-backed and age-filtere
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-level").selectOption("C");
  await page.locator("#dbv-calendar-period").selectOption("all");
- for(const [age,count,hexen] of [["U11",3,false],["U13",3,false],["U15",4,true],["U17",4,true],["U19",4,true]]){
+ for(const [age,curated,total,hexen] of [["U11",3,4,false],["U13",3,4,false],["U15",4,5,true],["U17",4,6,true],["U19",4,5,true]]){
   await page.locator("#dbv-calendar-age").selectOption(age);
   const results=page.locator("#dbv-calendar-results");
-  await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(count);
+  await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(curated);
+  await expect(page.locator("#dbv-calendar-status")).toContainText(total+" passende Turniere");
   await expect(results).toContainText("Reutlingen");
   await expect(results).toContainText("Friedrichshafen");
   await expect(results).toContainText("Mössingen");
@@ -279,6 +280,7 @@ test("v150: U17 2026 C missing imported events suggests past verified events and
  await expect(results.locator("[data-calendar-show-history]")).toBeVisible();
  await results.locator("[data-calendar-show-history]").click();
  await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(4);
+ await expect(page.locator("#dbv-calendar-status")).toContainText("6 passende Turniere");
  await expect(results.locator("[data-calendar-show-2027]")).toBeVisible();
  await results.locator("[data-calendar-show-2027]").click();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
