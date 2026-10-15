@@ -232,7 +232,8 @@ async function readBWArchive(){
  const rows=data.entries.map(calendarEntry);
  if(rows.some(row=>!row||row.bundesland!=="Baden-Württemberg"||
    !["A","B","C"].includes(row.level)||!row.ages.some(age=>BW_YOUTH_AGES.includes(age))||
-   !row.start.startsWith(String(data.year))||row.end>=localToday())){
+   !(Array.isArray(data.years)?data.years:[data.year]).map(String).includes(row.start.slice(0,4))||
+   row.end>=localToday())){
   throw Error("Archiv enthält nicht passende oder zukünftige DBV-Daten");
  }
  if(new Set(rows.map(t=>t.key)).size!==rows.length)throw Error("Doppelte DBV-Archivkennungen");
