@@ -14,7 +14,7 @@ const BW_YOUTH_AGES=["U11","U13","U15","U17","U19"];
 // These are source-backed planning/award dates, NOT confirmed sign-up events.
 const BWBV_C_FRAMEWORK_2027=[
  {start:"2027-01-16",end:"2027-01-17",level:"C",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
- {start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
+ {start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ages:["U13","U15","U17","U19"],ageCertain:false},
  {start:"2027-05-08",end:"2027-05-09",level:"C",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
  // The fourth C round does not generally offer U11 according to BWBV youth rules.
  {start:"2027-06-26",end:"2027-06-27",level:"C",title:"4. BWBV/C-RLT Jugend · Hexen-Cup",ages:["U13","U15","U17","U19"],ageCertain:false}
@@ -25,10 +25,12 @@ const BWBV_B_FRAMEWORK_2027=[
   source:"https://bwbv.de/wp-content/uploads/2025/11/bj-2025-11-web.pdf"}
 ];
 const DBV_A_VERGABE_2027=[
+ {start:"2027-02-20",end:"2027-02-21",level:"A",title:"2. A-RLT U11/U13 · BC Lörrach-Brombach",ages:["U11","U13"],ageCertain:true,
+  source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
  {start:"2027-04-24",end:"2027-04-25",level:"A",title:"4. DBV-A-RLT U11/U13 · BSV Eggenstein",ages:["U11","U13"],ageCertain:true,
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"}
 ];
-const BW_YOUTH_FRAMEWORK_2027=[
+let BW_YOUTH_FRAMEWORK_2027=[
  ...BWBV_C_FRAMEWORK_2027.map(t=>({...t,source:BWBV_FRAMEWORK_SOURCE})),
  ...BWBV_B_FRAMEWORK_2027,...DBV_A_VERGABE_2027
 ].sort((a,b)=>a.start.localeCompare(b.start));
@@ -40,7 +42,7 @@ function bwFrameworkDates(filters,today){
   t.ages.includes(filters.age)&&
   (filters.level==="all"||filters.level===t.level)&&
   (filters.period!=="upcoming"||t.end>=today)&&
-  (!search||(t.title+" "+t.level+" 2027 BWBV DBV Eggenstein").normalize("NFKC").toLocaleLowerCase("de").includes(search)));
+  (!search||(t.title+" "+t.level+" 2027 BWBV DBV").normalize("NFKC").toLocaleLowerCase("de").includes(search)));
 }
 function bwFrameworkHTML(filters,today){
  const planned=bwFrameworkDates(filters,today);
@@ -223,6 +225,34 @@ async function readSnapshot(){
  return {rows,timestamp:Date.parse(data.capturedAt)||0};
 }
 // Independent DBV historical source archive (public only; no personal data).
+// An independent, source-backed BWBV/DBV plan supersedes hand-maintained 2027 cards.
+async function readBWBVFramework(){
+ const response=await fetch("./data/bwbv-youth-framework-2027.json",{cache:"no-store"});
+ if(!response.ok)throw Error("BWBV Planungsdatei nicht verfügbar");
+ const data=await response.json();
+ if(data.schemaVersion!==1||data.scope!=="bw-youth-abc-planning-2027"||
+  data.year!==2027||!Array.isArray(data.entries)||data.entries.length!==7||
+  !Array.isArray(data.sourceFamilies)||data.sourceFamilies.length!==2)throw Error("BWBV Datenformat");
+ const allowedSources=new Set([
+  "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+  "https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"
+ ]);
+ if(data.sourceFamilies.some(source=>!allowedSources.has(source))||
+  data.entries.some(t=>!t||typeof t.title!=="string"||t.title.length>150||
+   !["A","B","C"].includes(t.level)||!/^2027-\d{2}-\d{2}$/.test(t.start)||
+   !/^2027-\d{2}-\d{2}$/.test(t.end)||t.end<t.start||
+   !Array.isArray(t.ages)||!t.ages.length||t.ages.some(age=>!BW_YOUTH_AGES.includes(age))||
+   typeof t.ageCertain!=="boolean"||t.status!=="planned"||
+   !allowedSources.has(t.source)||typeof t.key!=="string"||t.key.length>70||
+   "event_url" in t||"registration_deadline" in t)){
+  throw Error("BWBV Planungsdatensatz unvollständig");
+ }
+ if(new Set(data.entries.map(x=>x.key)).size!==7||
+  ["A","B","C"].some((l,i)=>data.entries.filter(x=>x.level===l).length!==[2,1,4][i])){
+  throw Error("BWBV Planung enthält doppelte oder fehlende Termine");
+ }
+ return data.entries.map(t=>({...t})).sort((a,b)=>a.start.localeCompare(b.start));
+}
 async function readBWArchive(){
  const res=await fetch("./data/bw-youth-calendar-archive.json",{cache:"no-store"});
  if(!res.ok)throw Error("Kein historisches BW-Archiv verfügbar");
@@ -276,6 +306,9 @@ async function load(){
   entries=[...new Map([...entries,...historical].map(row=>[row.key,row])).values()]
    .sort((a,b)=>a.start.localeCompare(b.start));
  }catch{ /* keep current source and directly verified entries */ }
+ // Display independently published BW/DBV planning instead of stale hardcoded cards.
+ try{BW_YOUTH_FRAMEWORK_2027=await readBWBVFramework()}
+ catch{ /* remain on vetted official fallback when source refresh is unavailable */ }
  loading=false;loaded=true;
  updateControls();render();
  if(!entries.length&&problem)message(problem+" Offiziellen DBV-Kalender bei Bedarf direkt öffnen.");

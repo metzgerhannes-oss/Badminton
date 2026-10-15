@@ -83,3 +83,6 @@ assert.ok(app.includes("dbv-calendar-external-plan")&&app.includes("dbv-calendar
 assert.ok(app.includes("readBWArchive"),"Full-year verified BW archive must be consumed by the calendar");
 assert.ok(app.includes("./data/bw-youth-calendar-archive.json"),"Historical BW archive must remain a separate verifiable source");
 assert.ok(app.includes("isCuratedDuplicate"),"Do not double count official source and result cards");
+
+assert.ok(app.includes("readBWBVFramework"),"Official BWBV planning snapshot must supersede hardcoded cards");
+assert.ok(app.includes("./data/bwbv-youth-framework-2027.json"),"Verified 2027 BWBV/DBV source is a published file");

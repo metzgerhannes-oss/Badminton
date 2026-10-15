@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "scope": "bw-youth-abc-planning-2027",
+  "year": 2027,
+  "sourceFamilies": [
+    "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+    "https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"
+  ],
+  "entries": [
+    {
+      "key": "bwbv-2027-c-1",
+      "title": "1. BWBV/C-RLT Jugend · Einzel/Doppel",
+      "level": "C",
+      "start": "2027-01-16",
+      "end": "2027-01-17",
+      "ages": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "ageCertain": false,
+      "status": "planned",
+      "source": "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+      "organizer": ""
+    },
+    {
+      "key": "bwbv-2027-b-3",
+      "title": "3. B-RLT SüdOst U13–U19",
+      "level": "B",
+      "start": "2027-01-30",
+      "end": "2027-01-31",
+      "ages": [
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "ageCertain": true,
+      "status": "planned",
+      "source": "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+      "organizer": ""
+    },
+    {
+      "key": "dbv-bw-a-2027-2",
+      "title": "2. A-RLT U11/U13 · BC Lörrach-Brombach",
+      "level": "A",
+      "start": "2027-02-20",
+      "end": "2027-02-21",
+      "ages": [
+        "U11",
+        "U13"
+      ],
+      "ageCertain": true,
+      "status": "planned",
+      "source": "https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/",
+      "organizer": "BC Lörrach-Brombach"
+    },
+    {
+      "key": "bwbv-2027-c-2",
+      "title": "2. BWBV/C-RLT Jugend · Einzel/Mixed",
+      "level": "C",
+      "start": "2027-02-27",
+      "end": "2027-02-28",
+      "ages": [
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "ageCertain": false,
+      "status": "planned",
+      "source": "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+      "organizer": ""
+    },
+    {
+      "key": "dbv-bw-a-2027-4",
+      "title": "4. A-RLT U11/U13 · BSV Eggenstein",
+      "level": "A",
+      "start": "2027-04-24",
+      "end": "2027-04-25",
+      "ages": [
+        "U11",
+        "U13"
+      ],
+      "ageCertain": true,
+      "status": "planned",
+      "source": "https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/",
+      "organizer": "BSV Eggenstein"
+    },
+    {
+      "key": "bwbv-2027-c-3",
+      "title": "3. BWBV/C-RLT Jugend · Einzel/Doppel",
+      "level": "C",
+      "start": "2027-05-08",
+      "end": "2027-05-09",
+      "ages": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "ageCertain": false,
+      "status": "planned",
+      "source": "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+      "organizer": ""
+    },
+    {
+      "key": "bwbv-2027-c-4",
+      "title": "4. BWBV/C-RLT Jugend · Hexen-Cup",
+      "level": "C",
+      "start": "2027-06-26",
+      "end": "2027-06-27",
+      "ages": [
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "ageCertain": false,
+      "status": "planned",
+      "source": "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+      "organizer": ""
+    }
+  ],
+  "capturedAt": "2026-10-15T15:06:32.304492+00:00"
+}
