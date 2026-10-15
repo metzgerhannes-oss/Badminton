@@ -97,3 +97,11 @@ for(const [id,name] of women){
  }
  console.log("CHARLOTTE_PEER_RESULTS "+JSON.stringify({name,id,status,parsed}));
 }
+
+const me=await htmlGet("https://badhub.de/bwbv/turnier.php?id=4986");
+if(me.html){
+ const plain=me.html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,"").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,"")
+  .replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ");
+ const at=plain.indexOf("ME U13"),until=plain.indexOf("ME U15",at);
+ console.log("FRIEDRICHSHAFEN_ME_U13 "+JSON.stringify({group:at>=0&&until>at?plain.slice(at,until).slice(0,3100):null}));
+}
