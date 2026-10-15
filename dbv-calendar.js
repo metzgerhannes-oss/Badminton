@@ -71,7 +71,7 @@ const BW_U13_ARCHIVE_2026=[
  {level:"A",start:"2026-05-02",end:"2026-05-03",title:"4. A-RLT U11/U13",place:"Eggenstein-Leopoldshafen",detail:"",
   source:"https://bwbv.de/2026/05/07/4-a-rlt-in-eggenstein-leopoldshafen-silber-fuer-den-bsv/",sourceKind:"results"},
  {level:"B",start:"2026-06-13",end:"2026-06-14",title:"3. B-RLT SüdOst U13–U19",place:"Waghäusel",detail:"",
-  source:"https://badminton-rlp.de/aktuelles/33-globus-oliver-cup-jugend-badminton-in-waghaeusel",sourceKind:"report"},
+  source:"https://badminton-rlp.de/aktuelles/33-globus-oliver-cup-jugend-badminton-in-waghaeusel",sourceKind:"announcement"},
  // 2026 Hexen-Cup has A-ranking for U13, and C-ranking ONLY for U15/17/19.
  {level:"A",start:"2026-06-27",end:"2026-06-28",title:"6. A-RLT U11/U13 · Hexen-Cup",place:"Konstanz",detail:"Einzel/Doppel/Mixed",
   source:"https://dbv.turnier.de/tournament/35299a0c-11f6-4ffd-85c2-3aca6dd1c0aa",sourceKind:"results"}
@@ -95,7 +95,7 @@ function bwArchiveHTML(filters){
    '<div class="dbv-calendar-detail"><h5>'+esc(t.title)+'</h5>'+
    '<p>'+esc(t.place)+' · Level '+esc(t.level)+(t.detail?' · '+esc(t.detail):'')+'</p>'+
    '<a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">'+
-      (t.sourceKind==="results"?"Ergebnisse ansehen ↗":"Turnierbericht ↗")+'</a></div>'+
+      (t.sourceKind==="results"?"Ergebnisse ansehen ↗":"Turnierinfo ↗")+'</a></div>'+
    '</article>').join("")+'</section>';
 }
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
