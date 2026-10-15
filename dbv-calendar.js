@@ -57,7 +57,7 @@ function bwNextYearHint(filters){
  const planned=bwFrameworkDates({...filters,year:"2027"},localToday());
  if(!planned.length)return "";
  return '<button type="button" class="subtle-button dbv-calendar-year-jump" data-calendar-show-2027>'+
-   '2027: '+planned.length+' Termine ansehen ↗</button>';
+   '2027: '+planned.length+' A-/B-/C-Termine ansehen ↗</button>';
 }
 // Verified completed 2026 tournaments are displayed as real result cards,
 // never masquerading as imported DBV event IDs or registration opportunities.
@@ -148,20 +148,20 @@ function render(){
  if(!selected.total){
   const more=$("dbv-calendar-more");if(more)more.hidden=true;
   if(sourcedCount){
-   host.innerHTML=archiveHTML+frameworkHTML+nextYearHint;
+   host.innerHTML=nextYearHint+archiveHTML+frameworkHTML;
    return;
   }
   const alternatives=alternativeCalendarLevels(entries,{...settings,today});
   const switchPeriod=settings.period==="upcoming"&&settings.year==="2026"&&
      settings.region==="Baden-Württemberg"&&settings.age==="U13"
     ?'<button type="button" class="subtle-button" data-calendar-show-history>Ergebnisse 2026 ansehen ↗</button>':"";
-  host.innerHTML='<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere</h4>'+
+  host.innerHTML=nextYearHint+'<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere</h4>'+
     '<p>In dieser Auswahl sind keine bestätigten Einträge verfügbar.</p>'+
     switchPeriod+
     (alternatives.length?'<div class="dbv-calendar-alternatives">'+
      alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
       'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
-    '</div>'+nextYearHint;
+    '</div>';
   return;
  }
  const bookmarkState=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
@@ -189,7 +189,7 @@ function render(){
   }).join("");
   html+='</section>';
  }
- host.innerHTML=archiveHTML+frameworkHTML+html+nextYearHint;
+ host.innerHTML=nextYearHint+archiveHTML+frameworkHTML+html;
  const more=$("dbv-calendar-more");
  if(more)more.hidden=selected.groups.reduce((n,g)=>n+g.items.length,0)<=batchLimit;
 }
