@@ -354,3 +354,10 @@
 .dbv-calendar-next-year p{margin:7px 0;line-height:1.45;font-size:13px}
 .dbv-calendar-next-year button{min-height:44px;font-size:13px}
 
+
+/* v147: one concise source-backed event row, no large import-info cards. */
+.dbv-calendar-sourced-results,.dbv-calendar-sourced-plan{margin-top:8px}
+.dbv-calendar-external-result,.dbv-calendar-external-plan{border-bottom:1px solid #e2edf4}
+.dbv-calendar-external-result .dbv-calendar-detail a,
+.dbv-calendar-external-plan .dbv-calendar-detail a{display:inline-block;min-height:40px;padding:6px 0;font-weight:700}
+.dbv-calendar-year-jump{display:block;margin:12px 0 8px;min-height:44px;max-width:100%;white-space:normal;text-align:left}
