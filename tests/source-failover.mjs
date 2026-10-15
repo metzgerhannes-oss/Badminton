@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
+import {excludeContradictoryRounds} from "../scripts/match-source-integrity.mjs";
 import {assessSourceAvailability,importStatusForBatch} from "../supabase/functions/history-match-import/source-availability.mjs";
 const ok=s=>({status:"fulfilled",value:s});
 const bad={status:"rejected",reason:new Error("HTTP 404")};
@@ -30,4 +31,18 @@ assert.match(fn,/status:importStatusForBatch\(finished,excluded,sources\.missing
 assert.match(fn,/status:"awaiting_source"/);
 assert.match(fn,/unavailable_categories:sources\.missing/);
 assert.doesNotMatch(fn,/src=gesamt/,"Only existing tournament and league endpoints allowed");
+const proof=(id,event,round)=>({category:"tournament",source_key:"tournament:777:"+event+":"+round+":"+id,
+ event,round_label:round});
+const audit=excludeContradictoryRounds([
+ proof("a","JE U13","Halbfinale"),proof("b","JE U13","Halbfinale"),
+ proof("c","JE U13","Finale"),proof("d","ME U13","Halbfinale"),
+ proof("e","JE U17","Gruppe A"),proof("f","JE U17","Gruppe A")
+]);
+assert.equal(audit.excluded,3,"All contradictory-event rounds must be held back");
+assert.equal(audit.affectedEvents,1);
+assert.equal(audit.accepted.length,3,"Other fields and group games stay available");
+const deployedIntegrity=await readFile("supabase/functions/history-match-import/match-source-integrity.mjs","utf8");
+assert.equal(deployedIntegrity,await readFile("scripts/match-source-integrity.mjs","utf8"),
+ "The deployed guard must be the tested guard");
+assert.match(fn,/excludeContradictoryRounds\(\[\.\.\.matches\.values\(\)\]\)/);
 console.log("Match importer: partial source failover, no false completion, safe cursor reset and parser parity.");
