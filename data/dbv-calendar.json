@@ -1,32 +1,9 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-10-14T10:35:18.379387+00:00",
+  "capturedAt": "2026-10-15T10:17:18.940465+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
-    {
-      "source_key": "dbv-calendar-44698",
-      "title": "Victor Denmark Junior U15E",
-      "start_date": "2026-10-14",
-      "end_date": "2026-10-17",
-      "location_text": "Odense",
-      "organizer": "Badminton Europe",
-      "bundesland": null,
-      "region_scope": "international",
-      "category": "BEC-U15",
-      "level_group": "International",
-      "age_groups": [
-        "U15"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": null,
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
     {
       "source_key": "dbv-calendar-44659",
       "title": "C-RLT SAA O19 (SBV 3. C-RLT O19 2026)",
@@ -1037,7 +1014,7 @@
       "title": "5. D-RLT HES Frankfurt U15-U19",
       "start_date": "2026-11-14",
       "end_date": "2026-11-15",
-      "location_text": "Mörfelden-Walldorf",
+      "location_text": "Alzenau (OT Michelbach)",
       "organizer": "Hessen",
       "bundesland": "Hessen",
       "region_scope": "state",
@@ -1241,7 +1218,7 @@
       "title": "5. D-RLT HES Frankfurt U9-U13",
       "start_date": "2026-11-14",
       "end_date": "2026-11-15",
-      "location_text": "Alzenau (OT Michelbach)",
+      "location_text": "Mörfelden-Walldorf",
       "organizer": "Hessen",
       "bundesland": "Hessen",
       "region_scope": "state",
@@ -2308,6 +2285,29 @@
         "Doppel"
       ],
       "registration_deadline": "2026-11-10",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44751",
+      "title": "D-RLT NRW U15-U19 (5. Niederrheinisches Adventsdurcheinander)",
+      "start_date": "2026-12-06",
+      "end_date": "2026-12-06",
+      "location_text": "Geldern",
+      "organizer": "Nordrhein-Westfalen",
+      "bundesland": "Nordrhein-Westfalen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-27",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
