@@ -361,3 +361,6 @@
 .dbv-calendar-external-result .dbv-calendar-detail a,
 .dbv-calendar-external-plan .dbv-calendar-detail a{display:inline-block;min-height:40px;padding:6px 0;font-weight:700}
 .dbv-calendar-year-jump{display:block;margin:12px 0 8px;min-height:44px;max-width:100%;white-space:normal;text-align:left}
+
+/* Historical verified DBV rows are result records, not new registrations. */
+.dbv-calendar-entry--history .dbv-calendar-save{display:none}
