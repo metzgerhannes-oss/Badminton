@@ -139,9 +139,8 @@ function render(){
  const warning=source==="supabase"&&newest&&Date.now()-newest>8*86400000?" · Letzter DB-Abgleich vor über 8 Tagen":"";
  const coverage=entries.length?formatDate(entries.reduce((earliest,t)=>t.start<earliest?t.start:earliest,entries[0].start))+
   "–"+formatDate(entries.reduce((latest,t)=>t.end>latest?t.end:latest,entries[0].end)):"";
- message(selected.total+" von "+entries.length+" DBV-Importeinträgen (nur "+coverage+")"+
-  (archiveCount?" · "+archiveCount+" frühere U13-A/B/C-Turniere separat belegt":"")+
-  " · Quelle DBV"+warning);
+ message(selected.total+" von "+entries.length+" offiziellen Kalendereinträgen · Erfasster Zeitraum: "+coverage+
+  " · Quelle DBV"+(archiveCount?" · "+archiveCount+" frühere A/B/C-Turniere separat belegt":"")+warning);
  if(!selected.total){
   const region=settings.region==="all"?"allen Regionen":settings.region;
   const year=settings.year==="all"?"allen Jahren":"Jahr "+settings.year;
