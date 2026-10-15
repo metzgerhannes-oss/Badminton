@@ -40,11 +40,13 @@ jobs:
     timeout-minutes: 8
     permissions:
       contents: write
+      pages: write
     steps:
       - uses: actions/checkout@v4
       - name: Refresh verified public historical BW archive
         run: python3 scripts/import-bw-youth-archive.py --write-json
       - name: Commit source-backed archive only when it changes
+        id: publish
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
@@ -55,6 +57,23 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin main
             git rebase origin/main
-            if git push origin HEAD:main; then exit 0; fi
+            if git push origin HEAD:main; then echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0; fi
             if [ "$attempt" = 3 ]; then exit 1; fi
           done
+      # GITHUB_TOKEN pushes do not trigger automatic branch-based Pages builds.
+      # Request a new build explicitly only when a source-backed file changed.
+      - name: Publish updated archive to GitHub Pages
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error -o "$RUNNER_TEMP/pages-request.json" -w '%{http_code}' \
+            -X POST "https://api.github.com/repos/metzgerhannes-oss/Badminton/pages/builds" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28")
+          if [ "$status" != 201 ]; then
+            echo "Pages rebuild request failed (HTTP $status)"
+            exit 1
+          fi
