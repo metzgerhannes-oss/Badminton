@@ -50,7 +50,7 @@ assert.match(html,/id="match-stats-year"/);
 assert.match(html,/id="match-stats-more"/,"Full drilldown needs explicit pagination");
 assert.match(main,/detailLimit\+=DETAIL_PAGE/,"All validated matches must remain reachable");
 assert.doesNotMatch(main,/context\.details\.slice\(0,150\)/,"No silent 150-result limit");
-assert.match(main,/player_match_observations/);
+assert.doesNotMatch(main,/player_match_observations/,"Restricted official table is not a home source");
 assert.match(await readFile("scripts/match-availability.mjs","utf8"),/Noch keine einzeln belegten Spiele verfügbar/);
 assert.match(main,/external\.length>0/);
 assert.match(sql,/security_invoker\s*=\s*true/);
