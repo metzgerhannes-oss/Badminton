@@ -1,3 +1,4 @@
+import {parsePublicHistory} from "./badhub-history-parser.mjs";
 /** Read-only lookup of published tournament source URLs; no DB writes or match imports. */
 const sources=[
  ["club-ehingen","https://spvgg.org/abteilungen/badminton/aktuelles/4-e-rangliste-suedwuerttemberg-u11-u19-am-26-september-2026"],
@@ -71,4 +72,28 @@ if(peer.html){
    charlotteContext:idxC>=0?plain.slice(Math.max(0,idxC-230),idxC+170):null,
    scoreRows:(event.html.match(/sp-match-item/g)||[]).length}));
  }
+}
+
+const women=[
+ ["05-070018","Luisa Steinhauser"],
+ ["05-071508","Mihira Muthukumar"],
+ ["07-049074","Anabelle Matheis"],
+ ["05-072242","Karina Trippel"],
+ ["05-072223","Wencan Wu"]
+];
+for(const [id,name] of women){
+ const {status,html}=await htmlGet("https://badhub.de/spieler/"+id+"?saison=all&src=turnier");
+ let parsed=null;
+ if(html){
+  try{
+   const source=parsePublicHistory(html,{dbv_id:id,name},"tournament");
+   const found=source.items.filter(item=>
+    item.opponent_names.some(n=>n.toLocaleLowerCase("de")==="charlotte metzger"));
+   parsed={total:source.items.length,cards:source.cards_seen,meetings:found.map(m=>({
+    tournament:m.competition,source:m.source_url,event:m.event,round:m.round_label,
+    opponent:m.opponent_names,score:m.games,resultForCharlotte:m.player_side===m.winning_side?"loss":"win"
+   })).slice(0,10)};
+  }catch(e){parsed={error:e.message.slice(0,60)}}
+ }
+ console.log("CHARLOTTE_PEER_RESULTS "+JSON.stringify({name,id,status,parsed}));
 }
