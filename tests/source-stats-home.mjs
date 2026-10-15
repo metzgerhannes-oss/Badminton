@@ -44,7 +44,7 @@ const [stats,html,history,claim,cron,sw]=await Promise.all([
  "stats.js","index.html","history-demand.js","database/external-match-import.sql",
  "database/external-match-cron.sql","sw.js"].map(f=>readFile(f,"utf8")));
 assert.match(stats,/player_external_match_facts/);
-assert.match(stats,/player_match_observations/);
+assert.doesNotMatch(stats,/player_match_observations/,"Home must not query the restricted official observations table");
 assert.match(stats,/officialCount\.total===0&&external\.length>0/,
  "Never aggregate external and official matches into one total");
 assert.match(stats,/computeExternalStats/);
