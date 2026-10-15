@@ -67,7 +67,10 @@ test("frontend consumes database birth year and marks individual proofs",()=>{
  const sw=readFileSync(new URL("../sw.js",import.meta.url),"utf8");
  assert.match(html,/id="match-stats-age"/);
  assert.doesNotMatch(html,/id="match-stats-age-summary"/);
- assert.match(js,/queryBirthYear/);
+ assert.match(js,/queryBirthYear\(progress\)/);
+ assert.doesNotMatch(js,/getPage\("players\?"/,"Do not query the RLS-blocked public players table");
+ const reader=readFileSync(new URL("../scripts/supabase-read.mjs",import.meta.url),"utf8");
+ assert.match(reader,/birth_year:Number\.isInteger\(d\.birth_year\)/);
  assert.match(js,/ageContextBreakdown/);
  assert.match(js,/match-stats-age.*addEventListener/);
  assert.match(js,/AK nicht zuordenbar/);
