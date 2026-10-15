@@ -186,12 +186,14 @@ function render(){
  const context=ageContextBreakdown(stats,birthYear,{official:!sourced,filter:selectedAgeClass});
  const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
- // Member views prioritize every individually sourced match card. A dated
- // provider career summary remains informational and is not added to evidence.
+ // Member views show only one set of match counters. Keep the dated public
+ // Badhub snapshot solely as fallback when no app membership is available.
  const badhub=getBadhubMatchReference(selected,{
   year:selectedYear,discipline:selectedDiscipline,ageClass:selectedAgeClass
  });
- if(referenceSection&&badhub&&!privateMode){
+ // A dated Badhub total is a public fallback, not a second member KPI panel.
+ // Authorized members already see their documented games in the primary totals.
+ if(referenceSection&&badhub&&!privateMode&&!window.badmintonAppAccess?.allowed){
   referenceSection.hidden=false;
   referenceSection.innerHTML=
    '<div class="dbv-reference-heading"><strong>Badhub · veröffentlichte Karrierebilanz</strong>'+
