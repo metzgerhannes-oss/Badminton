@@ -134,14 +134,13 @@ function render(){
  const values=$("match-stats-values"),note=$("match-stats-note"),details=$("match-stats-details"),
   list=$("match-stats-list"),counter=$("match-stats-detail-count"),year=$("match-stats-year"),
   source=$("match-stats-source"),sourceDetails=$("match-stats-provenance-copy"),
-  retry=$("match-stats-retry"),ageSummary=$("match-stats-age-summary"),
+  retry=$("match-stats-retry"),
   referenceSection=$("match-stats-reference");
- if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry||!ageSummary)return;
+ if(!values||!note||!details||!list||!year||!source||!sourceDetails||!retry)return;
  const provenance=$("match-stats-provenance");
  values.hidden=false;
  note.hidden=false;
  if(provenance)provenance.hidden=false;
- ageSummary.hidden=true;
  if(referenceSection){referenceSection.hidden=true;referenceSection.innerHTML="";}
  // The public original is an optional cross-check, never evidence of a match.
  const lookup=$("match-stats-source-link");
@@ -185,14 +184,6 @@ function render(){
   computeExternalStats(rows,{year:selectedYear,discipline:selectedDiscipline}):
   computeMatchStats(rows,{year:selectedYear,discipline:selectedDiscipline});
  const context=ageContextBreakdown(stats,birthYear,{official:!sourced,filter:selectedAgeClass});
- const byAge=context.buckets;
- if(stats.total){
-  ageSummary.hidden=false;
-  ageSummary.textContent="Niederlagen nach gespielter AK · eigene: "+
-   byAge.own.losses+" · höhere: "+byAge.higher.losses+
-   " · nicht zuordenbar: "+byAge.unclassified.losses+
-   (birthYear===null?" · Spielerjahrgang nicht hinterlegt.":"");
- }
  const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
  // Member views prioritize every individually sourced match card. A dated
@@ -260,7 +251,6 @@ function render(){
  if(badhub&&referenceSection&&!privateMode&&!window.badmintonAppAccess?.allowed){
   values.hidden=true;
   note.hidden=true;
-  ageSummary.hidden=true;
   if(provenance)provenance.hidden=true;
   if(lookup)lookup.hidden=true;
   retry.hidden=true;
