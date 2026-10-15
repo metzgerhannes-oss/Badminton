@@ -1,6 +1,7 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
 import {assessSourceAvailability,importStatusForBatch} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
+import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const PUBLIC="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
@@ -115,7 +116,10 @@ Deno.serve(async req=>{
   const matches=new Map<string,any>();
   for(const result of parsed)for(const match of result.items)
    matches.set(match.source_key,match);
-  const all=[...matches.values()].sort((a,b)=>
+  // The original Badhub player pages can contain contradictory K.-o. rounds.
+  // Never re-add those cards after a fresh, manually reviewed P0 import.
+  const guarded=excludeContradictoryRounds([...matches.values()]);
+  const all=guarded.accepted.sort((a,b)=>
    b.match_year-a.match_year
    ||String(b.match_date||"").localeCompare(String(a.match_date||""))
    ||a.source_key.localeCompare(b.source_key));
