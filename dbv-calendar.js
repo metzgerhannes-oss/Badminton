@@ -195,7 +195,7 @@ function render(){
   html+='<section class="dbv-calendar-cluster"><h4>'+esc(cluster.label)+' <small>'+cluster.items.length+'</small></h4>';
   html+=visible.map(t=>{
    const closed=t.deadline&&t.deadline<localToday();
-   return '<article class="dbv-calendar-entry"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
+   return '<article class="dbv-calendar-entry'+(t.historicalArchive?' dbv-calendar-entry--history':'')+'"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
     '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
     '<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
@@ -229,7 +229,7 @@ async function readBWArchive(){
  const data=await res.json();
  if(data.schemaVersion!==1||data.source!=="https://turniere.badminton.de/"||
    data.scope!=="historical-bw-youth-abc"||!Array.isArray(data.entries))throw Error("Archiv-Metadaten ungültig");
- const rows=data.entries.map(calendarEntry);
+ const rows=data.entries.map(raw=>{const parsed=calendarEntry(raw);return parsed&&{...parsed,historicalArchive:true};});
  if(rows.some(row=>!row||row.bundesland!=="Baden-Württemberg"||
    !["A","B","C"].includes(row.level)||!row.ages.some(age=>BW_YOUTH_AGES.includes(age))||
    !(Array.isArray(data.years)?data.years:[data.year]).map(String).includes(row.start.slice(0,4))||
