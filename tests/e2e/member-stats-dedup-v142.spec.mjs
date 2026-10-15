@@ -41,5 +41,5 @@ test("v142: mobile home shows a single match-statistics panel for invited member
  await expect(page.locator("#match-stats-reference")).toBeHidden();
  await expect(page.locator("#match-stats-reference")).toBeEmpty();
  await expect(page.locator("#match-stats-source-link")).toContainText("Badhub");
- await expect(page.locator("#app-version-badge")).toContainText("v144");
+ await expect(page.locator("#app-version-badge")).toContainText("v145");
 });
