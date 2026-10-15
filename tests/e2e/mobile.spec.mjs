@@ -117,8 +117,10 @@ test("v153: screenshot regression – own AK totals survive restricted official 
  await page.route("**/rpc/app_access_player_coverage",route=>
   route.fulfill({status:503,headers,body:'{"error":"temporary"}'}));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await page.locator("#match-stats-age").selectOption("own");
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await page.locator("#match-stats-age").selectOption("own");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-retry")).toBeHidden();
  await expect(page.locator("#match-stats-note")).not.toContainText("teilweise abrufbar");
