@@ -34,3 +34,17 @@ dialog h2{font-size:24px;margin:8px 0 12px;line-height:1.18}
 #detail-art{min-height:200px}
 #detail-answer{max-width:44ch}
 @media(min-width:610px){.filters{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Narrow iPhone/WebKit: the brand plus back link must shrink rather than widen
+   the document. Long translated/rule words may wrap inside their own cards. */
+.wiki-header > .wiki-brand{min-width:0}
+.wiki-brand span{min-width:0}
+.entry-copy strong,dialog h2{overflow-wrap:anywhere;hyphens:auto}
+@media(max-width:355px){
+ .wiki-header{gap:7px;padding-left:11px;padding-right:11px}
+ .wiki-brand{gap:5px;font-size:14px;line-height:1.1}
+ .wiki-brand img{width:30px;height:30px;flex:0 0 30px}
+ .wiki-brand small{font-size:7px;letter-spacing:.7px;white-space:nowrap}
+ .wiki-header .back{font-size:13px;gap:2px}
+ .wiki-header .back:first-letter{font-size:21px}
+}
