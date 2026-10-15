@@ -9,21 +9,56 @@ const localToday=()=>{
  const x=Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
  return x.year+"-"+x.month+"-"+x.day;
 };
-// Official BWBV youth framework dates for 2027, not confirmed DBV event records.
- // Ages, venue, registration and final disciplines require each event's invitation.
+// Separate official schedule announcements from event-ID backed DBV records.
+// These are source-backed planning/award dates, NOT confirmed sign-up events.
 const BWBV_C_FRAMEWORK_2027=[
- {start:"2027-01-16",end:"2027-01-17",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel"},
- {start:"2027-02-27",end:"2027-02-28",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed"},
- {start:"2027-05-08",end:"2027-05-09",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel"},
- {start:"2027-06-26",end:"2027-06-27",title:"4. BWBV/C-RLT Jugend · Hexen-Cup, Einzel/Doppel/Mixed"}
+ {start:"2027-01-16",end:"2027-01-17",level:"C",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel",ageCertain:false},
+ {start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ageCertain:false},
+ {start:"2027-05-08",end:"2027-05-09",level:"C",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel",ageCertain:false},
+ {start:"2027-06-26",end:"2027-06-27",level:"C",title:"4. BWBV/C-RLT Jugend · Hexen-Cup, Einzel/Doppel/Mixed",ageCertain:false}
 ];
-const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2026/01/bj-2025-12-web.pdf";
-function bwFrameworkDates(settings,today){
- if(settings.region!=="Baden-Württemberg"||settings.level!=="C"||
-  !["all","U13"].includes(settings.age)||!["all","2027"].includes(settings.year))return [];
- const text=String(settings.q||"").toLowerCase().trim();
- return BWBV_C_FRAMEWORK_2027.filter(t=>(settings.period!=="upcoming"||t.end>=today)&&
-  (!text||(t.title+" 2027 BWBV C-RLT Rangliste").toLowerCase().includes(text)));
+const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2025/11/BWBV-U19-Turnierkalender_2027.pdf";
+const BWBV_B_FRAMEWORK_2027=[
+ {start:"2027-01-30",end:"2027-01-31",level:"B",title:"Gruppe SüdOst · B-RLT U13–U19",ageCertain:true,
+  source:"https://bwbv.de/wp-content/uploads/2025/11/bj-2025-11-web.pdf"}
+];
+const DBV_A_VERGABE_2027=[
+ {start:"2027-04-24",end:"2027-04-25",level:"A",title:"4. DBV-A-RLT U11/U13 · BSV Eggenstein",ageCertain:true,
+  source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"}
+];
+const BW_U13_FRAMEWORK_2027=[
+ ...BWBV_C_FRAMEWORK_2027.map(t=>({...t,source:BWBV_FRAMEWORK_SOURCE})),
+ ...BWBV_B_FRAMEWORK_2027,...DBV_A_VERGABE_2027
+].sort((a,b)=>a.start.localeCompare(b.start));
+function bwFrameworkDates(filters,today){
+ if(filters.region!=="Baden-Württemberg"||filters.age!=="U13"||
+  !["all","2027"].includes(filters.year))return [];
+ const search=String(filters.q||"").normalize("NFKC").toLocaleLowerCase("de").trim();
+ return BW_U13_FRAMEWORK_2027.filter(t=>
+  (filters.level==="all"||filters.level===t.level)&&
+  (filters.period!=="upcoming"||t.end>=today)&&
+  (!search||(t.title+" "+t.level+" 2027 BWBV DBV Eggenstein").normalize("NFKC").toLocaleLowerCase("de").includes(search)));
+}
+function bwFrameworkHTML(filters,today){
+ const planned=bwFrameworkDates(filters,today);
+ if(!planned.length)return "";
+ return '<section class="dbv-calendar-framework" aria-label="Offizielle A-B-C-Planung 2027">'+
+  '<h4>A-/B-/C-Termine 2027 · zusätzlich zu den DBV-Einträgen</h4>'+
+  '<p>Offiziell veröffentlichte Vergaben und Rahmentermine, <strong>nicht aus dem DBV-Turnierimport</strong>.'+
+  ' Diese Einträge sind noch keine bestätigten Ausschreibungen oder Anmeldungen. Ob U13 bei jedem C-Termin angeboten wird, ist erst mit der Ausschreibung sicher.</p>'+
+  '<ul>'+planned.map(t=>'<li><strong>'+esc(formatDate(t.start))+'–'+esc(formatDate(t.end))+'</strong>'+
+   ' · <strong>'+esc(t.level)+'</strong> · '+esc(t.title)+
+   ' <small>('+esc(t.level==="A"?"Ausrichter offiziell vergeben":t.ageCertain?"U13 im Plan genannt":"U13 noch nicht bestätigt")+')</small>'+
+   ' · <a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">Quelle ↗</a></li>').join("")+'</ul>'+
+  '<p>Nur bestätigte DBV-Turniere haben ein <strong>+</strong> zur Vormerkung. Geplante Termine bleiben davon strikt getrennt.</p>'+
+  '</section>';
+}
+function bwNextYearHint(filters){
+ if(filters.region!=="Baden-Württemberg"||filters.age!=="U13"||
+  filters.year!=="2026"||!["all","A","B","C"].includes(filters.level))return "";
+ return '<div class="dbv-calendar-next-year"><strong>Für 2027 sind bereits A-/B-/C-Termine angekündigt.</strong>'+
+  '<p>Der aktuelle DBV-Import umfasst nur veröffentlichte, verbleibende Termine. Zusätzliche DBV-/BWBV-Planungen fehlen hier noch.</p>'+
+  '<button type="button" class="subtle-button" data-calendar-show-2027>Termine 2027 ansehen ↗</button></div>';
 }
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
 const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
@@ -55,7 +90,10 @@ function render(){
  if(!loaded)return;
  const host=$("dbv-calendar-results");
  if(!host)return;
- const selected=filterCalendar(entries,{...settings,today:localToday()});
+ const today=localToday();
+ const selected=filterCalendar(entries,{...settings,today});
+ const frameworkHTML=bwFrameworkHTML(settings,today);
+ const nextYearHint=bwNextYearHint(settings);
  const fresh=entries.map(e=>Date.parse(e.checked)).filter(Number.isFinite);
  const newest=fresh.length?Math.max(...fresh):0;
  const warning=source==="supabase"&&newest&&Date.now()-newest>8*86400000?" · Letzter DB-Abgleich vor über 8 Tagen":"";
@@ -73,13 +111,6 @@ function render(){
   // may enter this list, so do not invent records from older PDF schedules.
   const bwU13C=settings.region==="Baden-Württemberg"&&
     settings.age==="U13"&&settings.level==="C";
-  const framework=bwFrameworkDates(settings,localToday());
-  const frameworkHTML=framework.length
-    ?'<section class="dbv-calendar-framework"><h4>BWBV · veröffentlichte C-Ranglisten-Rahmentermine 2027</h4>'+
-     '<p>Diese Termine stammen aus dem BWBV-Jugendrahmenkalender, <strong>nicht</strong> aus dem DBV-Turnierimport. Ob U13 bei jedem Termin angeboten wird, Ort und Anmeldung stehen erst in der jeweiligen Ausschreibung.</p>'+
-     '<ul>'+framework.map(t=>'<li><strong>'+esc(formatDate(t.start))+'–'+esc(formatDate(t.end))+'</strong> · '+esc(t.title)+'</li>').join("")+'</ul>'+
-     '<a href="'+BWBV_FRAMEWORK_SOURCE+'" target="_blank" rel="noopener noreferrer">Offizieller BWBV-Jugendrahmenkalender ↗</a></section>'
-    :"";
   const coverageNote=bwU13C
     ?'<p><strong>Quellenlücke möglich:</strong> Für die gewählte Filterauswahl sind im DBV-Import derzeit keine U13/C-Termine erfasst; andere Zeiträume können Treffer enthalten. Bitte den <a href="https://bwbv.de/kalender/" target="_blank" rel="noopener noreferrer">BWBV-Kalender ↗</a> als zweite offizielle Quelle prüfen.</p>'
     :'<p>Der Datenbestand kann unvollständig sein. Keine Treffer bedeuten nicht, dass keine Turniere stattfinden.</p>';
@@ -90,9 +121,9 @@ function render(){
    (alternatives.length?'<p>Mit denselben übrigen Filtern sind folgende Levels verfügbar:</p><div class="dbv-calendar-alternatives">'+
     alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
       'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
-   coverageNote+frameworkHTML+
+   coverageNote+
    '<p class="settings-hint">Der Import umfasst nur den angegebenen Zeitraum; nicht alle DBV-/BWBV-Veranstaltungen sind vollständig erfasst.</p>'+
-   '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>';
+   '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>'+frameworkHTML+nextYearHint;
   return;
  }
  const bookmarkState=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
@@ -120,7 +151,7 @@ function render(){
   }).join("");
   html+='</section>';
  }
- host.innerHTML=html;
+ host.innerHTML=nextYearHint+frameworkHTML+html;
  const more=$("dbv-calendar-more");
  if(more)more.hidden=selected.groups.reduce((n,g)=>n+g.items.length,0)<=batchLimit;
 }
@@ -179,6 +210,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
  }
  $("dbv-calendar-results")?.addEventListener("click",event=>{
+  const future=event.target.closest("button[data-calendar-show-2027]");
+  if(future){
+   settings.year="2027";
+   $("dbv-calendar-year").value="2027";
+   try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
+   batchLimit=36;render();return;
+  }
   const alternative=event.target.closest("button[data-calendar-alternative-level]");
   if(alternative&&LEVEL_OPTIONS.includes(alternative.dataset.calendarAlternativeLevel)){
    settings.level=alternative.dataset.calendarAlternativeLevel;
