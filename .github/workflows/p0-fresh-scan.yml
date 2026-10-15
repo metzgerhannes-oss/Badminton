@@ -1,0 +1,19 @@
+name: P0 Fresh source survey (no database writes)
+on:
+  push:
+    branches: [fix/p0-fresh-results-import-v152]
+    paths: [scripts/p0-fresh-source-scan.mjs, .github/workflows/p0-fresh-scan.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --check scripts/p0-fresh-source-scan.mjs
+      - name: Requery all club players at the original Badhub source
+        run: node scripts/p0-fresh-source-scan.mjs
