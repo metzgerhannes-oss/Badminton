@@ -336,3 +336,22 @@ test("v151: verified BWBV plan includes Lörrach A and excludes U11 from second 
  await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(2);
  await expect(page.locator("#dbv-calendar-results")).not.toContainText("2. BWBV/C-RLT");
 });
+
+
+test("v151: iPhone reads fresh official BWBV source file, not only fallback cards",async({page})=>{
+ const snapshot=JSON.parse(await readFile("data/bwbv-youth-framework-2027.json","utf8"));
+ const live={...snapshot,entries:snapshot.entries.map(x=>
+  x.key==="dbv-bw-a-2027-2"?{...x,title:"2. A-RLT U11/U13 · Livequelle Lörrach"}:x)};
+ await page.route("**/data/bwbv-youth-framework-2027.json",route=>
+  route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(live)}));
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("A");
+ await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(2);
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Livequelle Lörrach");
+ await expect(page.locator("#dbv-calendar-results")).not.toContainText("BC Lörrach-Brombach");
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
