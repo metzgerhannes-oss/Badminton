@@ -1,11 +1,13 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
 import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
+import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 "use strict";
-const rankUrl="./data/ranking.json";
-// The public historical JSON is deliberately blank. Never use it as a trophy source.
+// Official ranking totals are read only for accepted app members. Public ranking.json is intentionally empty.
 const rankNames={HE:"Einzel",DE:"Einzel",HD:"Doppel",DD:"Doppel",HM:"Mixed",DM:"Mixed"};
-let ranking=null,rankError=false,selection="",profiles=[],bookmarks=[],viewMode="own";
+let ranking=null,rankStatus="idle",selection="",profiles=[],bookmarks=[],viewMode="own";
+const rankingCache=new Map();
+let rankingRequest=0;
 const $=id=>document.getElementById(id);
 const escape=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=x=>typeof x==="number"&&Number.isFinite(x)?new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(x):"–";
@@ -83,8 +85,11 @@ function renderRank(){
  const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
  const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
  label.textContent=working?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
- source.innerHTML=working?'<span>Altersklasse · BW & Deutschland</span><span>'+escape(prior?"Vergleich KW "+prior.week:"Vergleich folgt")+'</span>':
- '<span>Ranglistenwerte noch nicht importiert</span>';
+ source.innerHTML=working?'<span>Bestätigte DBV-Ranglistenwerte · BW und Deutschland</span>':
+ rankStatus==="loading"?'<span>Bestätigte DBV-Werte werden geladen …</span>':
+ rankStatus==="protected"?'<span>Ranglistenwerte nach gültiger App-Einladung verfügbar</span>':
+ rankStatus==="unavailable"?'<span>Ranglistenwerte momentan nicht abrufbar</span>':
+ '<span>Für dieses Profil liegen noch keine bestätigten Ranglistenwerte vor</span>';
  if(archiveBehind)source.innerHTML+='<a class="ranking-stale-link" href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Aktuellere Webwerte möglich · DBV ansehen ↗</a>';
  const chosen=profiles.find(p=>p.id===selection&&/^\d{2}-\d{6}$/.test(p.id));
  if(!chosen){
@@ -94,12 +99,17 @@ function renderRank(){
  const player=ranking?.players?.[chosen.id],discs=player?.disciplines??{};
  const known=Object.values(discs)[0];
  const birth=known?.birthYear??chosen.birthYear;
- if(!known&&viewMode==="friend"){
-  const profileLink=chosen.url&&/^https:\/\//.test(chosen.url)?'<a class="friend-ranking-official" rel="noopener noreferrer" target="_blank" href="'+escape(chosen.url)+'">Offizielles Spielerprofil ↗</a>':"";
-  root.innerHTML='<div class="dashboard-empty-tile friend-ranking-empty"><strong>Ranglisten-KPIs noch nicht verfügbar</strong><small>Für '+escape(chosen.name)+' sind in der App derzeit noch keine bestätigten Ranglistendaten hinterlegt.</small>'+profileLink+'</div>';
+ if(!known){
+  const sourceLink='<a class="friend-ranking-official" rel="noopener noreferrer" target="_blank" href="https://turniere.badminton.de/ranking">DBV-Rangliste öffnen ↗</a>';
+  const caption=rankStatus==="loading"?"Offizielle Werte werden geladen …":
+   rankStatus==="protected"?"Bitte zuerst den App-Zugang mit einem Einladungslink freischalten.":
+   rankStatus==="unavailable"?"Die bestätigten Ranglistenwerte können gerade nicht geladen werden.":
+   "Für dieses Profil ist noch kein offiziell belegter Ranglistenstand in der App vorhanden.";
+  root.innerHTML='<div class="dashboard-empty-tile friend-ranking-empty"><strong>Rangliste</strong><small>'+escape(caption)+'</small>'+sourceLink+'</div>';
   return;
  }
- const keys=Object.keys(discs).some(k=>["HE","HD","HM"].includes(k))?["HE","HD","HM"]:Object.keys(discs).some(k=>["DE","DD","DM"].includes(k))?["DE","DD","DM"]:chosen.id==="05-070879"?["HE","HD","HM"]:["DE","DD","DM"];
+ // Never render three giant empty cards for disciplines without a verified rank.
+ const keys=["HE","HD","HM","DE","DD","DM"].filter(key=>discs[key]);
  root.innerHTML=keys.map(key=>{
   const e=discs[key],title=rankNames[key],cohort=birth?(e?.ageClass||ageLabel(birth))+" · Jg. "+birth:"Jahrgang offen";
   const bw=e?.bwAgeClassRank!=null?'#'+num(e.bwAgeClassRank):"–",de=e?.ageClassRank!=null?'#'+num(e.ageClassRank):"–";
@@ -213,19 +223,60 @@ function renderOtherKpis(){
 function renderDashboard(){
  renderRank();renderOtherKpis();
 }
+// No profile or ranking is persisted. Switching profiles cannot display stale values.
+async function requestPrivateRankings(){
+ const id=selection,ticket=++rankingRequest;
+ ranking=null;
+ if(!/^\d{2}-\d{6}$/.test(id)){
+  rankStatus="idle";renderDashboard();return;
+ }
+ const cached=rankingCache.get(id);
+ if(cached&&Date.now()-cached.checkedAt<120000){
+  ranking=cached.ranking;rankStatus=cached.status;renderDashboard();return;
+ }
+ rankStatus="loading";renderDashboard();
+ try{
+  const token=await window.badmintonAppAccess?.getAccessToken?.();
+  if(ticket!==rankingRequest||selection!==id)return;
+  if(!token){rankStatus="protected";renderDashboard();return;}
+  const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),8000);
+  let response;
+  try{
+   response=await fetch(SUPABASE_ROOT+"rpc/app_access_rankings_read",{
+    method:"POST",cache:"no-store",signal:abort.signal,
+    headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"},
+    body:JSON.stringify({p_player_dbv_id:id})
+   });
+  }finally{clearTimeout(timeout)}
+  if(!response.ok)throw Error("ranking unavailable");
+  const data=await response.json();
+  if(ticket!==rankingRequest||selection!==id)return;
+  if(!data||data.player_dbv_id!==id||!["available","no_verified_ranking"].includes(data.status))
+   throw Error("invalid ranking payload");
+  if(data.status==="available"&&data.current&&data.disciplines&&
+    Number.isInteger(data.current.year)&&Number.isInteger(data.current.week)){
+   ranking={status:"available",current:data.current,players:{[id]:{disciplines:data.disciplines}}};
+   rankStatus="ready";
+  }else{ranking=null;rankStatus="no_data";}
+  rankingCache.set(id,{ranking,status:rankStatus,checkedAt:Date.now()});
+ }catch{
+  if(ticket!==rankingRequest||selection!==id)return;
+  ranking=null;rankStatus="unavailable";
+ }
+ if(ticket===rankingRequest&&selection===id)renderDashboard();
+}
 window.renderDashboard=(selected,ps,links,options={})=>{
- selection=selected||"";profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
+ const next=selected||"",changed=next!==selection;
+ selection=next;profiles=Array.isArray(ps)?ps:[];bookmarks=Array.isArray(links)?links:[];viewMode=options.mode==="friend"?"friend":"own";
  requestPrivateTrophies(selection);
  renderDashboard();
+ if(changed||rankStatus==="idle"||rankStatus==="protected")void requestPrivateRankings();
 };
-async function load(){
- await fetch(rankUrl+"?v=2",{cache:"no-store"})
-  .then(r=>r.ok?r.json():Promise.reject(Error("ranking unavailable")))
-  .then(d=>{if(d?.schemaVersion===2&&d?.type==="dbv-published-excel-derived-ageclass-rank")ranking=d;else rankError=true})
-  .catch(()=>{rankError=true});
- renderDashboard();
-}
-document.addEventListener("DOMContentLoaded",load);
+document.addEventListener("DOMContentLoaded",()=>{if(selection)void requestPrivateRankings()});
+window.addEventListener("badminton:app-access-granted",()=>{if(selection)void requestPrivateRankings()});
+window.addEventListener("badminton:private-player-revoked",()=>{
+ rankingCache.clear();ranking=null;rankStatus="protected";++rankingRequest;renderDashboard();
+});
 
 window.addEventListener("badminton:private-trophies-updated",event=>{
  if(event.detail?.playerId===selection)renderDashboard();

@@ -128,3 +128,9 @@
  .focus-switcher-options{right:0;max-width:82vw}
 }
 @media(prefers-reduced-motion:reduce){#view-start .home-trophy-result{transition:none}}
+
+/* v140: one sourced discipline must use the available width on an iPhone,
+   not a narrow one-third tile. Do not enlarge empty placeholders. */
+#view-start .dashboard-ranking-grid>.ranking-tile:only-child{
+ grid-column:1/-1;min-height:126px;
+}
