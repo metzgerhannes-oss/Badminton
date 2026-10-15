@@ -57,7 +57,7 @@ def fetch_all(year):
 def build_snapshot(rows,year,today):
     selected=archived_bw_youth(rows,year,today)
     # Fail closed if the all-dates parameter silently reverts to 'remaining'.
-    if not selected or (str(year)=="2026" and not any(r["start_date"]<"2026-08-01" for r in selected)):
+    if str(year)=="2026" and (not selected or not any(r["start_date"]<"2026-08-01" for r in selected)):
         raise RuntimeError("DBV all-dates view did not provide historical BW A/B/C youth tournaments")
     ids=[r["source_key"] for r in selected]
     if len(ids)!=len(set(ids)):raise RuntimeError("Duplicate DBV tournament identifiers in BW archive")
@@ -66,11 +66,23 @@ def build_snapshot(rows,year,today):
 
 def write_snapshot(snapshot,path=OUT):
     path.parent.mkdir(parents=True,exist_ok=True)
-    # Never manufacture new collection dates for unchanged data.
+    # Carry already source-verified past years forward; the current year fetch
+    # replaces matching source IDs without deleting earlier played tournaments.
+    years={snapshot["year"]}
     if path.exists():
         try:
             old=json.loads(path.read_text(encoding="utf-8"))
-            if all(old.get(k)==snapshot[k] for k in ("schemaVersion","source","scope","year","entries")):
+            if old.get("source")==SOURCE and old.get("scope")=="historical-bw-youth-abc":
+                years.update(old.get("years") or [old.get("year")])
+                keys={r["source_key"]:r for r in old.get("entries",[]) if r.get("source_key")}
+                keys.update({r["source_key"]:r for r in snapshot["entries"]})
+                snapshot["entries"]=sorted(keys.values(),key=lambda r:(r["start_date"],r["source_key"]))
+        except (ValueError,TypeError,KeyError):pass
+    snapshot["years"]=sorted(y for y in years if isinstance(y,int))
+    if path.exists():
+        try:
+            old=json.loads(path.read_text(encoding="utf-8"))
+            if all(old.get(k)==snapshot[k] for k in ("schemaVersion","source","scope","year","entries","years")):
                 print("BW historical archive unchanged",flush=True)
                 return
         except (ValueError,KeyError,TypeError):pass
