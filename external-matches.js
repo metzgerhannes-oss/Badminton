@@ -59,6 +59,7 @@ function render(){
   info="Für dieses Profil sind in der App noch keine Einzelmatchbelege importiert.";
  }
  if(all.excluded)info+=" "+fmt(all.excluded)+" unklare oder doppelte Quellkarten wurden nicht als Spiel gezählt.";
+ if(all.quarantined)info+=" Darunter "+fmt(all.quarantined)+" Quellkarten aus Turnierkonkurrenzen mit widersprüchlichen K.-o.-Runden. Diese müssen vor einer Wertung nochmals belegt werden.";
  if(partial)info+=" Es konnten höchstens "+fmt(MAX_ROWS)+" Quellkarten geladen werden; die Historie ist möglicherweise unvollständig.";
  const badhub=getBadhubMatchReference(selected,{year,discipline,category});
  if(badhub){
