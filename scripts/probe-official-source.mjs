@@ -26,10 +26,10 @@ for(let i=0;i<clubReports.length;i++){
   try{
    const u=new URL(l);if(["dbv.turnier.de","www.turnier.de","turnier.de"].includes(u.hostname)&&
     /^\/tournament\/[a-f0-9-]{36}(?:\/.*)?$/i.test(u.pathname))
-    official.add("https://dbv.turnier.de/tournament/"+u.pathname.split("/")[2]);
+    official.add(u.origin+"/tournament/"+u.pathname.split("/")[2]);
   }catch{}
  }
- console.log(JSON.stringify({club:i+1,http:result.http,officialLinkCount:candidates.length}));
+ console.log(JSON.stringify({club:i+1,http:result.http,officialLinkCount:candidates.length,officialHosts:candidates.map(s=>{try{return new URL(s).hostname}catch{return "invalid"}})}));
 }
 for(const [i,url] of [...official].entries()){
  for(const suffix of ["","/matches","/draws"]){
