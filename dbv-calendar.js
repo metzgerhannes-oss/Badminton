@@ -141,7 +141,7 @@ function render(){
  const today=localToday();
  // Prefer direct result cards when DBV's archive contains the same tournament.
  // Public events are not counted twice.
- const normalizedPlace=x=>String(x||"").normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("de").replace(/[^a-z0-9]/g,"");
+ const normalizedPlace=x=>String(x||"").normalize("NFKD").replace(/\p{M}/gu,"").toLocaleLowerCase("de").replace(/[^a-z0-9]/g,"");
  const isCuratedDuplicate=t=>BW_YOUTH_ARCHIVE_2026.some(curated=>{
   const place=normalizedPlace(t.place),known=normalizedPlace(curated.place);
   return t.start===curated.start&&t.level===curated.level&&
