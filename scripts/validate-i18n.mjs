@@ -22,7 +22,13 @@ const packs = expected.map(locale => {
   return {locale,pack};
 });
 const base=Object.keys(packs[0].pack.messages).sort();
-for(const {locale,pack} of packs) assert.deepEqual(Object.keys(pack.messages).sort(),base,locale+": key mismatch");
+assert.ok(base.length>=342,"Regressed shared v2 language catalog coverage");
+for(const {locale,pack} of packs){
+ const missing=base.filter(key=>!Object.hasOwn(pack.messages,key));
+ assert.deepEqual(missing,[],locale+": required shared key missing");
+ // Some locales already contain newer, valid source keys from main.
+ // Preserve these until remaining languages are translated in issue #176.
+}
 const rootDir=path.resolve(new URL("../",import.meta.url).pathname);
 for(const page of ["index.html","welcome.html"]){
  const html=fs.readFileSync(path.join(rootDir,page),"utf8");
