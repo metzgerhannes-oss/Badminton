@@ -1,6 +1,6 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
-const FIRST="05-123456",SECOND="05-987654";
+const FIRST="05-123456",SECOND="05-987654",SARAH="05-061350";
 const headers={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer",
  "Access-Control-Allow-Methods":"GET,POST,OPTIONS"};
 test.beforeEach(async({page})=>{
@@ -20,9 +20,9 @@ test.beforeEach(async({page})=>{
     HE:{ageClass:"U11",birthYear:2016,points:2670,tournaments:13,ageClassRank:43,bwAgeClassRank:4},
     HD:{ageClass:"U11",birthYear:2016,points:1322,tournaments:3,ageClassRank:118,bwAgeClassRank:9},
     HM:{ageClass:"U11",birthYear:2016,points:1469,tournaments:2,ageClassRank:21,bwAgeClassRank:1}
-   }:id===SECOND?{DE:{ageClass:"U13",birthYear:2014,points:611,tournaments:2,ageClassRank:469,bwAgeClassRank:60}}:null;
+   }:id===SECOND?{DE:{ageClass:"U13",birthYear:2014,points:611,tournaments:2,ageClassRank:469,bwAgeClassRank:60}}:id===SARAH?{DE:{ageClass:"U17",birthYear:2010,points:61077,tournaments:13,ageClassRank:null,bwAgeClassRank:null,nationalYouthOverallRank:42},DD:{ageClass:"U17",birthYear:2010,points:67117,tournaments:11,ageClassRank:null,bwAgeClassRank:null,nationalYouthOverallRank:68},DM:{ageClass:"U17",birthYear:2010,points:44521,tournaments:11,ageClassRank:null,bwAgeClassRank:null,nationalYouthOverallRank:77}}:null;
    return route.fulfill({status:200,contentType:"application/json",headers,body:JSON.stringify(disciplines
-    ?{player_dbv_id:id,status:"available",current:{year:2026,week:41,url:"https://turniere.badminton.de/ranking"},disciplines}
+    ?{player_dbv_id:id,status:"available",current:{year:2026,week:id===SARAH?42:41,url:"https://turniere.badminton.de/ranking"},disciplines}
     :{player_dbv_id:id,status:"no_verified_ranking"})});
   }
   if(url.pathname.endsWith("/rpc/search_dbv_player_identity"))
@@ -43,7 +43,7 @@ test("v140: official member rankings replace three empty placeholders on a small
  await expect(page.locator("#dashboard-rankings")).toContainText("#4");
  await expect(page.locator("#dashboard-rankings")).toContainText("#9");
  await expect(page.locator("#dashboard-rankings")).toContainText("#1");
- await expect(page.locator("#app-version-badge")).toContainText("v143");
+ await expect(page.locator("#app-version-badge")).toContainText("v144");
  await expect(page.locator("#player-data-status")).toHaveCount(0);
  await expect(page.locator("#match-stats .home-stats-link")).toHaveAttribute("href","#historie");
  await expect(page.locator("#match-stats-age-summary")).toHaveCount(0);
@@ -76,4 +76,25 @@ test("v140: player search shows a verified name instead of repeating GitHub fall
  await expect(page.locator("#library-results")).toContainText(SECOND);
  await expect(page.locator("#library-source")).toContainText("Gezielte offizielle DBV-Identitätssuche");
  await expect(page.locator("#library-source")).not.toContainText("GitHub-Ausfallsicherung");
+});
+
+test("v144: followed Sarah shows verified Jugend overall ranks without invented U17 or BW places",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.evaluate(id=>window.renderDashboard(id,[],[],{mode:"friend"}),SARAH);
+ await expect(page.locator("#dashboard-week")).toHaveText("KW 42 / 2026");
+ await expect(page.locator("#dashboard-rankings .ranking-tile")).toHaveCount(3);
+ await expect(page.locator("#dashboard-rankings")).toContainText("61.077");
+ await expect(page.locator("#dashboard-rankings")).toContainText("67.117");
+ await expect(page.locator("#dashboard-rankings")).toContainText("44.521");
+ await expect(page.locator("#dashboard-rankings")).toContainText("DE Jugend gesamt");
+ await expect(page.locator("#dashboard-rankings")).toContainText("#42");
+ await expect(page.locator("#dashboard-rankings")).toContainText("#68");
+ await expect(page.locator("#dashboard-rankings")).toContainText("#77");
+ await expect(page.locator("#dashboard-rankings .ranking-bw-row strong")).toHaveText(["–","–","–"]);
+ await page.locator('#dashboard-rankings [data-rank-discipline="DE"]').click();
+ await expect(page.locator("#ranking-detail-content")).toContainText("Nicht U17-spezifisch");
+ await expect(page.locator("#ranking-detail-content")).toContainText("BW-U17-Platz");
+ const width=await page.evaluate(()=>document.documentElement.scrollWidth);
+ expect(width).toBeLessThanOrEqual(322);
 });
