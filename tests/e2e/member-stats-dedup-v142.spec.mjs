@@ -18,8 +18,8 @@ test("v142: mobile home shows a single match-statistics panel for invited member
   dbv_id:id,source_key:"test:"+i,category:"tournament",competition:"Prüfturnier",
   discipline:"Einzel",event:"JE U11",match_date:"2026-10-03",match_year:2026,
   player_side:1,winning_side:i<26?1:2,opponent_names:["Testgegner"],
-  partner_names:[],games:i<26?[[21,11]]:[[11,21]],source_name:"Badhub",
-  source_kind:"third-party-match-card",source_url:"https://badhub.de/test"
+  partner_names:[],games:i<26?[[21,11],[21,11]]:[[11,21],[11,21]],source_name:"Badhub",
+  source_kind:"third-party-match-card",source_url:"https://badhub.de/bwbv/turnier.php?id=123"
  }));
  await page.route("**/*.supabase.co/rest/v1/**",route=>{
   const url=new URL(route.request().url()),method=route.request().method();
