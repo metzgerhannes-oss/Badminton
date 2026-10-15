@@ -129,7 +129,7 @@ test("BWBV 2027 C framework dates are distinct from unavailable DBV U13 entries"
  await expect(page.locator(".dbv-calendar-framework")).toContainText("Ob U13");
  await expect(page.locator(".dbv-calendar-framework")).toContainText("nicht aus dem DBV-Turnierimport");
  await expect(page.locator(".dbv-calendar-entry")).toHaveCount(0);
- await expect(page.locator(".dbv-calendar-framework a")).toHaveAttribute("href",/bwbv\.de\/wp-content/);
+ await expect(page.locator(".dbv-calendar-framework a").first()).toHaveAttribute("href",/bwbv\.de\/wp-content/);
  await page.locator("#dbv-calendar-year").selectOption("2026");
  await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(0);
 });
