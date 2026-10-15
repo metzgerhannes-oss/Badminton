@@ -227,7 +227,7 @@ function renderDashboard(){
 async function requestPrivateRankings(){
  const id=selection,ticket=++rankingRequest;
  ranking=null;
- if(!/^\\d{2}-\\d{6}$/.test(id)){
+ if(!/^\d{2}-\d{6}$/.test(id)){
   rankStatus="idle";renderDashboard();return;
  }
  const cached=rankingCache.get(id);
