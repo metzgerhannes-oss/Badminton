@@ -68,35 +68,44 @@ function bwNextYearHint(filters){
 }
 // Individually corroborated 2026 events outside the remaining-only DBV snapshot.
 // Historical facts are shown separately: never assign a fictional DBV event ID.
+// Independently verified finished tournaments, not fabricated DBV calendar IDs.
+// The original DBV import starts on 14 October 2026, so these have result links.
 const BW_U13_ARCHIVE_2026=[
- {level:"C",start:"2026-04-25",end:"2026-04-26",
-  title:"3. C-RLT BAW U11–U19 · Mössingen",place:"Steinlachhalle Mössingen",
-  source:"https://bwbv.de/neuigkeiten/neuigkeiten-jugend/"},
- {level:"A",start:"2026-05-02",end:"2026-05-03",
-  title:"4. A-RLT U11/U13 · Eggenstein-Leopoldshafen",place:"Sportzentrum Eggenstein",
-  source:"https://bwbv.de/2026/05/07/4-a-rlt-in-eggenstein-leopoldshafen-silber-fuer-den-bsv/"},
- {level:"B",start:"2026-06-13",end:"2026-06-14",
-  title:"3. B-RLT SüdOst U13–U19 · Waghäusel",place:"Waghäusel-Kirrlach",
-  source:"https://badminton-rlp.de/aktuelles/33-globus-oliver-cup-jugend-badminton-in-waghaeusel"}
+ {level:"C",start:"2026-01-17",end:"2026-01-18",title:"1. C-RLT U11–U19",place:"Reutlingen",detail:"Einzel/Doppel",
+  source:"https://dbv.turnier.de/tournament/52b3b803-279b-48cf-8143-f5078f5236db",sourceKind:"results"},
+ {level:"C",start:"2026-02-28",end:"2026-03-01",title:"2. C-RLT U11–U19",place:"Friedrichshafen",detail:"Einzel/Mixed",
+  source:"https://bwbv.de/2026/03/22/erfolgreiches-c-ranglistenturnier-in-friedrichshafen/",sourceKind:"results"},
+ {level:"C",start:"2026-04-25",end:"2026-04-26",title:"3. C-RLT U11–U19",place:"Mössingen",detail:"Einzel/Doppel",
+  source:"https://dbv.turnier.de/tournament/DBB7AC20-FAD9-43A4-8842-6FA838623F35",sourceKind:"results"},
+ {level:"A",start:"2026-05-02",end:"2026-05-03",title:"4. A-RLT U11/U13",place:"Eggenstein-Leopoldshafen",detail:"",
+  source:"https://bwbv.de/2026/05/07/4-a-rlt-in-eggenstein-leopoldshafen-silber-fuer-den-bsv/",sourceKind:"results"},
+ {level:"B",start:"2026-06-13",end:"2026-06-14",title:"3. B-RLT SüdOst U13–U19",place:"Waghäusel",detail:"",
+  source:"https://badminton-rlp.de/aktuelles/33-globus-oliver-cup-jugend-badminton-in-waghaeusel",sourceKind:"report"},
+ // 2026 Hexen-Cup has A-ranking for U13, and C-ranking ONLY for U15/17/19.
+ {level:"A",start:"2026-06-27",end:"2026-06-28",title:"6. A-RLT U11/U13 · Hexen-Cup",place:"Konstanz",detail:"Einzel/Doppel/Mixed",
+  source:"https://dbv.turnier.de/tournament/35299a0c-11f6-4ffd-85c2-3aca6dd1c0aa",sourceKind:"results"}
 ];
 function bwArchiveDates(filters){
  if(filters.region!=="Baden-Württemberg"||filters.age!=="U13"||
-   filters.year!=="2026"||filters.period!=="all")return [];
+  filters.year!=="2026"||filters.period!=="all")return [];
  const search=String(filters.q||"").normalize("NFKC").toLocaleLowerCase("de").trim();
  return BW_U13_ARCHIVE_2026.filter(t=>
-   (filters.level==="all"||filters.level===t.level)&&
-   (!search||(t.title+" "+t.place+" "+t.level).normalize("NFKC").toLocaleLowerCase("de").includes(search)));
+  (filters.level==="all"||filters.level===t.level)&&
+  (!search||(t.title+" "+t.place+" "+t.level+" "+t.detail).normalize("NFKC").toLocaleLowerCase("de").includes(search)));
 }
 function bwArchiveHTML(filters){
  const found=bwArchiveDates(filters);
  if(!found.length)return "";
- return '<section class="dbv-calendar-archive" aria-label="Belegte bereits vergangene U13-Turniere 2026">'+
-  '<h4>2026 · '+found.length+' bereits gespielte'+(found.length===1?'s Turnier':' Turniere')+' belegt</h4>'+
-  '<p>Diese U13-Turniere sind offiziell nachgewiesen, liegen jedoch <strong>vor dem erfassten DBV-Import ab 14.10.2026</strong>. Kein Anmeldelink und keine vollständige Jahresliste.</p>'+
-  '<ul>'+found.map(t=>'<li><strong>'+esc(formatDate(t.start))+'–'+esc(formatDate(t.end))+'</strong>'+
-    ' · <strong>Level '+esc(t.level)+'</strong> · '+esc(t.title)+' · '+esc(t.place)+
-    ' · <a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">Beleg ↗</a></li>').join("")+'</ul>'+
-  '</section>';
+ return '<section class="dbv-calendar-cluster dbv-calendar-sourced-results" aria-label="Verifizierte Turniere 2026">'+
+  '<h4>Turniere 2026 <small>'+found.length+'</small></h4>'+
+  found.map(t=>'<article class="dbv-calendar-entry dbv-calendar-external-result">'+
+   '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+
+     '<small>bis '+esc(formatDate(t.end))+'</small></div>'+
+   '<div class="dbv-calendar-detail"><h5>'+esc(t.title)+'</h5>'+
+   '<p>'+esc(t.place)+' · Level '+esc(t.level)+(t.detail?' · '+esc(t.detail):'')+'</p>'+
+   '<a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">'+
+      (t.sourceKind==="results"?"Ergebnisse ansehen ↗":"Turnierbericht ↗")+'</a></div>'+
+   '</article>').join("")+'</section>';
 }
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
 const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
