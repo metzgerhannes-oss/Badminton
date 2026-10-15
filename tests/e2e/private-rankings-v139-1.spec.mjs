@@ -32,7 +32,7 @@ test.beforeEach(async({page})=>{
  });
 });
 
-test("v139.1: official member rankings replace three empty placeholders on a small iPhone",async({page})=>{
+test("v140: official member rankings replace three empty placeholders on a small iPhone",async({page})=>{
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#dashboard-week")).toHaveText("KW 41 / 2026");
@@ -43,13 +43,13 @@ test("v139.1: official member rankings replace three empty placeholders on a sma
  await expect(page.locator("#dashboard-rankings")).toContainText("#4");
  await expect(page.locator("#dashboard-rankings")).toContainText("#9");
  await expect(page.locator("#dashboard-rankings")).toContainText("#1");
- await expect(page.locator("#app-version-badge")).toContainText("v139.1");
+ await expect(page.locator("#app-version-badge")).toContainText("v140");
  const bounds=await page.locator(".topbar").boundingBox();
  expect(bounds).toBeTruthy();
  expect(bounds.x+bounds.width).toBeLessThanOrEqual(322);
 });
 
-test("v139.1: only verified disciplines are shown, with a compact empty state",async({page})=>{
+test("v140: only verified disciplines are shown, with a compact empty state",async({page})=>{
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#dashboard-rankings .ranking-tile")).toHaveCount(3);
  await page.evaluate(id=>window.renderDashboard(id,[{id,name:"Muster Spieler",birthYear:2014,club:"Testverein"}],[],{}),SECOND);
@@ -62,7 +62,7 @@ test("v139.1: only verified disciplines are shown, with a compact empty state",a
  await expect(page.locator("#dashboard-rankings")).toContainText("kein offiziell belegter Ranglistenstand");
 });
 
-test("v139.1: player search shows a verified name instead of repeating GitHub fallback",async({page})=>{
+test("v140: player search shows a verified name instead of repeating GitHub fallback",async({page})=>{
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await page.locator("#player-add-open").click();
  await expect(page.locator("#player-discover")).toBeVisible();
