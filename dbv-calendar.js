@@ -239,8 +239,8 @@ async function readBWBVFramework(){
  ]);
  if(data.sourceFamilies.some(source=>!allowedSources.has(source))||
   data.entries.some(t=>!t||typeof t.title!=="string"||t.title.length>150||
-   !["A","B","C"].includes(t.level)||!/^2027-\\d{2}-\\d{2}$/.test(t.start)||
-   !/^2027-\\d{2}-\\d{2}$/.test(t.end)||t.end<t.start||
+   !["A","B","C"].includes(t.level)||!/^2027-\d{2}-\d{2}$/.test(t.start)||
+   !/^2027-\d{2}-\d{2}$/.test(t.end)||t.end<t.start||
    !Array.isArray(t.ages)||!t.ages.length||t.ages.some(age=>!BW_YOUTH_AGES.includes(age))||
    typeof t.ageCertain!=="boolean"||t.status!=="planned"||
    !allowedSources.has(t.source)||typeof t.key!=="string"||t.key.length>70||
