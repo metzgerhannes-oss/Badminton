@@ -28,20 +28,9 @@ async function getPage(path,signal){
  const {rows}=await readPublicRows(path,{signal,count:false});
  return rows;
 }
-async function queryOfficial(id,signal){
- const rows=[];
- for(let offset=0;offset<MAX_ROWS;offset+=PAGE_LIMIT){
-  const qs=new URLSearchParams({
-   select:"dbv_id,match_id,tournament_name,match_date,event_code,discipline,match_status,player_side,winning_side,source_url,last_synced_at,opponent_names,game_score,countable,exclusion_reason",
-   dbv_id:"eq."+id,order:"match_date.desc.nullslast,match_id.asc",
-   limit:String(PAGE_LIMIT),offset:String(offset)
-  });
-  const data=await getPage("player_match_observations?"+qs,signal);
-  rows.push(...data);
-  if(data.length<PAGE_LIMIT)return {rows,partial:false};
- }
- return {rows,partial:true};
-}
+// Official match observations are not readable by invited app members and
+// have no usable rows. Do not query their restricted endpoint on Home.
+// Display only member-authorized, individually sourced match facts.
 async function queryExternal(id,signal){
  const status=await readMatchImportProgress(id,{signal}).catch(()=>null);
  const rows=[];
@@ -59,9 +48,17 @@ async function queryExternal(id,signal){
 }
 // The private, existing player-coverage RPC already provides this value.
 // Direct /players reads are blocked by RLS; that made all games "unclassified".
-function queryBirthYear(coverage){
- const birth=coverage?.birth_year;
- return Number.isInteger(birth)&&birth>=1900&&birth<=2100?birth:null;
+function queryBirthYear(coverage,id){
+ const valid=value=>Number.isInteger(value)&&value>=1900&&value<=2100?value:null;
+ const fromServer=valid(coverage?.birth_year);
+ if(fromServer!==null)return fromServer;
+ // The selected profile may already carry its verified birth year locally.
+ // This avoids an empty "eigene AK" filter when the coverage RPC times out.
+ try{
+  const local=JSON.parse(localStorage.getItem("shuttleboard-v1")||"null");
+  const profile=local?.players?.find(p=>p?.id===id||p?.dbv_id===id);
+  return valid(profile?.birthYear??profile?.birth_year);
+ }catch{return null}
 }
 async function fetchProfile(id,force=false){
  if(privateMode&&id===selected&&!force)return;
@@ -83,16 +80,19 @@ async function fetchProfile(id,force=false){
  controller?.abort();controller=new AbortController();
  const ticket=++seq,signal=controller.signal;
  render();
- const results=await Promise.allSettled([queryOfficial(id,signal),queryExternal(id,signal)]);
- if(ticket!==seq||signal.aborted)return;
- if(results[0].status==="fulfilled"){
-  official=results[0].value.rows;partialOfficial=results[0].value.partial;
- }else{officialError=true;console.warn("Official DBV match source unavailable",results[0].reason)}
- if(results[1].status==="fulfilled"){
-  external=results[1].value.rows;progress=results[1].value.progress;
-  partialExternal=results[1].value.partial;
-  birthYear=queryBirthYear(progress);
- }else{externalError=true;console.warn("Sourced Badhub match history unavailable",results[1].reason)}
+ // One authorized source, one coherent result; an empty unused official table
+ // must never hide the 1,974 imported Badhub cards or trigger a false outage.
+ try{
+  const data=await queryExternal(id,signal);
+  if(ticket!==seq||signal.aborted)return;
+  external=data.rows;progress=data.progress;partialExternal=data.partial;
+  birthYear=queryBirthYear(progress,id);
+ }catch(error){
+  if(ticket!==seq||signal.aborted)return;
+  externalError=true;
+  birthYear=queryBirthYear(null,id);
+  console.warn("Sourced match history temporarily unavailable",error);
+ }
  status="loaded";lastLoadedAt=Date.now();render();
 }
 function ageProof(m){
@@ -182,6 +182,12 @@ function render(){
  const stats=sourced?
   computeExternalStats(rows,{year:selectedYear,discipline:selectedDiscipline}):
   computeMatchStats(rows,{year:selectedYear,discipline:selectedDiscipline});
+ // In an offline/older session the server birth year can be unavailable.
+ // Preserve the match totals and show all instead of an unexplained blank panel.
+ if(birthYear===null&&selectedAgeClass!=="all"){
+  selectedAgeClass="all";
+  if($("match-stats-age"))$("match-stats-age").value="all";
+ }
  const context=ageContextBreakdown(stats,birthYear,{official:!sourced,filter:selectedAgeClass});
  const missing=context.total===0;
  const availability=matchAvailability({officialFailed:officialError,externalFailed:externalError});
