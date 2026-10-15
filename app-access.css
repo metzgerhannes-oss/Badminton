@@ -18,9 +18,3 @@ html:not([data-app-access="granted"]) dialog { display:none !important; }
 #app-access-submit:disabled {opacity:.6}
 #app-access-status { min-height:2.6em; }
 
-.player-data-status{padding:12px 16px;border-bottom:1px solid #b5cad8;margin:0 0 12px}
-.player-data-status[hidden]{display:none!important}
-.player-data-status-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.player-data-status-head a{font-size:.88rem}
-#player-data-counts{margin:8px 0 2px;font-weight:650;font-size:.93rem}
-#player-data-coverage-note{display:block;line-height:1.45;opacity:.8}
