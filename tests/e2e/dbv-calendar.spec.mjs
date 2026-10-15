@@ -133,3 +133,37 @@ test("BWBV 2027 C framework dates are distinct from unavailable DBV U13 entries"
  await page.locator("#dbv-calendar-year").selectOption("2026");
  await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(0);
 });
+
+test("v145: BW U13 calendar reveals verified 2027 A/B/C planning even when 2026 has D/E entries",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("all");
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(10);
+ await expect(page.locator(".dbv-calendar-next-year")).toContainText("2027");
+ await expect(page.locator(".dbv-calendar-framework")).toHaveCount(0);
+ await page.locator("[data-calendar-show-2027]").click();
+ await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
+ await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(6);
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("Eggenstein");
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("Gruppe SüdOst");
+ await expect(page.locator(".dbv-calendar-framework")).toContainText("U13 noch nicht bestätigt");
+ await expect(page.locator(".dbv-calendar-framework [data-calendar-toggle]")).toHaveCount(0);
+ const r=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+ expect(r).toBeLessThanOrEqual(2);
+});
+
+test("v145: BW U13 official A/B/C planning is filtered by level without presenting sign-ups",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ for(const [level,count,source] of [["A",1,"badminton.de"],["B",1,"bwbv.de"],["C",4,"bwbv.de"]]){
+  await page.locator("#dbv-calendar-level").selectOption(level);
+  await expect(page.locator(".dbv-calendar-framework li")).toHaveCount(count);
+  await expect(page.locator(".dbv-calendar-framework li a").first()).toHaveAttribute("href",new RegExp(source.replace(".","\\.")));
+  await expect(page.locator(".dbv-calendar-framework [data-calendar-toggle]")).toHaveCount(0);
+ }
+});
