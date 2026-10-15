@@ -1,3 +1,4 @@
+import {stageFreshResults} from "./p0-stage-results-oidc.mjs";
 /* One-time P0 source inventory. Does not change the DB or publish names/results.
  * Inspect the 13 agreed club profiles in a reproducible browser-like runner. */
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
@@ -34,6 +35,7 @@ function contradictions(rows){
  return {bad,rest:rows.filter(x=>!bad.has([x.competition_id,x.event].join("|")))};
 }
 let done=0,sourceOK=0,sourceGone=0,count=0,eligible=0,containsTarget=0;
+const staged=[];
 const results=await Promise.all(people.map(async ([id,name],index)=>{
  const check=[];
  for(const kind of ["turnier","liga"]){
@@ -47,6 +49,7 @@ const results=await Promise.all(people.map(async ([id,name],index)=>{
   }else sourceGone++;
   const related=matches.filter(m=>m.opponent_names.some(p=>p.toLowerCase().includes("charlotte metzger")));
   containsTarget+=related.length;count+=matches.length;
+  staged.push(...matches);
   const clean=contradictions(matches);eligible+=clean.rest.length;
   check.push({source:kind,status:data.status,cardCount:candidates,parsed:matches.length,
    safe:clean.rest.length,conflictedEvents:clean.bad.size,opponentMatchFound:related.length,reason});
@@ -57,3 +60,10 @@ const results=await Promise.all(people.map(async ([id,name],index)=>{
 console.log("FRESH_SOURCE_AUDIT "+JSON.stringify({profiles:done,sources_ok:sourceOK,sources_unavailable:sourceGone,
  candidate_cards:count,noncontradictory_cards:eligible,target_opponent_match_cards:containsTarget}));
 for(const result of results)console.log("FRESH_PROFILE "+JSON.stringify(result));
+
+if(process.argv.includes("--stage")){
+ const seen=new Set(),unique=[];
+ for(const row of staged){const key=row.dbv_id+"|"+row.source_key;if(seen.has(key))continue;seen.add(key);unique.push(row)}
+ const ack=await stageFreshResults(unique);
+ console.log("FRESH_STAGE_ACK "+JSON.stringify(ack));
+}
