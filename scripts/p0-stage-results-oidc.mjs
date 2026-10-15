@@ -1,7 +1,7 @@
 /** GitHub OIDC writer: no stored Supabase secrets, no raw rows in Actions logs.
  * Enabled exclusively on main's P0 one-time source scan. */
 const AUD="schmetterlinge-fresh-results-yadexibmjmnjfmfabrug";
-const URL="https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/spvgg-match-rebuild";
+const ENDPOINT="https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/spvgg-match-rebuild";
 export async function stageFreshResults(rows,env=process.env){
  if(env.GITHUB_REPOSITORY!=="metzgerhannes-oss/Badminton"||
     env.GITHUB_REF!=="refs/heads/main"||
@@ -19,7 +19,7 @@ export async function stageFreshResults(rows,env=process.env){
  const chunks=[];
  for(let i=0;i<rows.length;i+=60)chunks.push(rows.slice(i,i+60));
  for(const [index,chunk] of chunks.entries()){
-  const post=await fetch(URL,{
+  const post=await fetch(ENDPOINT,{
    method:"POST",headers:{Authorization:"Bearer "+jwt,"Content-Type":"application/json"},
    body:JSON.stringify({run:"run-"+env.GITHUB_RUN_ID,rows:chunk}),
    signal:AbortSignal.timeout(22000)
