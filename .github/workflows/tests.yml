@@ -46,6 +46,7 @@ jobs:
           node --check scripts/owner-invites-overview.mjs
           node --check club-branding.js
           node --check i18n.js
+          node --check scripts/validate-i18n.mjs
           node --check library.js
           node --check stats.js
           node --check scripts/private-match-source.mjs
@@ -168,6 +169,7 @@ jobs:
           node tests/service-worker-resilience.mjs
           node tests/release-version.mjs
           node tests/welcome-i18n.mjs
+          node scripts/validate-i18n.mjs
           node tests/supabase-read.mjs
           node tests/report-read-client.mjs
           node tests/supabase-library.mjs
