@@ -66,13 +66,13 @@ function bwNextYearHint(filters){
 // never masquerading as imported DBV event IDs or registration opportunities.
 const BW_YOUTH_ARCHIVE_2026=[
  {level:"C",start:"2026-01-17",end:"2026-01-18",title:"1. C-RLT U11–U19",ages:["U11","U13","U15","U17","U19"],place:"Reutlingen",detail:"Einzel/Doppel",
-  source:"https://bwbv.de/2026/02/02/1-c-rlt-baw-e-d-u11-u19-vom-17-18-01-2026-in-reutlingen/",sourceKind:"results"},
+  source:"https://dbv.turnier.de/tournament/52b3b803-279b-48cf-8143-f5078f5236db",sourceKind:"results"},
  {level:"A",start:"2026-02-07",end:"2026-02-08",title:"1. A-RLT U15/U19",ages:["U15","U19"],place:"Waghäusel",detail:"",
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2026/",sourceKind:"announcement"},
  {level:"C",start:"2026-02-28",end:"2026-03-01",title:"2. C-RLT U11–U19",ages:["U11","U13","U15","U17","U19"],place:"Friedrichshafen",detail:"Einzel/Mixed",
   source:"https://bwbv.de/2026/03/22/erfolgreiches-c-ranglistenturnier-in-friedrichshafen/",sourceKind:"results"},
  {level:"C",start:"2026-04-25",end:"2026-04-26",title:"3. C-RLT U11–U19",ages:["U11","U13","U15","U17","U19"],place:"Mössingen",detail:"Einzel/Doppel",
-  source:"https://bwbv.de/bezirke/suedwuerttemberg/jugend-sw/",sourceKind:"results"},
+  source:"https://dbv.turnier.de/tournament/DBB7AC20-FAD9-43A4-8842-6FA838623F35",sourceKind:"results"},
  {level:"A",start:"2026-05-02",end:"2026-05-03",title:"4. A-RLT U11/U13",ages:["U11","U13"],place:"Eggenstein-Leopoldshafen",detail:"",
   source:"https://bwbv.de/2026/05/07/4-a-rlt-in-eggenstein-leopoldshafen-silber-fuer-den-bsv/",sourceKind:"results"},
  {level:"B",start:"2026-06-13",end:"2026-06-14",title:"3. B-RLT SüdOst U13–U19",ages:["U13","U15","U17","U19"],place:"Waghäusel",detail:"",
