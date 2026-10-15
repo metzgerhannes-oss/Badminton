@@ -57,10 +57,10 @@ async function queryExternal(id,signal){
  }
  return {rows,progress:status||null,partial:true};
 }
-async function queryBirthYear(id,signal){
- const [profile]=await getPage("players?"+
-  new URLSearchParams({select:"birth_year",dbv_id:"eq."+id,limit:"1"}),signal);
- const birth=profile?.birth_year;
+// The private, existing player-coverage RPC already provides this value.
+// Direct /players reads are blocked by RLS; that made all games "unclassified".
+function queryBirthYear(coverage){
+ const birth=coverage?.birth_year;
  return Number.isInteger(birth)&&birth>=1900&&birth<=2100?birth:null;
 }
 async function fetchProfile(id,force=false){
@@ -83,7 +83,7 @@ async function fetchProfile(id,force=false){
  controller?.abort();controller=new AbortController();
  const ticket=++seq,signal=controller.signal;
  render();
- const results=await Promise.allSettled([queryOfficial(id,signal),queryExternal(id,signal),queryBirthYear(id,signal)]);
+ const results=await Promise.allSettled([queryOfficial(id,signal),queryExternal(id,signal)]);
  if(ticket!==seq||signal.aborted)return;
  if(results[0].status==="fulfilled"){
   official=results[0].value.rows;partialOfficial=results[0].value.partial;
@@ -91,9 +91,8 @@ async function fetchProfile(id,force=false){
  if(results[1].status==="fulfilled"){
   external=results[1].value.rows;progress=results[1].value.progress;
   partialExternal=results[1].value.partial;
+  birthYear=queryBirthYear(progress);
  }else{externalError=true;console.warn("Sourced Badhub match history unavailable",results[1].reason)}
- if(results[2].status==="fulfilled")birthYear=results[2].value;
- else console.warn("Player birth year unavailable for age class breakdown",results[2].reason);
  status="loaded";lastLoadedAt=Date.now();render();
 }
 function ageProof(m){

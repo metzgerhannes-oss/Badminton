@@ -83,7 +83,8 @@ export async function readMatchImportProgress(id,{signal}={}){
   const d=await response.json();
   if(d?.dbv_id!==id)return null;
   return {status:d.import_status||null,verified_count:Number(d.match_cards||0),
-   last_finished_at:d.last_import||null};
+   last_finished_at:d.last_import||null,
+   birth_year:Number.isInteger(d.birth_year)?d.birth_year:null};
  }
  const path="player_external_match_imports?"+new URLSearchParams({
   select:"status,verified_count,source_count,rejected_count,last_finished_at",
