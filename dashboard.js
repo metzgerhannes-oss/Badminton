@@ -93,7 +93,7 @@ function renderRank(){
  const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
  const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
  label.textContent=working?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
- source.innerHTML=working?'<span>Bestätigte DBV-Ranglistenwerte · unbestätigte Altersklassenplätze bleiben offen</span>':
+ source.innerHTML=working?'<span>Bestätigte DBV-Ranglistenwerte</span>':
  rankStatus==="loading"?'<span>Bestätigte DBV-Werte werden geladen …</span>':
  rankStatus==="protected"?'<span>Ranglistenwerte nach gültiger App-Einladung verfügbar</span>':
  rankStatus==="unavailable"?'<span>Ranglistenwerte momentan nicht abrufbar</span>':
