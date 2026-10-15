@@ -64,6 +64,13 @@ for(const result of results)console.log("FRESH_PROFILE "+JSON.stringify(result))
 if(process.argv.includes("--stage")){
  const seen=new Set(),unique=[];
  for(const row of staged){const key=row.dbv_id+"|"+row.source_key;if(seen.has(key))continue;seen.add(key);unique.push(row)}
- const ack=await stageFreshResults(unique);
+ if(sourceOK<24||sourceGone>2||unique.length<1700)throw Error("Source completeness regression – no automatic import");
+ // Two known gaps (Charlotte profile unavailable; Benjamin has no source
+ // matchcards) remain visible as warnings until original records are found.
+ if(results[3]?.results.some(x=>x.status!==200))
+  console.log("::warning title=Charlotte::Own match source missing; opponent-source proofs are tracked separately");
+ if(results[2]?.results.every(x=>x.parsed===0))
+  console.log("::warning title=Benjamin::Ranking exists but no published personal matchcards");
+ const ack=await stageFreshResults(unique,{sources_ok:sourceOK,sources_missing:sourceGone});
  console.log("FRESH_STAGE_ACK "+JSON.stringify(ack));
 }

@@ -1,4 +1,4 @@
-name: P0 Reimport SpVgg - safe staging
+name: P0 SpVgg nightly match reconciliation
 on:
   push:
     branches: [main, fix/p0-fresh-results-import-v152]
@@ -8,13 +8,15 @@ on:
       - .github/workflows/p0-fresh-scan.yml
       - supabase/functions/spvgg-match-rebuild/index.ts
   workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
 permissions:
   contents: read
   id-token: write
 jobs:
   source-inventory:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,6 +28,6 @@ jobs:
       - name: Read the 13 original public match sources without database writes
         if: github.ref != 'refs/heads/main'
         run: node scripts/p0-fresh-source-scan.mjs
-      - name: Stage fresh source facts for 13 club players with ephemeral OIDC credentials
+      - name: Incrementally reconcile 13 club match sources with authenticated OIDC and coverage validation
         if: github.ref == 'refs/heads/main'
         run: node scripts/p0-fresh-source-scan.mjs --stage
