@@ -159,8 +159,8 @@ test("v147: BWBV 2027 A/B/C announced dates are compact sourced cards, never fak
  }
  await page.locator("#dbv-calendar-level").selectOption("all");
  await expect(page.locator(".dbv-calendar-external-plan")).toHaveCount(6);
- await expect(page.locator(".dbv-calendar-external-plan")).toContainText("Eggenstein");
- await expect(page.locator(".dbv-calendar-external-plan")).toContainText("U13 noch offen");
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Eggenstein");
+ await expect(page.locator("#dbv-calendar-results")).toContainText("U13 noch offen");
  await expect(page.locator(".dbv-calendar-framework,.dbv-calendar-archive")).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
 });
