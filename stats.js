@@ -224,6 +224,7 @@ function render(){
    importCompleteness(progress,external.length)+
    (partialExternal?" Diese Liste ist derzeit unvollständig.":"")+
    (stats.excluded?" "+stats.excluded+" zusätzliche unklare Einträge wurden ausgeschlossen.":"")+
+   (stats.quarantined?" "+stats.quarantined+" Quellkarten wegen widersprüchlicher K.-o.-Runden vorläufig nicht als Siege oder Spiele gezählt.":"")+
    (availability.detail?" "+availability.detail:"")+
    " Ergebnisse aus verschiedenen Quellen werden nicht addiert.";
  }else if(official.length){
