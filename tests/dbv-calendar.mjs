@@ -71,7 +71,7 @@ assert.ok(main.includes('state.officialLinks.unshift(entry)'),"Private bookmark 
 assert.ok(main.includes('source!=="dbv-calendar"'),"Unverified calendar events must not be used for official live match options");
 console.log("DBV calendar: source IDs, 3-dimensional facets, BW, age/level, no fake tournament links and offline integration passed.");
 
-assert.ok(app.includes("BW_U13_ARCHIVE_2026"),"Real verified historical U13 tournament results must be rendered");
+assert.ok(app.includes("BW_YOUTH_ARCHIVE_2026")&&app.includes("t.ages.includes(filters.age)"),"Real verified historical BW youth results must be correctly age-filtered");
 assert.ok(app.includes("bwFrameworkHTML"),"Official planning sources remain distinct from confirmed event IDs");
 assert.ok(app.includes("data-calendar-show-history"),"Users must be able to open actual past results directly");
 
