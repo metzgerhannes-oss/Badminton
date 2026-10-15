@@ -32,7 +32,6 @@
 <script defer src="./settings-rooms.js"></script>
 <script type="module" src="./invite.js"></script>
 <script type="module" src="./app-access.js"></script>
-<script type="module" src="./player-data-status.js"></script>
 <script type="module" src="./library.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
@@ -75,7 +74,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v142" title="Version v142">v142</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v143" title="Version v143">v143</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -84,11 +83,6 @@
  </div>
  <main id="hauptinhalt" tabindex="-1">
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
-  <section id="player-data-status" class="player-data-status" aria-labelledby="player-data-heading" hidden>
-   <div class="player-data-status-head"><strong id="player-data-heading">Datenbestand</strong><a href="#historie">Alle Ergebnisse ansehen ↗</a></div>
-   <p id="player-data-counts" role="status" aria-live="polite">Datenstand wird geprüft …</p>
-   <small id="player-data-coverage-note"></small>
-  </section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1></div>
    <a href="#live" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
