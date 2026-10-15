@@ -108,6 +108,22 @@ test("An invited member sees individually sourced match statistics and navigable
  await expect(page.locator("#match-stats-details")).toBeVisible();
 });
 
+test("v153: screenshot regression – own AK totals survive restricted official source and missing coverage",async({page})=>{
+ const calls=[];
+ await page.route("**/player_match_observations?*",route=>{
+  calls.push(route.request().url());
+  return route.fulfill({status:403,headers,body:'{"code":"42501"}'});
+ });
+ await page.route("**/rpc/app_access_player_coverage",route=>
+  route.fulfill({status:503,headers,body:'{"error":"temporary"}'}));
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.locator("#match-stats-age").selectOption("own");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
+ await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
+ await expect(page.locator("#match-stats-retry")).toBeHidden();
+ await expect(page.locator("#match-stats-note")).not.toContainText("teilweise abrufbar");
+ expect(calls).toHaveLength(0);
+});
 test("Coverage RPC outage must not hide individually verified match cards",async ({page})=>{
  let coverageUnavailable=true;
  await page.route("**/rpc/app_access_player_coverage",route=>{
