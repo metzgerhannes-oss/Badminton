@@ -56,9 +56,47 @@ function bwFrameworkHTML(filters,today){
 function bwNextYearHint(filters){
  if(filters.region!=="Baden-Württemberg"||filters.age!=="U13"||
   filters.year!=="2026"||!["all","A","B","C"].includes(filters.level))return "";
- return '<div class="dbv-calendar-next-year"><strong>Für 2027 sind bereits A-/B-/C-Termine angekündigt.</strong>'+
-  '<p>Der aktuelle DBV-Import umfasst nur veröffentlichte, verbleibende Termine. Zusätzliche DBV-/BWBV-Planungen fehlen hier noch.</p>'+
-  '<button type="button" class="subtle-button" data-calendar-show-2027>Termine 2027 ansehen ↗</button></div>';
+ const planned=bwFrameworkDates({...filters,year:"2027"},localToday());
+ if(!planned.length)return "";
+ const title=filters.level==="all"
+  ?'2027: '+planned.length+' A-/B-/C-Plantermine'
+  :'2027: '+planned.length+' '+filters.level+'-'+(filters.level==="C"?"Rahmentermine":"Plantermin"+(planned.length===1?"":"e"));
+ return '<div class="dbv-calendar-next-year"><strong>'+esc(title)+'</strong>'+
+  '<p>Offiziell veröffentlichte Planung, noch keine vollständigen Turnierausschreibungen.'+
+  (filters.level==="C"?' U13-Teilnahme je C-Termin noch zu bestätigen.':'')+'</p>'+
+  '<button type="button" class="subtle-button" data-calendar-show-2027>2027-Termine anzeigen ↗</button></div>';
+}
+// Individually corroborated 2026 events outside the remaining-only DBV snapshot.
+// Historical facts are shown separately: never assign a fictional DBV event ID.
+const BW_U13_ARCHIVE_2026=[
+ {level:"C",start:"2026-04-25",end:"2026-04-26",
+  title:"3. C-RLT BAW U11–U19 · Mössingen",place:"Steinlachhalle Mössingen",
+  source:"https://bwbv.de/neuigkeiten/neuigkeiten-jugend/"},
+ {level:"A",start:"2026-05-02",end:"2026-05-03",
+  title:"4. A-RLT U11/U13 · Eggenstein-Leopoldshafen",place:"Sportzentrum Eggenstein",
+  source:"https://bwbv.de/2026/05/07/4-a-rlt-in-eggenstein-leopoldshafen-silber-fuer-den-bsv/"},
+ {level:"B",start:"2026-06-13",end:"2026-06-14",
+  title:"3. B-RLT SüdOst U13–U19 · Waghäusel",place:"Waghäusel-Kirrlach",
+  source:"https://badminton-rlp.de/aktuelles/33-globus-oliver-cup-jugend-badminton-in-waghaeusel"}
+];
+function bwArchiveDates(filters){
+ if(filters.region!=="Baden-Württemberg"||filters.age!=="U13"||
+   filters.year!=="2026"||filters.period!=="all")return [];
+ const search=String(filters.q||"").normalize("NFKC").toLocaleLowerCase("de").trim();
+ return BW_U13_ARCHIVE_2026.filter(t=>
+   (filters.level==="all"||filters.level===t.level)&&
+   (!search||(t.title+" "+t.place+" "+t.level).normalize("NFKC").toLocaleLowerCase("de").includes(search)));
+}
+function bwArchiveHTML(filters){
+ const found=bwArchiveDates(filters);
+ if(!found.length)return "";
+ return '<section class="dbv-calendar-archive" aria-label="Belegte bereits vergangene U13-Turniere 2026">'+
+  '<h4>2026 · '+found.length+' bereits gespielte'+(found.length===1?'s Turnier':' Turniere')+' belegt</h4>'+
+  '<p>Diese U13-Turniere sind offiziell nachgewiesen, liegen jedoch <strong>vor dem erfassten DBV-Import ab 14.10.2026</strong>. Kein Anmeldelink und keine vollständige Jahresliste.</p>'+
+  '<ul>'+found.map(t=>'<li><strong>'+esc(formatDate(t.start))+'–'+esc(formatDate(t.end))+'</strong>'+
+    ' · <strong>Level '+esc(t.level)+'</strong> · '+esc(t.title)+' · '+esc(t.place)+
+    ' · <a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">Beleg ↗</a></li>').join("")+'</ul>'+
+  '</section>';
 }
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
 const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
@@ -94,12 +132,15 @@ function render(){
  const selected=filterCalendar(entries,{...settings,today});
  const frameworkHTML=bwFrameworkHTML(settings,today);
  const nextYearHint=bwNextYearHint(settings);
+ const archiveHTML=bwArchiveHTML(settings);
+ const archiveCount=bwArchiveDates(settings).length;
  const fresh=entries.map(e=>Date.parse(e.checked)).filter(Number.isFinite);
  const newest=fresh.length?Math.max(...fresh):0;
  const warning=source==="supabase"&&newest&&Date.now()-newest>8*86400000?" · Letzter DB-Abgleich vor über 8 Tagen":"";
  const coverage=entries.length?formatDate(entries.reduce((earliest,t)=>t.start<earliest?t.start:earliest,entries[0].start))+
   "–"+formatDate(entries.reduce((latest,t)=>t.end>latest?t.end:latest,entries[0].end)):"";
- message(selected.total+" von "+entries.length+" offiziellen Kalendereinträgen · Erfasster Zeitraum: "+coverage+" · Quelle DBV"+warning);
+ message(selected.total+" von "+entries.length+" offiziellen Kalendereinträgen · Erfasster Zeitraum: "+coverage+
+  " · Quelle DBV"+(archiveCount?" · "+archiveCount+" frühere A/B/C-Turniere separat belegt":"")+warning);
  if(!selected.total){
   const region=settings.region==="all"?"allen Regionen":settings.region;
   const year=settings.year==="all"?"allen Jahren":"Jahr "+settings.year;
@@ -116,14 +157,15 @@ function render(){
     :'<p>Der Datenbestand kann unvollständig sein. Keine Treffer bedeuten nicht, dass keine Turniere stattfinden.</p>';
   const more=document.getElementById("dbv-calendar-more");
   if(more)more.hidden=true;
-  host.innerHTML='<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere im erfassten Zeitraum</h4>'+
+  host.innerHTML=archiveHTML+nextYearHint+
+   '<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere im erfassten Zeitraum</h4>'+
    '<p>Für '+esc(year)+' · '+esc(region)+' · '+esc(age)+' · '+esc(level)+' liegen im aktuellen Datenbestand ('+esc(coverage)+') keine passenden Termine vor.</p>'+
    (alternatives.length?'<p>Mit denselben übrigen Filtern sind folgende Levels verfügbar:</p><div class="dbv-calendar-alternatives">'+
     alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
       'Level '+esc(option.level)+' ('+option.count+')</button>').join("")+'</div>':"")+
    coverageNote+
    '<p class="settings-hint">Der Import umfasst nur den angegebenen Zeitraum; nicht alle DBV-/BWBV-Veranstaltungen sind vollständig erfasst.</p>'+
-   '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>'+frameworkHTML+nextYearHint;
+   '<a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Aktuellen DBV-Kalender öffnen ↗</a></div>'+frameworkHTML;
   return;
  }
  const bookmarkState=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
@@ -151,7 +193,7 @@ function render(){
   }).join("");
   html+='</section>';
  }
- host.innerHTML=nextYearHint+frameworkHTML+html;
+ host.innerHTML=archiveHTML+nextYearHint+frameworkHTML+html;
  const more=$("dbv-calendar-more");
  if(more)more.hidden=selected.groups.reduce((n,g)=>n+g.items.length,0)<=batchLimit;
 }
