@@ -33,11 +33,20 @@ function safeUrl(value){
  }catch{return ""}
 }
 export function regionLabel(t){return t.bundesland||t.organizer||"Überregional"}
-export function filterCalendar(entries,{region="all",age="all",level="all",year="all",q="",period="upcoming",group="region",today=""}={}){
+// The DBV U11 Masters final is national. A regional youth search should not
+// silently hide this one source-backed national championship.
+export function isNationalU11Masters(t){
+ return Boolean(t&&t.ages?.includes("U11")&&t.level==="A"&&
+   t.organizer==="DBV"&&!t.bundesland&&
+   /(?:german\s+masters|masters\s+finale).*u\s*11|u\s*11.*masters/i.test(t.title||""));
+}
+export function filterCalendar(entries,{region="all",age="all",level="all",year="all",q="",period="upcoming",group="region",today="",includeNationalU11Masters=false}={}){
  const search=String(q).normalize("NFKC").trim().toLocaleLowerCase("de");
  const filtered=entries.filter(t=>{
   if(year!=="all"&&t.start.slice(0,4)!==year)return false;
-  if(region!=="all"&&regionLabel(t)!==region)return false;
+  const nationalU11=includeNationalU11Masters&&age==="U11"&&
+    ALLOWED_ASSOCIATIONS.has(region)&&isNationalU11Masters(t);
+  if(region!=="all"&&regionLabel(t)!==region&&!nationalU11)return false;
   if(age!=="all"&&!t.ages.includes(age))return false;
   if(level!=="all"&&t.level!==level)return false;
   if(period==="upcoming"&&today&&t.end<today)return false;
