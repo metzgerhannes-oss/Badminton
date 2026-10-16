@@ -45,7 +45,7 @@ def qualifies(article_html):
         # Use only their primary article/main text, never navigation/footer.
         body = ' '.join(page.article or page.main)
         # Related-article teasers begin after this editorial boundary.
-        body = re.split(r'\\b(?:Weitere Beiträge|Ähnliche Berichte|Ähnliche Artikel)\\s*:', body,
+        body = re.split(r'\b(?:Weitere Beiträge|Ähnliche Berichte|Ähnliche Artikel)\s*:', body,
                         maxsplit=1, flags=re.I)[0].strip()
     if len(body) < 100:
         return False, None
