@@ -1,0 +1,68 @@
+/* Unified dark-navy desktop UI. The iPhone/tablet appearance is unchanged. */
+.desktop-club-nav{display:none!important}
+.club-overview-page{max-width:100%;margin:0}
+.club-overview-panel{border:1px solid #35567f;border-radius:18px;padding:18px;background:#112c51;color:#f3f8ff}
+.club-overview-intro{color:#bbcee7;font-size:.88rem;line-height:1.5;max-width:75rem}
+.club-overview-controls{display:grid;grid-template-columns:repeat(5,minmax(135px,1fr));gap:10px;align-items:end;margin:16px 0}
+.club-overview-controls label{display:grid;gap:6px;color:#e4efff;font-size:.84rem}
+.club-overview-controls input,.club-overview-controls select{width:100%;min-width:0;min-height:42px;border:1px solid #577aab;border-radius:10px;background:#1c3a61;color:#fff;padding:8px 10px;font:inherit}
+.club-overview-controls input::placeholder{color:#b1c9e8}
+.club-overview-controls button{min-height:42px;background:#254a76;color:#fff;border:1px solid #658ab9;border-radius:10px;padding:8px}
+.club-overview-count{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;margin:12px 0;color:#ecf3ff}
+.club-overview-source{font-size:.79rem;color:#c6d8ee;line-height:1.5;margin:12px 0 0}
+.club-overview-status{color:#f5d5a5;font-size:.82rem}
+.club-overview-scroll{width:100%;overflow-x:auto;scrollbar-color:#6b8eb7 #102b4d}
+.club-overview-table{border-collapse:collapse;width:100%;min-width:790px;color:#edf5ff;font-size:.83rem}
+.club-overview-table thead{background:#21446e;color:#cfe4ff}
+.club-overview-table th,.club-overview-table td{padding:11px 10px;text-align:left;border-bottom:1px solid #345378;vertical-align:middle}
+.club-overview-table tbody tr:nth-child(even){background:#17365a}
+.club-overview-table tbody tr:hover{background:#224972}
+.club-overview-table th[scope=row]{font-weight:600}
+.club-overview-name{display:block;color:#fff}
+.club-overview-table small{display:block;font-size:.72rem;font-weight:400;color:#aecaed;margin-top:4px}
+.club-overview-muted{color:#acc4df}
+.club-overview-missing{color:#f3d3ab;font-size:.75rem}
+.club-overview-profile{border:1px solid #87b9eb;background:#265786;color:white;border-radius:8px;padding:7px 10px;white-space:nowrap;font:inherit;cursor:pointer}
+.club-overview-profile:hover{background:#3271a5}
+.club-overview-empty{padding:2rem .6rem;color:#d4e4f5}
+@media(min-width:1080px){
+ html,body{background:#091a32!important;color:#e8f2ff!important}
+ body{background-image:linear-gradient(140deg,#091a32 0%,#142c4e 64%,#0c213d 100%)!important}
+ .app{max-width:1720px}
+ #hauptinhalt>.page:not(#view-start){max-width:100%}
+ .bottom-nav{background:#0f2948!important;border-color:#34577c!important;box-shadow:0 14px 40px #0613238c!important}
+ .bottom-nav a,.bottom-nav.has-live-tab a{color:#c6d9f2!important}
+ .bottom-nav a[aria-current=page]{background:#254d79!important;color:#fff!important;box-shadow:inset 0 0 0 1px #638db8!important}
+ .bottom-nav a:not([aria-current=page]):hover{background:#203e63!important;color:#fff!important}
+ .bottom-nav .desktop-club-nav{display:flex!important}
+ .topbar{border-bottom-color:#385a80!important}
+ .topbar .brand,.topbar .brand>span,.topbar .brand small{color:#f5f9ff!important}
+ .topbar-settings{background:#173a62!important;color:#e6f2ff!important;border-color:#577ca3!important}
+ .app-version-badge{color:#bed3ec!important}
+ .app .page h1,.app .page h2,.app .page h3,.app .page h4,.app .section-heading h2{color:#f7faff}
+ .app .page .muted,.app .page .supporting,.app .page .settings-hint{color:#c0d1e6}
+ .app .page .settings-card,.app .page .profile-card,.app .page .library-club-group,
+ .app .page .report-card,.app .page .home-ranking-section,.app .page .match-stats,
+ .app .page .dashboard-friends-section,.app .page .upcoming-tournaments-section,
+ .app .page .ranking-tile,.app .page .dashboard-next,.app .page .team-detail,
+ .app .page .follow-hub,.app .page .club-roster-shell{
+   background:#122e50!important;color:#e9f3ff!important;border-color:#355b83!important;
+ }
+ .app .page .settings-card p,.app .page .profile-card p{color:#d1e1f5}
+ .app .page input:not([type=checkbox]),.app .page select,.app .page textarea{
+  background:#193b60;color:#f3f8ff;border-color:#6284ad
+ }
+ .app .page input::placeholder{color:#b2c7e0}
+ .app .page a{color:#a7d8ff}
+ .app .page .primary-button{background:#176ea7!important;color:#fff!important}
+ .app .page button:focus-visible,.app .page a:focus-visible{outline:3px solid #a7d8ff!important;outline-offset:3px}
+ .app .page .library-player,.app .page .report-card-footer{border-color:#375b81}
+ #view-start .wiki-home-link{background:#1a3b61;color:#f1f8ff;border-color:#41678b}
+ #view-start .wiki-home-copy small{color:#c2d8ee}
+ .focused-profile{color:#f6faff}
+}
+@media(max-width:1079px){
+ .club-overview-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .club-overview-panel{padding:12px}
+}
+@media(max-width:540px){.club-overview-controls{grid-template-columns:1fr}}
