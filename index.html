@@ -36,6 +36,7 @@
 <script type="module" src="./library.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
+<script type="module" src="./follow-import.js"></script>
 <script type="module" src="./career-history.js"></script>
 <script type="module" src="./external-matches.js"></script>
 <script defer src="./live.js"></script>
@@ -383,9 +384,11 @@
     <div class="team-tabs" role="tablist" aria-label="Mannschafts-Saisondaten">
      <button type="button" role="tab" aria-controls="team-detail-games" aria-selected="true" data-team-tab="games">Spiele</button>
      <button type="button" role="tab" aria-controls="team-detail-table" aria-selected="false" data-team-tab="table">Tabelle</button>
+     <button type="button" role="tab" aria-controls="team-detail-reports" aria-selected="false" data-team-tab="reports">Berichte</button>
     </div>
     <div id="team-detail-games" role="tabpanel" aria-label="Spielplan" aria-live="polite"></div>
     <div id="team-detail-table" role="tabpanel" aria-label="Ligatabelle" aria-live="polite" hidden></div>
+    <div id="team-detail-reports" role="tabpanel" aria-label="Geprüfte Mannschaftsberichte" aria-live="polite" hidden></div>
     <a id="team-source-link" class="team-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Offizielle Saison bei nuLiga öffnen ↗</a>
    </section>
 
