@@ -1,6 +1,6 @@
 /** Public DBV calendar from Badminton Supabase, with static source fallback. */
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels} from "./scripts/dbv-calendar-utils.mjs";
+import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels,isNationalU11Masters} from "./scripts/dbv-calendar-utils.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const formatDate=s=>new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z"));
@@ -150,7 +150,7 @@ function render(){
    curated.ages.some(age=>t.ages.includes(age))&&
    known.length>=6&&place.length>=6&&(place.includes(known)||known.includes(place));
  });
- const selected=filterCalendar(entries.filter(t=>!isCuratedDuplicate(t)),{...settings,today});
+ const selected=filterCalendar(entries.filter(t=>!isCuratedDuplicate(t)),{...settings,today,includeNationalU11Masters:true});
  const frameworkHTML=bwFrameworkHTML(settings,today);
  const nextYearHint=bwNextYearHint(settings);
  const archiveHTML=bwArchiveHTML(settings);
@@ -163,16 +163,19 @@ function render(){
  const coverage=entries.length?formatDate(entries.reduce((earliest,t)=>t.start<earliest?t.start:earliest,entries[0].start))+
   "–"+formatDate(entries.reduce((latest,t)=>t.end>latest?t.end:latest,entries[0].end)):"";
  const hits=selected.total+sourcedCount;
+ const mastersVisible=settings.age==="U11"&&settings.region!=="all"&&
+   selected.groups.some(group=>group.items.some(isNationalU11Masters));
  message(hits+" passende Turniere"+(plansCount?" / Termine":"")+
   (sourcedCount?" · "+sourcedCount+" zusätzlich aus offiziellen Quellen":"")+
-  (selected.total?" · "+selected.total+" DBV":"")+warning);
+  (selected.total?" · "+selected.total+" DBV":"")+
+  (mastersVisible?" · inkl. German Masters U11 (DBV, bundesweit)":"")+warning);
  if(!selected.total){
   const more=$("dbv-calendar-more");if(more)more.hidden=true;
   if(sourcedCount){
    host.innerHTML=nextYearHint+archiveHTML+frameworkHTML;
    return;
   }
-  const alternatives=alternativeCalendarLevels(entries,{...settings,today});
+  const alternatives=alternativeCalendarLevels(entries,{...settings,today,includeNationalU11Masters:true});
   const switchPeriod=settings.period==="upcoming"&&settings.year==="2026"&&
      settings.region==="Baden-Württemberg"&&BW_YOUTH_AGES.includes(settings.age)
     ?'<button type="button" class="subtle-button" data-calendar-show-history>Ergebnisse 2026 ansehen ↗</button>':"";
@@ -204,7 +207,7 @@ function render(){
     ' aria-label="'+esc(bookmarkState.playerId?(savedKeys.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarkState.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
     (bookmarkState.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+
     (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p>'+esc(t.place)+(t.organizer?' · '+esc(t.organizer):"")+'</p>'+
-    '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+'</div>'+
+    '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+(isNationalU11Masters(t)?'<span>DBV · bundesweit</span>':'')+'</div>'+
     (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
     '<a href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
   }).join("");
@@ -298,6 +301,18 @@ async function load(){
    const snapshot=await readSnapshot();
    entries=snapshot.rows;source="snapshot";
   }catch{entries=[];source="offline";problem="Der Kalender ist derzeit nicht erreichbar."}
+ }
+ // Guard against a temporarily incomplete read-only DBV mirror. Only use a
+ // recently captured *official* static snapshot, and only for the verified
+ // U11 national Masters entry. No broad stale-calendar overwrite.
+ if(!entries.some(isNationalU11Masters)){
+  try{
+   const snapshot=await readSnapshot();
+   if(snapshot.timestamp>Date.now()-14*86400000){
+    const missing=snapshot.rows.filter(t=>isNationalU11Masters(t)&&!entries.some(e=>e.key===t.key));
+    if(missing.length)entries=[...entries,...missing].sort((a,b)=>a.start.localeCompare(b.start));
+   }
+  }catch{ /* no extra provider polling or speculative event */ }
  }
  // The archive is supplemental. Current DBV data and the six hand-verified
  // source cards remain visible if the independent archive is unavailable.
