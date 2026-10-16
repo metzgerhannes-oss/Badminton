@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels} from "../scripts/dbv-calendar-utils.mjs";
+import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels,isNationalU11Masters} from "../scripts/dbv-calendar-utils.mjs";
 
 const sample=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 assert.equal(sample.schemaVersion,1);
@@ -33,6 +33,24 @@ assert.deepEqual(alternativeCalendarLevels(rows,{...bwU13C,level:"all"}),[]);
 const age=filterCalendar(rows,{age:"U11",period:"all"});
 assert.ok(age.total>0);
 assert.ok(age.groups.flatMap(g=>g.items).every(t=>t.ages.includes("U11")));
+// The official U11 Masters is national (DBV), but must remain discoverable
+// in a Baden-Württemberg U11 search without mislabeling its region.
+const masters=rows.find(isNationalU11Masters);
+assert.ok(masters,"Official DBV snapshot must retain the German Masters U11");
+assert.equal(masters.title,"German Masters U11");
+assert.equal(masters.start,"2026-12-05");
+assert.equal(masters.end,"2026-12-06");
+assert.equal(masters.deadline,"2026-11-10");
+const bwU11={region:"Baden-Württemberg",age:"U11",year:"2026",level:"A",period:"upcoming",today:"2026-10-16"};
+const containsMasters=options=>filterCalendar(rows,options).groups.flatMap(g=>g.items).some(t=>t.key===masters.key);
+assert.equal(containsMasters(bwU11),false,"Strict regional filter excludes national events by default");
+assert.equal(containsMasters({...bwU11,includeNationalU11Masters:true}),true);
+assert.equal(containsMasters({...bwU11,age:"U13",includeNationalU11Masters:true}),false);
+assert.equal(containsMasters({...bwU11,level:"C",includeNationalU11Masters:true}),false);
+assert.equal(containsMasters({...bwU11,year:"2027",includeNationalU11Masters:true}),false);
+assert.equal(containsMasters({...bwU11,today:"2026-12-07",includeNationalU11Masters:true}),false);
+assert.equal(containsMasters({...bwU11,q:"German Masters",includeNationalU11Masters:true}),true);
+assert.equal(containsMasters({...bwU11,q:"unrelated",includeNationalU11Masters:true}),false);
 const c=filterCalendar(rows,{level:"C",period:"all"});
 assert.ok(c.total>0);
 assert.ok(c.groups.flatMap(g=>g.items).every(t=>t.level==="C"));
