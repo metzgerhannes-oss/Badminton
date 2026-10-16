@@ -634,3 +634,40 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 /* v75: career and individual-match KPIs share the same win/loss color meanings. */
 .dbv-reference-totals span.wins strong{color:#07864c}
 .dbv-reference-totals span.losses strong{color:#9b4242}
+
+/* v163: a compact, explicit player-follow flow. The club roster belongs to
+   Vereinsansicht/Mannschaften; the follow search shows only selectable DBV hits. */
+#view-spieler .follow-discovery-intro{margin:2px 0 12px;color:#486b86;font-size:13px;line-height:1.5}
+#view-spieler .follow-search-primary{display:grid;gap:7px;font-weight:800;color:#143d61;font-size:13px}
+#view-spieler .follow-search-primary input{width:100%;min-width:0;min-height:52px;border-radius:13px;border:1px solid #88b7d6;background:#fff;color:#122d52;padding:11px 13px;font:inherit;font-size:16px}
+#view-spieler .follow-search-primary input:focus-visible{outline:3px solid #168ac6;outline-offset:2px}
+#view-spieler .follow-search-advanced{margin:12px 0 9px;border:1px solid #c7dfee;border-radius:12px;background:#f5faff}
+#view-spieler .follow-search-advanced summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;min-height:44px;padding:10px 12px;color:#144d7e;font-size:13px;font-weight:800}
+#view-spieler .follow-search-advanced summary span{font-size:11px;color:#64819a;font-weight:500}
+#view-spieler .follow-search-advanced .library-filters{margin:2px 12px 12px;gap:10px}
+#view-spieler .follow-search-advanced .library-filters label{color:#315e80}
+#view-spieler .follow-search-advanced .library-filters input,
+#view-spieler .follow-search-advanced .library-filters select{background:#fff;color:#173e62;border-color:#a5c8de;font-size:14px}
+#view-spieler .library-result-bar{margin:10px 0 9px;align-items:center}
+#view-spieler .library-result-bar span{color:#246188;flex:1 0 100%;line-height:1.45}
+#view-spieler .library-club-group{background:#142f53;border-color:#345984;box-shadow:none;margin-bottom:10px}
+#view-spieler .library-club-group h3{background:#1c416e;color:#f3f8ff;font-size:13px;padding:11px 12px}
+#view-spieler .library-club-group h3 span{color:#c2d8ef}
+#view-spieler .library-player{border-top-color:#37577d;gap:10px}
+#view-spieler .library-player-info strong{color:#fff;font-size:14px}
+#view-spieler .library-player-info span{color:#d6e6f8}
+#view-spieler .library-player-info small{color:#b9d0e9}
+#view-spieler .library-player-action button{background:#b4e3ff;color:#123955;border-color:#9ad4f7;min-height:44px}
+#view-spieler .library-player-action button.following{background:#d8f8eb;color:#12543c;border-color:#9cdec3}
+#view-spieler .library-player-action button.library-view{color:#d2eeff;background:transparent}
+#view-spieler .library-own{color:#cbe9ff;background:#28557e;border-color:#567b9b}
+#view-spieler .follow-search-provenance{margin-top:14px;padding-top:8px;border-top:1px solid #d1e3f0}
+#view-spieler .follow-search-provenance summary{cursor:pointer;display:flex;align-items:center;min-height:44px;color:#526f88;font-size:12px}
+#view-spieler .follow-search-provenance .library-source{font-size:11px;margin:3px 0 9px}
+#view-spieler .follow-search-provenance .library-data-note{font-size:11px;line-height:1.45}
+@media(max-width:410px){
+ #view-spieler .follow-search-advanced summary span{font-size:10px}
+ #view-spieler .library-player{padding:9px 8px;gap:8px}
+ #view-spieler .library-player-avatar{width:33px;height:33px}
+ #view-spieler .library-player-action{max-width:109px}
+}
