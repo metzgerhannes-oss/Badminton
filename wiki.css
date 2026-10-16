@@ -48,3 +48,12 @@ dialog h2{font-size:24px;margin:8px 0 12px;line-height:1.18}
  .wiki-header .back{font-size:13px;gap:2px}
  .wiki-header .back:first-letter{font-size:21px}
 }
+
+/* Full library: clear three-topic sections, readable on phones and desktop. */
+.wiki-group-title{grid-column:1/-1;margin:18px 2px 1px;color:#155473;font-size:17px;letter-spacing:-.25px}
+.wiki-results .wiki-group-title:first-child{margin-top:4px}
+.wiki-detail-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px}
+.wiki-detail-nav button{background:#ebf6fc;border:1px solid #b8d9eb;border-radius:12px;color:#155473;font-size:13px;font-weight:750;min-height:44px;padding:10px 13px}
+.wiki-detail-nav button:disabled{opacity:.34;cursor:default}
+#wiki-card-position{font-size:12px;color:#527792;white-space:nowrap}
+.wiki-detail-nav button:focus-visible{outline:3px solid #127eba;outline-offset:2px}
