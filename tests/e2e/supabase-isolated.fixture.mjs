@@ -10,6 +10,7 @@ const headers={
  "Access-Control-Allow-Origin":"*",
  "Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer,x-client-info",
  "Access-Control-Allow-Methods":"GET,POST,PATCH,DELETE,OPTIONS",
+ "Access-Control-Expose-Headers":"X-Schmetterlinge-Mock",
  "Content-Type":"application/json",
  "X-Schmetterlinge-Mock":"browser-qa-no-live-supabase"
 };
