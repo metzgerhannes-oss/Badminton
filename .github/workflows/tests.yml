@@ -183,11 +183,11 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v
 
           ) > test-output.log 2>&1
-          cat test-output.lo      - name: Upload failing test output
+          cat test-output.log
+      - name: Upload failing test output
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: failed-tests-diagnostic
           path: test-output.log
           retention-days: 1
-g
