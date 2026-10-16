@@ -1,4 +1,27 @@
 import {test,expect} from "./supabase-isolated.fixture.mjs";
+
+// Home-layout assertions need a synthetic member; the public Wiki itself stays anonymous.
+// All requests still pass through the no-live-Supabase browser fixture.
+async function prepareMockMember(page){
+ await page.addInitScript(()=>{
+  localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({
+   access_token:"wiki-layout-mock",refresh_token:"wiki-layout-refresh",
+   expires_at:Date.now()+3600000,
+   user_id:"24c76504-b86c-4c73-a01a-b6210b78e3a3"
+  }));
+ });
+ const headers={
+  "Access-Control-Allow-Origin":"*",
+  "Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer,x-client-info",
+  "Access-Control-Allow-Methods":"POST,OPTIONS",
+  "Content-Type":"application/json"
+ };
+ await page.route("**/rest/v1/rpc/app_access_status",route=>
+  route.fulfill({status:route.request().method()==="OPTIONS"?204:200,
+   headers,body:route.request().method()==="OPTIONS"?"":'{"allowed":true,"owner":false}'})
+ );
+}
+
 test("Wiki: three topics and anonymous mobile search",async({page})=>{
  await page.goto("/wiki.html");
  await expect(page.getByRole("heading",{name:"Schnell erklärt."})).toBeVisible();
@@ -98,8 +121,10 @@ test("Wiki: four separate net rules get four different illustrations",async({pag
  }
 });
 
-test("Wiki v160: up-to-date Home entry and offline PWA assets",async({page})=>{
+test("Wiki: current Home entry and offline PWA assets",async({page})=>{
+ await prepareMockMember(page);
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("a.wiki-home-link")).toBeVisible();
  await expect(page.locator("a.wiki-home-link")).toHaveAttribute("href","./wiki.html");
  const response=await page.request.get("/sw.js");
  expect(response.ok()).toBe(true);
@@ -107,7 +132,10 @@ test("Wiki v160: up-to-date Home entry and offline PWA assets",async({page})=>{
  for(const path of ["./wiki.html","./wiki.js","./wiki.css"]){
   expect(script).toContain('"'+path+'"');
  }
- expect(script).toContain("schmetterlinge-shell-v160");
+ const release=await (await page.request.get("/app-release.js")).text();
+ const version=release.match(/version:"(v\\d+)"/)?.[1];
+ expect(version).toBeTruthy();
+ expect(script).toContain("schmetterlinge-shell-"+version);
 });
 
 
@@ -144,10 +172,12 @@ test("Wiki v160: out, distraction and doubles service boundary use truthful dist
  }
 });
 
-test("v160: Regeln & Wissen is the last Home tile and the club logo fits all viewports",async({page})=>{
+test("Regeln & Wissen is the last Home tile and the club logo fits all viewports",async({page})=>{
+ await prepareMockMember(page);
  for(const [width,logoMin] of [[320,49],[390,55],[430,61],[1440,71]]){
   await page.setViewportSize({width,height:900});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#app-access-gate")).toBeHidden();
   const layout=await page.evaluate(()=>{
    const home=document.querySelector("#view-start");
    const wiki=home.querySelector(".wiki-home-link");
