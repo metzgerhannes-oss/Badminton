@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 const token="0123456789abcdef".repeat(4);
 const id="11111111-2222-4333-8444-555555555555";
 const headers={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type,apikey,authorization","Access-Control-Allow-Methods":"POST,OPTIONS"};

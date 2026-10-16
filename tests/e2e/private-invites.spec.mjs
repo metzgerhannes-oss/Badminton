@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 const DBV="E24DC6EE-152A-454D-B00C-E625B751D7D5";
 const SOURCE="https://dbv.turnier.de/tournament/"+DBV;
 const INV_ID="a10b0c0d-2e3f-4a5b-8c6d-7e8f9a0b1c2d";
