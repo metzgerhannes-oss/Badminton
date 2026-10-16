@@ -2,7 +2,6 @@
 import {selectPlayers,clubGroups,normalizeText,sortClubs,localLibraryPlayers} from "./scripts/library-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {searchDbvIdentities,validDbvLookup} from "./scripts/targeted-player-search.mjs";
-import {loadSpvggRoster,rosterHtml,rosterMatchesClub} from "./scripts/spvgg-roster.mjs";
 
 const ROOT="./data/player-library/";
 let dbMode=false,localMode=false,rosterDenied=true,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
@@ -69,25 +68,6 @@ async function dbClubs(){
 const $=id=>document.getElementById(id);
 const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ageNames=["U11","U13","U15","U17","U19","U22"];
-let activeRoster=null,rosterFailure=false;
-function renderActiveRoster(){
- const root=$("spvgg-active-roster"),area=$("spvgg-active-roster-content");
- if(!root||!area)return;
- const club=$("library-club")?.value||"",age=ageChoice(),association=$("library-association")?.value||"all";
- root.hidden=!(rosterMatchesClub(club)&&age==="all"&&
-   (association==="all"||association==="BAW-Baden-Württemberg"||association==="BWBV"));
- if(root.hidden)return;
- if(rosterFailure){area.textContent="Mannschaftskader derzeit nicht verfügbar. Bitte erneut öffnen.";return}
- if(!activeRoster){area.textContent="Offizielle Mannschaftskader werden geladen …";return}
- area.innerHTML=rosterHtml(activeRoster,{
-   query:$("library-search")?.value||"",team:$("spvgg-roster-team")?.value||"all"
- });
-}
-async function initActiveRoster(){
- renderActiveRoster();
- try{activeRoster=await loadSpvggRoster()}catch{rosterFailure=true}
- renderActiveRoster();
-}
 const memory=new Map();
 let summary=null,entries=[],lastAge="",pending=0,visible=40,loaded=false;
 async function fetchJson(path){
@@ -169,7 +149,7 @@ function render(){
     '<small>DBV '+escape(p.id)+(p.lastSeen?' · Stand '+escape(p.lastSeen):"")+'</small></div>'+
     '<div class="library-player-action">'+
       (isOwn?'<span class="library-own">Eigenes Profil</span>':
-       '<button type="button" data-library-toggle="'+escape(p.id)+'" aria-label="'+escape(p.name)+' '+(isFollowed?"entfolgen":"folgen")+'" class="'+(isFollowed?"following":"")+'">'+(isFollowed?"✓ Folge ich":"+ Folgen")+'</button>')+
+       '<button type="button" data-library-toggle="'+escape(p.id)+'" aria-label="'+escape(p.name)+' '+(isFollowed?"bereits gefolgt":"folgen")+'" class="'+(isFollowed?"following":"")+'"'+(isFollowed?' disabled':'')+'>'+(isFollowed?"✓ Gefolgt":"+ Folgen")+'</button>')+
       (isFollowed?'<button type="button" class="library-view" data-library-open="'+escape(p.id)+'">Ansehen ↗</button>':"")+
     '</div></article>';
   }).join("")+'</section>'
@@ -303,7 +283,7 @@ async function nextPage(){
  }catch{const box=$("library-message");if(box)box.textContent="Weitere Spieler momentan nicht erreichbar."}
 }
 function delayedFilter(){
- renderActiveRoster();
+ 
  clearTimeout(filterTimer);
  if(!hasCriteria()){showIdle();return;}
  filterTimer=setTimeout(()=>{visible=40;load()},280);
@@ -313,13 +293,13 @@ document.addEventListener("DOMContentLoaded",()=>{
  showIdle();
  // Small club metadata fetch may populate the Landesverband filter, never the 9,246-player list.
  dbAssociations().catch(e=>console.warn("Landesverbände derzeit nicht abrufbar:",e?.message));
- $("library-age").addEventListener("change",()=>{renderActiveRoster();load()});
- $("spvgg-roster-team")?.addEventListener("change",renderActiveRoster);
- void initActiveRoster();
+ $("library-age").addEventListener("change",()=>{load()});
+ 
+ 
  for(const id of ["library-search","library-club"]){
   $(id).addEventListener("input",()=>{if(id==="library-club")updateClubSuggestions();delayedFilter();});
  }
- $("library-association").addEventListener("change",()=>{renderActiveRoster();visible=40;load();});
+ $("library-association").addEventListener("change",()=>{visible=40;load();});
  $("library-more").addEventListener("click",nextPage);
  $("library-reset").addEventListener("click",()=>{
   $("library-search").value="";
@@ -327,7 +307,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("library-age").value="all";
   $("library-association").value="all";
   $("library-club-suggestions").innerHTML="";
-  clearTimeout(filterTimer);showIdle();renderActiveRoster();
+  clearTimeout(filterTimer);showIdle();
   $("library-search").focus();
  });
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
