@@ -72,11 +72,14 @@ function init(){
   $("club-overview-search").value="";$("club-overview-team").value="all";
   $("club-overview-age").value="all";$("club-overview-sort").value="name";render();
  });
- window.addEventListener("badminton:club-profiles",event=>{
-  profiles=Array.isArray(event.detail?.players)?event.detail.players:[];
-  updateChoices();if(location.hash==="#verein")render();
- });
  window.addEventListener("hashchange",()=>{if(location.hash==="#verein")void open()});
  if(location.hash==="#verein")void open();
 }
+// Register before DOMContentLoaded: app.js may publish the first profile snapshot
+// before this module's own DOMContentLoaded handler runs.
+window.addEventListener("badminton:club-profiles",event=>{
+ profiles=Array.isArray(event.detail?.players)?event.detail.players:[];
+ updateChoices();
+ if(location.hash==="#verein")render();
+});
 document.addEventListener("DOMContentLoaded",init);
