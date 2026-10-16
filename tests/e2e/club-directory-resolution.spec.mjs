@@ -34,6 +34,7 @@ test("Scoped name and club search succeeds while full player-roster API yields n
  });
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await page.locator("#player-add-open").click();
+ await page.locator(".follow-search-more > summary").click();
  await page.locator("#library-club").fill("SpVgg. Mössingen");
  await page.locator("#library-search").fill("Mössinger");
  await expect(page.locator("#library-count")).toContainText("12 passende Spieler");
@@ -53,6 +54,7 @@ test("No name or zero verified results means no silent bulk club export",async (
  });
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
  await page.locator("#player-add-open").click();
+ await page.locator(".follow-search-more > summary").click();
  await page.locator("#library-club").fill("Nirgendwo FC");
  await expect(page.locator("#library-more")).toBeHidden();
  expect(queries).toHaveLength(0);
