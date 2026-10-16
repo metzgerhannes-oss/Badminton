@@ -1,4 +1,4 @@
-import {test as base,expect} from "@playwright/test";
+import {test as base,expect} from "./supabase-isolated.fixture.mjs";
 export {expect};
 
 // Legacy application-flow specs exercise a valid invited-member browser.

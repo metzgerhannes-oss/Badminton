@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 const player="99-000001",access="11111111-2222-4333-8444-555555555555";
 const headers={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type,apikey,authorization","Access-Control-Allow-Methods":"POST,OPTIONS"};
 const example={dbv_id:player,source_key:"tournament:synthetic-proof",category:"tournament",

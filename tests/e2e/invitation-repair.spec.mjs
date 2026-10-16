@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 
 const store={
  players:[{id:"local-older",name:"Philipp",club:"SpVgg Mössingen"},

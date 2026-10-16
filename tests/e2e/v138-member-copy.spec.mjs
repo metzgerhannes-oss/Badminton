@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 const API="https://yadexibmjmnjfmfabrug.supabase.co";
 const DBV="99-000001";
 const headers={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Content-Type":"application/json"};

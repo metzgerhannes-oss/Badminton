@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 test("v154 desktop layout with the original data components",async({page})=>{
  await page.setViewportSize({width:1440,height:900});await page.goto("/#start");
  const layout=await page.evaluate(()=>{

@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 
 const DBV="05-070879";
 const USER="2980046b-abd4-4056-b275-090a7364c4ac";
