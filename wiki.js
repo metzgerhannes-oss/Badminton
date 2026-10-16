@@ -1,6 +1,6 @@
 "use strict";
 // Schmetterlinge – compact editorial wiki. Search runs in the browser; no account or analytics.
-// All cards require subject-matter and graphical release review before merging this draft PR.
+// Each card is linked to the cited DBV/BWBV rule; independent review remains tracked separately.
 const DBV="https://www.badminton.de/fileadmin/dateien_upload/dateien_2026/juli_2026/dbv_satzungswerk_2026-27_stand_13.06.2026.pdf";
 const FAQ="https://www.badminton.de/der-dbv/jugend-wettkampf/faq/";
 const RANK="https://www.badminton.de/der-dbv/jugend-wettkampf/allgemeine-ranglisten-bestimmungen/";
@@ -61,6 +61,14 @@ const DATA=[
 ["jugend","Was bedeutet „ohne Hinterfeld“?","Im Einzel endet das Feld an der hinteren Doppel-Aufschlaglinie.","small games feld ohne hinten u13","BWBV-Spielform 8 · 2026",BWBV,"smallnoback"],
 ["jugend","Welche Small Games gelten beim C-RLT?","BWBV 2026 (U11/U13): 1. C-RLT Box, 2. ohne Hinterfeld, 3. Standardfeld. U13: 4. Mixed statt Einzel.","c rangliste small games c rlt bwbv 2026","BWBV-Jugendordnung 2026, Anhang 3",BWBV_J,"smallSchedule"],
 ["jugend","Darf man in einer höheren Altersklasse spielen?","Entscheidend sind Altersklassenregel und Turnierausschreibung.","hochmelden u13 u15 u17 höhere altersklasse","DBV/BWBV – konkrete Ausschreibung prüfen",BWBV_J,"ages"],
+["grundlagen","Wer bekommt nach einem Ballwechsel einen Punkt?","Die Seite, die den Ballwechsel gewinnt, erhält einen Punkt – unabhängig davon, wer aufgeschlagen hat.","rally point punktevergabe ballwechsel sieger","Spielregel 7.3",DBV,"bestof"],
+["grundlagen","Wie viele Aufschlagversuche hat man?","Es gibt keinen zweiten Versuch. Ein verfehlter Aufschlag ist ein Fehler.","zweiter aufschlag versuch wiederholen fehler","Spielregeln 9 und 13",DBV,"missServe"],
+["grundlagen","Welche hintere Linie zählt beim Doppelaufschlag?","Die innere hintere Doppel-Aufschlaglinie begrenzt das gültige Aufschlagfeld.","doppel aufschlag hintere linie feld hinten","Spielregeln 1 und 11",DBV,"double"],
+["spielsituationen","Federball berührt Körper oder Kleidung?","Fehler. Berührt der Federball eine Person oder deren Kleidung, verliert ihre Seite den Ballwechsel.","körper körperkontakt kleidung federball getroffen","Spielregel 13.3",DBV,"fault"],
+["spielsituationen","Ball landet vollständig außerhalb der Linien?","Aus. Die gegnerische Seite gewinnt den Ballwechsel.","aus außerhalb hinter grundlinie seitenlinie boden","Spielregel 13.3",DBV,"line"],
+["spielsituationen","Darf man beim Aufschlag auf der Linie stehen?","Nein. Aufschläger und Rückschläger dürfen die Linien ihres Aufschlagfeldes dabei nicht berühren.","aufschlag linie fuß stellung stehen feld","Spielregel 9.1",DBV,"feet"],
+["spielsituationen","Ist absichtliches Ablenken des Gegners erlaubt?","Nein. Absichtliche Ablenkung durch Rufe oder Gesten während des Ballwechsels ist ein Fehler.","rufen ablenkung gesten gegner stören","Spielregel 13.4",DBV,"coach"],
+["spielsituationen","Netzroller beim Aufschlag: weiterspielen?","Ja. Fliegt der Ball über das Netz ins gültige Aufschlagfeld, läuft der Ballwechsel weiter.","netz aufschlag netzroller gültig feld","Spielregeln 9 und 13",DBV,"netRoller"],
 ["jugend","Gilt ab 2027 überall die 15er-Zählweise?","Nein. Ab 4. Januar 2027 ist 3 × 15 für DBV-Individualturniere verbindlich; Landes- und Mannschaftswettbewerbe können abweichen.","2027 15 satz umstellung jugend","DBV-Individualturniere ab 04.01.2027",FIFTEEN,"score15"]
 ];
 const TOPICS={grundlagen:"Grundregeln",spielsituationen:"Spielsituationen",jugend:"Jugend & Turniere"};
@@ -327,13 +335,11 @@ function findItems(){
    }
    return {c:x.c,score,matched};
   }).filter(x=>x.matched).sort((a,b)=>b.score-a.score).map(x=>x.c);
- }else if(topic==="alle"){
-  const popularTitles=["Wie groß ist das Spielfeld?","Wohin muss der Aufschlag?","Wer schlägt von rechts auf?","Wie zählt man bis 21?","Was ist ein Let?","Darf ein Ball die Linie berühren?","Was sind Small Games?","Was bedeuten A- bis E-Turniere?"];
-  items=popularTitles.map(title=>CARDS.find(c=>c.title===title)).filter(Boolean);
  }else items=items.map(x=>x.c);
  return items;
 }
 function openCard(c){
+ dialog.dataset.cardId=c.id;
  document.getElementById("detail-category").textContent=TOPICS[c.topic];
  document.getElementById("detail-title").textContent=c.title;
  document.getElementById("detail-art").innerHTML=art(c.kind);
@@ -342,15 +348,32 @@ function openCard(c){
  document.getElementById("detail-answer").textContent=c.answer;
  document.getElementById("detail-scope").textContent=c.scope;
  document.getElementById("detail-source").href=c.source;
- dialog.showModal();
+ const visible=findItems(),position=visible.findIndex(item=>item.id===c.id);
+ document.getElementById("wiki-card-position").textContent=(position+1)+" von "+visible.length;
+ document.getElementById("wiki-previous").disabled=position<=0;
+ document.getElementById("wiki-next").disabled=position<0||position>=visible.length-1;
+ if(!dialog.open)dialog.showModal();
+}
+function adjacent(step){
+ const visible=findItems();
+ const position=visible.findIndex(item=>item.id===dialog.dataset.cardId);
+ if(position<0||position+step<0||position+step>=visible.length)return;
+ openCard(visible[position+step]);
 }
 function render(){
  const items=findItems(),term=search.value.trim();
- heading.textContent=term?"Suchergebnisse":topic==="alle"?"Beliebte Regeln":TOPICS[topic];
+ heading.textContent=term?"Suchergebnisse":topic==="alle"?"Alle Regeln":TOPICS[topic];
  count.textContent=items.length+" Karten";
  output.replaceChildren();
  empty.hidden=items.length!==0;
+ let lastGroup="";
  for(const c of items){
+  if(topic==="alle"&&!term&&lastGroup!==c.topic){
+   const label=document.createElement("h3");label.className="wiki-group-title";
+   const size=CARDS.filter(card=>card.topic===c.topic).length;
+   label.textContent=TOPICS[c.topic]+" · "+size+" Karten";
+   output.append(label);lastGroup=c.topic;
+  }
   const b=document.createElement("button");b.type="button";b.className="wiki-entry";
   const image=document.createElement("span");image.className="mini-art";image.innerHTML=art(c.kind);
   const copy=document.createElement("span");copy.className="entry-copy";
@@ -371,6 +394,8 @@ for(const button of document.querySelectorAll("[data-topic]")){
   render();
  });
 }
+document.getElementById("wiki-previous").addEventListener("click",()=>adjacent(-1));
+document.getElementById("wiki-next").addEventListener("click",()=>adjacent(1));
 document.getElementById("detail-close").addEventListener("click",()=>dialog.close());
 dialog.addEventListener("click",e=>{if(e.target===dialog)dialog.close();});
 render();
