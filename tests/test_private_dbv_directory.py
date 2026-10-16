@@ -55,7 +55,7 @@ class PrivateDirectoryTests(unittest.TestCase):
     def test_reject_incomplete_ranking_table(self):
         rows=sample()
         for row in rows[:1500]:
-            row.pop("discipline")
+            row["discipline"]="XX"
         with self.assertRaisesRegex(ValueError,"ranking coverage too low"):
             private.build_payload(rows,2026,42)
 
