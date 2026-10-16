@@ -133,7 +133,7 @@ test("Wiki: current Home entry and offline PWA assets",async({page})=>{
   expect(script).toContain('"'+path+'"');
  }
  const release=await (await page.request.get("/app-release.js")).text();
- const version=release.match(/version:"(v\\d+)"/)?.[1];
+ const version=release.match(/version:"(v\d+)"/)?.[1];
  expect(version).toBeTruthy();
  expect(script).toContain("schmetterlinge-shell-"+version);
 });
