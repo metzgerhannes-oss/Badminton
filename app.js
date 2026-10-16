@@ -213,7 +213,7 @@ function showPlayerDiscover(open=true,focus=true){
  if(!panel||!trigger)return;
  panel.hidden=!open;
  trigger.setAttribute("aria-expanded",String(open));
- trigger.textContent=open?"Suche schließen":"+ Hinzufügen";
+ trigger.textContent=open?"Suche schließen":"+ Spieler folgen";
  if(open&&focus){
   if(location.hash!=="#spieler")location.hash="#spieler";
   requestAnimationFrame(()=>{
@@ -245,6 +245,14 @@ window.badmintonLibraryToggleFollow=player=>{
   club:String(player.club||"").slice(0,120),url:""
  });
  showPlayerDiscover(false,false);save();render();window.dispatchEvent(new Event("badminton:library-following"));
+ // Return the focus and viewport to the player in the saved follow list.
+ requestAnimationFrame(()=>{
+  const card=[...(el("friend-list")?.querySelectorAll("[data-view-friend]")||[])]
+   .find(node=>node.dataset.viewFriend===id);
+  card?.focus({preventScroll:true});
+  card?.scrollIntoView({block:"nearest",behavior:"smooth"});
+ });
+ toast("Du folgst jetzt "+String(player.name).trim().slice(0,80));
  window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
