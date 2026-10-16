@@ -154,7 +154,7 @@ test("Private invitation start has a prominent app link without requiring accept
 });
 
 
-test("Accepted player invitation stores a follower but cannot bypass the separate app invitation",async({page})=>{
+test("Accepted player invitation gives a limited player shell, never broad app membership",async({page})=>{
  await page.route("**/*.supabase.co/auth/v1/signup",route=>cors(route,{
   access_token:"test-access",refresh_token:"test-refresh",expires_in:86400,
   user:{id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"}
@@ -178,10 +178,19 @@ test("Accepted player invitation stores a follower but cannot bypass the separat
  });
  await page.locator("#player-invite-open-app").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
- await expect(page.locator("#app-access-gate")).toBeVisible();
- await expect(page.locator("body > .app")).toBeHidden();
+ // Product contract v138: a server-confirmed player link opens a narrow shell.
+ // It does NOT confer global app membership or an unrestricted access token.
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("body > .app")).toBeVisible();
+ const rights=await page.evaluate(()=>({
+  shell:window.badmintonAppAccess.shellAllowed,
+  member:window.badmintonAppAccess.allowed,
+  token:window.badmintonAppAccess.accessToken
+ }));
+ expect(rights).toEqual({shell:true,member:false,token:null});
  await page.reload({waitUntil:"domcontentloaded"});
- await expect(page.locator("#app-access-gate")).toBeVisible();
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ expect(await page.evaluate(()=>window.badmintonAppAccess.allowed)).toBe(false);
  const unchanged=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(unchanged.friends[0].name).toBe("Philipp Metzger");
 });
