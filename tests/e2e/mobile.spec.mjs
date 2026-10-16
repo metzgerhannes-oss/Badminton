@@ -80,7 +80,7 @@ test.beforeEach(async ({page})=>{
  });
 });
 
-test("Following stays local; only Historie requests a new source import",async ({page})=>{
+test("Following stays device-local and immediately requests an authorized shared source check",async ({page})=>{
  const imports=[];
  page.on("request",request=>{
   if(request.method()==="POST"&&new URL(request.url()).pathname==="/rest/v1/rpc/app_access_history_demand")
@@ -88,11 +88,10 @@ test("Following stays local; only Historie requests a new source import",async (
  });
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await page.evaluate(()=>window.badmintonLibraryToggleFollow({id:"05-123456",name:"Testperson",club:"Testverein"}));
- await page.waitForTimeout(250);
- expect(imports).toHaveLength(0);
+ await expect.poll(()=>imports.some(request=>request.p_player_dbv_id==="05-123456"),{timeout:10000}).toBe(true);
+ expect(imports.every(request=>Object.keys(request).join(",")==="p_player_dbv_id")).toBe(true);
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
- await expect.poll(()=>imports.length,{timeout:10000}).toBeGreaterThan(0);
- expect(imports.some(request=>request.p_player_dbv_id===PLAYER)).toBe(true);
+ await expect.poll(()=>imports.some(request=>request.p_player_dbv_id===PLAYER),{timeout:10000}).toBe(true);
 });
 
 test("An invited member sees individually sourced match statistics and navigable proof cards",async({page})=>{
