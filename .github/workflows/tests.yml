@@ -48,6 +48,7 @@ jobs:
           node --check i18n.js
           node --check scripts/validate-i18n.mjs
           node --check library.js
+          node --check scripts/spvgg-roster.mjs
           node --check stats.js
           node --check scripts/private-match-source.mjs
           node --check scripts/external-match-stats.mjs
@@ -118,6 +119,7 @@ jobs:
           node tests/targeted-dbv-search.mjs
           node tests/invited-player-v125.mjs
           node tests/player-library.mjs
+          node tests/spvgg-active-roster.mjs
           node tests/local-directory-fallback-v128.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
