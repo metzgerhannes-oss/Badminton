@@ -43,6 +43,26 @@ test("Official calendar clusters by state, age and level without invented regist
  await expect(page.locator('.dbv-calendar-entry a[href="https://turniere.badminton.de/"]').first()).toBeVisible();
 });
 
+test("German Masters U11 stays visible in Baden-Württemberg U11 A filter",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U11");
+ await page.locator("#dbv-calendar-level").selectOption("A");
+ await page.locator("#dbv-calendar-q").fill("German Masters");
+ const results=page.locator("#dbv-calendar-results");
+ await expect(results.locator(".dbv-calendar-entry")).toHaveCount(1);
+ await expect(results).toContainText("German Masters U11");
+ await expect(results).toContainText("DBV · bundesweit");
+ await expect(results).toContainText("Hofheim");
+ await expect(results).toContainText("10.11.2026");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("inkl. German Masters U11");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await expect(results).not.toContainText("German Masters U11");
+ await page.locator("#dbv-calendar-level").selectOption("A");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await expect(results).not.toContainText("German Masters U11");
+});
 test("Plus saves the official calendar date for the own profile and check removes it on tap",async ({page})=>{
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
