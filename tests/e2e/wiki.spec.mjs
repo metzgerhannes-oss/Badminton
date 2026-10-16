@@ -98,7 +98,7 @@ test("Wiki: four separate net rules get four different illustrations",async({pag
  }
 });
 
-test("Wiki v158: up-to-date Home entry and offline PWA assets",async({page})=>{
+test("Wiki v159: up-to-date Home entry and offline PWA assets",async({page})=>{
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("a.wiki-home-link")).toHaveAttribute("href","./wiki.html");
  const response=await page.request.get("/sw.js");
@@ -107,11 +107,11 @@ test("Wiki v158: up-to-date Home entry and offline PWA assets",async({page})=>{
  for(const path of ["./wiki.html","./wiki.js","./wiki.css"]){
   expect(script).toContain('"'+path+'"');
  }
- expect(script).toContain("schmetterlinge-shell-v158");
+ expect(script).toContain("schmetterlinge-shell-v159");
 });
 
 
-test("Wiki v158: the home catalogue shows all 61 cards, organized by topic, with next/previous navigation",async({page})=>{
+test("Wiki v159: the home catalogue shows all 61 cards, organized by topic, with next/previous navigation",async({page})=>{
  await page.goto("/wiki.html");
  await expect(page.locator(".wiki-entry")).toHaveCount(61);
  await expect(page.locator(".wiki-group-title")).toHaveText([
@@ -132,7 +132,7 @@ test("Wiki v158: the home catalogue shows all 61 cards, organized by topic, with
  await expect(page.locator(".wiki-entry")).toHaveCount(1);
 });
 
-test("Wiki v158: out, distraction and doubles service boundary use truthful distinct diagrams",async({page})=>{
+test("Wiki v159: out, distraction and doubles service boundary use truthful distinct diagrams",async({page})=>{
  await page.goto("/wiki.html");
  for(const [term,kind] of [["vollständig außerhalb","out"],["Ablenken","distract"],["hintere Linie","doublesServeBack"]]){
   await page.getByRole("searchbox").fill(term);
