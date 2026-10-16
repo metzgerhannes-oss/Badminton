@@ -209,7 +209,7 @@ BEGIN
     RETURN jsonb_build_object(
       'player_dbv_id',p_player_dbv_id,'status','no_verified_ranking');
   END IF;
-  SELECT pg_catalog.coalesce(pg_catalog.jsonb_object_agg(e.discipline,
+  SELECT coalesce(pg_catalog.jsonb_object_agg(e.discipline,
      pg_catalog.jsonb_build_object(
        'ageClass',e.age_group,
        'birthYear',p.birth_year,
