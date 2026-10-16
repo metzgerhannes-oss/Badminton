@@ -1,52 +1,71 @@
 import assert from "node:assert/strict";
 import vm from "node:vm";
 import {readFile} from "node:fs/promises";
-const [source,html,articles,sources]=await Promise.all([
- readFile("reports.js","utf8"),readFile("index.html","utf8"),
- readFile("data/report-articles.json","utf8"),readFile("data/report-sources.json","utf8")
+const [code,html,sources]=await Promise.all([
+ readFile("reports.js","utf8"),readFile("index.html","utf8"),readFile("data/report-sources.json","utf8")
 ]);
-assert.match(source,/import \{readPublicRows\} from "\.\/scripts\/supabase-read\.mjs"/);
-assert.match(source,/readPublicRows\(path,\{count:false\}\)/);
-assert.doesNotMatch(source,/fetch\(URL\+"\/rest\/v1\//);
+assert.match(code,/rpc\/app_access_reports_read/);
+assert.match(code,/getPrivateSession\(false\)/);
+assert.doesNotMatch(code,/get\("articles\?/);
 assert.match(html,/<script type="module" src="\.\/reports\.js"><\/script>/);
-assert.match(source,/Promise\.allSettled\(/);
-assert.match(source,/const approved=getResult\(3\)\?\.articles\|\|\[\]/);
-assert.match(source,/const staticSources=getResult\(4\)\?\.sources\|\|\[\]/);
-assert.match(source,/if\(a\.status!=="verified"/);
-assert.match(source,/if\(ticket!==mentionRequest\|\|dbv!==profileId\)return/);
-// Exercise the actual report controller with a disconnected Supabase;
-// reviewed GitHub records must still be rendered, not counted as confirmed matches.
-const elements=new Map();
+const elements=new Map(),events=new Map();
 for(const id of ["report-list","report-count","report-source-list","report-refresh",
  "report-scope","report-category","report-search"]){
  elements.set(id,{innerHTML:"",textContent:"",disabled:false,
   value:id==="report-scope"?"mentions":id==="report-category"?"all":"",
-  addEventListener(){}});
+  addEventListener(name,handler){events.set(id+":"+name,handler)}});
 }
-const localFiles={
- "./data/report-articles.json":JSON.parse(articles),
- "./data/report-sources.json":JSON.parse(sources)
-};
-let networkRequests=0;
+const articles=[
+ {id:"report-1",title:"Meisterschaft Test",url:"https://spvgg.org/test-1",
+  published_on:"2026-10-01",club_id:"spvgg-moessingen",summary:"Beleg",
+  report_sources:{name:"SpVgg",category:"club"},named:true},
+ {id:"report-2",title:"Vereinsbericht Test",url:"https://spvgg.org/test-2",
+  published_on:"2026-09-01",club_id:"spvgg-moessingen",summary:"",
+  report_sources:{name:"SpVgg",category:"club"},named:false}
+];
+let requests=[],member=true;
 const context=vm.createContext({
- URL,Intl,console,Map,Set,
+ URL,Intl,console,Map,Set,AbortController,setTimeout,clearTimeout,
  document:{getElementById:id=>elements.get(id)||null,addEventListener(name,handler){
   if(name==="DOMContentLoaded")handler();
  }},
  window:{badmintonActivePlayerId:"05-070879",badmintonActiveClub:"SpVgg Mössingen",
-  addEventListener(){}},
+  badmintonAppAccess:{shellAllowed:true,get allowed(){return member},
+   getAccessToken:async()=> "member-token"},addEventListener(){}},
+ localStorage:{getItem:key=>key==="schmetterlinge.acceptedPlayerInvite.v3"
+    ?'["11111111-2222-4333-8444-555555555555"]'
+    :key==="schmetterlinge.acceptedPlayerInviteBindings.v1"
+    ?'{"11111111-2222-4333-8444-555555555555":"05-070879"}':null},
+ getPrivateSession:async()=>({access_token:"player-token"}),
+ SUPABASE_ROOT:"https://test.supabase.co/rest/v1/",PUBLIC_KEY:"safe-test-key",
  location:{hash:"#berichte"},
- readPublicRows:async()=>{networkRequests++;throw new Error("Supabase offline")},
- fetch:async path=>{
-  assert.ok(Object.hasOwn(localFiles,path),"Fallback may fetch only approved local JSON");
-  return {ok:true,json:async()=>localFiles[path]};
+ fetch:async(url,options)=>{
+  if(url==="./data/report-sources.json")return {ok:true,json:async()=>JSON.parse(sources)};
+  assert.match(url,/rpc\/app_access_reports_read$/);
+  assert.equal(options.method,"POST");
+  assert.match(options.headers.Authorization,/Bearer /);
+  requests.push(JSON.parse(options.body));
+  return {ok:true,json:async()=>({
+   scope:member?"member":"player",articles:member?articles:articles.slice(0,1)
+  })};
  }
 });
-vm.runInContext(source.replace(/^import[^\n]+\n/gm,""),context,{filename:"reports.js"});
-await new Promise(resolve=>setTimeout(resolve,35));
-assert.ok(networkRequests>=3,"The regular public DB checks were attempted");
-assert.doesNotMatch(elements.get("report-list").innerHTML,/55\. BWBV-Meisterschaft/);
-assert.ok(JSON.parse(articles).articles.length===0,"Public fallback must not expose named articles");
-assert.doesNotMatch(elements.get("report-list").innerHTML,/05-0[0-9]{5}|Philipp Metzger|Charlotte Metzger/);
-assert.equal(elements.get("report-refresh").disabled,false);
-console.log("Reports public GET client: reviewed local articles stay visible during database outage.");
+vm.runInContext(code.replace(/^import[^\n]+\n/gm,""),context,{filename:"reports.js"});
+await new Promise(resolve=>setTimeout(resolve,75));
+assert.equal(requests.length,1);
+assert.equal(requests[0].p_player_dbv_id,"05-070879");
+assert.equal(requests[0].p_invitation_id,null);
+assert.match(elements.get("report-list").innerHTML,/Meisterschaft Test/);
+assert.doesNotMatch(elements.get("report-list").innerHTML,/Vereinsbericht Test/);
+assert.equal(elements.get("report-count").textContent,"1 Bericht");
+elements.get("report-scope").value="club";
+events.get("report-scope:change")();
+assert.match(elements.get("report-list").innerHTML,/Vereinsbericht Test/);
+assert.equal(elements.get("report-count").textContent,"2 Berichte");
+member=false;
+events.get("report-refresh:click")();
+await new Promise(resolve=>setTimeout(resolve,75));
+assert.equal(requests.at(-1).p_invitation_id,"11111111-2222-4333-8444-555555555555");
+assert.equal(elements.get("report-count").textContent,"1 Bericht");
+assert.doesNotMatch(elements.get("report-list").innerHTML,/Vereinsbericht Test/);
+console.log("Reports v157: member and narrow invitation filtering passed.");
