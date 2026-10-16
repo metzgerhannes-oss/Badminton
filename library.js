@@ -2,7 +2,6 @@
 import {selectPlayers,clubGroups,normalizeText,sortClubs,localLibraryPlayers} from "./scripts/library-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {searchDbvIdentities,validDbvLookup} from "./scripts/targeted-player-search.mjs";
-import {loadSpvggRoster,rosterHtml,rosterMatchesClub} from "./scripts/spvgg-roster.mjs";
 
 const ROOT="./data/player-library/";
 let dbMode=false,localMode=false,rosterDenied=true,dbTotal=0,associationsLoaded=false,filterTimer=null,suggestionTicket=0;
@@ -69,25 +68,6 @@ async function dbClubs(){
 const $=id=>document.getElementById(id);
 const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ageNames=["U11","U13","U15","U17","U19","U22"];
-let activeRoster=null,rosterFailure=false;
-function renderActiveRoster(){
- const root=$("spvgg-active-roster"),area=$("spvgg-active-roster-content");
- if(!root||!area)return;
- const club=$("library-club")?.value||"",age=ageChoice(),association=$("library-association")?.value||"all";
- root.hidden=!(rosterMatchesClub(club)&&age==="all"&&
-   (association==="all"||association==="BAW-Baden-Württemberg"||association==="BWBV"));
- if(root.hidden)return;
- if(rosterFailure){area.textContent="Mannschaftskader derzeit nicht verfügbar. Bitte erneut öffnen.";return}
- if(!activeRoster){area.textContent="Offizielle Mannschaftskader werden geladen …";return}
- area.innerHTML=rosterHtml(activeRoster,{
-   query:$("library-search")?.value||"",team:$("spvgg-roster-team")?.value||"all"
- });
-}
-async function initActiveRoster(){
- renderActiveRoster();
- try{activeRoster=await loadSpvggRoster()}catch{rosterFailure=true}
- renderActiveRoster();
-}
 const memory=new Map();
 let summary=null,entries=[],lastAge="",pending=0,visible=40,loaded=false;
 async function fetchJson(path){
@@ -98,12 +78,9 @@ async function fetchJson(path){
 function error(msg){const box=$("library-results");if(box)box.innerHTML='<div class="library-message">'+escape(msg)+'</div>'}
 function ageChoice(){return $("library-age")?.value||"all"}
 function hasCriteria(){
- return Boolean(
-  String($("library-search")?.value||"").trim() ||
-  String($("library-club")?.value||"").trim() ||
-  ageChoice()!=="all" ||
-  ($("library-association")?.value||"all")!=="all"
- );
+ // Only explicit name/DBV-ID searches may trigger the central lookup.
+ // The optional filters narrow a query; they never enumerate player records.
+ return Boolean(String($("library-search")?.value||"").trim());
 }
 // No public player cards or whole-roster request before an explicit filter.
 function showIdle(){
@@ -112,7 +89,7 @@ function showIdle(){
  const count=$("library-count"),area=$("library-results"),more=$("library-more"),reset=$("library-reset");
  if(count)count.textContent="Spieler suchen";
  if(area)area.innerHTML='<div class="library-message library-idle"><strong>Spieler suchen</strong>'+
-  '<span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div>';
+  '<span>Gib mindestens drei Zeichen des Namens oder eine DBV-ID ein.</span></div>';
  if(more)more.hidden=true;
  if(reset)reset.hidden=true;
  if($("library-message"))$("library-message").textContent="";
@@ -245,8 +222,14 @@ async function loadBackup(){
 async function loadIdentityDirectory(){
  const name=String($("library-search")?.value||"").trim();
  if(!validDbvLookup(name)){
-  loadLocalDirectory();
-  if($("library-message"))$("library-message").textContent="Für die zentrale DBV-Namenssuche mindestens drei Zeichen eingeben. Ohne Namen werden nur lokal gespeicherte Profile gesucht.";
+  // Two-character input is not a failed search and must not silently fall back to
+  // local favorites or show a misleading "no matches" message.
+  ++pending;
+  entries=[];dbTotal=0;dbMode=false;localMode=false;loaded=true;
+  $("library-count").textContent="Suche ab drei Zeichen";
+  $("library-results").innerHTML='<div class="library-message library-idle"><strong>Weiter tippen</strong><span>Bitte mindestens drei Zeichen des Namens oder eine vollständige DBV-ID eingeben.</span></div>';
+  $("library-more").hidden=true;
+  $("library-source").textContent="Die DBV-Suche wurde noch nicht gestartet.";
   return;
  }
  const ticket=++pending;
@@ -303,7 +286,6 @@ async function nextPage(){
  }catch{const box=$("library-message");if(box)box.textContent="Weitere Spieler momentan nicht erreichbar."}
 }
 function delayedFilter(){
- renderActiveRoster();
  clearTimeout(filterTimer);
  if(!hasCriteria()){showIdle();return;}
  filterTimer=setTimeout(()=>{visible=40;load()},280);
@@ -311,15 +293,15 @@ function delayedFilter(){
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("library-results"))return;
  showIdle();
- // Small club metadata fetch may populate the Landesverband filter, never the 9,246-player list.
- dbAssociations().catch(e=>console.warn("Landesverbände derzeit nicht abrufbar:",e?.message));
- $("library-age").addEventListener("change",()=>{renderActiveRoster();load()});
- $("spvgg-roster-team")?.addEventListener("change",renderActiveRoster);
- void initActiveRoster();
+ // Fetch optional federation choices only if the advanced filter is opened.
+ $("player-search-filters")?.addEventListener("toggle",event=>{
+  if(event.target.open&&!associationsLoaded)dbAssociations().catch(e=>console.warn("Landesverbände derzeit nicht abrufbar:",e?.message));
+ });
+ $("library-age").addEventListener("change",()=>load());
  for(const id of ["library-search","library-club"]){
   $(id).addEventListener("input",()=>{if(id==="library-club")updateClubSuggestions();delayedFilter();});
  }
- $("library-association").addEventListener("change",()=>{renderActiveRoster();visible=40;load();});
+ $("library-association").addEventListener("change",()=>{visible=40;load();});
  $("library-more").addEventListener("click",nextPage);
  $("library-reset").addEventListener("click",()=>{
   $("library-search").value="";
@@ -327,7 +309,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("library-age").value="all";
   $("library-association").value="all";
   $("library-club-suggestions").innerHTML="";
-  clearTimeout(filterTimer);showIdle();renderActiveRoster();
+  clearTimeout(filterTimer);showIdle();
+  $("player-search-filters").open=false;
   $("library-search").focus();
  });
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
