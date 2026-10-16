@@ -61,3 +61,6 @@ assert.match(app,/SchmetterlingeRouter\.renderPage\(state\)/);
 assert.match(html,/<script defer src="\.\/router\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 assert.match(html,/<script defer src="\.\/state-storage\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 console.log("UX foundation: task-first Home, truthful source disclosure, retry/offline, keyboard routing, mobile touch targets and v38 PWA verified.");
+
+// Pure mock-only own-profile search regression. No productive network calls.
+await import("./own-profile-search.mjs");

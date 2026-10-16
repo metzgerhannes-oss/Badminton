@@ -418,6 +418,7 @@ function setup(){
   playerForm.elements.namedItem("club").value=p?.club||"";
   playerForm.elements.namedItem("url").value=p?.url||"";
   playerDialog.showModal();
+   window.dispatchEvent(new CustomEvent("badminton:own-profile-form-open",{detail:{editing:Boolean(p)}}));
  }
  window.openPlayerForm=openPlayerForm;
  el("add-player").addEventListener("click",()=>openPlayerForm());

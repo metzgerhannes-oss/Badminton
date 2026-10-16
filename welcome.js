@@ -146,7 +146,7 @@ function showSearchResults(players,source){
   }
   else if(source==="unavailable")
    setSearchStatus("Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.");
-  else setSearchStatus("Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.");
+  else setSearchStatus("Kein passender Spieler im DBV-Verzeichnis gefunden. Suchbegriff ändern oder DBV-ID manuell ergänzen.");
  }else setResultsStatus(players.length,source);
 }
 async function searchPlayers(value){
@@ -164,10 +164,9 @@ async function searchPlayers(value){
  clearError();
  setSearchStatus("Spieler werden im öffentlichen DBV-Verzeichnis gesucht …");
  try{
-  const saved=readSaved();
-  const known=[...(Array.isArray(saved?.players)?saved.players:[]),
-   ...(Array.isArray(saved?.friends)?saved.friends:[])];
-  const {players,source}=await searchInvitationPlayers(term,{signal:searchController.signal,savedCandidates:known});
+  // A previous local hit (often the same surname) must not hide all other
+  // DBV candidates when adding a second player on this device.
+  const {players,source}=await searchInvitationPlayers(term,{signal:searchController.signal,savedCandidates:[]});
   if(current!==searchTicket)return;
   showSearchResults(players,source);
  }catch(error){
