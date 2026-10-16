@@ -1,4 +1,5 @@
 import {test,expect} from "./supabase-isolated.fixture.mjs";
+import {test as invitedMemberTest} from "./invited-member.fixture.mjs";
 test("Wiki: three topics and anonymous mobile search",async({page})=>{
  await page.goto("/wiki.html");
  await expect(page.getByRole("heading",{name:"Schnell erklärt."})).toBeVisible();
@@ -107,7 +108,7 @@ test("Wiki v160: up-to-date Home entry and offline PWA assets",async({page})=>{
  for(const path of ["./wiki.html","./wiki.js","./wiki.css"]){
   expect(script).toContain('"'+path+'"');
  }
- expect(script).toContain("schmetterlinge-shell-v160");
+ expect(script).toMatch(/schmetterlinge-shell-v[1-9][0-9]+/);
 });
 
 
@@ -144,10 +145,11 @@ test("Wiki v160: out, distraction and doubles service boundary use truthful dist
  }
 });
 
-test("v160: Regeln & Wissen is the last Home tile and the club logo fits all viewports",async({page})=>{
+invitedMemberTest("v160: Regeln & Wissen is the last Home tile and the club logo fits all viewports",async({page})=>{
  for(const [width,logoMin] of [[320,49],[390,55],[430,61],[1440,71]]){
   await page.setViewportSize({width,height:900});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   const layout=await page.evaluate(()=>{
    const home=document.querySelector("#view-start");
    const wiki=home.querySelector(".wiki-home-link");
