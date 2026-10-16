@@ -36,6 +36,7 @@ test("Home previews three friends plus overflow, without horizontal clipping",as
  await page.locator(".friend-quick-more").click();
  await expect(page).toHaveURL(/#spieler$/);
  await expect(page.locator("#friend-list .friend-follow-item")).toHaveCount(9);
+ await expect(page.locator("#dashboard-friends-manage")).toHaveText("Alle anzeigen");
 });
 
 test("current followed profile remains visible among Home shortcuts; Home returns to own",async ({page})=>{
@@ -65,7 +66,8 @@ test("a single followed player remains directly accessible",async ({page})=>{
 test("empty friends offers one search entry point",async ({page})=>{
  await seed(page,[]);
  await page.goto("/#start");
- await expect(page.locator("#dashboard-friends .friend-quick-add")).toHaveCount(1);
+ await expect(page.locator("#dashboard-add-friend")).toBeVisible();
+ await expect(page.locator("#dashboard-friends")).toContainText("Noch keine Freunde");
  await expect(page.locator("#dashboard-friends-manage")).toBeHidden();
  await expect(page.locator(".friend-quick-more")).toHaveCount(0);
 });
