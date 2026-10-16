@@ -227,11 +227,16 @@ function showPlayerDiscover(open=true,focus=true){
  trigger.setAttribute("aria-expanded",String(open));
  trigger.textContent=open?"Suche schließen":"+ Hinzufügen";
  if(open&&focus){
-  if(location.hash!=="#spieler")location.hash="#spieler";
-  requestAnimationFrame(()=>{
+  const focusSearch=()=>requestAnimationFrame(()=>{
    panel.scrollIntoView({block:"start",behavior:"smooth"});
    el("library-search")?.focus({preventScroll:true});
   });
+  if(location.hash!=="#spieler"){
+   // Route focus runs on hashchange. Re-focus the search only after it has
+   // finished, otherwise the page heading steals the typing caret.
+   window.addEventListener("hashchange",focusSearch,{once:true});
+   location.hash="#spieler";
+  }else focusSearch();
  }
 }
 // The verified shared DBV roster is public; following a player is only local.
