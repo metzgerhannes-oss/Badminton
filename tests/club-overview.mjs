@@ -3,7 +3,7 @@ import {readFile} from "node:fs/promises";
 import {clubChoices,buildClubRows,filterClubRows,DEFAULT_CLUB} from "../scripts/club-overview-model.mjs";
 const official={schemaVersion:1,clubId:"10777",sourceSeason:"2025/26",sourceKind:"official_club_team_photo_captions",
  teams:["I","II","III","IV","V"].map((team,i)=>({team,sourceUrl:"https://www.spvgg.org/abteilungen/badminton/mannschaften/"+(i+1)+"-mannschaft",
- members:i===0?["Spieler Eins","Spieler Zwei","Spieler Drei","Spieler Vier","Spieler Fünf"]:["Spieler Eins",...Array.from({length:5},(_,j)=>"Testname "+i+" "+j)]}))};
+ members:i===0?["Spieler Eins","Spieler Zwei","Spieler Drei","Spieler Vier","Spieler Fünf"]:["Spieler Eins",...Array.from({length:5},(_,j)=>"Testname "+ "ABCDE"[i] +" "+"ABCDE"[j])]}))};
 const profiles=[{id:"05-123456",name:"Jugend Muster",club:"SpVgg Mössingen"},
  {id:"05-654321",name:"Spieler Eins",club:"SpVgg Mössingen"},
  {id:"05-333333",name:"Anderes Kind",club:"Anderer Verein"}];
