@@ -22,7 +22,7 @@ test("Profile choice offers optional local data import once; settings can reopen
  await expect(dialog).toBeVisible();
  await expect(dialog).toContainText("Deine Daten übernehmen");
  await expect(page.locator("#player-copy-now")).toBeVisible();
- await page.locator("#player-copy-later").click();
+ await page.getByRole("button",{name:"Fenster schließen"}).click();
  await expect(dialog).toBeHidden();
  await page.evaluate(id=>window.dispatchEvent(new CustomEvent("badminton:profile-selected",{detail:{playerId:id,source:"onboarding"}})),player);
  await expect(dialog).toBeHidden();
@@ -34,5 +34,6 @@ test("Profile choice offers optional local data import once; settings can reopen
  await page.getByRole("button",{name:"Daten für ausgewählten Spieler übernehmen"}).click();
  await expect(dialog).toBeVisible();
  await expect(page.locator("#player-copy-summary")).toContainText("Noch keine lokale Datenkopie");
+ await expect(page.locator("#player-copy-later")).toHaveText("Später");
  await page.locator("#player-copy-later").click();
 });

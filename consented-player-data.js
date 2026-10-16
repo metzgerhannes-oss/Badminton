@@ -12,6 +12,7 @@ function dialog(){
  let d=$("player-copy-dialog");if(d)return d;
  d=document.createElement("dialog");d.id="player-copy-dialog";d.className="player-copy-dialog";
  d.innerHTML='<section class="player-copy-modal" aria-labelledby="player-copy-title">'+
+  '<button type="button" id="player-copy-close" class="player-copy-close" aria-label="Fenster schließen" title="Schließen">×</button>'+
   '<h2 id="player-copy-title">Deine Daten übernehmen</h2>'+
   '<p id="player-copy-detail"></p>'+
   '<p>Einmalig und freiwillig: Wir prüfen deine bereits erteilte Spielerberechtigung und übernehmen vorhandene Matchkarten und belegte Top-4-Platzierungen auf dieses Gerät. Eine DBV-ID allein gibt keinen Zugriff.</p>'+
@@ -26,6 +27,7 @@ function dialog(){
   '</div></section>';
  document.body.append(d);
  $("player-copy-now").addEventListener("click",importNow);
+ $("player-copy-close").addEventListener("click",()=>d.close());
  $("player-copy-later").addEventListener("click",()=>d.close());
  $("player-copy-download").addEventListener("click",downloadCopy);
  $("player-copy-remove").addEventListener("click",()=>{
@@ -56,6 +58,7 @@ function open(player,{force=false}={}){
  $("player-copy-detail").textContent="Gewähltes Spielerprofil: "+player+". Du kannst den freigegebenen Datenbestand einseitig auf dein Gerät kopieren.";
  $("player-copy-status").textContent=copy?"Erneuter Abruf benötigt eine weiterhin gültige Berechtigung.":"Der Abruf startet erst nach deiner Bestätigung.";
  $("player-copy-now").disabled=false;
+ $("player-copy-later").textContent=copy?"Schließen":"Später";
  updateSummary();
  if(!d.open)d.showModal();
 }
@@ -97,8 +100,11 @@ async function importNow(){
   });
   if(!saved)throw Error("Die lokale Kopie konnte nicht gespeichert werden. Bitte freien Speicher prüfen.");
   updateSummary();
+  $("player-copy-later").textContent="Schließen";
   window.dispatchEvent(new CustomEvent("badminton:local-data-copy-updated",{detail:{playerId:player}}));
   status.textContent="Übernahme abgeschlossen. Nur vorhandene, belegte Ergebnisse wurden gespeichert; keine vollständige Karrierehistorie zugesichert.";
+  dialog().close();
+  window.dispatchEvent(new CustomEvent("badminton:community-feedback",{detail:{message:"Daten erfolgreich auf diesem Gerät gespeichert."}}));
  }catch(error){status.textContent="Abruf fehlgeschlagen. "+String(error?.message||"Die alte Kopie bleibt unverändert.").slice(0,120)}
  finally{busy=false;b.disabled=false}
 }
