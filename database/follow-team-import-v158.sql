@@ -76,9 +76,10 @@ begin
   order by requested desc, oldest nulls first, c.id
   limit p_max
  loop
+  -- Record the attempt outside the subtransaction so errors respect cooldown.
+  update private.team_import_demands set last_attempt_at=now()
+  where club_id=x.id and x.requested;
   begin
-   update private.team_import_demands set last_attempt_at=now()
-   where club_id=x.id and x.requested;
    perform private.sync_nuliga_club(x.id);
    update private.team_import_demands set last_completed_at=now() where club_id=x.id;
    ok:=ok+1;
