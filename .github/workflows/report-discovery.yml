@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   discover:
-    # Privacy cutover: halt creation of public candidate branches/issues with player mentions.
+    # Existing protected-mode release gate: no automated candidate publication.
     if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -40,9 +40,9 @@ jobs:
         shell: bash
         run: |
           if test -f /tmp/previous-report-pending.json; then
-            python3 scripts/discover-reports.py --previous /tmp/previous-report-pending.json
+            python3 scripts/discover-reports.py --club-only --previous /tmp/previous-report-pending.json
           else
-            python3 scripts/discover-reports.py
+            python3 scripts/discover-reports.py --club-only
           fi
       - name: Publish findings for human verification as a pull request
         shell: bash

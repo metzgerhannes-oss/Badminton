@@ -1,5 +1,5 @@
 /** Mannschaft: official league seasons with private per-device following. */
-import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {readPublicRows,SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {TEAM_FOLLOWS_KEY,normalizeFollows,normalizeTeamText,filterTeamRows,officialTeamUrl,
   displayTeamName,tablePoints,confirmedResult} from "./scripts/team-directory-utils.mjs";
 
@@ -19,6 +19,95 @@ const dateOnly=value=>{
 };
 let rows=[],clubs=[],loading=false,loadFailed=false,selectedId="",activeTab="games",detailsTicket=0,initialized=false;
 let detail={games:[],table:[],error:false},follows=[];
+let reportRows=[],reportState="idle",reportTicket=0;
+const TEAM_REQUESTS="schmetterlinge.teamImportRequests.v158";
+const teamQueue=[],pendingTeams=new Set();
+let teamDemandRunning=false;
+function lastTeamDemands(){
+ try{return JSON.parse(localStorage.getItem(TEAM_REQUESTS)||"{}")}catch{return {}}
+}
+function queueTeamDemand(key){
+ if(!/^nuliga:[0-9]{3,7}:[1-9][0-9]?$/.test(String(key||""))||!follows.includes(key))return;
+ if(!window.badmintonAppAccess?.allowed||pendingTeams.has(key))return;
+ if(Date.now()-Number(lastTeamDemands()[key]||0)<24*60*60*1000)return;
+ pendingTeams.add(key);teamQueue.push(key);void runTeamDemands();
+}
+async function runTeamDemands(){
+ if(teamDemandRunning)return;teamDemandRunning=true;
+ try{
+  while(teamQueue.length&&window.badmintonAppAccess?.allowed){
+   const key=teamQueue.shift();pendingTeams.delete(key);
+   if(!follows.includes(key))continue;
+   try{
+    const token=await window.badmintonAppAccess.getAccessToken();
+    if(!token)break;
+    const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),9000);
+    try{
+     const response=await fetch(SUPABASE_ROOT+"rpc/app_access_team_demand",{
+      method:"POST",cache:"no-store",signal:ctrl.signal,
+      headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"},
+      body:JSON.stringify({p_team_follow_key:key})
+     });
+     if(response.ok&&((await response.json())?.accepted===true)){
+      const stored=lastTeamDemands();stored[key]=Date.now();
+      localStorage.setItem(TEAM_REQUESTS,JSON.stringify(Object.fromEntries(Object.entries(stored).slice(-50))));
+     }
+    }finally{clearTimeout(timeout)}
+   }catch{/* Offline: keep existing league data and retry later. */}
+   if(teamQueue.length)await new Promise(resolve=>setTimeout(resolve,400));
+  }
+ }finally{teamDemandRunning=false}
+}
+function queueExistingTeams(){for(const key of follows)queueTeamDemand(key)}
+function safeReportLink(raw){
+ try{const u=new URL(String(raw));return u.protocol==="https:"?u.href:""}catch{return ""}
+}
+function renderTeamReports(){
+ const box=$("team-detail-reports");if(!box)return;
+ if(reportState==="loading"){box.textContent="Geprüfte Mannschaftsberichte werden geladen …";return}
+ if(reportState==="restricted"){box.textContent="Berichte sind nur mit einer gültigen App-Freigabe verfügbar.";return}
+ if(reportState==="error"){box.textContent="Berichte aktuell nicht abrufbar. Vorhandene Spielpläne bleiben sichtbar.";return}
+ if(!reportRows.length){
+  box.textContent="Für diesen Verein sind noch keine geprüften Berichte importiert.";return;
+ }
+ box.innerHTML='<div class="team-fixtures">'+reportRows.map(a=>
+  '<article class="team-fixture"><span>'+esc(dateOnly(a.published_on))+
+  '</span><strong>'+esc(a.title)+'</strong>'+
+  (a.summary?'<span>'+esc(a.summary)+'</span>':'')+
+  '<a href="'+esc(safeReportLink(a.url))+'" target="_blank" rel="noopener noreferrer">Originalbericht ↗</a></article>'
+ ).join("")+'</div>';
+}
+async function loadTeamReports(team){
+ const ticket=++reportTicket;
+ reportRows=[];reportState=window.badmintonAppAccess?.allowed?"loading":"restricted";renderTeamReports();
+ if(reportState==="restricted")return;
+ try{
+  const token=await window.badmintonAppAccess.getAccessToken();
+  if(!token)throw Error("no_member_token");
+  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),9000);
+  let data;
+  try{
+   const response=await fetch(SUPABASE_ROOT+"rpc/app_access_reports_read",{
+    method:"POST",cache:"no-store",signal:ctrl.signal,
+    headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,"Content-Type":"application/json"},
+    body:JSON.stringify({p_player_dbv_id:null,p_invitation_id:null})
+   });
+   if(!response.ok)throw Error("report_http");
+   data=await response.json();
+  }finally{clearTimeout(timeout)}
+  if(ticket!==reportTicket)return;
+  if(data?.scope!=="member"||!Array.isArray(data.articles))throw Error("invalid_report_response");
+  // Explicitly map official nuLiga club 10777 to the independently verified
+  // report archive. Other clubs require an equally verified source association.
+  const articleClub=team.club_id==="10777"?"spvgg-moessingen":team.club_id;
+  reportRows=data.articles.filter(a=>a.club_id===articleClub&&safeReportLink(a.url)&&typeof a.title==="string");
+  reportState="ready";
+ }catch{
+  if(ticket!==reportTicket)return;
+  reportState="error";
+ }
+ renderTeamReports();
+}
 function readFollows(){
  try{follows=normalizeFollows(JSON.parse(localStorage.getItem(TEAM_FOLLOWS_KEY)||"[]"))}catch{follows=[]}
 }
@@ -90,7 +179,7 @@ function wireCards(container){
   if(follows.includes(id))follows=follows.filter(x=>x!==id);
   else follows=normalizeFollows([id,...follows]);
   if(!saveFollows()){follows=old;showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");}
-  else if(!old.includes(id))setTeamDiscover(false,false);
+  else if(!old.includes(id)){setTeamDiscover(false,false);queueTeamDemand(id);}
   renderFollowed();renderSearchResults();
  }));
 }
@@ -153,9 +242,11 @@ function renderDetail(){
  if(href){link.href=href;link.hidden=false}else link.hidden=true;
  $("team-detail-games").hidden=activeTab!=="games";
  $("team-detail-table").hidden=activeTab!=="table";
+ $("team-detail-reports").hidden=activeTab!=="reports";
  root.querySelectorAll("[data-team-tab]").forEach(button=>{
   button.setAttribute("aria-selected",String(button.dataset.teamTab===activeTab));
  });
+ renderTeamReports();
  if(detail.error){
   const message='<p class="team-empty">Spielplan und Tabelle sind zurzeit nicht abrufbar. Die bisher bekannten Mannschaftsdaten bleiben sichtbar.</p>';
   $("team-detail-games").innerHTML=message;
@@ -185,6 +276,7 @@ function renderDetail(){
 async function selectTeam(id){
  if(!rows.some(row=>row.id===id))return;
  selectedId=id;setTeamDiscover(false,false);activeTab="games";detail={games:[],table:[],error:false};
+ void loadTeamReports(rows.find(team=>team.id===id));
  renderFollowed();renderSearchResults();renderDetail();
  const target=$("team-detail");target?.scrollIntoView({block:"start",behavior:"smooth"});
  const ticket=++detailsTicket;
@@ -242,6 +334,7 @@ function init(){
   renderFollowed();renderSearchResults();renderDetail();
  });
  $("team-refresh").addEventListener("click",load);
+ window.addEventListener("badminton:app-access-granted",queueExistingTeams);
  $("team-detail").querySelectorAll("[data-team-tab]").forEach(btn=>btn.addEventListener("click",()=>{
   activeTab=btn.dataset.teamTab;renderDetail();
  }));
@@ -250,5 +343,6 @@ function init(){
   if(event.key===TEAM_FOLLOWS_KEY){readFollows();renderFollowed();renderSearchResults()}
  });
  load();
+ if(window.badmintonAppAccess?.allowed)queueExistingTeams();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();

@@ -61,6 +61,7 @@ jobs:
           node --check scripts/badhub-history-parser.mjs
           node --check scripts/badminton-score-rules.mjs
           node --check scripts/nonplayed-rounds.mjs
+          node --check follow-import.js
           node --check history-demand.js
           node --check scripts/history-demand.mjs
           node --check scripts/external-history.mjs
@@ -125,6 +126,7 @@ jobs:
           node tests/nonplayed-rounds.mjs
           node tests/queued-match-worker.mjs
           node tests/source-failover.mjs
+          node tests/automatic-follow-import-v158.mjs
           node tests/history-demand.mjs
           node tests/history-status-ux.mjs
           node tests/live-links.mjs
