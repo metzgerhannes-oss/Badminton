@@ -6,7 +6,7 @@
  if(!view)return;
  const definitions=[
   {id:"profile",title:"Profile & Familie",desc:"Eigene Spieler, Elternfreigaben und Gerätezugang",group:"Spieler & Mannschaften",icon:"♙"},
-  {id:"spieler",title:"Gefolgte Spieler",desc:"Suchen, sortieren, bearbeiten und entfolgen",group:"Spieler & Mannschaften",icon:"◉"},
+  {id:"spieler",title:"Gefolgte Spieler",desc:"Alle anzeigen, suchen und entfolgen",group:"Spieler & Mannschaften",icon:"◉"},
   {id:"mannschaften",title:"Gefolgte Mannschaften",desc:"Deine Teams und ihre Reihenfolge",group:"Spieler & Mannschaften",icon:"▤"},
   {id:"darstellung",title:"Sprache & Vereinsdesign",desc:"Sprache, Name, Logo und Vereinsfarbe",group:"App & Daten",icon:"◐"},
   {id:"einladungen",title:"Einladungen & Freigaben",desc:"Spieler suchen und persönliche Zugänge verwalten",group:"App & Daten",icon:"↗"},
