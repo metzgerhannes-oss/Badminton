@@ -185,7 +185,7 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
           python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v
 
-          ) > test-output.log 2>&1
+          ) > test-output.log 2>&1 || { tail -n 120 test-output.log; exit 1; }
           cat test-output.log
       - name: Upload failing test output
         if: failure()
