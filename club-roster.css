@@ -1,0 +1,33 @@
+/* Compact, dark-blue SpVgg club roster; supplementary to DBV profiles. */
+.club-roster-shell{
+ margin:1.1rem 0;padding:1rem;border:1px solid #345681;border-radius:16px;
+ background:#112c51;color:#f0f6ff;
+}
+.club-roster-shell[hidden]{display:none!important}
+.club-roster-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.club-roster-heading h3{font-size:1.09rem;margin:0 0 .3rem;color:#fff}
+.club-roster-heading p,.club-roster-disclaimer{font-size:.81rem;line-height:1.45;color:#cadcf4;margin:.2rem 0 .8rem}
+.club-roster-heading label{font-size:.77rem;color:#dae9fc;display:grid;gap:.3rem}
+.club-roster-heading select{background:#f6f9ff;color:#102849;border-radius:9px;padding:.42rem .5rem;min-width:7rem}
+.club-roster-count{font-size:.82rem;color:#d9e9ff;margin:.4rem 0 .75rem;font-variant-numeric:tabular-nums}
+.club-roster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:.7rem}
+.club-roster-team{padding:.75rem;border:1px solid #3b5982;background:#173960;border-radius:12px;min-width:0}
+.club-roster-team-head{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem}
+.club-roster-team-head h4{color:#fff;font-size:.94rem;margin:0}
+.club-roster-team-head a{color:#b8dcff;font-size:.74rem;text-decoration:underline;text-underline-offset:2px}
+.club-roster-names{display:grid;grid-template-columns:1fr;gap:.3rem}
+.club-roster-name{font-size:.86rem;line-height:1.28;padding:.37rem .5rem;border-radius:7px;background:#21466f;color:#f9fcff;overflow-wrap:anywhere}
+.club-roster-grid-compact{grid-template-columns:1fr}
+.club-roster-empty{color:#d3e2fb;margin:.5rem 0}
+.club-roster-disclaimer{margin:.8rem 0 0}
+#team-detail-roster .club-roster-team{background:#173960}
+@media(min-width:1000px){
+ .club-roster-shell{padding:1.25rem}
+ .club-roster-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .club-roster-grid-compact{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .club-roster-names{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:430px){
+ .club-roster-shell{padding:.8rem}
+ .club-roster-name{font-size:.84rem}
+}
