@@ -7,10 +7,10 @@ const [html,app,storage,bookmarks,css]=await Promise.all([
 ].map(path=>readFile(path,"utf8")));
 const actions=html.match(/id="dashboard-friends-manage"/g)||[];
 assert.equal(actions.length,1,"Exactly one manage link in the Home friends header");
-assert.doesNotMatch(html,/id="dashboard-add-friend"/,"Duplicate Home action must be removed");
-assert.match(html,/id="dashboard-friends-manage"[^>]*href="#einstellungen\/spieler" hidden/);
+assert.match(html,/id="dashboard-add-friend"[^>]*href="#spieler"/,"Home + is a direct follow shortcut");
+assert.match(html,/id="dashboard-friends-manage"[^>]*href="#spieler" hidden/);
 assert.match(css,/\.dashboard-friends-links a\[hidden\]\{display:none!important\}/);
-assert.doesNotMatch(app,/el\("dashboard-add-friend"\)/,"No event handler for removed element");
+assert.match(app,/el\("dashboard-add-friend"\)\?\.addEventListener/);
 const root={innerHTML:"",querySelectorAll(){return [];}},manage={hidden:true};
 const ctx=vm.createContext({URL,Intl,Date,document:{
  addEventListener(){},
@@ -22,10 +22,8 @@ vm.runInContext(app,ctx,{filename:"app.js"});
 const run=script=>vm.runInContext(script,ctx);
 run("renderFriendQuick()");
 assert.equal(manage.hidden,true,"Manage shortcut must be hidden without friends");
-assert.match(root.innerHTML,/Spieler suchen und folgen/);
-assert.match(root.innerHTML,/href="#spieler"/);
-assert.equal((root.innerHTML.match(/href="#spieler"/g)||[]).length,1,
- "Empty friends state must offer one entry path");
+assert.match(root.innerHTML,/Noch keine Freunde/);
+assert.doesNotMatch(root.innerHTML,/friend-quick-add/,"Only Home heading offers the follow shortcut");
 run('state.players=[{id:"05-111111",name:"Eigen"}];state.activeProfileId="05-111111";state.friends=[{id:"05-222222",name:"Gast"}]');
 run("renderFriendQuick()");
 assert.equal(manage.hidden,false,"Management visible only when friends exist");
@@ -44,5 +42,5 @@ assert.match(root.innerHTML,/data-friend-quick="05-222251"/,"Selected friend sta
 assert.match(root.innerHTML,/\+28 weitere/);
 run('state.viewingFriendId=null');
 run("state.friends=[];renderFriendQuick()");
-assert.equal(manage.hidden,true,"Removing the last friend must restore the single search CTA");
+assert.equal(manage.hidden,true,"Removing the last friend must hide Alle anzeigen");
 console.log("Home friend UX v62: exactly one contextual entry, existing friend switching intact.");
