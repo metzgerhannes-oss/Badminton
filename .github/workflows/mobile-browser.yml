@@ -23,6 +23,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Install real browser engines
         run: npx playwright install --with-deps chromium webkit
+      - name: Verify QA Supabase network isolation
+        run: node tests/browser-qa-supabase-isolation.mjs
       - name: Exercise user journeys on narrow screens
         run: npm run test:mobile
       - name: Preserve failing screenshots and traces
