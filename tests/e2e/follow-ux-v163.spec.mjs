@@ -2,11 +2,11 @@ import {test,expect} from "./invited-member.fixture.mjs";
 
 const FRIEND={dbv_id:"05-123456",name:"Vinzent Muster",club:"SpVgg. Mössingen",age_class:"U17",association:"BAW-Baden-Württemberg"};
 test.beforeEach(async({page})=>{
- await page.addInitScript(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+ await page.addInitScript(()=>{if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
   players:[{id:"05-070879",name:"Startprofil",club:"SpVgg. Mössingen"}],
   friends:[],officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",
   historyProfilesInitialized:true
- })));
+ })));});
  await page.route("**/rest/v1/rpc/search_dbv_player_identity",route=>
   route.fulfill({status:route.request().method()==="OPTIONS"?204:200,
    headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer",
