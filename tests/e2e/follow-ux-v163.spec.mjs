@@ -6,7 +6,7 @@ test.beforeEach(async({page})=>{
   players:[{id:"05-070879",name:"Startprofil",club:"SpVgg. Mössingen"}],
   friends:[],officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",
   historyProfilesInitialized:true
- })));});
+ }));});
  await page.route("**/rest/v1/rpc/search_dbv_player_identity",route=>
   route.fulfill({status:route.request().method()==="OPTIONS"?204:200,
    headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer",
