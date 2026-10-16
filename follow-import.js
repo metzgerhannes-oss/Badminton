@@ -66,8 +66,15 @@ async function drainMatches(){
        "Content-Type":"application/json"},body:JSON.stringify({dbv_id:id})
      });
      if(result.ok){
-      mark(id,"source");
-      window.dispatchEvent(new CustomEvent("badminton:external-matches-updated",{detail:{playerId:id}}));
+      const outcome=await result.json().catch(()=>null);
+      // HTTP 200 with queued:false can be a rate-limit or missing-source refusal.
+      // Do not pretend that such a request imported or refreshed any results.
+      if(outcome?.queued===true){
+       mark(id,"source");
+       window.dispatchEvent(new CustomEvent("badminton:external-matches-updated",{detail:{playerId:id}}));
+      }else if(outcome?.reason==="recently_complete"){
+       mark(id,"source");
+      }
      }
     }finally{clearTimeout(timeout)}
    }catch{/* Existing evidence remains visible; a later visit can retry. */}
