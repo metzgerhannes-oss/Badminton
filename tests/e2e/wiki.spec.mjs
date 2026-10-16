@@ -60,7 +60,7 @@ test("Wiki: editorial release gate validates every card, source and SVG",async({
   }
   return {length:CARDS.length,topics,problems};
  });
- expect(result).toEqual({length:53,topics:{grundlagen:19,spielsituationen:21,jugend:13},problems:[]});
+ expect(result).toEqual({length:61,topics:{grundlagen:22,spielsituationen:26,jugend:13},problems:[]});
 });
 test("Wiki: DBV/BWBV critical rule cases show correct short answers",async({page})=>{
  await page.goto("/wiki.html");
@@ -98,7 +98,7 @@ test("Wiki: four separate net rules get four different illustrations",async({pag
  }
 });
 
-test("Wiki v155: up-to-date Home entry and offline PWA assets",async({page})=>{
+test("Wiki v157: up-to-date Home entry and offline PWA assets",async({page})=>{
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("a.wiki-home-link")).toHaveAttribute("href","./wiki.html");
  const response=await page.request.get("/sw.js");
@@ -107,5 +107,39 @@ test("Wiki v155: up-to-date Home entry and offline PWA assets",async({page})=>{
  for(const path of ["./wiki.html","./wiki.js","./wiki.css"]){
   expect(script).toContain('"'+path+'"');
  }
- expect(script).toContain("schmetterlinge-shell-v155");
+ expect(script).toContain("schmetterlinge-shell-v157");
+});
+
+
+test("Wiki v157: the home catalogue shows all 61 cards, organized by topic, with next/previous navigation",async({page})=>{
+ await page.goto("/wiki.html");
+ await expect(page.locator(".wiki-entry")).toHaveCount(61);
+ await expect(page.locator(".wiki-group-title")).toHaveText([
+  "Grundregeln · 22 Karten","Spielsituationen · 26 Karten","Jugend & Turniere · 13 Karten"
+ ]);
+ await expect(page.locator("#wiki-count")).toHaveText("61 Karten");
+ await page.locator(".wiki-entry").first().click();
+ await expect(page.locator("#wiki-card-position")).toHaveText("1 von 61");
+ await expect(page.locator("#wiki-previous")).toBeDisabled();
+ await page.locator("#wiki-next").click();
+ await expect(page.locator("#wiki-card-position")).toHaveText("2 von 61");
+ await page.locator("#wiki-previous").click();
+ await expect(page.locator("#wiki-card-position")).toHaveText("1 von 61");
+ await page.locator("#detail-close").click();
+ await page.getByRole("button",{name:"Spielsituationen",exact:true}).click();
+ await expect(page.locator(".wiki-entry")).toHaveCount(26);
+ await page.getByRole("searchbox").fill("Ablenkung");
+ await expect(page.locator(".wiki-entry")).toHaveCount(1);
+});
+
+test("Wiki v157: out, distraction and doubles service boundary use truthful distinct diagrams",async({page})=>{
+ await page.goto("/wiki.html");
+ for(const [term,kind] of [["vollständig außerhalb","out"],["Ablenken","distract"],["hintere Linie","doublesServeBack"]]){
+  await page.getByRole("searchbox").fill(term);
+  await expect(page.locator(".wiki-entry").first()).toBeVisible();
+  await page.locator(".wiki-entry").first().click();
+  await expect(page.locator("#detail-art")).toHaveAttribute("data-kind",kind);
+  await expect(page.locator("#detail-art svg")).toBeVisible();
+  await page.getByRole("button",{name:"Regel schließen"}).click();
+ }
 });
