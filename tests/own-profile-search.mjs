@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {searchInvitationPlayers} from "../scripts/invitation-search.mjs";
 
-const [html,app,searchUi,styles,worker,release]=await Promise.all([
- "index.html","app.js","player-profile-search.js","styles.css","sw.js","app-release.js"
+const [html,app,searchUi,welcome,styles,worker,release]=await Promise.all([
+ "index.html","app.js","player-profile-search.js","welcome.js","styles.css","sw.js","app-release.js"
 ].map(p=>readFile(p,"utf8")));
 for(const id of ["own-player-search","own-player-search-input","own-player-search-status","own-player-search-results"]){
  assert.ok(html.includes('id="'+id+'"'),"Profile search requires "+id);
@@ -12,6 +12,7 @@ assert.match(html,/<script type="module" src="\.\/player-profile-search\.js">/);
 assert.match(app,/playerDialog\.showModal\(\);\s*window\.dispatchEvent\(new CustomEvent\("badminton:own-profile-form-open"/);
 assert.match(searchUi,/section\.hidden=Boolean\(event\.detail\?\.editing\)/);
 assert.match(searchUi,/savedCandidates:\[\]/,"Existing family surname must not hide other players");
+assert.match(welcome,/searchInvitationPlayers\(term,\{signal:searchController\.signal,savedCandidates:\[\]\}\)/,"Welcome must search the full DBV index, not only previously saved family members");
 assert.match(searchUi,/controller\?\.abort\(\)/,"Previous requests must cancel");
 assert.match(searchUi,/hit\.type="button"/,"Selecting a candidate must not submit the form");
 assert.match(searchUi,/form\.elements\.namedItem\("id"\)\.value=player\.id/);
