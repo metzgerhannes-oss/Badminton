@@ -42,16 +42,17 @@ test("follow-first Spieler and Mannschaft tabs; profile and follow management in
  assert.doesNotMatch(html,/id="dashboard-add-friend"/);
 });
 
-test("empty default library state and explicit search/filter criteria",()=>{
+test("empty default library state and name-first search with optional filters",()=>{
  const match=library.match(/function hasCriteria\(\)\{[\s\S]*?\n\}/);
  assert.ok(match,"hasCriteria function present");
  const get=new Function("$","ageChoice",match[0]+"\nreturn hasCriteria;");
  const forms=[
   [{},false],
   [{"library-search":"Sarah"},true],
-  [{"library-club":"Mössingen"},true],
-  [{"library-age":"U13"},true],
-  [{"library-association":"BAW"},true],
+  [{"library-club":"Mössingen"},false],
+  [{"library-age":"U13"},false],
+  [{"library-association":"BAW"},false],
+  [{"library-search":"Sarah","library-club":"Mössingen"},true],
   [{"library-search":"  ","library-age":"all","library-association":"all"},false]
  ];
  for(const [fields,result] of forms){
@@ -64,6 +65,9 @@ test("empty default library state and explicit search/filter criteria",()=>{
  assert.doesNotMatch(library,/if\(location\.hash==="#spieler"\)load\(\)/);
  assert.match(library,/library-reset/);
  assert.match(html,/class="library-message library-idle"/);
+ assert.match(html,/id="player-search-filters"/);
+ assert.doesNotMatch(html,/id="spvgg-active-roster"/);
+ assert.doesNotMatch(library,/loadSpvggRoster/);
 });
 
 test("Home and friends use one profile navigation mechanism",()=>{
