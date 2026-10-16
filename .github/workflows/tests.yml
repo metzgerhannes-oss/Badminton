@@ -47,6 +47,8 @@ jobs:
           node --check club-branding.js
           node --check i18n.js
           node --check scripts/validate-i18n.mjs
+          node --check club-overview.js
+          node --check scripts/club-overview-model.mjs
           node --check library.js
           node --check scripts/spvgg-roster.mjs
           node --check stats.js
@@ -121,6 +123,7 @@ jobs:
           node tests/invited-player-v125.mjs
           node tests/player-library.mjs
           node tests/spvgg-active-roster.mjs
+          node tests/club-overview.mjs
           node tests/local-directory-fallback-v128.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
