@@ -20,6 +20,14 @@ class TeamReports(unittest.TestCase):
   self.assertFalse(mod.qualifies(UNRELATED)[0])
   self.assertFalse(mod.qualifies('<nav>SpVgg Mössingen Mannschaft Regionalliga Sieg</nav>'+UNRELATED.replace('SpVgg Mössingen','Sportverein Baden Baden'))[0])
 
+ def test_joomla_article_body_without_editorial_class(self):
+  html='<main><article><h1>Regionalliga Spieltag in Mössingen</h1><p>Die Spvgg trat mit ihrer Mannschaft am Wochenende in der Regionalliga an. Das Team spielte den zweiten Spieltag in der Saison gegen zwei gute Gegner und erreichte ein Unentschieden.</p></article></main>'
+  self.assertTrue(mod.qualifies(html)[0])
+
+ def test_related_article_teasers_not_counted_as_team_evidence(self):
+  html='<main><article><h1>Sommerfest im Verein</h1><p>Beim diesjährigen Sommerfest der Spvgg gab es gutes Wetter und verschiedene Angebote für die Gäste. Viele ehrenamtliche Helferinnen und Helfer haben für Speisen und Getränke gesorgt.</p><h3>Weitere Beiträge:</h3><p>Regionalliga Mannschaft Sieg Spieltag: Unsere Spvgg spielte den nächsten Wettbewerb.</p></article></main>'
+  self.assertFalse(mod.qualifies(html)[0])
+
  def test_official_https_path_only(self):
   monitor={'index_url':INDEX,'article_path_regex':r'^/abteilungen/badminton/aktuelles/[a-z0-9-]+/?$'}
   self.assertTrue(mod.valid_link(URL,monitor))
