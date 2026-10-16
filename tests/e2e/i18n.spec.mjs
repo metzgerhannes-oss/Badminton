@@ -1,4 +1,4 @@
-import {test, expect} from "@playwright/test";
+import {test, expect} from "./supabase-isolated.fixture.mjs";
 
 test("language switch works on invitation page and persists across reload", async ({page}) => {
   await page.goto("/welcome.html");

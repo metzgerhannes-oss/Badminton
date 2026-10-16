@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 
 // Security-relevant browser contract; real database grants must also be verified
 // against Supabase before deployment. Never bypass the gate in production.
