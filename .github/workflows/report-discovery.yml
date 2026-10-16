@@ -19,8 +19,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   discover:
-    # Club-only: public source URLs, no personal DBV IDs or player-mention candidates.
-    if: ${{ true }}
+    # Existing protected-mode release gate: no automated candidate publication.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
