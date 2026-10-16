@@ -335,7 +335,14 @@ function findItems(){
    }
    return {c:x.c,score,matched};
   }).filter(x=>x.matched).sort((a,b)=>b.score-a.score).map(x=>x.c);
- }else items=items.map(x=>x.c);
+ }else {
+  items=items.map(x=>x.c);
+  // Group the full overview even when new rules are appended after older topics.
+  if(topic==="alle"){
+   const order={grundlagen:0,spielsituationen:1,jugend:2};
+   items.sort((a,b)=>order[a.topic]-order[b.topic]);
+  }
+ }
  return items;
 }
 function openCard(c){
