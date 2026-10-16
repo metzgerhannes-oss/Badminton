@@ -14,6 +14,9 @@ export default defineConfig({
     trace:"retain-on-failure",
     video:"retain-on-failure",
     serviceWorkers:"block",
+    // Second safety layer: even a page.route(...).continue() cannot reach external APIs.
+    // Browser QA is offline except for the local webServer; release smokes are separate.
+    proxy:{server:"http://127.0.0.1:1",bypass:"127.0.0.1,localhost"},
     locale:"de-DE",
     timezoneId:"Europe/Berlin",
     reducedMotion:"reduce"
