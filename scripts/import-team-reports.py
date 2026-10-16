@@ -41,12 +41,20 @@ def qualifies(article_html):
     page = source.parse(article_html)
     body = page.article_text()
     if len(body) < 100:
+        # Some official Joomla articles have no WordPress-style body class.
+        # Use only their primary article/main text, never navigation/footer.
+        body = ' '.join(page.article or page.main)
+        # Related-article teasers begin after this editorial boundary.
+        body = re.split(r'\\b(?:Weitere Beiträge|Ähnliche Berichte|Ähnliche Artikel)\\s*:', body,
+                        maxsplit=1, flags=re.I)[0].strip()
+    if len(body) < 100:
         return False, None
     title = page.headline()
-    if not CLUB_NAME.search(body):
+    if not CLUB_NAME.search(body[:900]):
         return False, None
-    evidence = title + " " + body
-    if not TEAM.search(evidence) or not MATCH.search(evidence):
+    # The actual report must establish team context early; keywords appearing
+    # only in footer/related story teasers never establish a match report.
+    if not TEAM.search(title + ' ' + body[:450]) or not MATCH.search(title + ' ' + body[:1000]):
         return False, None
     return True, page.published()
 
