@@ -131,3 +131,15 @@ test("Wiki v157: the home catalogue shows all 61 cards, organized by topic, with
  await page.getByRole("searchbox").fill("Ablenkung");
  await expect(page.locator(".wiki-entry")).toHaveCount(1);
 });
+
+test("Wiki v157: out, distraction and doubles service boundary use truthful distinct diagrams",async({page})=>{
+ await page.goto("/wiki.html");
+ for(const [term,kind] of [["vollständig außerhalb","out"],["Ablenken","distract"],["hintere Linie","doublesServeBack"]]){
+  await page.getByRole("searchbox").fill(term);
+  await expect(page.locator(".wiki-entry").first()).toBeVisible();
+  await page.locator(".wiki-entry").first().click();
+  await expect(page.locator("#detail-art")).toHaveAttribute("data-kind",kind);
+  await expect(page.locator("#detail-art svg")).toBeVisible();
+  await page.getByRole("button",{name:"Regel schließen"}).click();
+ }
+});
