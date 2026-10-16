@@ -47,6 +47,8 @@ jobs:
           node --check club-branding.js
           node --check i18n.js
           node --check scripts/validate-i18n.mjs
+          node --check club-overview.js
+          node --check scripts/club-overview-model.mjs
           node --check library.js
           node --check scripts/spvgg-roster.mjs
           node --check stats.js
@@ -122,6 +124,7 @@ jobs:
           node tests/invited-player-v125.mjs
           node tests/player-library.mjs
           node tests/spvgg-active-roster.mjs
+          node tests/club-overview.mjs
           node tests/local-directory-fallback-v128.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
@@ -183,7 +186,7 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
           python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v
 
-          ) > test-output.log 2>&1
+          ) > test-output.log 2>&1 || { tail -n 120 test-output.log; exit 1; }
           cat test-output.log
       - name: Upload failing test output
         if: failure()

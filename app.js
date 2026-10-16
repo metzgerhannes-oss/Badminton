@@ -341,6 +341,8 @@ function render(){
   lastNotifiedClub=window.badmintonActiveClub;
   window.dispatchEvent(new CustomEvent("badminton:profile-change",{detail:{playerId:state.chosen,club:window.badmintonActiveClub}}));
  }
+ // Desktop club view uses device-only profile metadata; no new remote reads.
+ window.dispatchEvent(new CustomEvent("badminton:club-profiles",{detail:{players:[...state.players,...state.friends].map(p=>({id:p.id,name:p.name,club:p.club,ageClass:p.ageClass||""}))}}));
  updateLiveNavigation();
  SchmetterlingeRouter.renderPage(state);
 }

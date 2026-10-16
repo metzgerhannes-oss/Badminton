@@ -13,9 +13,9 @@ const dashboard=file("dashboard.js");
 const history=file("history.js");
 const sw=file("sw.js");
 
-test("four usual destinations plus conditional LIVE; settings in header; history reachable",()=>{
+test("mobile destinations plus desktop-only club and conditional LIVE; settings in header; history reachable",()=>{
  const links=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
- assert.deepEqual(links,["start","turniere","live","spieler","mannschaft","berichte"]);
+ assert.deepEqual(links,["start","turniere","live","spieler","verein","mannschaft","berichte"]);
  assert.match(html,/class="topbar-settings" href="#einstellungen"/);
  assert.match(html,/href="#historie"/);
  assert.match(html,/href="#turniere">← Turniertag/);

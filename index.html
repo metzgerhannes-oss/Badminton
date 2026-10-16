@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="./settings-rooms.css">
 <link rel="stylesheet" href="./home-v137.css">
 <link rel="stylesheet" href="./desktop-dashboard.css">
+<link rel="stylesheet" href="./club-overview.css">
 <script defer src="./ui-feedback.js"></script>
 <script type="module" src="./backup.js"></script>
 <script defer src="./state-storage.js"></script>
@@ -35,6 +36,7 @@
 <script type="module" src="./invite.js"></script>
 <script type="module" src="./app-access.js"></script>
 <script type="module" src="./library.js"></script>
+<script type="module" src="./club-overview.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
 <script type="module" src="./follow-import.js"></script>
@@ -77,7 +79,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v161" title="Version v161">v161</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v162" title="Version v162">v162</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -345,6 +347,23 @@
     <div id="report-source-list" class="report-source-list"></div>
    </details>
   </section>
+  <section class="page club-overview-page" id="view-verein" aria-labelledby="heading-verein">
+   <div class="section-heading"><h2 id="heading-verein">Vereinsübersicht</h2></div>
+   <section class="club-overview-panel">
+    <p class="club-overview-intro">Alle in den verfügbaren Vereinsquellen und auf diesem Gerät erfassten Spieler auf einen Blick. Unbelegte Ergebnisse werden nicht als Nullwerte ausgegeben.</p>
+    <div class="club-overview-controls">
+     <label>Verein<select id="club-overview-club"><option value="SpVgg Mössingen">SpVgg Mössingen</option></select></label>
+     <label>Spieler suchen<input type="search" id="club-overview-search" placeholder="Name oder lokale DBV-ID"></label>
+     <label>Mannschaft<select id="club-overview-team"><option value="all">Alle Mannschaften</option><option value="I">I</option><option value="II">II</option><option value="III">III</option><option value="IV">IV</option><option value="V">V</option></select></label>
+     <label>Altersklasse<select id="club-overview-age"><option value="all">Alle Altersklassen</option><option value="unknown">Nicht erfasst</option><option value="U11">U11</option><option value="U13">U13</option><option value="U15">U15</option><option value="U17">U17</option><option value="U19">U19</option><option value="U22">U22</option></select></label>
+     <label>Sortierung<select id="club-overview-sort"><option value="name">Spielername</option><option value="team">Mannschaft</option><option value="age">Altersklasse</option></select></label>
+    </div>
+    <div class="club-overview-count"><strong id="club-overview-total">Vereinsliste wird geladen</strong><button type="button" id="club-overview-reset" class="subtle-button">Filter zurücksetzen</button></div>
+    <p class="club-overview-status" id="club-overview-status" role="status" aria-live="polite"></p>
+    <div id="club-overview-table" class="club-overview-scroll" aria-live="polite"></div>
+    <p id="club-overview-source" class="club-overview-source"></p>
+   </section>
+  </section>
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
    <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2><button type="button" class="subtle-button follow-add" id="player-add-open" aria-expanded="false" aria-controls="player-discover">+ Hinzufügen</button></div>
    <section class="follow-hub" aria-label="Meine Spieler">
@@ -553,6 +572,7 @@
   <a href="#turniere" data-page="turniere"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span><small>Turniere</small></a>
   <a href="#live" data-page="live" id="live-nav-tab" class="live-nav-tab" aria-label="Live-Matches am Turniertag" hidden><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.4 4.4a11 11 0 0 0 0 15.2M19.6 4.4a11 11 0 0 1 0 15.2"/></svg></span><small>LIVE</small></a>
   <a href="#spieler" data-page="spieler"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><small>Spieler</small></a>
+  <a href="#verein" data-page="verein" class="desktop-club-nav"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 21V5l9-3 9 3v16M3 9h18M8 9v12M16 9v12M3 21h18"/></svg></span><small>Verein</small></a>
   <a href="#mannschaft" data-page="mannschaft"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><circle cx="12" cy="5" r="3"/><path d="M3 8a3 3 0 0 1 4-3M21 8a3 3 0 0 0-4-3"/></svg></span><small>Mannschaft</small></a>
   <a href="#berichte" data-page="berichte"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></span><small>Berichte</small></a>
  </nav>
