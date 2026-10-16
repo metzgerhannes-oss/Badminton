@@ -84,3 +84,30 @@ test("BWBV directory finds new clubs without inventing teams",async ({page})=>{
  await expect(page.locator("#team-clubs-results")).toContainText("Mannschaften verfügbar");
  await expect(page.locator('#team-clubs-results [data-team-club-filter="SpVgg. Mössingen"]')).toHaveCount(1);
 });
+
+test("Official sourced team reports appear in the new report tab without copying article text",async ({page})=>{
+ await page.route("**/data/team-report-links.json",route=>route.fulfill({
+  status:200,contentType:"application/json",body:JSON.stringify({
+   schemaVersion:1,sourceKind:"verified_official_team_report_links",checkedOn:"2026-10-16",
+   reports:[
+    {source_id:"club-moessingen",club_id:"spvgg-moessingen",
+     url:"https://www.spvgg.org/abteilungen/badminton/aktuelles/erster-mannschaftsspieltag",
+     title:"Player names must be ignored",published_on:"2026-10-12"},
+    {source_id:"club-moessingen",club_id:"spvgg-moessingen",
+     url:"https://example.net/abteilungen/badminton/aktuelles/fake",
+     title:"Foreign link",published_on:"2026-10-13"}
+   ]
+  }),
+  headers:{"Access-Control-Allow-Origin":"*"}
+ }));
+ await page.goto("/#mannschaft");
+ await page.locator("#team-add-open").click();
+ await page.locator("#team-search").fill("Mössingen");
+ await page.locator('#team-results [data-team-toggle="nuliga:10777:2"]').click();
+ await page.locator('#team-followed [data-team-open="nuliga:10777:2026-27:2"]').click();
+ await page.locator('[data-team-tab="reports"]').click();
+ await expect(page.locator("#team-detail-reports")).toContainText("Mannschaftsbericht der SpVgg Mössingen");
+ await expect(page.locator('#team-detail-reports a[href*="erster-mannschaftsspieltag"]')).toHaveCount(1);
+ await expect(page.locator("#team-detail-reports")).not.toContainText("Player names must be ignored");
+ await expect(page.locator("#team-detail-reports")).not.toContainText("Foreign link");
+});
