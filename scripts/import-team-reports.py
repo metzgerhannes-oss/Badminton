@@ -25,7 +25,7 @@ SOURCE = "club-moessingen"
 PAGE_LIMIT = 6
 LINK_LIMIT = 35
 MAX_RECORDS = 160
-INDEX_PATTERN = re.compile(r"^https://www[.]spvgg[.]org/abteilungen/badminton/aktuelles$")
+INDEX_PATTERN = re.compile(r"^https://(?:www[.])?spvgg[.]org/abteilungen/badminton/aktuelles$")
 TEAM = re.compile(r"\b(?:mannschaft(?:en|s|smeisterschaft)?|team(?:s)?|spieltag|punktspiel(?:e)?|"
                   r"regionalliga|verbandsliga|oberliga|bezirksliga|landesliga|kreisliga|"
                   r"rundenspiel(?:e)?|heimspiel(?:e)?|ausw[aä]rtsspiel(?:e)?|"
@@ -33,9 +33,7 @@ TEAM = re.compile(r"\b(?:mannschaft(?:en|s|smeisterschaft)?|team(?:s)?|spieltag|
 MATCH = re.compile(r"\b(?:spiel(?:en|te|ten|tag|tags|s|e)?|begegnung(?:en)?|"
                    r"gewann|gewonnen|verlor|verloren|sieg(?:e)?|niederlage(?:n)?|"
                    r"saison|gruppe|runde|turnier|kampf|aufstieg|abstieg|meisterschaft)\b", re.I)
-CLUB_NAME = re.compile(r"\b(?:spvgg[.]?\s*m[öo]ssingen|sportvereinigung\s*m[öo]ssingen|"
-                       r"m[öo]ssinger\s+(?:team|mannschaft))\b", re.I)
-
+CLUB_NAME = re.compile(r"\b(?:spvgg|sportvereinigung|m[öo]ssingen|m[öo]ssinger)\b", re.I)
 def valid_link(url, monitor):
     return source.article_allowed(url, monitor) and len(url) <= 450
 
