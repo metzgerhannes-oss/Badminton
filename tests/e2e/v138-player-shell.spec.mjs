@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 
 // v138: a player-only grant may open the UI, but must not become broad membership.
 const API="https://yadexibmjmnjfmfabrug.supabase.co";

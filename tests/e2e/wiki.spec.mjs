@@ -1,4 +1,4 @@
-import {test,expect} from "@playwright/test";
+import {test,expect} from "./supabase-isolated.fixture.mjs";
 test("Wiki: three topics and anonymous mobile search",async({page})=>{
  await page.goto("/wiki.html");
  await expect(page.getByRole("heading",{name:"Schnell erklärt."})).toBeVisible();
