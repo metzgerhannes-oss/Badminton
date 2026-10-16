@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#d9ecfb">
 <meta name="description" content="Schmetterlinge: U11-Altersklassenrangliste, Turniere und Trophäenschrank.">
-<title>Schmetterlinge · Badminton Jugend</title>
+<title>Schmetterlinge · Badminton</title>
 <link rel="icon" type="image/svg+xml" href="./assets/spvgg-schmetterlinge.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="./club-branding.css">
 <link rel="stylesheet" href="./app-shell.css">
 <link rel="stylesheet" href="./teams.css">
+<link rel="stylesheet" href="./club-roster.css">
 <link rel="stylesheet" href="./private-sharing.css">
 <link rel="stylesheet" href="./settings-rooms.css">
 <link rel="stylesheet" href="./home-v137.css">
@@ -36,6 +37,7 @@
 <script type="module" src="./library.js"></script>
 <script type="module" src="./stats.js"></script>
 <script type="module" src="./history-demand.js"></script>
+<script type="module" src="./follow-import.js"></script>
 <script type="module" src="./career-history.js"></script>
 <script type="module" src="./external-matches.js"></script>
 <script defer src="./live.js"></script>
@@ -75,7 +77,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v157" title="Version v157">v157</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v161" title="Version v161">v161</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -86,7 +88,6 @@
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1></div>
-   <a class="wiki-home-link" href="./wiki.html" aria-label="Badminton-Regeln im Wiki suchen"><span class="wiki-home-icon" aria-hidden="true">▧</span><span class="wiki-home-copy"><strong>Regeln & Wissen</strong><small>61 Grafikkarten · Suche · offline</small></span><span class="wiki-home-arrow" aria-hidden="true">↗</span></a>
    <a href="#live" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
    <div id="dashboard-next" class="dashboard-next"></div>
    <section id="match-stats" class="match-stats" aria-labelledby="match-stats-heading">
@@ -138,6 +139,7 @@
     <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-friends-manage" class="dashboard-friends-manage" href="#einstellungen/spieler" hidden>Gefolgte Spieler verwalten ↗</a></div></div>
     <div id="dashboard-friends" class="dashboard-friends" aria-label="Freunden folgen und KPIs anzeigen"></div>
    </section>
+   <a class="wiki-home-link" href="./wiki.html" aria-label="Badminton-Regeln im Wiki suchen"><span class="wiki-home-icon" aria-hidden="true">▧</span><span class="wiki-home-copy"><strong>Regeln & Wissen</strong><small>61 Grafikkarten · Suche · offline</small></span><span class="wiki-home-arrow" aria-hidden="true">↗</span></a>
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
    <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
@@ -362,6 +364,13 @@
     <label>Verein<input type="search" id="library-club" placeholder="Alle Vereine" autocomplete="off" list="library-club-suggestions"><datalist id="library-club-suggestions"></datalist></label>
     <label>Landesverband<select id="library-association"><option value="all">Alle Landesverbände</option></select></label>
    </div>
+   <section class="club-roster-shell" id="spvgg-active-roster" aria-labelledby="spvgg-active-heading">
+    <div class="club-roster-heading"><div><h3 id="spvgg-active-heading">SpVgg Mössingen · Aktivenmannschaften</h3>
+     <p>Namentlich veröffentlichte Kader der Saison 2025/26, Mannschaften I–V. Auch Jugendspieler können hier mitspielen.</p></div>
+     <label>Mannschaft <select id="spvgg-roster-team"><option value="all">Alle fünf</option><option value="I">I</option><option value="II">II</option><option value="III">III</option><option value="IV">IV</option><option value="V">V</option></select></label></div>
+    <div id="spvgg-active-roster-content" aria-live="polite">Vereinskader wird geladen …</div>
+    <p class="club-roster-disclaimer">Quelle: offizielle Mannschaftsseiten der SpVgg. Ohne verifizierte DBV-ID keine automatische Profilzuordnung. Die Kaderangaben sind nicht gleichbedeutend mit einer aktuellen Spielberechtigung.</p>
+   </section>
    <div class="library-result-bar"><strong id="library-count">Suche starten</strong><button id="library-reset" type="button" class="subtle-button" hidden>Filter zurücksetzen</button><span id="library-message" role="status" aria-live="polite"></span></div>
    <div id="library-results" class="library-results" aria-live="polite"><div class="library-message library-idle"><strong>Spieler suchen</strong><span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div></div>
    <button id="library-more" type="button" class="outline-button library-more" hidden>Weitere Spieler anzeigen</button>
@@ -383,9 +392,13 @@
     <div class="team-tabs" role="tablist" aria-label="Mannschafts-Saisondaten">
      <button type="button" role="tab" aria-controls="team-detail-games" aria-selected="true" data-team-tab="games">Spiele</button>
      <button type="button" role="tab" aria-controls="team-detail-table" aria-selected="false" data-team-tab="table">Tabelle</button>
+     <button type="button" role="tab" aria-controls="team-detail-reports" aria-selected="false" data-team-tab="reports">Berichte</button>
+     <button type="button" role="tab" aria-controls="team-detail-roster" aria-selected="false" data-team-tab="roster">Kader</button>
     </div>
     <div id="team-detail-games" role="tabpanel" aria-label="Spielplan" aria-live="polite"></div>
     <div id="team-detail-table" role="tabpanel" aria-label="Ligatabelle" aria-live="polite" hidden></div>
+    <div id="team-detail-reports" role="tabpanel" aria-label="Geprüfte Mannschaftsberichte" aria-live="polite" hidden></div>
+    <div id="team-detail-roster" role="tabpanel" aria-label="Veröffentlichter Mannschaftskader" aria-live="polite" hidden></div>
     <a id="team-source-link" class="team-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Offizielle Saison bei nuLiga öffnen ↗</a>
    </section>
 

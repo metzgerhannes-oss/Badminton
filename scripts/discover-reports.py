@@ -82,7 +82,8 @@ VOID_TAGS = {'meta','link','img','br','hr','input','source','area','base','embed
 # Strict post-content containers. Never search broad <main> or <article> wrappers:
 # WordPress related-post cards can contain names from unrelated stories.
 CONTENT_CLASSES = {'entry-content','post-content','elementor-widget-theme-post-content',
-                   'elementor-widget-post-content','td-post-content','news-content'}
+                   'elementor-widget-post-content','td-post-content','news-content',
+                   'com-content-article__body','article-body','article-content','item-page'}
 
 def canonical(raw):
     try:
@@ -276,6 +277,9 @@ def run(root,day,previous=None,*,scanner=discover,name_patterns=None):
     known={key(item['url']) for item in approved}
     pending=[]
     seen=set()
+    # Club-only automation never persists individual player IDs from older candidates.
+    if name_patterns is not None and not name_patterns:
+        queue=[{**item,'players':[]} for item in queue if item.get('club_context') is True]
     for item in queue:
         k=key(item.get('url',''))
         if k and k not in seen and k not in known:

@@ -40,11 +40,19 @@ test("invited member explicitly copies sourced matches without separate player l
  await page.getByRole("button",{name:"Daten für ausgewählten Spieler übernehmen"}).click();
  await page.locator("#player-copy-now").click();
  await expect(page.locator("#player-copy-status")).toContainText("Übernahme abgeschlossen");
+ await expect(page.locator("#player-copy-dialog")).toBeHidden();
  const saved=await page.evaluate(id=>{
   const value=JSON.parse(localStorage.getItem("schmetterlinge.consentedPlayerData.v1")||"{}");
   return value[id]?.matches?.map(x=>x.source_key);
  },DBV);
  expect(saved).toEqual(["test:1"]);
+ // Reopening and closing the dialog must not erase the device copy.
+ await page.getByRole("button",{name:"Daten für ausgewählten Spieler übernehmen"}).click();
+ await expect(page.locator("#player-copy-dialog")).toBeVisible();
+ await expect(page.locator("#player-copy-later")).toHaveText("Schließen");
+ await expect(page.locator("#player-copy-summary")).toContainText("1 Matchkarten");
+ await page.locator("#player-copy-later").click();
+ await expect(page.locator("#player-copy-dialog")).toBeHidden();
  // The mock denies all player-only grants, so this result proves that
  // existing app membership suffices for the voluntary data copy.
 });

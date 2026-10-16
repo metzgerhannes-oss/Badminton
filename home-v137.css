@@ -1,12 +1,12 @@
-/* Schmetterlinge v137: mobile-first compact Home, original blue/white identity.
+/* Schmetterlinge v160: mobile-first compact Home, original blue/white identity.
    Loaded after the historical design layers to prevent contradictory overrides. */
 /* Apply the top inset once at app level; header remains in document flow
    so browser chrome / Liquid Glass cannot overlap the logo while scrolling. */
 .app{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
 .topbar{display:flex;position:relative;align-items:center;justify-content:space-between;
- gap:9px;min-height:65px;margin:0 0 7px;overflow:visible}
+ gap:9px;min-height:76px;margin:0 0 7px;overflow:visible}
 .topbar .brand{gap:8px;min-width:0;flex:1 1 auto}
-.topbar .brand-logo{width:47px!important;height:47px!important;min-width:47px!important;max-width:47px!important}
+.topbar .brand-logo{width:62px!important;height:62px!important;min-width:62px!important;max-width:62px!important}
 .topbar .brand>span{font-size:clamp(17px,4.4vw,21px);line-height:1.14;overflow-wrap:anywhere}
 .topbar .brand small{margin-top:3px;line-height:1.2;font-size:clamp(7px,1.65vw,9px);letter-spacing:.2px}
 .topbar-actions{flex:0 0 46px;gap:2px;align-self:center}
@@ -107,8 +107,8 @@
 .bottom-nav{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 @media(max-width:410px){
  .app{padding-top:calc(env(safe-area-inset-top,0px) + 6px)}
- .topbar{min-height:62px}
- .topbar .brand-logo{width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important}
+ .topbar{min-height:72px}
+ .topbar .brand-logo{width:56px!important;height:56px!important;min-width:56px!important;max-width:56px!important}
  .topbar .brand>span{font-size:clamp(16px,4.6vw,19px)}
  .focused-profile{padding:7px 8px;gap:7px;min-height:61px}
  .focus-profile-avatar{width:39px;height:39px;min-width:39px;font-size:19px}
@@ -120,6 +120,8 @@
  #view-start .match-stat.rate strong{font-size:14px}
 }
 @media(max-width:350px){
+ .topbar{min-height:66px}
+ .topbar .brand-logo{width:50px!important;height:50px!important;min-width:50px!important;max-width:50px!important}
  .topbar .brand small{font-size:7px}
  .topbar-actions{flex-basis:44px}
  #view-start .upcoming-tournament-info strong{font-size:12px}

@@ -48,6 +48,7 @@ jobs:
           node --check i18n.js
           node --check scripts/validate-i18n.mjs
           node --check library.js
+          node --check scripts/spvgg-roster.mjs
           node --check stats.js
           node --check scripts/private-match-source.mjs
           node --check scripts/external-match-stats.mjs
@@ -61,6 +62,7 @@ jobs:
           node --check scripts/badhub-history-parser.mjs
           node --check scripts/badminton-score-rules.mjs
           node --check scripts/nonplayed-rounds.mjs
+          node --check follow-import.js
           node --check history-demand.js
           node --check scripts/history-demand.mjs
           node --check scripts/external-history.mjs
@@ -89,6 +91,7 @@ jobs:
           node --check scripts/live-links.mjs
       - name: Run tests
         run: |
+          (
           node tests/browser-qa-supabase-isolation.mjs
           node tests/private-publication-gate.mjs
           node tests/security-gate.mjs
@@ -118,6 +121,7 @@ jobs:
           node tests/targeted-dbv-search.mjs
           node tests/invited-player-v125.mjs
           node tests/player-library.mjs
+          node tests/spvgg-active-roster.mjs
           node tests/local-directory-fallback-v128.mjs
           node tests/friend-search.mjs
           node tests/external-history.mjs
@@ -126,6 +130,7 @@ jobs:
           node tests/nonplayed-rounds.mjs
           node tests/queued-match-worker.mjs
           node tests/source-failover.mjs
+          node tests/automatic-follow-import-v158.mjs
           node tests/history-demand.mjs
           node tests/history-status-ux.mjs
           node tests/live-links.mjs
@@ -177,3 +182,13 @@ jobs:
           python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
           python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v
+
+          ) > test-output.log 2>&1
+          cat test-output.log
+      - name: Upload failing test output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-tests-diagnostic
+          path: test-output.log
+          retention-days: 1

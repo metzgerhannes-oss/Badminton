@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "club": "SpVgg Mössingen",
+  "clubId": "10777",
+  "sourceSeason": "2025/26",
+  "sourceKind": "official_club_team_photo_captions",
+  "notes": "Mannschaftsfoto-Unterschriften einschließlich 'Es fehlen'. Die Namen belegen eine Nennung im Kader 2025/26, nicht die Spielberechtigung 2026/27. Es werden keine DBV-IDs oder Geburtsjahre abgeleitet.",
+  "teams": [
+    {
+      "team": "I",
+      "sourceUrl": "https://www.spvgg.org/abteilungen/badminton/mannschaften/1-mannschaft",
+      "members": [
+        "Andrii Don",
+        "Bent Julian Meyer",
+        "Daniel Göricke",
+        "Martin Hähnel",
+        "Nadja-Christine Reihle",
+        "Natalya Voytsekh",
+        "Patrick Spahr",
+        "Sofiia Malinina",
+        "Vitalii Reva"
+      ]
+    },
+    {
+      "team": "II",
+      "sourceUrl": "https://www.spvgg.org/abteilungen/badminton/mannschaften/2-mannschaft",
+      "members": [
+        "Amera Dubinovic",
+        "Jan Käpernick",
+        "Julian Maier",
+        "Lukas Brandl",
+        "Natalya Voytsekh",
+        "Nhi Fassnacht",
+        "Niklas Haug",
+        "Patrick Sickinger",
+        "Tabea Schäfer"
+      ]
+    },
+    {
+      "team": "III",
+      "sourceUrl": "https://www.spvgg.org/abteilungen/badminton/mannschaften/3-mannschaft",
+      "members": [
+        "Anna Malinina",
+        "Kian Tiegs",
+        "Lion Rullkötter",
+        "Mika Julian Tiegs",
+        "Romy Ziegler",
+        "Sarah Storz",
+        "Sreenivas Chandru",
+        "Tim Hoffmann"
+      ]
+    },
+    {
+      "team": "IV",
+      "sourceUrl": "https://www.spvgg.org/abteilungen/badminton/mannschaften/4-mannschaft",
+      "members": [
+        "Amira El-Cheikh Youssef",
+        "Anand Waghmare",
+        "Andreas Stickel",
+        "Gudrun Käpernick",
+        "Ilirijana Berisha",
+        "Janne Straub",
+        "Julian Mikitisin",
+        "Kian Tiegs",
+        "Reinhold Portscheller",
+        "Sreenivas Chandru",
+        "Tabea Schäfer"
+      ]
+    },
+    {
+      "team": "V",
+      "sourceUrl": "https://www.spvgg.org/abteilungen/badminton/mannschaften/5-mannschaft",
+      "members": [
+        "Andreas Gallai",
+        "Cherry Surya Pratama",
+        "Dominik Frank",
+        "Dorina Kohler",
+        "Felix Koch",
+        "Frank Tiegs",
+        "Gudrun Käpernick",
+        "Jörg-Andreas Reihle",
+        "Karin Betz-Oberhauser",
+        "Marco Stickel",
+        "Saran Saengkla",
+        "Tilo Bauer",
+        "Vladimir Gehl"
+      ]
+    }
+  ]
+}
