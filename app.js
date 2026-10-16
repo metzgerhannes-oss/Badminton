@@ -140,7 +140,7 @@ function renderFriendQuick(){
  const manage=el("dashboard-friends-manage");
  if(manage)manage.hidden=!state.friends.length;
  if(!state.friends.length){
-  root.innerHTML='<a class="friend-quick-add" href="#spieler"><span class="friend-quick-add-icon" aria-hidden="true">+</span><span>Spieler suchen und folgen</span><span aria-hidden="true">↗</span></a>';
+  root.innerHTML='<p class="friends-empty">Noch keine Freunde. Mit dem + oben kannst du Spielern folgen.</p>';
   return;
  }
  // Home is a quick overview, not a second complete friend-management screen.
@@ -170,22 +170,37 @@ function renderFriendQuick(){
   '<a class="friend-quick-more" href="#spieler" aria-label="'+remaining+' weitere Freunde ansehen">'+
    '<span class="friend-quick-avatar friend-quick-more-icon" aria-hidden="true">···</span>'+
    '<span class="friend-quick-name">+'+remaining+' weitere</span></a>':"");
+ root.querySelector(".friend-quick-more")?.addEventListener("click",()=>showPlayerDiscover(false,false));
  root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.isOwn==="true"){navigateHome();return;}
   window.badmintonSelectViewer(b.dataset.friendQuick);
  }));
 }
+function unfollowPlayer(id){
+ const friend=state.friends.find(p=>p.id===id);
+ if(!friend||!SchmetterlingeStorage.unfollow(state,id))return;
+ save();render();window.dispatchEvent(new Event("badminton:library-following"));
+ toast(friend.name+" entfolgt");
+}
 function renderFriends(){
  const root=el("friend-list"),settings=el("friend-settings-list");
+ const query=String(el("followed-player-search")?.value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").trim();
+ const matching=state.friends.filter(p=>!query||[p.name,p.id,p.club].some(value=>
+  String(value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").includes(query)));
+ const count=el("followed-player-count");if(count)count.textContent="("+state.friends.length+")";
+ const all=el("followed-show-all");if(all)all.hidden=!query;
  if(root){
-  root.innerHTML=state.friends.length?state.friends.map(p=>{
+  root.innerHTML=matching.length?matching.map(p=>{
    const current=state.viewingFriendId===p.id;
-   return '<button type="button" class="friend-follow-item'+(current?' is-current':'')+'" data-view-friend="'+esc(p.id)+'">'+
+   return '<article class="followed-player-row">'+
+    '<button type="button" class="friend-follow-item'+(current?' is-current':'')+'" data-view-friend="'+esc(p.id)+'">'+
     '<span class="friend-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>'+
     '<span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.club?' · '+esc(p.club):'')+'</small></span>'+
-    '<span class="follow-item-arrow" aria-hidden="true">›</span></button>';
-  }).join(""):'<p class="team-empty">Du folgst noch keinen Spielern. Mit „+ Hinzufügen“ kannst du Spieler suchen.</p>';
+    '<span class="follow-item-arrow" aria-hidden="true">›</span></button>'+
+    '<button type="button" class="followed-inline-remove" data-unfollow-inline="'+esc(p.id)+'" aria-label="'+esc(p.name)+' entfolgen">Entfolgen</button></article>';
+  }).join(""):'<p class="team-empty">'+(state.friends.length?'Keine gefolgten Spieler zu dieser Suche.':'Du folgst noch keinen Spielern. Über + Hinzufügen kannst du Spieler suchen.')+'</p>';
   root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend)));
+  root.querySelectorAll("[data-unfollow-inline]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollowInline)));
  }
  if(!settings)return;
  settings.innerHTML=state.friends.length?state.friends.map((p,i)=>
@@ -203,10 +218,7 @@ function renderFriends(){
   state.friends.splice(target,0,friend);save();render();
  }));
  settings.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
- settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>{
-  if(!SchmetterlingeStorage.unfollow(state,b.dataset.unfollow))return;
-  save();render();window.dispatchEvent(new Event("badminton:library-following"));toast("Spieler entfolgt");
- }));
+ settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollow)));
 }
 function showPlayerDiscover(open=true,focus=true){
  const panel=el("player-discover"),trigger=el("player-add-open");
@@ -233,18 +245,14 @@ window.badmintonLibraryToggleFollow=player=>{
  if(!/^\d{2}-\d{6}$/.test(id)||!String(player?.name||"").trim())return {ok:false,message:"Kein bestätigtes DBV-Spielerprofil."};
  if(state.players.some(p=>p.id===id))return {ok:false,message:"Dieser Spieler ist bereits dein eigenes Profil."};
  const exists=state.friends.some(p=>p.id===id);
- if(exists){
-  SchmetterlingeStorage.unfollow(state,id);
-  save();render();window.dispatchEvent(new Event("badminton:library-following"));
-  return {ok:true,message:"Spieler entfolgt."};
- }
+ if(exists)return {ok:false,message:"Du folgst diesem Spieler bereits. Entfolgen geht in deiner Freundeliste."};
  if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
  state.friends.unshift({
   id,name:String(player.name).trim().slice(0,80),
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
  });
- showPlayerDiscover(false,false);save();render();window.dispatchEvent(new Event("badminton:library-following"));
+ save();render();window.dispatchEvent(new Event("badminton:library-following"));toast("Du folgst jetzt "+player.name);
  window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
@@ -463,6 +471,10 @@ function setup(){
   friendDialog.showModal();
  }
  window.openFriendForm=openFriendForm;
+ el("dashboard-add-friend")?.addEventListener("click",event=>{event.preventDefault();showPlayerDiscover(true)});
+ el("dashboard-friends-manage")?.addEventListener("click",()=>showPlayerDiscover(false,false));
+ el("followed-player-search")?.addEventListener("input",renderFriends);
+ el("followed-show-all")?.addEventListener("click",()=>{const field=el("followed-player-search");if(field){field.value="";renderFriends();field.focus()}});
  el("player-add-open")?.addEventListener("click",()=>showPlayerDiscover(el("player-discover").hidden));
   el("player-discover-close")?.addEventListener("click",()=>showPlayerDiscover(false,false));
   el("settings-players-add")?.addEventListener("click",()=>showPlayerDiscover(true));
