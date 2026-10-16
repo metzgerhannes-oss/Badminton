@@ -1,0 +1,57 @@
+name: Privater DBV-Spielerverzeichnis-Import
+on:
+  # Freitag nach Veröffentlichung der wöchentlichen offiziellen DBV-Rangliste (UTC).
+  schedule:
+    - cron: '15 9 * * 5'
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/private-dbv-directory.yml'
+      - 'scripts/private-dbv-directory-import.py'
+      - 'scripts/player-library.py'
+      - 'scripts/update-ranking.py'
+      - 'tests/test_private_dbv_directory.py'
+      - 'supabase/functions/private-dbv-directory/index.ts'
+      - 'supabase/migrations/20261016190000_private_dbv_directory_import.sql'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/private-dbv-directory.yml'
+      - 'scripts/private-dbv-directory-import.py'
+      - 'tests/test_private_dbv_directory.py'
+      - 'supabase/functions/private-dbv-directory/index.ts'
+permissions:
+  contents: read
+concurrency:
+  group: badminton-private-dbv-directory
+  cancel-in-progress: false
+jobs:
+  verify:
+    name: Offline-Fixture-Tests (keine produktiven Requests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p test_private_dbv_directory.py -v
+  publish:
+    # Production source requests are exclusively explicitly dispatched or scheduled.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Official XLSX dependency
+        run: python -m pip install --disable-pip-version-check 'openpyxl==3.1.5'
+      - name: One verified private import (no data artifacts, no commits)
+        run: python scripts/private-dbv-directory-import.py --publish
