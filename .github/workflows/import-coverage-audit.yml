@@ -19,12 +19,15 @@ jobs:
           node-version: '22'
       - name: Auditlogik ohne Netzwerk testen
         run: node scripts/import-coverage-audit.test.mjs
+      # On PRs/pushes the audit logic runs exclusively against local test fixtures.
+      # A live inventory requires a deliberate manual dispatch.
       - name: Supabase-Datenbestand ausschließlich lesen
+        if: github.event_name == 'workflow_dispatch'
         env:
           AUDIT_OUTPUT: audit-report.json
         run: node scripts/import-coverage-audit.mjs --live
       - name: Prüfbericht als GitHub-Artefakt
-        if: success()
+        if: github.event_name == 'workflow_dispatch' && success()
         uses: actions/upload-artifact@v4
         with:
           name: import-coverage-report
