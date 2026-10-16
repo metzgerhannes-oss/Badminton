@@ -1,6 +1,42 @@
 {
   "schemaVersion": 1,
   "sourceKind": "verified_official_team_report_links",
-  "checkedOn": null,
-  "reports": []
+  "checkedOn": "2026-10-16",
+  "reports": [
+    {
+      "source_id": "club-moessingen",
+      "club_id": "spvgg-moessingen",
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/regionalliga-spieltage-am-10-11-oktober-2026",
+      "title": "Mannschaftsbericht der SpVgg Mössingen",
+      "published_on": "2026-10-06"
+    },
+    {
+      "source_id": "club-moessingen",
+      "club_id": "spvgg-moessingen",
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/regionalliga-auftakt-am-26-september-2026-das-fieber-steigt",
+      "title": "Mannschaftsbericht der SpVgg Mössingen",
+      "published_on": "2026-09-16"
+    },
+    {
+      "source_id": "club-moessingen",
+      "club_id": "spvgg-moessingen",
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/gelungene-generalprobe",
+      "title": "Mannschaftsbericht der SpVgg Mössingen",
+      "published_on": "2026-08-31"
+    },
+    {
+      "source_id": "club-moessingen",
+      "club_id": "spvgg-moessingen",
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/regionalliga-wir-kommen",
+      "title": "Mannschaftsbericht der SpVgg Mössingen",
+      "published_on": "2026-04-28"
+    },
+    {
+      "source_id": "club-moessingen",
+      "club_id": "spvgg-moessingen",
+      "url": "https://www.spvgg.org/abteilungen/badminton/aktuelles/6-spieltag-der-aktiven-am-21-februar-2026",
+      "title": "Mannschaftsbericht der SpVgg Mössingen",
+      "published_on": null
+    }
+  ]
 }
