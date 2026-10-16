@@ -35,7 +35,33 @@ def build_payload(rows,year,week):
         raise ValueError("Official DBV directory count outside safe range")
     if len(conflicts)>200:
         raise ValueError("Too many contradictory official DBV identities")
-    payload={"source":SOURCE,"year":year,"week":week,"total":len(players),"players":players}
+    # Build positions from the entire official published ranking table, not merely
+    # players who played in the publication week. Rankings roll forward weekly.
+    ranking=load("scripts/update-ranking.py","dbv_complete_weekly_ranking")
+    national=ranking.cohort_ranks(rows)
+    bw=ranking.cohort_ranks([r for r in rows if r.get("association")==ranking.BW_ASSOCIATION])
+    rank_count=0
+    for player in players:
+        player["rankings"]=[]
+        for discipline in ranking.VALID_DISCIPLINES:
+            record=national.get((player["id"],discipline))
+            if not record:
+                continue
+            regional=bw.get((player["id"],discipline))
+            if record["points"]<0 or not float(record["points"])<1_000_000_000:
+                raise ValueError("Invalid official aggregate ranking points")
+            # Six compact positional fields: discipline, total points, counted
+            # tournaments, German cohort rank, BW cohort rank, DBV overall rank.
+            player["rankings"].append([
+                discipline,record["points"],record["tournaments"],
+                record["ageClassRank"],regional["ageClassRank"] if regional else None,
+                record["overallRank"] if record["overallRank"] and record["overallRank"]>0 else None
+            ])
+            rank_count+=1
+    if rank_count<int(len(players)*0.80):
+        raise ValueError("Official ranking coverage too low; import rejected")
+    payload={"source":SOURCE,"year":year,"week":week,"total":len(players),
+             "rankingTotal":rank_count,"players":players}
     encoded=json.dumps(payload,ensure_ascii=False,separators=(",",":")).encode("utf-8")
     if len(encoded)>MAX_BODY:
         raise ValueError("Verified directory payload exceeds size limit")
@@ -65,7 +91,8 @@ def publish(body,token):
     if len(body)>MAX_BODY:
         raise ValueError("Payload too large")
     payload=json.loads(body)
-    if payload["total"]!=len(payload["players"]) or payload["total"]<5000:
+    if payload["total"]!=len(payload["players"]) or payload["total"]<5000 or\
+       payload.get("rankingTotal",0)<int(payload["total"]*0.80):
         raise ValueError("Invalid player count")
     req=Request(URL,method="POST",data=body,headers={
         "Authorization":"Bearer "+token,"Content-Type":"application/json",
@@ -81,7 +108,10 @@ def publish(body,token):
         raise RuntimeError("Directory writer returned HTTP "+str(e.code)) from None
     except URLError:
         raise RuntimeError("Directory writer not reachable") from None
-    print("Private DBV directory synced:",result["snapshot"],result["count"],"records")
+    if result.get("rankingCount")!=payload["rankingTotal"]:
+        raise RuntimeError("Rankings were not fully confirmed by the database")
+    print("Private DBV directory and CURRENT ranking synced:",result["snapshot"],
+          result["count"],"players;",result["rankingCount"],"discipline totals")
 
 def produce():
     ranking=load("scripts/update-ranking.py","official_dbv_ranking")
