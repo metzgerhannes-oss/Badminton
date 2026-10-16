@@ -2,6 +2,7 @@
 import {readPublicRows,SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {TEAM_FOLLOWS_KEY,normalizeFollows,normalizeTeamText,filterTeamRows,officialTeamUrl,
   displayTeamName,tablePoints,confirmedResult} from "./scripts/team-directory-utils.mjs";
+import {loadSpvggRoster,rosterHtml} from "./scripts/spvgg-roster.mjs";
 
 const $=id=>document.getElementById(id);
 const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -20,6 +21,11 @@ const dateOnly=value=>{
 let rows=[],clubs=[],loading=false,loadFailed=false,selectedId="",activeTab="games",detailsTicket=0,initialized=false;
 let detail={games:[],table:[],error:false},follows=[];
 let reportRows=[],reportState="idle",reportTicket=0;
+let clubRoster=null,clubRosterError=false;
+async function fetchClubRoster(){
+ try{clubRoster=await loadSpvggRoster()}catch{clubRosterError=true}
+ renderDetail();
+}
 const TEAM_REQUESTS="schmetterlinge.teamImportRequests.v158";
 const teamQueue=[],pendingTeams=new Set();
 let teamDemandRunning=false;
@@ -270,6 +276,19 @@ function renderDetail(){
  $("team-detail-games").hidden=activeTab!=="games";
  $("team-detail-table").hidden=activeTab!=="table";
  $("team-detail-reports").hidden=activeTab!=="reports";
+ $("team-detail-roster").hidden=activeTab!=="roster";
+ const squad=$("team-detail-roster");
+ if(team.club_id!=="10777"){
+  squad.textContent="Für diesen Verein ist noch kein offiziell belegter Mannschaftskader importiert.";
+ }else if(clubRosterError){
+  squad.textContent="Offizieller Mannschaftskader zurzeit nicht abrufbar.";
+ }else if(!clubRoster){
+  squad.textContent="Vereinskader wird geladen …";
+ }else{
+  squad.innerHTML='<p class="team-source-note">Offiziell veröffentlichte Mannschafts-Fotonamen der Saison '+
+    esc(clubRoster.sourceSeason)+'. Kein Beleg für die aktuelle Spielberechtigung; DBV-IDs sind nicht zugeordnet.</p>'+
+    rosterHtml(clubRoster,{team:team.team_label,compact:true});
+ }
  root.querySelectorAll("[data-team-tab]").forEach(button=>{
   button.setAttribute("aria-selected",String(button.dataset.teamTab===activeTab));
  });
@@ -304,6 +323,7 @@ async function selectTeam(id){
  if(!rows.some(row=>row.id===id))return;
  selectedId=id;setTeamDiscover(false,false);activeTab="games";detail={games:[],table:[],error:false};
  void loadTeamReports(rows.find(team=>team.id===id));
+ if(rows.find(team=>team.id===id)?.club_id==="10777"&&!clubRoster&&!clubRosterError)void fetchClubRoster();
  renderFollowed();renderSearchResults();renderDetail();
  const target=$("team-detail");target?.scrollIntoView({block:"start",behavior:"smooth"});
  const ticket=++detailsTicket;
