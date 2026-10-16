@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="./home-v137.css">
 <link rel="stylesheet" href="./desktop-dashboard.css">
 <link rel="stylesheet" href="./club-overview.css">
+ <link rel="stylesheet" href="./follow-ux.css">
 <script defer src="./ui-feedback.js"></script>
 <script type="module" src="./backup.js"></script>
 <script defer src="./state-storage.js"></script>
@@ -138,7 +139,7 @@
     <div id="dashboard-rank-source" class="dashboard-source"></div>
    </section>
    <section class="dashboard-friends-section" aria-labelledby="dashboard-friends-heading">
-    <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-friends-manage" class="dashboard-friends-manage" href="#einstellungen/spieler" hidden>Gefolgte Spieler verwalten ↗</a></div></div>
+    <div class="section-heading"><h2 id="dashboard-friends-heading">Freunde</h2><div class="dashboard-friends-links"><a id="dashboard-friends-manage" class="dashboard-friends-manage" href="#spieler" hidden>Alle anzeigen</a><a id="dashboard-add-friend" class="dashboard-add-friend" href="#spieler" aria-label="Spieler folgen" title="Spieler folgen">+</a></div></div>
     <div id="dashboard-friends" class="dashboard-friends" aria-label="Freunden folgen und KPIs anzeigen"></div>
    </section>
    <a class="wiki-home-link" href="./wiki.html" aria-label="Badminton-Regeln im Wiki suchen"><span class="wiki-home-icon" aria-hidden="true">▧</span><span class="wiki-home-copy"><strong>Regeln & Wissen</strong><small>61 Grafikkarten · Suche · offline</small></span><span class="wiki-home-arrow" aria-hidden="true">↗</span></a>
@@ -369,28 +370,26 @@
    <section class="follow-hub" aria-label="Meine Spieler">
     <h3>Mein Startprofil</h3>
     <div id="player-own-preview" class="follow-stack" aria-live="polite"></div>
-    <div class="follow-hub-subheading"><h3>Gefolgte Spieler</h3><a href="#einstellungen">Verwalten ↗</a></div>
+    <div class="follow-hub-subheading"><h3>Gefolgte Spieler <span id="followed-player-count"></span></h3><button id="followed-show-all" type="button" class="subtle-button" hidden>Alle anzeigen</button></div>
+     <label class="followed-search-label">Gefolgte Spieler suchen<input id="followed-player-search" type="search" placeholder="Name, Verein oder DBV-ID" autocomplete="off"></label>
     <div id="friend-list" class="friends-list follow-stack" aria-live="polite"></div>
    </section>
    <section id="player-discover" class="follow-discovery" aria-labelledby="player-discover-heading" hidden>
     <div class="follow-hub-subheading"><h3 id="player-discover-heading">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>
-   <div class="section-heading library-section-heading"><h3>DBV-Verzeichnis</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
-   <p class="supporting">Gezielte DBV-Namenssuche ab drei Zeichen oder per DBV-ID. Es erscheinen höchstens zwölf bestätigte Profiltreffer mit Verein und Altersklasse. Trophäen und Matchdaten bleiben nur mit gültiger Berechtigung zugänglich.</p>
+   <div class="section-heading library-section-heading"><h3>Spieler suchen</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
+   <p class="supporting">Name (mindestens 3 Zeichen) oder DBV-ID eingeben und auf „+ Folgen“ tippen.</p>
    <div class="library-source" id="library-source" aria-live="polite">Offizielle DBV-Rangliste wird geladen.</div>
    <div class="library-filters">
-    <label>Spielerin / Spieler suchen<input type="search" id="library-search" placeholder="Name oder DBV-Spieler-ID" autocomplete="off"></label>
-    <label>Altersklasse<select id="library-age"><option value="all">Alle Altersklassen</option><option value="U11">U11</option><option value="U13">U13</option><option value="U15">U15</option><option value="U17">U17</option><option value="U19">U19</option><option value="U22">U22</option></select></label>
-    <label>Verein<input type="search" id="library-club" placeholder="Alle Vereine" autocomplete="off" list="library-club-suggestions"><datalist id="library-club-suggestions"></datalist></label>
-    <label>Landesverband<select id="library-association"><option value="all">Alle Landesverbände</option></select></label>
-   </div>
-   <section class="club-roster-shell" id="spvgg-active-roster" aria-labelledby="spvgg-active-heading">
-    <div class="club-roster-heading"><div><h3 id="spvgg-active-heading">SpVgg Mössingen · Aktivenmannschaften</h3>
-     <p>Namentlich veröffentlichte Kader der Saison 2025/26, Mannschaften I–V. Auch Jugendspieler können hier mitspielen.</p></div>
-     <label>Mannschaft <select id="spvgg-roster-team"><option value="all">Alle fünf</option><option value="I">I</option><option value="II">II</option><option value="III">III</option><option value="IV">IV</option><option value="V">V</option></select></label></div>
-    <div id="spvgg-active-roster-content" aria-live="polite">Vereinskader wird geladen …</div>
-    <p class="club-roster-disclaimer">Quelle: offizielle Mannschaftsseiten der SpVgg. Ohne verifizierte DBV-ID keine automatische Profilzuordnung. Die Kaderangaben sind nicht gleichbedeutend mit einer aktuellen Spielberechtigung.</p>
-   </section>
-   <div class="library-result-bar"><strong id="library-count">Suche starten</strong><button id="library-reset" type="button" class="subtle-button" hidden>Filter zurücksetzen</button><span id="library-message" role="status" aria-live="polite"></span></div>
+     <label class="follow-main-search">Name oder DBV-ID<input type="search" id="library-search" placeholder="Spieler suchen" autocomplete="off"></label>
+     <details class="follow-search-more"><summary>Weitere Filter</summary>
+      <div class="follow-search-extra">
+       <label>Altersklasse<select id="library-age"><option value="all">Alle Altersklassen</option><option value="U11">U11</option><option value="U13">U13</option><option value="U15">U15</option><option value="U17">U17</option><option value="U19">U19</option><option value="U22">U22</option></select></label>
+       <label>Verein<input type="search" id="library-club" placeholder="Alle Vereine" autocomplete="off" list="library-club-suggestions"><datalist id="library-club-suggestions"></datalist></label>
+       <label>Landesverband<select id="library-association"><option value="all">Alle Landesverbände</option></select></label>
+      </div>
+     </details>
+    </div>
+    <div class="library-result-bar"><strong id="library-count">Suche starten</strong><button id="library-reset" type="button" class="subtle-button" hidden>Filter zurücksetzen</button><span id="library-message" role="status" aria-live="polite"></span></div>
    <div id="library-results" class="library-results" aria-live="polite"><div class="library-message library-idle"><strong>Spieler suchen</strong><span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div></div>
    <button id="library-more" type="button" class="outline-button library-more" hidden>Weitere Spieler anzeigen</button>
    <p class="library-data-note">Nur in der offiziellen DBV-Rangliste veröffentlichte Spieler werden zentral aufgenommen. Neu angelegte lokale Profile und private Favoritenlisten werden nicht automatisch veröffentlicht. Für andere Spieler können Ranglisten-KPIs noch fehlen.</p>
