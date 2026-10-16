@@ -82,7 +82,8 @@ VOID_TAGS = {'meta','link','img','br','hr','input','source','area','base','embed
 # Strict post-content containers. Never search broad <main> or <article> wrappers:
 # WordPress related-post cards can contain names from unrelated stories.
 CONTENT_CLASSES = {'entry-content','post-content','elementor-widget-theme-post-content',
-                   'elementor-widget-post-content','td-post-content','news-content'}
+                   'elementor-widget-post-content','td-post-content','news-content',
+                   'com-content-article__body','article-body','article-content','item-page'}
 
 def canonical(raw):
     try:
