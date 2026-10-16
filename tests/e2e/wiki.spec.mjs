@@ -143,3 +143,34 @@ test("Wiki v160: out, distraction and doubles service boundary use truthful dist
   await page.getByRole("button",{name:"Regel schließen"}).click();
  }
 });
+
+test("v160: Regeln & Wissen is the last Home tile and the club logo fits all viewports",async({page})=>{
+ for(const [width,logoMin] of [[320,49],[390,55],[430,61],[1440,71]]){
+  await page.setViewportSize({width,height:900});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  const layout=await page.evaluate(()=>{
+   const home=document.querySelector("#view-start");
+   const wiki=home.querySelector(".wiki-home-link");
+   const friends=home.querySelector(".dashboard-friends-section");
+   const logo=document.querySelector(".topbar .brand-logo");
+   const settings=document.querySelector(".topbar-settings");
+   const a=wiki.getBoundingClientRect(),b=friends.getBoundingClientRect();
+   const l=logo.getBoundingClientRect(),s=settings.getBoundingClientRect();
+   return {
+    lastElement:home.lastElementChild===wiki,
+    linkBelowFriends:a.top>=b.bottom-1,
+    logoWidth:l.width,
+    logoClearOfSettings:l.right<=s.left+1,
+    withinScreen:document.documentElement.scrollWidth<=innerWidth+2,
+    desktopGridArea:getComputedStyle(wiki).gridArea,
+   };
+  });
+  expect(layout.lastElement).toBe(true);
+  expect(layout.linkBelowFriends).toBe(true);
+  expect(layout.logoWidth).toBeGreaterThanOrEqual(logoMin);
+  expect(layout.logoClearOfSettings).toBe(true);
+  expect(layout.withinScreen).toBe(true);
+  if(width>=1080)expect(layout.desktopGridArea).toBe("wiki");
+  await expect(page.locator(".wiki-home-link")).toHaveAttribute("href","./wiki.html");
+ }
+});
