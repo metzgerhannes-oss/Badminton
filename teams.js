@@ -90,8 +90,8 @@ async function verifiedClubLinks(team){
   try{
    const url=new URL(a.url);
    return url.protocol==="https:"&&["spvgg.org","www.spvgg.org"].includes(url.hostname)&&
-    /^\\/abteilungen\\/badminton\\/aktuelles\\/[a-z0-9-]+\\/?$/.test(url.pathname)&&
-    (a.published_on===null||/^\\d{4}-\\d{2}-\\d{2}$/.test(a.published_on));
+    /^\/abteilungen\/badminton\/aktuelles\/[a-z0-9-]+\/?$/.test(url.pathname)&&
+    (a.published_on===null||/^\d{4}-\d{2}-\d{2}$/.test(a.published_on));
   }catch{return false}
  }).map(a=>({url:a.url,title:"Mannschaftsbericht der SpVgg Mössingen",
   published_on:a.published_on,summary:"Originalbericht auf der Vereinswebsite",
@@ -128,7 +128,7 @@ async function loadTeamReports(team){
  const merged=new Map();
  for(const row of [...found,...stored]){
   const link=safeReportLink(row.url);
-  if(link)merged.set(link.replace("://www.","://").replace(/\\/$/,""),row);
+  if(link)merged.set(link.replace("://www.","://").replace(/\/$/,""),row);
  }
  reportRows=[...merged.values()].sort((a,b)=>
   String(b.published_on||"").localeCompare(String(a.published_on||""))).slice(0,160);
