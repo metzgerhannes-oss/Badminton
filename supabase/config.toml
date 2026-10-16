@@ -1,3 +1,7 @@
 [functions.dbv-calendar-publish]
 # GitHub OIDC is verified cryptographically by the function itself.
 verify_jwt = false
+
+[functions.private-dbv-directory]
+# Signed GitHub OIDC is validated inside the function, no public or anonymous writer.
+verify_jwt = false
