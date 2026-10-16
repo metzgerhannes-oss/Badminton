@@ -244,6 +244,11 @@ window.badmintonLibraryToggleFollow=player=>{
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
  });
+ // The next addition starts with a fresh search rather than a stale name/filter.
+ for(const field of ["library-search","library-club"])if(el(field))el(field).value="";
+ for(const field of ["library-age","library-association"])if(el(field))el(field).value="all";
+ if(el("player-search-filters"))el("player-search-filters").open=false;
+ el("library-search")?.dispatchEvent(new Event("input",{bubbles:true}));
  showPlayerDiscover(false,false);save();render();window.dispatchEvent(new Event("badminton:library-following"));
  // Return the focus and viewport to the player in the saved follow list.
  requestAnimationFrame(()=>{
