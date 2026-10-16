@@ -91,6 +91,7 @@ jobs:
           node --check scripts/live-links.mjs
       - name: Run tests
         run: |
+          (
           node tests/private-publication-gate.mjs
           node tests/security-gate.mjs
           node tests/operations-audit.mjs
@@ -180,3 +181,13 @@ jobs:
           python scripts/test-player-library.py
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
           python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v
+
+          ) > test-output.log 2>&1
+          cat test-output.lo      - name: Upload failing test output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-tests-diagnostic
+          path: test-output.log
+          retention-days: 1
+g
