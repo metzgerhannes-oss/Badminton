@@ -1,0 +1,36 @@
+/* v163: one-tap follow, local list search, inline unfollow. */
+#view-start .dashboard-friends-section>.section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#view-start .dashboard-friends-links{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-left:auto;flex-wrap:nowrap}
+#view-start .dashboard-friends-manage{min-height:44px;display:inline-flex;align-items:center;font-size:12px;font-weight:800;text-decoration:none}
+#view-start .dashboard-add-friend{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;border-radius:13px;background:#143459;border:1px solid #4479a6;color:#fff;text-decoration:none;font-size:27px;font-weight:650;line-height:1}
+#view-start .dashboard-add-friend:focus-visible,#view-spieler .followed-inline-remove:focus-visible{outline:3px solid #32a4e2;outline-offset:2px}
+#view-start .friends-empty{grid-column:1/-1;padding:10px 12px;border-radius:12px;border:1px dashed #accce1;background:#f3f8fd;color:#476987;font-size:12px;line-height:1.5;margin:0}
+#view-spieler .followed-player-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch;min-width:0}
+#view-spieler .followed-player-row>.friend-follow-item{min-width:0;min-height:64px;padding:9px 10px}
+#view-spieler .followed-player-row .friend-details{min-width:0}
+#view-spieler .followed-inline-remove{min-width:92px;min-height:44px;padding:7px 9px;border:1px solid #bbccd9;background:#eff5fa;color:#204b6f;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer}
+#view-spieler .followed-inline-remove:hover{background:#e1eef8}
+#view-spieler #followed-player-count{font-weight:600;color:#54758f;font-size:13px}
+#view-spieler .followed-search-label{display:grid;gap:5px;margin:10px 0 13px;color:#365b77;font-weight:800;font-size:12px}
+#view-spieler .followed-search-label input{box-sizing:border-box;width:100%;min-width:0;min-height:46px;border:1px solid #aecce0;border-radius:12px;background:#f8fcff;color:#173c60;padding:10px 12px;font:inherit;font-size:14px}
+#view-spieler #followed-show-all[hidden]{display:none!important}
+#view-spieler .follow-hub{margin-bottom:16px}
+#view-spieler .follow-discovery{background:#f8fcff;border-color:#b6d3e7}
+#view-spieler .follow-discovery .supporting{margin:6px 0;color:#436a89}
+#view-spieler .follow-discovery .library-source,#view-spieler .follow-discovery .library-data-note{display:none}
+#view-spieler .follow-discovery .library-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+#view-spieler .follow-search-more{border-top:1px solid #d7e8f3;padding-top:4px}
+#view-spieler .follow-search-more>summary{cursor:pointer;color:#136d9d;font-size:12px;font-weight:800;min-height:44px;display:flex;align-items:center}
+#view-spieler .follow-search-extra{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:3px 0 12px}
+#view-spieler .follow-search-extra label{min-width:0}
+#view-spieler .follow-search-extra label:last-child{grid-column:1/-1}
+#view-spieler .library-player-action button:disabled{opacity:1;cursor:default;color:#145c4c;background:#e1f8ed;border-color:#91ccbb}
+@media(max-width:410px){
+ #view-spieler .followed-player-row{gap:5px}
+ #view-spieler .followed-player-row>.friend-follow-item{gap:6px;padding:8px 7px}
+ #view-spieler .followed-player-row .friend-details strong{font-size:12px}
+ #view-spieler .followed-player-row .friend-details small{font-size:10px}
+ #view-spieler .followed-inline-remove{min-width:78px;padding:7px 5px;font-size:11px}
+ #view-spieler .follow-search-extra{grid-template-columns:1fr}
+ #view-spieler .follow-search-extra label:last-child{grid-column:auto}
+}
