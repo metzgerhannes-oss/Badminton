@@ -85,6 +85,7 @@ function renderRank(){
  if(!root||!source||!label)return;
  const current=ranking?.current,prior=ranking?.previous;
  const working=ranking?.status==="available"&&current?.week&&current?.year;
+ const published=Boolean(current?.week&&current?.year&&(working||rankStatus==="not_listed"));
  const today=new Date();
  const isoDate=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate()));
  isoDate.setUTCDate(isoDate.getUTCDate()+4-(isoDate.getUTCDay()||7));
@@ -92,8 +93,9 @@ function renderRank(){
  const yearStart=new Date(Date.UTC(isoYear,0,1));
  const isoWeek=Math.ceil((((isoDate-yearStart)/86400000)+1)/7);
  const archiveBehind=Boolean(working&&(current.year<isoYear||(current.year===isoYear&&current.week<isoWeek)));
- label.textContent=working?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
+ label.textContent=published?"KW "+current.week+" / "+current.year:"DBV-Rangliste";
  source.innerHTML=working?'<span>Bestätigte DBV-Ranglistenwerte</span>':
+ rankStatus==="not_listed"?'<span>Im aktuellen DBV-Export nicht gelistet</span>':
  rankStatus==="loading"?'<span>Bestätigte DBV-Werte werden geladen …</span>':
  rankStatus==="protected"?'<span>Ranglistenwerte nach gültiger App-Einladung verfügbar</span>':
  rankStatus==="unavailable"?'<span>Ranglistenwerte momentan nicht abrufbar</span>':
@@ -114,6 +116,7 @@ function renderRank(){
   const caption=rankStatus==="loading"?"Offizielle Werte werden geladen …":
    rankStatus==="protected"?"Bitte zuerst den App-Zugang mit einem Einladungslink freischalten.":
    rankStatus==="unavailable"?"Die bestätigten Ranglistenwerte können gerade nicht geladen werden.":
+   rankStatus==="not_listed"?"Im vollständigen DBV-Ranglistenexport KW "+current.week+"/"+current.year+" ist dieses Profil nicht gelistet. Ältere Platzierungen gelten nicht als aktuelle Rangliste.":
    "Für dieses Profil ist noch kein offiziell belegter Ranglistenstand in der App vorhanden.";
   root.innerHTML='<div class="dashboard-empty-tile friend-ranking-empty"><strong>Rangliste</strong><small>'+escape(caption)+'</small>'+sourceLink+'</div>';
   return;
@@ -271,6 +274,9 @@ async function requestPrivateRankings(){
     Number.isInteger(data.current.year)&&Number.isInteger(data.current.week)){
    ranking={status:"available",current:data.current,players:{[id]:{disciplines:data.disciplines}}};
    rankStatus="ready";
+  }else if(data.reason==="not_listed_in_latest_official_export"&&
+   Number.isInteger(data.current?.year)&&Number.isInteger(data.current?.week)){
+   ranking={status:"no_ranking",current:data.current,players:{}};rankStatus="not_listed";
   }else{ranking=null;rankStatus="no_data";}
   rankingCache.set(id,{ranking,status:rankStatus,checkedAt:Date.now()});
  }catch{
