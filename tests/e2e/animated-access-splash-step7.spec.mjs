@@ -31,7 +31,13 @@ test("checking uses original club logo and animated shuttle without visible text
  await expect(page.locator("#app-access-splash img")).toHaveAttribute("src","./assets/spvgg-schmetterlinge.svg");
  await expect(page.locator("#app-access-splash .app-access-visually-hidden")).toContainText("Zugang wird geprüft");
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
- expect(await page.locator("#app-access-splash").evaluate(el=>el.innerText.trim())).toBe("Zugang wird geprüft.");
+ const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
+  width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
+  clip:getComputedStyle(el).clip
+ }));
+ expect(screenReaderOnly.width).toBeLessThanOrEqual(1);
+ expect(screenReaderOnly.height).toBeLessThanOrEqual(1);
+ expect(screenReaderOnly.clip).not.toBe("auto");
  await expect.poll(()=>Boolean(allowResponse)).toBe(true);
  allowResponse();
  await expect(page.locator("#app-access-gate")).toBeHidden();
