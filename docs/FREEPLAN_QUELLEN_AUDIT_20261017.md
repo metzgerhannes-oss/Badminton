@@ -15,7 +15,7 @@ Nur Badminton Supabase-Projekt `yadexibmjmnjfmfabrug` (Organisation Badminton), 
 | Aktuelle Ranglistenwochen | 2 | Speicherung auf maximal **acht** Wochen begrenzt durch `20261016214500_private_weekly_rankings.sql` |
 | Externe Matchbelege | 1.977 / 12 Personen | Nur bestätigte Badhub-Einzelkarten; kein Nachweis vollständiger Karrieren |
 | Noch ohne Matchquelle | 1 Importauftrag | `awaiting_source`; belegte Ranglistenpunkte ersetzen keine Matches |
-| Importquellen | 17 registriert | Quellenregister: 10 geprüft, 7 Kandidaten (Quellenprüfung ≠ Importvolumen) |
+| Importquellen | 17 registriert | Quellenregister: 9 verifiziert, 8 Kandidaten (Quellenprüfung ≠ Importvolumen) |
 | DBV-Kalender | 284 Termine | Erforderlich: Aktualität, Dubletten und Quellabgleich |
 | Supabase Logs Ingest | 1,74 GB von 1 GB (Snapshot 15.10.) | **Historischer Dashboardwert, keine neue Monatsmessung.** Gegenwartswert nur im Usage-Dashboard |
 | Cloudflare Pages | 141 Produktions- und 2.407 Preview-Deploymentdatensätze | 17.10., Preview-Branch-Setting bereits `none`; queued/idle ≠ verbrauchter Build |
