@@ -27,6 +27,7 @@ jobs:
           node --check router.js
           node --check app.js
           node --check app-release.js
+          node --check app-access.js
           node --check scripts/stamp-release.mjs
           node --check backup.js
           node --check scripts/local-backup.mjs
@@ -192,6 +193,7 @@ jobs:
           node tests/settings-rooms-v120.mjs
           node tests/service-worker-resilience.mjs
           node tests/release-version.mjs
+          node tests/animated-access-splash-step7.mjs
           node tests/welcome-i18n.mjs
           node scripts/validate-i18n.mjs
           node tests/supabase-read.mjs
