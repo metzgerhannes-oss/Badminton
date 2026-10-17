@@ -113,6 +113,7 @@ BEGIN
 
   classification := CASE
     WHEN (counts->>'pg_database_bytes')::bigint >= 350000000
+      OR (counts->>'ranking_weeks_retained')::int > 8
       OR (counts->>'club_profiles')::int < 13
       OR (counts->>'players_without_match_proof')::int > 0
       OR (counts->>'players_without_latest_ranking')::int > 0
