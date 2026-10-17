@@ -251,6 +251,9 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("mode-own").addEventListener("click",()=>updateMode("manual"));
  $("mode-dbv").addEventListener("click",()=>updateMode("dbv"));
  $("welcome-form").addEventListener("submit",saveProfile);
+ // WebKit can expose the form before this module is ready; block native GET
+ // navigation until the submit listener is installed.
+ $("welcome-manual-submit").disabled=false;
  $("welcome-selection-save").addEventListener("click",saveSelected);
  const playerSearch=$("welcome-player-search");
  playerSearch.addEventListener("input",onSearchInput);

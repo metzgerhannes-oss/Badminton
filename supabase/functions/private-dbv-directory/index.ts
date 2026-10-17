@@ -44,8 +44,10 @@ function checkPayload(p:any):boolean{
   p.source!==SOURCE || !Number.isInteger(p.year) || p.year<2026 || p.year>2100 ||
   !Number.isInteger(p.week)||p.week<1||p.week>53||
   !Array.isArray(p.players)||p.players.length<5000||p.players.length>20000||
-  p.total!==p.players.length)return false;
+  p.total!==p.players.length || !Number.isInteger(p.rankingTotal) ||
+  p.rankingTotal<Math.floor(p.total*0.80) || p.rankingTotal>p.total*6)return false;
  const seen=new Set<string>();
+ let rankingCount=0;
  const tag=p.year+"-KW"+String(p.week).padStart(2,"0");
  for(const row of p.players){
    if(!row||typeof row!=="object"||Array.isArray(row)||
@@ -57,9 +59,23 @@ function checkPayload(p:any):boolean{
       (row.clubId!==""&&(!CLUB_ID.test(row.clubId)||!row.club.trim()))||
       typeof row.association!=="string"||row.association.length>70||
       row.lastSeen!==tag)return false;
+   if(!Array.isArray(row.rankings)||row.rankings.length>6)return false;
+   const disciplines=new Set<string>();
+   for(const r of row.rankings){
+     if(!Array.isArray(r)||r.length!==6)return false;
+     const [d,points,tournaments,de,bw,overall]=r;
+     if(!["HE","HD","HM","DE","DD","DM"].includes(d)||disciplines.has(d)||
+       typeof points!=="number"||!Number.isFinite(points)||points<0||points>1e9||
+       !Number.isInteger(tournaments)||tournaments<0||tournaments>200||
+       !Number.isInteger(de)||de<1||de>50000||
+       (bw!==null&&(!Number.isInteger(bw)||bw<1||bw>50000))||
+       (overall!==null&&(!Number.isInteger(overall)||overall<1||overall>50000)))return false;
+     disciplines.add(d);
+     rankingCount++;
+   }
    seen.add(row.id);
  }
- return true;
+ return rankingCount===p.rankingTotal;
 }
 Deno.serve(async(req:Request)=>{
  if(req.method!=="POST")return error(405,"method_not_allowed");
@@ -95,9 +111,11 @@ Deno.serve(async(req:Request)=>{
  if(!db.ok)return error(502,"database_ingest_rejected");
  let result:any;
  try{result=await db.json()}catch{return error(502,"bad_database_response")}
- if(result?.read!==payload.total||result?.snapshot!==payload.year+"-KW"+String(payload.week).padStart(2,"0"))
+ if(result?.read!==payload.total||result?.rankings_imported!==payload.rankingTotal||
+    result?.snapshot!==payload.year+"-KW"+String(payload.week).padStart(2,"0"))
    return error(502,"database_confirmation_mismatch");
  return Response.json({ok:true,snapshot:result.snapshot,count:result.read,
-   updated:result.players_upserted,clubs:result.clubs_inserted},
+   updated:result.players_upserted,clubs:result.clubs_inserted,
+   rankingCount:result.rankings_imported},
    {headers:{"Cache-Control":"no-store"}});
 });

@@ -23,7 +23,11 @@ test.beforeEach(async({page})=>{
    }:id===SECOND?{DE:{ageClass:"U13",birthYear:2014,points:611,tournaments:2,ageClassRank:469,bwAgeClassRank:60}}:id===SARAH?{DE:{ageClass:"U17",birthYear:2010,points:61077,tournaments:13,ageClassRank:null,bwAgeClassRank:null,nationalYouthOverallRank:42},DD:{ageClass:"U17",birthYear:2010,points:67117,tournaments:11,ageClassRank:null,bwAgeClassRank:null,nationalYouthOverallRank:68},DM:{ageClass:"U17",birthYear:2010,points:44521,tournaments:11,ageClassRank:null,bwAgeClassRank:null,nationalYouthOverallRank:77}}:null;
    return route.fulfill({status:200,contentType:"application/json",headers,body:JSON.stringify(disciplines
     ?{player_dbv_id:id,status:"available",current:{year:2026,week:id===SARAH?42:41,url:"https://turniere.badminton.de/ranking"},disciplines}
-    :{player_dbv_id:id,status:"no_verified_ranking"})});
+    :id==="05-555555"
+     ?{player_dbv_id:id,status:"no_verified_ranking",
+       reason:"not_listed_in_latest_official_export",
+       current:{year:2026,week:42,url:"https://turniere.badminton.de/ranking"}}
+     :{player_dbv_id:id,status:"no_verified_ranking"})});
   }
   if(url.pathname.endsWith("/rpc/search_dbv_player_identity"))
    return route.fulfill({status:200,contentType:"application/json",headers,
@@ -97,4 +101,14 @@ test("v144: followed Sarah shows verified Jugend overall ranks without invented 
  await expect(page.locator("#ranking-detail-content")).toContainText("BW-U17-Platz");
  const width=await page.evaluate(()=>document.documentElement.scrollWidth);
  expect(width).toBeLessThanOrEqual(322);
+});
+
+test("complete current DBV snapshot never labels last played week as current ranking",async({page})=>{
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>window.renderDashboard("05-555555",
+  [{id:"05-555555",name:"Synthetischer Testspieler",birthYear:2012}],[],{}));
+ await expect(page.locator("#dashboard-week")).toHaveText("KW 42 / 2026");
+ await expect(page.locator("#dashboard-rankings")).toContainText("nicht gelistet");
+ await expect(page.locator("#dashboard-rankings .ranking-tile")).toHaveCount(0);
+ await expect(page.locator("#dashboard-rankings")).not.toContainText("KW 39");
 });
