@@ -1,6 +1,8 @@
 name: Badminton Importbestand lesen
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '43 6 * * 1' # wöchentlich, kein Import, nur bounded read-only inventory
   push:
     branches: [main]
     paths:
@@ -19,8 +21,12 @@ jobs:
           node-version: '22'
       - name: Auditlogik ohne Netzwerk testen
         run: node scripts/import-coverage-audit.test.mjs
-      # On PRs/pushes the audit logic runs exclusively against local test fixtures.
-      # A live inventory requires a deliberate manual dispatch.
+      # Pull/push checks use synthetic fixtures only; never query production in CI.
+      # The scheduled live audit is narrow, read-only, and prints aggregate counts only.
+      - name: Wöchentliche anonyme Quellabdeckung (nur lesen)
+        if: github.event_name == 'schedule'
+        run: node scripts/import-coverage-audit.mjs --live --aggregate-only
+      # Manual detailed live inventory remains explicitly opt-in.
       - name: Supabase-Datenbestand ausschließlich lesen
         if: github.event_name == 'workflow_dispatch'
         env:
