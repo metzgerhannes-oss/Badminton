@@ -2,6 +2,7 @@ import {stageFreshResults} from "./p0-stage-results-oidc.mjs";
 /* One-time P0 source inventory. Does not change the DB or publish names/results.
  * Inspect the 13 agreed club profiles in a reproducible browser-like runner. */
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
+import {parseTournamentPlayerView} from "./badhub-tournament-view-parser.mjs";
 const people=[
  ["05-067838","Amélie Zhu"],["05-070637","Anneliese Zhu"],["05-069897","Benjamin Belser"],
  ["05-071969","Charlotte Metzger"],["05-061414","Julian Mikitisin"],["05-061352","Kian Tiegs"],
@@ -34,6 +35,35 @@ function contradictions(rows){
  }
  return {bad,rest:rows.filter(x=>!bad.has([x.competition_id,x.event].join("|")))};
 }
+// Curated public tournament-result pages for the known profile-history gaps.
+// Profile names already reside in "people"; no page HTML is persisted.
+// These are match sources, NOT a claim of complete career history.
+// The two other verified tournaments have already been individually recorded.
+// Their legacy source keys differ from the tournament parser's generated keys;
+// re-importing would duplicate genuine games. Explicitly include ONLY the
+// currently missing source until cross-key match-identity deduplication is live.
+const sourceFallbacks=[
+ {tournamentId:4185,profileIndex:2,expectedMinimum:5}
+];
+async function getTournamentView({tournamentId,profileIndex}){
+ const player=people[profileIndex],url="https://badhub.de/bwbv/turnier.php?id="+
+   tournamentId+"&player="+encodeURIComponent(player[0]);
+ const ctl=new AbortController(),timeout=setTimeout(()=>ctl.abort(),13000);
+ try{
+  const res=await fetch(url,{redirect:"error",signal:ctl.signal,headers:{Accept:"text/html"}});
+  if(!res.ok||!(res.headers.get("content-type")||"").includes("text/html"))
+   return {status:res.status,items:[],error:"unavailable"};
+  if(Number(res.headers.get("content-length")||0)>950000)
+   return {status:res.status,items:[],error:"oversized"};
+  const body=await res.text();
+  if(body.length>950000)return {status:res.status,items:[],error:"oversized"};
+  const parsed=parseTournamentPlayerView(body,{dbv_id:player[0],name:player[1]},{tournamentId});
+  return {status:res.status,items:parsed.items,cardCount:parsed.cards_seen,
+   excluded:Object.values(parsed.rejection_reasons).reduce((a,b)=>a+b,0)};
+ }catch(e){return {status:"unavailable",items:[],error:"fetch_or_parse"}}
+ finally{clearTimeout(timeout)}
+}
+
 let done=0,sourceOK=0,sourceGone=0,count=0,eligible=0,containsTarget=0;
 const staged=[];
 const results=await Promise.all(people.map(async ([id,name],index)=>{
@@ -57,6 +87,23 @@ const results=await Promise.all(people.map(async ([id,name],index)=>{
  done++;
  return {profile:index+1,results:check};
 }));
+// Source fallback fetches are bounded and performed only during explicit
+// source-fallback runs (not all daily scans or normal CI).
+const fallbackChecks=[];
+if(process.argv.includes("--source-fallback")){
+ for(const entry of sourceFallbacks){
+  const r=await getTournamentView(entry);
+  const success=r.status===200&&r.items.length>=entry.expectedMinimum;
+  if(success)staged.push(...r.items);
+  fallbackChecks.push({tournament:entry.tournamentId,ok:success,
+   found:r.items.length,required:entry.expectedMinimum,
+   rejected:r.excluded||0,status:r.status});
+ }
+ console.log("FRESH_TOURNAMENT_FALLBACK "+JSON.stringify({checked:fallbackChecks.length,
+  passed:fallbackChecks.filter(x=>x.ok).length,
+  match_facts:fallbackChecks.reduce((a,x)=>a+x.found,0),
+  failed:fallbackChecks.filter(x=>!x.ok).map(x=>x.tournament)}));
+}
 console.log("FRESH_SOURCE_AUDIT "+JSON.stringify({profiles:done,sources_ok:sourceOK,sources_unavailable:sourceGone,
  candidate_cards:count,noncontradictory_cards:eligible,target_opponent_match_cards:containsTarget}));
 for(const result of results)console.log("FRESH_PROFILE "+JSON.stringify(result));
@@ -65,6 +112,8 @@ if(process.argv.includes("--stage")){
  const seen=new Set(),unique=[];
  for(const row of staged){const key=row.dbv_id+"|"+row.source_key;if(seen.has(key))continue;seen.add(key);unique.push(row)}
  if(sourceOK<24||sourceGone>2||unique.length<1700)throw Error("Source completeness regression – no automatic import");
+ if(process.argv.includes("--source-fallback")&&fallbackChecks.some(x=>!x.ok))
+  throw Error("Tournament source fallback completeness failed – no automatic import");
  // Two known gaps (Charlotte profile unavailable; Benjamin has no source
  // matchcards) remain visible as warnings until original records are found.
  if(results[3]?.results.some(x=>x.status!==200))

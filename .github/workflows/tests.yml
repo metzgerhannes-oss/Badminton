@@ -62,6 +62,7 @@ jobs:
           node --check career-history.js
           node --check external-matches.js
           node --check scripts/badhub-history-parser.mjs
+          node --check scripts/badhub-tournament-view-parser.mjs
           node --check scripts/badminton-score-rules.mjs
           node --check scripts/nonplayed-rounds.mjs
           node --check follow-import.js
@@ -129,6 +130,7 @@ jobs:
           node tests/friend-search.mjs
           node tests/external-history.mjs
           node tests/external-match-parser.mjs
+          node tests/badhub-tournament-view-parser.mjs
           node tests/badminton-score-rules.mjs
           node tests/nonplayed-rounds.mjs
           node tests/queued-match-worker.mjs

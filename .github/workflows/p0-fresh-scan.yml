@@ -24,10 +24,15 @@ jobs:
       - name: Verify source and OIDC client syntax
         run: |
           node --check scripts/p0-fresh-source-scan.mjs
+          node --check scripts/badhub-tournament-view-parser.mjs
+          node tests/badhub-tournament-view-parser.mjs
           node --check scripts/p0-stage-results-oidc.mjs
       - name: Read the 13 original public match sources without database writes
         if: github.ref != 'refs/heads/main'
         run: node scripts/p0-fresh-source-scan.mjs
-      - name: Incrementally reconcile 13 club match sources with authenticated OIDC and coverage validation
-        if: github.ref == 'refs/heads/main'
+      - name: Incrementally reconcile regular verified club sources via OIDC
+        if: github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch'
         run: node scripts/p0-fresh-source-scan.mjs --stage
+      - name: Explicit P0 source fallback (manual dispatch only, bounded)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+        run: node scripts/p0-fresh-source-scan.mjs --stage --source-fallback
