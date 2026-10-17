@@ -105,7 +105,7 @@ export function makeReport(historyRows,jobRows,factRows,{now=Date.now()}={}){
   excluded:items.reduce((a,x)=>a+x.excluded,0),
   grouped,items};
 }
-export function printReport(report,limits,issues=35){
+export function printReport(report,limits,issues=35,{aggregateOnly=false}={}){
  const lines=[
   "# Badminton: tatsächliche Importabdeckung",
   "Stand (UTC): "+report.timestamp,
@@ -128,6 +128,16 @@ export function printReport(report,limits,issues=35){
   "batch_backlog","not_started","loading_delayed","queued_delayed",
   "no_countable_proofs","status_behind_facts","sources_excluded","import_not_finished",
   "in_progress","not_proven_complete","facts_without_queue"];
+ if(aggregateOnly){
+  // Scheduled reports must never publish player IDs, names or source URLs.
+  lines.splice(lines.indexOf("## Priorisierte Prüfungen"));
+  lines.push("","Automatische Wochenprüfung: ausschließlich aggregierte Zahlen. "+
+    "Eine vollständige Spielerhistorie lässt sich aus Importstatus und Kartenzahl nicht ableiten.");
+  const truncated=Object.entries(limits).filter(([,v])=>v).map(([name])=>name);
+  if(truncated.length)lines.push("Stichprobe gekappt: "+truncated.join(", ")+
+    "; Summen sind Untergrenzen.");
+  return lines.join("\n")+"\n";
+ }
  const sorted=[...report.items].sort((a,b)=>
   priority.indexOf(a.finding)-priority.indexOf(b.finding)||a.dbv_id.localeCompare(b.dbv_id));
  for(const x of sorted.slice(0,issues)){
@@ -153,10 +163,12 @@ async function main(){
   readTable("player_external_match_facts",SOURCE_FIELDS,MAX_FACTS)
  ]);
  const report=makeReport(h.rows,j.rows,f.rows);
- const md=printReport(report,{history:h.truncated,imports:j.truncated,facts:f.truncated});
+ const aggregateOnly=process.argv.includes("--aggregate-only");
+ const md=printReport(report,{history:h.truncated,imports:j.truncated,facts:f.truncated},
+  35,{aggregateOnly});
  console.log(md);
  if(process.env.GITHUB_STEP_SUMMARY)await writeFile(process.env.GITHUB_STEP_SUMMARY,md,{flag:"a"});
- if(process.env.AUDIT_OUTPUT)await writeFile(process.env.AUDIT_OUTPUT,
+ if(process.env.AUDIT_OUTPUT && !aggregateOnly)await writeFile(process.env.AUDIT_OUTPUT,
   JSON.stringify({report,limits:{history:h.truncated,imports:j.truncated,facts:f.truncated}},null,2)+"\n");
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
