@@ -1,0 +1,61 @@
+/* U6 · v168: reusable visual rhythm for the existing Schmetterlinge views.
+   Deliberately presentation-only. The mobile pale-blue app and the existing
+   dark-navy desktop workspace keep their approved identities. */
+:root{
+ --ux-card-radius:16px;
+ --ux-control-radius:12px;
+ --ux-card-border:#bfdbea;
+ --ux-card-shadow:0 5px 16px #17497312;
+ --ux-heading:#0c355c;
+ --ux-label:#355d7b;
+}
+@media(max-width:1079px){
+ /* Repeated secondary-page headings now follow the same hierarchy. */
+ .app .page:not(#view-start)>.section-heading{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;
+  margin:8px 0 12px;min-width:0;
+ }
+ .app .page:not(#view-start)>.section-heading>:is(h2,h3){
+  font-size:clamp(18px,4.7vw,22px);
+  letter-spacing:-.025em;line-height:1.25;
+  color:var(--ux-heading);margin:0;min-width:0;overflow-wrap:anywhere;
+ }
+ .app .page>.section-heading>.subtle-button{
+  margin-left:auto;
+ }
+ /* Same card edge, depth and corner treatment across data/list pages. */
+ .app .page :is(.settings-card,.report-card,.library-club-group,.dbv-calendar-panel){
+  border-radius:var(--ux-card-radius);
+  box-shadow:var(--ux-card-shadow);
+ }
+ .app .page :is(.report-card,.library-club-group,.dbv-calendar-panel){
+  border-color:var(--ux-card-border);
+ }
+ /* Keep touch areas spacious without enlarging the compact dashboard tiles. */
+ .app .page :is(.subtle-button,.outline-button,.primary-button){
+  min-height:44px;
+  border-radius:var(--ux-control-radius);
+  line-height:1.3;
+ }
+ .app .page :is(.library-filters,.report-filters) label{
+  color:var(--ux-label);font-weight:750;line-height:1.4;
+ }
+ .app .page :is(.library-filters,.report-filters) :is(input,select){
+  border-radius:var(--ux-control-radius);
+  min-width:0;
+ }
+ /* Notes and real empty states share spacing, but keep their status colors. */
+ .app .page :is(.library-message,.report-empty,.dbv-calendar-no-results){
+  border-radius:var(--ux-control-radius);
+  line-height:1.55;
+ }
+ .app .page :is(.library-data-note,.dbv-calendar-source,.report-source-status){
+  line-height:1.5;overflow-wrap:anywhere;
+ }
+}
+@media(max-width:350px){
+ .app .page:not(#view-start)>.section-heading>:is(h2,h3){font-size:18px}
+ .app .page:not(#view-start)>.section-heading{gap:7px}
+}
+/* A visible keyboard outline and iOS pinch-zoom remain controlled by the
+   established accessibility and mobile-input layers; no gesture interception. */
