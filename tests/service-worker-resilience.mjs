@@ -135,8 +135,8 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  const sw=harness();
  await sw.lifecycle("install");
  const html=await readFile("index.html","utf8");
- const required=[...html.matchAll(/<link\\s+rel="stylesheet"\\s+href="(\\.\\/[^"]+)"/g),
-   ...html.matchAll(/<script\\b[^>]*\\bsrc="(\\.\\/[^"]+)"/g)].map(x=>x[1]);
+ const required=[...html.matchAll(/<link\s+rel="stylesheet"\s+href="(\.\/[^"]+)"/g),
+   ...html.matchAll(/<script\b[^>]*\bsrc="(\.\/[^"]+)"/g)].map(x=>x[1]);
  for(const path of required)assert.ok(sw.accepted.includes(path),"Missing offline boot asset: "+path);
  assert.ok(!sw.accepted.includes("./wiki.js"),"Wiki loads on demand, not on every install");
  assert.ok(!sw.accepted.includes("./data/history.json"),"Public data indexes should not be precached");
@@ -148,7 +148,7 @@ for(const path of ["welcome.html?invite=secret","private-player.html?code=secret
  assert.equal((await sw.fetchResult(makeReq(path))).status,200);
  assert.equal(sw.cacheWrites.length,0,"Unexpected cached request: "+path);
 }
-assert.doesNotMatch(source,/\\blocalStorage\\b|\\bindexedDB\\b/,
+assert.doesNotMatch(source,/\blocalStorage\b|\bindexedDB\b/,
  "PWA updates must not touch profile storage");
 {
  const sw=harness({failOptional:true});
