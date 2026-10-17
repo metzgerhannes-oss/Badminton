@@ -31,7 +31,10 @@ test("mobile controls are >=16px; navigation taps do not invoke double-tap zoom"
 });
 test("search and modal entry remain readable on narrow iPhone and keyboard focus",async({page})=>{
  await page.setViewportSize({width:320,height:700});
- await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ // Real user route: tap + at friends to reveal the (normally collapsed) search.
+ await page.locator("#dashboard-add-friend").click();
+ await expect(page.locator("#player-discover")).toBeVisible();
  const search=page.locator("#library-search");
  await expect(search).toBeVisible();
  await search.focus();
