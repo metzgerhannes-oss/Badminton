@@ -26,7 +26,7 @@ test("checking uses original club logo and animated shuttle without visible text
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
  await page.setViewportSize({width:320,height:640});
- await page.goto("/",{waitUntil:"domcontentloaded"});
+ await page.goto("/",{waitUntil:"commit"});
  await expect(page.locator("#app-access-splash")).toBeVisible();
  await expect(page.locator(".app-access-panel")).toBeHidden();
  await expect(page.locator("body > .app")).toBeHidden();
@@ -72,7 +72,7 @@ test("reduced motion keeps the shuttle static while a session is being checked",
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
  await page.setViewportSize({width:390,height:844});
- await page.goto("/",{waitUntil:"domcontentloaded"});
+ await page.goto("/",{waitUntil:"commit"});
  await expect(page.locator("#app-access-splash")).toBeVisible();
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","none");
  await expect.poll(()=>Boolean(resolveCheck)).toBe(true);
