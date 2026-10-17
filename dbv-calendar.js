@@ -170,12 +170,18 @@ function render(){
  const mastersVisible=settings.age==="U11"&&settings.region!=="all"&&
    selected.groups.some(group=>group.items.some(isNationalU11Masters));
  const unavailable=source==="offline",snapshotOnly=source==="snapshot";
- message((unavailable?"Aktuelle DBV-Kalenderquelle nicht erreichbar"+(sourcedCount?" · nur separat belegte Termine / Ergebnisse":" · keine aktuellen DBV-Ergebnisse")+
-   ". Bitte später erneut aktualisieren.":snapshotOnly?"Gespeicherter offizieller DBV-Stand · "+hits+" passende Turniere"+(plansCount?" / Termine":""):
-   hits+" passende Turniere"+(plansCount?" / Termine":"")+
-  (sourcedCount?" · "+sourcedCount+" zusätzlich aus offiziellen Quellen":"")+
+ const details=(sourcedCount?" · "+sourcedCount+" zusätzlich aus offiziellen Quellen":"")+
   (selected.total?" · "+selected.total+" DBV":"")+
-  (mastersVisible?" · inkl. German Masters U11 (DBV, bundesweit)":"")+warning);
+  (mastersVisible?" · inkl. German Masters U11 (DBV, bundesweit)":"")+warning;
+ if(unavailable){
+  message("Aktuelle DBV-Kalenderquelle nicht erreichbar"+
+   (sourcedCount?" · nur separat belegte Termine und Ergebnisse":" · keine aktuellen DBV-Ergebnisse")+
+   ". Bitte später erneut aktualisieren.","offline");
+ }else{
+  message((snapshotOnly?"Gespeicherter offizieller DBV-Stand · ":"")+
+   hits+" passende Turniere"+(plansCount?" / Termine":"")+details,
+   snapshotOnly?"limited":hits?"ready":"empty");
+ }
  if(!selected.total){
   const more=$("dbv-calendar-more");if(more)more.hidden=true;
   if(sourcedCount){
