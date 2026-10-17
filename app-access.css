@@ -26,34 +26,48 @@ html[data-app-access="checking"] #app-access-gate {
  background:radial-gradient(circle at 50% 38%,#1b4d76 0,#112f54 45%,#091e3b 100%);
 }
 html[data-app-access="checking"] .app-access-panel {display:none!important}
-html:not([data-app-access="checking"]) #app-access-splash {display:none!important}
+html:not([data-app-access="checking"]) /* v170: transparent club artwork and a detailed, aerodynamic feather shuttle.
+   No new runtime library, no extra Auth/data calls, no interaction overlay. */
 #app-access-splash {
- width:100%; max-width:340px; min-height:240px;
+ width:100%; max-width:360px; min-height:265px;
  display:grid; place-items:center; color:#f0f7ff;
 }
 .app-access-splash-art {
- position:relative; width:min(62vw,230px); height:min(62vw,230px);
+ position:relative; width:min(70vw,260px); height:min(70vw,260px);
  display:grid; place-items:center;
 }
 .app-access-splash-emblem {
- width:80%; aspect-ratio:1; border-radius:50%;
- display:grid; place-items:center; background:#e9f5ff;
- border:1px solid #9fbedc; box-shadow:0 12px 42px #06172e75,0 0 0 9px #ffffff0d;
+ width:84%; aspect-ratio:1; border-radius:50%; overflow:hidden; isolation:isolate;
+ display:grid; place-items:center;
+ background:#dceefa; border:1px solid #96b9d7;
+ box-shadow:0 13px 44px #06172e66,0 0 0 9px #ffffff08;
 }
-.app-access-splash-emblem img {width:88%;height:88%;object-fit:contain}
+.app-access-splash-emblem img {
+ display:block; width:98%; height:98%; object-fit:contain; border:0;
+ /* Safe fallback if an older iOS WebKit fails to apply the SVG's alpha filter:
+    the white photographic matte multiplies into the pale round badge, never a square. */
+ mix-blend-mode:multiply;
+}
 .app-access-shuttle {
- position:absolute; width:52px; height:52px; right:-5%; bottom:2%;
- filter:drop-shadow(0 4px 5px #09162d90);
- animation:app-access-shuttle-flight 2.6s ease-in-out infinite;
+ position:absolute; width:69px; height:auto; aspect-ratio:96/118;
+ right:-8%; bottom:-6%; pointer-events:none; user-select:none;
+ filter:drop-shadow(0 7px 5px #061d3890);
+ transform-origin:52% 83%;
+ animation:app-access-shuttle-flight 3.4s ease-in-out infinite;
 }
 @keyframes app-access-shuttle-flight {
- 0%,100% {transform:translate(-7px,4px) rotate(-14deg)}
- 50% {transform:translate(4px,-14px) rotate(8deg)}
+ 0%,100% {transform:translate(7px,7px) rotate(13deg) scale(.97)}
+ 25% {transform:translate(-7px,-17px) rotate(-4deg) scale(1)}
+ 51% {transform:translate(-19px,-29px) rotate(-13deg) scale(1.04)}
+ 78% {transform:translate(-5px,-10px) rotate(1deg) scale(1)}
+}
+@media (max-width:350px) {
+ .app-access-shuttle {width:61px;right:-5%;bottom:-5%}
 }
 .app-access-visually-hidden {
  position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;
  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
 }
 @media (prefers-reduced-motion:reduce) {
- .app-access-shuttle {animation:none;transform:translate(-7px,4px) rotate(-14deg)}
+ .app-access-shuttle {animation:none;transform:translate(7px,7px) rotate(13deg) scale(.97)}
 }
