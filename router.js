@@ -1,7 +1,51 @@
 "use strict";
 /** Single route/controller for the existing 4 destinations plus history and settings. */
 var SchmetterlingeRouter=(function(){
+// Only in-memory navigation positions; never read/write profile storage or backend data.
+let currentHash=location.hash||"#start";
+let returningByHistory=false;
+const scrollPositions=new Map();
+const dialogOpeners=new WeakMap();
+function rememberScroll(){
+ scrollPositions.set(currentHash,Math.max(0,window.scrollY||0));
+}
+window.addEventListener("scroll",rememberScroll,{passive:true});
+window.addEventListener("popstate",()=>{returningByHistory=true});
+// Save the departing screen before browser anchor navigation changes the hash.
+document.addEventListener("click",event=>{
+ if(event.target.closest?.('a[href^="#"]'))rememberScroll();
+},true);
+function finishNavigation(){
+ const target=location.hash||"#start";
+ const position=returningByHistory?scrollPositions.get(target)||0:0;
+ currentHash=target;
+ returningByHistory=false;
+ // Let the target view render and the on-screen keyboard/focus settle.
+ requestAnimationFrame(()=>window.scrollTo({top:position,behavior:"auto"}));
+}
+function openDialog(dialog){
+ if(!dialog)return;
+ const opener=document.activeElement;
+ if(opener instanceof HTMLElement&&!dialog.contains(opener))dialogOpeners.set(dialog,opener);
+ if(!dialog.dataset.focusReturnWired){
+  dialog.dataset.focusReturnWired="true";
+  dialog.addEventListener("close",()=>{
+   const previous=dialogOpeners.get(dialog);
+   dialogOpeners.delete(dialog);
+   if(document.querySelector("dialog[open]"))return;
+   // Browser focus restoration generally works; repair Safari where it does not.
+   if(document.activeElement!==document.body&&document.activeElement!==document.documentElement)return;
+   if(previous?.isConnected&&previous.getClientRects().length){
+    previous.focus({preventScroll:true});return;
+   }
+   const fallback=document.querySelector(".page.active h1, .page.active h2");
+   if(fallback){fallback.setAttribute("tabindex","-1");fallback.focus({preventScroll:true});}
+  });
+ }
+ dialog.showModal();
+}
 function routeTo(state,page,render){
+ rememberScroll();
  state.page=page;
  if(location.hash!=="#"+page)location.hash="#"+page;
  else{render();focusCurrentView(state);}
@@ -17,7 +61,7 @@ function focusCurrentView(state){
   heading.setAttribute("tabindex","-1");
   heading.focus({preventScroll:true});
  }
- window.scrollTo({top:0,behavior:"auto"});
+ finishNavigation();
 }
 
  function renderPage(state){
@@ -40,5 +84,5 @@ function focusCurrentView(state){
   else settingsLink.removeAttribute("aria-current");
  }
  }
- return Object.freeze({routeTo,focusCurrentView,renderPage});
+ return Object.freeze({routeTo,focusCurrentView,renderPage,openDialog});
 })();
