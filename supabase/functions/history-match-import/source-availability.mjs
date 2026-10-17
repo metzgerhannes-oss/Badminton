@@ -16,3 +16,12 @@ export function importStatusForBatch(finished,excluded,missing){
  return finished&&excluded===0&&Array.isArray(missing)&&missing.length===0
   ?"complete":"partial";
 }
+
+/** A refresh of a previously evidenced player with zero NEW cards must not
+ * reclassify recorded results as never having had a match source.
+ * Pure classifier: the caller must query one actual persisted fact (not an
+ * import cursor/count, which can be stale) before using this result.
+ */
+export function missingSourceStatus(hasStoredMatchFact){
+ return hasStoredMatchFact===true?"partial":"awaiting_source";
+}
