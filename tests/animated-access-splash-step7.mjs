@@ -10,7 +10,7 @@ assert.match(html,/id="app-access-splash"[^>]+role="status"/);
 assert.match(html,/class="app-access-visually-hidden">Zugang wird geprüft\.<\/span>/);
 assert.match(html,/id="app-access-splash"[\s\S]*?assets\/spvgg-schmetterlinge-splash\.svg/);
 assert.match(html,/class="app-access-shuttle"[^>]+src="\.\/assets\/shuttlecock-splash\.svg"/);
-assert.match(html,/class="brand"[^>]+assets\/spvgg-schmetterlinge\.svg/);
+assert.match(html,/class="brand"[\s\S]*?src="\.\/assets\/spvgg-schmetterlinge\.svg"/);
 assert.match(html,/<p id="app-access-status" role="status" aria-live="polite"><\/p>/);
 assert.match(css,/html\[data-app-access="checking"\] \.app-access-panel \{display:none!important\}/);
 assert.match(css,/html:not\(\[data-app-access="checking"\]\) #app-access-splash \{display:none!important\}/);
@@ -28,9 +28,9 @@ assert.match(js,/if\(permission==="player"\)\{grant\(\{member:false\}\);return;\
 assert.doesNotMatch(css,/display:none!important;\s*$/m); // no accidental blanket hiding of errors
 assert.match(sw,/schmetterlinge-shell-v170/);
 assert.match(sw,/\.\/app-access\.css/);
-assert.match(release,/version:"v169"/);
-assert.match(welcome,/v169/);
-assert.match(html,/v169/);
+assert.match(release,/version:"v170"/);
+assert.match(welcome,/v170/);
+assert.match(html,/v170/);
 assert.doesNotMatch(html,/user-scalable=no|maximum-scale=1/);
 const embedded=svg=>svg.match(/data:image\/webp;base64,([^"]+)/)?.[1];
 assert.ok(embedded(club),"Original image is embedded WebP");
