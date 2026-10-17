@@ -1,5 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,importStatusForBatch} from "./source-availability.mjs";
+import {assessSourceAvailability,importStatusForBatch,missingSourceStatus} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
@@ -45,6 +45,23 @@ async function update(id:string,fields:Record<string,unknown>){
   method:"PATCH",headers:{Prefer:"return=minimal"},
   body:JSON.stringify({...fields,updated_at:new Date().toISOString()})
  });
+}
+// Read at most one individually sourced persisted match (not the import counter):
+// a profile page going empty must never erase the existence of actual results.
+async function hasStoredMatchFact(id:string):Promise<boolean>{
+ const facts=await api("player_external_match_facts?select=source_key&dbv_id=eq."+
+  encodeURIComponent(id)+"&limit=1");
+ if(!Array.isArray(facts))throw Error("Unexpected source fact read");
+ return facts.length>0;
+}
+async function updateNoNewSource(id:string,detail:string){
+ const saved=await hasStoredMatchFact(id);
+ await update(id,{status:missingSourceStatus(saved),lease_until:null,
+  last_finished_at:new Date().toISOString(),
+  detail:saved
+   ?"Vorhandene Einzelmatchbelege sind gespeichert; "+detail
+   :detail});
+ return saved;
 }
 async function source(id:string,category:string,signal:AbortSignal){
  const url="https://badhub.de/spieler/"+id+"?src="+category+"&saison=all";
@@ -105,10 +122,9 @@ Deno.serve(async req=>{
   // Do not claim complete if only tournament OR league was reachable.
   const sources=assessSourceAvailability(outcomes);
   if(sources.available.length===0){
-   await update(id,{status:"awaiting_source",lease_until:null,
-    last_finished_at:new Date().toISOString(),
-    detail:"Badhub-Turnier- und Ligaquellen derzeit nicht erreichbar; erneute Prüfung vorgesehen"});
-   return respond(200,{queued:true,stored:0,eligible:0,
+   const saved=await updateNoNewSource(id,
+    "Badhub-Turnier- und Ligaquellen derzeit nicht erreichbar; erneute Prüfung vorgesehen");
+   return respond(200,{queued:true,stored:0,eligible:0,existing_proof:saved,
     reason:"source_temporarily_unavailable"},origin);
   }
   const parsed=sources.available.map(({category,html})=>
@@ -125,12 +141,10 @@ Deno.serve(async req=>{
    ||a.source_key.localeCompare(b.source_key));
   const cardCount=parsed.reduce((n,result)=>n+result.cards_seen,0);
   if(cardCount===0){
-   await update(id,{status:"awaiting_source",lease_until:null,
-    last_finished_at:new Date().toISOString(),
-    detail:sources.missing.length
-     ?"Nur ein Teil der Badhub-Quellen war erreichbar; bisher keine belegten Einzelmatches."
-     :"In den erreichbaren Badhub-Quellen sind derzeit keine Einzelmatchkarten veröffentlicht."});
-   return respond(200,{queued:true,stored:0,eligible:0,
+   const saved=await updateNoNewSource(id,sources.missing.length
+    ?"Nur ein Teil der Badhub-Quellen war erreichbar; keine zusätzlichen Matchkarten gefunden."
+    :"In den erreichbaren allgemeinen Spielerquellen sind derzeit keine neuen Einzelmatchkarten veröffentlicht.");
+   return respond(200,{queued:true,stored:0,eligible:0,existing_proof:saved,
     reason:sources.missing.length?"partial_source_no_matches":"no_source_matches"},origin);
   }
   if(all.length<Math.floor(cardCount*0.55))
