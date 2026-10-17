@@ -376,7 +376,7 @@ function openTournamentForm(item=null){
  el("tournament-save").textContent=item?"Änderungen speichern":"Turnier speichern";
  if(el("tournament-share"))el("tournament-share").checked=Boolean(item&&window.badmintonCommunity?.isShared(item));
  if(el("community-save-status")){el("community-save-status").hidden=true;el("community-save-status").textContent="";}
- dialog.showModal();
+ SchmetterlingeRouter.openDialog(dialog);
 }
 function setup(){
  window.addEventListener("badminton:community-feedback",event=>{
@@ -432,7 +432,7 @@ function setup(){
   playerForm.elements.namedItem("birthYear").value=p?.birthYear||"";
   playerForm.elements.namedItem("club").value=p?.club||"";
   playerForm.elements.namedItem("url").value=p?.url||"";
-  playerDialog.showModal();
+  SchmetterlingeRouter.openDialog(playerDialog);
  }
  window.openPlayerForm=openPlayerForm;
  el("add-player").addEventListener("click",()=>openPlayerForm());
@@ -473,7 +473,7 @@ function setup(){
   friendForm.elements.namedItem("birthYear").value=p?.birthYear||"";
   friendForm.elements.namedItem("club").value=p?.club||"";
   friendForm.elements.namedItem("url").value=p?.url||"";
-  friendDialog.showModal();
+  SchmetterlingeRouter.openDialog(friendDialog);
  }
  window.openFriendForm=openFriendForm;
  el("dashboard-add-friend")?.addEventListener("click",event=>{event.preventDefault();showPlayerDiscover(true)});
@@ -551,9 +551,9 @@ function setup(){
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
   });
-  if(window.badmintonAppAccess?.allowed)welcome.showModal();
+  if(window.badmintonAppAccess?.allowed)SchmetterlingeRouter.openDialog(welcome);
   else window.addEventListener("badminton:app-access-granted",()=>{
-   if(!state.players.length&&!state.friends.length&&!welcome.open)welcome.showModal();
+   if(!state.players.length&&!state.friends.length&&!welcome.open)SchmetterlingeRouter.openDialog(welcome);
   },{once:true});
  }
  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
