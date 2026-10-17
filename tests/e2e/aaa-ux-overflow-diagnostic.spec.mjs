@@ -1,5 +1,11 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 test("diagnose narrow WebKit overflow without exposing personal data",async({page})=>{
+ await page.addInitScript(()=>{
+  if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"UI Testprofil"}],friends:[],officialLinks:[],
+   activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true
+  }));
+ });
  await page.setViewportSize({width:320,height:720});
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#view-turniere")).toBeVisible();
