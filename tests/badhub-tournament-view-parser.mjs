@@ -3,7 +3,7 @@ import {parseTournamentPlayerView} from "../scripts/badhub-tournament-view-parse
 import {computeExternalStats} from "../scripts/external-match-stats.mjs";
 
 // Synthetic fixture: never embed minors' source pages or personal results in CI.
-const player={dbv_id:"05-000001",name:"Demo Spieler"};
+const player={id:"05-000001",dbv_id:"05-000001",name:"Demo Spieler"};
 const other1={id:"05-000002",name:"Gegner Eins"};
 const other2={id:"05-000003",name:"Gegner Zwei"};
 const partner={id:"05-000004",name:"Demo Partner"};
@@ -57,7 +57,7 @@ assert.equal(parseTournamentPlayerView(wrongWin,player,{tournamentId:4185}).item
 const doubleCard=html+section("JE U13","Finale",card([player],[other1],[[15,9],[15,11]],1));
 assert.equal(parseTournamentPlayerView(doubleCard,player,{tournamentId:4185}).items.length,4,
  "Multiple cards with identical source identity must not be counted");
-const bye=html.replace('<span class="set-score">15:9</span><span class="set-score">15:11</span>',
+const bye=html.replace(/<span class="set-score">15:9<\/span>\s*<span class="set-score">15:11<\/span>/,
  "BYE");
 assert.equal(parseTournamentPlayerView(bye,player,{tournamentId:4185}).items.length,4);
 assert.throws(()=>parseTournamentPlayerView(html.slice(0,100),player,{tournamentId:4185}));
