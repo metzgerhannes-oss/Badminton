@@ -1,0 +1,32 @@
+name: One-time generate official iOS PNG icons
+on:
+  push:
+    branches: [feat/ios-integration-step2]
+    paths:
+      - scripts/generate-ios-icons.py
+      - .github/workflows/ios-icon-build-once.yml
+permissions:
+  contents: write
+jobs:
+  icons:
+    if: github.repository == 'metzgerhannes-oss/Badminton'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install temporary image build dependency
+        run: python -m pip install --disable-pip-version-check --no-cache-dir Pillow==11.3.0
+      - name: Render PNG icons from existing official embedded image
+        run: python scripts/generate-ios-icons.py
+      - name: Commit generated binary icons only on feature branch
+        run: |
+          git add assets/schmetterlinge-apple-touch-icon-180.png assets/schmetterlinge-pwa-192.png assets/schmetterlinge-pwa-512.png
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "assets(ios): generate official crest icons [skip ci]"
+          git push origin HEAD:feat/ios-integration-step2
