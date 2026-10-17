@@ -45,6 +45,8 @@ import {getPrivateSession} from "./private-invites.js";
    return !term||[a.title,a.summary,a.report_sources?.name].join(" ").toLocaleLowerCase("de").includes(term);
   });
   if(count)count.textContent=matches.length+" "+(matches.length===1?"Bericht":"Berichte");
+  box.dataset.state=matches.length?"ready":"empty";
+  box.setAttribute("aria-busy","false");
   if(!matches.length){
    let message="Für diese Filter gibt es noch keine belegten Artikel.";
    if(mode==="mentions"&&!validId(profileId))message="Wähle ein Spielerprofil mit DBV-ID.";
@@ -99,7 +101,7 @@ import {getPrivateSession} from "./private-invites.js";
   const requested=profileId;
   busy=true;
   const button=$("report-refresh"),box=$("report-list");if(button)button.disabled=true;
-  if(box)box.innerHTML='<p class="report-empty">Berichte werden geladen …</p>';
+  if(box){box.dataset.state="loading";box.setAttribute("aria-busy","true");box.innerHTML='<p class="report-empty">Berichte werden geladen …</p>';}
   try{
    // Public registry lists source links only. Private player mentions are never
    // restored from public JSON or exposed through direct table reads.
@@ -112,7 +114,7 @@ import {getPrivateSession} from "./private-invites.js";
    renderSources();
    if(!catalog){
     loaded=false;
-    if(box)box.innerHTML='<p class="report-empty">Berichte sind nach bestätigter App- oder Spielerfreigabe sichtbar. Bitte öffne einen gültigen Einladungslink.</p>';
+    if(box){box.dataset.state="access";box.setAttribute("aria-busy","false");box.innerHTML='<p class="report-empty">Berichte sind nach bestätigter App- oder Spielerfreigabe sichtbar. Bitte öffne einen gültigen Einladungslink.</p>';}
     if($("report-count"))$("report-count").textContent="Berechtigung erforderlich";
     return;
    }
@@ -121,8 +123,12 @@ import {getPrivateSession} from "./private-invites.js";
    loadedFor=requested;loaded=true;render();
   }catch(error){
    loaded=false;
-   if(box)box.innerHTML='<p class="report-empty">Berichte konnten nicht geladen werden. Bitte erneut aktualisieren.</p>';
-   if($("report-count"))$("report-count").textContent="Quelle nicht erreichbar";
+   const offline=navigator.onLine===false;
+   if(box){box.dataset.state=offline?"offline":"error";box.setAttribute("aria-busy","false");
+    box.innerHTML='<p class="report-empty">'+(offline?
+      "Keine Internetverbindung. Vorhandene lokale Profile bleiben erhalten; Berichte können derzeit nicht abgerufen werden.":
+      "Berichtsquelle derzeit nicht erreichbar. Das bedeutet nicht, dass keine Berichte existieren. Bitte erneut aktualisieren.")+'</p>';}
+   if($("report-count"))$("report-count").textContent=offline?"Offline":"Quelle nicht erreichbar";
    console.warn("Badminton report directory:",error.message);
   }finally{
    busy=false;if(button)button.disabled=false;
