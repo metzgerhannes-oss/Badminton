@@ -6,6 +6,7 @@ const API="https://yadexibmjmnjfmfabrug.supabase.co";
 const headers={
  "Access-Control-Allow-Origin":"*",
  "Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer",
+ "Access-Control-Allow-Methods":"POST,OPTIONS",
  "Content-Type":"application/json"
 };
 async function withExistingSession(page){
@@ -20,6 +21,7 @@ test("checking uses original club logo and animated shuttle without visible text
  await withExistingSession(page);
  let allowResponse;
  await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
   await new Promise(resolve=>{allowResponse=resolve;});
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
@@ -49,7 +51,9 @@ test("checking uses original club logo and animated shuttle without visible text
 test("a failed status check shows the actionable error and does not trap the user in animation",async({page})=>{
  await withExistingSession(page);
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>
-  route.fulfill({status:503,headers,body:'{"message":"offline"}'}));
+  route.request().method()==="OPTIONS"
+   ?route.fulfill({status:204,headers,body:""})
+   :route.fulfill({status:503,headers,body:'{"message":"offline"}'}));
  await page.goto("/",{waitUntil:"domcontentloaded"});
  await expect(page.locator("html")).toHaveAttribute("data-app-access","denied");
  await expect(page.locator("#app-access-splash")).toBeHidden();
@@ -63,6 +67,7 @@ test("reduced motion keeps the shuttle static while a session is being checked",
  await withExistingSession(page);
  let resolveCheck;
  await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
   await new Promise(resolve=>{resolveCheck=resolve;});
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
