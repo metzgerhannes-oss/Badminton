@@ -433,9 +433,35 @@ function setup(){
   playerForm.elements.namedItem("club").value=p?.club||"";
   playerForm.elements.namedItem("url").value=p?.url||"";
   playerDialog.showModal();
+  window.dispatchEvent(new CustomEvent("badminton:own-profile-dialog",{detail:{editing:Boolean(p)}}));
  }
  window.openPlayerForm=openPlayerForm;
  el("add-player").addEventListener("click",()=>openPlayerForm());
+ // An explicitly selected DBV identity becomes a device-local profile, not a permission grant.
+ window.addEventListener("badminton:own-profile-selected",event=>{
+  if(!playerDialog.open||editingPlayerId)return;
+  const candidate=event.detail||{},id=String(candidate.id||"");
+  const name=String(candidate.name||"").trim().slice(0,80);
+  if(!/^\d{2}-\d{6}$/.test(id)||!name){toast("Kein gültiger DBV-Spieler ausgewählt");return}
+  if(state.players.some(p=>p.id===id)){toast("Spielerprofil bereits vorhanden");return}
+  if(state.players.length>=12){toast("Maximal 12 eigene Spielerprofile");return}
+  const birth=Number(candidate.birthYear);
+  const followed=state.friends.some(p=>p.id===id);
+  // Move an existing followed identity only on explicit selection; never duplicate it.
+  if(followed){
+   state.friends=state.friends.filter(p=>p.id!==id);
+   if(state.viewingFriendId===id)SchmetterlingeStorage.showOwn(state);
+  }
+  state.players.push({id,name,birthYear:Number.isInteger(birth)&&birth>=1900&&birth<=2100?birth:undefined,
+   club:String(candidate.club||"").trim().slice(0,120),url:""});
+  if(!state.activeProfileId)state.activeProfileId=id;
+  if(activatingNewProfile){state.activeProfileId=id;SchmetterlingeStorage.showOwn(state);location.hash="#start";}
+  activatingNewProfile=false;
+  save();render();playerDialog.close();playerForm.reset();
+  if(followed)window.dispatchEvent(new Event("badminton:library-following"));
+  toast(followed?"Gefolgten Spieler als eigenes Profil übernommen":"Spielerprofil hinzugefügt");
+  window.dispatchEvent(new CustomEvent("badminton:own-profile-added",{detail:{playerId:id}}));
+ });
  el("cancel-dialog").addEventListener("click",()=>{
   playerDialog.close();
   if(activatingNewProfile){activatingNewProfile=false;el("first-run-dialog").showModal();}
@@ -447,6 +473,7 @@ function setup(){
   const id=editingPlayerId||String(data.get("id")||"").trim()||"local-"+Date.now();
   const birth=Number(data.get("birthYear"));
   if(!name||(!editingPlayerId&&state.players.some(p=>p.id===id))){toast("Name fehlt oder Spieler-ID bereits vorhanden");return}
+  if(!editingPlayerId&&state.players.length>=12){toast("Maximal 12 eigene Spielerprofile");return}
   const club=String(data.get("club")||"").trim().slice(0,120);
   const record={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club,url:safeUrl(data.get("url")||"")};
   const isNewOwn=!editingPlayerId;

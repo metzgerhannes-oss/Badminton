@@ -1,0 +1,20 @@
+/* Mobile-first own profile selection; keeps the existing dark-blue visual language. */
+#player-dialog{max-height:min(86dvh,calc(100dvh - 36px));overflow-y:auto;overscroll-behavior:contain}
+#player-dialog .modal{gap:15px}
+.own-profile-lookup{display:grid;gap:10px}
+.own-profile-lookup[hidden]{display:none}
+.own-profile-lookup label{font-size:14px;font-weight:750}
+#own-player-search{min-height:50px;font-size:16px}
+#own-player-search-status{margin:0;color:#b5cde1;font-size:12px;line-height:1.5}
+.own-player-search-results{display:grid;gap:8px;max-height:min(38dvh,340px);overflow:auto}
+.own-player-result{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px;border:1px solid #536f8e;border-radius:12px;background:#162a46}
+.own-player-result-label{min-width:0;display:grid;gap:5px}
+.own-player-result-label strong{font-size:13px;overflow-wrap:anywhere}
+.own-player-result-label small{font-size:11px;line-height:1.4;color:#bdd1e3;overflow-wrap:anywhere}
+.own-player-result button{min-width:116px;flex:0 0 auto;padding:10px;font-size:12px;white-space:normal}
+.own-player-result button:disabled{opacity:.6;cursor:default}
+.own-player-manual{padding-top:12px;border-top:1px solid #405672}
+.own-player-manual summary{cursor:pointer;font-size:13px;font-weight:750;line-height:1.5;color:#93d8ff}
+.own-player-manual-fields{display:grid;gap:14px;margin-top:15px}
+.own-player-manual-fields>.primary-button{width:100%}
+@media(max-width:390px){.own-player-result{flex-direction:column;align-items:stretch}.own-player-result button{width:100%}}
