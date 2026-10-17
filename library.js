@@ -75,7 +75,12 @@ async function fetchJson(path){
  if(!response.ok)throw Error("HTTP "+response.status);
  return response.json();
 }
-function error(msg){const box=$("library-results");if(box)box.innerHTML='<div class="library-message">'+escape(msg)+'</div>'}
+function error(msg,state="empty"){
+ const box=$("library-results");if(!box)return;
+ box.dataset.state=state;
+ box.setAttribute("aria-busy",state==="loading"?"true":"false");
+ box.innerHTML='<div class="library-message">'+escape(msg)+'</div>';
+}
 function ageChoice(){return $("library-age")?.value||"all"}
 function hasCriteria(){
  return Boolean(
@@ -91,6 +96,7 @@ function showIdle(){
  entries=[];dbTotal=0;visible=40;loaded=true;
  const count=$("library-count"),area=$("library-results"),more=$("library-more"),reset=$("library-reset");
  if(count)count.textContent="Spieler suchen";
+ if(area){area.dataset.state="idle";area.setAttribute("aria-busy","false");}
  if(area)area.innerHTML='<div class="library-message library-idle"><strong>Spieler suchen</strong>'+
   '<span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div>';
  if(more)more.hidden=true;
@@ -134,9 +140,11 @@ function render(){
  if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
-  error(localMode?"Auf diesem Gerät kein passendes gespeichertes Profil gefunden. Die allgemeine DBV-Spielersuche ist derzeit nicht verfügbar.":"Keine passenden bestätigten DBV-Spieler gefunden. Andere Filter wählen oder bei einem neuen Profil die DBV-ID ergänzen.");
+  error(localMode?"Zentrale DBV-Suche derzeit eingeschränkt. Auch auf diesem Gerät wurde kein passendes Profil gefunden.":"Keine bestätigten DBV-Treffer für diese Suchfilter. Bitte Namen oder Filter ändern.",localMode?"limited":"empty");
   $("library-more").hidden=true;return;
  }
+ area.dataset.state=localMode?"limited":"ready";
+ area.setAttribute("aria-busy","false");
  area.innerHTML=clubGroups(shown).map(group=>
   '<section class="library-club-group"><h3>'+escape(group.club||"Verein nicht ausgewiesen")+
   '<span>'+group.players.length+' Spieler'+(group.players.length===1?"":"innen und Spieler")+'</span></h3>'+
@@ -195,7 +203,7 @@ async function loadBackup(){
  const ticket=++pending;
  $("library-more").hidden=true;
  loaded=false;
- error("Die öffentliche DBV-Spielerbibliothek wird geladen …");
+ error("Die öffentliche DBV-Spielerbibliothek wird geladen …","loading");
  try{
   if(!summary){
    summary=await fetchJson(ROOT+"index.json");
@@ -231,7 +239,7 @@ async function loadIdentityDirectory(){
  }
  const ticket=++pending;
  loaded=false;$("library-more").hidden=true;
- error("Gezielte DBV-Spielersuche wird geladen …");
+ error("Gezielte DBV-Spielersuche wird geladen …","loading");
  try{
   const people=await searchDbvIdentities(name,{
    ageClass:ageChoice()==="all"?null:ageChoice(),
@@ -247,7 +255,7 @@ async function loadIdentityDirectory(){
   if(ticket!==pending)return;
   loadLocalDirectory();
   const box=$("library-message");
-  if(box)box.textContent="Zentrale Spielersuche derzeit nicht verfügbar. Lokale Profile sind weiterhin nutzbar.";
+  if(box)box.textContent="Die zentrale DBV-Spielersuche ist derzeit nicht erreichbar. Angezeigt werden nur lokal gespeicherte Profile.";
  }
 }
 async function load(){
@@ -255,7 +263,7 @@ async function load(){
  if(rosterDenied){loadIdentityDirectory();return;}
  const ticket=++pending;
  loaded=false;$("library-more").hidden=true;
- error("Die Spielerbibliothek wird aus Supabase geladen …");
+ error("Die Spielerbibliothek wird aus Supabase geladen …","loading");
  try{
   const {people,total}=await dbPage(0);
   if(ticket!==pending)return;

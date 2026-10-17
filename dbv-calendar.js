@@ -116,7 +116,11 @@ function readPreference(){
  try{const x=JSON.parse(localStorage.getItem(STORAGE)||"{}");return {...defaults,...Object.fromEntries(Object.entries(x).filter(([k,v])=>k in defaults&&typeof v==="string"))}}catch{return {...defaults}}
 }
 let settings=readPreference(),entries=[],source="supabase",loading=false,loaded=false,problem="",batchLimit=36;
-function message(s){const n=$("dbv-calendar-status");if(n)n.textContent=s}
+function message(s,state="ready"){
+ const n=$("dbv-calendar-status");if(!n)return;
+ n.textContent=s;n.dataset.state=state;
+ n.setAttribute("aria-busy",state==="loading"?"true":"false");
+}
 function selectOptions(node,values,placeholder){
  if(!node)return;
  node.innerHTML='<option value="all">'+esc(placeholder)+'</option>'+values.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
@@ -165,10 +169,19 @@ function render(){
  const hits=selected.total+sourcedCount;
  const mastersVisible=settings.age==="U11"&&settings.region!=="all"&&
    selected.groups.some(group=>group.items.some(isNationalU11Masters));
- message(hits+" passende Turniere"+(plansCount?" / Termine":"")+
-  (sourcedCount?" · "+sourcedCount+" zusätzlich aus offiziellen Quellen":"")+
+ const unavailable=source==="offline",snapshotOnly=source==="snapshot";
+ const details=(sourcedCount?" · "+sourcedCount+" zusätzlich aus offiziellen Quellen":"")+
   (selected.total?" · "+selected.total+" DBV":"")+
-  (mastersVisible?" · inkl. German Masters U11 (DBV, bundesweit)":"")+warning);
+  (mastersVisible?" · inkl. German Masters U11 (DBV, bundesweit)":"")+warning;
+ if(unavailable){
+  message("Aktuelle DBV-Kalenderquelle nicht erreichbar"+
+   (sourcedCount?" · nur separat belegte Termine und Ergebnisse":" · keine aktuellen DBV-Ergebnisse")+
+   ". Bitte später erneut aktualisieren.","offline");
+ }else{
+  message((snapshotOnly?"Gespeicherter offizieller DBV-Stand · ":"")+
+   hits+" passende Turniere"+(plansCount?" / Termine":"")+details,
+   snapshotOnly?"limited":hits?"ready":"empty");
+ }
  if(!selected.total){
   const more=$("dbv-calendar-more");if(more)more.hidden=true;
   if(sourcedCount){
@@ -179,8 +192,8 @@ function render(){
   const switchPeriod=settings.period==="upcoming"&&settings.year==="2026"&&
      settings.region==="Baden-Württemberg"&&BW_YOUTH_AGES.includes(settings.age)
     ?'<button type="button" class="subtle-button" data-calendar-show-history>Ergebnisse 2026 ansehen ↗</button>':"";
-  host.innerHTML=nextYearHint+'<div class="dbv-calendar-no-results"><h4>Keine passenden Turniere</h4>'+
-    '<p>In dieser Auswahl sind keine bestätigten Einträge verfügbar.</p>'+
+  host.innerHTML=nextYearHint+'<div class="dbv-calendar-no-results"><h4>'+(unavailable?"Kalenderquelle nicht erreichbar":"Keine passenden Turniere")+'</h4>'+
+    '<p>'+(unavailable?"Aktuelle Turnierdaten konnten nicht geprüft werden. Das ist kein Nachweis für fehlende Turniere.":"In dieser Auswahl sind keine bestätigten Einträge verfügbar.")+'</p>'+
     switchPeriod+
     (alternatives.length?'<div class="dbv-calendar-alternatives">'+
      alternatives.map(option=>'<button type="button" class="subtle-button" data-calendar-alternative-level="'+esc(option.level)+'">'+
@@ -274,7 +287,7 @@ async function readBWArchive(){
 }
 async function load(){
  if(loading)return;
- loading=true;problem="";message("Offizieller DBV-Kalender wird geladen …");
+ loading=true;problem="";message("Offizieller DBV-Kalender wird geladen …","loading");
  try{
   const collected=[];
   for(let offset=0;offset<1200;offset+=400){
@@ -326,7 +339,7 @@ async function load(){
  catch{ /* remain on vetted official fallback when source refresh is unavailable */ }
  loading=false;loaded=true;
  updateControls();render();
- if(!entries.length&&problem)message(problem+" Offiziellen DBV-Kalender bei Bedarf direkt öffnen.");
+ if(!entries.length&&problem)message(problem+" Offiziellen DBV-Kalender bei Bedarf direkt öffnen.","offline");
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("dbv-calendar-results"))return;

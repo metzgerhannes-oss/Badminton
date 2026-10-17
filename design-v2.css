@@ -634,3 +634,17 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 /* v75: career and individual-match KPIs share the same win/loss color meanings. */
 .dbv-reference-totals span.wins strong{color:#07864c}
 .dbv-reference-totals span.losses strong{color:#9b4242}
+
+/* U5: distinguish actual empty results from unavailable source data at a glance.
+   These states report information; they never imply a player has zero results. */
+#library-results[data-state="loading"] .library-message,
+#report-list[data-state="loading"] .report-empty{border-left:3px solid #4d91c2}
+#library-results[data-state="empty"] .library-message,
+#report-list[data-state="empty"] .report-empty{border-left:3px solid #8ba4b5}
+#library-results[data-state="limited"] .library-message,
+#report-list[data-state="offline"] .report-empty,
+#report-list[data-state="error"] .report-empty,
+#report-list[data-state="access"] .report-empty{border-left:3px solid #b77c38}
+#dbv-calendar-status[data-state="offline"],
+#dbv-calendar-status[data-state="limited"]{color:#754f1f;font-weight:600}
+#dbv-calendar-status[data-state="loading"]{color:#275c80}
