@@ -4,6 +4,7 @@ const [html,css,js,sw,release,welcome]=await Promise.all([
  "index.html","app-access.css","app-access.js","sw.js","app-release.js","welcome.html"
 ].map(file=>readFile(file,"utf8")));
 assert.match(html,/<html lang="de" data-app-access="checking">/);
+assert.match(html,/<style>[\s\S]*?html\[data-app-access="checking"\] \.app-access-panel\{display:none!important\}/,"Invitation panel must be hidden on first paint without external CSS");
 assert.match(html,/id="app-access-splash"[^>]+role="status"/);
 assert.match(html,/class="app-access-visually-hidden">Zugang wird geprüft\.<\/span>/);
 assert.match(html,/id="app-access-splash"[\s\S]*?assets\/spvgg-schmetterlinge\.svg/);
