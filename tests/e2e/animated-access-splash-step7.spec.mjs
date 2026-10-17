@@ -29,7 +29,10 @@ test("checking uses original club logo and animated shuttle without visible text
  await expect(page.locator("#app-access-splash")).toBeVisible();
  await expect(page.locator(".app-access-panel")).toBeHidden();
  await expect(page.locator("body > .app")).toBeHidden();
- await expect(page.locator("#app-access-splash img")).toHaveAttribute("src","./assets/spvgg-schmetterlinge.svg");
+ await expect(page.locator(".app-access-splash-emblem img")).toHaveAttribute("src","./assets/spvgg-schmetterlinge-splash.svg");
+ await expect(page.locator(".app-access-splash-emblem img")).toHaveCSS("mix-blend-mode","multiply");
+ await expect(page.locator(".app-access-shuttle")).toHaveAttribute("src","./assets/shuttlecock-splash.svg");
+ await expect(page.locator(".app-access-shuttle")).toHaveJSProperty("naturalWidth",96);
  await expect(page.locator("#app-access-splash .app-access-visually-hidden")).toContainText("Zugang wird geprüft");
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
@@ -74,4 +77,20 @@ test("reduced motion keeps the shuttle static while a session is being checked",
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","none");
 
  await expect(page.locator("#app-access-gate")).toBeHidden();
+});
+
+test("splash-specific club logo actually has transparent white corners",async({page})=>{
+ await page.goto("/",{waitUntil:"domcontentloaded"});
+ const corners=await page.evaluate(async()=>{
+  const image=new Image();
+  image.src="./assets/spvgg-schmetterlinge-splash.svg";
+  await image.decode();
+  const canvas=document.createElement("canvas");
+  canvas.width=canvas.height=192;
+  const ctx=canvas.getContext("2d",{willReadFrequently:true});
+  ctx.drawImage(image,0,0,192,192);
+  return [[0,0],[191,0],[0,191],[191,191]].map(([x,y])=>
+   ctx.getImageData(x,y,1,1).data[3]);
+ });
+ expect(Math.max(...corners),"The original photo's white square must be removed, not merely covered").toBeLessThan(40);
 });
