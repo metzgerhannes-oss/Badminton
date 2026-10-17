@@ -62,6 +62,7 @@ jobs:
           node --check scripts/external-match-stats.mjs
           node --check scripts/dbv-match-reference.mjs
           node --check scripts/import-coverage-audit.mjs
+          node --check tests/import-health-private-sql.mjs
           node --check supabase/functions/history-match-import/source-availability.mjs
           node --check tests/import-status-preserve-evidence.mjs
           node --check scripts/match-availability.mjs
@@ -159,6 +160,7 @@ jobs:
           node tests/dbv-match-reference.mjs
           node tests/badhub-primary-career.mjs
           node scripts/import-coverage-audit.test.mjs
+          node tests/import-health-private-sql.mjs
           node tests/external-match-consistency.mjs
           node tests/import-status-preserve-evidence.mjs
           node tests/match-availability.mjs
