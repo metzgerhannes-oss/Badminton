@@ -1,8 +1,16 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-app-access="checking">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+/* Critical first paint: prevent invitation text and app content flashing before CSS loads. */
+html[data-app-access="checking"] .app-access-panel{display:none!important}
+html:not([data-app-access="checking"]) #app-access-splash{display:none!important}
+html:not([data-app-access="granted"]) body>.app{display:none!important}
+html[data-app-access="checking"] #app-access-gate{position:fixed;inset:0;z-index:30000;display:flex;align-items:center;justify-content:center;background:#112f54}
+html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Schmetterlinge">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -68,14 +76,25 @@
 <script type="module" src="./teams.js"></script>
 </head>
 <body>
-<div id="app-access-gate" role="region" aria-label="Einladung für Schmetterlinge">
+<div id="app-access-gate" role="region" aria-label="Zugang zu Schmetterlinge">
+ <div id="app-access-splash" class="app-access-splash" role="status" aria-live="polite" aria-atomic="true">
+  <span class="app-access-visually-hidden">Zugang wird geprüft.</span>
+  <div class="app-access-splash-art" aria-hidden="true">
+   <div class="app-access-splash-emblem"><img src="./assets/spvgg-schmetterlinge.svg" alt=""></div>
+   <svg class="app-access-shuttle" viewBox="0 0 64 64" focusable="false" aria-hidden="true">
+    <path d="M20 42 6 13 13 8 30 32M25 40 20 4 29 5 34 32M30 40 38 6 47 11 39 35M35 43 53 18 58 26 41 47" fill="#f1f7ff" stroke="#accbe4" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M10 14 29 36M24 9 32 34M41 12 37 37M53 25 40 43" fill="none" stroke="#7ca4cb" stroke-width="1.2"/>
+    <path d="M18 42 Q30 35 42 45 L37 55 Q26 59 19 50Z" fill="#e7bd7a" stroke="#fff1d2" stroke-width="1.7"/>
+   </svg>
+  </div>
+ </div>
  <section class="app-access-panel">
   <h1>Schmetterlinge · Einladung</h1>
   <p>Die App ist für eingeladene Badminton-Familien zugänglich. Mit einem gültigen Link siehst du belegte Matchkarten, Turnierergebnisse und Trophäen.</p>
   <label for="app-access-code">Einladungslink oder Code</label>
   <input id="app-access-code" type="password" autocomplete="off" spellcheck="false" placeholder="Einladungslink hier einfügen">
   <button id="app-access-submit" type="button">Zugang freischalten</button>
-  <p id="app-access-status" role="status" aria-live="polite">Zugang wird geprüft …</p>
+  <p id="app-access-status" role="status" aria-live="polite"></p>
   <small>Keine E-Mail-Adresse und kein Passwort erforderlich. Auf dem iPhone nach dem Hinzufügen zum Home-Bildschirm den Einladungslink bei Bedarf noch einmal hier einfügen.</small>
  </section>
 </div>
@@ -85,7 +104,7 @@
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v168" title="Version v168">v168</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v169" title="Version v169">v169</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>

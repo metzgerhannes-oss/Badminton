@@ -45,6 +45,16 @@ function grant({member=true}={}){
  window.dispatchEvent(new CustomEvent(member?"badminton:app-access-granted":"badminton:player-shell-granted"));
 }
 function inform(message){status.textContent=message;}
+// Bound the visual check: a stalled Auth/connection request must never leave
+// users staring at an endless animation. Late replies cannot grant access.
+async function withCheckDeadline(work){
+ let timer;
+ try{
+  return await Promise.race([work,new Promise((_,reject)=>{
+   timer=setTimeout(()=>reject(Error("Die Zugangsprüfung dauert zu lange. Bitte Verbindung prüfen und erneut öffnen.")),12000);
+  })]);
+ }finally{clearTimeout(timer)}
+}
 async function hasAcceptedPlayerLink(token){
  // The server validates the accepted player invitation on every opening.
  // A device-local invitation id alone never proves access.
@@ -74,16 +84,21 @@ async function accept(raw){
  if(!TOKEN.test(token)){inform("Bitte den vollständigen Einladungslink öffnen oder den Code einfügen.");return}
  if(busy)return;
  busy=true;submit.disabled=true;
- inform("Einladung wird geprüft …");
+ root.dataset.appAccess="checking";
+ inform("");
  try{
-  session=await getPrivateSession(true);
-  const ok=await rpc("app_access_invite_accept",{p_secret:token},session.access_token);
-  if(ok!==true)throw Error("Dieser Link ist ungültig, widerrufen oder abgelaufen.");
-  const permission=await rpc("app_access_status",{},session.access_token);
-  if(permission?.allowed!==true)throw Error("Die Einladung wurde nicht freigeschaltet.");
+  await withCheckDeadline((async()=>{
+   session=await getPrivateSession(true);
+   const ok=await rpc("app_access_invite_accept",{p_secret:token},session.access_token);
+   if(ok!==true)throw Error("Dieser Link ist ungültig, widerrufen oder abgelaufen.");
+   const permission=await rpc("app_access_status",{},session.access_token);
+   if(permission?.allowed!==true)throw Error("Die Einladung wurde nicht freigeschaltet.");
+  })());
   grant();
- }catch(error){inform(error?.message||"Einladung konnte nicht geprüft werden.")}
- finally{busy=false;submit.disabled=false}
+ }catch(error){
+  root.dataset.appAccess="denied";
+  inform(error?.message||"Einladung konnte nicht geprüft werden.");
+ }finally{busy=false;submit.disabled=false}
 }
 submit?.addEventListener("click",()=>accept(code.value));
 code?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();accept(code.value)}});
@@ -93,15 +108,21 @@ async function initialize(){
  if(TOKEN.test(incoming||""))code.value=incoming;
  gate.hidden=false;
  try{
-  session=await getPrivateSession(false);
-  if(session){
+  const permission=await withCheckDeadline((async()=>{
+   session=await getPrivateSession(false);
+   if(!session)return null;
    const result=await rpc("app_access_status",{},session.access_token);
-   if(result?.allowed===true){grant();return;}
-   if(await hasAcceptedPlayerLink(session.access_token)){
-    grant({member:false});return;
-   }
-  }
- }catch{/* Fail closed; never interpret a network error as valid membership. */}
+   if(result?.allowed===true)return "member";
+   return await hasAcceptedPlayerLink(session.access_token)?"player":null;
+  })());
+  if(permission==="member"){grant();return;}
+  if(permission==="player"){grant({member:false});return;}
+ }catch(error){
+  // An unavailable server never turns a private session into authorization.
+  root.dataset.appAccess="denied";
+  inform(error?.message||"Zugang konnte nicht geprüft werden. Bitte später erneut versuchen.");
+  return;
+ }
  root.dataset.appAccess="denied";
  inform(incoming?"Einladung erkannt. Bitte Zugang bestätigen.":"Diese App ist nur mit Einladung zugänglich. Öffne deinen persönlichen Einladungslink oder füge den Code ein.");
  if(incoming&&TOKEN.test(incoming))accept(incoming);

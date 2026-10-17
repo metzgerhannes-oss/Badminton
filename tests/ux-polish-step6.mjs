@@ -7,13 +7,13 @@ assert.match(css,/@media\(max-width:1079px\)/,"Desktop must keep existing dark l
 assert.match(css,/\.app \.page:not\(#view-start\)/,"Compact home must stay structurally unchanged");
 assert.doesNotMatch(css,/user-scalable|maximum-scale|touch-action\s*:\s*none/);
 assert.match(html,/<link rel="stylesheet" href="\.\/ux-polish\.css">/);
-assert.match(html,/<span[^>]*data-app-version[^>]*>v168<\/span>/);
-assert.match(sw,/schmetterlinge-shell-v168/);
+assert.match(html,/<span[^>]*data-app-version[^>]*>v169<\/span>/);
+assert.match(sw,/schmetterlinge-shell-v169/);
 const patterns=[/const ASSETS=(\[[^\n]+\]);/,/const SHELL_ASSETS=(\[[^\n]+\]);/];
 for(const regex of patterns){
  const match=sw.match(regex);
  assert.ok(match,"Missing SW asset catalogue");
  assert.ok(JSON.parse(match[1]).includes("./ux-polish.css"),"Polish must be cached for existing PWA updates");
 }
-assert.match(release,/version:"v168"/);
+assert.match(release,/version:"v169"/);
 console.log("U6: presentation only, correct CSS cascade/cache and persistent PWA version.");
