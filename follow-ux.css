@@ -34,3 +34,14 @@
  #view-spieler .follow-search-extra{grid-template-columns:1fr}
  #view-spieler .follow-search-extra label:last-child{grid-column:auto}
 }
+
+/* Step 1: iOS focus must not autozoom small search/selection fields.
+   Keep intentional pinch-to-zoom, system text scaling and page scrolling available. */
+@media (max-width: 767px) and (pointer: coarse) {
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]), select, textarea, [contenteditable="true"]) {
+    font-size: 16px !important;
+  }
+  :where(a, button, summary, [role="button"], [role="tab"], [role="link"], input[type="submit"], input[type="button"]) {
+    touch-action: manipulation;
+  }
+}
