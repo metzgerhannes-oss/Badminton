@@ -42,7 +42,20 @@ test("mobile secondary views use consistent card, heading and control shapes",as
   }));
   expect(card.radius).toBe(16);
   expect(card.shadow).not.toBe("none");
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+  const overflow=await page.evaluate(()=>{
+   const viewport=innerWidth;
+   const exposed=[...document.querySelectorAll("body *")].flatMap(node=>{
+    if(!(node instanceof HTMLElement || node instanceof SVGElement))return [];
+    const rect=node.getBoundingClientRect();
+    const style=getComputedStyle(node);
+    if(style.display==="none"||style.visibility==="hidden"||rect.width<=0||rect.height<=0||rect.right<=viewport+3)return [];
+    return [{node:node.tagName.toLowerCase(),id:node.id,cls:String(node.getAttribute("class")||"").slice(0,90),
+      right:Math.round(rect.right),width:Math.round(rect.width),parent:node.parentElement?.className||"",
+      text:(node.textContent||"").trim().slice(0,55)}];
+   }).sort((a,b)=>b.right-a.right).slice(0,18);
+   return {extra:document.documentElement.scrollWidth-viewport,viewport,exposed};
+  });
+  expect(overflow.extra,JSON.stringify({width,overflow},null,2)).toBeLessThanOrEqual(2);
   const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
   expect(stored.activeProfileId).toBe("05-070879");
  }
