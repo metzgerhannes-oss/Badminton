@@ -38,10 +38,12 @@ function contradictions(rows){
 // Curated public tournament-result pages for the known profile-history gaps.
 // Profile names already reside in "people"; no page HTML is persisted.
 // These are match sources, NOT a claim of complete career history.
+// The two other verified tournaments have already been individually recorded.
+// Their legacy source keys differ from the tournament parser's generated keys;
+// re-importing would duplicate genuine games. Explicitly include ONLY the
+// currently missing source until cross-key match-identity deduplication is live.
 const sourceFallbacks=[
- {tournamentId:4185,profileIndex:2,expectedMinimum:5},
- {tournamentId:4973,profileIndex:3,expectedMinimum:3},
- {tournamentId:4986,profileIndex:3,expectedMinimum:1}
+ {tournamentId:4185,profileIndex:2,expectedMinimum:5}
 ];
 async function getTournamentView({tournamentId,profileIndex}){
  const player=people[profileIndex],url="https://badhub.de/bwbv/turnier.php?id="+
