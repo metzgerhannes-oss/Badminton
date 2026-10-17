@@ -35,3 +35,13 @@
  font-size:11px;line-height:1.4;color:#c9e4f6;font-weight:750;
  font-variant-numeric:tabular-nums}
 
+/* Step 1: iOS focus must not autozoom small search/selection fields.
+   Keep intentional pinch-to-zoom, system text scaling and page scrolling available. */
+@media (max-width: 767px) and (pointer: coarse) {
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]), select, textarea, [contenteditable="true"]) {
+    font-size: 16px !important;
+  }
+  :where(a, button, summary, [role="button"], [role="tab"], [role="link"], input[type="submit"], input[type="button"]) {
+    touch-action: manipulation;
+  }
+}
