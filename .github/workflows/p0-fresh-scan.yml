@@ -4,6 +4,8 @@ on:
     branches: [main, fix/p0-fresh-results-import-v152]
     paths:
       - scripts/p0-fresh-source-scan.mjs
+      - scripts/badhub-tournament-view-parser.mjs
+      - tests/badhub-tournament-view-parser.mjs
       - scripts/p0-stage-results-oidc.mjs
       - .github/workflows/p0-fresh-scan.yml
       - supabase/functions/spvgg-match-rebuild/index.ts
