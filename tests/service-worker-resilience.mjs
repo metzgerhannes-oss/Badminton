@@ -135,8 +135,8 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  const sw=harness();
  await sw.lifecycle("install");
  const html=await readFile("index.html","utf8");
- const linked=[...html.matchAll(/<link\\b[^>]*rel="stylesheet"[^>]*href="(\\.\\/[^"]+)"/g),
-  ...html.matchAll(/<script\\b[^>]*src="(\\.\\/[^"]+)"/g)].map(match=>match[1]);
+ const linked=[...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="(\.\/[^"]+)"/g),
+  ...html.matchAll(/<script\b[^>]*src="(\.\/[^"]+)"/g)].map(match=>match[1]);
  for(const path of linked)assert.ok(sw.accepted.includes(path),"Missing initial shell asset "+path);
  for(const png of ["./assets/schmetterlinge-apple-touch-icon-180.png",
   "./assets/schmetterlinge-pwa-192.png","./assets/schmetterlinge-pwa-512.png"])
@@ -153,7 +153,7 @@ for(const path of ["welcome.html?invite=secret","private-player.html?code=secret
  assert.equal(response.status,200);
  assert.equal(sw.cacheWrites.length,0,"Sensitive/unlisted URL was cached: "+path);
 }
-assert.doesNotMatch(source,/\\blocalStorage\\b|\\bindexedDB\\b/,
+assert.doesNotMatch(source,/\blocalStorage\b|\bindexedDB\b/,
  "PWA updates must not modify any private local profile storage");
 {
  const sw=harness({failOptional:true});
