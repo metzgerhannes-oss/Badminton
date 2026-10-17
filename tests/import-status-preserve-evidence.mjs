@@ -17,4 +17,5 @@ assert.doesNotMatch(edge,/await update\(id,\{status:"awaiting_source"/,
  "No unconditional downgrade to awaiting_source when existing match facts are stored");
 assert.match(edge,/source_temporarily_unavailable/);
 assert.match(edge,/no_source_matches/);
+assert.doesNotMatch(edge,/String\(error\)\.includes\("Source unavailable"\)\?"awaiting_source"/);
 console.log("P0: verified persisted matches survive an empty personal source profile.");
