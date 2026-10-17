@@ -130,6 +130,31 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.equal(response.status,200);
  assert.equal(sw.cacheWrites.length,1);
 }
+// v166: install only the directly used shell. Unvisited features load on demand.
+{
+ const sw=harness();
+ await sw.lifecycle("install");
+ const html=await readFile("index.html","utf8");
+ const linked=[...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="(\.\/[^"]+)"/g),
+  ...html.matchAll(/<script\b[^>]*src="(\.\/[^"]+)"/g)].map(match=>match[1]);
+ for(const path of linked)assert.ok(sw.accepted.includes(path),"Missing initial shell asset "+path);
+ for(const png of ["./assets/schmetterlinge-apple-touch-icon-180.png",
+  "./assets/schmetterlinge-pwa-192.png","./assets/schmetterlinge-pwa-512.png"])
+  assert.ok(sw.accepted.includes(png),"iPhone install icon missing: "+png);
+ assert.ok(!sw.accepted.includes("./wiki.js"),"Wiki module should load on first use");
+ assert.ok(!sw.accepted.some(path=>path.includes("/data/")),"No player indexes during worker installation");
+ assert.ok(sw.accepted.length<100,"Avoid full pre-caching of every optional feature");
+}
+// Invitation query tokens, unrelated resources and JSON indexes remain outside runtime CacheStorage.
+for(const path of ["welcome.html?invite=secret","private-player.html?code=secret","unknown.json","data/history.json"]){
+ const sw=harness();
+ const response=await sw.fetchResult(makeReq(path));
+ if(path==="data/history.json"){assert.equal(response,null);continue;}
+ assert.equal(response.status,200);
+ assert.equal(sw.cacheWrites.length,0,"Sensitive/unlisted URL was cached: "+path);
+}
+assert.doesNotMatch(source,/\blocalStorage\b|\bindexedDB\b/,
+ "PWA updates must not modify any private local profile storage");
 {
  const sw=harness({failOptional:true});
  await sw.lifecycle("install");
