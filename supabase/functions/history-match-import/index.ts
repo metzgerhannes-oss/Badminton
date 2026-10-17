@@ -194,13 +194,16 @@ Deno.serve(async req=>{
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
  }catch(error){
-  if(claimed)try{await update(id,{
-   status:String(error).includes("Source unavailable")?"awaiting_source":"error",
-   lease_until:null,last_finished_at:new Date().toISOString(),
-   detail:String(error).includes("Source unavailable")
-     ?"Für diesen Spieler liefert Badhub noch keinen abrufbaren Matchdatensatz"
-     :"Quellenabgleich fehlgeschlagen; keine unbelegten Matches gespeichert"
-  });}catch{}
+  if(claimed)try{
+   if(String(error).includes("Source unavailable")){
+    await updateNoNewSource(id,
+     "Für diesen Spieler liefert das allgemeine Badhub-Profil gerade keinen neuen Matchdatensatz");
+   }else{
+    await update(id,{status:"error",lease_until:null,
+     last_finished_at:new Date().toISOString(),
+     detail:"Quellenabgleich fehlgeschlagen; vorhandene belegte Matches bleiben gespeichert"});
+   }
+  }catch{}
   console.error("External source import failed",id,String(error).slice(0,250));
   return respond(502,{error:"source_import_unavailable"},origin);
  }
