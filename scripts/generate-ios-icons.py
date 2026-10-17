@@ -32,15 +32,19 @@ for size, filename in (
     # Padding makes the crest legible in iOS rounded-square icons and ensures
     # maskable Android crops cannot clip the original SpVgg Mössingen logo.
     tile = Image.new("RGB", (size, size), "#0d2b4c")
-    draw = ImageDraw.Draw(tile)
     inset = round(size * 0.12)
-    draw.rounded_rectangle(
+    # Keep the corners of the white embedded original from spilling outside
+    # the rounded backing. Mask the whole white plate including the crest.
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).rounded_rectangle(
         (inset, inset, size - inset - 1, size - inset - 1),
-        radius=round(size * 0.15), fill="#ffffff",
+        radius=round(size * 0.15), fill=255,
     )
+    plate = Image.new("RGB", (size, size), "#ffffff")
     side = round(size * 0.72)
     resized = crest.resize((side, side), Image.Resampling.LANCZOS)
-    tile.paste(resized, ((size - side) // 2, (size - side) // 2))
+    plate.paste(resized, ((size - side) // 2, (size - side) // 2))
+    tile.paste(plate, (0, 0), mask)
     target = ROOT / "assets" / filename
     tile.save(target, format="PNG", optimize=True)
     print(f"{target.relative_to(ROOT)}: {size}x{size}, {target.stat().st_size} bytes")
