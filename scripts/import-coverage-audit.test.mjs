@@ -33,4 +33,12 @@ assert.equal(diagnosis({status:"partial",cursor_offset:20,verified_count:200,
 assert.equal(diagnosis({status:"complete",cursor_offset:2,verified_count:2},
  true,2,2,time),"not_proven_complete");
 assert.match(printReport(report,{facts:true}),/Stichprobe gekappt/);
+const weekly=printReport(report,{history:false,imports:false,facts:false},35,
+ {aggregateOnly:true});
+assert.match(weekly,/ausschließlich aggregierte Zahlen/);
+assert.match(weekly,/Quellkarten: 1/);
+assert.doesNotMatch(weekly,/05-070879|05-071969|05-060000|Testgegner/);
+assert.doesNotMatch(weekly,/Priorisierte Prüfungen/);
+assert.match(printReport(report,{facts:true},35,{aggregateOnly:true}),/Stichprobe gekappt/);
+
 console.log("Import coverage audit: sourced read-only counts, stuck jobs, uncertainty and no names.");
