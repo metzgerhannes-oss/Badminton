@@ -1,0 +1,41 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+const paths=["index.html","app.js","desktop-context-v173.js","desktop-tournament-v173.css","desktop-shell-v172.css","app-release.js","sw.js","tests/e2e/supabase-isolated.fixture.mjs"];
+const [html,app,script,css,shell,release,sw,fixture]=await Promise.all(paths.map(p=>readFile(p,"utf8")));
+assert.match(html,/id="desktop-tournament-context" aria-labelledby=/);
+assert.match(html,/id="desktop-context-events"/);
+assert.match(html,/data-desktop-action="follow"/);
+assert.match(html,/data-desktop-action="calendar"/);
+assert.match(html,/data-desktop-action="schedule"/);
+assert.match(html,/data-desktop-action="add-tournament"/);
+assert.match(html,/data-desktop-action="import"/);
+assert.match(html,/<script defer src="\.\/desktop-context-v173\.js"><\/script>/);
+assert.match(html,/<link rel="stylesheet" href="\.\/desktop-tournament-v173\.css">/);
+assert.match(css,/@media \(min-width:1280px\)/);
+assert.match(css,/#view-turniere\.active/);
+assert.match(css,/grid-template-columns:minmax\(0,1fr\) clamp\(290px,22\.2vw,320px\)/);
+assert.match(css,/\.desktop-tournament-context \{display:none\}/);
+assert.match(css,/position:sticky/);
+assert.match(css,/focus-visible/);
+assert.doesNotMatch(css,/user-scalable|maximum-scale|touch-action\s*:\s*none/i);
+assert.match(script,/window\.badmintonDesktopContext\?\.\(\)/);
+assert.match(script,/badminton:tournament-bookmarks/);
+assert.match(script,/replaceChildren\(\)/);
+assert.doesNotMatch(script,/\bfetch\s*\(|XMLHttpRequest|setInterval|localStorage|indexedDB|supabase\.co/i);
+assert.match(app,/window\.badmintonDesktopContext=\(\)=>/);
+assert.match(app,/if\(state\.viewingFriendId/);
+assert.match(app,/SchmetterlingeBookmarks\.visible\(state\)/);
+assert.match(app,/SchmetterlingeSpond\.dashboardItems\(/);
+assert.match(app,/return \{own:true,events:/);
+assert.match(shell,/--desktop-rail:220px/);
+assert.match(release,/version:"v173"/);
+assert.match(sw,/schmetterlinge-shell-v173/);
+for(const key of ["ASSETS","SHELL_ASSETS"]){
+ const match=sw.match(new RegExp("const "+key+"=(\\[[^\\n]+\\]);"));
+ assert.ok(match,key+" must exist");
+ const files=JSON.parse(match[1]);
+ for(const asset of ["./desktop-context-v173.js","./desktop-tournament-v173.css"])
+  assert.ok(files.includes(asset),key+" missing "+asset);
+}
+assert.match(fixture,/context\.route\(SUPABASE/);
+console.log("Desktop V2 PR2: one contextual column, source-backed local events, existing actions, no extra polling, offline assets.");
