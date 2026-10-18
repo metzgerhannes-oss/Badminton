@@ -80,7 +80,14 @@ test("desktop PR2: tablet/iPhone keep existing stacked layout and actions",async
     return {tag:node.tagName,selector:node.id?"#"+node.id:node.className&&typeof node.className==="string"?"."+node.className.trim().replace(/\\s+/g,"."):node.tagName,
      left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),display:css.display,whiteSpace:css.whiteSpace};
    }).filter(x=>x.display!=="none"&&x.right>innerWidth+3).sort((a,b)=>b.right-a.right).slice(0,12);
-   return {viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow,outliers};
+   const internal=[...document.querySelectorAll("html,body,.app,#hauptinhalt,#view-turniere,#view-turniere *,nav.bottom-nav")].map(node=>{
+    const b=node.getBoundingClientRect(),c=getComputedStyle(node);
+    return {selector:node.id?"#"+node.id:node.className&&typeof node.className==="string"?"."+node.className.trim().replace(/\\s+/g,"."):node.tagName,
+     width:Math.round(b.width),client:node.clientWidth,scroll:node.scrollWidth,
+     left:Math.round(b.left),right:Math.round(b.right),xOverflow:c.overflowX,display:c.display};
+   }).filter(x=>x.display!=="none"&&x.scroll>x.client+8).sort((a,b)=>b.scroll-b.client-(a.scroll-a.client)).slice(0,20);
+   return {viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow,outliers,internal,
+    bodyScroll:document.body.scrollWidth,bodyClient:document.body.clientWidth,documentClient:document.documentElement.clientWidth};
   });
   if(diag.overflow>2)console.log("DESKTOP_PR2_OVERFLOW_DIAGNOSTIC",JSON.stringify({width,...diag}));
   expect(diag.overflow).toBeLessThanOrEqual(2);
