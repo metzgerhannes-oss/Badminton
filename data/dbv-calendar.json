@@ -1,154 +1,9 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-10-15T10:17:18.940465+00:00",
+  "capturedAt": "2026-10-18T09:52:42.410335+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
-    {
-      "source_key": "dbv-calendar-44659",
-      "title": "C-RLT SAA O19 (SBV 3. C-RLT O19 2026)",
-      "start_date": "2026-10-17",
-      "end_date": "2026-10-18",
-      "location_text": "Oberthal",
-      "organizer": "Saarland",
-      "bundesland": "Saarland",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-11",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44240",
-      "title": "4. D-RLT BAY U13-U19",
-      "start_date": "2026-10-17",
-      "end_date": "2026-10-17",
-      "location_text": "Regensburg",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-06",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44629",
-      "title": "C-RLT NRW U13-U19 (10. Offene Lüner Stadtmeisterschaft der Jugend)",
-      "start_date": "2026-10-17",
-      "end_date": "2026-10-18",
-      "location_text": "Lünen",
-      "organizer": "Nordrhein-Westfalen",
-      "bundesland": "Nordrhein-Westfalen",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-10-04",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44404",
-      "title": "3. E-RLT NIS OHZ/ROW/VER U11-U19",
-      "start_date": "2026-10-17",
-      "end_date": "2026-10-17",
-      "location_text": "Lilienthal",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-10-13",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44557",
-      "title": "C-RLT SAH U11-U19",
-      "start_date": "2026-10-17",
-      "end_date": "2026-10-17",
-      "location_text": "Salzwedel",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-09",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44630",
-      "title": "D-RLT NRW U11 (10. Offene Lüner Stadtmeisterschaft der Jugend)",
-      "start_date": "2026-10-17",
-      "end_date": "2026-10-18",
-      "location_text": "Lünen",
-      "organizer": "Nordrhein-Westfalen",
-      "bundesland": "Nordrhein-Westfalen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-10-04",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
     {
       "source_key": "dbv-calendar-44435",
       "title": "Freizeitturnier Mühlhäuser Traditionsturnier O19",
@@ -1428,31 +1283,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44526",
-      "title": "3. D-RLT BAW SB U11-U19",
-      "start_date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "location_text": "Freiburg",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": null,
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44527",
       "title": "3. D-RLT BAW NB U11-U19",
       "start_date": "2026-11-21",
@@ -1498,6 +1328,32 @@
         "Einzel"
       ],
       "registration_deadline": "2026-10-17",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44526",
+      "title": "3. D-RLT BAW SB U11-U19",
+      "start_date": "2026-11-22",
+      "end_date": "2026-11-22",
+      "location_text": "Freiburg",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-16",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
