@@ -45,6 +45,25 @@
  #view-berichte .report-search-label{grid-column:auto}
  #view-berichte :is(.report-filters label,.report-filters select,.report-filters input){min-width:0}
  #view-berichte .report-source-directory {max-width:100%}
+ /* The original mobile discovery cards are pale blue. The desktop workspace
+    has white headings, so both panels must switch together to navy; otherwise
+    the search heading becomes unreadable (white on pale blue). */
+ #view-spieler .follow-discovery,
+ #view-mannschaft .follow-discovery {
+   background:var(--desktop-card-bg);
+   color:var(--desktop-copy);
+   border-color:var(--desktop-card-border);
+ }
+ #view-spieler .follow-discovery .supporting,
+ #view-mannschaft .follow-discovery .supporting,
+ #view-spieler .follow-discovery .library-data-note,
+ #view-mannschaft .follow-discovery .team-source-note {
+   color:var(--desktop-muted);
+ }
+ #view-spieler .follow-discovery :is(label,h3,h4),
+ #view-mannschaft .follow-discovery :is(label,h3,h4) {
+   color:var(--desktop-copy);
+ }
  #view-spieler .follow-hub {width:100%;min-width:0}
  #view-spieler .follow-stack {min-width:0}
  #view-mannschaft .team-section,
