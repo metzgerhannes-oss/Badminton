@@ -7,6 +7,7 @@ const root=document.documentElement;
 const gate=document.getElementById("app-access-gate");
 const code=document.getElementById("app-access-code");
 const submit=document.getElementById("app-access-submit");
+const paste=document.getElementById("app-access-paste");
 const status=document.getElementById("app-access-status");
 window.badmintonAppAccess=Object.freeze({
  get accessToken(){return allowed?session?.access_token||null:null;},
@@ -102,10 +103,39 @@ async function accept(raw){
 }
 submit?.addEventListener("click",()=>accept(code.value));
 code?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();accept(code.value)}});
+// After iOS installation Safari and the PWA have separate storage. A deliberate
+// user gesture can transfer the original link from the shared OS clipboard
+// without copying/typing a 64-character secret into a form.
+paste?.addEventListener("click",async()=>{
+ if(busy)return;
+ try{
+  if(!navigator.clipboard?.readText)throw Error("clipboard");
+  const text=await navigator.clipboard.readText();
+  if(!text.trim())throw Error("empty");
+  await accept(text);
+ }catch{
+  inform("Zwischenablage nicht verfügbar. Öffne den ursprünglichen Einladungslink oder füge ihn hier ein.");
+ }
+});
 async function initialize(){
  root.dataset.appAccess="checking";
- const incoming=new URLSearchParams(location.hash.slice(1)).get("appinvite");
+ const hashParams=new URLSearchParams(location.hash.slice(1));
+ const incoming=hashParams.get("appinvite");
+ // Safari's accepted anonymous Auth session is NOT carried into the installed
+ // iPhone Home Screen app (independent localStorage). Intercept a fresh link
+ // *before redeeming it*, so the same invite is accepted once in the final app.
+ // The bootstrap has no PWA manifest: iOS installs its current fragment URL.
+ // Existing PWA sessions, Android and explicit browser-only use are unchanged.
+ const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||
+  (/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+ const standalone=navigator.standalone===true||
+  matchMedia("(display-mode:standalone)").matches;
+ if(ios&&!standalone&&TOKEN.test(incoming||"")&&hashParams.get("browser")!=="1"){
+  location.replace("./install-invite.html#appinvite="+incoming.toLowerCase());
+  return;
+ }
  if(TOKEN.test(incoming||""))code.value=incoming;
+ if(paste)paste.hidden=!navigator.clipboard?.readText;
  gate.hidden=false;
  try{
   const permission=await withCheckDeadline((async()=>{
