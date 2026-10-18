@@ -41,7 +41,9 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
  expect(calls).toEqual([]);
  const content=await page.content();
  expect(content).not.toMatch(/rel="manifest"/);
- expect(content).not.toContain(SECRET);
+ const browserLink=new URL(await page.locator("#browser-only").getAttribute("href"),page.url());
+ expect(browserLink.search).toBe("");
+ expect(browserLink.hash).toMatch(/^#appinvite=[a-f0-9]{64}&browser=1$/);
 });
 test("iPhone installed app redeems captured invitation automatically only once",async({page})=>{
  await simulateIOS(page,{standalone:true});
