@@ -72,6 +72,21 @@
  #view-berichte .report-search-label{grid-column:auto}
  #view-berichte :is(.report-filters label,.report-filters select,.report-filters input){min-width:0}
  #view-berichte .report-source-directory {max-width:100%}
+ /* Match field labels and empty-result notices to their navy surroundings.
+    Inputs and white message panels retain their darker text. */
+ #view-berichte .report-filters>label,
+ #view-berichte .report-result-heading>#report-count,
+ #view-spieler .follow-hub>.followed-search-label,
+ #view-mannschaft>.follow-season>label,
+ #view-mannschaft>.team-source-note {
+   color:#caddf0!important;
+ }
+ #view-berichte>.section-heading>#report-refresh,
+ #view-spieler>.section-heading>#player-add-open,
+ #view-mannschaft>.section-heading>#team-add-open {
+   color:#a4ddff!important;
+ }
+
  /* The original mobile discovery cards are pale blue. The desktop workspace
     has white headings, so both panels must switch together to navy; otherwise
     the search heading becomes unreadable (white on pale blue). */
