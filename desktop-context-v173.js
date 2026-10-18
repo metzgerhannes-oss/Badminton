@@ -43,7 +43,7 @@
   const dest=action==="calendar"?"dbv-calendar-heading":action==="schedule"?"tournament-live-select":null;
   const node=dest&&document.getElementById(dest);
   if(!node)return;
-  node.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"instant":"smooth"});
+  node.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
   if(action==="schedule")node.focus({preventScroll:true});
   if(action==="calendar")document.getElementById("dbv-calendar-q")?.focus({preventScroll:true});
  }
