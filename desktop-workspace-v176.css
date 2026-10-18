@@ -19,6 +19,33 @@
  #hauptinhalt>.page.active :is(.settings-card,.follow-hub,.team-detail,.club-overview-panel) {
    min-width:0;
  }
+ /* Screenshot QA: several older light-theme widgets retain ink-blue text on
+    the navy workspace. Scope light text to dark surfaces only: the trophy
+    panel and the small statistic tiles intentionally remain pale. */
+ #view-start>.dashboard-heading h1,
+ #view-start .dashboard-friends-section>.section-heading h2,
+ #view-start .dashboard-friends-section .section-heading h2 {
+   color:#eef8ff!important;
+ }
+ #view-start .dashboard-heading .muted,
+ #view-start .upcoming-tournaments-empty,
+ #view-start #dashboard-next .upcoming-tournament-label,
+ #view-start #match-stats .match-stats-source,
+ #view-start #match-stats .match-stats-note,
+ #view-start #match-stats .match-stats-details summary,
+ #view-start #match-stats .home-match-filter-panel summary,
+ #view-start .dashboard-source,
+ #view-einstellungen>.app-build-info,
+ #view-einstellungen .settings-room-hub>.settings-hub-lead {
+   color:#caddf0!important;
+ }
+ #view-start .home-trophy-heading h2 {
+   color:#123b5e!important;
+ }
+ #view-start .home-trophy-heading a,
+ #view-start .home-trophy-coverage>summary {
+   color:#155b8e!important;
+ }
  /* Wide reports and league tables scroll *inside* their own panels. */
  #hauptinhalt :is(.club-overview-scroll,.team-table-scroll,.reports-table-scroll,.table-scroll){
    width:100%;max-width:100%;min-width:0;overflow-x:auto;
