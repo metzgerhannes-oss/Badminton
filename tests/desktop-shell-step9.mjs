@@ -15,7 +15,7 @@ assert.match(existing,/\.bottom-nav/,"The existing navigation is reused");
 assert.equal((html.match(/<nav class="bottom-nav"/g)||[]).length,1,"No duplicate navigation");
 assert.match(html,/<link rel="stylesheet" href="\.\/desktop-shell-v172\.css">/);
 const ver=release.match(/version:"(v\d+)"/)?.[1];
-assert.equal(ver,"v175");
+assert.equal(ver,"v176");
 assert.match(sw,new RegExp("schmetterlinge-shell-"+ver+"\\b"));
 for(const name of ["ASSETS","SHELL_ASSETS"]){
  const m=sw.match(new RegExp("const "+name+"=(\\[[^\\n]+\\]);"));

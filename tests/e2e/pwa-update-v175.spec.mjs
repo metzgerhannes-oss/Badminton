@@ -18,14 +18,14 @@ test("iPhone PWA offers v175 and refreshes without deleting existing local profi
   if(url.searchParams.has("pwa-check")){probeLoads++;return route.fulfill({status:200,contentType:"text/javascript",body:current});}
   scriptLoads++;
   return route.fulfill({status:200,contentType:"text/javascript",
-   body:scriptLoads===1?current.replace('version:"v175"','version:"v174"'):current});
+   body:scriptLoads===1?current.replace('version:"v176"','version:"v175"'):current});
  });
  await page.setViewportSize({width:390,height:844});
  await page.goto("/index.html#spieler",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#pwa-update-prompt")).toBeVisible();
- await expect(page.locator("#pwa-update-prompt")).toContainText("v175");
+ await expect(page.locator("#pwa-update-prompt")).toContainText("v176");
  await page.locator("#pwa-update-apply").click();
- await expect(page).toHaveURL(/app-update=v175/);
+ await expect(page).toHaveURL(/app-update=v176/);
  await expect(page.locator("#pwa-update-prompt")).toHaveCount(0);
  await expect(page.locator("#view-spieler")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")||"null"));

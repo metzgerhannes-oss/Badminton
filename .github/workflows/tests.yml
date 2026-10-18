@@ -199,6 +199,7 @@ jobs:
           node tests/pwa-updates-v175.mjs
           node tests/desktop-shell-step9.mjs
           node tests/desktop-tournament-step9.mjs
+          node tests/desktop-workspace-step9.mjs
           node tests/ux-motion-step8.mjs
           node tests/welcome-i18n.mjs
           node scripts/validate-i18n.mjs

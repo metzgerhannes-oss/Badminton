@@ -1,0 +1,212 @@
+/* Step 9 / package 3: expand the accepted desktop shell to existing routes.
+   Presentation only: no new records, data fetches, route copies or profile state.
+   Phone/tablet remain on their existing flow until the 1280px workspace. */
+@media (min-width:1080px) {
+ .app {
+   --desktop-card-bg:#122e50;
+   --desktop-card-border:#355b83;
+   --desktop-copy:#eef7ff;
+   --desktop-muted:#c0d4ea;
+   --desktop-focus:#a7d8ff;
+ }
+ #hauptinhalt>.page.active {min-width:0}
+ #hauptinhalt>.page.active>.section-heading {
+   min-width:0;gap:12px;flex-wrap:wrap;margin:4px 0 18px;
+ }
+ #hauptinhalt>.page.active>.section-heading :is(h1,h2) {
+   font-size:clamp(24px,2.25vw,32px);line-height:1.2;overflow-wrap:anywhere;
+ }
+ #hauptinhalt>.page.active :is(.settings-card,.follow-hub,.team-detail,.club-overview-panel) {
+   min-width:0;
+ }
+ /* Screenshot QA: several older light-theme widgets retain ink-blue text on
+    the navy workspace. Scope light text to dark surfaces only: the trophy
+    panel and the small statistic tiles intentionally remain pale. */
+ #view-start>.dashboard-heading h1,
+ #view-start .dashboard-friends-section>.section-heading h2,
+ #view-start .dashboard-friends-section .section-heading h2 {
+   color:#eef8ff!important;
+ }
+ #view-start .dashboard-heading .muted,
+ #view-start .upcoming-tournaments-empty,
+ #view-start #dashboard-next .upcoming-tournament-label,
+ #view-start #match-stats .match-stats-source,
+ #view-start #match-stats .match-stats-note,
+ #view-start #match-stats .match-stats-details summary,
+ #view-start #match-stats .home-match-filter-panel summary,
+ #view-start .dashboard-source,
+ #view-einstellungen>.app-build-info,
+ #view-einstellungen .settings-room-hub>.settings-hub-lead {
+   color:#caddf0!important;
+ }
+ #view-start .home-trophy-heading h2 {
+   color:#123b5e!important;
+ }
+ #view-start .home-trophy-heading a,
+ #view-start .home-trophy-coverage>summary {
+   color:#155b8e!important;
+ }
+ /* Wide reports and league tables scroll *inside* their own panels. */
+ #hauptinhalt :is(.club-overview-scroll,.team-table-scroll,.reports-table-scroll,.table-scroll){
+   width:100%;max-width:100%;min-width:0;overflow-x:auto;
+ }
+ #hauptinhalt .page.active :is(input,select,textarea,button){max-width:100%}
+ #hauptinhalt .page.active :is(a,button,summary,input,select,textarea):focus-visible{
+   outline:3px solid var(--desktop-focus)!important;outline-offset:3px;
+ }
+ .app :is(.settings-card,.team-detail,.follow-hub,.club-overview-panel,.report-card) {
+   scroll-margin-top:18px;
+ }
+ #view-start .dashboard-friends-section .dashboard-friends,
+ #view-start .dashboard-ranking-grid,
+ #view-start .dashboard-kpi-grid {min-width:0}
+ #view-start .dashboard-friends-section .friend-quick-name,
+ #view-start .dashboard-friends-section .friend-details {overflow-wrap:anywhere}
+ #view-verein .club-overview-panel {max-width:100%;min-width:0}
+ #view-verein .club-overview-controls {grid-template-columns:repeat(5,minmax(0,1fr))}
+ #view-verein :is(.club-overview-controls label,.club-overview-controls input,.club-overview-controls select){min-width:0}
+ #view-historie :is(.history-content,.trophy-section,.career-history,.external-match-history) {
+   max-width:100%;min-width:0;
+ }
+ #view-berichte .report-filters{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+ #view-berichte .report-search-label{grid-column:auto}
+ #view-berichte :is(.report-filters label,.report-filters select,.report-filters input){min-width:0}
+ #view-berichte .report-source-directory {max-width:100%}
+ /* Match field labels and empty-result notices to their navy surroundings.
+    Inputs and white message panels retain their darker text. */
+ #view-berichte .report-filters>label,
+ #view-berichte .report-result-heading>#report-count,
+ #view-spieler .follow-hub>.followed-search-label,
+ #view-mannschaft>.follow-season>label,
+ #view-mannschaft>.team-source-note {
+   color:#caddf0!important;
+ }
+ #view-berichte>.section-heading>#report-refresh,
+ #view-spieler>.section-heading>#player-add-open,
+ #view-mannschaft>.section-heading>#team-add-open {
+   color:#a4ddff!important;
+ }
+
+ /* The original mobile discovery cards are pale blue. The desktop workspace
+    has white headings, so both panels must switch together to navy; otherwise
+    the search heading becomes unreadable (white on pale blue). */
+ #view-spieler .follow-discovery,
+ #view-mannschaft .follow-discovery {
+   background:var(--desktop-card-bg);
+   color:var(--desktop-copy);
+   border-color:var(--desktop-card-border);
+ }
+ #view-spieler .follow-discovery .supporting,
+ #view-mannschaft .follow-discovery .supporting,
+ #view-spieler .follow-discovery .library-data-note,
+ #view-mannschaft .follow-discovery .team-source-note {
+   color:var(--desktop-muted);
+ }
+ #view-spieler .follow-discovery :is(label,h3,h4),
+ #view-mannschaft .follow-discovery :is(label,h3,h4) {
+   color:var(--desktop-copy);
+ }
+ #view-spieler .follow-hub {width:100%;min-width:0}
+ #view-spieler .follow-stack {min-width:0}
+ #view-mannschaft .team-section,
+ #view-mannschaft .team-detail,
+ #view-mannschaft .team-discovery {min-width:0}
+}
+@media (min-width:1280px) {
+ /* Follow hub + search: searching never compresses cards or overlaps the rail. */
+ #view-spieler.active {
+   display:grid;grid-template-columns:minmax(0,1fr);
+   align-items:start;column-gap:18px;row-gap:14px;
+ }
+ #view-spieler.active>.section-heading {grid-column:1/-1;margin-bottom:0}
+ #view-spieler.active:has(#player-discover:not([hidden])) {
+   grid-template-columns:minmax(0,1.05fr) minmax(350px,.95fr);
+ }
+ #view-spieler.active:has(#player-discover:not([hidden])) .follow-hub {
+   grid-column:1;grid-row:2;
+ }
+ #view-spieler.active #player-discover:not([hidden]) {
+   grid-column:2;grid-row:2;min-width:0;
+ }
+ #view-spieler.active:has(#player-discover:not([hidden])) .follow-hub,
+ #view-spieler.active #player-discover:not([hidden]){
+   border:1px solid var(--desktop-card-border);border-radius:19px;
+   padding:clamp(14px,1.35vw,20px);margin:0;min-width:0;
+ }
+ #view-spieler.active .follow-hub .follow-stack{max-width:none}
+ #view-spieler.active .follow-hub-subheading {gap:10px;flex-wrap:wrap}
+ #view-spieler.active .followed-player-row{min-width:0}
+ #view-spieler.active :is(.library-filters,.follow-search-extra){min-width:0}
+ /* Teams: the followed list and its selected official fixture share the same
+    row; without a selection the complete list takes the available width. */
+ #view-mannschaft.active {
+   display:grid;
+   grid-template-columns:minmax(315px,.85fr) minmax(0,1.15fr);
+   align-items:start;column-gap:18px;row-gap:13px;
+ }
+ #view-mannschaft.active>.section-heading,
+ #view-mannschaft.active>.follow-season {grid-column:1/-1}
+ #view-mannschaft.active>.team-section {grid-column:1;grid-row:3;margin:0}
+ #view-mannschaft.active>#team-detail:not([hidden]) {
+   grid-column:2;grid-row:3;margin:0;min-width:0;
+ }
+ #view-mannschaft.active:not(:has(#team-detail:not([hidden])))>.team-section {
+   grid-column:1/-1;
+ }
+ #view-mannschaft.active:not(:has(#team-detail:not([hidden]))) #team-followed {
+   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+ }
+ #view-mannschaft.active>#team-discover:not([hidden]) {
+   grid-column:1/-1;grid-row:4;min-width:0;margin:0;
+ }
+ #view-mannschaft.active>.team-source-note {grid-column:1/-1}
+ #view-mannschaft.active #team-detail :is(.team-tabs,.team-fixtures,.team-league-table) {max-width:100%}
+ /* Reports: use the wide content column for two readable independent cards.
+    The source directory and no-results messages always span the whole row. */
+ #view-berichte.active #report-list {
+   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+   gap:13px;align-items:stretch;min-width:0;
+ }
+ #view-berichte.active #report-list>:not(.report-card) {grid-column:1/-1}
+ #view-berichte.active #report-list .report-card {margin:0;min-width:0}
+ /* Settings: two columns of existing locally controlled sections, without
+    moving a form or changing the keyboard order in the document. */
+ #view-einstellungen.active {
+   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+   gap:16px 20px;align-items:start;
+ }
+ #view-einstellungen.active>.section-heading,
+ #view-einstellungen.active>.app-build-info {grid-column:1/-1;margin:0}
+ #view-einstellungen.active>.settings-room-hub,
+ #view-einstellungen.active>.settings-room:not([hidden]){
+   grid-column:1/-1;min-width:0;margin-top:0;
+ }
+ /* The settings entry grid is its own responsive surface, not a half-width
+    child of the wider two-column edit-form grid. */
+ #view-einstellungen.active .settings-hub-grid{
+   grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));
+   gap:12px;
+ }
+
+ #view-einstellungen.active>:is(.settings-card,.player-management) {
+   min-width:0;max-width:100%;margin-top:0;
+ }
+ #view-einstellungen.active .settings-card :is(input,select,textarea){min-width:0}
+ #view-einstellungen.active .player-management .settings-section{min-width:0}
+}
+@media (min-width:1280px) and (max-width:1420px) {
+ #view-spieler.active:has(#player-discover:not([hidden])) {
+  grid-template-columns:minmax(0,1fr) minmax(330px,1fr);
+ }
+ #view-mannschaft.active{grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr)}
+ #view-berichte.active #report-list{gap:10px}
+}
+@media (max-width:1279px) {
+ /* Do not ship the new wide-grid layouts into existing phone/tablet flows. */
+ #view-spieler.active,#view-mannschaft.active,#view-berichte.active,#view-einstellungen.active {
+   min-width:0;
+ }
+}
+@media (min-width:1080px) and (prefers-reduced-motion:reduce) {
+ .app .page :is(.report-card,.team-card,.followed-player-row) {transition:none!important}
+}
