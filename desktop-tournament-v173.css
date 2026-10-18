@@ -73,6 +73,28 @@
   #view-turniere .live-radar-panel .live-radar-disclaimer {color:#426987!important}
   #view-turniere .live-hub-follow-link {color:#086da4!important}
   #view-turniere .live-hub-toolbar label {color:#294e6b!important}
+  /* Native desktop WebKit painted this selector light-on-light despite the
+     supplied dark control palette. Keep the real accessible native select,
+     but provide deterministic foreground/background and an SVG chevron. */
+  #view-turniere .live-hub-toolbar #live-player-select {
+    -webkit-appearance:none;
+    appearance:none;
+    color-scheme:dark;
+    color:#f7fbff!important;
+    -webkit-text-fill-color:#f7fbff;
+    background-color:#173b5f!important;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6' fill='none' stroke='%23d3edff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position:right 12px center;
+    background-repeat:no-repeat;
+    background-size:16px 16px;
+    padding-right:40px;
+    border-color:#79b5d7;
+  }
+  #view-turniere .live-hub-toolbar #live-player-select:disabled {
+    opacity:1;
+    color:#e5f3ff!important;
+    -webkit-text-fill-color:#e5f3ff;
+  }
   /* Existing official schedule, live radar, filters and calendar render in the
      same middle column, retaining their own scroll and all event handlers. */
   #view-turniere .tournament-live-toolbar,
