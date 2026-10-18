@@ -71,6 +71,9 @@
   #view-turniere .live-radar-panel .live-hub-title h3 {color:#173d5e!important}
   #view-turniere .live-radar-panel .live-radar-hint,
   #view-turniere .live-radar-panel .live-radar-disclaimer {color:#426987!important}
+  /* Source links in the pale live card must be darker than their background. */
+  #view-turniere .live-radar-panel a,
+  #view-turniere .live-radar-panel a:visited {color:#0b5b91!important}
   #view-turniere .live-hub-follow-link {color:#086da4!important}
   #view-turniere .live-hub-toolbar label {color:#294e6b!important}
   /* Native desktop WebKit painted this selector light-on-light despite the
