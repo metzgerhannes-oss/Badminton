@@ -3,7 +3,18 @@ import {readFile} from "node:fs/promises";
 const data=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 const sourceTotal=data.entries.length;
 const entries2026=data.entries.filter(e=>e.start_date?.startsWith("2026"));
-const countBW2026=entries2026.filter(e=>e.bundesland==="Baden-Württemberg").length;
+const bwArchive=JSON.parse(await readFile("data/bw-youth-calendar-archive.json","utf8"));
+// The app merges six source-backed BW archive events with the 2026 snapshot.
+// Four are intentionally displayed via the separately verified curated
+// result cards, so they are not counted twice in the imported event grid.
+const curatedArchiveKeys=new Set([
+ "dbv-calendar-44014","dbv-calendar-44018","dbv-calendar-44019","dbv-calendar-44020"
+]);
+const unique2026=new Map([...entries2026,...bwArchive.entries.filter(e=>
+ e.start_date?.startsWith("2026")&&!curatedArchiveKeys.has(e.source_key)
+)].map(e=>[e.source_key,e]));
+const expected2026=unique2026.size;
+const countBW2026=[...unique2026.values()].filter(e=>e.bundesland==="Baden-Württemberg").length;
 const own={players:[{id:"05-070879",name:"Testprofil"}],friends:[],officialLinks:[],
  activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true};
 test.beforeEach(async ({page})=>{
@@ -23,7 +34,7 @@ test("Official calendar clusters by state, age and level without invented regist
  // subset (yesterday's tournaments leave that subset at local midnight).
  await page.locator("#dbv-calendar-period").selectOption("all");
  await page.locator("#dbv-calendar-year").selectOption("2026");
- await expect(page.locator("#dbv-calendar-status")).toContainText(entries2026.length+" passende Turniere");
+ await expect(page.locator("#dbv-calendar-status")).toContainText(expected2026+" passende Turniere");
  await expect(results.locator(".dbv-calendar-entry").first()).toBeVisible();
  const filter=page.locator("#dbv-calendar-region");
  await filter.selectOption("Baden-Württemberg");
