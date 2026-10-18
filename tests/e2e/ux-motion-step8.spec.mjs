@@ -9,7 +9,7 @@ test("320px and 390px: subtle tap feedback, instant view change, intact keyboard
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#view-start")).toBeVisible();
   const nav=page.locator('.bottom-nav a[data-page="berichte"]');
-  const icon=nav.locator(">span");
+  const icon=nav.locator(":scope > span");
   await expect(icon).toHaveCSS("transition-property","transform");
   await expect(icon).toHaveCSS("transition-duration","0.14s");
   await nav.click();
@@ -37,7 +37,7 @@ test("reduced motion: new touch transitions and transforms are off",async({page}
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#view-start")).toBeVisible();
  const nav=page.locator('.bottom-nav a[data-page="spieler"]');
- const icon=nav.locator(">span");
+ const icon=nav.locator(":scope > span");
  await expect(icon).toHaveCSS("transition-property","none");
  const settings=page.locator(".topbar-settings");
  await expect(settings).toHaveCSS("transition-property","none");
