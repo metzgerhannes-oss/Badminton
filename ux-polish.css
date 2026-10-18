@@ -59,3 +59,42 @@
 }
 /* A visible keyboard outline and iOS pinch-zoom remain controlled by the
    established accessibility and mobile-input layers; no gesture interception. */
+
+/* U7 · v171: calm native-like touch feedback only. The DOM, route/render logic,
+   desktop Navy layout, focus outlines and touch target sizes stay unchanged.
+   Never transition visibility, geometry, page display or a dialog backdrop. */
+@media (prefers-reduced-motion:no-preference) {
+ .app .bottom-nav a,
+ .app .topbar-settings,
+ .app .page button[aria-pressed] {
+  transition:color 150ms ease-out,background-color 150ms ease-out,
+   border-color 150ms ease-out,box-shadow 150ms ease-out;
+ }
+ .app .bottom-nav a > span,
+ .app .topbar-settings svg {
+  transition:transform 140ms ease-out;
+ }
+ .app .bottom-nav a:active > span {
+  transform:scale(.91);
+ }
+ .app .topbar-settings:active svg {
+  transform:rotate(8deg) scale(.94);
+ }
+ .app .page :is(.primary-button,.subtle-button,.outline-button,.dashboard-add-friend):not(:disabled):not([aria-disabled="true"]) {
+  transition:transform 140ms ease-out,box-shadow 150ms ease-out,
+   background-color 150ms ease-out,border-color 150ms ease-out;
+ }
+ .app .page :is(.primary-button,.subtle-button,.outline-button,.dashboard-add-friend):not(:disabled):not([aria-disabled="true"]):active {
+  transform:translateY(1px) scale(.985);
+ }
+}
+@media (prefers-reduced-motion:reduce) {
+ .app .bottom-nav a,
+ .app .bottom-nav a > span,
+ .app .topbar-settings,
+ .app .topbar-settings svg,
+ .app .page button[aria-pressed],
+ .app .page :is(.primary-button,.subtle-button,.outline-button,.dashboard-add-friend) {
+  transition:none!important;
+ }
+}
