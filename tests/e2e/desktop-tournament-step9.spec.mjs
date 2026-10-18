@@ -1,3 +1,4 @@
+import {mkdir} from "node:fs/promises";
 import {test,expect} from "./invited-member.fixture.mjs";
 
 test.beforeEach(async({page})=>{
@@ -37,6 +38,8 @@ test("desktop PR2: turniertag has usable right context and no horizontal page ov
   expect(m.calendarCount).toBe(1);
   expect(m.liveCount).toBe(1);
   expect(m.overflow).toBeLessThanOrEqual(2);
+  await mkdir("test-results",{recursive:true});
+  await page.screenshot({path:`test-results/desktop-pr2-${width}x${height}-${test.info().project.name}.png`,animations:"disabled"});
  }
  await expect(page.locator("#desktop-context-events")).toContainText("Noch keine datierten Termine");
  await page.locator('[data-desktop-action="add-tournament"]').click();
