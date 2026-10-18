@@ -37,6 +37,28 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
    expect(m.nav.right).toBeLessThanOrEqual(m.main.left-4);
    expect(m.scroll-m.innerWidth,route+" overflows at "+width+"px").toBeLessThanOrEqual(2);
    expect(m.active?.width).toBeGreaterThan(300);
+   if(width===1440&&route==="start"){
+    // Real screenshot regression: inherited light-theme ink on the dark
+    // dashboard made headings unreadable, while a pale trophy card needs ink.
+    const colors=await page.evaluate(()=>{
+     const channels=selector=>Array.from(getComputedStyle(document.querySelector(selector)).color.matchAll(/[0-9.]+/g))
+      .slice(0,3).map(match=>Number(match[0]));
+     return {
+      heading:channels("#view-start>.dashboard-heading h1"),
+      friends:channels("#view-start .dashboard-friends-section .section-heading h2"),
+      empty:channels("#view-start .upcoming-tournaments-empty"),
+      trophy:channels("#view-start .home-trophy-heading h2")
+     };
+    });
+    for(const key of ["heading","friends","empty"])
+     expect(Math.min(...colors[key]),key+" must remain light on navy").toBeGreaterThanOrEqual(180);
+    expect(Math.max(...colors.trophy),"Pale trophy card needs dark readable heading").toBeLessThan(130);
+   }
+   if(width===1440&&route==="einstellungen"){
+    const lead=await page.locator("#settings-room-hub .settings-hub-lead").evaluate(el=>
+     getComputedStyle(el).color.match(/[0-9.]+/g).slice(0,3).map(Number));
+    expect(Math.min(...lead),"Settings intro must be light on navy").toBeGreaterThanOrEqual(180);
+   }
    if(width===1440&&["start","spieler","verein","mannschaft","berichte","einstellungen"].includes(route)){
     await mkdir("test-results",{recursive:true});
     await page.screenshot({
