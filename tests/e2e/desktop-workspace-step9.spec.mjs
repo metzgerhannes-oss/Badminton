@@ -59,7 +59,10 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
      getComputedStyle(el).color.match(/[0-9.]+/g).slice(0,3).map(Number));
     expect(Math.min(...lead),"Settings intro must be light on navy").toBeGreaterThanOrEqual(180);
    }
-   if(width===1440&&["start","spieler","verein","mannschaft","berichte","einstellungen"].includes(route)){
+   // Screenshot QA at all three accepted desktop widths; limit to three representative
+   // routes outside 1440px to keep artifact size small on the free GitHub tier.
+   if((width===1440&&["start","spieler","verein","mannschaft","berichte","einstellungen"].includes(route))||
+      ([1280,1920].includes(width)&&["start","verein","berichte"].includes(route))){
     await mkdir("test-results",{recursive:true});
     await page.screenshot({
      path:`test-results/desktop-pr3-${route}-${width}-${test.info().project.name}.png`,
