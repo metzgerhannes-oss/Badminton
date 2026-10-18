@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Schmetterlinge">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#112f54">
+<title>Schmetterlinge · Zugang übernehmen</title>
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/schmetterlinge-apple-touch-icon-180.png">
+<!-- Deliberately no manifest here. iOS should install the *current invite URL*,
+     not the generic start_url which loses the invitation in a new PWA store. -->
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;
+padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+background:linear-gradient(150deg,#09203d,#183f68);font:16px/1.55 system-ui,sans-serif;color:#eff9ff}
+main{width:min(100%,460px);background:#133557;border:1px solid #4c789e;
+box-shadow:0 16px 40px #03102166;border-radius:22px;padding:25px}
+img{display:block;width:80px;height:80px;margin:0 auto 14px;object-fit:contain}
+h1{font-size:23px;line-height:1.25;text-align:center;margin:0 0 15px}
+p{margin:10px 0;color:#d7eaff}
+ol{padding-left:23px;line-height:1.7}
+li{padding:3px 0}
+button,a{font:inherit}
+button{width:100%;min-height:48px;border:1px solid #82cbed;background:#d8f1ff;
+color:#102d46;font-weight:800;padding:12px;border-radius:12px;margin-top:12px}
+a{color:#c2eaff;display:block;text-align:center;padding:10px}
+a:focus-visible,button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+small{display:block;color:#c6dbed;margin-top:16px;font-size:12px}
+#install-status{min-height:1.5em}
+</style>
+</head>
+<body>
+<main>
+<img src="./assets/spvgg-schmetterlinge-splash.svg" alt="Logo der Schmetterlinge" width="80" height="80">
+<h1>Einmal einladen – direkt in der App freigeschaltet</h1>
+<p>iPhone und Safari speichern den Zugang getrennt. Deshalb wird dein Einladungslink <strong>erst beim Öffnen der installierten App</strong> freigeschaltet.</p>
+<button id="install-copy" type="button">1. Einladung sichern</button>
+<p id="install-status" role="status" aria-live="polite"></p>
+<p><strong>Schmetterlinge ist schon installiert?</strong> Tippe unten auf „Einladung sichern“, öffne danach dein <strong>bereits vorhandenes App-Symbol</strong> und tippe dort auf „Einladung aus Zwischenablage übernehmen“. Keine zweite Installation nötig.</p>
+<p><strong>Neue Installation:</strong></p>
+<ol>
+<li>Öffne diese Seite in <strong>Safari</strong> (nicht im Messenger-Fenster).</li>
+<li>Tippe zuerst auf <strong>„Einladung sichern“</strong>. Damit bleibt der Link auch erhalten, wenn iOS ihn nicht ins Symbol übernimmt.</li>
+<li>Tippe auf <strong>Teilen → Zum Home-Bildschirm hinzufügen</strong>.</li>
+<li>Aktiviere <strong>Als Web-App öffnen</strong> und tippe auf Hinzufügen.</li>
+<li>Öffne <strong>Schmetterlinge</strong> über das neue Symbol: Die Einladung wird automatisch geprüft. Nur wenn iOS den Link verworfen hat, tippe dort einmal auf <strong>„Einladung übernehmen“</strong>.</li>
+</ol>
+
+<a id="browser-only" href="./index.html">Stattdessen nur im Browser verwenden</a>
+<small>Die Freischaltung gilt ausschließlich auf diesem Gerät. Die Einladung wird nicht in einer neuen Datenbank gespeichert. Einladungen können widerrufen werden.</small>
+</main>
+<script>
+"use strict";
+(function(){
+ const token=new URLSearchParams(location.hash.slice(1)).get("appinvite");
+ const valid=typeof token==="string"&&/^[a-f0-9]{64}$/i.test(token);
+ const standalone=navigator.standalone===true||matchMedia("(display-mode:standalone)").matches;
+ const next=new URL("./index.html",location.href);
+ if(valid)next.hash="appinvite="+token.toLowerCase();
+ else next.hash="start";
+ if(standalone){location.replace(next.href);return}
+ const status=document.getElementById("install-status");
+ const copy=document.getElementById("install-copy");
+ const browser=document.getElementById("browser-only");
+ if(!valid){
+  status.textContent="Kein gültiger Einladungslink erkannt. Öffne den Original-Link aus der Nachricht.";
+  copy.disabled=true;browser.href="./index.html#start";return;
+ }
+ browser.href=next.href+"&browser=1";
+ copy.addEventListener("click",async()=>{
+  try{
+   if(!navigator.clipboard?.writeText)throw Error("clipboard");
+   await navigator.clipboard.writeText(next.href);
+   status.textContent="Einladung gesichert. Nach der Installation im App-Fenster „Zugang übernehmen“ antippen, falls nötig.";
+  }catch{
+   status.textContent="Automatisches Kopieren ist nicht verfügbar. Öffne den Einladungslink nach der Installation erneut oder kopiere ihn aus der Nachricht.";
+  }
+ });
+})();
+</script>
+</body>
+</html>

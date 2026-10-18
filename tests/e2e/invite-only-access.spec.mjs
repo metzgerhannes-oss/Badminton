@@ -16,7 +16,7 @@ test("without an accepted invitation the app shell stays hidden",async({page})=>
  await expect(page.locator("#app-access-status")).toContainText("nur mit Einladung");
 });
 
-test("a valid invitation creates a device session and unlocks the shell",async({page})=>{
+test("explicit browser-only invitation creates a device session and unlocks the shell",async({page})=>{
  const calls=[];
  await page.route(API+"/**",async route=>{
   const req=route.request(),u=new URL(req.url());
@@ -34,7 +34,7 @@ test("a valid invitation creates a device session and unlocks the shell",async({
    return route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
   return route.fulfill({status:200,headers,body:"[]"});
  });
- await page.goto("/#appinvite="+KEY,{waitUntil:"domcontentloaded"});
+ await page.goto("/#appinvite="+KEY+"&browser=1",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page.locator("body > .app")).toBeVisible();
  expect(calls).toEqual([KEY]);
