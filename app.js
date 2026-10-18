@@ -582,6 +582,6 @@ function setup(){
    if(!state.players.length&&!state.friends.length&&!welcome.open)SchmetterlingeRouter.openDialog(welcome);
   },{once:true});
  }
- if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
+ window.SchmetterlingePwaUpdate?.initialize();
 }
 document.addEventListener("DOMContentLoaded",setup);

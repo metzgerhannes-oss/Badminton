@@ -196,6 +196,7 @@ jobs:
           node tests/release-version.mjs
           node tests/animated-access-splash-step7.mjs
           node tests/ios-invite-install.mjs
+          node tests/pwa-updates-v175.mjs
           node tests/desktop-shell-step9.mjs
           node tests/desktop-tournament-step9.mjs
           node tests/ux-motion-step8.mjs
