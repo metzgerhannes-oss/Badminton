@@ -19,6 +19,9 @@ test("Official calendar clusters by state, age and level without invented regist
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  const results=page.locator("#dbv-calendar-results");
+ // Compare with the complete 2026 fixture, not the date-dependent upcoming
+ // subset (yesterday's tournaments leave that subset at local midnight).
+ await page.locator("#dbv-calendar-period").selectOption("all");
  await page.locator("#dbv-calendar-year").selectOption("2026");
  await expect(page.locator("#dbv-calendar-status")).toContainText(entries2026.length+" passende Turniere");
  await expect(results.locator(".dbv-calendar-entry").first()).toBeVisible();
