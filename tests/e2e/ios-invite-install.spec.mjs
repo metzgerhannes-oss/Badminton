@@ -43,7 +43,7 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
  // Existing app scripts may make unrelated, fully intercepted public read calls
  // before the navigation redirect commits in WebKit. They must never signup,
  // redeem the invitation or query the access grant in the Safari context.
- const accessCalls=calls.filter(x=>/\\/auth\\/v1\\/signup$|\\/rest\\/v1\\/rpc\\/app_access_(invite_accept|status)$/.test(x.path));
+ const accessCalls=calls.filter(({path})=>path.endsWith("/auth/v1/signup")||path.endsWith("/rpc/app_access_invite_accept")||path.endsWith("/rpc/app_access_status"));
  expect(accessCalls,"Safari must not consume an invitation or grant a session").toEqual([]);
  const content=await page.content();
  expect(content).not.toMatch(/rel="manifest"/);
