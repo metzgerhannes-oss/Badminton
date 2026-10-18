@@ -44,6 +44,15 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
  const browserLink=new URL(await page.locator("#browser-only").getAttribute("href"),page.url());
  expect(browserLink.search).toBe("");
  expect(browserLink.hash).toMatch(/^#appinvite=[a-f0-9]{64}&browser=1$/);
+ for(const width of [320,390]){
+  await page.setViewportSize({width,height:844});
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow,"iOS install-first screen must not overflow at "+width).toBeLessThanOrEqual(2);
+ }
+ await page.screenshot({
+  path:"test-results/ios-install-first-"+test.info().project.name+".png",
+  animations:"disabled"
+ });
 });
 test("iPhone installed app redeems captured invitation automatically only once",async({page})=>{
  await simulateIOS(page,{standalone:true});
