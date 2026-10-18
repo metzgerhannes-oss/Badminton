@@ -1,5 +1,19 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
+// The first-run profile picker is correctly modal. Use a synthetic existing
+// player so this shell test measures navigation, not an unfinished onboarding.
+// Same test-only fixture as the already-established step 8 browser suite.
+test.beforeEach(async({page})=>{
+ await page.addInitScript(()=>{
+  if(!localStorage.getItem("shuttleboard-v1"))
+   localStorage.setItem("shuttleboard-v1",JSON.stringify({
+    players:[{id:"05-070879",name:"UI Testprofil"}],friends:[],officialLinks:[],
+    activeProfileId:"05-070879",chosen:"05-070879",
+    historyProfilesInitialized:true
+   }));
+ });
+});
+
 /* Static fixture / mocked invited session and blocked production network. */
 test("desktop PR 1: full-width header, large original logo and nonoverlapping rail",async({page})=>{
  for(const width of [1280,1440,1920]){
