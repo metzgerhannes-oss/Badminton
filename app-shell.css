@@ -299,9 +299,10 @@
 .dbv-calendar-panel>.dbv-calendar-source{font-size:12px;margin-top:17px}
 @media(max-width:650px){.dbv-calendar-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.dbv-calendar-filters .dbv-calendar-search{grid-column:1/-1}}
 @media(max-width:390px){.dbv-calendar-panel{padding:12px}.dbv-calendar-entry{grid-template-columns:84px minmax(0,1fr);gap:8px}.dbv-calendar-detail h5{font-size:14px}}
-/* Very narrow iPhones cannot reliably fit two native WebKit select controls:
-   use one full-width field per row, including the long regional picker. */
-@media(max-width:350px){
+/* Narrow phones cannot reliably fit two native WebKit select controls
+   side by side (verified 91px scroll overflow at 390px). Keep each field
+   full-width through 440px, especially the long region picker. */
+@media(max-width:440px){
  .dbv-calendar-filters{grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%;box-sizing:border-box}
  .dbv-calendar-filters .dbv-calendar-search{grid-column:auto}
  .dbv-calendar-filters label{display:block;min-width:0;max-width:100%}
