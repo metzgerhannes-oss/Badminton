@@ -28,8 +28,8 @@ assert.match(app,/SchmetterlingeBookmarks\.visible\(state\)/);
 assert.match(app,/SchmetterlingeSpond\.dashboardItems\(/);
 assert.match(app,/return \{own:true,events:/);
 assert.match(shell,/--desktop-rail:220px/);
-assert.match(release,/version:"v174"/);
-assert.match(sw,/schmetterlinge-shell-v174/);
+assert.match(release,/version:"v175"/);
+assert.match(sw,/schmetterlinge-shell-v175/);
 for(const key of ["ASSETS","SHELL_ASSETS"]){
  const match=sw.match(new RegExp("const "+key+"=(\\[[^\\n]+\\]);"));
  assert.ok(match,key+" must exist");
