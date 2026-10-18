@@ -32,8 +32,8 @@ assert.doesNotMatch(install,/auth\/v1|supabase\.co|localStorage|analytics|fetch\
 assert.doesNotMatch(app,/new URLSearchParams\(location\.search\)\.set\("appinvite"/);
 assert.match(fixture,/context\.route\(SUPABASE/);
 assert.match(invites,/appinvite=/);
-assert.match(sw,/schmetterlinge-shell-v174/);
-assert.match(release,/version:"v174"/);
+assert.match(sw,/schmetterlinge-shell-v175/);
+assert.match(release,/version:"v175"/);
 for(const key of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  const m=sw.match(new RegExp("const "+key+"=(\\[[^\\n]+\\]);"));
  assert.ok(m,key+" present");
