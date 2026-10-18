@@ -39,6 +39,7 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
  await expect(page).toHaveURL(new RegExp("/install-invite\\.html#appinvite="+SECRET+"$"));
  await expect(page.getByRole("heading",{name:/Einmal einladen/})).toBeVisible();
  await expect(page.locator("#install-copy")).toBeVisible();
+ await expect(page.locator('main > img')).toHaveAttribute("src","./assets/spvgg-schmetterlinge-splash.svg");
  expect(calls).toEqual([]);
  const content=await page.content();
  expect(content).not.toMatch(/rel="manifest"/);
@@ -49,6 +50,9 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
   await page.setViewportSize({width,height:844});
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   expect(overflow,"iOS install-first screen must not overflow at "+width).toBeLessThanOrEqual(2);
+  const cta=await page.locator("#install-copy").boundingBox();
+  expect(cta,"Save-invite action should be available without scrolling at "+width).toBeTruthy();
+  expect(cta.y+cta.height,"Save-invite action must precede long install instructions").toBeLessThanOrEqual(844);
  }
  await mkdir("test-results",{recursive:true});
  await page.screenshot({
