@@ -25,6 +25,7 @@ const bounds=async(page)=>page.evaluate(()=>{
 });
 
 test("desktop PR3: wide existing views use the shell without clipping or duplicate navigation",async({page})=>{
+ test.setTimeout(120_000); // 21 route loads plus deterministic screenshots on CI
  for(const width of [1280,1440,1920]){
   await page.setViewportSize({width,height:900});
   for(const route of ["start","spieler","verein","mannschaft","berichte","historie","einstellungen"]){
@@ -61,6 +62,23 @@ test("desktop PR3: player search opens alongside followed profiles and keeps foc
  expect(m.find.left).toBeGreaterThanOrEqual(m.follow+8);
  expect(m.overflow).toBeLessThanOrEqual(2);
  await expect(page.locator("#library-search")).toBeVisible();
+ // Regression: mobile's pale discovery card must not retain a white desktop
+ // heading. Measure rendered contrast rather than only checking CSS strings.
+ const contrast=await page.locator("#player-discover").evaluate(panel=>{
+  const parse=value=>value.match(/[\\d.]+/g).slice(0,3).map(Number);
+  const lum=rgb=>rgb.map(v=>{
+   const c=v/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;
+  }).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  const background=lum(parse(getComputedStyle(panel).backgroundColor));
+  const heading=lum(parse(getComputedStyle(panel.querySelector("h3")).color));
+  return (Math.max(background,heading)+.05)/(Math.min(background,heading)+.05);
+ });
+ expect(contrast,"Desktop discovery heading must be readable").toBeGreaterThan(7);
+ await page.locator("#player-discover-close").focus();
+ await page.keyboard.press("Tab");
+ await expect(page.locator("#library-reload")).toBeFocused();
+ await page.keyboard.press("Tab");
+ await expect(page.locator("#library-search")).toBeFocused();
  await page.locator("#player-discover-close").click();
  await expect(page.locator("#player-discover")).toBeHidden();
 });
@@ -88,6 +106,7 @@ test("desktop PR3: selected team details and report cards fit in two columns",as
 });
 
 test("desktop PR3: tablet/iPhone keep familiar stacked views and original nav",async({page})=>{
+ test.setTimeout(120_000); // 25 route loads across five viewport sizes
  for(const width of [1024,768,440,390,320]){
   await page.setViewportSize({width,height:844});
   for(const route of ["start","spieler","mannschaft","berichte","einstellungen"]){
