@@ -48,7 +48,13 @@
   if(!force&&now-lastChecked<MIN_CHECK_GAP)return;
   lastChecked=now;
   if(navigator.onLine===false)return;
-  const running=releaseNumber(window.SchmetterlingeRelease?.version);
+  // The rendered Pages-stamped HTML is the actual running shell. A newer
+  // app-release.js can be served into an old WebKit document; in that case
+  // the release object's version would hide a necessary update prompt.
+  const badge=document.querySelector?.("[data-app-version]");
+  const pageVersion=badge?.getAttribute?.("data-release-build")
+   ?releaseNumber(badge.textContent?.trim()):null;
+  const running=pageVersion??releaseNumber(window.SchmetterlingeRelease?.version);
   if(!running)return;
   try{
    const url=new URL("./app-release.js",location.href);
