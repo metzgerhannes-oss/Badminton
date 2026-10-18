@@ -62,6 +62,17 @@
   .desktop-context-motif {display:flex;align-items:center;gap:11px;min-width:0;opacity:.78}
   .desktop-context-motif img {width:43px;height:43px;object-fit:contain;flex:none}
   .desktop-context-motif small {font-size:11px;line-height:1.4;color:#c1d8e9}
+  /* Desktop has a dark navy canvas around the existing light matchday cards:
+     headings on the canvas must be light, while text inside cards stays dark. */
+  #view-turniere > .section-heading h2 {color:#eff8ff!important}
+  #view-turniere > .section-heading .live-hub-kicker,
+  #view-turniere > .live-hub-lead {color:#bad7eb!important}
+  #view-turniere > .history-inline-link {color:#0b5b91!important}
+  #view-turniere .live-radar-panel .live-hub-title h3 {color:#173d5e!important}
+  #view-turniere .live-radar-panel .live-radar-hint,
+  #view-turniere .live-radar-panel .live-radar-disclaimer {color:#426987!important}
+  #view-turniere .live-hub-follow-link {color:#086da4!important}
+  #view-turniere .live-hub-toolbar label {color:#294e6b!important}
   /* Existing official schedule, live radar, filters and calendar render in the
      same middle column, retaining their own scroll and all event handlers. */
   #view-turniere .tournament-live-toolbar,
