@@ -65,7 +65,7 @@ test("desktop PR3: player search opens alongside followed profiles and keeps foc
  // Regression: mobile's pale discovery card must not retain a white desktop
  // heading. Measure rendered contrast rather than only checking CSS strings.
  const contrast=await page.locator("#player-discover").evaluate(panel=>{
-  const parse=value=>value.match(/[\\d.]+/g).slice(0,3).map(Number);
+  const parse=value=>value.match(/[0-9.]+/g).slice(0,3).map(Number);
   const lum=rgb=>rgb.map(v=>{
    const c=v/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;
   }).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
