@@ -46,15 +46,16 @@ test("desktop PR2: turniertag has usable right context and no horizontal page ov
 });
 
 test("desktop PR2: saved fixture schedule is local, dated and never claims registration",async({page})=>{
- await page.addInitScript(()=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>{
   const key="shuttleboard-v1",s=JSON.parse(localStorage.getItem(key)||"{}");
   s.officialLinks=[{id:"11111111-1111-1111-1111-111111111111",playerId:"05-070879",
    url:"https://dbv.turnier.de/tournament/11111111-1111-1111-1111-111111111111",
    name:"Synthetisches Turnier",startDate:"2026-11-13",endDate:"2026-11-14"}];
   localStorage.setItem(key,JSON.stringify(s));
  });
- await page.setViewportSize({width:1440,height:900});
- await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator("#desktop-context-events")).toContainText("Synthetisches Turnier");
  await expect(page.locator("#desktop-context-events")).toContainText("Teilnahme nicht bestätigt");
  await expect(page.locator("#desktop-context-events time")).toHaveAttribute("datetime","2026-11-13");
