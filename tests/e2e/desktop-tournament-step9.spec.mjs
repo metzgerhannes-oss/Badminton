@@ -25,6 +25,9 @@ test("desktop PR2: turniertag has usable right context and no horizontal page ov
    return {railRight:rail.right,mainLeft:main.left,mainRight:main.right,
     panelLeft:panel.left,panelRight:panel.right,panelWidth:panel.width,
     liveRight:live.right,overflow:document.documentElement.scrollWidth-innerWidth,
+    pickerAppearance:getComputedStyle(document.querySelector("#live-player-select")).appearance,
+    pickerColor:getComputedStyle(document.querySelector("#live-player-select")).color,
+    pickerBackground:getComputedStyle(document.querySelector("#live-player-select")).backgroundColor,
     panelDisplay:getComputedStyle(document.querySelector("#desktop-tournament-context")).display,
     calendarCount:document.querySelectorAll("#dbv-calendar-results").length,
     liveCount:document.querySelectorAll("#live-radar-content").length};
@@ -35,6 +38,9 @@ test("desktop PR2: turniertag has usable right context and no horizontal page ov
   expect(m.panelWidth).toBeGreaterThanOrEqual(289);
   expect(m.panelWidth).toBeLessThanOrEqual(321);
   expect(m.panelDisplay).not.toBe("none");
+  expect(m.pickerAppearance,"WebKit native select must use deterministic custom paint").toBe("none");
+  expect(m.pickerColor).toBe("rgb(247, 251, 255)");
+  expect(m.pickerBackground).toBe("rgb(23, 59, 95)");
   expect(m.calendarCount).toBe(1);
   expect(m.liveCount).toBe(1);
   expect(m.overflow).toBeLessThanOrEqual(2);
