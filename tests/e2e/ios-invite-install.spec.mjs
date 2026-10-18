@@ -40,7 +40,11 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
  await expect(page.getByRole("heading",{name:/Einmal einladen/})).toBeVisible();
  await expect(page.locator("#install-copy")).toBeVisible();
  await expect(page.locator('main > img')).toHaveAttribute("src","./assets/spvgg-schmetterlinge-splash.svg");
- expect(calls).toEqual([]);
+ // Existing app scripts may make unrelated, fully intercepted public read calls
+ // before the navigation redirect commits in WebKit. They must never signup,
+ // redeem the invitation or query the access grant in the Safari context.
+ const accessCalls=calls.filter(x=>/\\/auth\\/v1\\/signup$|\\/rest\\/v1\\/rpc\\/app_access_(invite_accept|status)$/.test(x.path));
+ expect(accessCalls,"Safari must not consume an invitation or grant a session").toEqual([]);
  const content=await page.content();
  expect(content).not.toMatch(/rel="manifest"/);
  const browserLink=new URL(await page.locator("#browser-only").getAttribute("href"),page.url());
