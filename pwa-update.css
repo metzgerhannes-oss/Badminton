@@ -1,0 +1,19 @@
+/* Non-destructive PWA upgrade: distinct from access gates and modal forms. */
+.pwa-update-prompt{
+ position:fixed;z-index:12;inset:auto 12px calc(83px + env(safe-area-inset-bottom));
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;
+ max-width:620px;margin-inline:auto;padding:12px 14px;
+ background:#0c2948;color:#f4faff;border:1px solid #76bce4;
+ border-radius:16px;box-shadow:0 9px 30px #06162d9c;
+ font:600 13px/1.45 system-ui,-apple-system,sans-serif
+}
+.pwa-update-copy{flex:1 1 190px;min-width:0}
+#pwa-update-apply{
+ min-height:44px;padding:9px 13px;border:1px solid #92d4f4;
+ background:#e5f6ff;color:#0a2d50;border-radius:11px;
+ font:800 13px system-ui,-apple-system,sans-serif
+}
+#pwa-update-apply:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#pwa-update-apply:disabled{opacity:.72}
+@media(min-width:1080px){.pwa-update-prompt{inset:auto 20px 20px auto;width:min(480px,calc(100vw - 40px));margin:0}}
+@media(max-width:350px){.pwa-update-prompt{padding:10px}.pwa-update-copy{flex-basis:100%}#pwa-update-apply{width:100%}}
