@@ -2,6 +2,15 @@ import {test,expect} from "./invited-member.fixture.mjs";
 
 /* Step 8: UI only, synthetic invited account. The inherited fixture blocks
    productive Supabase and all other external network traffic. */
+test.beforeEach(async({page})=>{
+ await page.addInitScript(()=>{
+  if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"UI Testprofil"}],friends:[],officialLinks:[],
+   activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true
+  }));
+ });
+});
+
 test("320px and 390px: subtle tap feedback, instant view change, intact keyboard focus",async({page})=>{
  await page.emulateMedia({reducedMotion:"no-preference"});
  for(const width of [320,390]){
