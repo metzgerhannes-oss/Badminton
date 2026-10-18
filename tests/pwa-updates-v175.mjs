@@ -26,7 +26,7 @@ for(const name of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
   assert.ok(JSON.parse(m[1]).includes(path),name+" contains "+path);
 }
 
-function harness({online=true,current="v174",offered="v175"}={}){
+function harness({online=true,current="v174",offered="v175",stampedVersion=null}={}){
  let requests=[],nodes=[],navigated=null,registerCount=0,workerChecks=0;
  const listeners={};
  const makeNode=(tag)=>({
@@ -36,6 +36,9 @@ function harness({online=true,current="v174",offered="v175"}={}){
   addEventListener(name,cb){this.events[name]=cb}
  });
  const doc={body:{append:node=>nodes.push(node)},getElementById:()=>null,
+  querySelector:selector=>selector==="[data-app-version]"&&stampedVersion
+    ?{textContent:stampedVersion,getAttribute:key=>key==="data-release-build"?"mock-pages-sha":null}
+    :null,
   createElement:makeNode,addEventListener:(name,cb)=>{listeners["doc:"+name]=cb}};
  const nav={onLine:online,serviceWorker:{
   async register(path,opts){registerCount++;assert.equal(path,"./sw.js");assert.equal(opts.updateViaCache,"none");
@@ -77,6 +80,14 @@ const settle=()=>new Promise(r=>setTimeout(r,20));
  const h=harness({current:"v175",offered:"v175"});
  h.win.SchmetterlingePwaUpdate.initialize();
  await settle();assert.equal(h.nodes.length,0,"No banner when already updated");
+}
+{
+ // Reproduces the user's iPhone symptom: Pages-stamped DOM is older than
+ // the version loaded by JS from cache/network. Trust deployed HTML.
+ const h=harness({current:"v175",offered:"v175",stampedVersion:"v174"});
+ h.win.SchmetterlingePwaUpdate.initialize();
+ await settle();
+ assert.equal(h.nodes.length,1,"Old installed Pages HTML must prompt for an update");
 }
 {
  const h=harness({online:false});
