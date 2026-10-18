@@ -1,3 +1,4 @@
+import {mkdir} from "node:fs/promises";
 import {test,expect} from "./supabase-isolated.fixture.mjs";
 
 const API="https://yadexibmjmnjfmfabrug.supabase.co";
@@ -49,6 +50,7 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   expect(overflow,"iOS install-first screen must not overflow at "+width).toBeLessThanOrEqual(2);
  }
+ await mkdir("test-results",{recursive:true});
  await page.screenshot({
   path:"test-results/ios-install-first-"+test.info().project.name+".png",
   animations:"disabled"
