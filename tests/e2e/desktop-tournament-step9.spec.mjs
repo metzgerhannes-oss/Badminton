@@ -66,13 +66,17 @@ test("desktop PR2: saved fixture schedule is local, dated and never claims regis
 });
 
 test("desktop PR2: tablet/iPhone keep existing stacked layout and actions",async({page})=>{
- for(const width of [1080,1024,768,390,320]){
+ for(const width of [1080,1024,768,440,420,400,390,375,350,320]){
   await page.setViewportSize({width,height:844});
   await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#view-turniere")).toBeVisible();
   await expect(page.locator("#desktop-tournament-context")).toBeHidden();
   await expect(page.locator("#dbv-calendar-results")).toBeAttached();
   await expect(page.locator("#add-tournament")).toBeAttached();
+  if(width<=440){
+   const columns=await page.locator(".dbv-calendar-filters").evaluate(node=>getComputedStyle(node).gridTemplateColumns.split(" ").length);
+   expect(columns,"Native WebKit calendar selects need one column at "+width+"px").toBe(1);
+  }
   const diag=await page.evaluate(()=>{
    const overflow=document.documentElement.scrollWidth-innerWidth;
    const outliers=[...document.querySelectorAll("body *")].map(node=>{
