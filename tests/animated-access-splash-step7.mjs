@@ -26,11 +26,11 @@ assert.match(js,/12000/);
 assert.match(js,/if\(permission==="member"\)\{grant\(\);return;\}/);
 assert.match(js,/if\(permission==="player"\)\{grant\(\{member:false\}\);return;\}/);
 assert.doesNotMatch(css,/display:none!important;\s*$/m); // no accidental blanket hiding of errors
-assert.match(sw,/schmetterlinge-shell-v172/);
+assert.match(sw,/schmetterlinge-shell-v173/);
 assert.match(sw,/\.\/app-access\.css/);
-assert.match(release,/version:"v172"/);
-assert.match(welcome,/v172/);
-assert.match(html,/v172/);
+assert.match(release,/version:"v173"/);
+assert.match(welcome,/v173/);
+assert.match(html,/v173/);
 assert.doesNotMatch(html,/user-scalable=no|maximum-scale=1/);
 const embedded=svg=>svg.match(/data:image\/webp;base64,([^"]+)/)?.[1];
 assert.ok(embedded(club),"Original image is embedded WebP");

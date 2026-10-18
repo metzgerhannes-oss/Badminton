@@ -300,6 +300,32 @@ window.badmintonCalendarToggle=item=>{
  save();render();toast("Turnier für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
  return {ok:true,saved:true};
 };
+// Read-only desktop context. Show only currently selected OWN profile's locally
+// saved entries, never private bookmarks while viewing a followed player.
+window.badmintonDesktopContext=()=>{
+ if(state.viewingFriendId||!state.players.some(p=>p.id===state.activeProfileId))
+  return {own:false,events:[]};
+ const today=localDay();
+ const saved=SchmetterlingeBookmarks.visible(state).map(t=>({
+  name:t.name,startDate:t.startDate,endDate:t.endDate||t.startDate,
+  note:t.source==="dbv-calendar"?"DBV-Vormerkung · Anmeldung nicht bestätigt":"Gespeicherter Turnierlink · Teilnahme nicht bestätigt",
+  url:safeUrl(t.url)
+ }));
+ const imported=SchmetterlingeSpond.dashboardItems(state.activeProfileId,state.officialLinks).map(t=>({
+  name:t.name,startDate:t.startDate,endDate:t.endDate||t.startDate,
+  note:"Kalenderimport · Teilnahme nicht bestätigt",url:""
+ }));
+ const unique=new Map();
+ for(const t of [...saved,...imported]){
+  if(!SchmetterlingeBookmarks.validDate(t.startDate))continue;
+  if(!SchmetterlingeBookmarks.validDate(t.endDate)||t.endDate<t.startDate)continue;
+  if(t.endDate<today)continue;
+  const key=t.startDate+"|"+String(t.name).trim().toLocaleLowerCase("de");
+  if(!unique.has(key))unique.set(key,t);
+ }
+ return {own:true,events:[...unique.values()].sort((a,b)=>
+  a.startDate.localeCompare(b.startDate)||a.name.localeCompare(b.name,"de")).slice(0,3)};
+};
 window.badmintonTournamentOptions=()=>{
  // Shared event hints are never written to family bookmarks. Their DBV source
  // link can still open the already verified LIVE/tournament match views.

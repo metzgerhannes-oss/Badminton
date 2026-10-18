@@ -26,6 +26,7 @@ jobs:
           node --check spond-calendar.js
           node --check router.js
           node --check app.js
+          node --check desktop-context-v173.js
           node --check app-release.js
           node --check app-access.js
           node --check scripts/stamp-release.mjs
@@ -195,6 +196,7 @@ jobs:
           node tests/release-version.mjs
           node tests/animated-access-splash-step7.mjs
           node tests/desktop-shell-step9.mjs
+          node tests/desktop-tournament-step9.mjs
           node tests/ux-motion-step8.mjs
           node tests/welcome-i18n.mjs
           node scripts/validate-i18n.mjs
