@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-const paths=["index.html","app.js","desktop-context-v173.js","desktop-tournament-v173.css","desktop-shell-v172.css","app-release.js","sw.js","tests/e2e/supabase-isolated.fixture.mjs"];
-const [html,app,script,css,shell,release,sw,fixture]=await Promise.all(paths.map(p=>readFile(p,"utf8")));
+const paths=["index.html","app.js","desktop-context-v173.js","desktop-tournament-v173.css","desktop-shell-v172.css","app-release.js","sw.js","tests/e2e/supabase-isolated.fixture.mjs","app-shell.css"];
+const [html,app,script,css,shell,release,sw,fixture,appShell]=await Promise.all(paths.map(p=>readFile(p,"utf8")));
 assert.match(html,/id="desktop-tournament-context" aria-labelledby=/);
 assert.match(html,/id="desktop-context-events"/);
 assert.match(html,/data-desktop-action="follow"/);
@@ -38,4 +38,5 @@ for(const key of ["ASSETS","SHELL_ASSETS"]){
   assert.ok(files.includes(asset),key+" missing "+asset);
 }
 assert.match(fixture,/context\.route\(SUPABASE/);
+assert.match(appShell,/@media\(max-width:440px\)\{\s*\.dbv-calendar-filters\{grid-template-columns:minmax\(0,1fr\)/);
 console.log("Desktop V2 PR2: one contextual column, source-backed local events, existing actions, no extra polling, offline assets.");
