@@ -55,6 +55,9 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
     expect(Math.max(...colors.trophy),"Pale trophy card needs dark readable heading").toBeLessThan(130);
    }
    if(width===1440&&route==="einstellungen"){
+    const hub=await page.locator("#settings-room-hub").boundingBox();
+    expect(hub,"Settings home should use the full desktop content column").toBeTruthy();
+    expect(hub.width).toBeGreaterThan(m.active.width*.8);
     const lead=await page.locator("#settings-room-hub .settings-hub-lead").evaluate(el=>
      getComputedStyle(el).color.match(/[0-9.]+/g).slice(0,3).map(Number));
     expect(Math.min(...lead),"Settings intro must be light on navy").toBeGreaterThanOrEqual(180);
