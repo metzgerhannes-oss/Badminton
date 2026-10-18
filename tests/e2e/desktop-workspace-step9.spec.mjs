@@ -37,6 +37,16 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
    expect(m.nav.right).toBeLessThanOrEqual(m.main.left-4);
    expect(m.scroll-m.innerWidth,route+" overflows at "+width+"px").toBeLessThanOrEqual(2);
    expect(m.active?.width).toBeGreaterThan(300);
+   if(width===1440&&["berichte","spieler","mannschaft"].includes(route)){
+    const selector={
+     berichte:"#view-berichte .report-filters>label",
+     spieler:"#view-spieler .followed-search-label",
+     mannschaft:"#view-mannschaft .follow-season>label"
+    }[route];
+    const color=await page.locator(selector).first().evaluate(el=>
+     getComputedStyle(el).color.match(/[0-9.]+/g).slice(0,3).map(Number));
+    expect(Math.min(...color),route+" filter label must be light on navy").toBeGreaterThanOrEqual(180);
+   }
    if(width===1440&&route==="start"){
     // Real screenshot regression: inherited light-theme ink on the dark
     // dashboard made headings unreadable, while a pale trophy card needs ink.
