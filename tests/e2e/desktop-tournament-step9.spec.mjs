@@ -73,6 +73,16 @@ test("desktop PR2: tablet/iPhone keep existing stacked layout and actions",async
   await expect(page.locator("#desktop-tournament-context")).toBeHidden();
   await expect(page.locator("#dbv-calendar-results")).toBeAttached();
   await expect(page.locator("#add-tournament")).toBeAttached();
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+  const diag=await page.evaluate(()=>{
+   const overflow=document.documentElement.scrollWidth-innerWidth;
+   const outliers=[...document.querySelectorAll("body *")].map(node=>{
+    const r=node.getBoundingClientRect(),css=getComputedStyle(node);
+    return {tag:node.tagName,selector:node.id?"#"+node.id:node.className&&typeof node.className==="string"?"."+node.className.trim().replace(/\\s+/g,"."):node.tagName,
+     left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),display:css.display,whiteSpace:css.whiteSpace};
+   }).filter(x=>x.display!=="none"&&x.right>innerWidth+3).sort((a,b)=>b.right-a.right).slice(0,12);
+   return {viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow,outliers};
+  });
+  if(diag.overflow>2)console.log("DESKTOP_PR2_OVERFLOW_DIAGNOSTIC",JSON.stringify({width,...diag}));
+  expect(diag.overflow).toBeLessThanOrEqual(2);
  }
 });
