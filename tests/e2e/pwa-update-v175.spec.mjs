@@ -1,6 +1,6 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
-// Synthetic previous shell release (v178) versus fresh current static probe (v179).
+// Synthetic previous shell release (v179) versus fresh current static probe (v180).
 // All production Supabase routes are blocked by the inherited context fixture.
 test("iPhone PWA offers the next release and refreshes without deleting existing local profile",async({page})=>{
  let scriptLoads=0,probeLoads=0;
@@ -18,14 +18,14 @@ test("iPhone PWA offers the next release and refreshes without deleting existing
   if(url.searchParams.has("pwa-check")){probeLoads++;return route.fulfill({status:200,contentType:"text/javascript",body:current});}
   scriptLoads++;
   return route.fulfill({status:200,contentType:"text/javascript",
-   body:scriptLoads===1?current.replace('version:"v179"','version:"v178"'):current});
+   body:scriptLoads===1?current.replace('version:"v180"','version:"v180"'):current});
  });
  await page.setViewportSize({width:390,height:844});
  await page.goto("/index.html#spieler",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#pwa-update-prompt")).toBeVisible();
- await expect(page.locator("#pwa-update-prompt")).toContainText("v179");
+ await expect(page.locator("#pwa-update-prompt")).toContainText("v180");
  await page.locator("#pwa-update-apply").click();
- await expect(page).toHaveURL(/app-update=v179/);
+ await expect(page).toHaveURL(/app-update=v180/);
  await expect(page.locator("#pwa-update-prompt")).toHaveCount(0);
  await expect(page.locator("#view-spieler")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")||"null"));
