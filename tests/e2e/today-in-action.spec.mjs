@@ -35,6 +35,9 @@ test("Heute im Einsatz: source-backed scheduled team, never invented running sta
  await expect(home).toBeVisible();
  await expect(home).toContainText("Heute im Einsatz");
  await expect(home).toContainText("Heute angesetzt",{timeout:15000});
+ await expect(page.locator("#live-nav-tab")).toBeVisible();
+ await expect(page.locator("#live-nav-tab")).toContainText("Heute");
+ await expect(page.locator("#live-nav-tab")).not.toHaveAttribute("aria-current","page");
  await expect(home).not.toContainText("Mannschaftsspiel läuft");
  await expect(home.locator("a.today-entry-original")).toHaveAttribute("href",SOURCE);
  await page.locator("#today-home [data-today-refresh]").click();
@@ -56,6 +59,7 @@ test("Heute im Einsatz: no evidence gives neutral state, no invented LIVE label"
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#today-home")).toBeVisible();
  await expect(page.locator("#today-home")).not.toContainText("Mannschaftsspiel läuft");
+ await expect(page.locator("#live-nav-tab")).toBeHidden();
  await expect(page.locator("#today-home [data-today-status]")).toContainText(
   /keine bestätigten Einsätze|Quellen momentan nicht erreichbar|Ein Teil der Quellen/,
   {timeout:15000}
@@ -83,8 +87,10 @@ test("Heute im Einsatz: source-confirmed player LIVE expires without provider po
  }));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#today-home")).toContainText("Spielt gerade",{timeout:15000});
+ await expect(page.locator("#live-nav-tab")).toBeVisible();
  // No repeated GET is required: a single local expiry timer removes the now-stale state.
  await page.clock.fastForward(93000);
  await expect(page.locator("#today-home")).not.toContainText("Spielt gerade");
+ await expect(page.locator("#live-nav-tab")).toBeHidden();
  await expect(page.locator("#today-home [data-today-status]")).toContainText("keine bestätigten Einsätze");
 });
