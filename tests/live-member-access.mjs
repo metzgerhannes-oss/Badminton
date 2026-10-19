@@ -42,4 +42,7 @@ assert.match(radar,/badminton:app-access-granted/,"Live radar must retry after a
 assert.match(radar,/if\(!window\.badmintonAppAccess\?\.allowed\)/,
  "Live radar must not request unauthenticated watch during startup");
 assert.match(followed,/getAccessToken/);
+assert.match(followed,/badminton:app-access-granted/);
+assert.match(followed,/if\(!window\.badmintonAppAccess\?\.allowed\)/,
+ "Followed LIVE must await membership before scheduling watches");
 console.log("App membership required for Badhub watch+live cache; fixture public read unchanged; no extra cron.");
