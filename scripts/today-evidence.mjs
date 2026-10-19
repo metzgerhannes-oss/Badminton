@@ -32,7 +32,7 @@ export function fixtureReadPath(teams,{limit=TODAY_TEAM_LIMIT,day=berlinDay()}={
  if(!validDay(day))return null;
  const bound=Number.isSafeInteger(limit)?Math.max(1,Math.min(TODAY_TEAM_LIMIT,limit)):TODAY_TEAM_LIMIT;
  const ids=[...new Set((Array.isArray(teams)?teams:[])
-  .map(t=>exactId(t?.id)).filter(id=>(/^[0-9]+$/.test(id)||/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id))))].slice(0,bound);
+  .map(t=>exactId(t?.id)).filter(id=>/^(?:nuliga:[0-9]{3,7}:[0-9]{4}-[0-9]{2}:[1-9][0-9]?|[0-9]+|[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})$/i.test(id)))].slice(0,bound);
  if(!ids.length)return null;
  // 48h UTC bound covers every Europe/Berlin local day (UTC+1 or UTC+2).
  // Exact day-filtering happens only *after* receiving public fixtures.
@@ -40,8 +40,8 @@ export function fixtureReadPath(teams,{limit=TODAY_TEAM_LIMIT,day=berlinDay()}={
  const end=new Date(start.getTime()+86400000);
  start.setTime(start.getTime()-86400000);
  const query=new URLSearchParams({
-  select:"id,team_id,match_date,home_team,away_team,home_score,away_score,status,source_url",
-  team_id:"in.("+ids.join(",")+")",order:"match_date.asc",limit:"96"
+  select:"id,team_id,match_date,home_team,away_team,home_score,away_score,status,source_url,source_checked_at",
+  team_id:"in.("+ids.map(id=>'"'+id+'"').join(",")+")",order:"match_date.asc",limit:"96"
  });
  query.append("match_date","gte."+start.toISOString());
  query.append("match_date","lt."+end.toISOString());
@@ -88,7 +88,7 @@ export function todayTeamEvents({today,teams=[],fixtures=[]}={}){
    id:"team:"+id,entity:"team",kind,status,name:short(displayTeamName(t),100),
    detail:short(row.home_team,95)+" – "+short(row.away_team,95),
    score:score||"",when:row.match_date,sourceUrl:source,
-   checkedAt:short(t.source_checked_at,48)||null,
+   checkedAt:short(row.source_checked_at,48)||null,
    teamId:t.id,followKey:t.follow_key,source:"nuLiga"
   });
  }
