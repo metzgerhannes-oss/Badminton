@@ -68,10 +68,10 @@ test("empty default library state and explicit search/filter criteria",()=>{
 
 test("Home and friends use one profile navigation mechanism",()=>{
  assert.match(app,/function navigateHome\(\)/);
- assert.match(app,/function navigateHome\\(\\)\\{return navigatePrimary\\("start"\\)\\}/);
- assert.match(app,/function navigatePrimary\\(page\\)/);
- assert.match(app,/document\\.querySelector\\("\\.bottom-nav"\\)\\?\\.addEventListener\\("click"/);
- assert.match(app,/SchmetterlingeRouter\\.renderPage\\(state\\)/);
+ assert.ok(app.includes('function navigateHome(){return navigatePrimary("start")}'));
+ assert.ok(app.includes("function navigatePrimary(page){"));
+ assert.ok(app.includes('document.querySelector(".bottom-nav")?.addEventListener("click"'));
+ assert.ok(app.includes("SchmetterlingeRouter.renderPage(state);"));
  assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.friendQuick\)/);
  assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.viewFriend\)/);
  assert.match(app,/window\.badmintonSelectViewer\(button\.dataset\.switchProfile\)/);
