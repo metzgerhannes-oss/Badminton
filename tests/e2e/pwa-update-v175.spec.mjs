@@ -18,7 +18,7 @@ test("iPhone PWA offers the next release and refreshes without deleting existing
   if(url.searchParams.has("pwa-check")){probeLoads++;return route.fulfill({status:200,contentType:"text/javascript",body:current});}
   scriptLoads++;
   return route.fulfill({status:200,contentType:"text/javascript",
-   body:scriptLoads===1?current.replace('version:"v180"','version:"v180"'):current});
+   body:scriptLoads===1?current.replace('version:"v180"','version:"v179"'):current});
  });
  await page.setViewportSize({width:390,height:844});
  await page.goto("/index.html#spieler",{waitUntil:"domcontentloaded"});
