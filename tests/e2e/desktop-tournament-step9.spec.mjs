@@ -72,6 +72,10 @@ test("desktop PR2: saved fixture schedule is local, dated and never claims regis
 });
 
 test("desktop PR2: tablet/iPhone keep existing stacked layout and actions",async({page})=>{
+ // Ten full page navigations across WebKit device widths can exceed the default
+ // 30-second per-test budget on a shared CI runner without any layout failure.
+ // Keep every viewport, assertion and screenshot/overflow check unchanged.
+ test.setTimeout(90000);
  for(const width of [1080,1024,768,440,420,400,390,375,350,320]){
   await page.setViewportSize({width,height:844});
   await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
