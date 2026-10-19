@@ -92,12 +92,19 @@ async function refresh(){
 function sync(){
  if(!visible()){seq++;controller?.abort();busy=false;return}
  const p=followedRoster(window.badmintonLiveViewerOptions?.()||{});
+ // The invitation/session check may finish after DOMContentLoaded on iOS.
+ // Never mark a watch as requested before the member token exists.
+ if(!window.badmintonAppAccess?.allowed){
+  checked=0;render(p.players,[],p.remaining);
+  return;
+ }
  const ids=p.players.map(x=>x.id).join(",");
  if(ids!==lastRoster.map(x=>x.id).join(",")||!checked||Date.now()-checked>30000)refresh();
  else render(p.players,lastRows,p.remaining);
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("followed-live-cards"))return;
+ window.addEventListener("badminton:app-access-granted",sync);
  window.addEventListener("badminton:matchday-mode",sync);
  window.addEventListener("badminton:profile-change",sync);
  window.addEventListener("hashchange",sync);
