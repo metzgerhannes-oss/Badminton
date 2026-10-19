@@ -22,11 +22,14 @@ await readPublicRows("league_fixtures?limit=1",{fetchImpl:fake,retries:0,count:f
 assert.equal(header,"","Public nuLiga fixtures must not acquire an invitation token");
 delete globalThis.window;
 const migration=await readFile("supabase/migrations/20261019210000_member_scoped_live_read_watch.sql","utf8");
-assert.match(migration,/grant select\(dbv_id,provider,source_url,checked_at,payload,last_error_at\)/i);
-assert.match(migration,/grant insert\(dbv_id\) on public\.player_live_watches to authenticated/i);
+assert.match(migration,/grant select\s*\(dbv_id,\s*provider,\s*source_url,\s*checked_at,\s*payload,\s*last_error_at\)/i);
+assert.match(migration,/grant insert\s*\(dbv_id\)\s+on\s+(?:table\s+)?public\.player_live_watches to authenticated/i);
 assert.match(migration,/app_access_is_member\(\)/g);
-assert.match(migration,/app_access_is_verified_live_player\(player_live_watches\.dbv_id\)/);
-assert.match(migration,/security definer set search_path to ''/i);
+assert.match(migration,/app_access_is_verified_live_player\(dbv_id\)/);
+assert.equal((migration.match(/\$member_check\$/g)||[]).length,2,"SQL function delimiter must be balanced");
+assert.equal((migration.match(/\bcommit\s*;/gi)||[]).length,1,"SQL must be one transaction");
+assert.match(migration,/select public\.app_access_is_member\(\)[\s\S]*and p_dbv_id/,"helper must also require membership");
+assert.match(migration,/security definer\s+set search_path\s*=\s*''/i);
 assert.doesNotMatch(migration,/grant\s+select\s+on\s+public\.players/i);
 assert.doesNotMatch(migration,/grant\s+(?:select|insert)\s+on\s+public\.player_live_(?:watches|snapshots)\s+to\s+anon/i);
 assert.doesNotMatch(migration,/cron\.schedule|cron\.unschedule|create\s+extension/i);
