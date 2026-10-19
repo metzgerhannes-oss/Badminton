@@ -25,6 +25,9 @@ const migration=await readFile("supabase/migrations/20261019210000_member_scoped
 assert.match(migration,/grant select\(dbv_id,provider,source_url,checked_at,payload,last_error_at\)/i);
 assert.match(migration,/grant insert\(dbv_id\) on public\.player_live_watches to authenticated/i);
 assert.match(migration,/app_access_is_member\(\)/g);
+assert.match(migration,/app_access_is_verified_live_player\(player_live_watches\.dbv_id\)/);
+assert.match(migration,/security definer set search_path to ''/i);
+assert.doesNotMatch(migration,/grant\s+select\s+on\s+public\.players/i);
 assert.doesNotMatch(migration,/grant\s+(?:select|insert)\s+on\s+public\.player_live_(?:watches|snapshots)\s+to\s+anon/i);
 assert.doesNotMatch(migration,/cron\.schedule|cron\.unschedule|create\s+extension/i);
 const radar=await readFile("live-radar.js","utf8");
