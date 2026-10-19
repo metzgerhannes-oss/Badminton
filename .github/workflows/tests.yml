@@ -157,6 +157,7 @@ jobs:
           node tests/badhub-event-bridge.mjs
           node tests/badhub-event-ui.mjs
           node tests/followed-live.mjs
+          node tests/today-evidence.mjs
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
