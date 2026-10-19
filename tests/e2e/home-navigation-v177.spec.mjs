@@ -29,7 +29,7 @@ for(const width of [320,390]){
   await expect(page.locator(".app")).toHaveAttribute("data-current-view","start");
   await expect(page.locator('.bottom-nav a[data-page="start"]')).toHaveAttribute("aria-current","page");
   await expect(page.locator("#view-start #match-stats")).toBeVisible();
-  await expect(page.locator("#today-home")).toBeVisible();
+  await expect(page.locator("#today-home")).toBeHidden();
   const summaryFirst=await page.evaluate(()=>{
    const stats=document.querySelector("#view-start #match-stats");
    const today=document.querySelector("#today-home");
@@ -60,7 +60,7 @@ test("iPhone bottom navigation: every destination works and only current tab is 
  await mockVerifiedTodayTeam(page);
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#today-home")).toContainText("Heute angesetzt",{timeout:15000});
+ await expect(page.locator("#today-home .today-match-row")).toContainText("Anpfiff",{timeout:15000});
  await expect(page.locator("#live-nav-tab")).toBeVisible();
  await page.locator("#live-nav-tab").click();
  await expect(page.locator("#view-turniere")).toBeVisible();
