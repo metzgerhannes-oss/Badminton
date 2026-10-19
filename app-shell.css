@@ -42,7 +42,10 @@
 /* Six slots: five main pages plus the LIVE tab. Five widths at 20% plus LIVE
    previously exceeded a 320px phone viewport by 75px in WebKit. */
 .bottom-nav.has-live-tab a{width:calc(100% / 6)!important;flex:1 1 calc(100% / 6);min-width:0}
-.bottom-nav.has-live-tab .live-nav-tab{color:#ac1743;background:#fff2f5;border:1px solid #f1b9c8;border-radius:12px}
+/* "Heute" is NOT always the current page. It shares the neutral tab
+   paint unless active; the old permanent pink outline falsely signalled
+   selected "Heute" even while Home/Spieler was displayed. */
+.bottom-nav.has-live-tab .live-nav-tab{color:inherit;background:transparent;border:1px solid transparent;border-radius:12px}
 .bottom-nav.has-live-tab .live-nav-tab[aria-current="page"]{color:#fff;background:#b91f4d;border-color:#9f123b}
 .bottom-nav.has-live-tab .live-nav-tab .nav-icon{stroke-width:2.1}
 .live-tournaments-return{display:none}
