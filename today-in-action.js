@@ -7,7 +7,7 @@ import {todayEvidence,followedTeamSelection,fixtureReadPath,berlinDay,hasVerifie
 import {followedRoster,followedSnapshotPath} from "./scripts/followed-live.mjs";
 import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {today'sMatchRows} from "./scripts/today-presentation.mjs";
+import {todayMatchRows} from "./scripts/today-presentation.mjs";
 
 const $=id=>document.getElementById(id);
 const hosts=["today-home","today-tournament"];
@@ -50,7 +50,7 @@ function renderHost(host,model){
  if(!list)return;
  // No empty/error/coverage messages, statuses, results, controls or sources.
  // Source validation remains internal and the saved official URL is the card link.
- const rows=today'sMatchRows(model?.events||[],{limit:host.id==="today-home"?4:8});
+ const rows=todayMatchRows(model?.events||[],{limit:host.id==="today-home"?4:8});
  list.replaceChildren(...rows.map(buildCard));
  host.hidden=rows.length===0;
 }
