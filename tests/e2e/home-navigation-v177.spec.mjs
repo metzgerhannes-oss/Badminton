@@ -54,3 +54,42 @@ test("Normal Turniertag to Home to Turniertag retains distinct views",async({pag
  await expect(page.locator("#view-turniere")).toBeVisible();
  await expect(page.locator("#view-start")).toBeHidden();
 });
+
+test("iPhone bottom navigation: every destination works and only current tab is selected",async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-turniere")).toBeVisible();
+ const paths=[
+  ["start","start"],["turniere","turniere"],["spieler","spieler"],
+  ["mannschaft","mannschaft"],["berichte","berichte"],["start","start"]
+ ];
+ for(const [tab,view] of paths){
+  await page.locator('.bottom-nav a[data-page="'+tab+'"]').click();
+  await expect(page).toHaveURL(new RegExp("#"+tab+"$"));
+  await expect(page.locator("#view-"+view)).toBeVisible();
+  await expect(page.locator(".app")).toHaveAttribute("data-current-view",tab);
+  await expect(page.locator('.bottom-nav a[data-page="'+tab+'"]')).toHaveAttribute("aria-current","page");
+  await expect(page.locator('.bottom-nav a[aria-current="page"]')).toHaveCount(1);
+ }
+ // The latest v177 screenshot showed a pink Heute tab even on Home. This
+ // shortcut must have neither aria-current nor the selected pink treatment.
+ await page.evaluate(()=>{
+  const live=document.querySelector("#live-nav-tab");
+  live.hidden=false;
+  live.parentElement.classList.add("has-live-tab");
+ });
+ const today=page.locator("#live-nav-tab");
+ await expect(today).not.toHaveAttribute("aria-current","page");
+ const inactiveBg=await today.evaluate(e=>getComputedStyle(e).backgroundColor);
+ expect(inactiveBg).not.toBe("rgb(185, 31, 77)");
+ // A backed 'Heute' destination still opens Turniertag, and Home escapes it.
+ await today.click();
+ await expect(page.locator("#view-turniere")).toBeVisible();
+ await expect(page.locator(".app")).toHaveAttribute("data-current-view","live");
+ await expect(today).toHaveAttribute("aria-current","page");
+ await page.locator('.bottom-nav a[data-page="start"]').click();
+ await expect(page.locator("#view-start")).toBeVisible();
+ await expect(page.locator("#view-turniere")).toBeHidden();
+ await expect(today).not.toHaveAttribute("aria-current","page");
+ await expect(page.locator('.bottom-nav a[data-page="start"]')).toHaveAttribute("aria-current","page");
+});
