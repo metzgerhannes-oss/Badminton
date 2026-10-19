@@ -146,7 +146,10 @@ async function refresh(force=false){
  loading=false;render(false,errors?"partial":"");
  informNav();
 }
-function changed(){signature="";if(visible())void refresh(true)}
+function changed(){
+ signature="";checked=0;last=null;informNav();
+ if(visible())void refresh(true);
+}
 function route(){if(visible())void refresh()}
 function init(){
  if(!$(hosts[0])||!$(hosts[1]))return;
