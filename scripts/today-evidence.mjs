@@ -31,21 +31,20 @@ export function sourceMatchDay(raw){
 export function fixtureReadPath(teams,{limit=TODAY_TEAM_LIMIT,day=berlinDay()}={}){
  if(!validDay(day))return null;
  const ids=[...new Set((Array.isArray(teams)?teams:[])
-  .map(t=>exactId(t?.id)).filter(id=>/^[0-9a-f]{8}-[0-9a-f-]{27,36}$/i.test(id)))].slice(0,limit);
+  .map(t=>exactId(t?.id)).filter(id=>(/^[0-9]+$/.test(id)||/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id))))].slice(0,limit);
  if(!ids.length)return null;
  // 48h UTC bound covers every Europe/Berlin local day (UTC+1 or UTC+2).
  // Exact day-filtering happens only *after* receiving public fixtures.
  const start=new Date(day+"T00:00:00.000Z");
  const end=new Date(start.getTime()+86400000);
  start.setTime(start.getTime()-86400000);
- return "league_fixtures?"+new URLSearchParams({
+ const query=new URLSearchParams({
   select:"id,team_id,match_date,home_team,away_team,home_score,away_score,status,source_url",
-  team_id:"in.("+ids.join(",")+")",
-  match_date:"gte."+start.toISOString(),
-  "match_date_lte":"", // removed below: PostgREST combines filters on same column with AND
-  order:"match_date.asc",limit:"96"
- }).toString().replace("&match_date_lte=","")+
- "&match_date=lt."+encodeURIComponent(end.toISOString());
+  team_id:"in.("+ids.join(",")+")",order:"match_date.asc",limit:"96"
+ });
+ query.append("match_date","gte."+start.toISOString());
+ query.append("match_date","lt."+end.toISOString());
+ return "league_fixtures?"+query;
 }
 export function followedTeamSelection(rawFollows,teamRows,{limit=TODAY_TEAM_LIMIT}={}){
  const follows=normalizeFollows(rawFollows);
