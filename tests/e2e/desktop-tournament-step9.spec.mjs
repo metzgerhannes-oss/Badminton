@@ -72,9 +72,12 @@ test("desktop PR2: saved fixture schedule is local, dated and never claims regis
 });
 
 test("desktop PR2: tablet/iPhone keep existing stacked layout and actions",async({page})=>{
+ // A single synthetic page load is sufficient: responsive CSS is verified at every width.
+ // Reloading ten times made this viewport-only check exceed the 30s WebKit test budget.
+ await page.setViewportSize({width:1080,height:844});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  for(const width of [1080,1024,768,440,420,400,390,375,350,320]){
   await page.setViewportSize({width,height:844});
-  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#view-turniere")).toBeVisible();
   await expect(page.locator("#desktop-tournament-context")).toBeHidden();
   await expect(page.locator("#dbv-calendar-results")).toBeAttached();
