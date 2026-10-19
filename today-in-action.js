@@ -7,6 +7,7 @@ import {todayEvidence,followedTeamSelection,fixtureReadPath,berlinDay,hasVerifie
 import {followedRoster,followedSnapshotPath} from "./scripts/followed-live.mjs";
 import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
+import {today'sMatchRows} from "./scripts/today-presentation.mjs";
 
 const $=id=>document.getElementById(id);
 const hosts=["today-home","today-tournament"];
@@ -16,15 +17,6 @@ const n=(tag,cls,value)=>{
  if(cls)el.className=cls;
  if(value!==undefined)el.textContent=String(value);
  return el;
-};
-const dateStamp=value=>{
- if(!value)return "Quellenzeit unbekannt";
- const date=new Date(value);
- if(!Number.isFinite(date.getTime()))return "Quellenzeit unbekannt";
- return "Quelle geprüft: "+new Intl.DateTimeFormat("de-DE",{
-  day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",
-  timeZone:"Europe/Berlin"
- }).format(date);
 };
 const readLocalFollows=()=>{
  try{return normalizeFollows(JSON.parse(localStorage.getItem(TEAM_FOLLOWS_KEY)||"[]"))}
@@ -42,75 +34,28 @@ const context=()=>{
  return {groups,follows,teams:selection.teams,selection};
 };
 function buildCard(event){
- const card=n("article","today-entry");
- const head=n("div","today-entry-head");
- head.append(n("strong","",event.name),n("span","today-entry-state",event.status));
- card.append(head);
- if(event.detail)card.append(n("p","today-entry-detail",event.detail));
- if(event.score)card.append(n("strong","today-entry-score",event.score));
- const source=n("small","today-entry-source",
-  event.source+" · "+dateStamp(event.checkedAt));
- card.append(source);
- const actions=n("div","today-entry-actions");
- if(event.entity==="player"){
-  const open=n("button","today-entry-button","Spieler ansehen");
-  open.type="button";
-  open.addEventListener("click",()=>{
-   if(!window.badmintonSelectViewer?.(event.playerId,{stayOnPage:true})){
-    location.hash="#spieler";
-   }
-  });
-  actions.append(open);
- }else{
-  const open=n("button","today-entry-button","Mannschaft ansehen");
-  open.type="button";
-  open.addEventListener("click",()=>{
-   if(!window.badmintonTodayOpenTeam?.(event.teamId))location.hash="#mannschaft";
-  });
-  actions.append(open);
- }
- if(typeof event.sourceUrl==="string"&&event.sourceUrl.startsWith("https://")){
-  const link=n("a","today-entry-original","Originalquelle ↗");
-  link.href=event.sourceUrl;link.target="_blank";link.rel="noopener noreferrer";
-  actions.append(link);
- }
- card.append(actions);
- return card;
+ const link=n("a","today-match-row");
+ // Open the live public nuLiga page itself on demand. We never pretend that
+ // opening a source also refreshes an unverified score inside Schmetterlinge.
+ link.href=event.url;
+ link.target="_blank";link.rel="noopener noreferrer";
+ link.setAttribute("aria-label","nuLiga öffnen: Anpfiff "+event.kickoff+"; "+event.pairing);
+ link.append(n("span","today-match-kickoff","Anpfiff "+event.kickoff));
+ link.append(n("strong","today-match-pairing",event.pairing));
+ return link;
 }
-function renderHost(host,model,waiting=false,error=""){
+function renderHost(host,model){
  if(!host)return;
  const list=host.querySelector("[data-today-cards]");
- const info=host.querySelector("[data-today-status]");
- const more=host.querySelector("[data-today-more]");
- if(!list||!info||!more)return;
- const entries=model?.events||[];
- const limit=host.id==="today-home"?4:8;
- const expanded=host.dataset.expanded==="true";
- const shown=expanded?entries:entries.slice(0,limit);
- list.replaceChildren();
- for(const kind of ["player","team"]){
-  const matching=shown.filter(item=>item.entity===kind);
-  if(!matching.length)continue;
-  const label=n("h3","today-group-label",kind==="player"?"Spieler":"Mannschaften");
-  list.append(label);
-  for(const item of matching)list.append(buildCard(item));
- }
- if(waiting)info.textContent="Belegte Spieltermine werden geprüft …";
- else if(error&&entries.length)info.textContent="Ein Teil der Quellen ist momentan nicht erreichbar. Nur belegte Ergebnisse werden angezeigt.";
- else if(error)info.textContent="Quellen momentan nicht erreichbar. Kein aktueller Spielstatus bestätigt.";
- else if(!entries.length)info.textContent="Heute keine bestätigten Einsätze in den verfügbaren Quellen.";
- else info.textContent=entries.length+" belegte Ereignisse heute · kein Mannschafts-Live ohne Quellenbeleg.";
- if(model?.coverage?.playersOmitted||model?.coverage?.teamsOmitted||model?.coverage?.teamsUnresolved){
-  info.textContent+=" · Auswahl begrenzt; weitere Profile/Mannschaften ggf. nicht geprüft.";
- }
- more.hidden=entries.length<=limit;
- if(!more.hidden){
-  more.textContent=expanded?"Weniger anzeigen":"Alle "+entries.length+" anzeigen";
-  more.setAttribute("aria-expanded",String(expanded));
- }
+ if(!list)return;
+ // No empty/error/coverage messages, statuses, results, controls or sources.
+ // Source validation remains internal and the saved official URL is the card link.
+ const rows=today'sMatchRows(model?.events||[],{limit:host.id==="today-home"?4:8});
+ list.replaceChildren(...rows.map(buildCard));
+ host.hidden=rows.length===0;
 }
-function render(waiting=false,error=""){
- for(const id of hosts)renderHost($(id),last,waiting,error);
+function render(){
+ for(const id of hosts)renderHost($(id),last);
 }
 /** Source-backed live cards expire locally at 120s; never retain stale playing claims.
  * A one-shot local expiry is not a provider poll or additional network request.
@@ -178,14 +123,6 @@ function changed(){
 function route(){if(visible())void refresh()}
 function init(){
  if(!$(hosts[0])||!$(hosts[1]))return;
- for(const id of hosts){
-  const host=$(id);
-  host.querySelector("[data-today-refresh]")?.addEventListener("click",()=>void refresh(true));
-  host.querySelector("[data-today-more]")?.addEventListener("click",()=>{
-   host.dataset.expanded=host.dataset.expanded!=="true"?"true":"false";
-   render();
-  });
- }
  window.addEventListener("hashchange",route);
  window.addEventListener("badminton:app-access-granted",changed);
  window.addEventListener("badminton:teams-updated",changed);
