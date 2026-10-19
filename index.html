@@ -121,14 +121,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <section class="page active" id="view-start" aria-labelledby="heading-start">
    <div class="section-heading dashboard-heading"><h1 id="heading-start">Übersicht</h1></div>
    <a href="#live" id="home-live-peek" class="home-live-peek" aria-live="polite" hidden></a>
-   <section class="today-evidence" id="today-home" aria-label="Heute im Einsatz">
- <div class="today-heading"><h2>Heute im Einsatz</h2>
-  <button type="button" data-today-refresh aria-label="Einsatzdaten jetzt prüfen">Aktualisieren</button>
- </div>
- <p data-today-status role="status">Belegte Spieltermine werden geprüft …</p>
- <div data-today-cards aria-label="Belegte Tagesereignisse"></div>
- <button type="button" data-today-more aria-expanded="false" hidden>Alle anzeigen</button>
-</section>
+   
     <div id="dashboard-next" class="dashboard-next"></div>
    <section id="match-stats" class="match-stats" aria-labelledby="match-stats-heading">
     <div class="section-heading match-stats-heading"><h2 id="match-stats-heading">Meine Spielstatistik</h2><a class="home-stats-link" href="#historie">Alle Spiele ↗</a></div>
@@ -167,6 +160,14 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
       <button id="match-stats-more" type="button" class="subtle-button" hidden>Weitere Matchkarten anzeigen</button>
     </details>
    </section>
+    <section class="today-evidence" id="today-home" aria-label="Heute im Einsatz">
+ <div class="today-heading"><h2>Heute im Einsatz</h2>
+  <button type="button" data-today-refresh aria-label="Einsatzdaten jetzt prüfen">Aktualisieren</button>
+ </div>
+ <p data-today-status role="status">Belegte Spieltermine werden geprüft …</p>
+ <div data-today-cards aria-label="Belegte Tagesereignisse"></div>
+ <button type="button" data-today-more aria-expanded="false" hidden>Alle anzeigen</button>
+</section>
    <div id="dashboard-kpis" class="dashboard-kpi-grid" aria-label="Trophäenschrank und belegte Turnierauszeichnungen"></div>
    <div id="shared-tournaments" class="shared-tournaments" hidden></div>
    <p id="community-sync-status" class="community-save-status" role="status" aria-live="polite" hidden></p>
