@@ -131,7 +131,11 @@ async function getSnapshot(id,signal){
 async function watch(id,signal){
  const post=watchRequest(id);
  if(!post)return;
- const res=await fetch(post.url,{method:"POST",headers:post.headers,body:post.body,signal});
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token)throw Error("Mitgliedsfreigabe erforderlich");
+ const res=await fetch(post.url,{method:"POST",
+  headers:{...post.headers,Authorization:"Bearer "+token},
+  body:post.body,signal});
  if(!res.ok)throw Error("Watch request "+res.status);
  lastWatchAt=Date.now();
 }
