@@ -84,6 +84,8 @@ jobs:
           node --check scripts/match-stats.mjs
           node --check scripts/library-utils.mjs
           node --check scripts/supabase-read.mjs
+          node --check today-in-action.js
+          node --check scripts/today-evidence.mjs
           node --check teams.js
           node --check scripts/team-directory-utils.mjs
           node --check welcome.js
