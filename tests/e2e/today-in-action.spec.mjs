@@ -73,8 +73,13 @@ test("Direct official nuLiga match report opens once it is published",async({pag
   status:200,contentType:"application/json",body:JSON.stringify([{
    id:"nuliga:10777:2026-27:1",follow_key:"nuliga:10777:1",
    club_id:"10777",club_name:"Synthetischer Verein",team_label:"1",
-   season:"2026/27",source_url:REPORT,source_checked_at:now
+   season:"2026/27",source_url:SOURCE,source_checked_at:now
   }])
+ }));
+ // Real team-directory reads BOTH team and club rows. The isolated QA network
+ // intentionally blocks unmocked Supabase calls, so mock both endpoints.
+ await page.route("**/rest/v1/league_clubs?*",route=>route.fulfill({
+  status:200,contentType:"application/json",body:"[]"
  }));
  await page.route("**/rest/v1/league_fixtures?*",route=>route.fulfill({
   status:200,contentType:"application/json",body:JSON.stringify([{
