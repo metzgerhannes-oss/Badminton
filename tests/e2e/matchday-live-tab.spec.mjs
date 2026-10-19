@@ -51,7 +51,7 @@ test("Only a verified scheduled fixture makes red Heute a prominent additional t
  await mockVerifiedTodayTeam(page);
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#today-home")).toContainText("Heute angesetzt",{timeout:15000});
+ await expect(page.locator("#today-home .today-match-row")).toContainText("Anpfiff",{timeout:15000});
  await expect(page.locator(".bottom-nav a:visible")).toHaveCount(6);
  await expect(page.locator("#live-nav-tab")).toBeVisible();
  const rect=await page.locator("#live-nav-tab").boundingBox();
