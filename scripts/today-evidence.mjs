@@ -119,6 +119,17 @@ export function todayPlayerEvents({today,groups={},rows=[],now=Date.now()}={}){
  }
  return {events,remaining};
 }
+/** Show the prominent red 'Heute' tab only for a sourced match planned today.
+ * A tournament announcement, an unconfirmed bookmark or a past/final score
+ * is NOT proof of an upcoming/current match.
+ */
+export function hasVerifiedMatchToday(events=[]){
+ return Array.isArray(events)&&events.some(event=>
+  (event?.entity==="team"&&event.kind==="scheduled")||
+  (event?.entity==="player"&&["next","playing"].includes(event.kind))
+ );
+}
+
 /** Bookmarks are optional information only: never count as confirmed attendance. */
 export function unconfirmedPlans({today,bookmarks=[],ownProfiles=[]}={}){
  if(!validDay(today))return [];

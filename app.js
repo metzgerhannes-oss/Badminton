@@ -31,12 +31,30 @@ function setActiveProfile(id){
 // Existing UI callers keep the same route and focus methods.
 function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
-function navigateHome(){
- if(!state.players.length&&state.friends.length)
-  SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
- else SchmetterlingeStorage.showOwn(state);
- routeTo("start");
+/** Native-feeling primary navigation: source of truth is the tapped destination,
+ * not a deferred hashchange from installed WebKit. All six navigation links use
+ * the same route. This does not touch stored players, friends or invitations.
+ */
+function navigatePrimary(page){
+ const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte"];
+ if(!allowed.includes(page))return false;
+ if(page==="start"){
+  if(!state.players.length&&state.friends.length)
+   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
+  else SchmetterlingeStorage.showOwn(state);
+ }
+ state.page=page;
+ if(location.hash!=="#"+page)location.hash="#"+page;
+ // Render the destination first. An unrelated dashboard/live rendering failure
+ // must not trap navigation on the previous view.
+ SchmetterlingeRouter.renderPage(state);
+ try{render()}finally{
+  SchmetterlingeRouter.renderPage(state);
+  focusCurrentView();
+ }
+ return true;
 }
+function navigateHome(){return navigatePrimary("start")}
 function renderFocusHeader(){
  const p=currentProfile();
  const isFriend=Boolean(state.viewingFriendId);
@@ -348,21 +366,17 @@ window.badmintonLibraryView=id=>{
  return window.badmintonSelectViewer(id);
 };
 }
-let liveEvidence={playerId:"",day:"",active:false};
-let todayNav={day:"",confirmed:false,playing:false};
+let todayNav={day:"",matchToday:false};
 function updateLiveNavigation(){
  const tab=el("live-nav-tab");if(!tab)return false;
- const today=localDay();
- const shouldShow=SchmetterlingeBookmarks.hasTournamentToday(state,today)||
-  (liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today)||
-  (todayNav.confirmed&&todayNav.day===today);
+ // A mere tournament, own calendar bookmark, dated result or yesterday's
+ // source snapshot must never expose the prominent red game-day shortcut.
+ const shouldShow=todayNav.matchToday&&todayNav.day===localDay();
  const changed=tab.hidden===shouldShow;
  tab.hidden=!shouldShow;
  tab.parentElement?.classList.toggle("has-live-tab",shouldShow);
- const genuineLive=(liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today)||
-  (todayNav.playing&&todayNav.day===today);
- const caption=tab.querySelector("small");if(caption)caption.textContent=genuineLive?"LIVE":"Heute";
- tab.setAttribute("aria-label",genuineLive?"Bestätigte aktuelle Spielmeldungen":"Heutige belegte Spieltermine");
+ const caption=tab.querySelector("small");if(caption)caption.textContent="Heute";
+ tab.setAttribute("aria-label","Heute angesetzte oder laufende Spiele");
  return changed;
 }
 let lastNotifiedProfile="",lastNotifiedClub="";
@@ -413,17 +427,11 @@ function openTournamentForm(item=null){
 function setup(){
  window.addEventListener("badminton:today-events",event=>{
   const d=event.detail||{};
-  todayNav={day:String(d.day||""),confirmed:d.confirmed===true,playing:d.playing===true};
+  todayNav={day:String(d.day||""),matchToday:d.matchToday===true};
   if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
  });
  window.addEventListener("badminton:community-feedback",event=>{
   if(typeof event.detail?.message==="string")toast(event.detail.message);
- });
- window.addEventListener("badminton:live-evidence",event=>{
-  const playerId=String(event.detail?.playerId||"");
-  if(playerId!==state.chosen)return;
-  liveEvidence={playerId,day:localDay(),active:event.detail?.active===true};
-  if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
  });
  // Local date rollover check only: no additional provider polling.
  setInterval(()=>{if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state)},60_000);
@@ -448,15 +456,26 @@ function setup(){
   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
  SchmetterlingeSpond.mount({getState:()=>state,onChange:render});
  state.page=(location.hash||"#start").slice(1).split("/")[0];
- // Native anchor routing alone retains the viewed friend's profile. Home must reset it,
- // including a second tap while #start is already the active hash.
- document.querySelectorAll('.bottom-nav a[data-page="start"], .topbar .brand[href="#start"]').forEach(link=>{
+ // A single delegated click handler covers ALL seven links, including a repeat
+ // tap and a still-pending iPhone hashchange. Do not rely on anchor events alone.
+ document.querySelector(".bottom-nav")?.addEventListener("click",event=>{
+  const link=event.target.closest?.("a[data-page]");
+  const page=link?.dataset.page;
+  if(!page||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  event.preventDefault();
+  navigatePrimary(page);
+ },{capture:true});
+ document.querySelectorAll('.topbar .brand[href="#start"]').forEach(link=>{
   link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
  });
  window.addEventListener("hashchange",()=>{
   state.page=(location.hash||"#start").slice(1).split("/")[0];
-  render();
-  focusCurrentView();
+  // Never let an unrelated data renderer hold the old section on-screen.
+  SchmetterlingeRouter.renderPage(state);
+  try{render()}finally{
+   SchmetterlingeRouter.renderPage(state);
+   focusCurrentView();
+  }
  });
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
  let editingPlayerId=null,activatingNewProfile=false;

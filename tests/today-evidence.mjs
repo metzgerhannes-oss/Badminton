@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {
  berlinDay,sourceMatchDay,followedTeamSelection,fixtureReadPath,
- todayTeamEvents,todayPlayerEvents,unconfirmedPlans,todayEvidence
+ todayTeamEvents,todayPlayerEvents,unconfirmedPlans,todayEvidence,hasVerifiedMatchToday
 } from "../scripts/today-evidence.mjs";
 import {TEAM_FOLLOWS_KEY} from "../scripts/team-directory-utils.mjs";
 
@@ -127,6 +127,23 @@ for(const event of mixed.events){
  assert.ok(["Badhub","nuLiga"].includes(event.source));
  assert.notEqual(event.status,"Mannschaftsspiel läuft");
 }
+// The red 'Heute' tab means a match, NOT an unconfirmed tournament/day.
+assert.equal(hasVerifiedMatchToday([]),false);
+assert.equal(hasVerifiedMatchToday([{entity:"team",kind:"scheduled"}]),true);
+assert.equal(hasVerifiedMatchToday([{entity:"player",kind:"next"}]),true);
+assert.equal(hasVerifiedMatchToday([{entity:"player",kind:"playing"}]),true);
+for(const kind of ["cancelled","postponed","result","unverified-result","tournament","unconfirmed"]){
+ assert.equal(hasVerifiedMatchToday([{entity:kind==="tournament"?"player":"team",kind}]),false,
+  kind+" alone must not display red Heute");
+}
+assert.equal(hasVerifiedMatchToday(mixed.events),true);
+assert.equal(hasVerifiedMatchToday(todayEvidence({
+ now,groups:{own:[own],friends:[friend]},follows:[a.follow_key],teams:[a],
+ fixtures:[fixture({status:"cancelled"})],snapshots:[]
+}).events),false);
+assert.equal(hasVerifiedMatchToday(todayEvidence({
+ now,groups:{own:[own]},follows:[],teams:[],fixtures:[],snapshots:[],bookmarks
+}).events),false,"A tournament bookmark must not display red Heute");
 const src=await readFile("scripts/today-evidence.mjs","utf8");
 assert.doesNotMatch(src,/fetch\(|setInterval|setTimeout|localStorage|supabase\.co|POST|DELETE|writeFile/i);
 console.log("#298 Paket A: sourced date/score/status, Badhub freshness, dedupe, unconfirmed bookmarks, bounded reads.");
