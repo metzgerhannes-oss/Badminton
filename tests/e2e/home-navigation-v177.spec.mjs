@@ -1,4 +1,5 @@
 import {test,expect} from "./invited-member.fixture.mjs";
+import {mockVerifiedTodayTeam} from "./verified-today-team.mjs";
 
 // Regression: native iPhone Home must not remain on the v177 'Heute' / live view
 // even when WebKit has not yet dispatched the hashchange after tapping Home.
@@ -56,8 +57,12 @@ test("Normal Turniertag to Home to Turniertag retains distinct views",async({pag
 });
 
 test("iPhone bottom navigation: every destination works and only current tab is selected",async({page})=>{
+ await mockVerifiedTodayTeam(page);
  await page.setViewportSize({width:390,height:844});
- await page.goto("/#live",{waitUntil:"domcontentloaded"});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#today-home")).toContainText("Heute angesetzt",{timeout:15000});
+ await expect(page.locator("#live-nav-tab")).toBeVisible();
+ await page.locator("#live-nav-tab").click();
  await expect(page.locator("#view-turniere")).toBeVisible();
  const paths=[
   ["start","start"],["turniere","turniere"],["spieler","spieler"],
@@ -71,14 +76,10 @@ test("iPhone bottom navigation: every destination works and only current tab is 
   await expect(page.locator('.bottom-nav a[data-page="'+tab+'"]')).toHaveAttribute("aria-current","page");
   await expect(page.locator('.bottom-nav a[aria-current="page"]')).toHaveCount(1);
  }
- // The latest v177 screenshot showed a pink Heute tab even on Home. This
- // shortcut must have neither aria-current nor the selected pink treatment.
- await page.evaluate(()=>{
-  const live=document.querySelector("#live-nav-tab");
-  live.hidden=false;
-  live.parentElement.classList.add("has-live-tab");
- });
+ // The latest v177 screenshot showed a pink Heute tab even on Home.
+ // Use a real mocked verified fixture rather than forcibly unhiding the link.
  const today=page.locator("#live-nav-tab");
+ await expect(today).toBeVisible();
  await expect(today).not.toHaveAttribute("aria-current","page");
  const inactiveBg=await today.evaluate(e=>getComputedStyle(e).backgroundColor);
  expect(inactiveBg).not.toBe("rgb(185, 31, 77)");
