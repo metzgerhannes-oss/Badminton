@@ -1,7 +1,7 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
 const SOURCE="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/groupPage?championship=2026";
-test("Heute im Einsatz: source-backed scheduled team, never invented running state",async({page})=>{
+test("Today info shows ONLY kickoff and pairing; tap opens original nuLiga",async({page})=>{
  const now=new Date().toISOString();
  await page.addInitScript(()=>{
   localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(["nuliga:10777:1"]));
@@ -32,43 +32,39 @@ test("Heute im Einsatz: source-backed scheduled team, never invented running sta
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  const home=page.locator("#today-home");
- await expect(home).toBeVisible();
- await expect(home).toContainText("Heute im Einsatz");
- await expect(home).toContainText("Heute angesetzt",{timeout:15000});
+ const card=home.locator(".today-match-row");
+ await expect(card).toBeVisible({timeout:15000});
+ await expect(card).toContainText("Anpfiff");
+ await expect(card).toContainText("Synthetischer Verein 1 – Fiktive Gäste 1");
+ await expect(card).toHaveAttribute("href",SOURCE);
+ await expect(card).toHaveAttribute("target","_blank");
+ // No badges, dates of provider verification, scores, controls or disclaimers.
+ for(const word of ["Heute angesetzt","Aktualisieren","Originalquelle","Mannschaften",
+  "Quelle geprüft","Spielt gerade","Nur belegte Ergebnisse"]){
+  await expect(home).not.toContainText(word);
+ }
+ await expect(home.locator("button,small,h2,h3")).toHaveCount(0);
+ await expect(home.locator(".today-match-row")).toHaveCount(1);
  await expect(page.locator("#live-nav-tab")).toBeVisible();
- await expect(page.locator("#live-nav-tab")).toContainText("Heute");
- await expect(page.locator("#live-nav-tab")).not.toHaveAttribute("aria-current","page");
- await expect(home).not.toContainText("Mannschaftsspiel läuft");
- await expect(home.locator("a.today-entry-original")).toHaveAttribute("href",SOURCE);
- await page.locator("#today-home [data-today-refresh]").click();
- await expect(home).toContainText("Heute angesetzt");
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#today-tournament")).toBeVisible();
- await expect(page.locator("#today-tournament")).toContainText("Heute angesetzt");
+ const tour=page.locator("#today-tournament");
+ await expect(tour.locator(".today-match-row")).toBeVisible();
+ await expect(tour.locator(".today-match-row")).toContainText("Anpfiff");
+ await expect(tour).not.toContainText("Quelle geprüft");
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
- // Desktop retains evidence and a keyboard-accessible original source link.
  await page.setViewportSize({width:1440,height:900});
- await expect(page.locator("#today-tournament")).toContainText("Heute angesetzt");
- await expect(page.locator("#today-tournament .today-entry-original")).toHaveAttribute("href",SOURCE);
- await expect(page.locator("#today-tournament .today-entry-original")).toBeVisible();
- await page.screenshot({path:"test-results/heute-im-einsatz-desktop.png",animations:"disabled"});
+ await expect(tour.locator(".today-match-row")).toBeVisible();
+ await page.screenshot({path:"test-results/heute-kompakt-desktop.png",animations:"disabled"});
 });
-test("Heute im Einsatz: no evidence gives neutral state, no invented LIVE label",async({page})=>{
+test("Today info is absent if no confirmed scheduled pairing is present",async({page})=>{
  await page.setViewportSize({width:320,height:667});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#today-home")).toBeVisible();
- await expect(page.locator("#today-home")).not.toContainText("Mannschaftsspiel läuft");
+ await expect(page.locator("#today-home")).toBeHidden({timeout:15000});
  await expect(page.locator("#live-nav-tab")).toBeHidden();
- await expect(page.locator("#today-home [data-today-status]")).toContainText(
-  /keine bestätigten Einsätze|Quellen momentan nicht erreichbar|Ein Teil der Quellen/,
-  {timeout:15000}
- );
 });
-
-test("Heute im Einsatz: source-confirmed player LIVE expires without provider polling",async({page})=>{
- const now=Date.parse("2026-10-19T11:00:00.000Z");
- const id="05-070879";
+test("Today info never invents an Anpfiff for a Badhub-only live player",async({page})=>{
+ const now=Date.parse("2026-10-19T11:00:00.000Z"),id="05-070879";
  await page.clock.install({time:new Date(now)});
  await page.addInitScript(()=>{
   if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
@@ -86,11 +82,9 @@ test("Heute im Einsatz: source-confirmed player LIVE expires without provider po
   }])
  }));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#today-home")).toContainText("Spielt gerade",{timeout:15000});
- await expect(page.locator("#live-nav-tab")).toBeVisible();
- // No repeated GET is required: a single local expiry timer removes the now-stale state.
+ await expect(page.locator("#live-nav-tab")).toBeVisible({timeout:15000});
+ await expect(page.locator("#today-home")).toBeHidden();
  await page.clock.fastForward(93000);
- await expect(page.locator("#today-home")).not.toContainText("Spielt gerade");
  await expect(page.locator("#live-nav-tab")).toBeHidden();
- await expect(page.locator("#today-home [data-today-status]")).toContainText("keine bestätigten Einsätze");
+ await expect(page.locator("#today-home")).toBeHidden();
 });
