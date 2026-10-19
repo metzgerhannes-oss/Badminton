@@ -52,6 +52,10 @@ assert.deepEqual(params.getAll("match_date"),[
 ]);
 assert.equal(params.get("team_id"),"in.(108,109)");
 assert.equal(params.get("limit"),"96");
+const manyTeams=Array.from({length:30},(_,i)=>({id:String(i+1)}));
+const boundedQuery=new URLSearchParams(fixtureReadPath(manyTeams,{day:today,limit:999}).split("?")[1]);
+assert.equal(boundedQuery.get("team_id").split(",").length,12,"No caller may exceed the 12-team read budget");
+
 assert.equal(fixtureReadPath([a,b],{day:"not-a-day"}),null);
 assert.equal(fixtureReadPath([{id:"1;DROP TABLE"}],{day:today}),null);
 const scheduled=todayTeamEvents({today,teams:[a],fixtures:[fixture(),fixture({id:"tomorrow",match_date:"2026-10-20T12:00:00+02:00"})]});
