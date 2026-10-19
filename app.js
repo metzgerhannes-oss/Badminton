@@ -36,6 +36,11 @@ function navigateHome(){
   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
  else SchmetterlingeStorage.showOwn(state);
  routeTo("start");
+ // iOS Home Screen/Safari can delay hashchange; a tap must update Home now,
+ // even when the hash is already #start but the visible view is still Turniertag.
+ // The later hashchange handler remains idempotent and never resets profiles.
+ render();
+ focusCurrentView();
 }
 function renderFocusHeader(){
  const p=currentProfile();
