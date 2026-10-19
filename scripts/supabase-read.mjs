@@ -35,9 +35,13 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   if(signal)signal.addEventListener("abort",onAbort,{once:true});
   const timer=setTimeout(()=>{timedOut=true;controller.abort()},timeoutMs);
   try{
-   const protectedRoute=/^(?:player_external_match_facts|tournament_placements)[?]/.test(path);
+   const protectedRoute=/^(?:player_external_match_facts|tournament_placements|player_live_snapshots)[?]/.test(path);
    const sessionToken=protectedRoute&&typeof window!=="undefined"
     ?await window.badmintonAppAccess?.getAccessToken?.():null;
+   // The live snapshot cache is member-only. Never issue an unauthenticated
+   // request that is guaranteed to 403 (or expose an old cached snapshot).
+   if(path.startsWith("player_live_snapshots?")&&!sessionToken)
+    throw new PublicReadError("restricted","Live snapshots require app membership",403);
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
     headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),

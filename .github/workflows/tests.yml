@@ -86,6 +86,7 @@ jobs:
           node --check scripts/supabase-read.mjs
           node --check today-in-action.js
           node --check scripts/today-evidence.mjs
+          node --check scripts/today-presentation.mjs
           node --check teams.js
           node --check scripts/team-directory-utils.mjs
           node --check welcome.js
@@ -154,12 +155,14 @@ jobs:
           node tests/history-status-ux.mjs
           node tests/live-links.mjs
           node tests/live-radar.mjs
+          node tests/live-member-access.mjs
           node tests/live-hub.mjs
           node tests/tournament-live.mjs
           node tests/badhub-event-bridge.mjs
           node tests/badhub-event-ui.mjs
           node tests/followed-live.mjs
           node tests/today-evidence.mjs
+          node tests/today-presentation.mjs
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs

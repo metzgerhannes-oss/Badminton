@@ -131,13 +131,24 @@ async function getSnapshot(id,signal){
 async function watch(id,signal){
  const post=watchRequest(id);
  if(!post)return;
- const res=await fetch(post.url,{method:"POST",headers:post.headers,body:post.body,signal});
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token)throw Error("Mitgliedsfreigabe erforderlich");
+ const res=await fetch(post.url,{method:"POST",
+  headers:{...post.headers,Authorization:"Bearer "+token},
+  body:post.body,signal});
  if(!res.ok)throw Error("Watch request "+res.status);
  lastWatchAt=Date.now();
 }
 async function refresh(){
  const id=currentId;
  if(!displayed()||!DBV_ID.test(id||"")||busy)return;
+ // On a freshly launched iPhone/PWA, app-access may still be resolving
+ // the saved invitation when the live UI mounts. Wait for its grant event
+ // instead of sending a doomed watch/snapshot request and showing an error.
+ if(!window.badmintonAppAccess?.allowed){
+  message("Live-Radar wird vorbereitet","Die Mitgliederfreigabe wird geprüft.","pending");
+  return;
+ }
  const seq=++generation;
  busy=true;
  controller?.abort();
@@ -178,6 +189,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  if(!root())return;
  currentId=String(window.badmintonActivePlayerId||"");
  $("live-radar-refresh")?.addEventListener("click",refresh);
+ window.addEventListener("badminton:app-access-granted",()=>{if(displayed())refresh()});
  window.addEventListener("badminton:profile-change",e=>{
   const id=String(e.detail?.playerId||"");
   if(id!==currentId)switchPlayer(id);

@@ -54,11 +54,15 @@ function render(roster,rows,remaining,error=""){
 async function registerWatches(roster,signal){
  const now=Date.now();
  const needed=roster.filter(p=>now-(watchTimes.get(p.id)||0)>75000);
+ if(!needed.length)return;
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token)return;
  await Promise.allSettled(needed.map(async p=>{
   watchTimes.set(p.id,now); // even failed requests must not trigger a busy retry loop
   const post=watchRequest(p.id);
   if(!post)return;
-  const response=await fetch(post.url,{method:"POST",headers:post.headers,body:post.body,signal});
+  const response=await fetch(post.url,{method:"POST",
+   headers:{...post.headers,Authorization:"Bearer "+token},body:post.body,signal});
   if(!response.ok&&response.status!==409&&response.status!==400)
    console.warn("Player LIVE subscription rejected",response.status);
  }));
@@ -88,12 +92,19 @@ async function refresh(){
 function sync(){
  if(!visible()){seq++;controller?.abort();busy=false;return}
  const p=followedRoster(window.badmintonLiveViewerOptions?.()||{});
+ // The invitation/session check may finish after DOMContentLoaded on iOS.
+ // Never mark a watch as requested before the member token exists.
+ if(!window.badmintonAppAccess?.allowed){
+  checked=0;render(p.players,[],p.remaining);
+  return;
+ }
  const ids=p.players.map(x=>x.id).join(",");
  if(ids!==lastRoster.map(x=>x.id).join(",")||!checked||Date.now()-checked>30000)refresh();
  else render(p.players,lastRows,p.remaining);
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("followed-live-cards"))return;
+ window.addEventListener("badminton:app-access-granted",sync);
  window.addEventListener("badminton:matchday-mode",sync);
  window.addEventListener("badminton:profile-change",sync);
  window.addEventListener("hashchange",sync);
