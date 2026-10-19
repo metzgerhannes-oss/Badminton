@@ -14,7 +14,7 @@ export function kickoffLabel(value,now=Date.now()){
  return new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit",
   hour12:false,timeZone:"Europe/Berlin"}).format(date)+" Uhr";
 }
-export function today'sMatchRows(events,{now=Date.now(),limit=12}={}){
+export function todayMatchRows(events,{now=Date.now(),limit=12}={}){
  if(!Array.isArray(events))return [];
  const bounded=Number.isInteger(limit)?Math.max(1,Math.min(12,limit)):12;
  const seen=new Set(),result=[];
