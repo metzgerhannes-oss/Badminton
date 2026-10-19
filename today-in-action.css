@@ -1,0 +1,30 @@
+/* #298 Paket C — navy surfaces and WCAG-AA readable evidence cards. */
+.today-evidence{margin:1rem 0 1.25rem;padding:1rem 1.1rem;border:1px solid #47799f;
+ border-radius:16px;background:#173b5f;color:#f7fbff;min-width:0}
+.today-evidence .today-heading{display:flex;gap:.75rem;align-items:center;
+ justify-content:space-between;flex-wrap:wrap;margin-bottom:.5rem}
+.today-evidence h2{font-size:clamp(1.16rem,1.4vw,1.42rem);color:#fff;margin:0}
+.today-evidence h3{font-size:1rem;color:#e9f7ff;margin:.8rem 0 .35rem}
+.today-evidence [data-today-status]{font-size:.98rem;color:#e1eef9;line-height:1.5;margin:.35rem 0}
+.today-evidence [data-today-cards]{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:.7rem}
+.today-evidence .today-group-label{grid-column:1/-1}
+.today-entry{border:1px solid #7199b5;background:#102e4b;border-radius:12px;
+ padding:.8rem;min-width:0;display:flex;flex-direction:column;gap:.55rem}
+.today-entry-head{display:flex;flex-wrap:wrap;gap:.45rem .7rem;align-items:center;justify-content:space-between}
+.today-entry-head strong{font-size:1.05rem;color:#fff;overflow-wrap:anywhere}
+.today-entry-state{padding:.23rem .5rem;border:1px solid #97cbe3;
+ border-radius:999px;background:#244f70;color:#fff;font-weight:700;font-size:.88rem}
+.today-entry-detail{color:#f1f7fd;margin:0;overflow-wrap:anywhere;font-size:.99rem}
+.today-entry-score{font-size:1.1rem;color:#fff}
+.today-entry-source{font-size:.87rem;color:#d8eefa;line-height:1.5}
+.today-entry-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:auto}
+.today-evidence button,.today-entry-original{display:inline-flex;align-items:center;justify-content:center;
+ min-height:44px;min-width:44px;cursor:pointer;border-radius:9px;padding:.55rem .75rem;font:inherit;
+ font-size:.94rem;font-weight:650;text-decoration:none}
+.today-evidence button{background:#e8f5ff;color:#123651;border:1px solid #c7eaff}
+.today-entry-original{background:transparent;color:#f7fbff;border:1px solid #bad8ed}
+.today-evidence button:focus-visible,.today-entry-original:focus-visible{
+ outline:3px solid #fff;outline-offset:3px}
+.today-evidence [data-today-more][hidden]{display:none}
+.today-evidence [data-today-more]{margin-top:.75rem}
+@media(max-width:420px){.today-evidence{padding:.85rem}.today-entry{padding:.75rem}}
