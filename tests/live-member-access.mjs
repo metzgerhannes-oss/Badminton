@@ -38,5 +38,8 @@ const followed=await readFile("followed-live.js","utf8");
 assert.match(radar,/Authorization:"Bearer "\+token/);
 assert.match(followed,/Authorization:"Bearer "\+token/);
 assert.match(radar,/getAccessToken/);
+assert.match(radar,/badminton:app-access-granted/,"Live radar must retry after async member grant");
+assert.match(radar,/if\(!window\.badmintonAppAccess\?\.allowed\)/,
+ "Live radar must not request unauthenticated watch during startup");
 assert.match(followed,/getAccessToken/);
 console.log("App membership required for Badhub watch+live cache; fixture public read unchanged; no extra cron.");
