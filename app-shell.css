@@ -42,10 +42,9 @@
 /* Six slots: five main pages plus the LIVE tab. Five widths at 20% plus LIVE
    previously exceeded a 320px phone viewport by 75px in WebKit. */
 .bottom-nav.has-live-tab a{width:calc(100% / 6)!important;flex:1 1 calc(100% / 6);min-width:0}
-/* "Heute" is NOT always the current page. It shares the neutral tab
-   paint unless active; the old permanent pink outline falsely signalled
-   selected "Heute" even while Home/Spieler was displayed. */
-.bottom-nav.has-live-tab .live-nav-tab{color:inherit;background:transparent;border:1px solid transparent;border-radius:12px}
+/* A verified scheduled/current match makes Heute visible and conspicuously red.
+   A pale alert is visually distinct from the solid-red selected tab. */
+.bottom-nav.has-live-tab .live-nav-tab{color:#9f123b;background:#fff1f4;border:1px solid #c94e70;border-radius:12px;font-weight:800}
 .bottom-nav.has-live-tab .live-nav-tab[aria-current="page"]{color:#fff;background:#b91f4d;border-color:#9f123b}
 .bottom-nav.has-live-tab .live-nav-tab .nav-icon{stroke-width:2.1}
 .live-tournaments-return{display:none}
