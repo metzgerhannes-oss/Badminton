@@ -10,14 +10,14 @@ const today="2026-10-19";
 const now=Date.parse("2026-10-19T11:00:00.000Z");
 const teamUrl="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/groupPage?championship=2026";
 const reportUrl="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/clubMeetingReport?match=1";
-const a={id:"108",follow_key:"nuliga:10777:1",club_name:"SpVgg Test",team_label:"1",season:"2026/27",
+const a={id:"nuliga:10777:2026-27:1",follow_key:"nuliga:10777:1",club_name:"SpVgg Test",team_label:"1",season:"2026/27",
  source_url:teamUrl,source_checked_at:"2026-10-18T20:00:00Z"};
-const b={id:"109",follow_key:"nuliga:10777:2",club_name:"SpVgg Test",team_label:"2",season:"2026/27",
+const b={id:"nuliga:10777:2026-27:2",follow_key:"nuliga:10777:2",club_name:"SpVgg Test",team_label:"2",season:"2026/27",
  source_url:teamUrl};
 const fixture=(extra={})=>({
- id:"fixture-1",team_id:"108",match_date:"2026-10-19T12:00:00+02:00",
+ id:"fixture-1",team_id:a.id,match_date:"2026-10-19T12:00:00+02:00",
  home_team:"SpVgg Test 1",away_team:"Gäste 1",home_score:null,away_score:null,
- status:"scheduled",source_url:reportUrl,...extra
+ status:"scheduled",source_url:reportUrl,source_checked_at:"2026-10-19T10:50:00Z",...extra
 });
 const own={id:"05-070879",name:"Spieler Eigen"};
 const friend={id:"05-070880",name:"Spieler Gefolgt"};
@@ -50,7 +50,7 @@ const params=new URLSearchParams(plan.split("?")[1]);
 assert.deepEqual(params.getAll("match_date"),[
  "gte.2026-10-18T00:00:00.000Z","lt.2026-10-20T00:00:00.000Z"
 ]);
-assert.equal(params.get("team_id"),"in.(108,109)");
+assert.equal(params.get("team_id"),'in.("nuliga:10777:2026-27:1","nuliga:10777:2026-27:2")');
 assert.equal(params.get("limit"),"96");
 const manyTeams=Array.from({length:30},(_,i)=>({id:String(i+1)}));
 const boundedQuery=new URLSearchParams(fixtureReadPath(manyTeams,{day:today,limit:999}).split("?")[1]);
@@ -58,12 +58,20 @@ assert.equal(boundedQuery.get("team_id").split(",").length,12,"No caller may exc
 
 assert.equal(fixtureReadPath([a,b],{day:"not-a-day"}),null);
 assert.equal(fixtureReadPath([{id:"1;DROP TABLE"}],{day:today}),null);
+assert.equal(fixtureReadPath([{id:"nuliga:10777:2026-27:1;drop"}],{day:today}),null);
+const persistedModel=await readFile("database/team-league-public-directory-v95.sql","utf8");
+assert.match(persistedModel,/\('nuliga:10777:2026-27:1'/,
+ "The actual public team IDs are source-prefixed strings, not UUIDs");
+assert.match(persistedModel,/league_fixtures \(/);
+assert.match(persistedModel,/source_checked_at timestamptz not null/);
+assert.ok(params.get("select").includes("source_checked_at"));
+
 const scheduled=todayTeamEvents({today,teams:[a],fixtures:[fixture(),fixture({id:"tomorrow",match_date:"2026-10-20T12:00:00+02:00"})]});
 assert.equal(scheduled.length,1);
 assert.equal(scheduled[0].status,"Heute angesetzt");
 assert.equal(scheduled[0].kind,"scheduled");
 assert.equal(scheduled[0].score,"");
-assert.equal(scheduled[0].checkedAt,a.source_checked_at);
+assert.equal(scheduled[0].checkedAt,"2026-10-19T10:50:00Z","Use fixture last-check, not unrelated team-directory last-check");
 for(const [status,expected] of [["cancelled","Abgesagt"],["postponed","Verlegt"]]){
  const rows=todayTeamEvents({today,teams:[a],fixtures:[fixture({status})]});
  assert.equal(rows[0].status,expected);
