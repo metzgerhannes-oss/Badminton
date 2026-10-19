@@ -44,6 +44,12 @@ test("Heute im Einsatz: source-backed scheduled team, never invented running sta
  await expect(page.locator("#today-tournament")).toContainText("Heute angesetzt");
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
  expect(overflow).toBeLessThanOrEqual(2);
+ // Desktop retains evidence and a keyboard-accessible original source link.
+ await page.setViewportSize({width:1440,height:900});
+ await expect(page.locator("#today-tournament")).toContainText("Heute angesetzt");
+ await expect(page.locator("#today-tournament .today-entry-original")).toHaveAttribute("href",SOURCE);
+ await expect(page.locator("#today-tournament .today-entry-original")).toBeVisible();
+ await page.screenshot({path:"test-results/heute-im-einsatz-desktop.png",animations:"disabled"});
 });
 test("Heute im Einsatz: no evidence gives neutral state, no invented LIVE label",async({page})=>{
  await page.setViewportSize({width:320,height:667});
