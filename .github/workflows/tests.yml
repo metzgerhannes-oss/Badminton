@@ -166,6 +166,7 @@ jobs:
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs
           node tests/source-stats-home.mjs
+          node tests/stats-results-v180.mjs
           node tests/dbv-match-reference.mjs
           node tests/badhub-primary-career.mjs
           node scripts/import-coverage-audit.test.mjs
