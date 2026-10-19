@@ -2,7 +2,7 @@
  * No timer, provider watcher, new team directory read, personal upload or server write.
  * Every claimed match/live state is derived by today-evidence.mjs.
  */
-import {todayEvidence,followedTeamSelection,fixtureReadPath,berlinDay,TEAM_FOLLOWS_KEY}
+import {todayEvidence,followedTeamSelection,fixtureReadPath,berlinDay,hasVerifiedMatchToday,TEAM_FOLLOWS_KEY}
  from "./scripts/today-evidence.mjs";
 import {followedRoster,followedSnapshotPath} from "./scripts/followed-live.mjs";
 import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
@@ -137,7 +137,8 @@ function scheduleLocalExpiry(){
 function informNav(){
  const events=last?.events||[];
  window.dispatchEvent(new CustomEvent("badminton:today-events",{
-  detail:{day:last?.today||berlinDay(),confirmed:events.length>0,
+  detail:{day:last?.today||berlinDay(),
+   matchToday:hasVerifiedMatchToday(events),
    playing:events.some(item=>item.entity==="player"&&item.kind==="playing")}
  }));
 }
