@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-10-18T09:52:42.410335+00:00",
+  "capturedAt": "2026-10-19T11:14:12.377513+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
     {
@@ -1894,6 +1894,29 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44752",
+      "title": "Landesmeisterschaften BAY O19 (71. BBV-Victor-Meisterschaft der Aktiven)",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Regensburg",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-24",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44568",
       "title": "D-RLT SAH Nord U11-U19",
       "start_date": "2026-12-05",
@@ -2503,7 +2526,7 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-12-13",
+      "registration_deadline": "2026-12-20",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -2526,7 +2549,7 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2026-12-15",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -2821,7 +2844,7 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2026-12-19",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3096,7 +3119,7 @@
       "title": "1. B-RLT Mitte U15/U19",
       "start_date": "2027-01-30",
       "end_date": "2027-01-31",
-      "location_text": "",
+      "location_text": "Heiligenwald (SAA)",
       "organizer": "Gruppe Mitte",
       "bundesland": null,
       "region_scope": "group",
@@ -3111,7 +3134,7 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2027-01-02",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -5581,7 +5604,7 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2027-05-08",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
