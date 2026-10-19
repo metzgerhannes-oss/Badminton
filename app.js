@@ -31,17 +31,30 @@ function setActiveProfile(id){
 // Existing UI callers keep the same route and focus methods.
 function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
-function navigateHome(){
- if(!state.players.length&&state.friends.length)
-  SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
- else SchmetterlingeStorage.showOwn(state);
- routeTo("start");
- // iOS Home Screen/Safari can delay hashchange; a tap must update Home now,
- // even when the hash is already #start but the visible view is still Turniertag.
- // The later hashchange handler remains idempotent and never resets profiles.
- render();
- focusCurrentView();
+/** Native-feeling primary navigation: source of truth is the tapped destination,
+ * not a deferred hashchange from installed WebKit. All six navigation links use
+ * the same route. This does not touch stored players, friends or invitations.
+ */
+function navigatePrimary(page){
+ const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte"];
+ if(!allowed.includes(page))return false;
+ if(page==="start"){
+  if(!state.players.length&&state.friends.length)
+   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
+  else SchmetterlingeStorage.showOwn(state);
+ }
+ state.page=page;
+ if(location.hash!=="#"+page)location.hash="#"+page;
+ // Render the destination first. An unrelated dashboard/live rendering failure
+ // must not trap navigation on the previous view.
+ SchmetterlingeRouter.renderPage(state);
+ try{render()}finally{
+  SchmetterlingeRouter.renderPage(state);
+  focusCurrentView();
+ }
+ return true;
 }
+function navigateHome(){return navigatePrimary("start")}
 function renderFocusHeader(){
  const p=currentProfile();
  const isFriend=Boolean(state.viewingFriendId);
@@ -453,15 +466,26 @@ function setup(){
   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
  SchmetterlingeSpond.mount({getState:()=>state,onChange:render});
  state.page=(location.hash||"#start").slice(1).split("/")[0];
- // Native anchor routing alone retains the viewed friend's profile. Home must reset it,
- // including a second tap while #start is already the active hash.
- document.querySelectorAll('.bottom-nav a[data-page="start"], .topbar .brand[href="#start"]').forEach(link=>{
+ // A single delegated click handler covers ALL seven links, including a repeat
+ // tap and a still-pending iPhone hashchange. Do not rely on anchor events alone.
+ document.querySelector(".bottom-nav")?.addEventListener("click",event=>{
+  const link=event.target.closest?.("a[data-page]");
+  const page=link?.dataset.page;
+  if(!page||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  event.preventDefault();
+  navigatePrimary(page);
+ },{capture:true});
+ document.querySelectorAll('.topbar .brand[href="#start"]').forEach(link=>{
   link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
  });
  window.addEventListener("hashchange",()=>{
   state.page=(location.hash||"#start").slice(1).split("/")[0];
-  render();
-  focusCurrentView();
+  // Never let an unrelated data renderer hold the old section on-screen.
+  SchmetterlingeRouter.renderPage(state);
+  try{render()}finally{
+   SchmetterlingeRouter.renderPage(state);
+   focusCurrentView();
+  }
  });
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
  let editingPlayerId=null,activatingNewProfile=false;
