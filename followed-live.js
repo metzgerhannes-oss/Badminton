@@ -54,11 +54,15 @@ function render(roster,rows,remaining,error=""){
 async function registerWatches(roster,signal){
  const now=Date.now();
  const needed=roster.filter(p=>now-(watchTimes.get(p.id)||0)>75000);
+ if(!needed.length)return;
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token)return;
  await Promise.allSettled(needed.map(async p=>{
   watchTimes.set(p.id,now); // even failed requests must not trigger a busy retry loop
   const post=watchRequest(p.id);
   if(!post)return;
-  const response=await fetch(post.url,{method:"POST",headers:post.headers,body:post.body,signal});
+  const response=await fetch(post.url,{method:"POST",
+   headers:{...post.headers,Authorization:"Bearer "+token},body:post.body,signal});
   if(!response.ok&&response.status!==409&&response.status!==400)
    console.warn("Player LIVE subscription rejected",response.status);
  }));
