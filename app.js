@@ -366,21 +366,17 @@ window.badmintonLibraryView=id=>{
  return window.badmintonSelectViewer(id);
 };
 }
-let liveEvidence={playerId:"",day:"",active:false};
-let todayNav={day:"",confirmed:false,playing:false};
+let todayNav={day:"",matchToday:false};
 function updateLiveNavigation(){
  const tab=el("live-nav-tab");if(!tab)return false;
- const today=localDay();
- const shouldShow=SchmetterlingeBookmarks.hasTournamentToday(state,today)||
-  (liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today)||
-  (todayNav.confirmed&&todayNav.day===today);
+ // A mere tournament, own calendar bookmark, dated result or yesterday's
+ // source snapshot must never expose the prominent red game-day shortcut.
+ const shouldShow=todayNav.matchToday&&todayNav.day===localDay();
  const changed=tab.hidden===shouldShow;
  tab.hidden=!shouldShow;
  tab.parentElement?.classList.toggle("has-live-tab",shouldShow);
- const genuineLive=(liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today)||
-  (todayNav.playing&&todayNav.day===today);
- const caption=tab.querySelector("small");if(caption)caption.textContent=genuineLive?"LIVE":"Heute";
- tab.setAttribute("aria-label",genuineLive?"Bestätigte aktuelle Spielmeldungen":"Heutige belegte Spieltermine");
+ const caption=tab.querySelector("small");if(caption)caption.textContent="Heute";
+ tab.setAttribute("aria-label","Heute angesetzte oder laufende Spiele");
  return changed;
 }
 let lastNotifiedProfile="",lastNotifiedClub="";
@@ -431,17 +427,11 @@ function openTournamentForm(item=null){
 function setup(){
  window.addEventListener("badminton:today-events",event=>{
   const d=event.detail||{};
-  todayNav={day:String(d.day||""),confirmed:d.confirmed===true,playing:d.playing===true};
+  todayNav={day:String(d.day||""),matchToday:d.matchToday===true};
   if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
  });
  window.addEventListener("badminton:community-feedback",event=>{
   if(typeof event.detail?.message==="string")toast(event.detail.message);
- });
- window.addEventListener("badminton:live-evidence",event=>{
-  const playerId=String(event.detail?.playerId||"");
-  if(playerId!==state.chosen)return;
-  liveEvidence={playerId,day:localDay(),active:event.detail?.active===true};
-  if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
  });
  // Local date rollover check only: no additional provider polling.
  setInterval(()=>{if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state)},60_000);
