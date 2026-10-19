@@ -24,7 +24,7 @@ export function berlinDay(now=Date.now()){
 export function sourceMatchDay(raw){
  if(typeof raw!=="string")return "";
  if(validDay(raw))return raw;
- if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.\d{1,3})?)?(?:Z|[+-]\d\d:\d\d)$/.test(raw))return "";
+ if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.\d{1,9})?)?(?:Z|[+-]\d\d:\d\d)$/.test(raw)||!validDay(raw.slice(0,10)))return "";
  const date=new Date(raw);
  return Number.isFinite(date.getTime())?berlinDay(date):"";
 }
