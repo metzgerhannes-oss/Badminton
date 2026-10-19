@@ -61,3 +61,30 @@ test("Heute im Einsatz: no evidence gives neutral state, no invented LIVE label"
   {timeout:15000}
  );
 });
+
+test("Heute im Einsatz: source-confirmed player LIVE expires without provider polling",async({page})=>{
+ const now=Date.parse("2026-10-19T11:00:00.000Z");
+ const id="05-070879";
+ await page.clock.install({time:new Date(now)});
+ await page.addInitScript(()=>{
+  if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"Synthetisches Spielerprofil",club:"Testverein"}],
+   friends:[],officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",
+   historyProfilesInitialized:true
+  }));
+ });
+ await page.route("**/rest/v1/player_live_snapshots?*",route=>route.fulfill({
+  status:200,contentType:"application/json",body:JSON.stringify([{
+   dbv_id:id,provider:"Badhub",source_url:"https://badhub.de/spieler/"+id+"/live",
+   checked_at:new Date(now-30000).toISOString(),
+   payload:{upcoming:[],past:[],entries:[],tournament:{name:"Synthetisches Turnier"},
+    running:{court:"Feld 1",sets:[[21,19]]}}
+  }])
+ }));
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#today-home")).toContainText("Spielt gerade",{timeout:15000});
+ // No repeated GET is required: a single local expiry timer removes the now-stale state.
+ await page.clock.fastForward(93000);
+ await expect(page.locator("#today-home")).not.toContainText("Spielt gerade");
+ await expect(page.locator("#today-home [data-today-status]")).toContainText("keine bestätigten Einsätze");
+});
