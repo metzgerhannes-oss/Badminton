@@ -30,8 +30,9 @@ export function sourceMatchDay(raw){
 }
 export function fixtureReadPath(teams,{limit=TODAY_TEAM_LIMIT,day=berlinDay()}={}){
  if(!validDay(day))return null;
+ const bound=Number.isSafeInteger(limit)?Math.max(1,Math.min(TODAY_TEAM_LIMIT,limit)):TODAY_TEAM_LIMIT;
  const ids=[...new Set((Array.isArray(teams)?teams:[])
-  .map(t=>exactId(t?.id)).filter(id=>(/^[0-9]+$/.test(id)||/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id))))].slice(0,limit);
+  .map(t=>exactId(t?.id)).filter(id=>(/^[0-9]+$/.test(id)||/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id))))].slice(0,bound);
  if(!ids.length)return null;
  // 48h UTC bound covers every Europe/Berlin local day (UTC+1 or UTC+2).
  // Exact day-filtering happens only *after* receiving public fixtures.
