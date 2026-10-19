@@ -31,6 +31,8 @@ const readLocalFollows=()=>{
  catch{return []}
 };
 let last=null,signature="",checked=0,loading=false,seq=0,controller=null;
+let expiryTimer=null;
+
 const activeGroups=()=>window.badmintonLiveViewerOptions?.()||{own:[],friends:[],selected:""};
 const context=()=>{
  const groups=activeGroups(),follows=readLocalFollows();
@@ -110,6 +112,28 @@ function renderHost(host,model,waiting=false,error=""){
 function render(waiting=false,error=""){
  for(const id of hosts)renderHost($(id),last,waiting,error);
 }
+/** Source-backed live cards expire locally at 120s; never retain stale playing claims.
+ * A one-shot local expiry is not a provider poll or additional network request.
+ */
+function scheduleLocalExpiry(){
+ if(expiryTimer!==null){clearTimeout(expiryTimer);expiryTimer=null}
+ const now=Date.now();
+ const moments=(last?.events||[]).filter(e=>e.entity==="player")
+  .map(e=>Date.parse(e.checkedAt)+120000).filter(x=>Number.isFinite(x));
+ if(!moments.length)return;
+ const closest=Math.min(...moments);
+ expiryTimer=setTimeout(()=>{
+  expiryTimer=null;
+  if(!last)return;
+  const now=Date.now();
+  const events=last.events.filter(e=>e.entity!=="player"||
+   (Number.isFinite(Date.parse(e.checkedAt))&&Date.parse(e.checkedAt)+120000>now));
+  if(events.length!==last.events.length){
+   last={...last,events};render();informNav();
+  }
+  scheduleLocalExpiry();
+ },Math.max(0,closest-now+50));
+}
 function informNav(){
  const events=last?.events||[];
  window.dispatchEvent(new CustomEvent("badminton:today-events",{
@@ -144,10 +168,10 @@ async function refresh(force=false){
  signature=errors?"":stamp;
  checked=errors?0:Date.now();
  loading=false;render(false,errors?"partial":"");
- informNav();
+ informNav();scheduleLocalExpiry();
 }
 function changed(){
- signature="";checked=0;last=null;informNav();
+ signature="";checked=0;last=null;informNav();scheduleLocalExpiry();
  if(visible())void refresh(true);
 }
 function route(){if(visible())void refresh()}
