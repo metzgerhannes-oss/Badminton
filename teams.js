@@ -145,7 +145,11 @@ function readFollows(){
  try{follows=normalizeFollows(JSON.parse(localStorage.getItem(TEAM_FOLLOWS_KEY)||"[]"))}catch{follows=[]}
 }
 function saveFollows(){
- try{localStorage.setItem(TEAM_FOLLOWS_KEY,JSON.stringify(follows));return true}catch{return false}
+ try{
+  localStorage.setItem(TEAM_FOLLOWS_KEY,JSON.stringify(follows));
+  window.dispatchEvent(new Event("badminton:teams-updated"));
+  return true;
+ }catch{return false}
 }
 function showStatus(message){
  const n=$("team-directory-status");if(n)n.textContent=message;
@@ -363,8 +367,17 @@ async function load(){
   showStatus(rows.length+" Mannschaften · "+clubs.length+" offizielle BWBV-Vereine · Quellenstand jeweils in der Karte");
  }catch{
   loadFailed=true;showStatus("Öffentliche Mannschaftsdaten gerade nicht erreichbar. Bitte erneut versuchen.");
- }finally{loading=false;renderFollowed();renderSearchResults();renderDetail()}
+ }finally{
+  loading=false;renderFollowed();renderSearchResults();renderDetail();
+  window.dispatchEvent(new Event("badminton:teams-updated"));
+ }
 }
+// Reuse the existing cached team directory, never trigger another team list read.
+window.badmintonTodayTeamRows=()=>rows.filter(t=>follows.includes(t.follow_key));
+window.badmintonTodayOpenTeam=id=>{
+ if(!rows.some(t=>t.id===id))return false;
+ location.hash="#mannschaft";void selectTeam(id);return true;
+};
 function init(){
  if(initialized||!$("view-mannschaft"))return;initialized=true;readFollows();
  $("team-add-open").addEventListener("click",()=>setTeamDiscover($("team-discover").hidden));
@@ -387,7 +400,7 @@ function init(){
  }));
  window.addEventListener("hashchange",()=>{if(location.hash==="#mannschaft"&&rows.length===0&&!loading)load()});
  window.addEventListener("storage",event=>{
-  if(event.key===TEAM_FOLLOWS_KEY){readFollows();renderFollowed();renderSearchResults()}
+  if(event.key===TEAM_FOLLOWS_KEY){readFollows();renderFollowed();renderSearchResults();window.dispatchEvent(new Event("badminton:teams-updated"))}
  });
  load();
  if(window.badmintonAppAccess?.allowed)queueExistingTeams();

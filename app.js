@@ -349,14 +349,20 @@ window.badmintonLibraryView=id=>{
 };
 }
 let liveEvidence={playerId:"",day:"",active:false};
+let todayNav={day:"",confirmed:false,playing:false};
 function updateLiveNavigation(){
  const tab=el("live-nav-tab");if(!tab)return false;
  const today=localDay();
  const shouldShow=SchmetterlingeBookmarks.hasTournamentToday(state,today)||
-  (liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today);
+  (liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today)||
+  (todayNav.confirmed&&todayNav.day===today);
  const changed=tab.hidden===shouldShow;
  tab.hidden=!shouldShow;
  tab.parentElement?.classList.toggle("has-live-tab",shouldShow);
+ const genuineLive=(liveEvidence.active&&liveEvidence.playerId===state.chosen&&liveEvidence.day===today)||
+  (todayNav.playing&&todayNav.day===today);
+ const caption=tab.querySelector("small");if(caption)caption.textContent=genuineLive?"LIVE":"Heute";
+ tab.setAttribute("aria-label",genuineLive?"Bestätigte aktuelle Spielmeldungen":"Heutige belegte Spieltermine");
  return changed;
 }
 let lastNotifiedProfile="",lastNotifiedClub="";
@@ -405,6 +411,11 @@ function openTournamentForm(item=null){
  SchmetterlingeRouter.openDialog(dialog);
 }
 function setup(){
+ window.addEventListener("badminton:today-events",event=>{
+  const d=event.detail||{};
+  todayNav={day:String(d.day||""),confirmed:d.confirmed===true,playing:d.playing===true};
+  if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
+ });
  window.addEventListener("badminton:community-feedback",event=>{
   if(typeof event.detail?.message==="string")toast(event.detail.message);
  });
