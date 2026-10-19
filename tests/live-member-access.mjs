@@ -1,0 +1,36 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+import {readPublicRows,PublicReadError} from "../scripts/supabase-read.mjs";
+// All network responses in this test are synthetic. No production API calls.
+const path="player_live_snapshots?dbv_id=eq.05-070879&limit=1";
+let attempts=0,header="";
+const fake=async(_url,options)=>{
+ attempts++;header=options.headers.Authorization||"";
+ return {ok:true,status:200,headers:{get:()=>null},json:async()=>[]};
+};
+globalThis.window={badmintonAppAccess:{async getAccessToken(){return null}}};
+await assert.rejects(readPublicRows(path,{fetchImpl:fake,retries:0}),e=>
+ e instanceof PublicReadError&&e.kind==="restricted"&&e.status===403);
+assert.equal(attempts,0,"No anonymous live-cache request may be emitted");
+globalThis.window={badmintonAppAccess:{async getAccessToken(){return "synthetic-member-jwt"}}};
+const rows=await readPublicRows(path,{fetchImpl:fake,retries:0,count:false});
+assert.deepEqual(rows.rows,[]);
+assert.equal(attempts,1);
+assert.equal(header,"Bearer synthetic-member-jwt");
+header="";
+await readPublicRows("league_fixtures?limit=1",{fetchImpl:fake,retries:0,count:false});
+assert.equal(header,"","Public nuLiga fixtures must not acquire an invitation token");
+delete globalThis.window;
+const migration=await readFile("supabase/migrations/20261019210000_member_scoped_live_read_watch.sql","utf8");
+assert.match(migration,/grant select\(dbv_id,provider,source_url,checked_at,payload,last_error_at\)/i);
+assert.match(migration,/grant insert\(dbv_id\) on public\.player_live_watches to authenticated/i);
+assert.match(migration,/app_access_is_member\(\)/g);
+assert.doesNotMatch(migration,/grant\s+(?:select|insert)\s+on\s+public\.player_live_(?:watches|snapshots)\s+to\s+anon/i);
+assert.doesNotMatch(migration,/cron\.schedule|cron\.unschedule|create\s+extension/i);
+const radar=await readFile("live-radar.js","utf8");
+const followed=await readFile("followed-live.js","utf8");
+assert.match(radar,/Authorization:"Bearer "\+token/);
+assert.match(followed,/Authorization:"Bearer "\+token/);
+assert.match(radar,/getAccessToken/);
+assert.match(followed,/getAccessToken/);
+console.log("App membership required for Badhub watch+live cache; fixture public read unchanged; no extra cron.");
