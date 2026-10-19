@@ -210,3 +210,7 @@
 @media (min-width:1080px) and (prefers-reduced-motion:reduce) {
  .app .page :is(.report-card,.team-card,.followed-player-row) {transition:none!important}
 }
+
+/* Keep the match-statistics view focused on results and evidence. */
+#match-stats-source-link,
+#match-stats-provenance { display: none !important; }
