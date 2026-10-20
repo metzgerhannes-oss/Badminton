@@ -1,0 +1,26 @@
+/* v183 / #13 IA-2: one task home per relation, not a second settings workflow.
+   Keep accepted navy palette, accessible 44px controls and existing storage. */
+.follow-manage-details{min-width:0;margin:15px 0 0;padding:11px 12px;border:1px solid #7796b4;border-radius:14px;background:transparent}
+.follow-manage-details>summary{display:flex;align-items:center;min-height:46px;cursor:pointer;list-style:revert;font-size:14px;font-weight:780;line-height:1.45}
+.follow-manage-details>summary:focus-visible{outline:3px solid #a7d8ff;outline-offset:3px}
+.follow-manage-details[open]>summary{margin-bottom:10px}
+.follow-manage-help{font-size:13px;line-height:1.5;margin:0 0 12px}
+.follow-manage-details .follow-manage-item{min-width:0}
+.follow-manage-details .follow-manage-actions{display:flex;flex-wrap:wrap;gap:8px}
+.follow-manage-details .follow-manage-actions button{min-height:44px;min-width:44px}
+#view-spieler .friend-add-manual{margin-top:12px;min-height:44px;white-space:normal}
+#view-spieler #player-own-preview[hidden],
+#view-spieler [hidden],
+#view-mannschaft [hidden]{display:none!important}
+@media(max-width:390px){
+ .follow-manage-details{padding:10px}
+ .follow-manage-details .follow-manage-item{display:grid;gap:10px}
+ .follow-manage-details .follow-manage-actions{justify-content:flex-start}
+}
+@media(min-width:1080px){
+ .follow-manage-details{border-color:#6085a9;background:#16395e;color:#f2f7ff}
+ .follow-manage-details>summary,.follow-manage-details .follow-manage-help{color:#d9eaff}
+ .follow-manage-details .follow-manage-label :is(strong,small){color:#e6f4ff}
+ .follow-manage-details .follow-manage-actions button{background:#244d77;color:#f4faff;border:1px solid #8aaecb}
+ .follow-manage-details .follow-manage-actions button:disabled{opacity:.54}
+}
