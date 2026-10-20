@@ -6,8 +6,6 @@
  if(!view)return;
  const definitions=[
   {id:"profile",title:"Profile & Familie",desc:"Eigene Spieler, Elternfreigaben und Gerätezugang",group:"Spieler & Mannschaften",icon:"♙"},
-  {id:"spieler",title:"Gefolgte Spieler",desc:"Alle anzeigen, suchen und entfolgen",group:"Spieler & Mannschaften",icon:"◉"},
-  {id:"mannschaften",title:"Gefolgte Mannschaften",desc:"Deine Teams und ihre Reihenfolge",group:"Spieler & Mannschaften",icon:"▤"},
   {id:"darstellung",title:"Sprache & Vereinsdesign",desc:"Sprache, Name, Logo und Vereinsfarbe",group:"App & Daten",icon:"◐"},
   {id:"einladungen",title:"Einladungen & Freigaben",desc:"Spieler suchen und persönliche Zugänge verwalten",group:"App & Daten",icon:"↗"},
   {id:"daten",title:"Sicherung & Datenschutz",desc:"Gerätewechsel, Export und Datenschutz",group:"App & Daten",icon:"▣"},
@@ -58,33 +56,7 @@
   if(!node)throw Error("Settings room missing control: "+selector);
   rooms.get(key).room.append(node);return node;
  }
- // Split one old, overloaded follow card into two independently managed rooms.
- const follow=view.querySelector(".follow-settings");
- const followedTeamHeading=follow?.querySelectorAll(".follow-hub-subheading")[1];
- const followedTeamList=follow?.querySelector("#team-settings-list");
- if(!follow||!followedTeamHeading||!followedTeamList)return;
- const teamSection=document.createElement("section");
- teamSection.className="settings-card follow-settings";
- const teamLabel=document.createElement("p");teamLabel.className="settings-hint";
- teamLabel.textContent="Hier verwaltest du nur die Mannschaften, denen du folgst. Die Reihenfolge bleibt lokal gespeichert.";
- teamSection.append(teamLabel,followedTeamHeading,followedTeamList);
- const oldTitle=follow.querySelector("#follow-settings-title");
- if(oldTitle)oldTitle.textContent="Meine gefolgten Spieler";
- const oldHint=follow.querySelector(".settings-hint");
- if(oldHint)oldHint.textContent="Behalte den Überblick: Suche nach Namen oder DBV-ID, ändere die Reihenfolge oder entfolge einem Spieler.";
- const searchWrap=document.createElement("label");searchWrap.className="settings-friend-search-label";
- searchWrap.textContent="Gefolgte Spieler suchen";
- const search=document.createElement("input");search.type="search";search.id="settings-followed-player-search";
- search.placeholder="Name oder DBV-ID";search.autocomplete="off";
- search.setAttribute("aria-controls","friend-settings-list");searchWrap.append(search);
- const list=follow.querySelector("#friend-settings-list");
- follow.insertBefore(searchWrap,follow.querySelector(".follow-hub-subheading"));
- const noResults=document.createElement("p");noResults.id="settings-followed-empty";
- noResults.className="settings-hint";noResults.hidden=true;
- noResults.textContent="Kein gefolgter Spieler passt zu deiner Suche.";
- list?.after(noResults);
- rooms.get("spieler").room.append(follow);
- rooms.get("mannschaften").room.append(teamSection);
+ // IA-2: follower management lives in subject pages, never a second settings room.
  appendTo("profile",".player-management");
  appendTo("profile","#owner-admin-panel");
  appendTo("profile","#owner-activation-setup");
@@ -100,22 +72,6 @@
   const heading=element.querySelector("h3")?.textContent?.trim()||"";
   if(heading==="Daten & Datenschutz")rooms.get("daten").room.append(element);
   if(heading==="Datenquellen & Nachweise")rooms.get("quellen").room.append(element);
- }
- function filterFollowed(){
-  const query=search.value.normalize("NFKC").toLocaleLowerCase("de").trim();
-  let total=0,shown=0;
-  for(const card of list.querySelectorAll(".follow-manage-item")){
-   total++;
-   const visible=!query||card.textContent.normalize("NFKC").toLocaleLowerCase("de").includes(query);
-   card.hidden=!visible;
-   if(visible)shown++;
-  }
-  noResults.hidden=!(query&&total>0&&shown===0);
- }
- search.addEventListener("input",filterFollowed);
- if(list){
-  const observer=new MutationObserver(filterFollowed);
-  observer.observe(list,{childList:true});
  }
  // Device-local overview only: no authentication, data writes or server-status claims.
  const grantRoom=rooms.get("einladungen").room;
@@ -181,16 +137,15 @@
   if(!unique.length)empty(receivedList,"Noch keine auf diesem Gerät angenommenen Spielerrechte.");
  }
  function updateCounts(){
-  let friends=0,players=0;
+  let players=0;
   try{
    const data=JSON.parse(localStorage.getItem("shuttleboard-v1")||"{}");
-   friends=Array.isArray(data.friends)?data.friends.length:0;
    players=Array.isArray(data.players)?data.players.length:0;
   }catch{}
-  const counts={spieler:friends,profile:players};
+  const counts={profile:players};
   for(const [id,count] of Object.entries(counts)){
    const target=hub.querySelector('[data-settings-count="'+id+'"]');
-   if(target){target.hidden=false;target.textContent=count===1?"1 Profil":count+" "+(id==="spieler"?"gefolgte Spieler":"Profile");}
+   if(target){target.hidden=false;target.textContent=count===1?"1 Profil":count+" Profile";}
   }
  }
  function resolve(){
@@ -200,11 +155,14 @@
  }
  let previous=null;
  function sync(){
+  // Preserve old bookmarked settings links without leaving dead rooms.
+  const redirect={"#einstellungen/spieler":"#spieler","#einstellungen/mannschaften":"#mannschaft"}[location.hash];
+  if(redirect){location.replace(redirect);return}
   const key=resolve();
   if(key===null)return;
   hub.hidden=Boolean(key);
   for(const [id,v] of rooms)v.room.hidden=id!==key;
-  updateCounts();filterFollowed();if(key==="einladungen")refreshGrants();
+  updateCounts();if(key==="einladungen")refreshGrants();
   if(key!==previous){
    previous=key;
    if(key){
@@ -221,6 +179,5 @@
  window.addEventListener("pageshow",sync);
  window.addEventListener("storage",updateCounts);
  window.addEventListener("storage",()=>{if(resolve()==="einladungen")refreshGrants()});
- window.addEventListener("badminton:friend-followed",updateCounts);
  sync();
 })();
