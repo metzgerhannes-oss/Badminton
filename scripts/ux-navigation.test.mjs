@@ -23,18 +23,22 @@ test("mobile destinations plus desktop-only club and conditional LIVE; settings 
  assert.match(shell,/\.bottom-nav a\{width:25%!important/);
 });
 
-test("follow-first Spieler and Mannschaft tabs; profile and follow management in Einstellungen",()=>{
+test("follow-first Spieler and Mannschaft tabs; only family profiles in Einstellungen",()=>{
  assert.doesNotMatch(html,/src="\.\/friend-search\.js"/);
  assert.doesNotMatch(html,/id="friend-search"/);
  assert.equal((html.match(/id="library-search"/g)||[]).length,1);
- for(const id of ["add-player","add-friend","add-friend-manual","friend-list","profile-list","friend-settings-list","team-settings-list"]){
+ for(const id of ["add-player","add-friend-manual","friend-list","profile-list","friend-settings-list","team-settings-list"]){
   assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1);
  }
  for(const id of ["friend-list","player-discover","player-add-open","team-followed","team-discover","team-add-open"]){
   assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'),id);
  }
- for(const id of ["profile-list","friend-settings-list","team-settings-list"]){
-  assert.ok(html.indexOf('id="'+id+'"')>html.indexOf('id="view-einstellungen"'),id);
+ for(const id of ["friend-settings-list","team-settings-list"]){
+  assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'),id);
+ }
+ assert.ok(html.indexOf('id="profile-list"')>html.indexOf('id="view-einstellungen"'));
+ for(const id of ["settings-players-add","settings-teams-add","add-friend"]){
+  assert.doesNotMatch(html,new RegExp('id="'+id+'"'));
  }
  assert.match(html,/id="player-discover"[^>]*hidden/);
  assert.match(html,/id="team-discover"[^>]*hidden/);
