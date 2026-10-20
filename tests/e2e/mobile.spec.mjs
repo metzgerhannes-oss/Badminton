@@ -444,24 +444,34 @@ test("Backup in Einstellungen creates a local JSON and restores only after confi
  expect(actual.activeProfileId).toBe(PLAYER);
 });
 
-test("Settings rooms: followed players have their own searchable page and deep link",async ({page})=>{
+test("v183: followed players use their canonical Spieler page and old bookmarks redirect",async ({page})=>{
  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#settings-room-hub")).toBeVisible();
  await expect(page.locator("#friend-settings-list")).toBeHidden();
  await expect(page.locator("#team-settings-list")).toBeHidden();
  await expect(page.locator("#backup-export")).toBeHidden();
- await page.locator('a[data-settings-target="spieler"]').click();
- await expect(page).toHaveURL(/#einstellungen\/spieler$/);
+ await expect(page.locator('a[data-settings-target="spieler"]')).toHaveCount(0);
+ await expect(page.locator('a[data-settings-target="mannschaften"]')).toHaveCount(0);
+
+ // Search, sort and follow status live on Spieler, not a second settings form.
+ await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-spieler")).toBeVisible();
+ await expect(page.locator("#friend-list")).toContainText("Sarah Storz");
+ await page.locator("#followed-player-search").fill("unbekannt");
+ await expect(page.locator("#friend-list")).toContainText("Keine gefolgten Spieler zu dieser Suche");
+ await page.locator("#followed-player-search").fill("Sarah");
+ await expect(page.locator("#friend-list")).toContainText("Sarah Storz");
+ await page.locator("#friend-manage-details summary").click();
  await expect(page.locator("#friend-settings-list")).toBeVisible();
  await expect(page.locator("#friend-settings-list")).toContainText("Sarah Storz");
- await page.locator("#settings-followed-player-search").fill("unbekannt");
- await expect(page.locator("#settings-followed-empty")).toBeVisible();
- await page.locator("#settings-followed-player-search").fill("Sarah");
- await expect(page.locator("#settings-followed-empty")).toBeHidden();
- await page.locator('#settings-room-spieler a[href="#einstellungen"]').click();
- await expect(page.locator("#settings-room-hub")).toBeVisible();
+
+ // Bookmarked links have one canonical destination and never become dead rooms.
+ await page.goto("/#einstellungen/spieler",{waitUntil:"domcontentloaded"});
+ await expect(page).toHaveURL(/#spieler$/);
+ await expect(page.locator("#view-spieler")).toBeVisible();
  await page.goto("/#einstellungen/mannschaften",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#settings-room-mannschaften")).toBeVisible();
+ await expect(page).toHaveURL(/#mannschaft$/);
+ await expect(page.locator("#team-manage-details")).toBeVisible();
  await page.goto("/#einstellungen/darstellung",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#app-language")).toBeVisible();
  await page.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});

@@ -1,4 +1,6 @@
-import {test,expect} from "./supabase-isolated.fixture.mjs";
+// These profile flows require a synthetic, already-invited member session.
+// Unauthorized entry is tested separately by the fail-closed access specs.
+import {test,expect} from "./invited-member.fixture.mjs";
 
 const store={
  players:[{id:"local-older",name:"Philipp",club:"SpVgg Mössingen"},

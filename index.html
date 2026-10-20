@@ -41,6 +41,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
 <link rel="stylesheet" href="./pwa-update.css">
 <link rel="stylesheet" href="./today-in-action.css">
 <link rel="stylesheet" href="./accessibility-v182.css">
+<link rel="stylesheet" href="./canonical-follows-v183.css">
 <script defer src="./ui-feedback.js"></script>
 <script type="module" src="./backup.js"></script>
 <script defer src="./state-storage.js"></script>
@@ -110,7 +111,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v182" title="Version v182">v182</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v183" title="Version v183">v183</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -425,11 +426,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
    <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2><button type="button" class="subtle-button follow-add" id="player-add-open" aria-expanded="false" aria-controls="player-discover">+ Hinzufügen</button></div>
    <section class="follow-hub" aria-label="Meine Spieler">
-    <h3>Mein Startprofil</h3>
-    <div id="player-own-preview" class="follow-stack" aria-live="polite"></div>
+    <h3 hidden>Mein Startprofil</h3>
+    <div id="player-own-preview" class="follow-stack" aria-live="polite" hidden></div>
     <div class="follow-hub-subheading"><h3>Gefolgte Spieler <span id="followed-player-count"></span></h3><button id="followed-show-all" type="button" class="subtle-button" hidden>Alle anzeigen</button></div>
      <label class="followed-search-label">Gefolgte Spieler suchen<input id="followed-player-search" type="search" placeholder="Name, Verein oder DBV-ID" autocomplete="off"></label>
     <div id="friend-list" class="friends-list follow-stack" aria-live="polite"></div>
+    <details id="friend-manage-details" class="follow-manage-details"><summary>Reihenfolge und Freundesverwaltung</summary><p class="follow-manage-help">Gefolgte Spieler sortieren, bearbeiten oder entfolgen. Eigene Profile bleiben unberührt.</p><div id="friend-settings-list" class="friends-list follow-stack" aria-live="polite"></div></details>
    </section>
    <section id="player-discover" class="follow-discovery" aria-labelledby="player-discover-heading" hidden>
     <div class="follow-hub-subheading"><h3 id="player-discover-heading">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>
@@ -449,6 +451,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <div class="library-result-bar"><strong id="library-count">Suche starten</strong><button id="library-reset" type="button" class="subtle-button" hidden>Filter zurücksetzen</button><span id="library-message" role="status" aria-live="polite"></span></div>
    <div id="library-results" class="library-results" aria-live="polite"><div class="library-message library-idle"><strong>Spieler suchen</strong><span>Name oder DBV-ID eingeben oder nach Verein, Altersklasse bzw. Landesverband filtern.</span></div></div>
    <button id="library-more" type="button" class="outline-button library-more" hidden>Weitere Spieler anzeigen</button>
+   <button id="add-friend-manual" type="button" class="subtle-button friend-add-manual">Spieler mit DBV-ID manuell hinzufügen ↗</button>
    <p class="library-data-note">Nur in der offiziellen DBV-Rangliste veröffentlichte Spieler werden zentral aufgenommen. Neu angelegte lokale Profile und private Favoritenlisten werden nicht automatisch veröffentlicht. Für andere Spieler können Ranglisten-KPIs noch fehlen.</p>
 
    </section>
@@ -457,8 +460,9 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <div class="section-heading follow-hub-header"><h2 id="heading-mannschaft">Mannschaften</h2><button id="team-add-open" class="subtle-button follow-add" type="button" aria-expanded="false" aria-controls="team-discover">+ Hinzufügen</button></div>
    <div class="follow-season"><label for="team-season">Saison</label><select id="team-season"><option value="2026/27">2026/27</option></select><button id="team-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
    <section class="team-section" aria-labelledby="team-followed-heading">
-    <div class="follow-hub-subheading"><h3 id="team-followed-heading">Meine Mannschaften</h3><a href="#einstellungen">Verwalten ↗</a></div>
+    <div class="follow-hub-subheading"><h3 id="team-followed-heading">Meine Mannschaften</h3></div>
     <div id="team-followed" class="team-stack" aria-live="polite"></div>
+    <details id="team-manage-details" class="follow-manage-details"><summary>Mannschaften sortieren und verwalten</summary><p class="follow-manage-help">Reihenfolge ändern oder einer Mannschaft entfolgen.</p><div id="team-settings-list" class="team-stack" aria-live="polite"></div></details>
    </section>
    <section id="team-detail" class="team-detail" aria-labelledby="team-detail-title" hidden>
     <h3 id="team-detail-title"></h3>
@@ -493,28 +497,14 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
    <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v100 · Release-Informationen werden geladen</p>
-   <section class="settings-card follow-settings" aria-labelledby="follow-settings-title">
-    <h3 id="follow-settings-title">Spieler und Mannschaften verwalten</h3>
-    <p class="settings-hint">Deine Folgen-Listen bleiben auf diesem Gerät. Hier kannst du die Reihenfolge ändern oder Einträge entfernen.</p>
-    <div class="follow-hub-subheading"><h4>Gefolgte Spieler</h4><button id="settings-players-add" class="subtle-button" type="button">+ Spieler</button></div>
-    <div id="friend-settings-list" class="friends-list follow-stack" aria-live="polite"></div>
-    <div class="follow-hub-subheading"><h4>Gefolgte Mannschaften</h4><button id="settings-teams-add" class="subtle-button" type="button">+ Mannschaft</button></div>
-    <div id="team-settings-list" class="team-stack" aria-live="polite"></div>
-   </section>
-   <section class="player-management" aria-label="Meine Spielerprofile und Freunde">
-    <div class="player-management-head"><h3>Profile und Familie</h3><p>Eigene Profile und Spieler, denen du folgst – nur auf diesem Gerät gespeichert.</p></div>
+   <section class="player-management" aria-label="Meine eigenen Spielerprofile">
+    <div class="player-management-head"><h3>Profile und Familie</h3><p>Verwalte hier nur deine eigenen Spielerprofile. Andere Spieler findest du unter Spieler → Gefolgte Spieler.</p></div>
     <div class="settings-section">
     <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
     <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
     <div id="profile-list" class="profiles"></div>
     <p class="settings-hint"><a href="./private-player.html">Angenommene private Spielerfreigaben ansehen ↗</a></p>
    </div>
-    <div class="settings-section">
-      <div class="section-heading"><h3>Weitere Spieleraktionen</h3><button id="add-friend" class="subtle-button" type="button">Spieler suchen</button></div>
-      <p class="settings-hint">Zum Folgen in der Spieleransicht auf „+ Hinzufügen“ tippen.</p>
-      <p class="settings-hint">Deine gefolgten Spieler verwaltest du oben.</p>
-      <button id="add-friend-manual" class="subtle-button friend-add-manual" type="button">Spieler mit DBV-ID manuell hinzufügen ↗</button>
-    </div>
     <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
    </section>
 
