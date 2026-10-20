@@ -95,7 +95,10 @@ test("Direct official nuLiga match report opens once it is published",async({pag
  await expect(report).toHaveAttribute("href",REPORT);
  await expect(report).toHaveAttribute("target","_blank");
  await expect(report).toContainText("Anpfiff");
- await expect(report).not.toContainText("5:3");
+ // A kickoff like 15:37 contains the substring 5:3; compare the exact visible fields instead.
+ await expect(report.locator(".today-match-kickoff")).toMatchAriaSnapshot(`- text: Anpfiff 15:37 Uhr`);
+ await expect(report.locator(".today-match-pairing")).toHaveText("Synthetischer Verein 1 – Fiktive Gäste 1");
+ await expect(report.locator(".today-match-row-score, .match-score, .team-score")).toHaveCount(0);
 });
 test("Today info is absent if no confirmed scheduled pairing is present",async({page})=>{
  await page.setViewportSize({width:320,height:667});
