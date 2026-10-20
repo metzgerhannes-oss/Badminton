@@ -538,8 +538,6 @@ function setup(){
  el("followed-show-all")?.addEventListener("click",()=>{const field=el("followed-player-search");if(field){field.value="";renderFriends();field.focus()}});
  el("player-add-open")?.addEventListener("click",()=>showPlayerDiscover(el("player-discover").hidden));
   el("player-discover-close")?.addEventListener("click",()=>showPlayerDiscover(false,false));
-  el("settings-players-add")?.addEventListener("click",()=>showPlayerDiscover(true));
-  el("add-friend").addEventListener("click",()=>showPlayerDiscover(true));
   el("add-friend-manual").addEventListener("click",()=>openFriendForm());
  el("cancel-friend").addEventListener("click",()=>friendDialog.close());
  friendForm.addEventListener("submit",event=>{
