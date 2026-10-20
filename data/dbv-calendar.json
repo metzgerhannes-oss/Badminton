@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-10-19T11:14:12.377513+00:00",
+  "capturedAt": "2026-10-20T10:24:07.250238+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
     {
@@ -2261,6 +2261,34 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44546",
+      "title": "Bezirksmeisterschaften SAC RVL U9-U19 (Regionalmeisterschaft)",
+      "start_date": "2026-12-12",
+      "end_date": "2026-12-12",
+      "location_text": "Zwenkau",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-12-05",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-43798",
       "title": "3. D-RLT THÜ Süd U15/U19",
       "start_date": "2026-12-12",
@@ -2683,7 +2711,7 @@
       "title": "1. C-RLT NIS U11-U19",
       "start_date": "2027-01-09",
       "end_date": "2027-01-10",
-      "location_text": "",
+      "location_text": "Lüneburg",
       "organizer": "Niedersachsen",
       "bundesland": "Niedersachsen",
       "region_scope": "state",
