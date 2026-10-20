@@ -382,7 +382,6 @@ function init(){
  if(initialized||!$("view-mannschaft"))return;initialized=true;readFollows();
  $("team-add-open").addEventListener("click",()=>setTeamDiscover($("team-discover").hidden));
  $("team-discover-close").addEventListener("click",()=>setTeamDiscover(false,false));
- $("settings-teams-add").addEventListener("click",()=>setTeamDiscover(true));
  $("team-search").addEventListener("input",renderSearchResults);
  $("team-season").addEventListener("change",()=>{
   if(selectedId&&!rows.some(r=>r.id===selectedId&&r.season===season())){
