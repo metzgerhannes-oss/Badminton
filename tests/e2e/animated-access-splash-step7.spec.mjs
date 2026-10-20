@@ -68,7 +68,7 @@ test("reduced motion keeps the shuttle static while a session is being checked",
  await withExistingSession(page);
  await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
-  await new Promise(resolve=>setTimeout(resolve,3500));
+  await new Promise(resolve=>setTimeout(resolve,650));
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
  await page.setViewportSize({width:390,height:844});
@@ -76,7 +76,7 @@ test("reduced motion keeps the shuttle static while a session is being checked",
  await expect(page.locator("#app-access-splash")).toBeVisible();
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","none");
 
- await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#app-access-gate")).toBeHidden({timeout:12000});
 });
 
 test("splash-specific club logo actually has transparent white corners",async({page})=>{

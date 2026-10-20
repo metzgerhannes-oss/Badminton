@@ -1,7 +1,7 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
 const SOURCE="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/groupPage?championship=2026";
-test("Today info shows ONLY kickoff and pairing; tap opens original nuLiga",async({page})=>{
+test("Today info shows ONLY kickoff and pairing; schedule page is NOT a live-result link",async({page})=>{
  const now=new Date().toISOString();
  await page.addInitScript(()=>{
   localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(["nuliga:10777:1"]));
@@ -36,8 +36,9 @@ test("Today info shows ONLY kickoff and pairing; tap opens original nuLiga",asyn
  await expect(card).toBeVisible({timeout:15000});
  await expect(card).toContainText("Anpfiff");
  await expect(card).toContainText("Synthetischer Verein 1 – Fiktive Gäste 1");
- await expect(card).toHaveAttribute("href",SOURCE);
- await expect(card).toHaveAttribute("target","_blank");
+ await expect(card).not.toHaveAttribute("href",/.+/);
+ await expect(card).toHaveAttribute("aria-label",/Noch kein offizieller Spielbericht veröffentlicht/);
+ await expect(home.locator("a.today-match-row")).toHaveCount(0);
  // No badges, dates of provider verification, scores, controls or disclaimers.
  for(const word of ["Heute angesetzt","Aktualisieren","Originalquelle","Mannschaften",
   "Quelle geprüft","Spielt gerade","Nur belegte Ergebnisse"]){
@@ -56,6 +57,45 @@ test("Today info shows ONLY kickoff and pairing; tap opens original nuLiga",asyn
  await page.setViewportSize({width:1440,height:900});
  await expect(tour.locator(".today-match-row")).toBeVisible();
  await page.screenshot({path:"test-results/heute-kompakt-desktop.png",animations:"disabled"});
+});
+test("Direct official nuLiga match report opens once it is published",async({page})=>{
+ const now=new Date().toISOString();
+ const REPORT="https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/groupMeetingReport?meeting=384845&championship=SW+26%2F27&group=40175";
+ await page.addInitScript(()=>{
+  localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(["nuliga:10777:1"]));
+  localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"Synthetisches Profil",club:"Testverein"}],
+   friends:[],officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",
+   historyProfilesInitialized:true
+  }));
+ });
+ await page.route("**/rest/v1/league_teams?*",route=>route.fulfill({
+  status:200,contentType:"application/json",body:JSON.stringify([{
+   id:"nuliga:10777:2026-27:1",follow_key:"nuliga:10777:1",
+   club_id:"10777",club_name:"Synthetischer Verein",team_label:"1",
+   season:"2026/27",source_url:SOURCE,source_checked_at:now
+  }])
+ }));
+ // Real team-directory reads BOTH team and club rows. The isolated QA network
+ // intentionally blocks unmocked Supabase calls, so mock both endpoints.
+ await page.route("**/rest/v1/league_clubs?*",route=>route.fulfill({
+  status:200,contentType:"application/json",body:"[]"
+ }));
+ await page.route("**/rest/v1/league_fixtures?*",route=>route.fulfill({
+  status:200,contentType:"application/json",body:JSON.stringify([{
+   id:"synthetic-report",team_id:"nuliga:10777:2026-27:1",match_date:now,
+   home_team:"Synthetischer Verein 1",away_team:"Fiktive Gäste 1",
+   status:"finished",home_score:5,away_score:3,source_url:REPORT,source_checked_at:now
+  }])
+ }));
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ const report=page.locator("#today-home a.today-match-row");
+ await expect(report).toBeVisible({timeout:15000});
+ await expect(report).toHaveAttribute("href",REPORT);
+ await expect(report).toHaveAttribute("target","_blank");
+ await expect(report).toContainText("Anpfiff");
+ await expect(report).not.toContainText("5:3");
 });
 test("Today info is absent if no confirmed scheduled pairing is present",async({page})=>{
  await page.setViewportSize({width:320,height:667});

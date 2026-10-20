@@ -34,22 +34,27 @@ const context=()=>{
  return {groups,follows,teams:selection.teams,selection};
 };
 function buildCard(event){
- const link=n("a","today-match-row");
- // Open the live public nuLiga page itself on demand. We never pretend that
- // opening a source also refreshes an unverified score inside Schmetterlinge.
- link.href=event.url;
- link.target="_blank";link.rel="noopener noreferrer";
- link.setAttribute("aria-label","nuLiga öffnen: Anpfiff "+event.kickoff+"; "+event.pairing);
- link.append(n("span","today-match-kickoff","Anpfiff "+event.kickoff));
- link.append(n("strong","today-match-pairing",event.pairing));
- return link;
+ // Never offer a static fixture/group page as though it contained live scores.
+ const hasReport=Boolean(event.url);
+ const row=n(hasReport?"a":"div","today-match-row"+(hasReport?"":" today-match-pending"));
+ if(hasReport){
+  row.href=event.url;
+  row.target="_blank";row.rel="noopener noreferrer";
+  row.setAttribute("aria-label","nuLiga-Spielbericht öffnen: Anpfiff "+event.kickoff+"; "+event.pairing);
+ }else{
+  row.setAttribute("aria-label","Anpfiff "+event.kickoff+"; "+event.pairing+
+   ". Noch kein offizieller Spielbericht veröffentlicht.");
+ }
+ row.append(n("span","today-match-kickoff","Anpfiff "+event.kickoff));
+ row.append(n("strong","today-match-pairing",event.pairing));
+ return row;
 }
 function renderHost(host,model){
  if(!host)return;
  const list=host.querySelector("[data-today-cards]");
  if(!list)return;
  // No empty/error/coverage messages, statuses, results, controls or sources.
- // Source validation remains internal and the saved official URL is the card link.
+ // Source validation remains internal; linking requires a direct per-match report.
  const rows=todayMatchRows(model?.events||[],{limit:host.id==="today-home"?4:8});
  list.replaceChildren(...rows.map(buildCard));
  host.hidden=rows.length===0;

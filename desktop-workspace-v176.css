@@ -210,3 +210,9 @@
 @media (min-width:1080px) and (prefers-reduced-motion:reduce) {
  .app .page :is(.report-card,.team-card,.followed-player-row) {transition:none!important}
 }
+
+/* v180: results first. The original Badhub reference and methodology stay
+   available in individual source-backed match cards and the history view;
+   only the redundant Home-statistics shortcuts are visually suppressed. */
+#match-stats-source-link,
+#match-stats-provenance { display:none !important; }

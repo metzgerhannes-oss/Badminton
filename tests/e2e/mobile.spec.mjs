@@ -105,6 +105,11 @@ test("An invited member sees individually sourced match statistics and navigable
  await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("0");
  await expect(page.locator("#match-stats-source")).toContainText("Bisher belegte Spiele");
  await expect(page.locator("#match-stats-details")).toBeVisible();
+ // v180: only real outcomes and direct proof navigation remain on Home.
+ await expect(page.locator("#match-stats-source-link")).toBeHidden();
+ await expect(page.locator("#match-stats-provenance")).toBeHidden();
+ await expect(page.locator(".home-stats-link")).toBeVisible();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
 });
 
 test("v153: screenshot regression – own AK totals survive restricted official source and missing coverage",async({page})=>{
