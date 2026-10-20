@@ -1,0 +1,163 @@
+/* v182 / #308: contrast-first, readable navy workspace; no data or routing changes.
+   Dark surfaces use --a11y-on-dark, pale evidence/controls use --a11y-on-light. */
+.app{
+ --a11y-dark:#122e50;
+ --a11y-on-dark:#f3f9ff;
+ --a11y-muted-dark:#d2e5f8;
+ --a11y-link-dark:#b4e7ff;
+ --a11y-on-light:#183b5c;
+ --a11y-muted-light:#355673;
+ --a11y-pale:#edf7ff;
+ --a11y-outline:#b2e6ff;
+}
+/* Mobile maintains its layout but stops shrinking captions into 8-10 px text. */
+@media (max-width:1079px){
+ #view-start .ranking-compact .ranking-top{font-size:clamp(13px,3.5vw,16px)}
+ #view-start .ranking-bw-title,
+ #view-start .ranking-de-row,
+ #view-start .ranking-compact-points,
+ #view-start .ranking-compact-footer{font-size:clamp(11px,3vw,13px);line-height:1.35}
+ #view-start .ranking-bw-row .movement{font-size:11px}
+ #view-start .home-trophy-slot small,
+ #view-start .home-trophy-result small,
+ #view-start .home-trophy-coverage>summary{font-size:11px;line-height:1.35}
+ #view-start .home-trophy-result strong,
+ #view-start .upcoming-tournament-info small,
+ #view-start .match-stat span{font-size:11px;line-height:1.35}
+ #view-start .home-trophy-symbol{font-size:27px}
+ #view-start .match-stat{min-height:69px}
+ #view-start .match-stats-details>summary{min-height:44px}
+ #view-start .friends-empty{color:var(--a11y-on-light);font-size:12px}
+ #view-start .dashboard-add-friend{min-width:44px;min-height:44px}
+ .bottom-nav .nav-icon{width:24px;height:24px}
+ .bottom-nav a small{font-size:clamp(9px,2.5vw,12px);line-height:1.22}
+ .app .page :is(input:not([type="checkbox"]),select,textarea){font-size:max(16px,1rem)}
+}
+@media(max-width:350px){
+ #view-start .dashboard-ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #view-start .match-stats-values{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #view-start .ranking-tile.ranking-compact{min-height:191px}
+ #view-start .home-trophy-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+/* The desktop palette is already navy; preserve it and fix inherited light-card ink. */
+@media(min-width:1080px){
+ .app{font-size:16px}
+ .app .page{--ink:var(--a11y-on-dark);--ink-soft:var(--a11y-muted-dark)}
+ .app .page :is(.ranking-tile,.dashboard-friends-section,.home-ranking-section,
+  .settings-card,.profile-card,.follow-hub,.club-overview-panel,.team-detail,.report-card){
+   color:var(--a11y-on-dark);
+ }
+ .app .page :is(.muted,.supporting,.settings-hint){color:var(--a11y-muted-dark)}
+ .app .page :is(input,select,textarea){font-size:16px;line-height:1.4}
+ .app .page :is(input,select,textarea)::placeholder{color:#d0e3f8;opacity:1}
+ .app .page :is(a,button,summary,input,select,textarea):focus-visible{
+   outline:3px solid var(--a11y-outline)!important;outline-offset:3px;
+ }
+ .app .page .section-heading :is(h1,h2){font-size:clamp(22px,1.65vw,30px);line-height:1.28}
+ .app .page :is(.settings-card,.profile-card,.follow-hub,.team-detail,.club-overview-panel,.report-card)
+  :is(p,small,.muted,.supporting){font-size:clamp(13px,.92vw,15px);line-height:1.55}
+ .app .page :is(.settings-card,.profile-card,.follow-hub,.team-detail,.club-overview-panel,.report-card)
+  :is(h3,h4,label){color:var(--a11y-on-dark)}
+ .app .page :is(.settings-card,.profile-card,.follow-hub,.team-detail,.club-overview-panel,.report-card)
+  :is(.muted,.supporting,.settings-hint){color:var(--a11y-muted-dark)}
+ .bottom-nav .nav-icon{width:29px;height:29px}
+ .bottom-nav a>span{height:30px;flex-basis:30px}
+ .bottom-nav a small{font-size:14px;line-height:1.3}
+ .bottom-nav a{min-height:52px!important}
+ #view-start .dashboard-friends-section>.section-heading h2,
+ #view-start .dashboard-friends-section .section-heading h2{
+   color:var(--a11y-on-dark)!important;font-size:clamp(21px,1.5vw,25px)!important;
+ }
+ #view-start .dashboard-friends-section .dashboard-friends-links a{
+   color:var(--a11y-link-dark);font-size:14px;min-height:44px;
+ }
+ #view-start .dashboard-friends-section .dashboard-friends-links .dashboard-add-friend{
+   color:#fff;font-size:29px;
+ }
+ #view-start .friends-empty{
+   background:var(--a11y-pale)!important;color:var(--a11y-on-light)!important;
+   border-color:#8fbdd9;font-size:14px;line-height:1.55;padding:15px 16px;
+ }
+ #view-start .dashboard-friends .friend-quick-name{font-size:14px}
+ #view-start .dashboard-friends .friend-quick{min-height:56px}
+ #view-start .dashboard-source,
+ #view-start #dashboard-rank-source{color:var(--a11y-muted-dark)!important;font-size:14px;line-height:1.55}
+ #view-start .home-ranking-section>.section-heading h2{font-size:23px}
+ #view-start .home-ranking-section>.section-heading .muted{font-size:14px;color:var(--a11y-muted-dark)}
+ /* Two roomier ranking columns on 1280-1599 desktop instead of 3 tiny tiles. */
+ #view-start .dashboard-ranking-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+ #view-start .ranking-tile.ranking-compact{
+   background:var(--a11y-dark)!important;color:var(--a11y-on-dark)!important;
+   border:1px solid #6b96bc!important;min-height:232px;padding:17px 15px;
+   display:flex;flex-direction:column;align-items:stretch;text-align:left;
+ }
+ #view-start .ranking-tile .ranking-top,
+ #view-start .ranking-tile .ranking-bw-row strong,
+ #view-start .ranking-tile .ranking-de-row strong{
+   color:var(--a11y-on-dark)!important;
+ }
+ #view-start .ranking-tile .ranking-top{font-size:17px;font-weight:850}
+ #view-start .ranking-tile .ranking-bw-title,
+ #view-start .ranking-tile .ranking-de-row,
+ #view-start .ranking-tile .ranking-compact-footer,
+ #view-start .ranking-tile .ranking-compact-points small{
+   color:var(--a11y-muted-dark)!important;font-size:14px;line-height:1.4;
+ }
+ #view-start .ranking-tile .ranking-bw-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+ #view-start .ranking-tile .ranking-bw-row strong{font-size:clamp(35px,3vw,47px);line-height:1.12;letter-spacing:-.7px}
+ #view-start .ranking-tile .ranking-de-row{border-top:1px solid #6581a4;padding-top:10px}
+ #view-start .ranking-tile .ranking-de-row strong{font-size:22px}
+ #view-start .ranking-tile .ranking-compact-points{font-size:17px;color:var(--a11y-on-dark)!important;line-height:1.4}
+ #view-start .ranking-tile .ranking-compact-footer{overflow-wrap:anywhere;margin-top:auto}
+ #view-start .ranking-tile .ranking-compact-footer span{color:var(--a11y-link-dark)!important;font-size:21px}
+ /* Movement colors must contrast against navy, not against the old white tile. */
+ #view-start .ranking-tile .movement-up{color:#90efbf!important}
+ #view-start .ranking-tile .movement-down{color:#ffc3c8!important}
+ #view-start .ranking-tile .movement-same,
+ #view-start .ranking-tile .movement-unknown{color:var(--a11y-muted-dark)!important}
+ #view-start .ranking-tile .movement{font-size:13px;line-height:1.35}
+ #view-start .dashboard-empty-tile{background:var(--a11y-pale);color:var(--a11y-on-light)}
+ #view-start .dashboard-empty-tile :is(strong,small){color:var(--a11y-on-light)}
+ #view-start .dashboard-empty-tile small{font-size:14px;line-height:1.5}
+ /* Home stat shell stays navy; numerical buttons stay pale for legible ink. */
+ #view-start #match-stats .match-stats-heading h2{font-size:22px;color:var(--a11y-on-dark)}
+ #view-start #match-stats .match-stats-source,
+ #view-start #match-stats .match-stats-note,
+ #view-start #match-stats .match-stats-details summary,
+ #view-start #match-stats .home-match-filter-panel summary{
+   color:var(--a11y-muted-dark)!important;font-size:14px;line-height:1.5;
+ }
+ #view-start .match-stats-values{gap:9px}
+ #view-start .match-stat{min-height:92px;padding:13px 7px;gap:7px}
+ #view-start .match-stat span{font-size:13px;color:var(--a11y-on-light)}
+ #view-start .match-stat strong{font-size:clamp(23px,2vw,33px)}
+ #view-start .match-stat.rate strong{font-size:clamp(21px,1.8vw,29px)}
+ #view-start .home-match-filter-panel .match-stats-filters label{color:var(--a11y-on-dark);font-size:14px}
+ #view-start .match-stats-list .match-proof{background:var(--a11y-pale);color:var(--a11y-on-light)}
+ #view-start .match-stats-list .match-proof :is(p,strong,.match-proof-head){color:var(--a11y-on-light)}
+ #view-start .match-stats-list .match-proof :is(p,.match-proof-head){font-size:13px}
+ #view-start .match-stats-list .match-proof a{color:#155b86;font-size:14px}
+ #view-start .home-trophy-heading h2{font-size:22px;color:var(--a11y-on-light)!important}
+ #view-start .home-trophy-heading a{font-size:14px;color:#155b86!important;min-height:44px}
+ #view-start .home-trophy-slot strong{font-size:25px}
+ #view-start .home-trophy-slot small{font-size:13px;color:var(--a11y-muted-light)}
+ #view-start .home-trophy-symbol{font-size:34px}
+ #view-start .home-trophy-slot{grid-template-rows:40px 30px auto;padding:8px 4px}
+ #view-start .home-trophy-result{min-height:52px;grid-template-columns:34px minmax(0,1fr) 22px}
+ #view-start .home-trophy-result strong{font-size:14px;line-height:1.4;color:var(--a11y-on-light)}
+ #view-start .home-trophy-result small{font-size:13px;color:var(--a11y-muted-light)}
+ #view-start .home-trophy-medal{width:34px;height:34px;font-size:16px}
+ #view-start .home-trophy-result>span:last-child{font-size:22px}
+ #view-start .home-trophy-status{color:var(--a11y-muted-light);font-size:14px}
+ #view-start .home-trophy-coverage>summary{min-height:44px;font-size:13px;color:var(--a11y-muted-light)!important}
+ #view-start .upcoming-tournaments-header h2{font-size:21px}
+ #view-start .upcoming-tournament-info :is(strong,small){font-size:clamp(14px,1vw,16px)}
+ #view-start .upcoming-tournament-date :is(small,.upcoming-tournament-month){font-size:12px}
+ #view-start .upcoming-tournament-day{font-size:26px}
+ #view-start .wiki-home-icon{font-size:29px;width:43px;height:43px}
+ #view-start .wiki-home-arrow{font-size:24px}
+}
+@media(min-width:1600px){
+ #view-start .dashboard-ranking-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+/* Keep iPhone auto-zoom protection: form input font size stays >=16px. */
