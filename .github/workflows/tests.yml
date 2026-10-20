@@ -169,6 +169,7 @@ jobs:
           node tests/stats-results-v180.mjs
           node tests/result-evidence-nav-v181.mjs
           node tests/accessibility-v182.mjs
+          node tests/navigation-ia1-v183.mjs
           node tests/dbv-match-reference.mjs
           node tests/badhub-primary-career.mjs
           node scripts/import-coverage-audit.test.mjs
