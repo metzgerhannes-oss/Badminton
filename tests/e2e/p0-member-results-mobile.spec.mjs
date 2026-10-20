@@ -112,3 +112,66 @@ test("P0 iPhone: independent four-match 1:3 profile, no incorrect trophies or mi
  await page.locator("#external-match-discipline").selectOption("Mixed");
  await expect(page.locator("#external-match-count")).toContainText("keine zählbaren Einzelspiele");
 });
+
+
+test("v181: tapping wins/losses reveals only matching individual sourced match cards",async({page})=>{
+ await setup(page,FIRST);
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("5");
+ const wins=page.locator('#match-stats-values button[data-result-outcome="wins"]');
+ await expect(wins).toHaveAttribute("aria-label",/Einzelnachweise anzeigen/);
+ await wins.click();
+ await expect(page.locator("#match-stats-details")).toHaveAttribute("open","");
+ await expect(page.locator("#match-stats-selection-note")).toContainText("Siege (1)");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(1);
+ await expect(page.locator("#match-stats-list .match-win")).toHaveCount(1);
+ await page.locator('#match-stats-values button[data-result-outcome="losses"]').focus();
+ await page.keyboard.press("Enter");
+ await expect(page.locator("#match-stats-selection-note")).toContainText("Niederlagen (4)");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(4);
+ await expect(page.locator("#match-stats-list .match-loss")).toHaveCount(4);
+ await page.locator("#home-match-filter-panel > summary").click();
+ await page.locator("#match-stats-discipline").selectOption("Mixed");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("2");
+ await page.locator('#match-stats-values button[data-result-outcome="losses"]').click();
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(2);
+ await expect(page.locator("#match-stats-selection-note")).toContainText("Niederlagen (2)");
+ for(const width of [320,390,1280,1440]){
+  await page.setViewportSize({width,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+  if(width<=390){
+   const bounds=await page.locator('#match-stats-values button[data-result-outcome="losses"]').boundingBox();
+   expect(bounds.height).toBeGreaterThanOrEqual(44);
+  }
+ }
+});
+
+test("v181: selected trophy opens its exact evidence and survives reload/back",async({page})=>{
+ await setup(page,FIRST);
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ const link=page.locator('.home-trophy-latest a[href="#historie/result/p0-synthetic-trophy-0"]');
+ await expect(link).toHaveCount(1);
+ await link.click();
+ await expect(page).toHaveURL(/#historie\/result\/p0-synthetic-trophy-0$/);
+ await expect(page.locator("#view-historie")).toBeVisible();
+ await expect(page.locator("#history-timeline .history-result.is-proof-target")).toHaveCount(1);
+ await expect(page.locator("#history-proof-feedback")).toContainText("Keine einzelnen Matchbelege verfügbar");
+ await expect(page.locator(".history-result.is-proof-target")).toContainText("Einzel");
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#history-timeline .history-result.is-proof-target")).toHaveCount(1);
+ await page.goBack();
+ await expect(page.locator("#view-start")).toBeVisible();
+});
+
+test("v181: deep link never opens another player's private result",async({page})=>{
+ await setup(page,SECOND);
+ await page.goto("/#historie/result/p0-synthetic-trophy-0",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#view-historie")).toBeVisible();
+ await expect(page.locator("#history-proof-feedback")).toContainText("nicht verfügbar oder nicht freigegeben");
+ await expect(page.locator("#history-timeline .history-result.is-proof-target")).toHaveCount(0);
+ await expect(page.locator("#history-timeline")).not.toContainText("Synthetisches Jugendturnier");
+});
