@@ -1,10 +1,12 @@
 import {summarizeTrophies,TROPHY_PLACES} from "./scripts/trophy-stats.mjs";
+import {parseResultEvidenceHash} from "./scripts/result-evidence-nav.mjs";
 import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
 "use strict";
 /** Curated, sourced historical tournament placements; never a live DBV API. */
 (() => {
  // Public history.json is a deliberately empty privacy placeholder.
  let records=[],pendingResults=[],loaded=true,error=null,year="all",discipline="all",lastPlayer="all",lastProfiles=[],trophyPlace="all",viewMode="own";
+ let priorProofFilters=null,activeProofId="";
  const $=id=>document.getElementById(id);
  const escape=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const safeUrl=s=>{try{const u=new URL(String(s));return u.protocol==="https:"?u.href:""}catch{return ""}};
@@ -127,6 +129,28 @@ function render(){
     ?"Belegte Platzierungen aller Ränge im aktuellen Quellenbestand. Im Trophäenschrank zählen nur bestätigte Top-4-Ergebnisse. Die Historie kann Lücken enthalten."
     :"Geschütztes Teilarchiv: Belegte Top-4-Platzierungen. Weitere Ergebnisse können fehlen.";
   const playerRecords=state.results.filter(r=>r.playerId===lastPlayer);
+  // Fragment is only a display pointer; authorization always comes from the
+  // exact already-granted player snapshot, never from a URL-supplied identity.
+  const proofId=parseResultEvidenceHash(location.hash);
+  const proof=proofId?playerRecords.find(r=>r.id===proofId&&r.verified===true):null;
+  if(!proofId&&priorProofFilters){
+   year=priorProofFilters.year;discipline=priorProofFilters.discipline;
+   priorProofFilters=null;activeProofId="";
+  }
+  if(proof&&proofId!==activeProofId){
+   if(!priorProofFilters)priorProofFilters={year,discipline};
+   year=proof.date.slice(0,4);discipline=proof.discipline;trophyPlace="all";
+   activeProofId=proofId;
+  }
+  const notice=$("history-proof-feedback");
+  if(notice){
+   notice.hidden=!proofId;
+   notice.textContent=!proofId?"":!proof
+    ?"Für das ausgewählte Profil ist dieser Einzelnachweis nicht verfügbar oder nicht freigegeben."
+    :proof.matchEvidence?.kind==="club-report-scored-games"
+    ?"Bestätigte Einzelspiele aus dem Vereinsbericht; nicht Teil der Badhub-Statistik."
+    :"Keine einzelnen Matchbelege verfügbar. Die belegte Platzierung und die vorhandenen Originalquellen sind unten verlinkt.";
+  }
   // Lifetime trophy cabinet is independent of the chronicle's year/discipline filters.
   renderTrophies(playerRecords);
   if(trophySection)trophySection.hidden=false;
@@ -154,7 +178,7 @@ function render(){
   timeline.innerHTML=[...grouped.values()].map(t=>{
     const sourceUrl=safeUrl(t.source?.url);
     const proofUrl=safeUrl(t.items.find(r=>r.verification?.url)?.verification?.url);
-    const entries=t.items.map(r=>'<div class="history-result"><div class="history-place '+rank(r.place)+'"><b>'+escape(r.place)+'.</b><small>Platz</small></div><div class="history-result-copy"><strong>'+escape(r.discipline)+" "+escape(r.ageGroup)+'</strong>'+(r.partner?'<small>mit '+escape(r.partner)+'</small>':"")+
+    const entries=t.items.map(r=>'<div class="history-result" data-proof-id="'+escape(r.id)+'"><div class="history-place '+rank(r.place)+'"><b>'+escape(r.place)+'.</b><small>Platz</small></div><div class="history-result-copy"><strong>'+escape(r.discipline)+" "+escape(r.ageGroup)+'</strong>'+(r.partner?'<small>mit '+escape(r.partner)+'</small>':"")+
    (r.matchEvidence?.kind==="club-report-at-least-one-win"
     ?'<p class="history-match-evidence">Vereinsbericht: mindestens '+escape(r.matchEvidence.minimumWins)+
       ' Sieg bestätigt. Gegner und Satzstände fehlen – nicht in der Spielstatistik enthalten.</p>':"")+
@@ -165,10 +189,26 @@ function render(){
        .map(m=>'<li><span>'+escape(m.result)+' gegen '+escape(m.opponent)+'</span><small>Sätze: '+
          escape(m.games.map(g=>g[0]+":"+g[1]).join(" · "))+'</small></li>').join("")+
       '</ul><small>Quellbeleg aus Vereinsbericht; noch ohne Abgleich eindeutiger Match-IDs</small></section>':"")+
+   (proof&&r.id===proof.id&&r.matchEvidence?.kind!=="club-report-scored-games"
+    ?'<p class="history-detail-note">Keine einzelnen Matchbelege verfügbar · Platzierungsquelle siehe unten.</p>':"")+
    '</div></div>').join("");
     return '<article class="history-event"><div class="history-stem" aria-hidden="true"></div><div class="history-content"><div class="history-date">'+escape(niceDate(t.date))+'</div><h3>'+escape(t.event)+'</h3><div class="history-location">'+escape(t.location||"Ort unbekannt")+(lastPlayer==="all"?" · "+escape(t.playerName):"")+'</div><div class="history-results">'+entries+'</div>'+(t.items.some(i=>i.confirmation==="family-confirmed")?'<div class="history-family-flag">Familienbestätigung · offizielle Detailprüfung offen</div>':'')+(sourceUrl?'<a href="'+escape(sourceUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link">'+(sourceUrl.includes("dbv.turnier.de")?'DBV-Turnierergebnisse ↗':'Originalbericht ansehen ↗')+'</a>':"")+(proofUrl?'<a href="'+escape(proofUrl)+'" target="_blank" rel="noopener noreferrer" class="history-source-link history-verification-link">Namentlichen Ergebnisbeleg ↗</a>':"")+'</div></article>';
   }).join("");
+  if(proof){
+   const node=[...timeline.querySelectorAll("[data-proof-id]")].find(x=>x.dataset.proofId===proof.id);
+   if(node){
+    node.classList.add("is-proof-target");
+    node.setAttribute("tabindex","-1");
+    const route=location.hash;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+     if(location.hash!==route||!node.isConnected)return;
+     node.scrollIntoView({block:"center",behavior:"auto"});
+     node.focus({preventScroll:true});
+    }));
+   }
+  }
  }
+ window.addEventListener("hashchange",()=>{if(lastPlayer&&document.getElementById("view-historie"))render()});
  window.renderHistory=(selected,profiles,options={})=>{
    lastPlayer=selected||"";lastProfiles=Array.isArray(profiles)?profiles:[];viewMode=options.mode==="friend"?"friend":"own";
    requestPrivateTrophies(lastPlayer);

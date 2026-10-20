@@ -156,6 +156,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <div id="external-match-summary" class="external-match-summary" hidden></div>
     <details id="match-stats-details" class="match-stats-details">
       <summary>Einzelnachweise ansehen <span id="match-stats-detail-count"></span></summary>
+      <p id="match-stats-selection-note" class="match-stats-selection-note" role="status" aria-live="polite" hidden></p>
       <div id="match-stats-list" class="match-stats-list"></div>
       <button id="match-stats-more" type="button" class="subtle-button" hidden>Weitere Matchkarten anzeigen</button>
     </details>
@@ -218,6 +219,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <div id="history-source" class="notice" role="status" hidden></div>
    <div id="history-summary" class="history-summary"></div>
    <div id="history-pending" class="history-pending" aria-live="polite"></div>
+   <p id="history-proof-feedback" class="history-proof-feedback" role="status" aria-live="polite" hidden></p>
    <div id="history-filters" class="history-filters" aria-label="Turnierchronik filtern">
     <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
     <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
