@@ -22,6 +22,7 @@ let selectedYear="all",selectedDiscipline="all",selectedAgeClass="all",birthYear
 // Progressive details: never confuse a render limit with the number of matches.
 const DETAIL_PAGE=50;
 let detailLimit=DETAIL_PAGE;
+let resultOutcome="all",proofActivated=false;
 const PAGE_LIMIT=400,MAX_ROWS=10000;
 let controller,privateMode=false;
 async function getPage(path,signal){
@@ -66,12 +67,13 @@ async function fetchProfile(id,force=false){
  if(/^\d{2}-\d{6}$/.test(id||"")&&!window.badmintonAppAccess?.allowed)requestPrivateMatches(id,{force});
  if(!/^\d{2}-\d{6}$/.test(id||"")){
   controller?.abort();++seq;selected=id||"";official=[];external=[];
+  resultOutcome="all";proofActivated=false;
   progress=null;birthYear=null;status="missing-id";render();return;
  }
  if(id===selected&&!force&&status==="loaded")return;
  if(id!==selected){
   selectedYear="all";selectedDiscipline="all";selectedAgeClass="all";
-  detailLimit=DETAIL_PAGE;
+  detailLimit=DETAIL_PAGE;resultOutcome="all";proofActivated=false;
   if($("match-stats-discipline"))$("match-stats-discipline").value="all";
    if($("match-stats-age"))$("match-stats-age").value="all";
  }
@@ -220,7 +222,16 @@ function render(){
   ["Siege",missing?"–":context.wins,"wins"],
   ["Niederlagen",missing?"–":context.losses,"losses"],
   ["Siegquote",missing?"–":context.rate+" %","rate"]
- ].map(([name,value,key])=>'<div class="match-stat '+key+'"><span>'+esc(name)+'</span><strong>'+esc(value)+'</strong></div>').join("");
+ ].map(([name,value,key])=>{
+  const outcome=key==="wins"?"wins":key==="losses"?"losses":"all";
+  const active=!missing&&(outcome==="wins"?context.wins>0:outcome==="losses"?context.losses>0:true);
+  const tag=active?"button":"div";
+  return '<'+tag+' class="match-stat '+key+(active?' match-stat-action':'')+'"'+
+   (active?' type="button" data-result-outcome="'+outcome+'" aria-pressed="'+
+    (proofActivated&&resultOutcome===outcome)+'" aria-label="'+esc(name)+': '+esc(value)+
+    '. Passende Einzelnachweise anzeigen"':'')+'>'+
+   '<span>'+esc(name)+'</span><strong>'+esc(value)+'</strong></'+tag+'>';
+ }).join("");
  if(sourced){
   note.textContent=context.total
    ? "Bisher belegte Spiele. Weitere Ergebnisse können fehlen."
@@ -264,10 +275,19 @@ function render(){
   source.textContent="Badhub · Karrierebilanz";
  }
  details.hidden=missing;
- const available=context.details.length;
+ const proofRows=context.details.filter(row=>resultOutcome==="all"||
+  (resultOutcome==="wins"?row.won:!row.won));
+ const available=proofRows.length;
  const visible=Math.min(detailLimit,available);
  counter.textContent=available?"("+visible+" von "+available+" Belegen)":"(0)";
- list.innerHTML=context.details.slice(0,visible).map(sourced?externalProof:officialProof).join("");
+ const selectionNote=$("match-stats-selection-note");
+ if(selectionNote){
+  selectionNote.hidden=!proofActivated||missing;
+  selectionNote.textContent=resultOutcome==="wins"?"Einzelnachweise: Siege ("+available+")":
+   resultOutcome==="losses"?"Einzelnachweise: Niederlagen ("+available+")":
+   "Einzelnachweise: Alle Spiele ("+available+")";
+ }
+ list.innerHTML=proofRows.slice(0,visible).map(sourced?externalProof:officialProof).join("");
  const more=$("match-stats-more");
  if(more){
   more.hidden=missing||visible>=available;
@@ -290,9 +310,24 @@ window.addEventListener("badminton:private-matches-updated",e=>{
 });
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("match-stats"))return;
- $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;detailLimit=DETAIL_PAGE;render()});
- $("match-stats-year").addEventListener("change",e=>{selectedYear=e.target.value;detailLimit=DETAIL_PAGE;render()});
- $("match-stats-age").addEventListener("change",e=>{selectedAgeClass=e.target.value;detailLimit=DETAIL_PAGE;render()});
+ $("match-stats-values").addEventListener("click",event=>{
+  const button=event.target.closest?.("button[data-result-outcome]");
+  if(!button||!$("match-stats-values").contains(button))return;
+  resultOutcome=button.dataset.resultOutcome;proofActivated=true;detailLimit=DETAIL_PAGE;
+  render();
+  const details=$("match-stats-details"),list=$("match-stats-list");
+  if(details.hidden)return;
+  details.open=true;
+  requestAnimationFrame(()=>{
+   const target=$("match-stats-selection-note")||list;
+   target.setAttribute("tabindex","-1");
+   target.scrollIntoView({block:"center",behavior:"auto"});
+   target.focus({preventScroll:true});
+  });
+ });
+ $("match-stats-discipline").addEventListener("change",e=>{selectedDiscipline=e.target.value;resultOutcome="all";proofActivated=false;detailLimit=DETAIL_PAGE;render()});
+ $("match-stats-year").addEventListener("change",e=>{selectedYear=e.target.value;resultOutcome="all";proofActivated=false;detailLimit=DETAIL_PAGE;render()});
+ $("match-stats-age").addEventListener("change",e=>{selectedAgeClass=e.target.value;resultOutcome="all";proofActivated=false;detailLimit=DETAIL_PAGE;render()});
  $("match-stats-more")?.addEventListener("click",()=>{detailLimit+=DETAIL_PAGE;render()});
  $("match-stats-retry")?.addEventListener("click",()=>fetchProfile(selected,true));
  window.addEventListener("badminton:network-restored",()=>{

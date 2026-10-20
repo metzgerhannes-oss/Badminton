@@ -1,4 +1,5 @@
 import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
+import {resultEvidenceHash} from "./scripts/result-evidence-nav.mjs";
 import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
@@ -197,7 +198,7 @@ function renderOtherKpis(){
   ).join("")+'</div>'+
   '<p class="home-trophy-status" role="status">'+escape(status)+'</p>'+
   (latest.length?'<div class="home-trophy-latest" aria-label="Jüngste belegte Platzierungen">'+
-   latest.map(result=>'<a href="#historie" class="home-trophy-result">'+
+   latest.map(result=>'<a href="'+escape(resultEvidenceHash(result.id))+'" class="home-trophy-result">'+
     '<span class="home-trophy-medal">'+escape(result.place)+'.</span>'+
     '<span><strong>'+escape(result.event||"Turnier")+'</strong><small>'+escape(date(result.date))+
     (result.discipline?' · '+escape(result.discipline):'')+'</small></span><span aria-hidden="true">›</span></a>').join("")+

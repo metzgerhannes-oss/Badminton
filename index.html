@@ -109,7 +109,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v180" title="Version v180">v180</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v181" title="Version v181">v181</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -156,6 +156,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <div id="external-match-summary" class="external-match-summary" hidden></div>
     <details id="match-stats-details" class="match-stats-details">
       <summary>Einzelnachweise ansehen <span id="match-stats-detail-count"></span></summary>
+      <p id="match-stats-selection-note" class="match-stats-selection-note" role="status" aria-live="polite" hidden></p>
       <div id="match-stats-list" class="match-stats-list"></div>
       <button id="match-stats-more" type="button" class="subtle-button" hidden>Weitere Matchkarten anzeigen</button>
     </details>
@@ -218,6 +219,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <div id="history-source" class="notice" role="status" hidden></div>
    <div id="history-summary" class="history-summary"></div>
    <div id="history-pending" class="history-pending" aria-live="polite"></div>
+   <p id="history-proof-feedback" class="history-proof-feedback" role="status" aria-live="polite" hidden></p>
    <div id="history-filters" class="history-filters" aria-label="Turnierchronik filtern">
     <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
     <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>

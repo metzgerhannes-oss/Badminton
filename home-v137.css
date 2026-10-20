@@ -136,3 +136,13 @@
 #view-start .dashboard-ranking-grid>.ranking-tile:only-child{
  grid-column:1/-1;min-height:126px;
 }
+
+/* v181: visible, accessible direct result-to-proof actions, without changing the navy identity. */
+#view-start button.match-stat-action{width:100%;appearance:none;font:inherit;color:inherit;cursor:pointer;border:1px solid #638fb4;background:#e9f4fb}
+#view-start button.match-stat-action:hover,#view-start button.match-stat-action[aria-pressed="true"]{background:#cceafe;border-color:#2678ad}
+#view-start button.match-stat-action:focus-visible,#view-start .home-trophy-result:focus-visible{outline:3px solid #008ac9;outline-offset:3px}
+#view-start .home-trophy-result{min-height:44px}
+.match-stats-selection-note{font-size:14px;font-weight:750;line-height:1.5;color:#154f79;margin:10px 0;scroll-margin-top:90px}
+#view-historie .history-proof-feedback{background:#153352;color:#edf8ff;border:1px solid #72b9e8;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5}
+#view-historie .history-result.is-proof-target{outline:3px solid #75c9ff;outline-offset:4px;border-radius:10px;scroll-margin-top:100px}
+#view-historie .history-detail-note{font-weight:700;font-size:13px;color:#d9edff;line-height:1.45}

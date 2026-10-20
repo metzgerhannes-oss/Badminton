@@ -12,8 +12,8 @@ assert.match(css,/#match-stats-source-link,\s*#match-stats-provenance\s*\{\s*dis
  "Suppress both duplicate Home-only elements on all viewport sizes");
 assert.match(stats,/sourceDetails\.textContent/,"Keep the original evidence explanations internally");
 assert.match(stats,/function render\(/,"Match calculation must remain unchanged");
-assert.match(release,/version:"v180"/,"User-visible shell version");
-assert.match(sw,/const CACHE="schmetterlinge-shell-v180"/,"Versioned PWA cache without deleting user data");
+assert.match(release,/version:"v181"/,"User-visible shell version");
+assert.match(sw,/const CACHE="schmetterlinge-shell-v181"/,"Versioned PWA cache without deleting user data");
 assert.doesNotMatch(css,/#[\w-]*match-stats-(?:values|details|list|filters)[\w-]*\s*\{\s*display:\s*none/i,
  "Never suppress result counts, filters or match cards");
 console.log("v180 UI: no duplicate links/methodology; results, proofs, filters, user data unchanged.");
