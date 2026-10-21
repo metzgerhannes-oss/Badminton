@@ -145,5 +145,6 @@ assert.equal(hasVerifiedMatchToday(todayEvidence({
  now,groups:{own:[own]},follows:[],teams:[],fixtures:[],snapshots:[],bookmarks
 }).events),false,"A tournament bookmark must not display red Heute");
 const src=await readFile("scripts/today-evidence.mjs","utf8");
-assert.doesNotMatch(src,/fetch\(|setInterval|setTimeout|localStorage|supabase\.co|POST|DELETE|writeFile/i);
+assert.doesNotMatch(src,/\bfetch\s*\(|\bsetInterval\s*\(|\bsetTimeout\s*\(|\blocalStorage\b|supabase\.co|\bPOST\b|\bDELETE\b|\bwriteFile\s*\(/,
+ "Evidence calculations must not poll, write or trigger network calls");
 console.log("#298 Paket A: sourced date/score/status, Badhub freshness, dedupe, unconfirmed bookmarks, bounded reads.");

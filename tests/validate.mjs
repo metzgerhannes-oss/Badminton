@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {createHash} from "node:crypto";
 for(const path of ["index.html","styles.css","state-storage.js","tournament-bookmarks.js","app.js","history.js","sw.js","manifest.webmanifest","assets/spvgg-schmetterlinge.svg","data/history.json","scripts/trophy-stats.mjs"])await access(path);
 const html=await readFile("index.html","utf8");
-for(const id of ["focused-profile","profile-list","friend-list","friend-dialog","add-friend","view-einstellungen","player-dialog","tournament-dialog","tournament-form","add-tournament","official-tournament-list","view-historie","trophy-shelf","trophy-awards"])assert.ok(html.includes('id="'+id+'"'),"Missing "+id);
+for(const id of ["focused-profile","profile-list","friend-list","friend-dialog","player-add-open","add-friend-manual","view-einstellungen","player-dialog","tournament-dialog","tournament-form","add-tournament","official-tournament-list","view-historie","trophy-shelf","trophy-awards"])assert.ok(html.includes('id="'+id+'"'),"Missing "+id);
 for(const id of ["next-match","feed-badge","demo-toggle","match-list","notify"])assert.ok(!html.includes('id="'+id+'"'),"Obsolete live UI: "+id);
 assert.ok(html.includes('name="url" type="url" required'));
 assert.ok(html.includes('name="startDate" type="date"'));

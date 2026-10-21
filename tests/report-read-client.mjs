@@ -11,7 +11,8 @@ assert.match(html,/<script type="module" src="\.\/reports\.js"><\/script>/);
 const elements=new Map(),events=new Map();
 for(const id of ["report-list","report-count","report-source-list","report-refresh",
  "report-scope","report-category","report-search"]){
- elements.set(id,{innerHTML:"",textContent:"",disabled:false,
+ elements.set(id,{innerHTML:"",textContent:"",disabled:false,dataset:{},attributes:{},
+  setAttribute(name,value){this.attributes[name]=value},
   value:id==="report-scope"?"mentions":id==="report-category"?"all":"",
   addEventListener(name,handler){events.set(id+":"+name,handler)}});
 }
