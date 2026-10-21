@@ -15,7 +15,7 @@ assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
 for(const id of ["start","turniere","berichte","spieler","mannschaft"]){
  assert.match(html,new RegExp('data-page="'+id+'"'));
 }
-assert.equal((html.match(/class="nav-icon"/g)||[]).length,6);
+assert.equal((html.match(/class="nav-icon"/g)||[]).length,7,"Six possible links plus desktop-only club view");
 assert.match(css,/--ink:\s*#0b2a52/);
 assert.match(await readFile("ui-components.css","utf8"),/\.dashboard-ranking-grid\s*\{[^}]*repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(await readFile("ui-components.css","utf8"),/\.match-stats-values\s*\{[^}]*repeat\(4,minmax\(0,1fr\)\)/);
