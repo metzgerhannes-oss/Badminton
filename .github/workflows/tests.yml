@@ -106,10 +106,14 @@ jobs:
           node --check badhub-event.js
           node --check scripts/badhub-event.mjs
           node --check scripts/live-links.mjs
+      - name: Guard CI failure propagation
+        run: node tests/ci-fail-closed.mjs
       - name: Run tests
         run: |
+          set -euo pipefail
+          trap 'status=$?; echo "::error::Unit test suite exited with status $status"; tail -n 120 test-output.log || true' ERR
           (
-          set -e
+          set -euo pipefail
           node tests/browser-qa-supabase-isolation.mjs
           node tests/private-publication-gate.mjs
           node tests/security-gate.mjs
@@ -221,7 +225,7 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
           python3 -m unittest discover -s tests -p 'test_dbv_calendar.py' -v
 
-          ) > test-output.log 2>&1 || { tail -n 120 test-output.log; exit 1; }
+          ) > test-output.log 2>&1
           cat test-output.log
       - name: Upload failing test output
         if: failure()
