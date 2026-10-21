@@ -28,8 +28,9 @@ assert.match(app,/SchmetterlingeBookmarks\.visible\(state\)/);
 assert.match(app,/SchmetterlingeSpond\.dashboardItems\(/);
 assert.match(app,/return \{own:true,events:/);
 assert.match(shell,/--desktop-rail:220px/);
-assert.match(release,/version:"v176"/);
-assert.match(sw,/schmetterlinge-shell-v176/);
+const current=release.match(/version:"(v\d+)"/)?.[1];
+assert.ok(Number(current?.slice(1))>=176,"Desktop tournament behavior must remain available after v176");
+assert.ok(sw.includes("schmetterlinge-shell-"+current),"Release/cache consistency");
 for(const key of ["ASSETS","SHELL_ASSETS"]){
  const match=sw.match(new RegExp("const "+key+"=(\\[[^\\n]+\\]);"));
  assert.ok(match,key+" must exist");
