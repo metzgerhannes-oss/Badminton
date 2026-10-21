@@ -13,7 +13,10 @@ assert.match(html,/class="app-access-shuttle"[^>]+src="\.\/assets\/shuttlecock-s
 assert.match(html,/class="brand"[\s\S]*?src="\.\/assets\/spvgg-schmetterlinge\.svg"/);
 assert.match(html,/<p id="app-access-status" role="status" aria-live="polite"><\/p>/);
 assert.match(css,/html\[data-app-access="checking"\] \.app-access-panel \{display:none!important\}/);
-assert.match(css,/html:not\(\[data-app-access="checking"\]\) #app-access-splash \{display:none!important\}/);
+assert.match(html,/html:not\(\[data-app-access="checking"\]\) #app-access-splash\{display:none!important\}/,
+ "Critical inline CSS prevents the splash persisting after access resolves");
+assert.match(css,/html:not\(\[data-app-access="checking"\]\)[\s\S]*?#app-access-splash\s*\{/,
+ "External CSS keeps the splash art scoped to its access state");
 assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 assert.match(css,/mix-blend-mode:multiply/);
 assert.match(css,/@keyframes app-access-shuttle-flight/);
@@ -26,11 +29,13 @@ assert.match(js,/12000/);
 assert.match(js,/if\(permission==="member"\)\{grant\(\);return;\}/);
 assert.match(js,/if\(permission==="player"\)\{grant\(\{member:false\}\);return;\}/);
 assert.doesNotMatch(css,/display:none!important;\s*$/m); // no accidental blanket hiding of errors
-assert.match(sw,/schmetterlinge-shell-v176/);
+const current=release.match(/version:"(v\d+)"/)?.[1];
+assert.ok(current,"Current PWA release identifier missing");
+assert.ok(sw.includes("schmetterlinge-shell-"+current));
 assert.match(sw,/\.\/app-access\.css/);
-assert.match(release,/version:"v176"/);
-assert.match(welcome,/v176/);
-assert.match(html,/v176/);
+assert.match(release,/version:"v183"/);
+assert.ok(welcome.includes(current),"Welcome shows current release");
+assert.ok(html.includes(current),"App shell shows current release");
 assert.doesNotMatch(html,/user-scalable=no|maximum-scale=1/);
 const embedded=svg=>svg.match(/data:image\/webp;base64,([^"]+)/)?.[1];
 assert.ok(embedded(club),"Original image is embedded WebP");
