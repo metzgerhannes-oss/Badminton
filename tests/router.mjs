@@ -12,6 +12,7 @@ const app=attr(),settings=attr(),liveLink={hidden:true};
 const heading={setAttribute(){},focus(options){assert.equal(options.preventScroll,true);seen.focus++}};
 const document={
  title:"",
+ addEventListener(){},
  querySelector(q){
   if(q===".app")return app;
   if(q===".topbar-settings")return settings;
@@ -26,8 +27,8 @@ const document={
  }
 };
 const location={hash:"#start"};
-const window={scrollTo(o){assert.equal(o.top,0);seen.scroll++}};
-const ctx=vm.createContext({document,location,window,state,seen});
+const window={scrollY:0,addEventListener(){},scrollTo(o){assert.equal(o.top,0);seen.scroll++}};
+const ctx=vm.createContext({document,location,window,state,seen,requestAnimationFrame:callback=>callback()});
 vm.runInContext(code,ctx,{filename:"router.js"});
 const run=script=>vm.runInContext(script,ctx);
 run("SchmetterlingeRouter.renderPage(state)");
