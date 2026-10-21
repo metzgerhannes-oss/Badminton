@@ -20,11 +20,11 @@ const html=await readFile("index.html","utf8");
 const app=await readFile("app.js","utf8");
 const library=await readFile("library.js","utf8");
 const sw=await readFile("sw.js","utf8");
-for(const id of ["library-search","library-results","add-friend","add-friend-manual","dashboard-friends-manage","friend-list"]){
+for(const id of ["library-search","library-results","player-add-open","add-friend-manual","dashboard-friends-manage","friend-list"]){
  assert.match(html,new RegExp('id="'+id+'"'));
 }
 assert.equal((html.match(/id="library-search"/g)||[]).length,1);
-assert.doesNotMatch(html,/id="dashboard-add-friend"/);
+assert.match(html,/id="dashboard-add-friend"[^>]*href="#spieler"/);
 assert.ok(!html.includes('src="./friend-search.js"'));
 assert.ok(!html.includes('id="friend-search"'));
 assert.match(app,/badmintonLibraryToggleFollow/);
