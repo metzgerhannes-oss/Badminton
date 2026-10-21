@@ -23,7 +23,9 @@ assert.ok(tournament.indexOf('id="live-radar-content"')<tournament.indexOf('id="
 assert.ok(tournament.indexOf('id="dbv-live-advanced"')<tournament.indexOf('id="dbv-live-results"'),
  "Unused DBV query behind details");
 assert.equal((tournament.match(/id="live-radar-refresh"/g)||[]).length,1);
-assert.equal((html.match(/data-page="/g)||[]).length,6,"Five core destinations plus conditional LIVE");
+assert.deepEqual([...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]),
+ ["start","turniere","live","spieler","verein","mannschaft","berichte"],
+ "Five main destinations, one conditional LIVE and a desktop-only club view");
 assert.match(html,/data-page="start".*?<small>Home<\/small>/s);
 assert.match(app,/function navigateHome\(\)/);
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);/,"Home must return to locally selected own profile");
