@@ -20,7 +20,9 @@ assert.match(script,/updateViaCache:"none"/);
 assert.match(script,/cache:"no-store"/);
 assert.match(script,/location\.replace\(next\.href\)/);
 assert.match(style,/focus-visible/);
-assert.doesNotMatch(script,/localStorage|indexedDB|caches\.delete|supabase|setInterval|auth\/v1/i);
+const executable=script.replace(/\/\*[\s\S]*?\*\//g,"").replace(/^\s*\/\/[^\n]*$/gm,"");
+assert.doesNotMatch(executable,/localStorage|indexedDB|caches\.delete|supabase|setInterval|auth\/v1/i,
+ "Actual PWA update code must not access private storage, poll or call auth");
 for(const name of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  const m=worker.match(new RegExp("const "+name+"=(\\[[^\\n]+\\]);"));
  assert.ok(m,name+" exists");
