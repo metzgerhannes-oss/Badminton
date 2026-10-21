@@ -11,7 +11,7 @@ assert.match(html,/id="dashboard-add-friend"[^>]*href="#spieler"/,"Home + is a d
 assert.match(html,/id="dashboard-friends-manage"[^>]*href="#spieler" hidden/);
 assert.match(css,/\.dashboard-friends-links a\[hidden\]\{display:none!important\}/);
 assert.match(app,/el\("dashboard-add-friend"\)\?\.addEventListener/);
-const root={innerHTML:"",querySelectorAll(){return [];}},manage={hidden:true};
+const root={innerHTML:"",querySelector(){return null;},querySelectorAll(){return [];}},manage={hidden:true};
 const ctx=vm.createContext({URL,Intl,Date,document:{
  addEventListener(){},
  getElementById(id){return id==="dashboard-friends"?root:id==="dashboard-friends-manage"?manage:null;}
