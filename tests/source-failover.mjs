@@ -28,7 +28,8 @@ assert.match(fn,/Promise\.allSettled\(/);
 assert.match(fn,/parsePublicHistory\(html,profiles\[0\],category\)/);
 assert.match(fn,/const start=sources\.missing\.length\?0/);
 assert.match(fn,/status:importStatusForBatch\(finished,excluded,sources\.missing\)/);
-assert.match(fn,/status:"awaiting_source"/);
+assert.match(fn,/status:missingSourceStatus\(saved\)/,
+ "Missing upstream source must preserve existing saved match evidence");
 assert.match(fn,/unavailable_categories:sources\.missing/);
 assert.doesNotMatch(fn,/src=gesamt/,"Only existing tournament and league endpoints allowed");
 const proof=(id,event,round)=>({category:"tournament",source_key:"tournament:777:"+event+":"+round+":"+id,
