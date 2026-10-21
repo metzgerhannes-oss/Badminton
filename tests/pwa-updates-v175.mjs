@@ -12,8 +12,10 @@ for(const page of [html,welcome]){
 }
 assert.match(app,/SchmetterlingePwaUpdate\?\.initialize\(\)/);
 assert.match(welcomeJs,/SchmetterlingePwaUpdate\?\.initialize\(\)/);
-assert.match(worker,/schmetterlinge-shell-v175/);
-assert.match(release,/version:"v175"/);
+const deployed=release.match(/version:"(v\d+)"/)?.[1];
+assert.ok(deployed,"A deployed version is required for cache upgrades");
+assert.ok(worker.includes("schmetterlinge-shell-"+deployed),"PWA cache and release must match");
+assert.match(release,/version:"v183"/);
 assert.match(script,/updateViaCache:"none"/);
 assert.match(script,/cache:"no-store"/);
 assert.match(script,/location\.replace\(next\.href\)/);
