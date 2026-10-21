@@ -26,7 +26,8 @@ assert.match(hub,/localStorage\.getItem\("shuttleboard-v1"\)/);
 assert.doesNotMatch(hub,/localStorage\.setItem|\bfetch\s*\(|private_owner_player_attest/,
  "Settings navigation must not change data, grants or authentication");
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\)/);
-assert.match(index,/href="#einstellungen\/profile"/);
+assert.match(hub,/id:"profile",title:"Profile & Familie"/,
+ "A single dedicated family-profile settings room must stay accessible");
 assert.match(index,/settings-rooms\.css/);
 assert.match(index,/settings-rooms\.js/);
 assert.match(sw,/settings-rooms\.css/);
