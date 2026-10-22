@@ -17,6 +17,16 @@ for(const [view,hash,details,list] of [
 ]){
  for(const width of [390,1280,1440,1920]){
   test(`#332: ${view} sorting has readable text and buttons at ${width}px`,async({page})=>{
+   // This checks existing users' sort controls, not the empty first-run dialog.
+   // Keep synthetic family data local; the fixture blocks all real Supabase.
+   await page.addInitScript(()=>{
+    localStorage.setItem("shuttleboard-v1",JSON.stringify({
+     players:[{id:"99-700001",name:"Lokales Testprofil",birthYear:2014}],
+     activeProfileId:"99-700001",chosen:"99-700001",
+     friends:[{id:"98-700002",name:"Gefolgter Testspieler"}],
+     officialLinks:[],historyProfilesInitialized:true
+    }));
+   });
    await page.setViewportSize({width,height:900});
    await page.goto("/"+hash,{waitUntil:"domcontentloaded"});
    await expect(page.locator("#app-access-gate")).toBeHidden();
