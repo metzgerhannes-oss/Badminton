@@ -6,6 +6,7 @@ on:
       - "app-access.js"
       - "app-access.css"
       - "invite.js"
+      - "welcome.js"
       - "index.html"
       - "player-data-status.js"
       - "tests/e2e/invite-only-access.spec.mjs"
