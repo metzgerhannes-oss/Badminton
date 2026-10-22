@@ -36,7 +36,9 @@ function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
  * the same route. This does not touch stored players, friends or invitations.
  */
 function navigatePrimary(page){
- const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte"];
+ const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte","historie","einstellungen"];
+ // Today is a contextual shortcut, never a permanent or unverified primary view.
+ if(page==="live"&&el("live-nav-tab")?.hidden)page="turniere";
  if(!allowed.includes(page))return false;
  if(page==="start"){
   if(!state.players.length&&state.friends.length)
@@ -72,7 +74,7 @@ function renderFocusHeader(){
    state.players.map(player=>'<button type="button" data-switch-profile="'+esc(player.id)+'" '+(player.id===state.activeProfileId?'aria-current="true"':'')+'><span class="switcher-avatar">'+esc(player.name.trim().charAt(0).toUpperCase())+'</span><span class="switcher-name">'+esc(player.name)+'</span>'+(player.id===state.activeProfileId?'<span class="switcher-check" aria-label="Aktiv">✓</span>':'')+'</button>').join("")+
    '</div></details>';
  }
- const profileMeta=[isFriend?"Gefolgt":"",p.birthYear?esc(p.birthYear):"",p.club?esc(p.club):""].filter(Boolean).join(" · ");
+ const profileMeta=[isFriend?"Gefolgter Spieler":"Eigenes Profil",p.birthYear?esc(p.birthYear):"",p.club?esc(p.club):""].filter(Boolean).join(" · ");
  wrap.innerHTML='<div class="focus-profile-avatar">'+esc(p.name.trim().charAt(0).toUpperCase())+'</div>'+
   '<div class="focus-profile-copy"><strong>'+esc(p.name)+'</strong>'+
   (profileMeta?'<span class="focus-profile-meta">'+profileMeta+'</span>':"")+
@@ -376,7 +378,7 @@ function updateLiveNavigation(){
  tab.hidden=!shouldShow;
  tab.parentElement?.classList.toggle("has-live-tab",shouldShow);
  const caption=tab.querySelector("small");if(caption)caption.textContent="Heute";
- tab.setAttribute("aria-label","Heute angesetzte oder laufende Spiele");
+ tab.setAttribute("aria-label","Heute belegte Ansetzungen ansehen");
  return changed;
 }
 let lastNotifiedProfile="",lastNotifiedClub="";
@@ -467,6 +469,16 @@ function setup(){
  },{capture:true});
  document.querySelectorAll('.topbar .brand[href="#start"]').forEach(link=>{
   link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
+ });
+ // Context links use the same synchronous navigation as the primary tabs.
+ // Limit to verified app destinations; preserve native settings-room deep links,
+ // dialogs, keyboard modifiers and the existing private access gate.
+ document.querySelectorAll('.topbar-settings[href="#einstellungen"],.home-stats-link[href="#historie"],#home-live-peek[href="#live"]').forEach(link=>{
+  link.addEventListener("click",event=>{
+   if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button!==0)return;
+   event.preventDefault();
+   navigatePrimary(link.getAttribute("href").slice(1));
+  });
  });
  window.addEventListener("hashchange",()=>{
   state.page=(location.hash||"#start").slice(1).split("/")[0];
