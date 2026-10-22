@@ -41,6 +41,8 @@ test("confirmed directory search reselects existing DBV account without making a
  await expect(page.locator("#welcome-selection-detail")).toContainText("DBV 05-070879");
  await page.locator("#welcome-selection-save").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
+ // A previously selected own DBV profile must never reopen the voluntary import dialog.
+ await expect(page.locator("#player-copy-dialog")).toBeHidden();
  await expect(page.locator(".focused-profile")).toContainText("Philipp Metzger");
  const current=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(current.players).toHaveLength(1);
