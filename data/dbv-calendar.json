@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-10-20T10:24:07.250238+00:00",
+  "capturedAt": "2026-10-22T10:36:58.899412+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
     {
@@ -1820,7 +1820,7 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2026-11-28",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -2555,6 +2555,29 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-20",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44753",
+      "title": "Freizeitturnier Pfaffenhofener Heilig-Drei-König-Turnier 2027 Bayern O19",
+      "start_date": "2027-01-06",
+      "end_date": "2027-07-06",
+      "location_text": "Pfaffenhofen",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "Freizeitturnier",
+      "level_group": "Freizeit",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-12-18",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
