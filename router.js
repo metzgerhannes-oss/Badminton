@@ -69,7 +69,7 @@ function focusCurrentView(state){
   const view=page==="live"?"turniere":page;
  document.querySelector(".app")?.setAttribute("data-current-view",page);
  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="view-"+view));
- const routeTitles={start:"Übersicht",historie:"Turnierhistorie",turniere:"Turniertag",live:"Live-Matches",
+ const routeTitles={start:"Übersicht",historie:"Turnierhistorie",turniere:"Turniertag",live:"Heute im Einsatz",
   spieler:"Spieler",verein:"Vereinsübersicht",mannschaft:"Mannschaft",berichte:"Berichte",einstellungen:"Einstellungen"};
  document.title=routeTitles[page]+" · Schmetterlinge";
  const liveHidden=document.querySelector("#live-nav-tab")?.hidden!==false;
