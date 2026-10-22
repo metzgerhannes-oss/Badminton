@@ -6,9 +6,9 @@ const [rooms,html,css,sw,release,storage,backup]=await Promise.all([
  "state-storage.js","backup.js"
 ].map(file=>readFile(file,"utf8")));
 const current=release.match(/version:"(v\d+)"/)?.[1];
-assert.equal(current,"v184","IA-3 must be released as a new update, not silently replace v183");
+assert.ok(Number(current?.slice(1))>=184,"IA-3 must remain present in v184 and later releases");
 assert.ok(sw.includes('const CACHE="schmetterlinge-shell-'+current+'"'));
-assert.match(html,/>v184<\/span>/);
+assert.ok(html.includes(">"+current+"</span>"),"The visible version must match the current release");
 const definitions=rooms.match(/const definitions=\[([\s\S]*?)\n \];/)?.[1];
 assert.ok(definitions,"Settings areas must have one static canonical definition");
 const entries=[...definitions.matchAll(/\{id:"([^"]+)",title:"([^"]+)"/g)]
