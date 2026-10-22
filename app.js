@@ -43,10 +43,12 @@ function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 function navigatePrimary(page,{returnToOwn=true}={}){
  const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte","historie"];
  if(!allowed.includes(page))return false;
- if(page==="start"&&returnToOwn){
-  if(!state.players.length&&state.friends.length)
-   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
-  else SchmetterlingeStorage.showOwn(state);
+ if(page==="start"){
+  if(returnToOwn){
+   if(!state.players.length&&state.friends.length)
+    SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
+   else SchmetterlingeStorage.showOwn(state);
+  }
  }
  state.page=page;
  if(location.hash!=="#"+page)location.hash="#"+page;
