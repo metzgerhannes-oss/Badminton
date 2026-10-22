@@ -94,8 +94,9 @@ test("v65 extracted home cards and dialogs retain readable component styling",as
  }
 });
 
-test("v68 legacy cleanup preserves active app views and dialog on narrow layouts",async ({page})=>{
- for(const width of [320,375,390]){
+// Each viewport gets an independent browser lifecycle and timeout; all original checks remain.
+for(const width of [320,375,390]){
+ test("v68 legacy cleanup preserves active app views and dialog at "+width+"px",async ({page})=>{
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#view-start")).toBeVisible();
@@ -124,8 +125,8 @@ test("v68 legacy cleanup preserves active app views and dialog on narrow layouts
   await page.locator(".brand").click();
   await expect(page.locator("#view-start")).toBeVisible();
   await expect(page.locator(".focused-profile")).toContainText("Philipp");
- }
-});
+ });
+}
 
 // Each viewport remains fully checked, but under its own WebKit timeout.
 // This avoids a cumulative 30s limit over four full navigation/dialog flows.
