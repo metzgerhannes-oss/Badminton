@@ -10,7 +10,7 @@ for(const term of mandatory)assert.ok(doc.includes(term),"Missing IA1 decision: 
 const routes=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
 assert.deepEqual(routes,["start","turniere","live","spieler","verein","mannschaft","berichte"]);
 assert.match(html,/id="live-nav-tab"[^>]*hidden/);
-assert.match(app,/function navigatePrimary\(page\)/);
+assert.match(app,/function navigatePrimary\(page,\{returnToOwn=true\}=\{\}\)/);
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\)/);
 assert.match(settings,/id:"profile"/);
 assert.doesNotMatch(settings,/id:"spieler"/);
