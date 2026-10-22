@@ -31,7 +31,7 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
-  .bottom-nav .nav-icon {width: 23px; height: 23px}
+  .bottom-nav .nav-icon {width: 24px; height: 24px}
   .bottom-nav a[aria-current="page"] {
     color: #f1faff;
     background: #326b91;
