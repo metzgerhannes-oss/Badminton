@@ -22,7 +22,7 @@ assert.deepEqual(entries,[
 ],"Exactly five distinct settings areas, matching IA-1");
 assert.match(rooms,/const grid=document\.createElement\("nav"\)/);
 assert.match(rooms,/setAttribute\("aria-label","Einstellungsbereiche"\)/);
-assert.match(rooms,/a\.href="#einstellungen\/"+d\.id/);
+assert.ok(rooms.includes('a.href="#einstellungen/"+d.id'),"Room links must target their unique canonical settings hash");
 for(const [room,control]of [
  ["profile",".player-management"],
  ["darstellung",".language-settings"],
