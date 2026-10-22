@@ -33,7 +33,7 @@ const current=release.match(/version:"(v\d+)"/)?.[1];
 assert.ok(current,"Current PWA release identifier missing");
 assert.ok(sw.includes("schmetterlinge-shell-"+current));
 assert.match(sw,/\.\/app-access\.css/);
-assert.match(release,/version:"v184"/);
+assert.ok(Number(current.slice(1))>=184,"Previously released splash and invitation flow must survive newer versions");
 assert.ok(welcome.includes(current),"Welcome shows current release");
 assert.ok(html.includes(current),"App shell shows current release");
 assert.doesNotMatch(html,/user-scalable=no|maximum-scale=1/);
