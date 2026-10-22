@@ -224,9 +224,7 @@ function renderOtherKpis(){
   const location=typeof t.location==="string"&&t.location.trim()?t.location.trim():"";
   const month=new Intl.DateTimeFormat("de-DE",{month:"short",timeZone:"UTC"})
    .format(new Date(t.startDate+"T12:00:00Z")).replace(".","").toUpperCase();
-  return '<a class="upcoming-tournament-row" href="'+(calendar?'#turniere':escape(t.url))+'"'+
-   (calendar?'':' rel="noopener noreferrer" target="_blank"')+
-   ' aria-label="'+escape(t.name)+', '+escape(range)+', '+(calendar?'in meiner Turnierliste ansehen':'offizielle Turnierseite öffnen')+'">'+
+  return '<a class="upcoming-tournament-row" href="#turniere" aria-label="'+escape(t.name)+', '+escape(range)+', Turnier in der App ansehen">'+
    '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'"><span class="upcoming-tournament-month">'+escape(month)+'</span><strong class="upcoming-tournament-day">'+escape(t.startDate.slice(8,10))+'</strong></time>'+(active?'<small>Läuft</small>':'')+'</span>'+
    '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+
    escape([range,location,owner].filter(Boolean).join(" · "))+'</small>'+
