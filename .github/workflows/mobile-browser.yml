@@ -19,7 +19,11 @@ jobs:
   mobile-browser:
     name: Mobile UX · Chromium and WebKit
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Official image includes matching Chromium/WebKit and system libraries.
+    # Avoid repeated 20-minute APT mirror stalls on hosted runners.
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,8 +31,9 @@ jobs:
           node-version: "22"
       - name: Install pinned test dependencies
         run: npm install --no-audit --no-fund
-      - name: Install real browser engines
-        run: npx playwright install --with-deps chromium webkit
+      - name: Verify pinned preinstalled browser engines
+        run: |
+          node -e 'const fs=require("node:fs"); const p=require("playwright"); for(const name of ["chromium","webkit"]){const path=p[name].executablePath();if(!fs.existsSync(path))throw Error(name+" browser missing: "+path);console.log(name+" browser available");}'
       - name: Verify QA Supabase network isolation
         run: node tests/browser-qa-supabase-isolation.mjs
       - name: Exercise user journeys on narrow screens
