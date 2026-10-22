@@ -54,7 +54,7 @@ assert.equal(location.hash,"#turniere");
 assert.equal(seen.render,1,"Changing hash uses existing native hashchange render");
 state.page="live";liveLink.hidden=false;
 run("SchmetterlingeRouter.renderPage(state)");
-assert.equal(document.title,"Live-Matches · Schmetterlinge");
+assert.equal(document.title,"Heute im Einsatz · Schmetterlinge");
 assert.equal(app.attrs["data-current-view"],"live");
 assert.equal(pages.find(x=>x.id==="view-turniere").classList.active,true);
 assert.equal(tabs.find(x=>x.dataset.page==="live").attrs["aria-current"],"page");
