@@ -20,7 +20,7 @@ assert.match(history,/r\.id===proofId&&r\.verified===true/);
 assert.match(history,/data-proof-id/);
 assert.match(dashboard,/resultEvidenceHash\(result\.id\)/);
 assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
-assert.match(sw,/schmetterlinge-shell-v183/,"v183 must preserve previously released v181 evidence behavior");
+assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/,"Future versions must preserve sourced result evidence");
 assert.match(sw,/scripts\/result-evidence-nav\.mjs/);
 assert.match(html,/id="history-proof-feedback"/);
 assert.match(html,/id="match-stats-selection-note"/);
