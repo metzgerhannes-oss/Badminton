@@ -175,6 +175,7 @@ jobs:
           node tests/accessibility-v182.mjs
           node tests/navigation-ia1-v183.mjs
           node tests/navigation-ia2-v183.mjs
+          node tests/settings-ia3-v184.mjs
           node tests/dbv-match-reference.mjs
           node tests/badhub-primary-career.mjs
           node scripts/import-coverage-audit.test.mjs

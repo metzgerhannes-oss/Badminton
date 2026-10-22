@@ -1,29 +1,24 @@
 "use strict";
-/* Settings rooms v120. Existing controls, local storage and data ownership stay unchanged.
+/* IA-3 / v184: five canonical settings rooms. All existing controls and storage remain unchanged.
    Progressive enhancement: when this file fails, the original settings remain usable. */
 (function(){
  const view=document.getElementById("view-einstellungen");
  if(!view)return;
  const definitions=[
-  {id:"profile",title:"Profile & Familie",desc:"Eigene Spieler, Elternfreigaben und Gerätezugang",group:"Spieler & Mannschaften",icon:"♙"},
-  {id:"darstellung",title:"Sprache & Vereinsdesign",desc:"Sprache, Name, Logo und Vereinsfarbe",group:"App & Daten",icon:"◐"},
-  {id:"einladungen",title:"Einladungen & Freigaben",desc:"Spieler suchen und persönliche Zugänge verwalten",group:"App & Daten",icon:"↗"},
-  {id:"daten",title:"Sicherung & Datenschutz",desc:"Gerätewechsel, Export und Datenschutz",group:"App & Daten",icon:"▣"},
-  {id:"quellen",title:"Datenquellen",desc:"Herkunft und Qualität der Informationen",group:"App & Daten",icon:"◎"}
+  {id:"profile",title:"Profile & Familie",desc:"Eigene Spielerprofile anlegen, auswählen und verwalten",icon:"♙"},
+  {id:"darstellung",title:"App & Darstellung",desc:"Sprache, Vereinsname, Logo und Erscheinungsbild",icon:"◐"},
+  {id:"einladungen",title:"Zugänge & Freigaben",desc:"Einladungen, Spielerberechtigungen und Eigentümerzugang",icon:"↗"},
+  {id:"daten",title:"Daten & Datenschutz",desc:"Datensicherung, Wiederherstellung und Privatsphäre",icon:"▣"},
+  {id:"hilfe",title:"Hilfe & Informationen",desc:"Regeln, App-Anleitung und Datenquellen",icon:"?"}
  ];
  const hub=document.createElement("div");
  hub.id="settings-room-hub";hub.className="settings-room-hub";
  const lead=document.createElement("p");lead.className="settings-hub-lead";
- lead.textContent="Wähle einen Bereich. Deine persönlichen Einstellungen und Folgen-Listen bleiben auf diesem Gerät.";
- hub.append(lead);
- const groups=new Map();
+ lead.textContent="Fünf Bereiche – jede Einstellung an genau einer Stelle.";
+ const grid=document.createElement("nav");grid.className="settings-hub-grid";
+ grid.setAttribute("aria-label","Einstellungsbereiche");
+ hub.append(lead,grid);
  for(const d of definitions){
-  if(!groups.has(d.group)){
-   const section=document.createElement("section");section.className="settings-hub-group";
-   const heading=document.createElement("h3");heading.textContent=d.group;
-   const grid=document.createElement("div");grid.className="settings-hub-grid";
-   section.append(heading,grid);hub.append(section);groups.set(d.group,grid);
-  }
   const a=document.createElement("a");a.href="#einstellungen/"+d.id;
   a.className="settings-room-link";a.dataset.settingsTarget=d.id;
   const icon=document.createElement("span");icon.className="settings-room-icon";icon.setAttribute("aria-hidden","true");icon.textContent=d.icon;
@@ -32,7 +27,7 @@
   const subtitle=document.createElement("small");subtitle.textContent=d.desc;
   const count=document.createElement("span");count.className="settings-room-count";count.dataset.settingsCount=d.id;count.hidden=true;
   const arrow=document.createElement("span");arrow.className="settings-room-arrow";arrow.setAttribute("aria-hidden","true");arrow.textContent="›";
-  copy.append(title,subtitle,count);a.append(icon,copy,arrow);groups.get(d.group).append(a);
+  copy.append(title,subtitle,count);a.append(icon,copy,arrow);grid.append(a);
  }
  const rooms=new Map();
  function makeRoom(d){
@@ -58,45 +53,50 @@
  }
  // IA-2: follower management lives in subject pages, never a second settings room.
  appendTo("profile",".player-management");
- appendTo("profile","#owner-admin-panel");
- appendTo("profile","#owner-activation-setup");
  appendTo("darstellung",".language-settings");
  appendTo("darstellung",".club-branding-card");
  // A v136 app invitation grants entry to the sourced sport archive.
- // Put issuance, server status and revocation in the invitations room,
- // never under a generic installation link or backup.
+ // Owner grants and activation live beside app invitations, never in family
+ // profile editing or a duplicated management screen.
  appendTo("einladungen",".invitation-card");
+ appendTo("einladungen","#owner-admin-panel");
+ appendTo("einladungen","#owner-activation-setup");
  appendTo("daten",".backup-card");
  const loose=[...view.children].filter(el=>el.classList?.contains("settings-card"));
  for(const element of loose){
   const heading=element.querySelector("h3")?.textContent?.trim()||"";
   if(heading==="Daten & Datenschutz")rooms.get("daten").room.append(element);
-  if(heading==="Datenquellen & Nachweise")rooms.get("quellen").room.append(element);
+  if(heading==="Datenquellen & Nachweise")rooms.get("hilfe").room.append(element);
  }
  // Device-local overview only: no authentication, data writes or server-status claims.
  const grantRoom=rooms.get("einladungen").room;
  const grantHub=document.createElement("div");grantHub.className="settings-grants";grantHub.id="settings-grants-overview";
  const make=(tag,cls,label)=>{const el=document.createElement(tag);el.className=cls||"";if(label)el.textContent=label;return el};
- const searchCard=make("section","settings-card settings-grant-card");
- searchCard.append(make("h4","","Spieler suchen"),make("p","settings-hint","Name oder DBV-ID auswählen, lokal folgen oder nach bestätigter Verwalterberechtigung einen privaten Link erstellen."));
- const searchLink=make("a","settings-grant-action","Spieler suchen und hinzufügen ↗");searchLink.href="#spieler";
- searchLink.addEventListener("click",()=>{
-  const button=document.getElementById("player-add-open");
-  if(button?.getAttribute("aria-expanded")!=="true")button?.click();
- });
- searchCard.append(searchLink);
  const issuedCard=make("section","settings-card settings-grant-card");
  issuedCard.append(make("h4","","Von mir erteilte Freigaben"));
  const issuedInfo=make("p","settings-hint","Auf diesem Gerät gespeicherte Linkinformationen. Ob ein Link angenommen oder widerrufen wurde, wird hier noch nicht serverseitig geprüft.");
  const issuedList=make("ul","settings-grant-list");issuedList.id="settings-grant-issued";
  issuedCard.append(issuedInfo,issuedList);
- const ownerLink=make("a","settings-grant-action","Spielerberechtigungen verwalten ↗");ownerLink.href="#einstellungen/profile";issuedCard.append(ownerLink);
- const receivedCard=make("section","settings-card settings-grant-card");
+  const receivedCard=make("section","settings-card settings-grant-card");
  receivedCard.append(make("h4","","Von mir angenommene Freigaben"),
   make("p","settings-hint","Annahmen sind an die technische Sitzung dieses Geräts gebunden. Jeder Zugriff wird erst beim Öffnen auf dem Server geprüft."));
  const receivedList=make("ul","settings-grant-list");receivedList.id="settings-grant-received";receivedCard.append(receivedList);
- grantHub.append(searchCard,issuedCard,receivedCard);
+ grantHub.append(issuedCard,receivedCard);
  grantRoom.append(grantHub);
+ // Help never opens a second way to manage profiles, follows or permissions.
+ const help=rooms.get("hilfe").room;
+ const helpCard=make("section","settings-card settings-grant-card");
+ helpCard.append(make("h4","","Hilfe zur App"),
+  make("p","settings-hint","Kurze Anleitungen und Badminton-Wissen. Persönliche Daten werden dafür nicht übertragen."));
+ const helpLinks=[
+  {title:"Einrichtung und Installation ↗",href:"./welcome.html#installation"},
+  {title:"Badminton-Wiki und Regeln ↗",href:"./wiki.html"}
+ ];
+ for(const item of helpLinks){
+  const link=make("a","settings-grant-action",item.title);link.href=item.href;
+  helpCard.append(link);
+ }
+ help.append(helpCard);
  const validDbv=id=>/^[0-9]{2}-[0-9]{6}$/.test(id);
  const validUuid=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
  function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
@@ -156,7 +156,8 @@
  let previous=null;
  function sync(){
   // Preserve old bookmarked settings links without leaving dead rooms.
-  const redirect={"#einstellungen/spieler":"#spieler","#einstellungen/mannschaften":"#mannschaft"}[location.hash];
+  const redirect={"#einstellungen/spieler":"#spieler","#einstellungen/mannschaften":"#mannschaft",
+   "#einstellungen/quellen":"#einstellungen/hilfe"}[location.hash];
   if(redirect){location.replace(redirect);return}
   const key=resolve();
   if(key===null)return;

@@ -29,8 +29,9 @@ assert.match(html,/accessibility-v182\.css/);
 for(const section of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  assert.match(sw,new RegExp("const "+section+"=\\[[^;]*accessibility-v182\\.css"));
 }
-assert.match(release,/version:"v183"/);
-assert.match(sw,/schmetterlinge-shell-v183/);
+const current=release.match(/version:"(v\d+)"/)?.[1];
+assert.ok(Number(current?.slice(1))>=182);
+assert.ok(sw.includes("schmetterlinge-shell-"+current));
 assert.match(css,/@media\(min-width:1080px\)/);
 assert.match(css,/@media\(max-width:350px\)/);
 assert.match(css,/min-width:1600px/);

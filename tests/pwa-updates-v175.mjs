@@ -15,7 +15,7 @@ assert.match(welcomeJs,/SchmetterlingePwaUpdate\?\.initialize\(\)/);
 const deployed=release.match(/version:"(v\d+)"/)?.[1];
 assert.ok(deployed,"A deployed version is required for cache upgrades");
 assert.ok(worker.includes("schmetterlinge-shell-"+deployed),"PWA cache and release must match");
-assert.match(release,/version:"v183"/);
+assert.match(release,/version:"v184"/);
 assert.match(script,/updateViaCache:"none"/);
 assert.match(script,/cache:"no-store"/);
 assert.match(script,/location\.replace\(next\.href\)/);

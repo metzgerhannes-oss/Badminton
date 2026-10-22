@@ -6,7 +6,7 @@ const [hub,css,index,app,sw,release]=await Promise.all([
 
 // The v120 rooms still exist in v183, but follower management has one canonical
 // home in its subject view, not duplicate controls inside Settings.
-const rooms=["profile","darstellung","einladungen","daten","quellen"];
+const rooms=["profile","darstellung","einladungen","daten","hilfe"];
 for(const id of rooms)assert.match(hub,new RegExp('id:"'+id+'"'));
 for(const removed of ["spieler","mannschaften"])
  assert.doesNotMatch(hub,new RegExp('\\{id:"'+removed+'"'),"No duplicated settings room: "+removed);
