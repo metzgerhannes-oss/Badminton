@@ -29,19 +29,26 @@ function setActiveProfile(id){
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
 // Existing UI callers keep the same route and focus methods.
-function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
+function routeTo(page){
+ // Choosing a followed player's statistics is not a Home/Logo action.
+ // Preserve that explicit viewer while making the destination visible now.
+ if(!navigatePrimary(page,{returnToOwn:false}))
+  SchmetterlingeRouter.routeTo(state,page,render);
+}
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 /** Native-feeling primary navigation: source of truth is the tapped destination,
  * not a deferred hashchange from installed WebKit. All six navigation links use
  * the same route. This does not touch stored players, friends or invitations.
  */
-function navigatePrimary(page){
- const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte"];
+function navigatePrimary(page,{returnToOwn=true}={}){
+ const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte","historie"];
  if(!allowed.includes(page))return false;
  if(page==="start"){
-  if(!state.players.length&&state.friends.length)
-   SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
-  else SchmetterlingeStorage.showOwn(state);
+  if(returnToOwn){
+   if(!state.players.length&&state.friends.length)
+    SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
+   else SchmetterlingeStorage.showOwn(state);
+  }
  }
  state.page=page;
  if(location.hash!=="#"+page)location.hash="#"+page;
@@ -253,7 +260,10 @@ function showPlayerDiscover(open=true,focus=true){
    // Route focus runs on hashchange. Re-focus the search only after it has
    // finished, otherwise the page heading steals the typing caret.
    window.addEventListener("hashchange",focusSearch,{once:true});
-   location.hash="#spieler";
+   navigatePrimary("spieler");
+   // An installed iPhone may dispatch hashchange late; keep the search usable
+   // immediately instead of leaving the user on Home with a hidden input.
+   focusSearch();
   }else focusSearch();
  }
 }
@@ -465,8 +475,20 @@ function setup(){
   event.preventDefault();
   navigatePrimary(page);
  },{capture:true});
- document.querySelectorAll('.topbar .brand[href="#start"]').forEach(link=>{
-  link.addEventListener("click",event=>{event.preventDefault();navigateHome()});
+ // IA-4: Home, Turniere, Heute, Freunde, Mannschaften, Berichte and
+ // history previews all use the same immediate router as the bottom tabs.
+ // Context anchors retain real hashes for browser Back, link sharing and reload.
+ // Settings deep links, proof/result hashes and external sources remain untouched.
+ document.addEventListener("click",event=>{
+  if(event.defaultPrevented||event.button!==0||
+     event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  const link=event.target.closest?.('a[href^="#"]');
+  if(!link||link.closest(".bottom-nav")||link.hasAttribute("download")||
+     link.target&&link.target!=="_self")return;
+  const dest=link.getAttribute("href")?.slice(1)||"";
+  if(!["start","turniere","live","spieler","verein","mannschaft","berichte","historie"].includes(dest))return;
+  event.preventDefault();
+  navigatePrimary(dest);
  });
  window.addEventListener("hashchange",()=>{
   state.page=(location.hash||"#start").slice(1).split("/")[0];
