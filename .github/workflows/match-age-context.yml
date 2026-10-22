@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - "stats.js"
+      - "welcome.js"
       - "index.html"
       - "scripts/match-age-context.mjs"
       - "tests/match-age-context.mjs"
@@ -12,6 +13,7 @@ on:
   pull_request:
     paths:
       - "stats.js"
+      - "welcome.js"
       - "index.html"
       - "scripts/match-age-context.mjs"
       - "tests/match-age-context.mjs"
