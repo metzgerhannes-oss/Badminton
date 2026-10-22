@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - "app.js"
+      - "welcome.js"
       - "index.html"
       - "library.js"
       - "dashboard.js"
@@ -15,6 +16,7 @@ on:
   pull_request:
     paths:
       - "app.js"
+      - "welcome.js"
       - "index.html"
       - "library.js"
       - "dashboard.js"
