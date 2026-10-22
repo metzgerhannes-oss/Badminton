@@ -127,8 +127,10 @@ test("v68 legacy cleanup preserves active app views and dialog on narrow layouts
  }
 });
 
-test("v70 CSS consolidation preserves app chrome, profile and dialog on phones and tablets",async ({page})=>{
- for(const width of [320,375,390,768]){
+// Each viewport remains fully checked, but under its own WebKit timeout.
+// This avoids a cumulative 30s limit over four full navigation/dialog flows.
+for(const width of [320,375,390,768]){
+ test("v70 CSS consolidation preserves app chrome, profile and dialog at "+width+"px",async ({page})=>{
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   const tabs=page.locator(".bottom-nav a:visible");
@@ -166,8 +168,8 @@ test("v70 CSS consolidation preserves app chrome, profile and dialog on phones a
   await page.locator(".brand").click();
   await expect(page.locator("#view-start")).toBeVisible();
   await expect(page.locator(".focused-profile")).toContainText("Philipp");
- }
-});
+ });
+}
 
 test("v142 member statistics appear only once on all mobile widths",async ({page})=>{
  for(const width of [320,375,390,768]){
