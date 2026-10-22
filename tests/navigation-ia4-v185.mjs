@@ -6,7 +6,7 @@ const [app,router,html,css,sw,release,settings,fixture]=await Promise.all([
 ].map(file=>readFile(file,"utf8")));
 assert.match(app,/function navigatePrimary\(page,\{returnToOwn=true\}=\{\}\)/);
 assert.match(app,/function navigateHome\(\)\{return navigatePrimary\("start"\)\}/);
-assert.match(app,/if\(page==="start"&&returnToOwn\)/);
+assert.match(app,/if\(page==="start"\)\{\s*if\(returnToOwn\)/);
 assert.match(app,/navigatePrimary\(page,\{returnToOwn:false\}\)/,
  "Explicitly selecting a followed player must not silently restore own Home");
 assert.match(app,/document\.addEventListener\("click",event=>\{/);
