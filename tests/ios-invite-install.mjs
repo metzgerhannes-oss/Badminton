@@ -35,7 +35,7 @@ assert.match(invites,/appinvite=/);
 const version=release.match(/version:"(v\d+)"/)?.[1];
 assert.ok(version,"App release version required");
 assert.ok(sw.includes("schmetterlinge-shell-"+version),"Cache and release must agree");
-assert.match(release,/version:"v184"/);
+assert.ok(Number(version.slice(1))>=184,"iOS invitation must survive v184 and newer PWA releases");
 for(const key of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  const m=sw.match(new RegExp("const "+key+"=(\\[[^\\n]+\\]);"));
  assert.ok(m,key+" present");
