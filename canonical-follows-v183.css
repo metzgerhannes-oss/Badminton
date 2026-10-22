@@ -20,7 +20,10 @@
 @media(min-width:1080px){
  .follow-manage-details{border-color:#6085a9;background:#16395e;color:#f2f7ff}
  .follow-manage-details>summary,.follow-manage-details .follow-manage-help{color:#d9eaff}
- .follow-manage-details .follow-manage-label :is(strong,small){color:#e6f4ff}
+ /* #332: desktop cards must match the light-on-navy labels, never white on white. */
+ .follow-manage-details .follow-manage-item{background:#1f4b75;border-color:#769bbd;color:#f2f7ff}
+ .follow-manage-details .follow-manage-label strong{color:#e6f4ff;font-size:15px;line-height:1.45}
+ .follow-manage-details .follow-manage-label small{color:#e6f4ff;font-size:13px;line-height:1.45}
  .follow-manage-details .follow-manage-actions button{background:#244d77;color:#f4faff;border:1px solid #8aaecb}
  .follow-manage-details .follow-manage-actions button:disabled{opacity:.54}
 }
