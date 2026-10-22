@@ -1,7 +1,10 @@
-/* v120: distinct, accessible settings rooms instead of one long settings feed. */
+/* v184 IA-3: five canonical rooms, original controls and established palette preserved. */
 #view-einstellungen>.settings-room-hub[hidden],
 #view-einstellungen>.settings-room[hidden]{display:none!important}
 .settings-room-hub{margin-top:17px;min-width:0}
+.settings-hub-grid{margin-bottom:18px}
+.settings-room[data-settings-room="hilfe"] .settings-grant-action{display:flex;width:fit-content;max-width:100%}
+.settings-room-link:focus-visible{outline-offset:4px}
 .settings-hub-lead{font-size:14px;line-height:1.55;color:#4a6b83;margin:0 0 22px}
 .settings-hub-group{margin-bottom:26px}
 .settings-hub-group>h3{font-size:15px;font-weight:850;letter-spacing:.01em;color:#133a60;margin:0 0 11px}
