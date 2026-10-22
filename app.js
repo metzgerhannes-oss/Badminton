@@ -258,7 +258,10 @@ function showPlayerDiscover(open=true,focus=true){
    // Route focus runs on hashchange. Re-focus the search only after it has
    // finished, otherwise the page heading steals the typing caret.
    window.addEventListener("hashchange",focusSearch,{once:true});
-   location.hash="#spieler";
+   navigatePrimary("spieler");
+   // An installed iPhone may dispatch hashchange late; keep the search usable
+   // immediately instead of leaving the user on Home with a hidden input.
+   focusSearch();
   }else focusSearch();
  }
 }
