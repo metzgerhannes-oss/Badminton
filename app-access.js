@@ -137,6 +137,15 @@ async function initialize(){
  if(TOKEN.test(incoming||""))code.value=incoming;
  if(paste)paste.hidden=!navigator.clipboard?.readText;
  gate.hidden=false;
+ // A deliberate invitation link already requests access. Do not perform a
+ // separate anonymous-session probe before redeeming it: on slow iOS/WebKit
+ // starts the extra async check can hold the access screen while the visitor
+ // expects the one-tap invite to be accepted. The accept() path still validates
+ // the secret AND rechecks server-side membership before calling grant().
+ if(TOKEN.test(incoming||"")){
+  await accept(incoming);
+  return;
+ }
  try{
   const permission=await withCheckDeadline((async()=>{
    session=await getPrivateSession(false);
@@ -155,6 +164,5 @@ async function initialize(){
  }
  root.dataset.appAccess="denied";
  inform(incoming?"Einladung erkannt. Bitte Zugang bestätigen.":"Diese App ist nur mit Einladung zugänglich. Öffne deinen persönlichen Einladungslink oder füge den Code ein.");
- if(incoming&&TOKEN.test(incoming))accept(incoming);
 }
 initialize();
