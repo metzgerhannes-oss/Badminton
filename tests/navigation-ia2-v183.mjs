@@ -28,8 +28,9 @@ assert.match(app, /SchmetterlingeStorage\.unfollow\(state,id\)/);
 assert.match(storage, /selectOwn/);
 assert.match(storage, /selectFriend/);
 assert.match(css, /min-height:44px/);
-assert.match(release, /version:"v183"/);
-assert.match(sw, /const CACHE="schmetterlinge-shell-v183"/);
+const current=release.match(/version:"(v\d+)"/)?.[1];
+assert.ok(Number(current?.slice(1))>=183,"IA-2 must survive subsequent releases");
+assert.ok(sw.includes('const CACHE="schmetterlinge-shell-'+current+'"'));
 for(const group of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  assert.match(sw,new RegExp("const "+group+"=\\[[^;]*canonical-follows-v183\\.css"));
 }
