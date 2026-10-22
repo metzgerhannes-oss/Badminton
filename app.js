@@ -29,16 +29,21 @@ function setActiveProfile(id){
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
 // Existing UI callers keep the same route and focus methods.
-function routeTo(page){SchmetterlingeRouter.routeTo(state,page,render)}
+function routeTo(page){
+ // Choosing a followed player's statistics is not a Home/Logo action.
+ // Preserve that explicit viewer while making the destination visible now.
+ if(!navigatePrimary(page,{returnToOwn:false}))
+  SchmetterlingeRouter.routeTo(state,page,render);
+}
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 /** Native-feeling primary navigation: source of truth is the tapped destination,
  * not a deferred hashchange from installed WebKit. All six navigation links use
  * the same route. This does not touch stored players, friends or invitations.
  */
-function navigatePrimary(page){
+function navigatePrimary(page,{returnToOwn=true}={}){
  const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte","historie"];
  if(!allowed.includes(page))return false;
- if(page==="start"){
+ if(page==="start"&&returnToOwn){
   if(!state.players.length&&state.friends.length)
    SchmetterlingeStorage.selectFriend(state,state.friends[0].id);
   else SchmetterlingeStorage.showOwn(state);
