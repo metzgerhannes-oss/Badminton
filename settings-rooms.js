@@ -176,6 +176,19 @@
    }
   }
  }
+ // IA-5: Settings navigation must not wait for an unreliable iOS hashchange.
+ // The hash remains the history source of truth for Back/Forward and bookmarks.
+ view.addEventListener("click",event=>{
+  const link=event.target.closest?.("a.settings-room-link, a.settings-room-back");
+  if(!link||!view.contains(link)||event.defaultPrevented||
+     event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  const destination=link.getAttribute("href")||"";
+  const match=/^#einstellungen(?:\/([a-z-]+))?$/.exec(destination);
+  if(!match||(match[1]&&!rooms.has(match[1])))return;
+  event.preventDefault();
+  if(location.hash!==destination)location.hash=destination;
+  sync();
+ });
  window.addEventListener("hashchange",sync);
  window.addEventListener("pageshow",sync);
  window.addEventListener("storage",updateCounts);

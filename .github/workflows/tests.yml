@@ -27,6 +27,7 @@ jobs:
           node --check router.js
           node --check app.js
           node --check desktop-context-v173.js
+          node --check settings-rooms.js
           node --check app-release.js
           node --check app-access.js
           node --check scripts/stamp-release.mjs
@@ -177,6 +178,7 @@ jobs:
           node tests/navigation-ia2-v183.mjs
           node tests/settings-ia3-v184.mjs
           node tests/navigation-ia4-v185.mjs
+          node tests/navigation-ia5-v186.mjs
           node tests/dbv-match-reference.mjs
           node tests/badhub-primary-career.mjs
           node scripts/import-coverage-audit.test.mjs
