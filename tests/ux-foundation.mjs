@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 const file=path=>readFile(path,"utf8");
-const [html,app,router,style,stats,feedback,sw]=await Promise.all([
- "index.html","app.js","router.js","design-v2.css","stats.js","ui-feedback.js","sw.js"
+const [html,app,router,style,stats,feedback,sw,dashboard]=await Promise.all([
+ "index.html","app.js","router.js","design-v2.css","stats.js","ui-feedback.js","sw.js","dashboard.js"
 ].map(file));
 const home=html.slice(html.indexOf('id="view-start"'),html.indexOf('id="view-historie"'));
+assert.match(html,/class="live-hub-official-link" href="https:\/\/turniere\.badminton\.de\/"/,
+ "External DBV calendar action must open the official DBV calendar, not the results portal");
+assert.match(dashboard,/class="upcoming-tournament-row" href="#turniere"/,
+ "Home tournament cards must remain inside the app on both iPhone and desktop");
+assert.doesNotMatch(dashboard,/calendar\?'#turniere':escape\(t\.url\)/,
+ "Home must not send official UUID bookings directly offsite");
+
 assert.ok(home.indexOf('id="dashboard-next"')<home.indexOf('id="match-stats"'),"Next tournament must appear first");
 assert.ok(home.indexOf('id="match-stats"')<home.indexOf('id="dashboard-rankings"'),"Stats precede dense rankings");
 assert.ok(home.indexOf('id="dashboard-rankings"')<home.indexOf('id="dashboard-friends"'),"Rankings precede secondary social");
