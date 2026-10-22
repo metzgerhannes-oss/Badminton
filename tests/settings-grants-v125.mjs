@@ -3,15 +3,17 @@ import {readFile} from "node:fs/promises";
 const [rooms,css,reader,share]=await Promise.all([
  "settings-rooms.js","settings-rooms.css","private-player-reader.js","player-access.js"
 ].map(p=>readFile(p,"utf8")));
-assert.match(rooms,/title:"Einladungen & Freigaben"/);
-for(const label of ["Spieler suchen","Von mir erteilte Freigaben","Von mir angenommene Freigaben"])
+assert.match(rooms,/title:"Zugänge & Freigaben"/);
+for(const label of ["Von mir erteilte Freigaben","Von mir angenommene Freigaben"])
  assert.ok(rooms.includes(label),"Missing grant section: "+label);
 assert.match(rooms,/appendTo\("einladungen","\.invitation-card"\)/,
  "App-issued invitations and revocation belong in the grant management room");
 assert.doesNotMatch(rooms,/App-Installationslink \(ohne Spielerrechte\)/,
  "An invitation granting sourced results must not be mislabeled as a bare installation link");
-assert.match(rooms,/searchLink.href="#spieler"/);
-assert.match(rooms,/ownerLink.href="#einstellungen\/profile"/);
+assert.match(rooms,/appendTo\("einladungen","#owner-admin-panel"\)/);
+assert.match(rooms,/appendTo\("einladungen","#owner-activation-setup"\)/);
+assert.doesNotMatch(rooms,/searchLink\.href|ownerLink\.href/,
+ "IA-3: avoid duplicate management routes from within the grants overview");
 assert.match(rooms,/schmetterlinge\.privatePlayerInvites\.v1/);
 assert.match(rooms,/schmetterlinge\.acceptedPlayerInvite\.v3/);
 assert.match(rooms,/Annahmestatus nicht geprüft/);
