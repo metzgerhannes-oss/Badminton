@@ -87,6 +87,10 @@ test("iPhone browser-only choice accepts the invite without infinite installatio
  await page.locator("#browser-only").click();
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page).toHaveURL(/\/index\.html#start$/);
+ const acceptance=calls.findIndex(x=>x.path.endsWith("/rpc/app_access_invite_accept"));
+ const statusCheck=calls.findIndex(x=>x.path.endsWith("/rpc/app_access_status"));
+ expect(acceptance,"A browser-only invitation must be verified once before the access grant").toBeGreaterThanOrEqual(0);
+ expect(statusCheck,"The server must independently confirm accepted membership").toBeGreaterThan(acceptance);
  expect(calls.filter(x=>x.path.endsWith("/rpc/app_access_invite_accept"))).toHaveLength(1);
 });
 test("existing installed PWA can use a single tap to accept clipboard invite",async({page})=>{
