@@ -1,0 +1,45 @@
+/* IA-4 v185: a single, legible primary navigation across native iPhone and desktop.
+   Context-only "Heute" is inactive unless its verified destination is selected. */
+.bottom-nav a:focus-visible,
+.topbar-settings:focus-visible,
+.topbar .brand:focus-visible {
+  outline: 3px solid #b4e8ff;
+  outline-offset: -3px;
+}
+@media (max-width: 767px) {
+  .bottom-nav {
+    display: flex;
+    align-items: stretch;
+    padding-inline: max(4px, env(safe-area-inset-left));
+    padding-right: max(4px, env(safe-area-inset-right));
+  }
+  .bottom-nav a:not([hidden]) {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0;
+    min-height: 56px;
+    padding: 7px 2px;
+    gap: 4px;
+    border-radius: 10px;
+  }
+  .bottom-nav a small {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(10px, 2.7vw, 12px);
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .bottom-nav .nav-icon {width: 23px; height: 23px}
+  .bottom-nav a[aria-current="page"] {
+    color: #f1faff;
+    background: #326b91;
+  }
+  .bottom-nav a[data-page="live"]:not([aria-current="page"]) {
+    color: #d5eaff;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .bottom-nav a[hidden] {display:none !important}
+}
