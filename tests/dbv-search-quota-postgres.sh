@@ -27,7 +27,7 @@ BEGIN
  IF NOT EXISTS (
   SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='public' AND p.proname='search_dbv_player_identity'
-    AND p.provolatile='v' AND p.prosecdef AND p.proconfig @> ARRAY['search_path=']
+    AND p.provolatile='v' AND p.prosecdef AND array_to_string(p.proconfig, ',') LIKE 'search_path=%'
  ) THEN RAISE EXCEPTION 'Quota function security properties are wrong'; END IF;
  IF has_table_privilege('anon','public.players','SELECT')
  OR has_table_privilege('anon','private_content.dbv_identity_search_quota','SELECT')
