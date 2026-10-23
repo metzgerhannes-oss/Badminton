@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
     paths:
+      - "database/**"
+      - "supabase/**"
       - "tests/private-player-scope-isolation.mjs"
       - "app.js"
       - "index.html"
@@ -15,6 +17,8 @@ on:
       - ".github/workflows/ux-navigation.yml"
   pull_request:
     paths:
+      - "database/**"
+      - "supabase/**"
       - "tests/private-player-scope-isolation.mjs"
       - "app.js"
       - "index.html"

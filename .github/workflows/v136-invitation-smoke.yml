@@ -3,6 +3,8 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "database/**"
+      - "supabase/**"
       - "tests/private-player-scope-isolation.mjs"
       - "app-access.js"
       - "app-access.css"
