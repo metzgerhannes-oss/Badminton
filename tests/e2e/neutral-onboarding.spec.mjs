@@ -62,7 +62,8 @@ test("Installed app offers local-only manual fallback without a DBV result",asyn
    headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"apikey,authorization,content-type,prefer","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}}));
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await page.locator("#first-run-new").click();
- await page.locator("#welcome-manual-panel summary").click();
+ await expect(page.locator("#welcome-manual-panel")).toHaveAttribute("open","");
+ await page.locator("#welcome-manual-fallback > summary").click();
  await page.locator("#welcome-name").fill("Kind ohne Rangliste");
  await page.locator('#welcome-form button[type="submit"]').click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
@@ -89,7 +90,8 @@ test("Invitation link finds a verified player by name and saves only after confi
  await page.goto("/welcome.html",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#onboard-install")).toBeVisible();
  await page.locator("#install-back").click();
- await expect(page.locator("#welcome-manual-panel")).not.toHaveAttribute("open","");
+ await expect(page.locator("#welcome-manual-panel")).toHaveAttribute("open","");
+ await expect(page.locator("#welcome-manual-fallback")).not.toHaveAttribute("open","");
  await page.locator("#welcome-player-search").fill("Storz");
  const result=page.locator(".welcome-search-hit",{hasText:"Sarah Storz"});
  await expect(result).toContainText("05-061350");
@@ -118,7 +120,8 @@ test("Invitation still offers manual creation when no public DBV result exists",
  await page.locator("#install-back").click();
  await page.locator("#welcome-player-search").fill("Nicht Vorhanden");
  await expect(page.locator("#welcome-search-status")).toContainText("Kein passender");
- await page.locator("#welcome-manual-panel summary").click();
+ await expect(page.locator("#welcome-manual-panel")).toHaveAttribute("open","");
+ await page.locator("#welcome-manual-fallback > summary").click();
  await page.locator("#welcome-name").fill("Neues Kind");
  await page.locator('#welcome-form input[name="birthYear"]').fill("2016");
  await page.locator('#welcome-form button[type="submit"]').click();

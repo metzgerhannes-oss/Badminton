@@ -48,22 +48,31 @@ export async function searchInvitationPlayers(raw,{fetchImpl=fetch,signal,savedC
  const needle=fold(term);
  const onDevice=invitationCandidates(savedCandidates).filter(player=>
   fold(player.name).includes(needle)||player.id.includes(term));
- if(onDevice.length)return {players:onDevice,source:"device"};
+ // A local hit must not hide other matching official identities.
+ const combine=remote=>{
+  const byId=new Map();
+  for(const p of [...onDevice,...invitationCandidates(remote)])
+   if(!byId.has(p.id))byId.set(p.id,p);
+  return [...byId.values()].slice(0,12);
+ };
+ if(signal?.aborted)throw Object.assign(new Error("Search aborted"),{kind:"aborted"});
  try{
   const rows=await searchDbvIdentities(term,{fetchImpl,signal});
-  return {players:invitationCandidates(rows),source:"dbv"};
+  if(signal?.aborted)throw Object.assign(new Error("Search aborted"),{kind:"aborted"});
+  return {players:combine(rows),source:onDevice.length&&rows.length?"mixed":onDevice.length?"device":"dbv"};
  }catch(error){
   if(signal?.aborted||error?.kind==="aborted")throw error;
-  // The v114 privacy cutover intentionally revoked browser SELECT on players.
-  // Do not misreport this access denial as "No matching DBV player".
+  // Respect 401/403 privacy restrictions; never bypass them via backup files.
   if(error?.status===401||error?.status===403)
-   return {players:[],source:"restricted"};
+   return {players:combine([]),source:onDevice.length?"restricted-device":"restricted"};
   try{
-   const players=await backupCandidates(term,fetchImpl,signal);
-   return {players,source:players.length?"backup":"unavailable"};
+   const remote=await backupCandidates(term,fetchImpl,signal);
+   if(signal?.aborted)throw Object.assign(new Error("Search aborted"),{kind:"aborted"});
+   return {players:combine(remote),source:remote.length?(onDevice.length?"mixed-backup":"backup"):
+    onDevice.length?"unavailable-device":"unavailable"};
   }catch(fallbackError){
    if(signal?.aborted)throw fallbackError;
-   return {players:[],source:"unavailable"};
+   return {players:combine([]),source:onDevice.length?"unavailable-device":"unavailable"};
   }
  }
 }

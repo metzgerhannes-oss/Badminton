@@ -71,7 +71,7 @@ test("Chinese installation-first onboarding is fully localized, including profil
     "已接受的球员邀请会自动添加。你可以选择本设备保存的其他球员，或通过姓名和 DBV 编号添加。");
   await expect(page.locator("#onboard-profile")).not.toContainText("Finde deinen Spieler");
   await expect(page.locator("#welcome-search-status")).toHaveText("至少输入三个字符以搜索球员。");
-  await page.locator("#welcome-manual-panel summary").click();
+  await page.locator("#welcome-manual-fallback > summary").click();
   await expect(page.locator("#mode-own")).toContainText("创建球员档案");
   await expect(page.locator("#welcome-manual-panel")).toContainText("关联 DBV 编号后");
   await page.goto("/welcome.html#installation");
