@@ -501,8 +501,89 @@ function setup(){
  });
  const playerDialog=el("player-dialog"),playerForm=el("player-form");
  let editingPlayerId=null,activatingNewProfile=false;
+ // Search is read-only until the separate "Spieler speichern" form action.
+ const ownSearch=document.createElement("section");
+ ownSearch.id="own-player-search-panel";
+ ownSearch.setAttribute("aria-label","Öffentliche DBV-Spielersuche");
+ ownSearch.innerHTML='<label for="own-player-search">Spieler zuerst suchen (Name oder DBV-ID)<input id="own-player-search" type="search" minlength="3" maxlength="70" autocomplete="off" placeholder="Mindestens 3 Zeichen"></label><p id="own-player-search-status" role="status" aria-live="polite">Mindestens drei Zeichen eingeben oder unten manuell ergänzen.</p><div id="own-player-search-results" role="group" aria-label="Gefundene DBV-Spieler"></div><p class="small muted">Öffentliche Treffer sind keine Berechtigung zur Einsicht privater Daten. Auswahl füllt nur das Formular.</p>';
+ playerForm.querySelector(".section-heading")?.insertAdjacentElement("afterend",ownSearch);
+ const ownSearchInput=ownSearch.querySelector("#own-player-search");
+ const ownSearchStatus=ownSearch.querySelector("#own-player-search-status");
+ const ownSearchResults=ownSearch.querySelector("#own-player-search-results");
+ let ownSearchTimer=0,ownSearchController=null,ownSearchGeneration=0;
+ function stopOwnSearch(){
+  clearTimeout(ownSearchTimer);
+  ownSearchController?.abort();
+  ownSearchController=null;
+  ++ownSearchGeneration;
+ }
+ function showOwnSearchResults(players,source){
+  ownSearchResults.replaceChildren();
+  for(const player of players.slice(0,12)){
+   const isOwn=state.players.some(p=>p.id===player.id);
+   const isFriend=state.friends.some(p=>p.id===player.id);
+   const button=document.createElement("button");
+   button.type="button";
+   button.className="friend-follow-item";
+   button.disabled=isOwn||isFriend;
+   const detail=[player.club,player.birthYear,player.ageClass,player.id].filter(Boolean).join(" · ");
+   button.textContent=player.name+" — "+detail+(isOwn?" (bereits eigenes Profil)":isFriend?" (bereits Freund)":"");
+   button.addEventListener("click",()=>{
+    if(state.players.some(p=>p.id===player.id)||state.friends.some(p=>p.id===player.id)){
+     toast("Dieser Spieler ist bereits vorhanden");return;
+    }
+    playerForm.elements.namedItem("name").value=player.name;
+    playerForm.elements.namedItem("id").value=player.id;
+    playerForm.elements.namedItem("birthYear").value=player.birthYear||"";
+    playerForm.elements.namedItem("club").value=player.club||"";
+    playerForm.elements.namedItem("url").value=player.url||"";
+    ownSearchStatus.textContent="Ausgewählt: "+player.name+". Erst „Spieler speichern“ legt das eigene Profil an.";
+    playerForm.elements.namedItem("name").focus();
+   });
+   ownSearchResults.append(button);
+  }
+  if(source==="restricted"||source==="restricted-device")
+   ownSearchStatus.textContent="Offizielle Suche durch die Quelle gesperrt (401/403). Nur lokale Treffer; manuelle Eingabe möglich.";
+  else if(source==="unavailable"||source==="unavailable-device")
+   ownSearchStatus.textContent="Öffentliche Suche nicht erreichbar. Verfügbare lokale Treffer oder manuelle Eingabe nutzen.";
+  else ownSearchStatus.textContent=players.length?players.length+" Treffer, maximal 12. Bitte den richtigen Verein/Jahrgang/DBV-ID prüfen.":"Keine Treffer. Spieler manuell ergänzen.";
+ }
+ ownSearchInput.addEventListener("input",()=>{
+  stopOwnSearch();
+  ownSearchResults.replaceChildren();
+  const term=ownSearchInput.value.trim();
+  if(editingPlayerId||term.length<3){
+   ownSearchStatus.textContent="Mindestens drei Zeichen eingeben oder unten manuell ergänzen.";
+   return;
+  }
+  const generation=ownSearchGeneration;
+  ownSearchTimer=setTimeout(async()=>{
+   const controller=new AbortController();
+   ownSearchController=controller;
+   ownSearchStatus.textContent="Suche nach öffentlichen DBV-Spielern …";
+   try{
+    const {searchInvitationPlayers}=await import("./scripts/invitation-search.mjs");
+    if(controller.signal.aborted||generation!==ownSearchGeneration)return;
+    const result=await searchInvitationPlayers(term,{
+     signal:controller.signal,
+     savedCandidates:[...state.players,...state.friends]
+    });
+    if(controller.signal.aborted||generation!==ownSearchGeneration)return;
+    showOwnSearchResults(result.players,result.source);
+   }catch(error){
+    if(controller.signal.aborted||generation!==ownSearchGeneration)return;
+    ownSearchStatus.textContent="Suche derzeit nicht erreichbar; bitte Spieler manuell ergänzen.";
+   }
+  },280);
+ });
+ playerDialog.addEventListener("close",stopOwnSearch);
  function openPlayerForm(p=null){
   editingPlayerId=p?.id||null;
+  stopOwnSearch();
+  ownSearchInput.value="";
+  ownSearchResults.replaceChildren();
+  ownSearchStatus.textContent="Mindestens drei Zeichen eingeben oder unten manuell ergänzen.";
+  ownSearch.hidden=Boolean(p);
   playerForm.reset();
   playerForm.elements.namedItem("name").value=p?.name||"";
   playerForm.elements.namedItem("id").value=(p&&/^\d{2}-\d{6}$/.test(p.id))?p.id:"";
