@@ -32,14 +32,14 @@ function medals(id){
   date:"2026-07-11",source:{url:"https://badhub.de/bwbv/turnier.php?id=123"}
  })):[];
 }
-async function setup(page,id){
- await page.addInitScript(playerId=>{
+async function setup(page,id,{birthYear=2015}={}){
+ await page.addInitScript(({playerId,birthYear})=>{
   localStorage.setItem("shuttleboard-v1",JSON.stringify({
-   players:[{id:playerId,name:"Demo-Profil",birthYear:2015,club:"Testverein"}],
+   players:[{id:playerId,name:"Demo-Profil",birthYear,club:"Testverein"}],
    friends:[],officialLinks:[],activeProfileId:playerId,chosen:playerId,
    historyProfilesInitialized:true
   }));
- },id);
+ },{playerId:id,birthYear});
  await page.route("**/*.supabase.co/rest/v1/**",route=>{
   const req=route.request(),u=new URL(req.url()),method=req.method();
   if(u.pathname.endsWith("/rpc/app_access_status"))return route.fallback();
@@ -52,7 +52,7 @@ async function setup(page,id){
    const player=JSON.parse(req.postData()||"{}").p_player_dbv_id;
    response={dbv_id:player,match_cards:facts[player]?.length||0,
     import_status:"partial",last_import:"2026-10-17T11:30:00Z",
-    birth_year:2015,placements:player===FIRST?2:0,top_four:player===FIRST?2:0};
+    birth_year:birthYear,placements:player===FIRST?2:0,top_four:player===FIRST?2:0};
   }else if(u.pathname.endsWith("/rpc/app_access_trophies_read")){
    const player=JSON.parse(req.postData()||"{}").p_player_dbv_id;
    response={player_dbv_id:player,scope:"app_archive",results:medals(player)};
