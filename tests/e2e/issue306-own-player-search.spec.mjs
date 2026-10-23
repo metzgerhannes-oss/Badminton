@@ -17,7 +17,9 @@ test.beforeEach(async({page})=>{
  await page.route("**/rpc/search_dbv_player_identity",route=>{
   if(route.request().method()==="OPTIONS")
    return route.fulfill({status:204,headers,body:""});
-  return route.fulfill({status:200,headers,body:JSON.stringify(rows)});
+  const query=String(JSON.parse(route.request().postData()||"{}").p_query||"").toLocaleLowerCase("de");
+  return route.fulfill({status:200,headers,body:JSON.stringify(rows.filter(row=>
+   row.name.toLocaleLowerCase("de").includes(query)||row.dbv_id.includes(query)))});
  });
  await page.goto("/#einstellungen/profile",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#app-access-gate")).toBeHidden();
