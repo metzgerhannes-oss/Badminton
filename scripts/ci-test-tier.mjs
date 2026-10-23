@@ -11,6 +11,7 @@ const FULL=[
  /^scripts\/ci-test-tier\.mjs$/,
  /^tests\/ci-test-tier\.mjs$/,
  /^supabase\//,/^database\//,
+ /^(?:package(?:-lock)?\.json|playwright\.config\.(?:mjs|js|ts)|index\.html|app\.js)$/,
  /^tests\/e2e\/(?:.*(?:invite|access|auth|backup|pwa|session|revocation|private|network|publication|scope).*)\.spec\.mjs$/,
  /^tests\/(?:browser-qa-supabase-isolation|private-player-scope-isolation|private-trophy-revocation-race|private-rpc-error-classification)\.mjs$/,
  /^(?:app-access|private-.*|owner-.*|player-access|state-storage|welcome|backup|app-security|invite|consented-player-data|player-data-status|shared-tournaments|sw)\.js$/,
@@ -27,9 +28,9 @@ const LOW=[
 const UI=[
  /^(?:tests\/e2e\/.*\.spec\.mjs)$/,
  /^(?:locales\/|data\/)/,
- /^(?:scripts\/.*\.(?:mjs|js|py))$/,
+ /^scripts\/(?:dbv-calendar|match-age-context|trophy-stats|upcoming-tournaments|ux-navigation|wiki-|i18n-)/,
  /\.(?:js|mjs|css|html|svg|json|webmanifest|png|jpg|jpeg|webp)$/i,
- /^package(?:-lock)?\.json$/,
+
 ];
 export function classify(files,{eventName="pull_request"}={}){
  if(eventName==="schedule"||eventName==="workflow_dispatch")return {tier:"full",risk:"R2",reason:"periodic/manual full regression"};
@@ -46,7 +47,7 @@ function changedFiles(){
  const head=process.env.CI_HEAD_SHA||"HEAD";
  if(!/^[0-9a-f]{40}$/i.test(base)||/^0{40}$/.test(base))throw Error("No usable base SHA");
  if(head!=="HEAD"&&!/^[0-9a-f]{40}$/i.test(head))throw Error("No usable head SHA");
- const result=execFileSync("git",["diff","--name-only","--diff-filter=ACMR",base,head],{encoding:"utf8",timeout:15000});
+ const result=execFileSync("git",["diff","--name-only","--no-renames",base,head],{encoding:"utf8",timeout:15000});
  return result.split(/\r?\n/).filter(Boolean);
 }
 function main(){
