@@ -11,6 +11,7 @@ on:
       - ".github/workflows/match-age-context.yml"
   pull_request:
     paths:
+      - "tests/private-player-scope-isolation.mjs"
       - "stats.js"
       - "index.html"
       - "scripts/match-age-context.mjs"
