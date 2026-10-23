@@ -19,6 +19,8 @@ on:
       - "tests/private-rpc-error-classification.mjs"
       - "settings-rooms.js"
       - ".github/workflows/v136-invitation-smoke.yml"
+      - ".github/workflows/ux-navigation.yml"
+      - ".github/workflows/match-age-context.yml"
   workflow_dispatch:
 jobs:
   invited-mobile:
