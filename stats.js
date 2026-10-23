@@ -185,11 +185,16 @@ function render(){
  const stats=sourced?
   computeExternalStats(rows,{year:selectedYear,discipline:selectedDiscipline}):
   computeMatchStats(rows,{year:selectedYear,discipline:selectedDiscipline});
- // In an offline/older session the server birth year can be unavailable.
- // Preserve the match totals and show all instead of an unexplained blank panel.
- if(birthYear===null&&selectedAgeClass!=="all"){
-  selectedAgeClass="all";
-  if($("match-stats-age"))$("match-stats-age").value="all";
+ // Available competition classes come from proved match events, even when
+ // birth year is missing in a private/offline session.
+ const ageSelector=$("match-stats-age");
+ if(ageSelector){
+  const available=eventAgeClasses(stats,{official:!sourced});
+  ageSelector.innerHTML='<option value="all">Alle Altersklassen</option>'+available.map(value=>
+   '<option value="'+esc(value)+'">'+esc(value)+'</option>').join("")+
+   '<option value="unclassified">Nicht zuordenbar</option>';
+  if(!["all","unclassified",...available].includes(selectedAgeClass))selectedAgeClass="all";
+  ageSelector.value=selectedAgeClass;
  }
  const context=ageContextBreakdown(stats,birthYear,{official:!sourced,filter:selectedAgeClass});
  const missing=context.total===0;
@@ -264,7 +269,7 @@ function render(){
    :"")+(availability.detail?availability.detail+" ":"")+
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
- if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
+ if(stats.total)sourceDetails.textContent+=" Die gespielte Altersklasse stammt aus dem belegten Wettkampffeld. Eine höhere AK belegt nicht das Alter einzelner Gegner.";
  // Do not display a second, partial set of career counters under Badhub's
  // published total. Filtering switches back to individually evidenced figures.
  if(badhub&&referenceSection&&!privateMode&&!window.badmintonAppAccess?.allowed){
