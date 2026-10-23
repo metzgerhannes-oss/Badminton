@@ -13,21 +13,21 @@ const BW_YOUTH_AGES=["U11","U13","U15","U17","U19"];
 // Separate official schedule announcements from event-ID backed DBV records.
 // These are source-backed planning/award dates, NOT confirmed sign-up events.
 const BWBV_C_FRAMEWORK_2027=[
- {start:"2027-01-16",end:"2027-01-17",level:"C",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
- {start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ages:["U13","U15","U17","U19"],ageCertain:false},
- {start:"2027-05-08",end:"2027-05-09",level:"C",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
+ {key:"bwbv-2027-c-1",start:"2027-01-16",end:"2027-01-17",level:"C",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
+ {key:"bwbv-2027-c-2",start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ages:["U13","U15","U17","U19"],ageCertain:false},
+ {key:"bwbv-2027-c-3",start:"2027-05-08",end:"2027-05-09",level:"C",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
  // The fourth C round does not generally offer U11 according to BWBV youth rules.
- {start:"2027-06-26",end:"2027-06-27",level:"C",title:"4. BWBV/C-RLT Jugend · Hexen-Cup",ages:["U13","U15","U17","U19"],ageCertain:false}
+ {key:"bwbv-2027-c-4",start:"2027-06-26",end:"2027-06-27",level:"C",title:"4. BWBV/C-RLT Jugend · Hexen-Cup",ages:["U13","U15","U17","U19"],ageCertain:false}
 ];
-const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2025/11/BWBV-U19-Turnierkalender_2027.pdf";
+const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf";
 const BWBV_B_FRAMEWORK_2027=[
- {start:"2027-01-30",end:"2027-01-31",level:"B",title:"Gruppe SüdOst · B-RLT U13–U19",ages:["U13","U15","U17","U19"],ageCertain:true,
-  source:"https://bwbv.de/wp-content/uploads/2025/11/bj-2025-11-web.pdf"}
+ {key:"bwbv-2027-b-3",start:"2027-01-30",end:"2027-01-31",level:"B",title:"Gruppe SüdOst · B-RLT U13–U19",ages:["U13","U15","U17","U19"],ageCertain:true,
+  source:BWBV_FRAMEWORK_SOURCE}
 ];
 const DBV_A_VERGABE_2027=[
- {start:"2027-02-20",end:"2027-02-21",level:"A",title:"2. A-RLT U11/U13 · BC Lörrach-Brombach",ages:["U11","U13"],ageCertain:true,
+ {key:"dbv-bw-a-2027-2",start:"2027-02-20",end:"2027-02-21",level:"A",title:"2. A-RLT U11/U13 · BC Lörrach-Brombach",ages:["U11","U13"],ageCertain:true,
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
- {start:"2027-04-24",end:"2027-04-25",level:"A",title:"4. DBV-A-RLT U11/U13 · BSV Eggenstein",ages:["U11","U13"],ageCertain:true,
+ {key:"dbv-bw-a-2027-4",start:"2027-04-24",end:"2027-04-25",level:"A",title:"4. DBV-A-RLT U11/U13 · BSV Eggenstein",ages:["U11","U13"],ageCertain:true,
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"}
 ];
 let BW_YOUTH_FRAMEWORK_2027=[
