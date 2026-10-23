@@ -43,7 +43,9 @@ async function rpc(session,name,args){
     "Content-Type":"application/json",Accept:"application/json"},
    body:JSON.stringify(args)
   });
-  if([400,401,403].includes(response.status))return null;
+  // 400 means a broken request/schema contract, not a denied player grant.
+  // Only explicit authentication/authorization failures are protected.
+  if([401,403].includes(response.status))return null;
   if(!response.ok)throw Error("archive read temporarily unavailable");
   return response.json();
  }finally{clearTimeout(timeout)}
