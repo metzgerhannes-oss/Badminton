@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {ownAgeClass,matchEventClass,classifyMatchAge,ageContextBreakdown}
+import {ownAgeClass,matchEventClass,classifyMatchAge,ageContextBreakdown,eventAgeClasses}
  from "../scripts/match-age-context.mjs";
 
 const ext=(source_key,event,won,match_year=2026,category="tournament")=>({
@@ -60,6 +60,42 @@ test("optional filter preserves actual wins/losses; no double counting",()=>{
   ageContextBreakdown(base,2010,{filter:"higher"}).total+
   ageContextBreakdown(base,2010,{filter:"unclassified"}).total,all.total);
  assert.equal(ageContextBreakdown({details:[]},2010,{filter:"own"}).rate,null);
+});
+test("62 synthetic event cards show real U11/U13 totals without birth year",()=>{
+ const details=Array.from({length:62},(_,i)=>({
+  ...ext("synthetic-event-"+i,i<36?"JE U11":"MxD U13",i<17||i>=36&&i<45,
+   i<18?2025:2026),
+  discipline:i>=56?"Mixed":"Einzel"
+ }));
+ const base={details,excluded:0};
+ assert.deepEqual(eventAgeClasses(base),["U11","U13"]);
+ const check=(filter,expected)=>{
+  const result=ageContextBreakdown(base,null,{filter});
+  assert.deepEqual([result.total,result.wins,result.losses],expected);
+  assert.equal(result.total,result.details.length);
+  assert.equal(result.total,result.wins+result.losses);
+  assert.ok(result.details.every(x=>filter==="all"||x.ageContext.event===filter));
+ };
+ check("all",[62,26,36]);
+ check("U11",[36,17,19]);
+ check("U13",[26,9,17]);
+ check("unclassified",[0,0,0]);
+ assert.equal(ageContextBreakdown(base,null).rate,42);
+ assert.equal(ageContextBreakdown(base,undefined,{filter:"U11"}).total,36);
+ const subset=details.filter(x=>x.match_year===2026&&x.discipline==="Mixed");
+ assert.deepEqual(eventAgeClasses({details:subset}),["U13"]);
+ assert.deepEqual([ageContextBreakdown({details:subset},null,{filter:"U13"}).total,
+  ageContextBreakdown({details:subset},null,{filter:"U11"}).total],[6,0]);
+});
+test("only ambiguous, missing and league match event classes remain unknown",()=>{
+ const details=[ext("1","JE U11",true),ext("2","JE U11/U13",false),
+  ext("3","DE",true),ext("4","JD U13",false,2026,"league"),
+  {event_code:"MS U15",match_date:"2026-09-01",won:true}];
+ assert.deepEqual(eventAgeClasses({details:details.slice(0,4)}),["U11"]);
+ const found=ageContextBreakdown({details:details.slice(0,4)},null,{filter:"unclassified"});
+ assert.equal(found.total,3);
+ assert.equal(ageContextBreakdown({details:[details[4]]},null,{official:true,filter:"U15"}).total,1);
+ assert.equal(classifyMatchAge(details[4],null,{official:true}).event,"U15");
 });
 test("frontend consumes database birth year and marks individual proofs",()=>{
  const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
