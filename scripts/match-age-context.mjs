@@ -21,13 +21,20 @@ export function classifyMatchAge(row,birthYear,{official=false}={}){
    row?.match_year||String(row?.match_date||"").slice(0,4));
  const own=ownAgeClass(birthYear,year);
  const event=(!official&&row?.category!=="tournament")?null:
-  matchEventClass(official?row?.event_code:row?.event);
+  matchEventClass(official?(row?.event_code||row?.event):row?.event);
  const category=own&&event
   ?Number(event.slice(1))===Number(own.slice(1))?"own":
    Number(event.slice(1))>Number(own.slice(1))?"higher":"unclassified"
   :"unclassified";
  // A lower class is not silently shown as a valid "own" or "higher" entry.
  return {category,own,event,year:Number.isInteger(year)&&year>=2000?year:null};
+}
+/** Actual competition classes are independent of a player's birth year.
+ * Only classify individual match cards; never infer ages from tournament names. */
+export function eventAgeClasses(stats,{official=false}={}){
+ const present=new Set((stats?.details||[]).map(row=>
+  classifyMatchAge(row,null,{official}).event).filter(Boolean));
+ return AGE_CLASSES.map(value=>"U"+value).filter(value=>present.has(value));
 }
 export function ageContextBreakdown(stats,birthYear,{official=false,filter="all"}={}){
  const buckets={own:{wins:0,losses:0},higher:{wins:0,losses:0},
@@ -38,7 +45,13 @@ export function ageContextBreakdown(stats,birthYear,{official=false,filter="all"
   row.won?bucket.wins++:bucket.losses++;
   return {...row,ageContext};
  });
- const details=filter==="all"?annotated:annotated.filter(row=>row.ageContext.category===filter);
+ // The played-class selector must work without a public birth-year lookup.
+ // Legacy own/higher classification is retained solely for optional comparisons.
+ const eventFilter=AGE_CLASSES.some(value=>filter==="U"+value);
+ const details=filter==="all"?annotated:annotated.filter(row=>
+  eventFilter?row.ageContext.event===filter:
+  filter==="unclassified"?!row.ageContext.event:
+  row.ageContext.category===filter);
  const wins=details.filter(row=>row.won).length,losses=details.length-wins,total=wins+losses;
  return {total,wins,losses,rate:total?Math.round(wins/total*100):null,
   excluded:stats?.excluded||0,details,buckets};
