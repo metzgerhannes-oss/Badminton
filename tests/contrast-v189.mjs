@@ -47,7 +47,7 @@ for(const key of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  assert.ok(JSON.parse(match[1]).includes("./contrast-v189.css"),
   "New styling must survive offline PWA upgrade: "+key);
 }
-const version=release.match(/version:"(v\\d+)"/)?.[1];
+const version=release.match(/version:"(v[0-9]+)"/)?.[1];
 assert.ok(version&&Number(version.slice(1))>=189,"Contrast audit must survive newer releases");
 assert.ok(sw.includes("schmetterlinge-shell-"+version),"CSS remains in the current PWA version");
 assert.ok(index.includes("App-Version "+version),"Index shell version matches release");
