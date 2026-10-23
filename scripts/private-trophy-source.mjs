@@ -23,7 +23,8 @@ async function rpc(name,args,session){
    body:JSON.stringify(args)
   });
   if(!r.ok){
-   if([400,401,403].includes(r.status))return null;
+   // A malformed RPC (400) must surface as unavailable, never as "no trophies".
+   if([401,403].includes(r.status))return null;
    if(r.status===404)throw Error("private trophy endpoint not installed");
    throw Error("service unavailable");
   }
