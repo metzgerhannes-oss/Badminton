@@ -28,9 +28,24 @@ assert.equal(existing.friends[0].name,"Old display","Do not mutate prior state")
 const ownsSame=addAcceptedPlayerToLocalStore({players:[{id:person.dbv_id,name:"Philipp"}],friends:[]},person);
 assert.equal(ownsSame.friends.length,0,"Existing owned profile must not duplicate into following");
 
-const local=await searchInvitationPlayers("Philipp",{savedCandidates:added.friends,fetchImpl:async()=>{throw Error("No network expected")}});
-assert.equal(local.source,"device");
+let scopedLookups=0;
+const local=await searchInvitationPlayers("Philipp",{savedCandidates:added.friends,fetchImpl:async url=>{
+ scopedLookups++;
+ if(String(url).includes("rpc/search_dbv_player_identity"))throw Error("Synthetic lookup offline");
+ throw Error("Synthetic backup unavailable");
+}});
+assert.equal(local.source,"unavailable-device");
 assert.equal(local.players[0].id,person.dbv_id);
+assert.ok(scopedLookups>=1,"A local hit must not skip the official identity lookup");
+const combined=await searchInvitationPlayers("Philipp",{savedCandidates:added.friends,fetchImpl:async url=>{
+ assert.ok(String(url).includes("rpc/search_dbv_player_identity"));
+ return {ok:true,json:async()=>[
+  {...person}, {dbv_id:"05-071970",name:"Philipp Beispiel",club:"Anderer Verein"}
+ ]};
+}});
+assert.equal(combined.source,"mixed");
+assert.deepEqual(combined.players.map(p=>p.id),["05-070879","05-071970"],
+ "Local and official search results combine without duplicate DBV IDs");
 const forbidden=await searchInvitationPlayers("Anderer Spieler",{fetchImpl:async(url)=>{
  if(String(url).includes("/rpc/search_dbv_player_identity"))return {ok:false,status:403};
  throw Error("Identity lookup must never read the restricted players table");
