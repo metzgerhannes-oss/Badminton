@@ -1,0 +1,46 @@
+name: F03 DBV quota SQL (synthetic PostgreSQL)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "database/dbv-identity-quota-f03.sql"
+      - "tests/dbv-search-quota-postgres.sh"
+      - ".github/workflows/dbv-search-quota-postgres.yml"
+  push:
+    branches: [main]
+    paths:
+      - "database/dbv-identity-quota-f03.sql"
+      - "tests/dbv-search-quota-postgres.sh"
+      - ".github/workflows/dbv-search-quota-postgres.yml"
+permissions:
+  contents: read
+jobs:
+  ephemeral-postgres:
+    name: PostgreSQL 17 quota/RLS synthetic contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: local_synthetic_only
+          POSTGRES_USER: postgres
+          POSTGRES_DB: badminton_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d badminton_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exercise SQL quota in ephemeral database only
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGDATABASE: badminton_test
+          PGUSER: postgres
+          PGPASSWORD: local_synthetic_only
+          PGSSLMODE: disable
+        run: bash tests/dbv-search-quota-postgres.sh
