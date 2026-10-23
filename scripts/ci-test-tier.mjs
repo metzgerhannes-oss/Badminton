@@ -13,6 +13,7 @@ const FULL=[
  /^supabase\//,/^database\//,
  /^(?:package(?:-lock)?\.json|playwright\.config\.(?:mjs|js|ts)|index\.html|app\.js)$/,
  /^tests\/e2e\/(?:.*(?:invite|access|auth|backup|pwa|session|revocation|private|network|publication|scope).*)\.spec\.mjs$/,
+ /^tests\/(?:.*(?:access|auth|invite|backup|private|security|network|scope|pwa|consent|session|storage|supabase|rls|rpc).*)\.(?:mjs|js)$/,
  /^tests\/(?:browser-qa-supabase-isolation|private-player-scope-isolation|private-trophy-revocation-race|private-rpc-error-classification)\.mjs$/,
  /^(?:app-access|private-.*|owner-.*|player-access|state-storage|welcome|backup|app-security|invite|consented-player-data|player-data-status|shared-tournaments|sw)\.js$/,
  /^scripts\/(?:private-|owner-|local-backup|auth-|player-access|shared-tournaments)/,
@@ -29,7 +30,7 @@ const UI=[
  /^(?:tests\/e2e\/.*\.spec\.mjs)$/,
  /^(?:locales\/|data\/)/,
  /^scripts\/(?:dbv-calendar|match-age-context|trophy-stats|upcoming-tournaments|ux-navigation|wiki-|i18n-)/,
- /\.(?:js|mjs|css|html|svg|json|webmanifest|png|jpg|jpeg|webp)$/i,
+ /^[a-z0-9_-]+\.(?:js|mjs|css|html|svg|json|webmanifest|png|jpg|jpeg|webp)$/i,
 
 ];
 export function classify(files,{eventName="pull_request"}={}){
