@@ -80,7 +80,7 @@
 /* Independent of .app .page: family/friend/tournament dialogs sit outside page. */
 :is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
  #spond-source-dialog,#spond-preview-dialog,#first-run-dialog){
- color:#173a57;background:linear-gradient(145deg,#fff,#e7f5ff);
+ color:#0c305a;background:linear-gradient(145deg,#fff,#e7f5ff);
 }
 :is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
  #spond-source-dialog,#spond-preview-dialog,#first-run-dialog)
