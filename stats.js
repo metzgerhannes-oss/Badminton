@@ -301,6 +301,9 @@ window.addEventListener("badminton:private-matches-updated",e=>{
  if(snap.state==="ready"){
   controller?.abort();++seq;privateMode=true;
   official=[];external=snap.rows;progress={status:"partial",verified_count:external.length};
+  // The private snapshot bypasses fetchProfile, so recompute the age context
+  // for this player instead of retaining a previous player's birth year.
+  birthYear=queryBirthYear(null,id);
   officialError=false;externalError=false;partialOfficial=false;partialExternal=false;
   status="loaded";lastLoadedAt=Date.now();render();
  }else if(privateMode){
