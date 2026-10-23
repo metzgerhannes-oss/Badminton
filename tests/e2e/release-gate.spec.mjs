@@ -24,6 +24,9 @@ test("Compact iPhone layout and dialog buttons remain operable",async ({page},in
    await expect(page.locator("#settings-room-profile")).toBeVisible();
   await page.locator("#add-player").click();
  await expect(page.locator("#player-dialog")).toBeVisible();
+ await expect(page.locator("#own-player-search")).toBeVisible();
+ await expect(page.locator("#player-dialog button[type=submit]")).toBeHidden();
+ await page.locator("#own-player-manual-fallback > summary").click();
  await page.locator("#player-dialog button[type=submit]").scrollIntoViewIfNeeded();
  await expect(page.locator("#player-dialog button[type=submit]")).toBeVisible();
  await page.screenshot({path:info.outputPath("compact-player-form.png")});
@@ -86,7 +89,10 @@ test("v65 extracted home cards and dialogs retain readable component styling",as
   });
   expect(dialogStyle.background).toContain("linear-gradient");
   expect(dialogStyle.color).toBe("rgb(12, 48, 90)");
+  await expect(page.locator("#own-player-search")).toBeVisible();
   const button=page.locator("#player-dialog button[type=submit]");
+  await expect(button).toBeHidden();
+  await page.locator("#own-player-manual-fallback > summary").click();
   await button.scrollIntoViewIfNeeded();
   await expect(button).toBeVisible();
   await page.locator("#cancel-dialog").click();
