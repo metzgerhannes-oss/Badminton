@@ -7,6 +7,8 @@ const DBV=/^[0-9]{2}-[0-9]{6}$/;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const HOLD_MS=30000;
 const states=new Map();
+// A revoked/changed session invalidates every in-flight private trophy read.
+let generation=0;
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}};
 function acceptedIdsFor(player){
  const bindings=read("schmetterlinge.acceptedPlayerInviteBindings.v1",{});
@@ -57,6 +59,7 @@ function announce(player){
 }
 export function requestPrivateTrophies(player,{force=false}={}){
  if(!DBV.test(String(player||"")))return Promise.resolve();
+ const ticket=generation;
  const previous=states.get(player);
  if(previous?.pending)return previous.pending;
  if(!force&&previous&&Date.now()-previous.checkedAt<HOLD_MS)return Promise.resolve();
@@ -64,30 +67,36 @@ export function requestPrivateTrophies(player,{force=false}={}){
  const pending=(async()=>{
   try{
    const session=await getPrivateSession(false);
+   if(ticket!==generation)return;
    if(!session){states.set(player,{state:"protected",results:[],checkedAt:Date.now()});return;}
    let response=window.badmintonAppAccess?.allowed
     ?await rpc("app_access_trophies_read",{p_player_dbv_id:player},session):null;
+   if(ticket!==generation)return;
    let validated=validResult(response,player);
    if(!validated){
     response=await rpc("private_owner_trophies_read",{p_player_dbv_id:player},session);
+    if(ticket!==generation)return;
     validated=validResult(response,player);
    }
    if(!validated){
     for(const id of acceptedIdsFor(player)){
      response=await rpc("private_player_trophies_read",{p_invitation_id:id},session);
+     if(ticket!==generation)return;
      validated=validResult(response,player);
      if(validated)break;
     }
    }
+   if(ticket!==generation)return;
    states.set(player,{...(validated||{state:"protected",results:[]}),checkedAt:Date.now()});
   }catch{
-   states.set(player,{state:"unavailable",results:[],checkedAt:Date.now()});
-  }finally{announce(player)}
+   if(ticket===generation)states.set(player,{state:"unavailable",results:[],checkedAt:Date.now()});
+  }finally{if(ticket===generation)announce(player)}
  })();
  states.set(player,{state:"loading",results:[],checkedAt:Date.now(),pending});
  return pending;
 }
 export function clearPrivateTrophyCache({refresh=true}={}){
+ generation++;
  const current=[...states.keys()];
  states.clear();
  if(refresh)current.forEach(player=>{requestPrivateTrophies(player,{force:true})});
@@ -97,5 +106,5 @@ if(typeof document!=="undefined"){
  window.addEventListener("badminton:private-player-revoked",()=>clearPrivateTrophyCache());
  window.addEventListener("badminton:app-access-granted",()=>clearPrivateTrophyCache());
   window.addEventListener("badminton:local-data-copy-updated",e=>{const id=e.detail?.playerId;if(DBV.test(String(id||"")))announce(id)});
- window.addEventListener("pagehide",()=>states.clear());
+ window.addEventListener("pagehide",()=>clearPrivateTrophyCache({refresh:false}));
 }
