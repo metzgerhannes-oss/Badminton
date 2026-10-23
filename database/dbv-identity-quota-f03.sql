@@ -32,8 +32,9 @@ AS $search$
 DECLARE
   q text := btrim(left(coalesce(p_query, ''), 70));
   club_filter text := btrim(left(coalesce(p_club, ''), 90));
-  minute_key timestamptz := date_trunc('minute', clock_timestamp());
-  day_key date := (clock_timestamp() AT TIME ZONE 'UTC')::date;
+  now_utc timestamptz := clock_timestamp();
+  minute_key timestamptz := date_trunc('minute', now_utc);
+  day_key date := (now_utc AT TIME ZONE 'UTC')::date;
   admitted boolean := false;
   retry_seconds integer := 60;
 BEGIN
