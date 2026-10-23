@@ -51,7 +51,8 @@ test("Existing own and followed players cannot be selected as new own profiles",
  await page.locator("#own-player-search").fill("Kind");
  const buttons=page.locator("#own-player-search-results button");
  await expect(buttons).toHaveCount(2);
- await expect(buttons).toBeDisabled();
+ await expect(buttons.nth(0)).toBeDisabled();
+ await expect(buttons.nth(1)).toBeDisabled();
  await expect(page.locator('#player-form input[name="id"]')).toHaveValue("");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toHaveLength(1);
