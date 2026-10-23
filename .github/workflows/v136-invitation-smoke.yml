@@ -3,6 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "tests/private-player-scope-isolation.mjs"
       - "app-access.js"
       - "app-access.css"
       - "invite.js"
