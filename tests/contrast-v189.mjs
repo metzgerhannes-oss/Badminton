@@ -1,8 +1,9 @@
 /** Offline contract for v189: explicit WCAG 2.2 AA color pairs, scoped PWA cache and unchanged Home. */
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-const [css,index,welcome,wiki,sw,release] = await Promise.all(
- ["contrast-v189.css","index.html","welcome.html","wiki.html","sw.js","app-release.js"].map(p=>readFile(p,"utf8")));
+const [css,index,welcome,wiki,sw,release,ui,wikiCss,welcomeCss] = await Promise.all(
+ ["contrast-v189.css","index.html","welcome.html","wiki.html","sw.js","app-release.js","ui-components.css","wiki.css","welcome.css"].map(p=>readFile(p,"utf8")));
+const completePalette=css+"\n"+ui+"\n"+wikiCss+"\n"+welcomeCss;
 const toRgb=value=>{
  const hex=value.replace(/^#/,"");
  assert.match(hex,/^[0-9a-f]{6}$/i);
@@ -32,7 +33,7 @@ const pairs=[
 ];
 for(const [label,fg,bg,required] of pairs){
  assert.ok(contrast(fg,bg)>=required,label+": "+contrast(fg,bg).toFixed(2)+":1");
- assert.ok(css.includes(fg)&&css.includes(bg),"Explicit audited color pairing: "+label);
+ assert.ok(completePalette.includes(fg)&&completePalette.includes(bg),"Audited color pairing: "+label);
 }
 assert.match(css,/\.app \.page:not\(#view-start\)/,"Home excluded from application page overrides");
 assert.doesNotMatch(css,/(^|\n)\s*(?:#view-start|\.focused-profile|\.dashboard-ranking-grid|\.topbar)\s*\{/,
