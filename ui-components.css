@@ -207,6 +207,7 @@ dialog::backdrop,.first-run-dialog::backdrop{background:#102e53a8}
 .ranking-score-total{color:#0c3156;background:#e4f5ff;border-color:#bad8ec}
 
 /* v188: search-first own-family profile dialog, legible in the established Navy theme. */
+#own-player-search-panel[hidden]{display:none!important}
 #own-player-search-panel{display:grid;gap:10px;padding:14px;border:1px solid #80b0d2;border-radius:14px;background:#173e60;color:#f3faff}
 #own-player-search-panel label{color:#f3faff;font-size:14px}
 #own-player-search{font-size:16px!important;min-height:48px;border:2px solid #94bfda!important;background:#f7fcff!important;color:#133957!important}
