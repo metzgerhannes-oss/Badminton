@@ -62,6 +62,7 @@ test("Restricted public source is transparent and manual profile entry stays pos
   route.fulfill({status:403,headers,body:'{"message":"forbidden"}'}));
  await page.locator("#own-player-search").fill("Mira");
  await expect(page.locator("#own-player-search-status")).toContainText("401/403");
+ await page.locator("#own-player-manual-fallback > summary").click();
  await page.locator('#player-form input[name="name"]').fill("Mira Lokal");
  await page.locator('#player-form button[type="submit"]').click();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
@@ -77,4 +78,16 @@ test("Closing or editing the dialog does not alter existing family storage",asyn
  await page.locator("#profile-list [data-edit-own]").first().click();
  await expect(page.locator("#own-player-search-panel")).toBeHidden();
  await expect(page.locator('#player-form input[name="name"]')).toHaveValue("Erstes Kind");
+});
+
+test("Welcome additional-player flow opens with the existing scoped DBV search",async({page})=>{
+ await page.goto("/welcome.html?from=app",{waitUntil:"domcontentloaded"});
+ const panel=page.locator("#welcome-manual-panel");
+ await expect(panel).toHaveAttribute("open","");
+ await expect(panel.locator("#welcome-player-search")).toBeVisible();
+ await expect(panel.locator("#welcome-manual-fallback")).not.toHaveAttribute("open","");
+ await panel.locator("#welcome-player-search").fill("Alex");
+ await expect(panel.locator(".welcome-search-hit")).toHaveCount(2);
+ await panel.locator("#welcome-manual-fallback > summary").click();
+ await expect(page.locator("#welcome-form")).toBeVisible();
 });
