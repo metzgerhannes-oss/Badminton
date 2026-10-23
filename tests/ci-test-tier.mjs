@@ -21,6 +21,8 @@ assert.equal(tier(["backup.js"]),"full");
 assert.equal(tier(["scripts/private-match-source.mjs"]),"full");
 assert.equal(tier(["supabase/migrations/abc.sql"]),"full");
 assert.equal(tier(["tests/e2e/f03-v2-scope-contract.spec.mjs"]),"full");
+assert.equal(tier(["tests/e2e/dbv-search-quota.spec.mjs"]),"full");
+assert.equal(tier(["tests/e2e/public-rate-abuse.spec.mjs"]),"full");
 assert.equal(tier([".github/workflows/mobile-browser.yml"]),"full");
 assert.equal(tier(["scripts/ci-test-tier.mjs"]),"full");
 assert.equal(tier(["docs/guide.md","owner-admin.js"]),"full");

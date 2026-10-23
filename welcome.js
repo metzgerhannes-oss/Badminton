@@ -103,7 +103,8 @@ function setResultsStatus(count,source){
  lastSearchStatus={kind:"results",count,source};
  $("welcome-search-status").textContent=format("{count} passende Spieler",{count})+
   (count===30?t(" (maximal 30; Suche eingrenzen)"):"")+
-  (source==="backup"?t(" · GitHub-Ausfallsicherung"):source==="device"?t(" · Auf diesem Gerät gespeichert"):"")+t(". Wähle den richtigen Spieler aus.");
+  (source==="backup"?t(" · GitHub-Ausfallsicherung"):source==="device"?t(" · Auf diesem Gerät gespeichert"):
+   source==="rate-limited-device"?t(" · Gespeichert auf diesem Gerät · DBV-Suche vorübergehend begrenzt"):"")+t(". Wähle den richtigen Spieler aus.");
 }
 function showSearchResults(players,source){
  lastSearchPlayers=players;
@@ -144,6 +145,8 @@ function showSearchResults(players,source){
    setSearchStatus("Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.");
    $("welcome-manual-panel").open=true;
   }
+  else if(source==="rate-limited")
+   setSearchStatus("Die DBV-Suche ist wegen zu vieler Anfragen vorübergehend begrenzt. Bitte später erneut suchen oder ein bereits gespeichertes Profil auswählen.");
   else if(source==="unavailable")
    setSearchStatus("Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.");
   else setSearchStatus("Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.");

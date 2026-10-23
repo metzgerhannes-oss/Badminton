@@ -12,7 +12,7 @@ const FULL=[
  /^tests\/ci-test-tier\.mjs$/,
  /^supabase\//,/^database\//,
  /^(?:package(?:-lock)?\.json|playwright\.config\.(?:mjs|js|ts)|index\.html|app\.js)$/,
- /^tests\/e2e\/(?:.*(?:invite|access|auth|backup|pwa|session|revocation|private|network|publication|scope).*)\.spec\.mjs$/,
+ /^tests\/e2e\/(?:.*(?:invite|access|auth|backup|pwa|session|revocation|private|network|publication|scope|quota|rate|abuse).*)\.spec\.mjs$/,
  /^tests\/(?:.*(?:access|auth|invite|backup|private|security|network|scope|pwa|consent|session|storage|supabase|rls|rpc).*)\.(?:mjs|js)$/,
  /^tests\/(?:browser-qa-supabase-isolation|private-player-scope-isolation|private-trophy-revocation-race|private-rpc-error-classification)\.mjs$/,
  /^(?:app-access|private-.*|owner-.*|player-access|state-storage|welcome|backup|app-security|invite|consented-player-data|player-data-status|shared-tournaments|sw)\.js$/,

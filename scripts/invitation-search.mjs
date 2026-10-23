@@ -62,6 +62,10 @@ export async function searchInvitationPlayers(raw,{fetchImpl=fetch,signal,savedC
   return {players:combine(rows),source:onDevice.length&&rows.length?"mixed":onDevice.length?"device":"dbv"};
  }catch(error){
   if(signal?.aborted||error?.kind==="aborted")throw error;
+  // Never bypass server rate limits through the bundled GitHub directory.
+  // Device-local previously selected profiles remain accessible offline.
+  if(error?.status===429)
+   return {players:combine([]),source:onDevice.length?"rate-limited-device":"rate-limited"};
   // Respect 401/403 privacy restrictions; never bypass them via backup files.
   if(error?.status===401||error?.status===403)
    return {players:combine([]),source:onDevice.length?"restricted-device":"restricted"};
