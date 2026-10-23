@@ -40,6 +40,8 @@
    <section id="onboard-profile" class="welcome-panel" aria-labelledby="setup-title">
     <h2 id="setup-title">Für wen möchtest du ein Profil anlegen?</h2>
     <p>Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.</p>
+    <details id="welcome-manual-panel" class="welcome-manual-panel" open>
+     <summary>Weiteren Spieler hinzufügen · Name oder DBV-ID suchen</summary>
     <section class="welcome-search" aria-labelledby="welcome-search-heading">
       <h3 id="welcome-search-heading">Spieler suchen</h3>
       <label for="welcome-player-search">Name oder DBV-Spieler-ID</label>
@@ -54,8 +56,8 @@
       </div>
     </section>
     <p id="welcome-error" class="welcome-error" role="alert" hidden></p>
-    <details id="welcome-manual-panel" class="welcome-manual-panel">
-     <summary>Weiteren Spieler mit Name oder DBV-ID hinzufügen</summary>
+    <details id="welcome-manual-fallback" class="welcome-manual-panel">
+     <summary>Spieler nicht gefunden? Manuell anlegen</summary>
     <div class="welcome-modes" role="group" aria-label="Art der Einrichtung">
       <button id="mode-own" type="button" class="mode-card active" aria-pressed="true"><strong>Spielerprofil anlegen</strong><small>Mit Name, Jahrgang und Verein</small></button>
       <button id="mode-dbv" type="button" class="mode-card" aria-pressed="false"><strong>Mit DBV-Profil starten</strong><small>ID oder offiziellen Link einfügen</small></button>
@@ -76,6 +78,7 @@
       <button class="welcome-primary" id="welcome-manual-submit" type="submit" disabled>Profil speichern <span aria-hidden="true">→</span></button>
     </form>
     <p class="welcome-small">Ohne DBV-ID kannst du ein eigenes Profil anlegen. Ranglisten erscheinen erst, wenn eine DBV-ID verknüpft ist.</p>
+    </details>
     </details>
     <p id="welcome-existing" class="welcome-existing" hidden>Auf diesem Gerät gibt es bereits Profile. Wir fügen ein weiteres hinzu; alle bisherigen Daten bleiben erhalten.</p>
     <a class="welcome-official" href="https://dbv.turnier.de/" rel="noopener noreferrer" target="_blank">DBV-Turnierportal öffnen ↗</a>
