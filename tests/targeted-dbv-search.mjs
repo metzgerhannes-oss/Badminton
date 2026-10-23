@@ -7,10 +7,10 @@ for(const x of ["","  ","ab","a"," -- ","%","*","?"]){
  assert.equal(validDbvLookup(x),"","Reject empty, too-short and wildcard lookups");
 }
 assert.equal(validDbvLookup("  Mössingen  "),"Mössingen");
-assert.equal(validDbvLookup("05-071969"),"05-071969");
+assert.equal(validDbvLookup("99-000001"),"99-000001");
 let calls=0;
 const records=Array.from({length:24},(_,i)=>({
- dbv_id:"05-"+String(i).padStart(6,"0"),name:"Probe "+i,
+ dbv_id:"99-"+String(i).padStart(6,"0"),name:"Probe "+i,
  club:"SpVgg Mössingen",age_class:"U13",association:"BAW-Baden-Württemberg"
 }));
 const result=await searchDbvIdentities("  Probe  ",{
@@ -31,7 +31,7 @@ const result=await searchDbvIdentities("  Probe  ",{
 });
 assert.equal(calls,1);
 assert.equal(result.length,12);
-assert.equal(result[0].id,"05-000000");
+assert.equal(result[0].id,"99-000000");
 assert.equal(result[0].birthYear,undefined,"Public RPC never returns personal birth year");
 assert.deepEqual(await searchDbvIdentities("a",{fetchImpl:()=>{throw Error("Must not make request")}}),[]);
 const sql=await readFile("database/targeted_dbv_identity_search_v133.sql","utf8");
@@ -64,7 +64,7 @@ await assert.rejects(()=>searchDbvIdentities("Probe",{
  fetchImpl:async()=>{throttledRequests++;throw Error("Must not refetch in cooldown")}
 }),error=>error.status===429);
 assert.equal(throttledRequests,1,"Cooldown prevents immediate duplicate lookup");
-const localPlayer={id:"05-123456",name:"Probe Beispiel",club:"Testverein",ageClass:"U13"};
+const localPlayer={id:"99-000123",name:"Probe Beispiel",club:"Testverein",ageClass:"U13"};
 const saved=await searchInvitationPlayers("Probe",{
  savedCandidates:[localPlayer],fetchImpl:async()=>{throttledRequests++;throw Error("No fallback during 429")}
 });
