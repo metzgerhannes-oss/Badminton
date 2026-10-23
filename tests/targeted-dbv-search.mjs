@@ -57,7 +57,7 @@ let throttledRequests=0;
 await assert.rejects(()=>searchDbvIdentities("Probe",{
  fetchImpl:async()=>{throttledRequests++;return {
   ok:false,status:429,headers:{get:key=>key==="retry-after"?"2":null}
- }};
+ }}
 }),error=>error.status===429&&error.retryAfterMs>0);
 assert.equal(throttledRequests,1);
 await assert.rejects(()=>searchDbvIdentities("Probe",{
