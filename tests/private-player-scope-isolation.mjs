@@ -71,3 +71,117 @@ function trophy(playerId){
  assert.equal(api.trophySnapshot(player).state,"protected");
 }
 console.log("F03: scoped synthetic v2 grant, v1 denial, and foreign identity isolation passed.");
+
+
+// F03 private match archive: exercise the real browser source, never a live RPC.
+const matchSource=(await readFile("scripts/private-match-source.mjs","utf8"))
+ .replace(/^import .*;\r?\n/gm,"")
+ .replace(/^export function /gm,"function ")
+ +"\nglobalThis.__matches={requestPrivateMatches,matchArchiveSnapshot,clearPrivateMatchArchive};";
+const matchRow=(id)=>({
+ dbv_id:id,source_key:"synthetic-match-001",
+ source_url:"https://example.invalid/match/001",match_date:"2026-10-02",
+ player_side:1,winning_side:2,games:[],opponent_names:[]
+});
+const matchPage=(id)=>({
+ dbv_id:id,kind:"match_card",scope_version:2,total:1,offset:0,
+ entries:[matchRow(id)]
+});
+const matchOk=(id)=>({ok:true,status:200,json:async()=>matchPage(id)});
+const matchDenied={ok:false,status:403,json:async()=>({message:"not_authorized"})};
+const nextTick=()=>new Promise(resolve=>setImmediate(resolve));
+
+function matchFixture({fetchImpl=async()=>matchOk(player),getSession=async()=>({access_token:"synthetic"})}={}){
+ const keys={
+  "schmetterlinge.acceptedPlayerInvite.v3":JSON.stringify([invitation]),
+  "schmetterlinge.acceptedPlayerInviteBindings.v1":JSON.stringify({[invitation]:player})
+ };
+ const requests=[];
+ const ctx={
+  SUPABASE_ROOT:"https://example.invalid/rest/v1/",PUBLIC_KEY:"synthetic",
+  getPrivateSession:getSession,loadPlayerCopy:()=>null,
+  readPublicRows:async()=>{throw Error("guest cannot read direct REST tables")},
+  localStorage:{getItem:key=>keys[key]??null},
+  window:{badmintonAppAccess:{allowed:false},dispatchEvent:()=>{}},
+  CustomEvent:class{constructor(name,options){this.type=name;this.detail=options?.detail}},
+  fetch:async(url,init)=>{
+   const endpoint=String(url).split("/").at(-1);
+   assert.equal(endpoint,"private_player_archive_read","guest must use only scoped archive RPC");
+   const body=JSON.parse(init.body);
+   assert.equal(body.p_invitation_id,invitation,"guest may use only accepted link");
+   assert.equal(body.p_kind,"match_card");
+   requests.push({endpoint,body,authorization:init.headers.Authorization});
+   return fetchImpl(url,init);
+  },
+  AbortController,setTimeout,clearTimeout,JSON,Date,Promise,Error
+ };
+ vm.runInNewContext(matchSource,vm.createContext(ctx),{filename:"private-match-source.mjs"});
+ return {api:ctx.__matches,requests,keys};
+}
+
+// Accepted v2 guest receives only a verified match page for its bound player.
+{
+ const {api,requests}=matchFixture();
+ await api.requestPrivateMatches(player);
+ assert.equal(api.matchArchiveSnapshot(player).state,"ready");
+ assert.equal(api.matchArchiveSnapshot(player).rows.length,1);
+ await api.requestPrivateMatches(other);
+ assert.equal(api.matchArchiveSnapshot(other).state,"protected");
+ assert.equal(requests.length,1,"foreign DBV ID cannot reuse a player's accepted link");
+}
+
+// v1, expired or revoked v2: simulated server 403 is never shown as zero matches.
+{
+ const {api}=matchFixture({fetchImpl:async()=>matchDenied});
+ await api.requestPrivateMatches(player);
+ assert.equal(api.matchArchiveSnapshot(player).state,"protected");
+}
+
+// A malformed server page belonging to a different player cannot leak match rows.
+{
+ const {api}=matchFixture({fetchImpl:async()=>matchOk(other)});
+ await api.requestPrivateMatches(player);
+ assert.equal(api.matchArchiveSnapshot(player).state,"unavailable");
+ assert.equal(api.matchArchiveSnapshot(player).rows.length,0);
+}
+
+// Revocation and session switch: a late old-session success cannot override 403.
+{
+ let resolveOld,call=0,session="old-synthetic";
+ const {api,requests}=matchFixture({
+  getSession:async()=>({access_token:session}),
+  fetchImpl:()=>{
+   call++;
+   return call===1?new Promise(resolve=>{resolveOld=resolve;}):Promise.resolve(matchDenied);
+  }
+ });
+ const old=api.requestPrivateMatches(player);
+ await nextTick();
+ assert.equal(call,1);
+ api.clearPrivateMatchArchive({refresh:false});
+ session="new-synthetic";
+ await api.requestPrivateMatches(player);
+ assert.equal(api.matchArchiveSnapshot(player).state,"protected");
+ assert.equal(requests[0].authorization,"Bearer old-synthetic");
+ assert.equal(requests[1].authorization,"Bearer new-synthetic");
+ resolveOld(matchOk(player));
+ await old;
+ assert.equal(api.matchArchiveSnapshot(player).state,"protected",
+  "late old-session success must never restore revoked matches");
+}
+
+// Pagehide/revoke while session is pending must not trigger any private RPC.
+{
+ let resolveSession,requests=0;
+ const {api}=matchFixture({
+  getSession:()=>new Promise(resolve=>{resolveSession=resolve;}),
+  fetchImpl:async()=>{requests++;return matchOk(player);}
+ });
+ const pending=api.requestPrivateMatches(player);
+ api.clearPrivateMatchArchive({refresh:false});
+ resolveSession({access_token:"stale-synthetic"});
+ await pending;
+ assert.equal(requests,0);
+ assert.notEqual(api.matchArchiveSnapshot(player).state,"ready");
+}
+console.log("F03: match archive v2/v1, foreign IDs, revoke and session-switch isolation passed.");
