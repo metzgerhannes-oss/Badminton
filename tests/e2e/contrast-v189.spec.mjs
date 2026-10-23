@@ -95,3 +95,40 @@ test("v189: Home module palette stays under existing visual rules",async({page})
  expect(v.background).toContain("linear-gradient");
  expect(v.radius).toBe("16px");
 });
+
+for(const width of [390,1280]){
+ test("v189 "+width+"px: card headings and helper copy contrast with actual CSS backgrounds",async({page})=>{
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#settings-room-hub")).toBeVisible();
+  // Synthetic, static DOM only: no user profiles or live reports requested.
+  const samples=await page.evaluate(()=>{
+   const cards=[
+    ["#view-einstellungen","settings-card"],
+    ["#view-berichte","report-card"],
+    ["#view-spieler","profile-card"],
+    ...(innerWidth>=1080?[["#view-historie","ranking-tile"]]:[])
+   ];
+   return cards.map(([host,card])=>{
+    const el=document.createElement("article");
+    el.className=card;
+    const heading=document.createElement("h3");
+    heading.textContent="Kontrastprüfung";
+    const note=document.createElement("p");
+    note.className="muted";
+    note.textContent="Synthetischer Hilfetext";
+    el.append(heading,note);
+    const parent=document.querySelector(host);
+    if(!parent)throw Error("Missing fixture host "+host);
+    parent.append(el);
+    const background=getComputedStyle(el).backgroundColor;
+    return {card,background,heading:getComputedStyle(heading).color,
+      note:getComputedStyle(note).color};
+   });
+  });
+  for(const sample of samples){
+   expect(ratio(sample.heading,sample.background),sample.card+" heading").toBeGreaterThanOrEqual(4.5);
+   expect(ratio(sample.note,sample.background),sample.card+" helper text").toBeGreaterThanOrEqual(4.5);
+  }
+ });
+}
