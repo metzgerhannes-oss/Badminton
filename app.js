@@ -507,6 +507,8 @@ function setup(){
  ownSearch.setAttribute("aria-label","Öffentliche DBV-Spielersuche");
  ownSearch.innerHTML='<label for="own-player-search">Spieler zuerst suchen (Name oder DBV-ID)<input id="own-player-search" type="search" minlength="3" maxlength="70" autocomplete="off" placeholder="Mindestens 3 Zeichen"></label><p id="own-player-search-status" role="status" aria-live="polite">Mindestens drei Zeichen eingeben oder unten manuell ergänzen.</p><div id="own-player-search-results" role="group" aria-label="Gefundene DBV-Spieler"></div><p class="small muted">Öffentliche Treffer sind keine Berechtigung zur Einsicht privater Daten. Auswahl füllt nur das Formular.</p>';
  playerForm.querySelector(".section-heading")?.insertAdjacentElement("afterend",ownSearch);
+ const ownManualFallback=el("own-player-manual-fallback");
+ const ownManualSummary=ownManualFallback.querySelector("summary");
  const ownSearchInput=ownSearch.querySelector("#own-player-search");
  const ownSearchStatus=ownSearch.querySelector("#own-player-search-status");
  const ownSearchResults=ownSearch.querySelector("#own-player-search-results");
@@ -537,6 +539,8 @@ function setup(){
     playerForm.elements.namedItem("birthYear").value=player.birthYear||"";
     playerForm.elements.namedItem("club").value=player.club||"";
     playerForm.elements.namedItem("url").value=player.url||"";
+    ownManualFallback.open=true;
+    ownManualSummary.textContent="DBV-Treffer kontrollieren oder Angaben bearbeiten";
     ownSearchStatus.textContent="Ausgewählt: "+player.name+". Erst „Spieler speichern“ legt das eigene Profil an.";
     playerForm.elements.namedItem("name").focus();
    });
@@ -584,6 +588,8 @@ function setup(){
   ownSearchResults.replaceChildren();
   ownSearchStatus.textContent="Mindestens drei Zeichen eingeben oder unten manuell ergänzen.";
   ownSearch.hidden=Boolean(p);
+  ownManualFallback.open=Boolean(p);
+  ownManualSummary.textContent=p?"Spielerprofil bearbeiten":"Spieler nicht gefunden? Manuell anlegen";
   playerForm.reset();
   playerForm.elements.namedItem("name").value=p?.name||"";
   playerForm.elements.namedItem("id").value=(p&&/^\d{2}-\d{6}$/.test(p.id))?p.id:"";
