@@ -2,7 +2,7 @@ import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
 import {getBadhubMatchReference} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
-import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
+import {ageContextBreakdown,eventAgeClasses} from "./scripts/match-age-context.mjs";
 import {readPublicRows,readMatchImportProgress} from "./scripts/supabase-read.mjs";
 import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
@@ -99,9 +99,10 @@ async function fetchProfile(id,force=false){
 }
 function ageProof(m){
  const a=m.ageContext;
- if(!a||a.category==="unclassified")return '<span class="match-age-proof muted-age">AK nicht zuordenbar</span>';
- return '<span class="match-age-proof">'+esc(a.event)+
-  (a.category==="higher"?" · höhere AK (eigene "+esc(a.own)+")":" · eigene AK")+'</span>';
+ if(!a?.event)return '<span class="match-age-proof muted-age">AK nicht zuordenbar</span>';
+ const relative=a.category==="higher"?" · höhere AK (eigene "+esc(a.own)+")":
+  a.category==="own"?" · eigene AK":"";
+ return '<span class="match-age-proof">'+esc(a.event)+relative+'</span>';
 }
 function externalProof(m){
  const u=sourceUrl(m.source_url);
