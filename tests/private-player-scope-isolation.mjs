@@ -185,3 +185,24 @@ function matchFixture({fetchImpl=async()=>matchOk(player),getSession=async()=>({
  assert.notEqual(api.matchArchiveSnapshot(player).state,"ready");
 }
 console.log("F03: match archive v2/v1, foreign IDs, revoke and session-switch isolation passed.");
+
+
+// #327/F03 static guard: public identity search remains a small, deliberate
+// lookup, never an anonymous SELECT on the full player or result tables.
+// This cannot prove a server-side rate limit or production RPC deployment.
+{
+ const searchSql=await readFile("database/targeted_dbv_identity_search_v133.sql","utf8");
+ const trophySql=await readFile("database/private_rpc_invoker_hardening_v127_1.sql","utf8");
+ assert.match(searchSql,/SECURITY DEFINER/);
+ assert.match(searchSql,/SET search_path = ''/);
+ assert.match(searchSql,/\{3,70\}/,"server rejects queries shorter than three characters");
+ assert.match(searchSql,/LIMIT 12/,"server limits each result set");
+ assert.match(searchSql,/RETURNS TABLE\(dbv_id text, name text, club text, age_class text, association text\)/);
+ assert.match(searchSql,/GRANT EXECUTE ON FUNCTION public\.search_dbv_player_identity\(text,text,text,text\)/);
+ assert.doesNotMatch(searchSql,/GRANT SELECT ON public\.(players|player_external_match_facts)/i);
+ assert.match(trophySql,/i\.accepted_by=auth\.uid\(\)/);
+ assert.match(trophySql,/i\.scope_version=2/);
+ assert.match(trophySql,/i\.granted_sections@>ARRAY\['trophies'\]::text\[\]/);
+ assert.match(trophySql,/i\.revoked_at IS NULL/);
+}
+console.log("F03: checked-in DBV lookup and v2 trophy scope invariants passed; production quota unverified.");
