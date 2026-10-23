@@ -13,6 +13,9 @@ on:
       - "tests/e2e/v138-owner-invites.spec.mjs"
       - "tests/e2e/v138-member-copy.spec.mjs"
       - "scripts/owner-invites-overview.mjs"
+      - "scripts/private-match-source.mjs"
+      - "scripts/private-trophy-source.mjs"
+      - "tests/private-rpc-error-classification.mjs"
       - "settings-rooms.js"
       - ".github/workflows/v136-invitation-smoke.yml"
   workflow_dispatch:
