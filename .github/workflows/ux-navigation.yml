@@ -14,6 +14,7 @@ on:
       - ".github/workflows/ux-navigation.yml"
   pull_request:
     paths:
+      - "tests/private-player-scope-isolation.mjs"
       - "app.js"
       - "index.html"
       - "library.js"
