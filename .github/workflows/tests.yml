@@ -213,6 +213,7 @@ jobs:
           node tests/settings-rooms-v120.mjs
           node tests/service-worker-resilience.mjs
           node tests/release-version.mjs
+          node tests/contrast-v189.mjs
           node tests/animated-access-splash-step7.mjs
           node tests/ios-invite-install.mjs
           node tests/pwa-updates-v175.mjs

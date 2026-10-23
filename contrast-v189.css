@@ -1,0 +1,158 @@
+/* v189 / #333: WCAG 2.2 AA contrast and legibility on non-Home surfaces.
+   Never target #view-start, Home modules, body, .topbar or the established navy layout.
+   Pale inputs and cards use dark ink; navy panels retain pale text. No external assets. */
+.app .page:not(#view-start){
+ --contrast-light:#f7fcff;
+ --contrast-ink:#193c58;
+ --contrast-muted:#344f66;
+ --contrast-dark:#142e4b;
+ --contrast-light-on-dark:#f2f9ff;
+ --contrast-muted-on-dark:#d6ebfb;
+ --contrast-focus:#9fe4ff;
+}
+.app .page:not(#view-start) :is(.small,.supporting,.settings-hint,.muted){
+ font-size:clamp(13px,1rem,15px);
+ line-height:1.52;
+ color:var(--contrast-muted);
+}
+.app .page:not(#view-start) :is(h1,h2,h3,h4){line-height:1.3;overflow-wrap:anywhere}
+.app .page:not(#view-start) :is(button,a,summary,input,select,textarea){
+ -webkit-tap-highlight-color:transparent;
+}
+.app .page:not(#view-start) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea){
+ font-size:16px!important;line-height:1.45;
+ max-width:100%;min-height:44px;
+ color:#193c58!important;
+ background:#f7fcff!important;
+ border-color:#8baec6!important;
+}
+.app .page:not(#view-start) :is(input,textarea)::placeholder{
+ color:#425f76!important;opacity:1;
+}
+.app .page:not(#view-start) :is(input,textarea,select,button,a,summary):focus-visible{
+ outline:3px solid #91dbff!important;outline-offset:3px;
+}
+/* Inset light cards inside navy sections must not inherit light-on-dark text. */
+.app .page:not(#view-start) :is(
+ .settings-card,.profile-card,.own-profile,.friend-card,.tournament-card,
+ .link-tile,.notice,.ranking-tile,.trophy-slot,.report-card,.settings-room-link,
+ .settings-grant-entry,.settings-grant-empty
+){color:#193c58}
+.app .page:not(#view-start) :is(
+ .settings-card,.profile-card,.own-profile,.friend-card,.tournament-card,
+ .link-tile,.notice,.ranking-tile,.trophy-slot,.report-card,.settings-room-link,
+ .settings-grant-entry,.settings-grant-empty
+) :is(.muted,.small,.supporting,.settings-hint,small){
+ color:#344f66!important;font-size:clamp(13px,.93rem,15px);line-height:1.5;
+}
+#view-einstellungen :is(.settings-hub-lead,.settings-room-header>p,.settings-room-copy small,.settings-room-count),
+#view-spieler :is(.follow-manage-help,.follow-manage-label small),
+#view-historie :is(.history-ranking-note,.trophy-description,.history-chronicle-title),
+#view-turniere :is(.tournament-card p,.tournament-card small),
+#view-berichte :is(.report-card p,.report-card small),
+#view-mannschaft :is(.team-detail p,.team-detail small){
+ font-size:clamp(13px,.93rem,15px);line-height:1.55;
+}
+#view-einstellungen .settings-room-link{
+ border-color:#8aafc6;background:#f7fcff;
+}
+#view-einstellungen .settings-room-link :is(strong,small,.settings-room-count){
+ color:#254862!important;
+}
+#view-einstellungen .settings-room-icon{background:#dcefff;color:#164663}
+#view-einstellungen .settings-room-link:focus-visible{outline-color:#086da6!important}
+/* Preserve the intentional desktop navy follow-and-sort panel. */
+@media(min-width:1080px){
+ .app .page:not(#view-start){color:#f2f9ff}
+ .app .page:not(#view-start) :is(.muted,.small,.supporting,.settings-hint){
+  color:var(--contrast-muted-on-dark);
+ }
+ #view-spieler .follow-manage-details,
+ #view-einstellungen .follow-manage-details{background:#16395e;color:#f2f9ff;border-color:#8ab1d0}
+ #view-spieler .follow-manage-details :is(.follow-manage-help,.follow-manage-label small),
+ #view-einstellungen .follow-manage-details :is(.follow-manage-help,.follow-manage-label small){
+  color:#e4f2ff!important;
+ }
+ .app .page:not(#view-start) :is(.settings-room-header>p,.settings-hub-lead){
+  color:#e4f2ff;
+ }
+}
+/* Independent of .app .page: family/friend/tournament dialogs sit outside page. */
+:is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
+ #spond-source-dialog,#spond-preview-dialog,#first-run-dialog){
+ color:#0c305a;background:linear-gradient(145deg,#fff,#e7f5ff);
+}
+:is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
+ #spond-source-dialog,#spond-preview-dialog,#first-run-dialog)
+ :is(label,.small,.muted,.supporting,.settings-hint,small,p){
+ color:#304f68!important;font-size:clamp(13px,.95rem,15px);line-height:1.5;
+}
+:is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
+ #spond-source-dialog,#spond-preview-dialog,#first-run-dialog)
+ :is(input:not([type="checkbox"]),select,textarea){
+ min-height:44px;font-size:16px!important;
+ color:#193c58!important;background:#f7fcff!important;
+ border:1px solid #8baec6!important;
+}
+:is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
+ #spond-source-dialog,#spond-preview-dialog,#first-run-dialog)
+ :is(input,textarea)::placeholder{color:#425f76!important;opacity:1}
+:is(#player-dialog,#friend-dialog,#tournament-dialog,#ranking-dialog,
+ #spond-source-dialog,#spond-preview-dialog,#first-run-dialog)
+ :is(button,a,summary,input,select,textarea):focus-visible{
+ outline:3px solid #0a669b!important;outline-offset:3px;
+}
+/* The own-player search region is NAVY, so its ink must remain light. */
+#player-dialog #own-player-search-panel,
+#player-dialog #own-player-search-panel :is(label,p,.small){
+ color:#f2f9ff!important;
+}
+#player-dialog #own-player-search-panel input{color:#193c58!important;background:#f7fcff!important}
+#player-dialog #own-player-search-panel input::placeholder{color:#425f76!important}
+#player-dialog #own-player-search-results button{color:#fff!important}
+#player-dialog #own-player-search-results button:disabled{color:#deeffc!important;opacity:1}
+/* Light manual fallback inside the navy app retains dark readable labels. */
+#player-dialog #own-player-manual-fallback,
+#player-dialog #own-player-manual-fallback :is(summary,label,.small,p,span){
+ color:#244b65!important;
+}
+#player-dialog #own-player-manual-fallback summary{min-height:44px;font-size:15px}
+#player-dialog :is(.modal,.own-player-fields){min-width:0}
+#player-dialog :is(label,input){max-width:100%;overflow-wrap:anywhere}
+/* Standalone setup and Wiki also need explicit background-specific corrections. */
+.welcome-shell :is(.welcome-search-status,.welcome-manual-panel>summary,
+ .welcome-footer,.welcome-search-hit small,.welcome-search-hit span){
+ color:#d9efff;font-size:clamp(13px,.92rem,15px);line-height:1.5;
+}
+.welcome-shell .welcome-search input::placeholder{color:#bfd6e9;opacity:1}
+.welcome-shell :is(button,input,select,summary,a):focus-visible{
+ outline:3px solid #aee8ff;outline-offset:3px;
+}
+.welcome-shell :is(input,select){font-size:16px}
+#wiki-main :is(.intro p,.result-head span,.entry-copy em,.wiki-footer,.empty),
+#wiki-detail :is(.detail-bottom,.detail-top,#detail-scope),
+.wiki-brand small{color:#35546d;font-size:clamp(13px,.91rem,15px);line-height:1.5}
+#wiki-main .entry-copy small{color:#1c5c81;font-size:13px}
+#wiki-main .filters button{font-size:14px;color:#234c66;border-color:#719ebc}
+#wiki-main .filters button.active{color:#fff;background:#0c628f;border-color:#0c628f}
+#wiki-main #wiki-search::placeholder{color:#425f76;opacity:1}
+#wiki-detail .wiki-detail-nav button:disabled{opacity:1;color:#49677d;background:#e3f2fc}
+:is(#wiki-main,#wiki-detail) :is(button,a,summary,input):focus-visible{
+ outline:3px solid #075f99;outline-offset:3px;
+}
+@media(max-width:390px){
+ .app .page:not(#view-start) :is(button,a,summary){min-height:44px}
+ #wiki-main .filters{gap:8px}
+}
+
+/* At desktop widths club-overview.css paints these cards navy with !important.
+   Restore pale ink there without changing pale mobile cards or Home. */
+@media(min-width:1080px){
+ .app .page:not(#view-start) :is(.settings-card,.profile-card,.ranking-tile,.report-card){
+  color:#f2f9ff!important;
+ }
+ .app .page:not(#view-start) :is(.settings-card,.profile-card,.ranking-tile,.report-card)
+  :is(h3,h4,label,p,small,.muted,.small,.supporting,.settings-hint){
+  color:#d6ebfb!important;
+ }
+}
