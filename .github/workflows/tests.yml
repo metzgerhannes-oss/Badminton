@@ -202,6 +202,7 @@ jobs:
           node tests/access-consistency-v138.mjs
           node tests/private-rpc-error-classification.mjs
           node tests/private-trophy-revocation-race.mjs
+          node tests/private-player-scope-isolation.mjs
           node tests/private-invites.mjs
           node tests/player-capability-invites.mjs
           node tests/private-trophy-scope-v127.mjs
