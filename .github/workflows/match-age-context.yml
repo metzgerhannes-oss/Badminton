@@ -3,6 +3,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "tests/private-player-scope-isolation.mjs"
       - "stats.js"
       - "index.html"
       - "scripts/match-age-context.mjs"
