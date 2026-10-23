@@ -2,7 +2,7 @@ import {computeMatchStats,availableYears} from "./scripts/match-stats.mjs";
 import {computeExternalStats,sourceMatchYears,importCompleteness} from "./scripts/external-match-stats.mjs";
 import {getBadhubMatchReference} from "./scripts/dbv-match-reference.mjs";
 import {matchAvailability} from "./scripts/match-availability.mjs";
-import {ageContextBreakdown} from "./scripts/match-age-context.mjs";
+import {ageContextBreakdown,eventAgeClasses} from "./scripts/match-age-context.mjs";
 import {readPublicRows,readMatchImportProgress} from "./scripts/supabase-read.mjs";
 import {matchArchiveSnapshot,requestPrivateMatches} from "./scripts/private-match-source.mjs";
 const $=id=>document.getElementById(id);
@@ -99,9 +99,10 @@ async function fetchProfile(id,force=false){
 }
 function ageProof(m){
  const a=m.ageContext;
- if(!a||a.category==="unclassified")return '<span class="match-age-proof muted-age">AK nicht zuordenbar</span>';
- return '<span class="match-age-proof">'+esc(a.event)+
-  (a.category==="higher"?" · höhere AK (eigene "+esc(a.own)+")":" · eigene AK")+'</span>';
+ if(!a?.event)return '<span class="match-age-proof muted-age">AK nicht zuordenbar</span>';
+ const relative=a.category==="higher"?" · höhere AK (eigene "+esc(a.own)+")":
+  a.category==="own"?" · eigene AK":"";
+ return '<span class="match-age-proof">'+esc(a.event)+relative+'</span>';
 }
 function externalProof(m){
  const u=sourceUrl(m.source_url);
@@ -184,11 +185,16 @@ function render(){
  const stats=sourced?
   computeExternalStats(rows,{year:selectedYear,discipline:selectedDiscipline}):
   computeMatchStats(rows,{year:selectedYear,discipline:selectedDiscipline});
- // In an offline/older session the server birth year can be unavailable.
- // Preserve the match totals and show all instead of an unexplained blank panel.
- if(birthYear===null&&selectedAgeClass!=="all"){
-  selectedAgeClass="all";
-  if($("match-stats-age"))$("match-stats-age").value="all";
+ // Available competition classes come from proved match events, even when
+ // birth year is missing in a private/offline session.
+ const ageSelector=$("match-stats-age");
+ if(ageSelector){
+  const available=eventAgeClasses(stats,{official:!sourced});
+  ageSelector.innerHTML='<option value="all">Alle Altersklassen</option>'+available.map(value=>
+   '<option value="'+esc(value)+'">'+esc(value)+'</option>').join("")+
+   '<option value="unclassified">Nicht zuordenbar</option>';
+  if(!["all","unclassified",...available].includes(selectedAgeClass))selectedAgeClass="all";
+  ageSelector.value=selectedAgeClass;
  }
  const context=ageContextBreakdown(stats,birthYear,{official:!sourced,filter:selectedAgeClass});
  const missing=context.total===0;
@@ -263,7 +269,7 @@ function render(){
    :"")+(availability.detail?availability.detail+" ":"")+
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
- if(stats.total)sourceDetails.textContent+=" Die Einordnung als höhere AK bezieht sich auf das Turnierfeld und belegt nicht das Alter einzelner Gegner.";
+ if(stats.total)sourceDetails.textContent+=" Die gespielte Altersklasse stammt aus dem belegten Wettkampffeld. Eine höhere AK belegt nicht das Alter einzelner Gegner.";
  // Do not display a second, partial set of career counters under Badhub's
  // published total. Filtering switches back to individually evidenced figures.
  if(badhub&&referenceSection&&!privateMode&&!window.badmintonAppAccess?.allowed){
@@ -301,6 +307,9 @@ window.addEventListener("badminton:private-matches-updated",e=>{
  if(snap.state==="ready"){
   controller?.abort();++seq;privateMode=true;
   official=[];external=snap.rows;progress={status:"partial",verified_count:external.length};
+  // The private snapshot bypasses fetchProfile, so recompute the age context
+  // for this player instead of retaining a previous player's birth year.
+  birthYear=queryBirthYear(null,id);
   officialError=false;externalError=false;partialOfficial=false;partialExternal=false;
   status="loaded";lastLoadedAt=Date.now();render();
  }else if(privateMode){

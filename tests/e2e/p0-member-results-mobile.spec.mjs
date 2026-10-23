@@ -32,14 +32,14 @@ function medals(id){
   date:"2026-07-11",source:{url:"https://badhub.de/bwbv/turnier.php?id=123"}
  })):[];
 }
-async function setup(page,id){
- await page.addInitScript(playerId=>{
+async function setup(page,id,{birthYear=2015}={}){
+ await page.addInitScript(({playerId,birthYear})=>{
   localStorage.setItem("shuttleboard-v1",JSON.stringify({
-   players:[{id:playerId,name:"Demo-Profil",birthYear:2015,club:"Testverein"}],
+   players:[{id:playerId,name:"Demo-Profil",birthYear,club:"Testverein"}],
    friends:[],officialLinks:[],activeProfileId:playerId,chosen:playerId,
    historyProfilesInitialized:true
   }));
- },id);
+ },{playerId:id,birthYear});
  await page.route("**/*.supabase.co/rest/v1/**",route=>{
   const req=route.request(),u=new URL(req.url()),method=req.method();
   if(u.pathname.endsWith("/rpc/app_access_status"))return route.fallback();
@@ -52,7 +52,7 @@ async function setup(page,id){
    const player=JSON.parse(req.postData()||"{}").p_player_dbv_id;
    response={dbv_id:player,match_cards:facts[player]?.length||0,
     import_status:"partial",last_import:"2026-10-17T11:30:00Z",
-    birth_year:2015,placements:player===FIRST?2:0,top_four:player===FIRST?2:0};
+    birth_year:birthYear,placements:player===FIRST?2:0,top_four:player===FIRST?2:0};
   }else if(u.pathname.endsWith("/rpc/app_access_trophies_read")){
    const player=JSON.parse(req.postData()||"{}").p_player_dbv_id;
    response={player_dbv_id:player,scope:"app_archive",results:medals(player)};
@@ -174,4 +174,61 @@ test("v181: deep link never opens another player's private result",async({page})
  await expect(page.locator("#history-proof-feedback")).toContainText("nicht verfügbar oder nicht freigegeben");
  await expect(page.locator("#history-timeline .history-result.is-proof-target")).toHaveCount(0);
  await expect(page.locator("#history-timeline")).not.toContainText("Synthetisches Jugendturnier");
+});
+
+test("P0 played age U11/U13 works with no birth year and combined year/discipline filters",async({page})=>{
+ await setup(page,FIRST,{birthYear:null});
+ const synthetic=Array.from({length:62},(_,i)=>{
+  const win=i<17||(i>=36&&i<45),mixed=i>=56;
+  return {...match(FIRST,i%5,{wins:win?5:0}),
+   source_key:"tournament:123:synthetic-age:"+i,
+   event:i<36?"JE U11":"MxD U13",
+   discipline:mixed?"Mixed":"Einzel",
+   partner_names:mixed?["Partner Demo"]:[],
+   opponent_names:mixed?["Gegner A","Gegner B"]:["Gegner A"],
+   match_year:i<18?2025:2026,
+   match_date:i<18?"2025-07-11":"2026-07-11"};
+ });
+ await page.route("**/rest/v1/player_external_match_facts?**",route=>
+  route.fulfill({status:200,contentType:"application/json",headers,
+   body:JSON.stringify(synthetic)}));
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("62");
+ await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("26");
+ await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("36");
+ await page.locator("#home-match-filter-panel summary").click();
+ const select=page.locator("#match-stats-age");
+ await expect(select.locator('option[value="U11"]')).toHaveCount(1);
+ await expect(select.locator('option[value="U13"]')).toHaveCount(1);
+ await select.selectOption("U11");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("36");
+ await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("17");
+ await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("19");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(36);
+ await expect(page.locator("#match-stats-list .match-age-proof")).toHaveCount(36);
+ await select.selectOption("U13");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("26");
+ await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("9");
+ await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("17");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(26);
+ await select.selectOption("unclassified");
+ await expect(page.locator("#match-stats-values")).toContainText("–");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(0);
+ await select.selectOption("U11");
+ await page.locator("#match-stats-year").selectOption("2025");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("18");
+ await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("17");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(18);
+ await page.locator("#match-stats-year").selectOption("2026");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("18");
+ await expect(page.locator("#match-stats-values .match-stat.losses strong")).toHaveText("18");
+ await select.selectOption("U13");
+ await page.locator("#match-stats-discipline").selectOption("Mixed");
+ await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("6");
+ await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("0");
+ await expect(page.locator("#match-stats-list .match-proof")).toHaveCount(6);
+ await expect(select.locator('option[value="U11"]')).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))
+  .toBeLessThanOrEqual(2);
 });
