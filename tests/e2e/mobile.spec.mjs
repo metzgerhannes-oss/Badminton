@@ -112,7 +112,7 @@ test("An invited member sees individually sourced match statistics and navigable
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
 });
 
-test("v153: screenshot regression – own AK totals survive restricted official source and missing coverage",async({page})=>{
+test("v190: event U11 totals survive restricted official source and missing coverage",async({page})=>{
  const calls=[];
  await page.route("**/player_match_observations?*",route=>{
   calls.push(route.request().url());
@@ -125,7 +125,7 @@ test("v153: screenshot regression – own AK totals survive restricted official 
  await expect(page.locator("#view-start")).toBeVisible();
  await expect(page.locator("#match-stats-values .match-stat.matches strong")).toHaveText("1");
  await page.locator("#home-match-filter-panel > summary").click();
- await page.locator("#match-stats-age").selectOption("own");
+ await page.locator("#match-stats-age").selectOption("U11");
  await expect(page.locator("#match-stats-values .match-stat.wins strong")).toHaveText("1");
  await expect(page.locator("#match-stats-retry")).toBeHidden();
  await expect(page.locator("#match-stats-note")).not.toContainText("teilweise abrufbar");
