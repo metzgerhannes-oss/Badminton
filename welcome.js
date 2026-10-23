@@ -48,13 +48,18 @@ function readSaved(){
 }
 function persistAndContinue(profile,{confirmed=false}={}){
  if(confirmed&&!/^\d{2}-\d{6}$/.test(profile?.id))throw Error("Der ausgewählte Spieler hat keine gültige DBV-ID. Bitte erneut suchen.");
- const result=addProfileToStore(readSaved(),profile,{confirmed});
+ const previous=readSaved();
+ const alreadySaved=previous?.players?.some(p=>p.id===profile.id)===true;
+ const result=addProfileToStore(previous,profile,{confirmed});
  localStorage.setItem(STORE,JSON.stringify(result));
  const stored=readSaved();
  if(confirmed&&(!stored?.players?.some(p=>p.id===profile.id)||stored.activeProfileId!==profile.id))
   throw Error("Die DBV-ID konnte nicht als aktives Profil gespeichert werden. Bitte erneut versuchen.");
- // A selected player may explicitly authorize a one-way data copy after entry.
- try{localStorage.setItem("schmetterlinge.pendingPlayerDataCopy.v1",profile.id)}catch{}
+ // Offer a one-way copy only for a newly confirmed DBV profile.
+ // Reselecting an existing family profile must never repeat the consent prompt.
+ if(confirmed&&!alreadySaved){
+  try{localStorage.setItem("schmetterlinge.pendingPlayerDataCopy.v1",profile.id)}catch{}
+ }
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};
  if(savedStatus)savedStatus.textContent=confirmed?format("✓ DBV-Profil {id} übernommen",{id:profile.id}):t("✓ Profil auf diesem Gerät gespeichert");
