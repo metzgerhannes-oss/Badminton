@@ -5,6 +5,9 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # A full offline Chromium/WebKit regression on main every night.
+    - cron: "23 2 * * *"
 
 # Superseded PR/main revisions do not need another full browser/test cycle.
 # Keep manual runs independent; all new final revisions still get their own QA.
@@ -16,7 +19,28 @@ permissions:
   contents: read
 
 jobs:
+  classify:
+    name: Browser QA risk tier (fail closed)
+    runs-on: ubuntu-latest
+    outputs:
+      tier: ${{ steps.policy.outputs.tier }}
+      risk: ${{ steps.policy.outputs.risk }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Determine required browser tier for changed paths
+        id: policy
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/ci-test-tier.mjs
   mobile-browser:
+    needs: classify
+    if: needs.classify.outputs.tier != 'none'
     name: Mobile UX · Chromium and WebKit
     runs-on: ubuntu-latest
     # Official image includes matching Chromium/WebKit and system libraries.
@@ -36,8 +60,13 @@ jobs:
           node -e 'const fs=require("node:fs"); const p=require("playwright"); for(const name of ["chromium","webkit"]){const path=p[name].executablePath();if(!fs.existsSync(path))throw Error(name+" browser missing: "+path);console.log(name+" browser available");}'
       - name: Verify QA Supabase network isolation
         run: node tests/browser-qa-supabase-isolation.mjs
-      - name: Exercise user journeys on narrow screens
+      - name: Complete offline Chromium and WebKit regression (R2/daily)
+        if: needs.classify.outputs.tier == 'full'
         run: npm run test:mobile
+      - name: Targeted Chromium and WebKit smoke (R1)
+        if: needs.classify.outputs.tier == 'smoke'
+        run: |
+          npx playwright test tests/e2e/release-gate.spec.mjs tests/e2e/invite-only-access.spec.mjs --grep "Compact iPhone layout and dialog buttons remain operable|without an accepted invitation the app shell stays hidden" --workers=2 --retries=0 --reporter=line
       - name: Preserve failing screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
