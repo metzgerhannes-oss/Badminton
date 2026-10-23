@@ -28,7 +28,7 @@ const LOW=[
 ];
 const UI=[
  /^(?:tests\/e2e\/.*\.spec\.mjs)$/,
- /^(?:locales\/|data\/)/,
+ /^locales\//,
  /^scripts\/(?:dbv-calendar|match-age-context|trophy-stats|upcoming-tournaments|ux-navigation|wiki-|i18n-)/,
  /^[a-z0-9_-]+\.(?:js|mjs|css|html|svg|json|webmanifest|png|jpg|jpeg|webp)$/i,
 
