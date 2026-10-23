@@ -19,7 +19,15 @@ async function selectConfirmedPlayer(page,alreadySaved){
   officialLinks:[{id:"synthetic-event",name:"Fiktives Turnier",playerId:OTHER}]
  };
  if(alreadySaved)previous.players.push({id:ID,name:"Mira Muster",club:"Testverein"});
- await page.addInitScript(value=>localStorage.setItem("shuttleboard-v1",JSON.stringify(value)),previous);
+ // Seed the browser storage exactly once. Playwright addInitScript executes on
+ // every navigation, including the mocked index.html redirect; without this
+ // guard it resets the just-saved family profiles and produces false failures.
+ await page.addInitScript(value=>{
+  if(sessionStorage.getItem("f04-fixture-seeded")!=="1"){
+   localStorage.setItem("shuttleboard-v1",JSON.stringify(value));
+   sessionStorage.setItem("f04-fixture-seeded","1");
+  }
+ },previous);
  await page.route("**/rest/v1/rpc/search_dbv_player_identity",route=>{
   if(route.request().method()==="OPTIONS")
    return route.fulfill({status:204,headers:HEADERS,body:""});
