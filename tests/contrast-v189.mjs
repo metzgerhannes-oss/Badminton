@@ -47,9 +47,10 @@ for(const key of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  assert.ok(JSON.parse(match[1]).includes("./contrast-v189.css"),
   "New styling must survive offline PWA upgrade: "+key);
 }
-assert.match(sw,/schmetterlinge-shell-v189/);
-assert.match(release,/version:"v189"/);
-assert.match(index,/App-Version v189/);
-assert.match(welcome,/App-Version v189/);
+const version=release.match(/version:"(v\\d+)"/)?.[1];
+assert.ok(version&&Number(version.slice(1))>=189,"Contrast audit must survive newer releases");
+assert.ok(sw.includes("schmetterlinge-shell-"+version),"CSS remains in the current PWA version");
+assert.ok(index.includes("App-Version "+version),"Index shell version matches release");
+assert.ok(welcome.includes("App-Version "+version),"Welcome shell version matches release");
 assert.doesNotMatch(css,/@import|url\(|font-face/i,"No font/CDN/network dependencies");
 console.log(pairs.length+" audited color/background pairs meet AA; PWA and non-Home scoping valid.");
