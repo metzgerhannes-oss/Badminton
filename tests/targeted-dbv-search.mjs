@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {validDbvLookup,searchDbvIdentities,IDENTITY_SEARCH_LIMIT} from "../scripts/targeted-player-search.mjs";
+import {validDbvLookup,searchDbvIdentities,IDENTITY_SEARCH_LIMIT,dbvRetryDelayMs} from "../scripts/targeted-player-search.mjs";
+import {searchInvitationPlayers} from "../scripts/invitation-search.mjs";
 assert.equal(IDENTITY_SEARCH_LIMIT,12);
 for(const x of ["","  ","ab","a"," -- ","%","*","?"]){
  assert.equal(validDbvLookup(x),"","Reject empty, too-short and wildcard lookups");
@@ -46,4 +47,34 @@ const invitation=await readFile("scripts/invitation-search.mjs","utf8");
 assert.match(library,/rosterDenied=true/);
 assert.match(library,/loadIdentityDirectory/);
 assert.match(invitation,/searchDbvIdentities/);
+// F03/#327: honor a server 429, cap Retry-After and never evade quotas via a
+// public GitHub catalog fallback. The local cooldown is only a courtesy guard.
+assert.equal(dbvRetryDelayMs("2",0),2000);
+assert.equal(dbvRetryDelayMs("999999",0),300000);
+assert.equal(dbvRetryDelayMs("invalid",0),30000);
+assert.equal(dbvRetryDelayMs("Thu, 01 Jan 1970 00:00:08 GMT",6000),2000);
+let throttledRequests=0;
+await assert.rejects(()=>searchDbvIdentities("Probe",{
+ fetchImpl:async()=>{throttledRequests++;return {
+  ok:false,status:429,headers:{get:key=>key==="retry-after"?"2":null}
+ }};
+}),error=>error.status===429&&error.retryAfterMs>0);
+assert.equal(throttledRequests,1);
+await assert.rejects(()=>searchDbvIdentities("Probe",{
+ fetchImpl:async()=>{throttledRequests++;throw Error("Must not refetch in cooldown")}
+}),error=>error.status===429);
+assert.equal(throttledRequests,1,"Cooldown prevents immediate duplicate lookup");
+const localPlayer={id:"05-123456",name:"Probe Beispiel",club:"Testverein",ageClass:"U13"};
+const saved=await searchInvitationPlayers("Probe",{
+ savedCandidates:[localPlayer],fetchImpl:async()=>{throttledRequests++;throw Error("No fallback during 429")}
+});
+assert.equal(saved.source,"rate-limited-device");
+assert.equal(saved.players.length,1,"On-device player remains selectable");
+const unknown=await searchInvitationPlayers("Nichtgespeichert",{
+ fetchImpl:async()=>{throttledRequests++;throw Error("No catalog bypass during cooldown")}
+});
+assert.equal(unknown.source,"rate-limited");
+assert.equal(unknown.players.length,0);
+assert.equal(throttledRequests,1,"Rate limit never triggers public backup file GETs");
+
 console.log("Scoped official DBV identity lookup: explicit query, 12-hit cap, no birth year, no anonymous table read");
