@@ -144,3 +144,15 @@
  .app .page:not(#view-start) :is(button,a,summary){min-height:44px}
  #wiki-main .filters{gap:8px}
 }
+
+/* At desktop widths club-overview.css paints these cards navy with !important.
+   Restore pale ink there without changing pale mobile cards or Home. */
+@media(min-width:1080px){
+ .app .page:not(#view-start) :is(.settings-card,.profile-card,.ranking-tile,.report-card){
+  color:#f2f9ff!important;
+ }
+ .app .page:not(#view-start) :is(.settings-card,.profile-card,.ranking-tile,.report-card)
+  :is(h3,h4,label,p,small,.muted,.small,.supporting,.settings-hint){
+  color:#d6ebfb!important;
+ }
+}
