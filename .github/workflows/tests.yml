@@ -143,6 +143,7 @@ jobs:
           node tests/source-register.mjs
           node tests/invitation.mjs
           node tests/targeted-dbv-search.mjs
+          node tests/dbv-search-server-quota.mjs
           node tests/invited-player-v125.mjs
           node tests/player-library.mjs
           node tests/spvgg-active-roster.mjs
