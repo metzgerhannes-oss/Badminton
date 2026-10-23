@@ -161,7 +161,7 @@ test("Accepted player invitation gives a limited player shell, never broad app m
  }));
  await page.route("**/*.supabase.co/rest/v1/rpc/private_player_invite_accept",route=>cors(route,id));
  await page.route("**/*.supabase.co/rest/v1/rpc/private_player_access_read",route=>cors(route,{
-  player:{dbv_id:"05-070879",name:"Philipp Metzger",club:"SpVgg Mössingen",birth_year:2016,age_class:"U13"},
+  player:{dbv_id:"99-000001",name:"Synthetischer Gastspieler",club:"Testverein",birth_year:2015,age_class:"U13"},
   matches:[]
  }));
  await page.goto("/private-player.html#token="+token,{waitUntil:"load"});
@@ -169,12 +169,12 @@ test("Accepted player invitation gives a limited player shell, never broad app m
  const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
  expect(before).toBeNull();
  await page.locator("#player-invite-accept").click();
- await expect(page.locator("#player-invite-name")).toContainText("Philipp Metzger");
+ await expect(page.locator("#player-invite-name")).toContainText("Synthetischer Gastspieler");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players??[]).toHaveLength(0);
  expect(saved.friends).toHaveLength(1);
  expect(saved.friends[0]).toMatchObject({
-  id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen"
+  id:"99-000001",name:"Synthetischer Gastspieler",birthYear:2015,club:"Testverein"
  });
  await page.locator("#player-invite-open-app").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
@@ -192,5 +192,5 @@ test("Accepted player invitation gives a limited player shell, never broad app m
  await expect(page.locator("#app-access-gate")).toBeHidden();
  expect(await page.evaluate(()=>window.badmintonAppAccess.allowed)).toBe(false);
  const unchanged=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(unchanged.friends[0].name).toBe("Philipp Metzger");
+ expect(unchanged.friends[0].name).toBe("Synthetischer Gastspieler");
 });
