@@ -133,6 +133,7 @@ jobs:
           node tests/friend-home-entry.mjs
           node tests/profile-switch.mjs
           node tests/local-backup.mjs
+          node tests/ci-test-tier.mjs
           node tests/state-storage.mjs
           node tests/profile-transitions.mjs
           node tests/router.mjs
@@ -203,6 +204,7 @@ jobs:
           node tests/private-rpc-error-classification.mjs
           node tests/private-trophy-revocation-race.mjs
           node tests/private-player-scope-isolation.mjs
+          node tests/ci-test-tier.mjs
           node tests/private-invites.mjs
           node tests/player-capability-invites.mjs
           node tests/private-trophy-scope-v127.mjs

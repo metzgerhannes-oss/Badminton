@@ -63,4 +63,37 @@ await assert.rejects(()=>readPublicRows(query,{retries:1,fetchImpl:async()=>{
 }}),error=>error.kind==="offline");
 assert.equal(networkAttempts,2);
 
+// F03: a player-invite guest must never query member-only REST tables.
+// The accepted invitation uses its own narrow private RPC instead.
+const restricted=[
+ "player_external_match_facts?select=dbv_id&limit=1",
+ "tournament_placements?select=id&limit=1",
+ "player_live_snapshots?select=id&limit=1"
+];
+let privateReads=0;
+const privateFetch=async()=>{privateReads++;return {ok:true,status:200,json:async()=>[]}};
+for(const route of restricted){
+ await assert.rejects(()=>readPublicRows(route,{fetchImpl:privateFetch,retries:0}),
+  error=>error instanceof PublicReadError&&error.kind==="restricted"&&error.status===403);
+}
+assert.equal(privateReads,0,"No unauthenticated member-only REST request leaves the browser");
+const previousWindow=globalThis.window;
+try{
+ globalThis.window={badmintonAppAccess:{allowed:false,getAccessToken:async()=>null}};
+ await assert.rejects(()=>readPublicRows(restricted[0],{fetchImpl:privateFetch,retries:0}),
+  error=>error.kind==="restricted");
+ assert.equal(privateReads,0,"A player-scoped invite is not global membership");
+ globalThis.window={badmintonAppAccess:{allowed:true,getAccessToken:async()=> "synthetic-member-only"}};
+ let authorization="";
+ await readPublicRows(restricted[0],{fetchImpl:async(_url,options)=>{
+  privateReads++;authorization=options.headers.Authorization;
+  return {ok:true,status:200,headers:{get:()=>null},json:async()=>[]};
+ },retries:0});
+ assert.equal(authorization,"Bearer synthetic-member-only");
+ assert.equal(privateReads,1,"Only verified members reach member-only REST endpoints");
+}finally{
+ if(previousWindow===undefined)delete globalThis.window;
+ else globalThis.window=previousWindow;
+}
+
 console.log("Public Supabase read-only client: bounded GET, pagination, timeouts, transient retries and safe failures.");
