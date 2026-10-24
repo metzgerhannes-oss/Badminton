@@ -2,7 +2,7 @@ import {WIZARD_KEY,parseStep,nextStep} from "./scripts/onboarding-wizard-state.m
 /* Guided, resumable first-run help. Reuses existing profile, team and tournament
    controls; it never creates a second copy of personal data or grants access. */
 const $=id=>document.getElementById(id);
-let dialog,resume,step=0,actionVisited=false,retries=0;
+let dialog,resume,step=0,actionVisited=false,retries=0,autoShown=false;
 const screens=[
  {title:"Dein Profil",description:"Dein erstes Spielerprofil ist bereit.",action:"Weiter"},
  {title:"Weitere Spieler",description:"Füge bei Bedarf weitere eigene Spielerprofile hinzu.",action:"Spielerprofil hinzufügen"},
@@ -39,17 +39,18 @@ function advance(){
  if(!saveStep(next))return;
  step=next;actionVisited=false;render();
 }
-function open(){
+function open(automatic=false){
+ if(automatic&&autoShown)return;
  const current=readStep();
  if(current===null){updateResume();return}
  if(!ownProfileExists())return;
  if(!window.badmintonAppAccess?.allowed)return;
  if(dialog.open)return;
  if(Array.from(document.querySelectorAll("dialog[open]")).some(d=>d!==dialog)){
-  if(retries++<25)setTimeout(open,800);
+  if(retries++<25)setTimeout(()=>open(automatic),800);
   return;
  }
- retries=0;step=current;render();resume.hidden=true;dialog.showModal();
+ retries=0;step=current;render();resume.hidden=true;dialog.showModal();autoShown=true;
 }
 function performAction(){
  if(step===0||actionVisited){advance();return}
@@ -95,7 +96,7 @@ function init(){
  $("onboarding-skip").addEventListener("click",advance);
  $("onboarding-action").addEventListener("click",performAction);
  $("onboarding-later").addEventListener("click",close);
- resume.addEventListener("click",open);
+ resume.addEventListener("click",()=>open(false));
  dialog.addEventListener("close",updateResume);
  const help=$("settings-room-hilfe");
  if(help){
@@ -112,8 +113,8 @@ function init(){
   (help.querySelector(".settings-grant-card")||help).append(button);
  }
  updateResume();
- window.addEventListener("badminton:app-access-granted",()=>setTimeout(open,300));
- setTimeout(open,700);
+ window.addEventListener("badminton:app-access-granted",()=>setTimeout(()=>open(true),300));
+ setTimeout(()=>open(true),700);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
 else init();
