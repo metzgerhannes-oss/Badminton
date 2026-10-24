@@ -49,9 +49,37 @@ function isDate(value){
  if(!Number.isFinite(x.getTime())||x.toISOString().slice(0,10)!==d)fail("Turnierdatum ungültig");
  return d;
 }
+const FRAMEWORK_SPECS=Object.freeze({
+ "bwbv-2027-c-1":{start:"2027-01-16",end:"2027-01-17",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "bwbv-2027-b-3":{start:"2027-01-30",end:"2027-01-31",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "dbv-bw-a-2027-2":{start:"2027-02-20",end:"2027-02-21",url:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
+ "bwbv-2027-c-2":{start:"2027-02-27",end:"2027-02-28",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "dbv-bw-a-2027-4":{start:"2027-04-24",end:"2027-04-25",url:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
+ "bwbv-2027-c-3":{start:"2027-05-08",end:"2027-05-09",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "bwbv-2027-c-4":{start:"2027-06-26",end:"2027-06-27",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"}
+});
 function bookmark(row,owns){
  if(!record(row))fail("Ungültiger Turnierfavorit");
  const raw=text(row.url,1200,"Turnierlink",true);
+ const playerId=text(row.playerId||"all",80,"Turnierspieler");
+ if(playerId!=="all"&&!owns.has(playerId)&&playerId!=="local-charlotte")fail("Turnier verweist auf unbekannten Spieler");
+ const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
+ if(startDate&&endDate&&endDate<startDate)fail("Turnierende vor Turnierbeginn");
+ const place=text(row.place,120,"Austragungsort");
+ const name=text(row.name,100,"Turniername");
+ if(row.source==="dbv-calendar"){
+  const id=text(row.id,80,"DBV-Kalenderkennung",true);
+  if(!/^dbv-calendar-\d{2,12}$/.test(id)||raw!=="https://turniere.badminton.de/"||
+     !owns.has(playerId)||!startDate||!endDate||endDate<startDate||!name)
+   fail("DBV-Kalendervormerkung ungültig");
+  return {id,url:raw,name,playerId,startDate,endDate,source:"dbv-calendar",place};
+ }
+ if(row.source==="bwbv-framework"){
+  const id=text(row.id,80,"Rahmenterminkennung",true),spec=FRAMEWORK_SPECS[id];
+  if(!spec||spec.url!==raw||spec.start!==startDate||spec.end!==endDate||
+     !owns.has(playerId)||!name)fail("Rahmenterminquelle oder Datum ungültig");
+  return {id,url:raw,name,playerId,startDate,endDate,source:"bwbv-framework",place};
+ }
  let parsed;
  try{parsed=new URL(raw)}catch{fail("Ungültiger DBV-Turnierlink")}
  if(parsed.protocol!=="https:"||!["dbv.turnier.de","turnier.de","www.turnier.de"].includes(parsed.hostname))
@@ -59,15 +87,8 @@ function bookmark(row,owns){
  const matched=parsed.pathname.match(/^\/tournament\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
  if(!matched)fail("DBV-Turnier-ID fehlt");
  const id=matched[1].toUpperCase();
- const playerId=text(row.playerId||"all",80,"Turnierspieler");
- if(playerId!=="all"&&!owns.has(playerId)&&playerId!=="local-charlotte")fail("Turnier verweist auf unbekannten Spieler");
- const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
- if(startDate&&endDate&&endDate<startDate)fail("Turnierende vor Turnierbeginn");
- return {
-  id,url:"https://dbv.turnier.de/tournament/"+id,
-  name:text(row.name,100,"Turniername")||"DBV-Turnier "+id.slice(0,8),
-  playerId,startDate,endDate
- };
+ return {id,url:"https://dbv.turnier.de/tournament/"+id,
+  name:name||"DBV-Turnier "+id.slice(0,8),playerId,startDate,endDate,place};
 }
 export function normalizeLocalData(data){
  if(!record(data))fail("Kein gültiger Schmetterlinge-Datensatz");

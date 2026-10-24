@@ -97,8 +97,10 @@ function renderTournaments(){
   const profile=t.playerId==="all"?"Alle Spieler":(state.players.find(p=>p.id===t.playerId)?.name||"Spieler");
   const [phase,tone]=bookmarkPhase(t);
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
-  const calendar=t.source==="dbv-calendar";
-  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-id">'+(calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button><button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  const planning=t.source==="bwbv-framework";
+  const calendar=t.source==="dbv-calendar"||planning;
+  const venue=t.place?"Austragungsort: "+t.place:"Austragungsort noch nicht veröffentlicht";
+  return '<article class="tournament-card"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p><p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
@@ -117,8 +119,8 @@ function renderTournaments(){
    return;
   }
   state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
-  save();render();toast(removed?.source==="dbv-calendar"?"Vormerkung entfernt":"Turnierlink entfernt");
-  if(removed&&removed.source!=="dbv-calendar")window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
+  save();render();toast(removed?.source==="dbv-calendar"||removed?.source==="bwbv-framework"?"Vormerkung entfernt":"Turnierlink entfernt");
+  if(removed&&removed.source!=="dbv-calendar"&&removed.source!=="bwbv-framework")window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
    detail:{bookmark:removed,publicShare:false,removed:true}
   }));
  }));
@@ -306,7 +308,7 @@ window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
 window.badmintonCalendarBookmarkState=()=>({
  playerId:state.viewingFriendId?"":state.activeProfileId,
  playerName:state.viewingFriendId?"":state.players.find(p=>p.id===state.activeProfileId)?.name||"",
- savedKeys:state.officialLinks.filter(t=>t.source==="dbv-calendar"&&t.playerId===state.activeProfileId).map(t=>t.id)
+ savedKeys:state.officialLinks.filter(t=>t.playerId===state.activeProfileId).map(t=>t.id)
 });
 window.badmintonCalendarToggle=item=>{
  if(state.viewingFriendId||!state.players.some(p=>p.id===state.activeProfileId)){
@@ -322,10 +324,52 @@ window.badmintonCalendarToggle=item=>{
  }
  if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
  const entry=normalizeBookmark({id:key,source:"dbv-calendar",url:"https://turniere.badminton.de/",
-  playerId:state.activeProfileId,name:item?.title,startDate:item?.start,endDate:item?.end});
+  playerId:state.activeProfileId,name:item?.title,startDate:item?.start,endDate:item?.end,place:item?.place});
  if(!entry)return {ok:false,message:"Turnier konnte nicht eindeutig zugeordnet werden."};
  state.officialLinks.unshift(entry);
  save();render();toast("Turnier für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
+ return {ok:true,saved:true};
+};
+// The seven published BWBV/DBV 2027 planning dates have source URLs but
+// not confirmed tournament UUIDs; save them only on this device.
+window.badmintonFrameworkToggle=item=>{
+ if(state.viewingFriendId||!state.players.some(p=>p.id===state.activeProfileId))
+  return {ok:false,message:"Bitte zuerst ein eigenes Spielerprofil auswählen."};
+ const id=String(item?.key||"");
+ const previous=state.officialLinks.find(t=>t.source==="bwbv-framework"&&t.id===id&&t.playerId===state.activeProfileId);
+ if(previous){
+  state.officialLinks=state.officialLinks.filter(t=>t!==previous);
+  save();render();toast("Vormerkung entfernt");
+  return {ok:true,saved:false};
+ }
+ if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
+ const entry=normalizeBookmark({id,source:"bwbv-framework",url:item?.source,
+  playerId:state.activeProfileId,name:item?.title,startDate:item?.start,endDate:item?.end,place:item?.place});
+ if(!entry)return {ok:false,message:"Rahmentermin konnte nicht eindeutig zugeordnet werden."};
+ state.officialLinks.unshift(entry);
+ save();render();toast("Rahmentermin für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
+ return {ok:true,saved:true};
+};
+// A verified 2026 result is a local bookmark, not a registration or access grant.
+window.badmintonOfficialTournamentToggle=item=>{
+ if(state.viewingFriendId||!state.players.some(p=>p.id===state.activeProfileId))
+  return {ok:false,message:"Bitte zuerst ein eigenes Spielerprofil auswählen."};
+ const parsed=SchmetterlingeBookmarks.parseDbvTournamentLink(item?.source);
+ if(!parsed||item?.sourceKind!=="results"||!SchmetterlingeBookmarks.validDate(item?.start)||
+    !SchmetterlingeBookmarks.validDate(item?.end)||item.end<item.start)
+  return {ok:false,message:"Keine eindeutig belegte offizielle Turnierseite."};
+ const existing=state.officialLinks.find(t=>t.id===parsed.id&&t.playerId===state.activeProfileId);
+ if(existing){
+  if(window.badmintonPrivateInvite?.hasActive(existing))
+   return {ok:false,message:"Zuerst den privaten Einladungslink widerrufen."};
+  state.officialLinks=state.officialLinks.filter(t=>t!==existing);
+  save();render();toast("Turnier aus Meine Turniere entfernt");return {ok:true,saved:false};
+ }
+ if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
+ const entry=normalizeBookmark({url:parsed.url,playerId:state.activeProfileId,
+  name:item.title,startDate:item.start,endDate:item.end,place:item.place});
+ if(!entry)return {ok:false,message:"Turnier konnte nicht eindeutig zugeordnet werden."};
+ state.officialLinks.unshift(entry);save();render();toast("Turnier zu Meine Turniere hinzugefügt");
  return {ok:true,saved:true};
 };
 // Read-only desktop context. Show only currently selected OWN profile's locally
@@ -336,7 +380,7 @@ window.badmintonDesktopContext=()=>{
  const today=localDay();
  const saved=SchmetterlingeBookmarks.visible(state).map(t=>({
   name:t.name,startDate:t.startDate,endDate:t.endDate||t.startDate,
-  note:t.source==="dbv-calendar"?"DBV-Vormerkung · Anmeldung nicht bestätigt":"Gespeicherter Turnierlink · Teilnahme nicht bestätigt",
+  note:t.source==="bwbv-framework"?"Rahmentermin · Anmeldung nicht bestätigt":t.source==="dbv-calendar"?"DBV-Vormerkung · Anmeldung nicht bestätigt":"Gespeicherter Turnierlink · Teilnahme nicht bestätigt",
   url:safeUrl(t.url)
  }));
  const imported=SchmetterlingeSpond.dashboardItems(state.activeProfileId,state.officialLinks).map(t=>({
@@ -357,7 +401,7 @@ window.badmintonDesktopContext=()=>{
 window.badmintonTournamentOptions=()=>{
  // Shared event hints are never written to family bookmarks. Their DBV source
  // link can still open the already verified LIVE/tournament match views.
- const local=state.officialLinks.filter(t=>t.source!=="dbv-calendar");
+ const local=state.officialLinks.filter(t=>t.source!=="dbv-calendar"&&t.source!=="bwbv-framework");
  const community=window.badmintonCommunityTournamentOptions?.()||[];
  const seen=new Set(local.map(t=>t.id));
  for(const t of community){if(!seen.has(t.id)){local.push(t);seen.add(t.id)}}

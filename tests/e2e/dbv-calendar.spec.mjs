@@ -136,7 +136,8 @@ test("v148: BW U13 C presents real 2026 tournament results instead of source exp
  await expect(cards.nth(0)).toContainText("Reutlingen");
  await expect(cards.nth(1)).toContainText("Friedrichshafen");
  await expect(cards.nth(2)).toContainText("Mössingen");
- await expect(cards.nth(0).locator("a")).toHaveAttribute("href",/dbv\.turnier\.de\/tournament/);
+ await expect(cards.nth(0).locator('a[href*="dbv.turnier.de/tournament/"]')).toHaveAttribute("href",/dbv\.turnier\.de\/tournament/);
+ await expect(cards.nth(0).locator('a[href*="bwbv.de/2026/02/02/"]')).toBeVisible();
  await expect(cards.nth(2).locator("a")).toHaveAttribute("href",/DBB7AC20/i);
  await expect(page.locator(".dbv-calendar-archive,.dbv-calendar-framework,.dbv-calendar-no-results")).toHaveCount(0);
  await expect(page.locator("#dbv-calendar-results [data-calendar-toggle]")).toHaveCount(0);
@@ -388,4 +389,76 @@ test("v151: iPhone reads fresh official BWBV source file, not only fallback card
  await expect(page.locator("#dbv-calendar-results")).toContainText("Livequelle Lörrach");
  await expect(page.locator("#dbv-calendar-results")).not.toContainText("BC Lörrach-Brombach");
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+
+test("F06: 2027 C planning + persists locally with honest unknown venue",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ const first=page.locator(".dbv-calendar-external-plan").first();
+ await expect(first.locator(".dbv-calendar-place")).toHaveText("Austragungsort noch nicht veröffentlicht");
+ await first.locator("[data-framework-toggle]").click();
+ await expect(first.locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator("#official-tournament-list")).toContainText("Rahmentermin · Anmeldung nicht bestätigt");
+ await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort noch nicht veröffentlicht");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved.filter(t=>t.source==="bwbv-framework")).toHaveLength(1);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","true");
+ await page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]").click();
+ await expect(page.locator("#official-tournament-list")).not.toContainText("Rahmentermin · Anmeldung nicht bestätigt");
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test("F06: verified 2026 Reutlingen C tournament + preserves exact source and place",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await page.locator("#dbv-calendar-period").selectOption("all");
+ const first=page.locator(".dbv-calendar-external-result").first();
+ await expect(first).toContainText("1. C-RLT BAW Einzel/Doppel U11–U19");
+ await expect(first.locator(".dbv-calendar-place")).toHaveText("Austragungsort: Reutlingen");
+ await expect(first.locator('a[href*="dbv.turnier.de/tournament/"]')).toBeVisible();
+ await first.locator("[data-official-toggle]").click();
+ await expect(first.locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort: Reutlingen");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved.filter(t=>t.id==="52B3B803-279B-48CF-8143-F5078F5236DB")).toHaveLength(1);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
+ await page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]").click();
+ await expect(page.locator("#official-tournament-list")).not.toContainText("Austragungsort: Reutlingen");
+});
+
+
+test("F06: Home tournament cards route internally on phone and desktop; external calendar stays official",async({page})=>{
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>{
+  const state=JSON.parse(localStorage.getItem("shuttleboard-v1"));
+  state.officialLinks=[{id:"11111111-2222-4333-8444-555555555555",
+   url:"https://dbv.turnier.de/tournament/11111111-2222-4333-8444-555555555555",
+   name:"Synthetisches Zukunftsturnier",playerId:"05-070879",
+   startDate:"2027-01-16",endDate:"2027-01-17",place:"Testhalle"}];
+  localStorage.setItem("shuttleboard-v1",JSON.stringify(state));
+ });
+ for(const width of [390,1280]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  const row=page.locator(".upcoming-tournament-row").first();
+  await expect(row).toHaveAttribute("href","#turniere");
+  await expect(row).toContainText("Austragungsort: Testhalle");
+  await row.click();
+  await expect(page).toHaveURL(/#turniere$/);
+  await expect(page.locator("#official-tournament-list")).toContainText("Synthetisches Zukunftsturnier");
+  await expect(page.locator('#official-tournament-list a[href*="dbv.turnier.de/tournament/"]')).toBeVisible();
+  await expect(page.locator(".live-hub-official-link")).toHaveAttribute("href","https://turniere.badminton.de/");
+ }
 });

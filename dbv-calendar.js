@@ -9,25 +9,26 @@ const localToday=()=>{
  const x=Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
  return x.year+"-"+x.month+"-"+x.day;
 };
+function venueLabel(place){const value=String(place||"").trim();return value?"Austragungsort: "+value:"Austragungsort noch nicht veröffentlicht";}
 const BW_YOUTH_AGES=["U11","U13","U15","U17","U19"];
 // Separate official schedule announcements from event-ID backed DBV records.
 // These are source-backed planning/award dates, NOT confirmed sign-up events.
 const BWBV_C_FRAMEWORK_2027=[
- {start:"2027-01-16",end:"2027-01-17",level:"C",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
- {start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ages:["U13","U15","U17","U19"],ageCertain:false},
- {start:"2027-05-08",end:"2027-05-09",level:"C",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
+ {key:"bwbv-2027-c-1",start:"2027-01-16",end:"2027-01-17",level:"C",title:"1. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
+ {key:"bwbv-2027-c-2",start:"2027-02-27",end:"2027-02-28",level:"C",title:"2. BWBV/C-RLT Jugend · Einzel/Mixed",ages:["U13","U15","U17","U19"],ageCertain:false},
+ {key:"bwbv-2027-c-3",start:"2027-05-08",end:"2027-05-09",level:"C",title:"3. BWBV/C-RLT Jugend · Einzel/Doppel",ages:["U11","U13","U15","U17","U19"],ageCertain:false},
  // The fourth C round does not generally offer U11 according to BWBV youth rules.
- {start:"2027-06-26",end:"2027-06-27",level:"C",title:"4. BWBV/C-RLT Jugend · Hexen-Cup",ages:["U13","U15","U17","U19"],ageCertain:false}
+ {key:"bwbv-2027-c-4",start:"2027-06-26",end:"2027-06-27",level:"C",title:"4. BWBV/C-RLT Jugend · Hexen-Cup",ages:["U13","U15","U17","U19"],ageCertain:false}
 ];
-const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2025/11/BWBV-U19-Turnierkalender_2027.pdf";
+const BWBV_FRAMEWORK_SOURCE="https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf";
 const BWBV_B_FRAMEWORK_2027=[
- {start:"2027-01-30",end:"2027-01-31",level:"B",title:"Gruppe SüdOst · B-RLT U13–U19",ages:["U13","U15","U17","U19"],ageCertain:true,
-  source:"https://bwbv.de/wp-content/uploads/2025/11/bj-2025-11-web.pdf"}
+ {key:"bwbv-2027-b-3",start:"2027-01-30",end:"2027-01-31",level:"B",title:"Gruppe SüdOst · B-RLT U13–U19",ages:["U13","U15","U17","U19"],ageCertain:true,
+  source:BWBV_FRAMEWORK_SOURCE}
 ];
 const DBV_A_VERGABE_2027=[
- {start:"2027-02-20",end:"2027-02-21",level:"A",title:"2. A-RLT U11/U13 · BC Lörrach-Brombach",ages:["U11","U13"],ageCertain:true,
+ {key:"dbv-bw-a-2027-2",start:"2027-02-20",end:"2027-02-21",level:"A",title:"2. A-RLT U11/U13 · BC Lörrach-Brombach",ages:["U11","U13"],ageCertain:true,
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
- {start:"2027-04-24",end:"2027-04-25",level:"A",title:"4. DBV-A-RLT U11/U13 · BSV Eggenstein",ages:["U11","U13"],ageCertain:true,
+ {key:"dbv-bw-a-2027-4",start:"2027-04-24",end:"2027-04-25",level:"A",title:"4. DBV-A-RLT U11/U13 · BSV Eggenstein",ages:["U11","U13"],ageCertain:true,
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"}
 ];
 let BW_YOUTH_FRAMEWORK_2027=[
@@ -42,17 +43,25 @@ function bwFrameworkDates(filters,today){
   t.ages.includes(filters.age)&&
   (filters.level==="all"||filters.level===t.level)&&
   (filters.period!=="upcoming"||t.end>=today)&&
-  (!search||(t.title+" "+t.level+" 2027 BWBV DBV").normalize("NFKC").toLocaleLowerCase("de").includes(search)));
+  (!search||(t.title+" "+(t.place||"")+" "+t.level+" 2027 BWBV DBV").normalize("NFKC").toLocaleLowerCase("de").includes(search)));
 }
 function bwFrameworkHTML(filters,today){
  const planned=bwFrameworkDates(filters,today);
  if(!planned.length)return "";
+ const bookmarks=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
+ const saved=new Set(bookmarks.savedKeys||[]);
  return '<section class="dbv-calendar-cluster dbv-calendar-sourced-plan" aria-label="Offizielle Termine 2027">'+
   '<h4>Turniere 2027 <small>'+planned.length+'</small></h4>'+
   planned.map(t=>'<article class="dbv-calendar-entry dbv-calendar-external-plan">'+
     '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong><small>bis '+esc(formatDate(t.end))+'</small></div>'+
-    '<div class="dbv-calendar-detail"><h5>'+esc(t.title)+'</h5>'+
-    '<p>Level '+esc(t.level)+' · '+esc(t.level==="A"?"Ausrichter vergeben":t.ageCertain?filters.age+" vorgesehen":filters.age+" noch offen")+'</p>'+
+    '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
+    '<button type="button" class="dbv-calendar-save'+(saved.has(t.key)?' is-saved':'')+'" data-framework-toggle="'+esc(t.key)+'"'+
+    ' aria-pressed="'+(saved.has(t.key)?'true':'false')+'"'+
+    ' aria-label="'+esc(bookmarks.playerId?(saved.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarks.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
+    (bookmarks.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+
+    (saved.has(t.key)?'✓':'+')+'</button></div>'+
+    '<p class="dbv-calendar-place">'+esc(venueLabel(t.place))+'</p>'+
+    '<p>Level '+esc(t.level)+' · '+esc(t.level==="A"?"Ausrichter vergeben":t.ageCertain?filters.age+" vorgesehen":filters.age+" noch offen")+' · Rahmentermin</p>'+
     '<a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">Terminquelle ↗</a></div>'+
   '</article>').join("")+'</section>';
 }
@@ -67,8 +76,9 @@ function bwNextYearHint(filters){
 // Verified completed 2026 tournaments are displayed as real result cards,
 // never masquerading as imported DBV event IDs or registration opportunities.
 const BW_YOUTH_ARCHIVE_2026=[
- {level:"C",start:"2026-01-17",end:"2026-01-18",title:"1. C-RLT U11–U19",ages:["U11","U13","U15","U17","U19"],place:"Reutlingen",detail:"Einzel/Doppel",
-  source:"https://dbv.turnier.de/tournament/52b3b803-279b-48cf-8143-f5078f5236db",sourceKind:"results"},
+ {level:"C",start:"2026-01-17",end:"2026-01-18",title:"1. C-RLT BAW Einzel/Doppel U11–U19",ages:["U11","U13","U15","U17","U19"],place:"Reutlingen",detail:"Einzel/Doppel",
+  source:"https://dbv.turnier.de/tournament/52b3b803-279b-48cf-8143-f5078f5236db",sourceKind:"results",
+  report:"https://bwbv.de/2026/02/02/1-c-rlt-baw-e-d-u11-u19-vom-17-18-01-2026-in-reutlingen/"},
  {level:"A",start:"2026-02-07",end:"2026-02-08",title:"1. A-RLT U15/U19",ages:["U15","U19"],place:"Waghäusel",detail:"",
   source:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2026/",sourceKind:"announcement"},
  {level:"C",start:"2026-02-28",end:"2026-03-01",title:"2. C-RLT U11–U19",ages:["U11","U13","U15","U17","U19"],place:"Friedrichshafen",detail:"Einzel/Mixed",
@@ -101,14 +111,22 @@ function bwArchiveHTML(filters){
  if(!found.length)return "";
  return '<section class="dbv-calendar-cluster dbv-calendar-sourced-results" aria-label="Verifizierte Turniere 2026">'+
   '<h4>Turniere 2026 <small>'+found.length+'</small></h4>'+
-  found.map(t=>'<article class="dbv-calendar-entry dbv-calendar-external-result">'+
+  found.map(t=>{
+  const direct=t.sourceKind==="results"?window.SchmetterlingeBookmarks?.parseDbvTournamentLink?.(t.source):null;
+  const own=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
+  const saved=Boolean(direct&&(own.savedKeys||[]).includes(direct.id));
+  return '<article class="dbv-calendar-entry dbv-calendar-external-result">'+
    '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+
      '<small>bis '+esc(formatDate(t.end))+'</small></div>'+
-   '<div class="dbv-calendar-detail"><h5>'+esc(t.title)+'</h5>'+
-   '<p>'+esc(t.place)+' · Level '+esc(t.level)+(t.detail?' · '+esc(t.detail):'')+'</p>'+
+   '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
+   (direct?'<button type="button" class="dbv-calendar-save'+(saved?' is-saved':'')+'" data-official-toggle="'+esc(direct.id)+'" aria-pressed="'+(saved?'true':'false')+'" aria-label="'+
+    esc(own.playerId?(saved?'Gespeichertes Turnier entfernen: ':'Für '+own.playerName+' speichern: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
+    (own.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+(saved?'✓':'+')+'</button>':'')+'</div>'+
+   '<p class="dbv-calendar-place">'+esc(venueLabel(t.place))+'</p>'+ 
+    '<p>Level '+esc(t.level)+(t.detail?' · '+esc(t.detail):'')+'</p>'+
    '<a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">'+
-      (t.sourceKind==="results"?"Ergebnisse ansehen ↗":"Turnierinfo ↗")+'</a></div>'+
-   '</article>').join("")+'</section>';
+      (t.sourceKind==="results"?"Ergebnisse ansehen ↗":"Turnierinfo ↗")+'</a>'+ (t.report?'<a href="'+esc(t.report)+'" target="_blank" rel="noopener noreferrer">BWBV-Bericht ↗</a>':'')+'</div>'+
+   '</article>';}).join("")+'</section>';
 }
 const STORAGE="schmetterlinge.dbvCalendarFilters.v1";
 const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcoming",group:"region"};
@@ -219,7 +237,8 @@ function render(){
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
     ' aria-label="'+esc(bookmarkState.playerId?(savedKeys.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarkState.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
     (bookmarkState.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+
-    (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p>'+esc(t.place)+(t.organizer?' · '+esc(t.organizer):"")+'</p>'+
+    (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p class="dbv-calendar-place">'+esc(venueLabel(t.place))+'</p>'+
+    (t.organizer?'<p>Veranstalter: '+esc(t.organizer)+'</p>':"")+
     '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+(isNationalU11Masters(t)?'<span>DBV · bundesweit</span>':'')+'</div>'+
     (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
     '<a href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
@@ -373,7 +392,23 @@ document.addEventListener("DOMContentLoaded",()=>{
    try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
    batchLimit=36;render();return;
   }
-  const button=event.target.closest("button[data-calendar-toggle]");
+  const official=event.target.closest("button[data-official-toggle]");
+   if(official){
+    const found=BW_YOUTH_ARCHIVE_2026.find(t=>window.SchmetterlingeBookmarks?.parseDbvTournamentLink?.(t.source)?.id===official.dataset.officialToggle);
+    if(!found)return;
+    const result=window.badmintonOfficialTournamentToggle?.(found);
+    if(!result?.ok)message(result?.message||"Turnier konnte nicht gespeichert werden.");
+    return;
+   }
+   const planning=event.target.closest("button[data-framework-toggle]");
+   if(planning){
+    const found=BW_YOUTH_FRAMEWORK_2027.find(t=>t.key===planning.dataset.frameworkToggle);
+    if(!found)return;
+    const result=window.badmintonFrameworkToggle?.(found);
+    if(!result?.ok)message(result?.message||"Rahmentermin konnte nicht vorgemerkt werden.");
+    return;
+   }
+   const button=event.target.closest("button[data-calendar-toggle]");
   if(!button)return;
   const found=entries.find(t=>t.key===button.dataset.calendarToggle);
   if(!found)return;
