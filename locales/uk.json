@@ -408,6 +408,22 @@
     "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Потім відкрийте Schmetterlinge через значок і створіть там профіль.",
     "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Профілі, уже збережені в Safari, не переносяться автоматично. Експортуйте їх через «Зберегти мої дані» та імпортуйте в застосунок.",
     "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "Після відкриття через значок створіть профіль. Вхід не потрібен.",
-    "Profil anlegen": "Створити профіль"
+    "Profil anlegen": "Створити профіль",
+    "Dein Profil": "Ваш профіль",
+    "Dein erstes Spielerprofil ist bereit.": "Ваш перший профіль гравця готовий.",
+    "Weitere Spieler": "Інші гравці",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "За потреби додайте інші власні профілі гравців.",
+    "Spielerprofil hinzufügen": "Додати профіль гравця",
+    "Suche eine Mannschaft, der du folgen möchtest.": "Знайдіть команду, за якою хочете стежити.",
+    "Mannschaft suchen": "Знайти команду",
+    "Merke interessante Turniere mit + für dein Profil vor.": "Збережіть цікаві турніри для свого профілю за допомогою +.",
+    "Turniere auswählen": "Вибрати турніри",
+    "Einrichtung": "Налаштування",
+    "Überspringen": "Пропустити",
+    "Später fortfahren": "Продовжити пізніше",
+    "Einrichtung fortsetzen": "Продовжити налаштування",
+    "Einrichtung erneut ansehen": "Переглянути налаштування ще раз",
+    "Fertig": "Готово",
+    "{step} von 4": "{step} з 4"
   }
 }
