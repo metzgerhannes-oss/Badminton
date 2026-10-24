@@ -4,7 +4,11 @@ const store={players:[player],friends:[],officialLinks:[],activeProfileId:player
 test("F07 wizard resumes, reuses real controls and never clears local profiles",async({page})=>{
  await page.addInitScript(data=>{
   if(localStorage.getItem("shuttleboard-v1")===null)localStorage.setItem("shuttleboard-v1",JSON.stringify(data));
-  if(localStorage.getItem("schmetterlinge.setupWizard.v1")===null)localStorage.setItem("schmetterlinge.setupWizard.v1","0");
+  // Seed once per tab, not again after the finish/reload assertion.
+  if(sessionStorage.getItem("syntheticWizardSeeded")!=="1"){
+   if(localStorage.getItem("schmetterlinge.setupWizard.v1")===null)localStorage.setItem("schmetterlinge.setupWizard.v1","0");
+   sessionStorage.setItem("syntheticWizardSeeded","1");
+  }
  },store);
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#start");

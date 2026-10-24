@@ -52,6 +52,16 @@ function open(automatic=false){
  }
  retries=0;step=current;render();resume.hidden=true;dialog.showModal();autoShown=true;
 }
+function focusTournamentSearch(attempt){
+ if(location.hash!=="#turniere")return;
+ const field=$("dbv-calendar-q");
+ if(field&&field.getClientRects().length){
+  field.scrollIntoView({block:"center"});
+  field.focus({preventScroll:true});
+  if(document.activeElement===field)return;
+ }
+ if(attempt<15)setTimeout(()=>focusTournamentSearch(attempt+1),100);
+}
 function performAction(){
  if(step===0||actionVisited){advance();return}
  actionVisited=true;
@@ -68,10 +78,9 @@ function performAction(){
   });
  }else if(step===3){
   location.hash="#turniere";
-  requestAnimationFrame(()=>{
-   $("dbv-calendar-q")?.scrollIntoView({block:"center"});
-   $("dbv-calendar-q")?.focus({preventScroll:true});
-  });
+  // Route rendering may finish after the first animation frame, especially on iOS.
+  // Focus the real search field only once it is visible, with a bounded retry.
+  setTimeout(()=>focusTournamentSearch(0),150);
  }
  updateResume();
 }
