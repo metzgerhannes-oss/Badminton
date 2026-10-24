@@ -10,7 +10,7 @@ test.beforeEach(async({page})=>{
 test("F10 P2-A: private Snake route, pause and own-profile-only records on 320px",async({page})=>{
  await page.setViewportSize({width:320,height:700});
  await page.goto("/#turniere");
- await page.locator('a[href="#spiele"]').first().click();
+ await page.locator('a[href="#spiele"]:visible').first().click();
  await expect(page.locator("#view-spiele")).toBeVisible();
  await expect(page.locator("#arcade-profile option")).toHaveCount(2);
  await expect(page.locator("#arcade-profile")).not.toContainText("Gefolgt");
