@@ -65,10 +65,11 @@ export function runPsql(args,env=process.env,executor=spawnSync){
 }
 export function runReplay(url,files,executor=spawnSync){
   // Verify target DB identity and no existing user/application relations.
-  const probeSql="SELECT current_database() || ':' || (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast') AND n.nspname NOT LIKE 'pg_temp%' AND n.nspname NOT LIKE 'pg_toast_temp%')";
+  const probeSql="SELECT current_database() || ':' || (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast') AND n.nspname NOT LIKE 'pg_temp%' AND n.nspname NOT LIKE 'pg_toast_temp%') || ':' || CASE WHEN current_user='f09_replay' AND EXISTS (SELECT 1 FROM pg_roles WHERE rolname=current_user AND NOT (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)) AND NOT pg_has_role(current_user,'pg_read_server_files','member') AND NOT pg_has_role(current_user,'pg_write_server_files','member') AND NOT pg_has_role(current_user,'pg_execute_server_program','member') THEN 'safe' ELSE 'unsafe' END";
   const probe=runPsql(['-X','-A','-t','-v','ON_ERROR_STOP=1',
     '--dbname='+url.href,'--command='+probeSql],process.env,executor);
-  if(probe!==decodeURIComponent(url.pathname).slice(1)+':0')throw Error('Scratch database is not empty');
+  if(probe!==decodeURIComponent(url.pathname).slice(1)+':0:safe')
+    throw Error('Scratch database is nonempty or replay role has unsafe privileges');
   let completed=0;
   for(const row of files){
     runPsql(['-X','-v','ON_ERROR_STOP=1','--dbname='+url.href,'--file='+row.filename],process.env,executor);
