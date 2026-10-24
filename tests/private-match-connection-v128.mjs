@@ -30,9 +30,9 @@ console.log("Private archive sync authorization, cache and integration checks pa
 // F05 regression: two independently authorized family profiles can load at
 // once. Starting the second must not invalidate the first or strand it in a
 // permanent loading state. All requests are synthetic example.invalid RPCs.
-const source=bridge.replace(/^import .*;\\r?\\n/gm,"")
+const source=bridge.replace(/^import .*;\r?\n/gm,"")
  .replace(/^export function /gm,"function ")
- +"\\nglobalThis.__privateMatchFixture={requestPrivateMatches,matchArchiveSnapshot,clearPrivateMatchArchive};";
+ +"\nglobalThis.__privateMatchFixture={requestPrivateMatches,matchArchiveSnapshot,clearPrivateMatchArchive};";
 const playerA="99-000001",playerB="99-000002";
 const inviteA="11111111-2222-4333-8444-555555555555";
 const inviteB="22222222-3333-4444-8555-666666666666";
@@ -49,7 +49,7 @@ const context={SUPABASE_ROOT:"https://example.invalid/rest/v1/",PUBLIC_KEY:"fixt
  window:{badmintonAppAccess:{allowed:false},dispatchEvent:()=>{}},
  CustomEvent:class{constructor(type,opts){this.type=type;this.detail=opts?.detail;}},
  fetch:async(url,options)=>{
-  assert.match(url,/^https:\\/\\/example\\.invalid\\/rest\\/v1\\/rpc\\/private_player_archive_read$/);
+  assert.match(url,/^https:\/\/example\.invalid\/rest\/v1\/rpc\/private_player_archive_read$/);
   const args=JSON.parse(options.body);
   assert.equal(args.p_offset,0);
   requests.push(args.p_invitation_id);
