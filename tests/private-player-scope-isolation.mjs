@@ -64,11 +64,14 @@ function trophy(playerId){
  await api.requestPrivateTrophies(player);
  assert.equal(api.trophySnapshot(player).state,"protected");
 }
-// Even a malformed/incorrectly scoped response cannot contaminate another player.
+// A wrong-player response is a server contract failure, not a genuine 403.
+// It must remain invisible and report unavailable rather than fake denial/zero.
 {
  const {api}=fixture({inviteResult:trophy(other)});
  await api.requestPrivateTrophies(player);
- assert.equal(api.trophySnapshot(player).state,"protected");
+ assert.equal(api.trophySnapshot(player).state,"unavailable",
+  "Cross-player payload must fail closed without pretending the grant was denied");
+ assert.equal(api.trophySnapshot(player).results.length,0);
 }
 console.log("F03: scoped synthetic v2 grant, v1 denial, and foreign identity isolation passed.");
 
