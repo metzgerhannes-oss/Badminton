@@ -67,8 +67,10 @@ class PrivateDirectoryTests(unittest.TestCase):
                 return None
             def published_export(self, *args, **kwargs):
                 raise AssertionError("stale archive fallback is forbidden")
-        with patch.object(private,"load",return_value=OfflineRanking()), \\
-             patch.object(private,"build_payload",side_effect=AssertionError("no payload")):
+        with (
+            patch.object(private,"load",return_value=OfflineRanking()),
+            patch.object(private,"build_payload",side_effect=AssertionError("no payload")),
+        ):
             with self.assertRaisesRegex(RuntimeError,"refusing stale archive"):
                 private.produce()
 
@@ -80,8 +82,10 @@ class PrivateDirectoryTests(unittest.TestCase):
                         "2026-10-21T11:30:00+02:00")
             def published_export(self, *args, **kwargs):
                 raise AssertionError("archive fallback is forbidden")
-        with patch.object(private,"load",return_value=OfflineRanking()), \\
-             patch.object(private,"build_payload",return_value=b"synthetic") as build:
+        with (
+            patch.object(private,"load",return_value=OfflineRanking()),
+            patch.object(private,"build_payload",return_value=b"synthetic") as build,
+        ):
             self.assertEqual(private.produce(),b"synthetic")
             build.assert_called_once_with(synthetic_rows,2026,43)
 
