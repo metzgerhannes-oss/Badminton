@@ -9,7 +9,7 @@ import {pathToFileURL} from 'node:url';
 const VERSION = /^\d{14}$/;
 const HASH = /^[a-f0-9]{64}$/;
 const FILE = /^(\d{14})\.sql$/;
-const FORBIDDEN_SQL = /\b(?:dblink(?:_connect)?|postgres_fdw|pg_net|http_get|http_post|cron\.schedule|cron\.schedule_in_database|copy\s+[^;]*\bprogram\b|pg_read_file|pg_ls_dir|lo_import|pg_terminate_backend|pg_cancel_backend|alter\s+system|(?:create|alter|drop)\s+(?:role|user|database|tablespace))\b/i;
+const FORBIDDEN_SQL = /\b(?:dblink(?:_connect)?|postgres_fdw|pg_net|http_get|http_post|cron\.schedule|cron\.schedule_in_database|copy|create\s+extension|pg_read_file|pg_ls_dir|lo_import|pg_terminate_backend|pg_cancel_backend|alter\s+system|(?:create|alter|drop)\s+(?:role|user|database|tablespace))\b/i;
 export function validateLocalTarget(value) {
   let url;
   try { url=new URL(value); } catch { throw Error('Invalid local database URL'); }
@@ -48,7 +48,7 @@ export async function validatePrivateFiles(folder,migrations){
       throw Error('Private migration SQL digest mismatch');
     const sql=bytes.toString('utf8');
     // psql backslash commands can reconnect and escape the target URL restriction.
-    if(/^\s*\\/m.test(sql)||FORBIDDEN_SQL.test(sql))
+    if(sql.includes('\\')||FORBIDDEN_SQL.test(sql))
       throw Error('Unsafe or network-capable SQL; requires isolated manual review');
     outputs.push({filename,version:migration.version});
   }
