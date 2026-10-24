@@ -1,4 +1,5 @@
 import {completedMatchWinner,explicitScoringRule} from "./badminton-score-rules.mjs";
+import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 /** Aggregate individually sourced third-party match cards, never rank points
  * or bulk Badhub career totals. Matches are explicitly not official DBV IDs. */
 export const SOURCE_TYPES=["Einzel","Doppel","Mixed"];
@@ -15,7 +16,13 @@ export function sourceMatchYears(rows){
   .filter(y=>/^20\d{2}$/.test(y)))].sort((a,b)=>b.localeCompare(a));
 }
 export function computeExternalStats(rows,{discipline="all",year="all"}={}){
- const matching=(Array.isArray(rows)?rows:[]).filter(r=>
+ const input=Array.isArray(rows)?rows:[];
+ // The importer already quarantines contradictory knockout rounds. Reapply the
+ // same rule to historical stored cards before any year/discipline filter so
+ // filtering cannot turn an impossible event into an apparent valid victory.
+ const {accepted}=excludeContradictoryRounds(input);
+ const allowed=new Set(accepted);
+ const matching=input.filter(r=>
   (discipline==="all"||r?.discipline===discipline)&&
   (year==="all"||String(r?.match_year)===String(year)));
  const grouped=new Map();
@@ -25,11 +32,12 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
   if(!grouped.has(key))grouped.set(key,[]);
   grouped.get(key).push(r);
  }
- let wins=0,losses=0,excluded=0;
+ let wins=0,losses=0,excluded=0,quarantined=0;
  const details=[];
  for(const versions of grouped.values()){
   if(versions.length!==1){excluded++;continue;}
   const r=versions[0];
+  if(!allowed.has(r)){excluded++;quarantined++;continue;}
   const games=r.games;
   const valid=[1,2].includes(r.player_side)&&[1,2].includes(r.winning_side)
    &&SOURCE_TYPES.includes(r.discipline)
@@ -61,7 +69,7 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
   String(b.match_date||"").localeCompare(String(a.match_date||""))||
   a.source_key.localeCompare(b.source_key));
  const total=wins+losses;
- return {total,wins,losses,excluded,rate:total?Math.round(wins/total*100):null,details};
+ return {total,wins,losses,excluded,quarantined,rate:total?Math.round(wins/total*100):null,details};
 }
 /**
  * Import cursor = source-processing position, never the number of persisted,

@@ -16,6 +16,34 @@ const data=[
  fixture("f","Einzel",1,1,2026,{games:[[21,10],[19,21]]}),
  fixture("z","Einzel",1,1),fixture("z","Einzel",1,1)
 ];
+
+// Previously imported contradictory knockout cards must be quarantined in
+// Home, Statistik and Historie even when the importer is already fixed.
+const knockout=(id,competition,event,round,year=2026)=>fixture(
+ id,"Einzel",1,1,year,{source_key:"tournament:"+competition+":"+event+":"+round+":"+id,
+  competition_id:competition,event,round_label:round,
+  source_url:"https://badhub.de/bwbv/turnier.php?id="+competition});
+const historic=[
+ knockout("semifinal-a","4184","JE U15","Halbfinale"),
+ knockout("semifinal-b","4184","JE U15","Halbfinale"),
+ knockout("final-a","4184","JE U15","Finale"),
+ knockout("independent","4190","JE U15","Finale"),
+ knockout("group-a","5200","JE U13","Gruppe A"),
+ knockout("group-b","5200","JE U13","Gruppe A")
+];
+const checked=computeExternalStats(historic);
+assert.equal(checked.total,3,"Contradictory event contributes no W/L; independent and group matches remain");
+assert.equal(checked.wins,3);
+assert.equal(checked.quarantined,3,"Every affected event card is held without deleting evidence");
+assert.equal(checked.excluded,3);
+assert.equal(checked.details.length,3);
+assert.equal(computeExternalStats(historic,{discipline:"Einzel",year:"2026"}).total,3);
+assert.equal(computeExternalStats(historic,{year:"2025"}).total,0);
+const unrelatedLeague=fixture("league:independent","Einzel",1,1,2026,{
+ category:"league",event:"JE U15",round_label:"Halbfinale",
+ source_url:"https://badhub.de/bwbv/begegnung.php?id=99"});
+assert.equal(computeExternalStats([...historic,unrelatedLeague]).total,4,
+ "League matches must not be quarantined as tournament knockout rounds");
 assert.deepEqual(sourceMatchYears(data),["2026","2025"]);
 const total=computeExternalStats(data);
 assert.equal(total.total,4);
@@ -48,6 +76,9 @@ assert.doesNotMatch(stats,/player_match_observations/,"Home must not query the r
 assert.match(stats,/officialCount\.total===0&&external\.length>0/,
  "Never aggregate external and official matches into one total");
 assert.match(stats,/computeExternalStats/);
+assert.match(stats,/stats\.quarantined/,"Home must disclose quarantined knockout cards");
+assert.match(await readFile("external-matches.js","utf8"),/all\.quarantined/,
+ "Historie must disclose the same excluded source evidence");
 assert.match(stats,/importCompleteness/);
 assert.match(await readFile("scripts/supabase-read.mjs","utf8"),/last_finished_at/);
 assert.match(stats,/lastLoadedAt/);

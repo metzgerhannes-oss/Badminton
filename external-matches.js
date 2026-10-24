@@ -83,6 +83,7 @@ function render(){
    :" Vier Badhub-Karten ohne Satzstände sind zur erneuten Einzelprüfung vorgemerkt. Nur eindeutig belegte Sieger werden beim Quellenimport berücksichtigt.";
  }
  progressEl.textContent=privateMode?fmt(rows.length)+" verifizierbare Quellkarten aus privater Spielerfreigabe (Teilbestand).":info;
+ if(all.quarantined)progressEl.textContent+=" "+fmt(all.quarantined)+" Quellkarten aus Turnierkonkurrenzen mit widersprüchlichen K.-o.-Runden sind zur Quellenprüfung zurückgestellt und werden nicht als Spiele gezählt.";
  const options=sourceMatchYears(rows);
  years.innerHTML='<option value="all">Alle Jahre</option>'+options.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
  if(year!=="all"&&!options.includes(year))year="all";
@@ -97,6 +98,8 @@ function render(){
   :"Für diese Auswahl sind in der App noch keine zählbaren Einzelspiele belegt.";
  if(result.excluded&&(year!=="all"||discipline!=="all"||category!=="all"))
   count.textContent+=" "+fmt(result.excluded)+" unklare Quellkarten nicht berücksichtigt.";
+ if(result.quarantined&&(year!=="all"||discipline!=="all"||category!=="all"))
+  count.textContent+=" Davon "+fmt(result.quarantined)+" aus widersprüchlichen K.-o.-Runden.";
  list.innerHTML=filtered.slice(0,show).map(r=>{
   const opponent=(r.opponent_names||[]).join(" / ");
   const partner=(r.partner_names||[]).join(" / ");
