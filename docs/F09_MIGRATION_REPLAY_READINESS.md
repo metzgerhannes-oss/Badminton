@@ -87,9 +87,12 @@ Private manifest outside the checkout:
 
 Every applied migration must be present in verified version order;
 the independently observed applied count must match, all file hashes
-must match. Symlinks, traversal, psql backslash commands and recognized
-outbound/server-side SQL (including dblink, pg_net, cron.schedule and
-COPY PROGRAM) are rejected. Never silently change historical SQL to
+must match. Symlinks, traversal, ANY backslash byte (including inline psql meta-commands),
+COPY, CREATE EXTENSION and recognized outbound/server-side SQL
+(including dblink, pg_net and cron.schedule) are rejected. This is a
+conservative preflight, NOT a SQL sandbox or a substitute for private
+manual review and network-isolated execution; historical SQL requiring
+these features must stop for separate assessment. Never silently change historical SQL to
 make a replay pass.
 
 Run only from a fully network-isolated disposable PostgreSQL instance,
