@@ -17,7 +17,9 @@ assert.match(app,/event\.metaKey\|\|event\.ctrlKey\|\|event\.shiftKey\|\|event\.
 assert.match(app,/navigatePrimary\(dest\)/);
 assert.match(app,/navigatePrimary\("spieler"\)/,
  "Home add friend must navigate directly to canonical player discovery");
-assert.match(app,/\["start","turniere","live","spieler","verein","mannschaft","berichte","historie"\]/);
+assert.match(app,/\["start","turniere","live","spieler","verein","mannschaft","berichte","historie","spiele"\]/);
+assert.match(html,/href="#spiele"/,"Spielecke must remain reachable from Home/Turniertag");
+assert.doesNotMatch(html,/<a[^>]*data-page="spiele"/,"Spielecke must not become a sixth main navigation tab");
 assert.match(router,/page==="historie"\|\|\(page==="live"&&liveHidden\)\?"turniere"/);
 assert.match(html,/class="home-stats-link" href="#historie"/);
 assert.match(html,/class="live-tournaments-return" href="#turniere"|class="history-inline-link live-tournaments-return" href="#turniere"/);
