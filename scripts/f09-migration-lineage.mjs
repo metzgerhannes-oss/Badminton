@@ -9,7 +9,7 @@ import {readFile,readdir} from "node:fs/promises";
 import path from "node:path";
 import {pathToFileURL} from "node:url";
 
-const VERSIONED=/^(\\d{14})_[a-zA-Z0-9_-]+\\.sql$/;
+const VERSIONED=/^(\d{14})_[a-zA-Z0-9_-]+\.sql$/;
 const HASH=/^[a-f0-9]{64}$/;
 
 export function auditLineage(local,applied,legacySqlCount=0){
@@ -18,7 +18,7 @@ export function auditLineage(local,applied,legacySqlCount=0){
  const localMap=new Map(),appliedMap=new Map();
  let duplicates=0,invalid=0;
  for(const row of local){
-  if(!/^\\d{14}$/.test(row.version)||!HASH.test(row.sha256||"")){
+  if(!/^\d{14}$/.test(row.version)||!HASH.test(row.sha256||"")){
    invalid++;continue;
   }
   if(localMap.has(row.version))duplicates++;
@@ -28,7 +28,7 @@ export function auditLineage(local,applied,legacySqlCount=0){
   // Migration input must be metadata only: never accept raw SQL in a report.
   if(Object.hasOwn(row,"statements")||Object.hasOwn(row,"sql")||
      Object.hasOwn(row,"query"))throw new Error("Raw migration SQL is prohibited");
-  if(!/^\\d{14}$/.test(row.version)||(
+  if(!/^\d{14}$/.test(row.version)||(
       row.sha256!==undefined && !HASH.test(row.sha256))){
    invalid++;continue;
   }
