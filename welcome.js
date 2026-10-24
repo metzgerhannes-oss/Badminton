@@ -2,6 +2,7 @@ import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scri
 import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
 import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
 import {shouldOfferInstallationFirst} from "./scripts/welcome-flow.mjs";
+import {WIZARD_KEY,isFirstProfile} from "./scripts/onboarding-wizard-state.mjs";
 const $=id=>document.getElementById(id);
 const t=key=>window.SchmetterlingeI18n?.t(key)||key;
 const format=(key,params={})=>t(key).replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??""));
@@ -59,6 +60,9 @@ function persistAndContinue(profile,{confirmed=false}={}){
  // Reselecting an existing family profile must never repeat the consent prompt.
  if(confirmed&&!alreadySaved){
   try{localStorage.setItem("schmetterlinge.pendingPlayerDataCopy.v1",profile.id)}catch{}
+ }
+ if(isFirstProfile(previous,stored,profile.id)){
+  try{localStorage.setItem(WIZARD_KEY,"0")}catch{}
  }
  const savedStatus=$("welcome-success");
  lastSavedProfile={confirmed,id:profile.id};

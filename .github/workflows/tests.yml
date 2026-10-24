@@ -91,6 +91,8 @@ jobs:
           node --check teams.js
           node --check scripts/team-directory-utils.mjs
           node --check welcome.js
+          node --check onboarding-wizard.js
+          node --check scripts/onboarding-wizard-state.mjs
           node --check scripts/invitation.mjs
           node --check scripts/invited-player-local.mjs
           node --check live.js
@@ -230,6 +232,7 @@ jobs:
           node tests/desktop-workspace-step9.mjs
           node tests/ux-motion-step8.mjs
           node tests/welcome-i18n.mjs
+          node tests/onboarding-wizard-v202.mjs
           node scripts/validate-i18n.mjs
           node tests/supabase-read.mjs
           node tests/report-read-client.mjs
