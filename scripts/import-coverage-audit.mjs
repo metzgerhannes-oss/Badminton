@@ -1,38 +1,17 @@
 /**
- * Bounded, read-only inventory of public match-import queues and stored facts.
- * No private follows, personal names, source-site scraping, or import triggers.
- * Run: node scripts/import-coverage-audit.mjs --live
+ * Offline-only privacy-preserving match import coverage diagnosis.
+ * Real source data is supplied separately via authorized Badminton backup;
+ * never query production Supabase from GitHub Actions.
+ * No names, DBV IDs, source URLs or match rows are printed or uploaded.
  */
-import {writeFile} from "node:fs/promises";
+import {readFile} from "node:fs/promises";
 import {pathToFileURL} from "node:url";
 import {computeExternalStats} from "./external-match-stats.mjs";
 
-const ROOT="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
-const KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
-const LIMIT=400,MAX_STATUSES=4000,MAX_FACTS=10000;
 const goodNumber=x=>Number.isSafeInteger(x)&&x>=0?x:0;
 const parsedTime=x=>typeof x==="string"&&Number.isFinite(Date.parse(x))?Date.parse(x):null;
-const utcDay=x=>x?new Date(x).toISOString().slice(0,10):"–";
 const ID=/^\d{2}-\d{6}$/;
-const SOURCE_FIELDS="dbv_id,source_key,category,discipline,match_year,player_side,winning_side,opponent_names,games,source_url";
 
-async function readTable(table,select,max=MAX_STATUSES){
- const result=[];
- for(let offset=0;offset<max;offset+=LIMIT){
-  const params=new URLSearchParams({select,limit:String(LIMIT),offset:String(offset)});
-  const response=await fetch(ROOT+table+"?"+params,{
-   cache:"no-store",
-   headers:{apikey:KEY,Accept:"application/json"},
-   signal:AbortSignal.timeout(18000)
-  });
-  if(!response.ok)throw Error(table+" public REST HTTP "+response.status);
-  const batch=await response.json();
-  if(!Array.isArray(batch)||batch.length>LIMIT)throw Error(table+" unexpected REST data");
-  result.push(...batch);
-  if(batch.length<LIMIT)return {rows:result,truncated:false};
- }
- return {rows:result,truncated:true};
-}
 export function diagnosis(job,history,stored,valid,now=Date.now()){
  if(!job)return history?"not_started":"facts_without_queue";
  const state=String(job.status||"unknown");
@@ -105,61 +84,59 @@ export function makeReport(historyRows,jobRows,factRows,{now=Date.now()}={}){
   excluded:items.reduce((a,x)=>a+x.excluded,0),
   grouped,items};
 }
-export function printReport(report,limits,issues=35){
- const lines=[
-  "# Badminton: tatsächliche Importabdeckung",
-  "Stand (UTC): "+report.timestamp,
-  "Öffentlich vorgemerkte IDs: "+report.history_jobs+
-   " | Einzelmatch-Importstatus: "+report.match_jobs+
-   " | untersuchte Spieler: "+report.players,
-  "Tatsächlich abrufbare Quellkarten: "+report.stored+
-   " | davon fachlich zählbare Spiele: "+report.countable+
-   " | ausgeschlossene Quellkarten: "+report.excluded,
-  "",
-  "## Befunde (Anzahl Spieler)",
-  ...Object.entries(report.grouped).sort((a,b)=>b[1]-a[1])
-   .map(([key,n])=>"- "+(FINDING_DE[key]||key)+": "+n),
-  "",
-  "## Priorisierte Prüfungen",
-  "| Öffentliche DBV-ID | Importstatus | verarbeitet | importierbar | gespeichert | zählbar | Befund |",
-  "|---|---|---:|---:|---:|---:|---|"
- ];
- const priority=["processed_but_missing","expired_lease","import_error","source_unavailable",
-  "batch_backlog","not_started","loading_delayed","queued_delayed",
-  "no_countable_proofs","status_behind_facts","sources_excluded","import_not_finished",
-  "in_progress","not_proven_complete","facts_without_queue"];
- const sorted=[...report.items].sort((a,b)=>
-  priority.indexOf(a.finding)-priority.indexOf(b.finding)||a.dbv_id.localeCompare(b.dbv_id));
- for(const x of sorted.slice(0,issues)){
-  lines.push("| "+x.dbv_id+" | "+x.import_status+" | "+x.cursor+
-    " | "+x.eligible+" | "+x.stored+" | "+x.countable+" | "+
-    (FINDING_DE[x.finding]||x.finding)+" |");
+/** Only aggregate fields may leave the local audit process. */
+export function publicSummary(report,limits={}){
+ const truncated=["history","imports","facts"].filter(key=>limits[key]===true);
+ const grouped={};
+ for(const [key,count] of Object.entries(report.grouped||{})){
+  if(Object.hasOwn(FINDING_DE,key)&&Number.isSafeInteger(count)&&count>=0)
+   grouped[key]=count;
  }
- if(sorted.length>issues)lines.push("Weitere "+(sorted.length-issues)+" Profile nicht einzeln gezeigt.");
- const truncated=Object.entries(limits).filter(([,v])=>v).map(([name])=>name);
- lines.push("","**Grenzen:** Nur öffentlich registrierte DBV-IDs, keine lokalen Follow-Listen anderer Geräte.",
-  "Der Importstatus misst Verarbeitung, nicht Vollständigkeit aller historischen Spiele.",
-  "Diese Prüfung greift nur lesend auf unsere bestehenden Supabase-Ansichten zu. "+
-  "Sie ruft weder Badhub/DBV noch die Edge-Importfunktion auf.");
- if(truncated.length)lines.push("**Stichprobe gekappt:** "+truncated.join(", ")+
-  " – Summen sind Untergrenzen; Einzelstatus nicht als vollständig bewerten.");
+ return {timestamp:report.timestamp,players:report.players,
+  history_jobs:report.history_jobs,match_jobs:report.match_jobs,
+  stored:report.stored,countable:report.countable,excluded:report.excluded,
+  grouped,truncated};
+}
+export function printReport(report,limits={}){
+ const safe=publicSummary(report,limits);
+ const lines=[
+  "# Badminton: anonymisierte Importabdeckung",
+  "Stand (UTC): "+safe.timestamp,
+  "Historienaufträge: "+safe.history_jobs+
+   " | Einzelmatch-Importstatus: "+safe.match_jobs+
+   " | untersuchte Profile: "+safe.players,
+  "Tatsächlich gespeicherte Quellkarten: "+safe.stored+
+   " | fachlich zählbare Spiele: "+safe.countable+
+   " | ausgeschlossene Quellkarten: "+safe.excluded,
+  "",
+  "## Befunde (nur aggregierte Profilanzahlen)",
+  ...Object.entries(safe.grouped).sort((a,b)=>b[1]-a[1])
+   .map(([key,n])=>"- "+FINDING_DE[key]+": "+n),
+  "",
+  "**Grenzen:** Keine DBV-IDs, Namen, Gegner, Quellenlinks oder Einzelprofile in Logs/Artefakten.",
+  "Importstatus bedeutet nicht vollständige Karrierehistorie; fehlende Belege werden nicht als null Spiele gewertet.",
+  "Nur aus autorisiertem Badminton-Backup lokal eingelesene Daten; keine Netzwerkabfragen oder produktiven CI-Requests."
+ ];
+ if(safe.truncated.length)lines.push("**Stichprobe gekappt:** "+safe.truncated.join(", ")+
+  " – Summen sind Untergrenzen; keine Vollständigkeit behaupten.");
  return lines.join("\n")+"\n";
 }
-async function main(){
- const [h,j,f]=await Promise.all([
-  readTable("player_history_imports","dbv_id,status,requested_at,last_checked_at,updated_at"),
-  readTable("player_external_match_imports",
-   "dbv_id,status,cursor_offset,verified_count,rejected_count,source_count,last_started_at,last_finished_at,lease_until,updated_at"),
-  readTable("player_external_match_facts",SOURCE_FIELDS,MAX_FACTS)
- ]);
- const report=makeReport(h.rows,j.rows,f.rows);
- const md=printReport(report,{history:h.truncated,imports:j.truncated,facts:f.truncated});
- console.log(md);
- if(process.env.GITHUB_STEP_SUMMARY)await writeFile(process.env.GITHUB_STEP_SUMMARY,md,{flag:"a"});
- if(process.env.AUDIT_OUTPUT)await writeFile(process.env.AUDIT_OUTPUT,
-  JSON.stringify({report,limits:{history:h.truncated,imports:j.truncated,facts:f.truncated}},null,2)+"\n");
+/** Local-only input JSON {history:[],jobs:[],facts:[],limits?:{}}. */
+export async function reportFromBackupFile(file){
+ const input=JSON.parse(await readFile(file,"utf8"));
+ if(!Array.isArray(input.history)||!Array.isArray(input.jobs)||!Array.isArray(input.facts))
+  throw new Error("Invalid backup coverage input; expected history/jobs/facts arrays");
+ return printReport(makeReport(input.history,input.jobs,input.facts),input.limits||{});
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- if(!process.argv.includes("--live")){console.error("Use --live for a read-only audit");process.exitCode=2}
- else main().catch(err=>{console.error("SUPABASE_AUDIT_UNVERIFIABLE",err.message);process.exitCode=1});
+ const args=process.argv.slice(2);
+ if(process.env.CI||process.env.GITHUB_ACTIONS){
+  console.error("Coverage backup processing is disabled in CI");process.exitCode=2;
+ }else if(args.length===2&&args[0]==="--from-backup-json"){
+  reportFromBackupFile(args[1]).then(x=>process.stdout.write(x))
+   .catch(()=>{console.error("Invalid local backup coverage input");process.exitCode=1});
+ }else{
+  console.error("Use --from-backup-json FILE locally; --live network mode is disabled");
+  process.exitCode=2;
+ }
 }
