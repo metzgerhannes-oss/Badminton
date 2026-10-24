@@ -146,3 +146,29 @@ test("#289: following a team closes iPhone search without zoom or clipped naviga
   await page.evaluate(()=>localStorage.setItem("schmetterlinge-followed-teams-v1","[]"));
  }
 });
+
+test("#291: personal team order drag + arrows stay local, persistent and readable",async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem("schmetterlinge-followed-teams-v1",
+  JSON.stringify(["nuliga:10777:1","nuliga:10777:2"])));
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#mannschaft");
+ await page.locator("#team-manage-details > summary").click();
+ const rows=page.locator("#team-settings-list [data-team-row]");
+ await expect(rows).toHaveCount(2);
+ await expect(rows.first()).toContainText("Mössingen I");
+ const handle=page.locator("#team-settings-list [data-team-drag]").first();
+ await expect(handle).toHaveAttribute("draggable","true");
+ await expect(handle).toHaveAttribute("aria-label",/Sortieren/);
+ await handle.dragTo(rows.last());
+ await expect(rows.first()).toContainText("Mössingen II");
+ let order=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")));
+ expect(order).toEqual(["nuliga:10777:2","nuliga:10777:1"]);
+ await page.locator('#team-settings-list [data-team-move="nuliga:10777:1"][data-direction="-1"]').click();
+ await expect(rows.first()).toContainText("Mössingen I");
+ await page.reload();
+ await page.locator("#team-manage-details > summary").click();
+ await expect(rows.first()).toContainText("Mössingen I");
+ order=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")));
+ expect(order).toEqual(["nuliga:10777:1","nuliga:10777:2"]);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
