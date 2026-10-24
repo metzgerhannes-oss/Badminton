@@ -109,8 +109,10 @@ After explicitly reviewing the local target and complete private SQL:
 Refresh the independent applied count; 70 is only the 24.10.2026
 snapshot. The script rejects non-loopback hostnames, default port,
 unsuitable DB names, passwords in URLs and non-allowlisted parameters,
-strips ambient PG* configuration and checks that the target has no
-application tables. A local URL is NOT by itself proof of network
+strips ambient PG* configuration, checks that the target has no
+application tables and verifies the connected `f09_replay` role has no
+superuser, role/database-creation, replication, BYPASSRLS or PostgreSQL
+server-file/program privileges. This does not attest host isolation. A local URL is NOT by itself proof of network
 isolation: no SSH production tunnel, real credentials or external
 network may be present.
 
