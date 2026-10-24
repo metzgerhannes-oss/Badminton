@@ -774,10 +774,19 @@ function setup(){
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
   });
-  if(window.badmintonAppAccess?.allowed)SchmetterlingeRouter.openDialog(welcome);
-  else window.addEventListener("badminton:app-access-granted",()=>{
-   if(!state.players.length&&!state.friends.length&&!welcome.open)SchmetterlingeRouter.openDialog(welcome);
-  },{once:true});
+  // A fast member check may finish before DOMContentLoaded; installed WebKit
+  // may also restore this document on pageshow after "Zur App". Recheck the
+  // existing server-verified grant without ever treating local storage as auth.
+  const showFirstRunWhenGranted=()=>{
+   if(state.players.length||state.friends.length||welcome.open)return;
+   if(window.badmintonAppAccess?.allowed!==true)return;
+   if(document.querySelector("dialog[open]"))return;
+   SchmetterlingeRouter.openDialog(welcome);
+  };
+  window.addEventListener("badminton:app-access-granted",showFirstRunWhenGranted);
+  window.addEventListener("pageshow",showFirstRunWhenGranted);
+  showFirstRunWhenGranted();
+  setTimeout(showFirstRunWhenGranted,350);
  }
  window.SchmetterlingePwaUpdate?.initialize();
 }
