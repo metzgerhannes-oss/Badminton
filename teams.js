@@ -189,12 +189,16 @@ function renderTeamSettings(){
    '<button type="button" data-team-toggle="'+esc(key)+'" aria-label="Mannschaft nicht mehr folgen">Entfolgen</button></div></article>';
  }).join(""):'<p class="team-empty">Noch keine Mannschaften abonniert.</p>';
  wireCards(container);
+ const reset=$("team-order-reset");if(reset)reset.disabled=follows.length<2;
  container.querySelectorAll("[data-team-move]").forEach(b=>b.addEventListener("click",()=>{
   const i=follows.indexOf(b.dataset.teamMove),next=i+Number(b.dataset.direction);
   if(i<0||next<0||next>=follows.length)return;
   const [key]=follows.splice(i,1);follows.splice(next,0,key);
   if(!saveFollows()){readFollows();showStatus("Reihenfolge konnte nicht gespeichert werden.");}
   renderFollowed();
+  const actions=Array.from($("team-settings-list")?.querySelectorAll("[data-team-move]")||[])
+   .filter(button=>button.dataset.teamMove===key&&!button.disabled);
+  (actions.find(button=>button.dataset.direction===b.dataset.direction)||actions[0])?.focus({preventScroll:true});
  }));
 }
 function setTeamDiscover(open,focus=true){
@@ -214,7 +218,7 @@ function wireCards(container){
  container.querySelectorAll("[data-team-toggle]").forEach(b=>b.addEventListener("click",()=>{
   const id=b.dataset.teamToggle,old=follows.slice();
   if(follows.includes(id))follows=follows.filter(x=>x!==id);
-  else follows=normalizeFollows([id,...follows]);
+  else follows=normalizeFollows([...follows,id]);
   if(!saveFollows()){follows=old;showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");}
   else if(!old.includes(id)){
    setTeamDiscover(false,false);
@@ -399,6 +403,19 @@ function init(){
   renderFollowed();renderSearchResults();renderDetail();
  });
  $("team-refresh").addEventListener("click",load);
+ $("team-order-reset")?.addEventListener("click",()=>{
+  if(follows.length<2)return;
+  const before=follows.slice();
+  const label=key=>{
+   const team=rows.find(t=>t.follow_key===key&&t.season===season())||rows.find(t=>t.follow_key===key);
+   return team?displayTeamName(team):key;
+  };
+  follows.sort((a,b)=>label(a).localeCompare(label(b),"de",{numeric:true,sensitivity:"base"})||a.localeCompare(b));
+  if(!saveFollows()){
+   follows=before;showStatus("Reihenfolge konnte nicht gespeichert werden.");
+  }else showStatus("Standardreihenfolge wiederhergestellt.");
+  renderFollowed();$("team-order-reset")?.focus({preventScroll:true});
+ });
  window.addEventListener("badminton:app-access-granted",queueExistingTeams);
  $("team-detail").querySelectorAll("[data-team-tab]").forEach(btn=>btn.addEventListener("click",()=>{
   activeTab=btn.dataset.teamTab;renderDetail();
