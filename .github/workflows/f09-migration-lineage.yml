@@ -4,7 +4,9 @@ on:
     branches: [main]
     paths:
       - 'scripts/f09-migration-lineage.mjs'
+      - 'scripts/f09-isolated-replay.mjs'
       - 'tests/f09-migration-lineage.mjs'
+      - 'tests/f09-isolated-replay.mjs'
       - 'docs/F09_MIGRATION_REPLAY_READINESS.md'
       - '.github/workflows/f09-migration-lineage.yml'
   push:
@@ -29,5 +31,7 @@ jobs:
         run: |
           node --check scripts/f09-migration-lineage.mjs
           node tests/f09-migration-lineage.mjs
+          node --check scripts/f09-isolated-replay.mjs
+          node tests/f09-isolated-replay.mjs
       - name: Repository inventory only (no secrets, database, or network)
         run: node scripts/f09-migration-lineage.mjs --inventory-only

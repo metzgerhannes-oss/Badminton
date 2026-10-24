@@ -71,3 +71,53 @@ RLS/privilege testing, cron and Edge verification.
 CI must stay entirely synthetic with no productive Supabase request.
 No payment changes, paid services, RLS weakening, or auto-repair.
 External gates #56, #17 and physical F11 remain open.
+
+
+## Guarded local replay runner (opt-in, never CI)
+
+The new scripts/f09-isolated-replay.mjs can attempt replay ONLY
+with privately recovered, SHA-pinned and individually reviewed SQL
+against a fresh disposable PostgreSQL database. It never fetches,
+exports or resets productive Supabase. CI tests mock all psql calls.
+
+Private manifest outside the checkout:
+    {"migrations":[{"version":"YYYYMMDDHHMMSS",
+      "file":"YYYYMMDDHHMMSS.sql","sha256":"64 lowercase hex",
+      "reviewed":true}]}
+
+Every applied migration must be present in verified version order;
+the independently observed applied count must match, all file hashes
+must match. Symlinks, traversal, ANY backslash byte (including inline psql meta-commands),
+COPY, CREATE EXTENSION and recognized outbound/server-side SQL
+(including dblink, pg_net and cron.schedule) are rejected. This is a
+conservative preflight, NOT a SQL sandbox or a substitute for private
+manual review and network-isolated execution; historical SQL requiring
+these features must stop for separate assessment. Never silently change historical SQL to
+make a replay pass.
+
+Run only from a fully network-isolated disposable PostgreSQL instance,
+with a dedicated f09_replay role, empty f09_replay_* database and a
+nondefault TCP port:
+
+    node scripts/f09-isolated-replay.mjs --plan /private/manifest.json /private/sql 70
+
+After explicitly reviewing the local target and complete private SQL:
+
+    export F09_REPLAY_DATABASE_URL='postgresql://f09_replay@127.0.0.1:55432/f09_replay_test?sslmode=disable'
+    node scripts/f09-isolated-replay.mjs --replay /private/manifest.json /private/sql 70 --confirm-local
+
+Refresh the independent applied count; 70 is only the 24.10.2026
+snapshot. The script rejects non-loopback hostnames, default port,
+unsuitable DB names, passwords in URLs and non-allowlisted parameters,
+strips ambient PG* configuration, checks that the target has no
+application tables and verifies the connected `f09_replay` role has no
+superuser, role/database-creation, replication, BYPASSRLS or PostgreSQL
+server-file/program privileges. This does not attest host isolation. A local URL is NOT by itself proof of network
+isolation: no SSH production tunnel, real credentials or external
+network may be present.
+
+If a migration is unsupported, STOP. Do not retry against a partially
+altered database; recreate the disposable scratch cluster and
+document the discrepancy. Executing local SQL alone is not proof of
+Supabase-compatible extensions, roles/RLS, Cron, Edge, backups or
+invitation flows. NO real 70/70 replay is claimed. Issue #326 stays open.
