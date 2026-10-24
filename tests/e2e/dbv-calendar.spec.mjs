@@ -136,7 +136,8 @@ test("v148: BW U13 C presents real 2026 tournament results instead of source exp
  await expect(cards.nth(0)).toContainText("Reutlingen");
  await expect(cards.nth(1)).toContainText("Friedrichshafen");
  await expect(cards.nth(2)).toContainText("Mössingen");
- await expect(cards.nth(0).locator("a")).toHaveAttribute("href",/dbv\.turnier\.de\/tournament/);
+ await expect(cards.nth(0).locator('a[href*="dbv.turnier.de/tournament/"]')).toHaveAttribute("href",/dbv\.turnier\.de\/tournament/);
+ await expect(cards.nth(0).locator('a[href*="bwbv.de/2026/02/02/"]')).toBeVisible();
  await expect(cards.nth(2).locator("a")).toHaveAttribute("href",/DBB7AC20/i);
  await expect(page.locator(".dbv-calendar-archive,.dbv-calendar-framework,.dbv-calendar-no-results")).toHaveCount(0);
  await expect(page.locator("#dbv-calendar-results [data-calendar-toggle]")).toHaveCount(0);
