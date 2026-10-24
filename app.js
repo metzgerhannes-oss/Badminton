@@ -244,9 +244,9 @@ function renderFriends(){
   if(index<0||target<0||target>=state.friends.length)return;
   const [friend]=state.friends.splice(index,1);
   state.friends.splice(target,0,friend);save();render();
-  Array.from(el("friend-settings-list")?.querySelectorAll("[data-friend-move]")||[])
-   .find(button=>button.dataset.friendMove===friend.id&&button.dataset.direction===b.dataset.direction)
-   ?.focus({preventScroll:true});
+  const actions=Array.from(el("friend-settings-list")?.querySelectorAll("[data-friend-move]")||[])
+   .filter(button=>button.dataset.friendMove===friend.id&&!button.disabled);
+  (actions.find(button=>button.dataset.direction===b.dataset.direction)||actions[0])?.focus({preventScroll:true});
  }));
  settings.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
  settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollow)));
