@@ -246,6 +246,7 @@ function render(){
    importCompleteness(progress,external.length)+
    (partialExternal?" Diese Liste ist derzeit unvollständig.":"")+
    (stats.excluded?" "+stats.excluded+" zusätzliche unklare Einträge wurden ausgeschlossen.":"")+
+   (stats.quarantined?" "+stats.quarantined+" Quellkarten aus widersprüchlichen K.-o.-Runden wurden vorsorglich nicht als Spiele gewertet.":"")+
    (availability.detail?" "+availability.detail:"")+
    " Ergebnisse aus verschiedenen Quellen werden nicht addiert.";
  }else if(official.length){
