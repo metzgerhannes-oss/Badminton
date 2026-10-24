@@ -51,6 +51,9 @@ test("Cancel installed-app search without silently creating a profile",async ({p
  await page.locator("#first-run-new").click();
  await expect(page.locator("#existing-app-link")).toBeVisible();
  await page.locator("#existing-app-link").click();
+ // The return path must keep the actual invitation grant; a visible chooser
+ // without an authorized shell would be a false-positive on slower WebKit.
+ await expect.poll(()=>page.evaluate(()=>window.badmintonAppAccess?.allowed===true)).toBe(true);
  await expect(page.locator("#first-run-dialog")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved).toBeNull(); // Cancel leaves the new PWA profile store untouched.
