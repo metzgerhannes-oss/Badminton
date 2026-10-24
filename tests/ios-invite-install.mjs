@@ -32,6 +32,19 @@ assert.doesNotMatch(install,/auth\/v1|supabase\.co|localStorage|analytics|fetch\
 assert.doesNotMatch(app,/new URLSearchParams\(location\.search\)\.set\("appinvite"/);
 assert.match(fixture,/context\.route\(SUPABASE/);
 assert.match(invites,/appinvite=/);
+
+const settingsGuide=gate.match(/<details class="invitation-short-guide">([\s\S]*?)<\/details>/)?.[1];
+assert.ok(settingsGuide,"Owner invitation settings must separate sending and receiving");
+assert.match(settingsGuide,/<h4>Einladung teilen<\/h4>/);
+assert.match(settingsGuide,/<h4>Einladung erhalten<\/h4>/);
+assert.match(settingsGuide,/Einladung erstellen &amp; teilen/);
+assert.match(install,/id="existing-installation"/);
+assert.match(install,/id="new-installation"/);
+assert.match(install,/<button id="install-copy" type="button">Einladung sichern<\/button>/);
+assert.match(install,/Einladung aus Zwischenablage übernehmen/);
+assert.doesNotMatch(install,/Tippe unten auf „Einladung sichern“/);
+assert.doesNotMatch(install,/im App-Fenster „Zugang übernehmen“ antippen/);
+
 const version=release.match(/version:"(v\d+)"/)?.[1];
 assert.ok(version,"App release version required");
 assert.ok(sw.includes("schmetterlinge-shell-"+version),"Cache and release must agree");
