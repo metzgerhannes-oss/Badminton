@@ -436,3 +436,29 @@ test("F06: verified 2026 Reutlingen C tournament + preserves exact source and pl
  await page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]").click();
  await expect(page.locator("#official-tournament-list")).not.toContainText("Austragungsort: Reutlingen");
 });
+
+
+test("F06: Home tournament cards route internally on phone and desktop; external calendar stays official",async({page})=>{
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ await page.evaluate(()=>{
+  const state=JSON.parse(localStorage.getItem("shuttleboard-v1"));
+  state.officialLinks=[{id:"11111111-2222-4333-8444-555555555555",
+   url:"https://dbv.turnier.de/tournament/11111111-2222-4333-8444-555555555555",
+   name:"Synthetisches Zukunftsturnier",playerId:"05-070879",
+   startDate:"2027-01-16",endDate:"2027-01-17",place:"Testhalle"}];
+  localStorage.setItem("shuttleboard-v1",JSON.stringify(state));
+ });
+ for(const width of [390,1280]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  const row=page.locator(".upcoming-tournament-row").first();
+  await expect(row).toHaveAttribute("href","#turniere");
+  await expect(row).toContainText("Austragungsort: Testhalle");
+  await row.click();
+  await expect(page).toHaveURL(/#turniere$/);
+  await expect(page.locator("#official-tournament-list")).toContainText("Synthetisches Zukunftsturnier");
+  await expect(page.locator('#official-tournament-list a[href*="dbv.turnier.de/tournament/"]')).toBeVisible();
+  await expect(page.locator(".live-hub-official-link")).toHaveAttribute("href","https://turniere.badminton.de/");
+ }
+});

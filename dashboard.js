@@ -219,17 +219,17 @@ function renderOtherKpis(){
   const active=t.startDate<=today&&end>=today;
   const range=t.endDate&&t.endDate!==t.startDate?date(t.startDate)+" – "+date(t.endDate):date(t.startDate);
   const owner=t.playerId==="all"?"Alle Spieler":(profiles.find(p=>p.id===t.playerId)?.name||"Mein Profil");
-  const calendar=t.source==="spond"||t.source==="dbv-calendar"||!t.url;
-  const label=t.source==="dbv-calendar"?"Vorgemerkt · keine Anmeldung":calendar?"Kalendertermin · keine Anmeldung":"Offizielle Turnierseite";
-  const location=typeof t.location==="string"&&t.location.trim()?t.location.trim():"";
+  const calendar=t.source==="spond"||t.source==="dbv-calendar"||t.source==="bwbv-framework"||!t.url;
+  const label=t.source==="bwbv-framework"?"Rahmentermin · keine Anmeldung":t.source==="dbv-calendar"?"Vorgemerkt · keine Anmeldung":calendar?"Kalendertermin · keine Anmeldung":"Gespeicherter Turnierlink";
+  const location=typeof t.place==="string"&&t.place.trim()?t.place.trim():typeof t.location==="string"&&t.location.trim()?t.location.trim():"";
   const month=new Intl.DateTimeFormat("de-DE",{month:"short",timeZone:"UTC"})
    .format(new Date(t.startDate+"T12:00:00Z")).replace(".","").toUpperCase();
-  return '<a class="upcoming-tournament-row" href="'+(calendar?'#turniere':escape(t.url))+'"'+
-   (calendar?'':' rel="noopener noreferrer" target="_blank"')+
-   ' aria-label="'+escape(t.name)+', '+escape(range)+', '+(calendar?'in meiner Turnierliste ansehen':'offizielle Turnierseite öffnen')+'">'+
-   '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'"><span class="upcoming-tournament-month">'+escape(month)+'</span><strong class="upcoming-tournament-day">'+escape(t.startDate.slice(8,10))+'</strong></time>'+(active?'<small>Läuft</small>':'')+'</span>'+
+  return '<a class="upcoming-tournament-row" href="#turniere"'+
+   ' aria-label="'+escape(t.name)+', '+escape(range)+', in meiner Turnierliste ansehen">'+
+   '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+'"><span class="upcoming-tournament-month">'+escape(month)+'</span><strong class="upcoming-tournament-day">'+escape(t.startDate.slice(8,10))+'</strong></time>'+(active?'<small>Termin heute</small>':'')+'</span>'+
    '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+'</strong><small>'+
-   escape([range,location,owner].filter(Boolean).join(" · "))+'</small>'+
+   escape([range,owner].filter(Boolean).join(" · "))+'</small>'+
+   '<small class="upcoming-tournament-venue">'+escape(location?"Austragungsort: "+location:"Austragungsort noch nicht veröffentlicht")+'</small>'+
    '<span class="upcoming-tournament-label">'+escape(label)+'</span></span>'+
    '<span class="upcoming-tournament-arrow" aria-hidden="true">›</span></a>';
  }).join(""):'<div class="upcoming-tournaments-empty">'+(undated?'Keine bevorstehenden Turniere mit Datum. Bitte bei den gespeicherten Turnieren den Termin ergänzen.':'Für diesen Spieler sind noch keine zukünftigen Turniere mit Datum gespeichert. Du kannst Turniere mit + direkt aus dem DBV-Kalender vormerken. Eine Vormerkung bestätigt keine Anmeldung.')+' <a href="#turniere">Turnier anlegen / bearbeiten ↗</a></div>';
