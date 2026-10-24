@@ -36,13 +36,14 @@ try{
     assert.equal(options.env.PGPASSFILE,'/dev/null');
     assert.equal(options.env.PGSSLMODE,undefined);
     assert.ok(args.some(a=>a.startsWith('--dbname='+okUrl)));
-    return {status:0,stdout:calls===1?'f09_replay_test:0\n':''};
+    return {status:0,stdout:calls===1?'f09_replay_test:0:safe\n':''};
   };
   const outcome=runReplay(url,files,executor);
   assert.deepEqual([outcome.attempted,outcome.applied],[1,1]);
   assert.equal(calls,2);
   assert.equal(outcome.isolated_environment_attested,false);
-  assert.throws(()=>runReplay(url,files,()=>({status:0,stdout:'f09_replay_test:1\n'})),/not empty/);
+  assert.throws(()=>runReplay(url,files,()=>({status:0,stdout:'f09_replay_test:1:safe\n'})),/not empty/);
+  assert.throws(()=>runReplay(url,files,()=>({status:0,stdout:'f09_replay_test:0:unsafe\\n'})),/unsafe privileges/);
   await writeFile(path.join(dir,file),'\\connect production');
   const changed=await validatePrivateFiles(dir,[{...row,sha256:createHash('sha256').update('\\connect production').digest('hex')}]).then(()=>null,e=>e);
   assert.match(changed.message,/Unsafe/);
