@@ -1,40 +1,38 @@
-name: P0 SpVgg nightly match reconciliation
+name: P0 SpVgg offline source contract
 on:
-  push:
-    branches: [main, fix/p0-fresh-results-import-v152]
+  pull_request:
+    branches: [main]
     paths:
-      - scripts/p0-fresh-source-scan.mjs
-      - scripts/badhub-tournament-view-parser.mjs
-      - tests/badhub-tournament-view-parser.mjs
-      - scripts/p0-stage-results-oidc.mjs
-      - .github/workflows/p0-fresh-scan.yml
-      - supabase/functions/spvgg-match-rebuild/index.ts
+      - '.github/workflows/p0-fresh-scan.yml'
+      - 'scripts/p0-fresh-source-scan.mjs'
+      - 'scripts/p0-stage-results-oidc.mjs'
+      - 'supabase/functions/spvgg-match-rebuild/index.ts'
+      - 'tests/p0-ci-prod-isolation.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/p0-fresh-scan.yml'
+      - 'scripts/p0-fresh-source-scan.mjs'
+      - 'scripts/p0-stage-results-oidc.mjs'
+      - 'supabase/functions/spvgg-match-rebuild/index.ts'
+      - 'tests/p0-ci-prod-isolation.mjs'
   workflow_dispatch:
   schedule:
     - cron: '17 3 * * *'
 permissions:
   contents: read
-  id-token: write
 jobs:
-  source-inventory:
+  offline-source-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Verify source and OIDC client syntax
+      - name: Verify synthetic/offline source contract
         run: |
           node --check scripts/p0-fresh-source-scan.mjs
+          node --check scripts/p0-stage-results-oidc.mjs
           node --check scripts/badhub-tournament-view-parser.mjs
           node tests/badhub-tournament-view-parser.mjs
-          node --check scripts/p0-stage-results-oidc.mjs
-      - name: Read the 13 original public match sources without database writes
-        if: github.ref != 'refs/heads/main'
-        run: node scripts/p0-fresh-source-scan.mjs
-      - name: Incrementally reconcile regular verified club sources via OIDC
-        if: github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch'
-        run: node scripts/p0-fresh-source-scan.mjs --stage
-      - name: Explicit P0 source fallback (manual dispatch only, bounded)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-        run: node scripts/p0-fresh-source-scan.mjs --stage --source-fallback
+          node tests/p0-ci-prod-isolation.mjs
