@@ -1,45 +1,53 @@
-# Einladungslink, Willkommensseite und Installation
+# Schmetterlinge: Einladungen teilen und auf iPhone installieren
 
-Stand: 11.10.2026 (v76). Statische GitHub-Pages-PWA Schmetterlinge ohne Benutzerkonten.
+Stand: 24.10.2026 · v201 · Issue #304. Die Hinweise entsprechen den tatsächlich sichtbaren Bedienelementen. Sie ändern weder Einladungsberechtigungen noch bestehende Profile.
 
-## Einladen
+## App-Zugang teilen (nur Betreiber)
 
-Unter Einstellungen → Familie & Freunde einladen → Einladungslink teilen oder Link kopieren:
+1. Öffne **Einstellungen → App-Zugänge einladen**.
+2. Wähle **„Einladung erstellen & teilen“**.
+3. Teile den erzeugten Link über die geöffnete Auswahl.
 
-https://metzgerhannes-oss.github.io/Badminton/welcome.html
+Alternativ: **„Einladungslink kopieren“** wählen und den Link in eine Nachricht einfügen. Ein Link kann innerhalb von 30 Tagen angenommen werden; bestehende Berechtigungen bleiben bis zum Widerruf erhalten. Eine App-Einladung gewährt nicht automatisch Rechte, fremde Spielerprofile zu bearbeiten.
 
-Der Link ist für alle nutzbar; er enthält keine persönlichen Informationen, keine DBV-ID und keinen Zugriff auf die Profile der versendenden Person. Er ist kein Login und erzeugt keine Cloud-Freundschaft.
+## Einladung erhalten
 
-## Neues Profil
+1. Öffne den erhaltenen Einladungslink.
+2. Folge der Anleitung für die bestehende oder neue App-Installation.
+3. Öffne **Schmetterlinge**.
 
-1. Willkommensseite öffnen und direkt per Namen, Namensbestandteil oder DBV-Spieler-ID suchen (ab zwei Zeichen).
-2. Im öffentlichen DBV-Spielerverzeichnis einen Treffer anhand von Verein, Jahrgang und ID auswählen.
-3. Die Auswahl **ausdrücklich bestätigen**. Die verifizierte DBV-ID, der Name, der Verein und – sofern vorhanden – das Geburtsjahr werden lokal als eigenes Profil gespeichert.
-4. Falls kein Treffer existiert oder die Suche nicht erreichbar ist: „Spieler nicht gefunden? Manuell einrichten“ öffnen, Name/Jahrgang/Verein angeben oder eine DBV-ID bzw. einen offiziellen Link einfügen.
-5. iPhone-/Android-Anleitung lesen und die App öffnen.
+Ein erfolgreicher Zugang bleibt beim späteren Start erhalten. Kein erneuter Code und keine Pflichtregistrierung. Berechtigungen werden weiterhin serverseitig überprüft und können widerrufen werden.
 
-Die Suche liest nur veröffentlichte DBV-Verzeichnisdaten aus Supabase. Bei Ausfall kann die statische GitHub-Spielerbibliothek verwendet werden. Vor einer Eingabe werden keine vollständigen Spielerverzeichnisse heruntergeladen. Es erfolgt kein serverseitiges Speichern privater Profile und keine automatische Spielerübernahme ohne Bestätigung.
+## iPhone: Schmetterlinge ist schon installiert
 
-Eine offizielle DBV-URL mit player-profile/UUID enthält nicht die numerische DBV-ID. Diese wird daher nicht erraten. Verifizierte Ranglisten erscheinen nur, wenn die ID separat verfügbar und importiert ist.
+1. Öffne den Einladungslink in Safari.
+2. Wähle **„Einladung sichern“**.
+3. Öffne **Schmetterlinge** über das bereits vorhandene App-Symbol.
+4. Nur falls der Zugang noch nicht aktiv ist: Wähle **„Einladung aus Zwischenablage übernehmen“**.
 
-Der neue Spieler wird ausschließlich lokal auf dem Gerät gespeichert. Frühere Profile, Freunde, Turnierfavoriten und Startprofil bleiben erhalten; doppelte DBV-IDs werden abgewiesen. Auf einem frischen Gerät werden keine fremden Spieler automatisch als eigene Profile angelegt.
+**Keine Neuinstallation** nötig. Der Hinweis bezieht sich auf den tatsächlichen Button der Zugangsseite in `index.html`.
 
-## Kostenlos auf den Home-Bildschirm
+## iPhone: Schmetterlinge zum ersten Mal installieren
 
-iPhone/iPad: In Safari öffnen. Über Teilen (ggf. Seitenmenü … → Teilen) → Zu Home-Bildschirm hinzufügen → ggf. Als Web-App öffnen → Hinzufügen. Apple: https://support.apple.com/guide/iphone/iphea86e5236/ios
+1. Öffne den Einladungslink in **Safari**.
+2. Wähle **„Einladung sichern“**.
+3. Öffne in Safari **„Teilen“**.
+4. Wähle **„Zum Home-Bildschirm hinzufügen“**.
+5. Aktiviere **„Als Web-App öffnen“**, falls angeboten.
+6. Wähle **„Hinzufügen“**.
+7. Öffne **Schmetterlinge** über das neue App-Symbol.
 
-Android: In Google Chrome öffnen. Menü ⋮ → App installieren oder Zum Startbildschirm hinzufügen → bestätigen. Google: https://support.google.com/chrome/answer/9658361?co=GENIE.Platform%3DAndroid
+Die Einladung wird beim Öffnen geprüft. Wurde der Link nicht vom iPhone übernommen, lässt sich die gespeicherte Einladung einmalig über **„Einladung aus Zwischenablage übernehmen“** annehmen. Nur ein tatsächlicher Berechtigungsnachweis schaltet Daten frei.
 
-Direktzugang für bestehende Nutzer zur Anleitung: https://metzgerhannes-oss.github.io/Badminton/welcome.html#installation
+## Android und Browser
 
-Es handelt sich um eine Progressive Web App, keinen klassischen App-Store-Download. Das Home-Screen-Symbol öffnet die bisherige App-Startseite; gespeicherte Profile werden nicht zwischen Geräten synchronisiert.
+In Chrome nach Öffnen des Einladungslinks **Menü → App installieren** oder **Zum Startbildschirm hinzufügen** wählen, sofern angeboten. Die Alternative **„Stattdessen nur im Browser verwenden“** nutzt den Browser ohne App-Installation.
 
-## Implementierung
+## Schutz und technische Regression
 
-- welcome.html, welcome.css, welcome.js: mobile Willkommens- und Einrichtungsseite mit Suche und Bestätigung
-- scripts/invitation-search.mjs: schreibgeschützte DBV-Volltextsuche, GitHub-Ausfallsicherung, Validierung und Duplikatfilter
-- scripts/invitation.mjs: strenge DBV-Validierung, verlustfreies Zusammenführen bestehender Profildaten
-- invite.js: systemeigenes Teilen, Link kopieren mit Fallback
-- index.html: Einstellungsbereich für Einladungen und Installationshilfe
-- sw.js: PWA-Cache inkl. neuer Dateien
-- tests/invitation.mjs: Validierungs- und Persistenztests
+- `install-invite.html`: keine PWA-Manifest-Umleitung auf den allgemeinen Start ohne Einladung.
+- `index.html` / `invite.js`: exakt beschriftete Teilen-, Kopieren- und Empfangsaktionen.
+- `tests/ios-invite-install.mjs` und `tests/e2e/ios-invite-install.spec.mjs`: synthetisch, keine produktiven Supabase-Anfragen, keine echte Einladungsannahme in CI.
+- Profil-/Favoritendaten und lokale Berechtigungen bleiben unverändert. Bei erfolgreicher Einladung entsteht kein neues Konto und keine zweite Codepflicht.
+- F02 #56: Betreiber-, Datenschutz- und Quellenrechte-Freigabe ist nicht durch diese Anleitung erledigt; reale iPhone-/VoiceOver-Abnahme in F11.
+
