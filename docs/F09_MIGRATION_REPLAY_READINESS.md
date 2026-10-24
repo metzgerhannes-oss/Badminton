@@ -1,0 +1,67 @@
+# F09 – Migration lineage and isolated replay readiness
+
+**Status: NOT REPLAY READY.** Read-only inventory checked 2026-10-24.
+This is a technical safety gate, not a production migration.
+
+## Current evidence
+
+The Badminton Supabase project has 70 applied migration versions.
+The checked main tree has 7 versioned files under supabase/migrations/
+and 53 historical .sql files under database/. Just one of the seven
+version numbers exactly matches a registered applied version:
+69 applied versions have no same-numbered local file and 6 local files
+have no same-numbered applied version. Historically renamed or
+aliased migrations are NOT presumed absent or eligible for execution.
+Legacy SQL files cannot be replayed in an arbitrary order.
+
+The existing private import_health_weekly snapshot from 2026-10-19
+reported ok. This does not prove career completeness, source rights,
+or monthly free-tier consumption.
+
+## Offline-only tooling
+
+Run the synthetic regression:
+    node tests/f09-migration-lineage.mjs
+
+Read inventory (counts only):
+    node scripts/f09-migration-lineage.mjs --inventory-only
+
+Authorized operators may prepare a PRIVATE metadata-only JSON
+outside the repository with this schema:
+    {"migrations":[{"version":"YYYYMMDDHHMMSS","sha256":"64 lowercase hex"}]}
+
+Then run LOCALLY, never in CI:
+    node scripts/f09-migration-lineage.mjs --manifest /private/metadata.json
+
+Every missing SHA is an unverified comparison, never assumed equal.
+Hashes compare exact SQL file bytes; statement-splitting/format
+differences must be manually reviewed, not silently normalized.
+Raw SQL and statement arrays are prohibited in the metadata input.
+The report prints only summary counts; never commit or upload input.
+
+Even if lineage_ready is true, isolated_replay_verified remains
+false: a matching manifest cannot substitute for PostgreSQL replay,
+RLS/privilege testing, cron and Edge verification.
+
+## Closing conditions for #326
+
+1. Obtain the applied-order/SQL provenance from the authorized
+   migration history, privately audit for secrets, personal data,
+   unsafe default grants, destructive statements and dependencies.
+   Map renamed versions explicitly, keeping the original scripts.
+2. Rebuild in a disposable, version-pinned, isolated PostgreSQL/
+   Supabase instance with synthetic fixtures. NEVER reset production,
+   reconnect a local CLI to production, or use production credentials.
+3. Compare schemas, extensions, indexes, triggers, per-role grants,
+   default ACLs, public RLS, sensitive RPC EXECUTE permissions,
+   cron jobs, Edge prerequisites, invitation and backup contracts.
+4. Record tool versions and the exact replay run, prove authorized
+   positives and unauthorized negatives, and document any migration
+   that cannot be reconstructed instead of claiming success.
+5. Track independently: #255 measured monthly logs/egress;
+   #162 cron, data freshness and deployment warnings;
+   #161 Cloudflare billing under an authorized account.
+
+CI must stay entirely synthetic with no productive Supabase request.
+No payment changes, paid services, RLS weakening, or auto-repair.
+External gates #56, #17 and physical F11 remain open.
