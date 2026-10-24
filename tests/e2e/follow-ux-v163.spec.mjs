@@ -59,6 +59,7 @@ test("Gefolgte Spieler: all entries, name/club/ID filtering, no iPhone horizonta
 });
 
 test("#289: following a player keeps iPhone viewport stable and dismisses search keyboard",async({page})=>{
+ test.setTimeout(90000); // Three full WebKit navigations under shared CI runners.
  for(const width of [320,390,420]){
   await page.setViewportSize({width,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
