@@ -408,6 +408,22 @@
     "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "بعد ذلك افتح Schmetterlinge من الأيقونة وأنشئ ملفك الشخصي فيه.",
     "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "لا تُنقل الملفات الشخصية المحفوظة في Safari تلقائياً. صدّرها عبر «نسخ بياناتي احتياطياً» ثم استوردها إلى التطبيق.",
     "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "بعد الفتح من الأيقونة، أنشئ ملفاً شخصياً. لا يلزم تسجيل الدخول.",
-    "Profil anlegen": "إنشاء ملف شخصي"
+    "Profil anlegen": "إنشاء ملف شخصي",
+    "Dein Profil": "ملفك الشخصي",
+    "Dein erstes Spielerprofil ist bereit.": "ملف اللاعب الأول جاهز.",
+    "Weitere Spieler": "لاعبون آخرون",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "أضف ملفات لاعبين أخرى تخصك عند الحاجة.",
+    "Spielerprofil hinzufügen": "إضافة ملف لاعب",
+    "Suche eine Mannschaft, der du folgen möchtest.": "ابحث عن فريق تريد متابعته.",
+    "Mannschaft suchen": "البحث عن فريق",
+    "Merke interessante Turniere mit + für dein Profil vor.": "احفظ البطولات التي تهمك في ملفك باستخدام +.",
+    "Turniere auswählen": "اختيار البطولات",
+    "Einrichtung": "الإعداد",
+    "Überspringen": "تخطي",
+    "Später fortfahren": "المتابعة لاحقًا",
+    "Einrichtung fortsetzen": "متابعة الإعداد",
+    "Einrichtung erneut ansehen": "عرض الإعداد مجددًا",
+    "Fertig": "إنهاء",
+    "{step} von 4": "{step} من 4"
   }
 }

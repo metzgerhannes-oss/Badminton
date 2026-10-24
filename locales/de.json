@@ -352,6 +352,22 @@
     "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.": "Die allgemeine DBV-Namenssuche ist aus Datenschutzgründen derzeit gesperrt. Angenommene Einladungen werden automatisch übernommen. Weitere eigene Profile kannst du unten mit Name und DBV-ID ergänzen.",
     "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.": "Die DBV-Namenssuche ist derzeit nicht erreichbar. Verwende die manuelle Einrichtung mit Name und DBV-ID.",
     "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.": "Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.",
-    " · Auf diesem Gerät gespeichert": " · Auf diesem Gerät gespeichert"
+    " · Auf diesem Gerät gespeichert": " · Auf diesem Gerät gespeichert",
+    "Dein Profil": "Dein Profil",
+    "Dein erstes Spielerprofil ist bereit.": "Dein erstes Spielerprofil ist bereit.",
+    "Weitere Spieler": "Weitere Spieler",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "Füge bei Bedarf weitere eigene Spielerprofile hinzu.",
+    "Spielerprofil hinzufügen": "Spielerprofil hinzufügen",
+    "Suche eine Mannschaft, der du folgen möchtest.": "Suche eine Mannschaft, der du folgen möchtest.",
+    "Mannschaft suchen": "Mannschaft suchen",
+    "Merke interessante Turniere mit + für dein Profil vor.": "Merke interessante Turniere mit + für dein Profil vor.",
+    "Turniere auswählen": "Turniere auswählen",
+    "Einrichtung": "Einrichtung",
+    "Überspringen": "Überspringen",
+    "Später fortfahren": "Später fortfahren",
+    "Einrichtung fortsetzen": "Einrichtung fortsetzen",
+    "Einrichtung erneut ansehen": "Einrichtung erneut ansehen",
+    "Fertig": "Fertig",
+    "{step} von 4": "{step} von 4"
   }
 }

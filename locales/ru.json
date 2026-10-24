@@ -408,6 +408,22 @@
     "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Затем откройте Schmetterlinge через значок и создайте профиль там.",
     "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Профили, уже сохранённые в Safari, не переносятся автоматически. Экспортируйте их через «Сохранить мои данные» и импортируйте в приложение.",
     "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "После открытия через значок создайте профиль. Вход не требуется.",
-    "Profil anlegen": "Создать профиль"
+    "Profil anlegen": "Создать профиль",
+    "Dein Profil": "Ваш профиль",
+    "Dein erstes Spielerprofil ist bereit.": "Ваш первый профиль игрока готов.",
+    "Weitere Spieler": "Другие игроки",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "При необходимости добавьте другие собственные профили игроков.",
+    "Spielerprofil hinzufügen": "Добавить профиль игрока",
+    "Suche eine Mannschaft, der du folgen möchtest.": "Найдите команду, за которой хотите следить.",
+    "Mannschaft suchen": "Найти команду",
+    "Merke interessante Turniere mit + für dein Profil vor.": "Сохраняйте интересные турниры в своём профиле с помощью +.",
+    "Turniere auswählen": "Выбрать турниры",
+    "Einrichtung": "Настройка",
+    "Überspringen": "Пропустить",
+    "Später fortfahren": "Продолжить позже",
+    "Einrichtung fortsetzen": "Продолжить настройку",
+    "Einrichtung erneut ansehen": "Посмотреть настройку ещё раз",
+    "Fertig": "Готово",
+    "{step} von 4": "{step} из 4"
   }
 }

@@ -1,4 +1,4 @@
-/* F07 v202: compact navy guided setup; never alters Home or personal data. */
+/* F07 v204: compact navy guided setup; never alters Home or personal data. */
 #onboarding-wizard{box-sizing:border-box;width:min(420px,calc(100vw - 28px));max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;border:1px solid #77acd2;border-radius:20px;background:#112c4b;color:#f4fbff;box-shadow:0 22px 70px #020b19c9;padding:23px 20px 20px;inset:0;margin:auto;font:16px/1.45 system-ui,sans-serif}
 #onboarding-wizard::backdrop{background:#020b1dcc}
 #onboarding-wizard .onboarding-head{display:flex;justify-content:space-between;gap:12px;color:#b8e5ff;font-size:13px}
@@ -12,3 +12,7 @@
 #onboarding-wizard button:focus-visible,#onboarding-resume:focus-visible{outline:3px solid #fff;outline-offset:3px}
 #onboarding-resume{position:fixed;right:14px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:75;background:#123e62;box-shadow:0 4px 22px #020b19b3;max-width:calc(100vw - 28px)}
 @media(max-width:360px){#onboarding-wizard{padding:17px 14px}#onboarding-wizard .onboarding-actions{justify-content:stretch}#onboarding-wizard .onboarding-primary{flex:1}}
+
+/* Arabic setup keeps the floating resume control inside the iPhone safe area. */
+html[dir="rtl"] #onboarding-wizard{direction:rtl}
+html[dir="rtl"] #onboarding-resume{right:auto;left:14px}
