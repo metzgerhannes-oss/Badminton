@@ -23,7 +23,7 @@ assert.equal(report.items.find(x=>x.dbv_id==="99-000001").finding,"processed_but
 assert.equal(report.items.find(x=>x.dbv_id==="99-000002").finding,"source_unavailable");
 assert.equal(report.items.find(x=>x.dbv_id==="99-000003").finding,"not_started");
 const message=printReport(report,{history:false,imports:false,facts:false});
-assert.match(message,/Tatsächlich abrufbare Quellkarten: 1/);
+assert.match(message,/Tatsächlich gespeicherte Quellkarten: 1/);
 assert.doesNotMatch(message,/99-000001|99-000002|99-000003/);
 assert.doesNotMatch(message,/\b\d{2}-\d{6}\b/);
 assert.equal(publicSummary(report,{}).items,undefined);
