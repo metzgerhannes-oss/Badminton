@@ -41,7 +41,7 @@ function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
  * the same route. This does not touch stored players, friends or invitations.
  */
 function navigatePrimary(page,{returnToOwn=true}={}){
- const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte","historie"];
+ const allowed=["start","turniere","live","spieler","verein","mannschaft","berichte","historie","spiele"];
  if(!allowed.includes(page))return false;
  if(page==="start"){
   if(returnToOwn){
@@ -414,6 +414,7 @@ window.badmintonTournamentOptions=()=>{
   return order[bookmarkPhase(a)[1]]-order[bookmarkPhase(b)[1]]||a.name.localeCompare(b.name,"de");
  });
 };
+window.badmintonArcadeProfiles=()=>({players:state.players.map(p=>({id:p.id,name:p.name})),activeProfileId:state.activeProfileId});
 window.badmintonLiveViewerOptions=()=>({
  own:state.players.map(p=>({id:p.id,name:p.name})),
  friends:state.friends.map(p=>({id:p.id,name:p.name})),
@@ -534,7 +535,7 @@ function setup(){
   if(!link||link.closest(".bottom-nav")||link.hasAttribute("download")||
      link.target&&link.target!=="_self")return;
   const dest=link.getAttribute("href")?.slice(1)||"";
-  if(!["start","turniere","live","spieler","verein","mannschaft","berichte","historie"].includes(dest))return;
+  if(!["start","turniere","live","spieler","verein","mannschaft","berichte","historie","spiele"].includes(dest))return;
   event.preventDefault();
   navigatePrimary(dest);
  });

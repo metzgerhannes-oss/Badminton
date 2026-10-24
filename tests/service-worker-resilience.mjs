@@ -143,7 +143,11 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
   assert.ok(sw.accepted.includes(png),"iPhone install icon missing: "+png);
  assert.ok(!sw.accepted.includes("./wiki.js"),"Wiki module should load on first use");
  assert.ok(!sw.accepted.some(path=>path.includes("/data/")),"No player indexes during worker installation");
- assert.ok(sw.accepted.length<100,"Avoid full pre-caching of every optional feature");
+ for(const asset of ["./spiele.js","./spiele.css","./games/snake.mjs"])
+  assert.ok(sw.accepted.includes(asset),"Snake must work offline on first installed launch: "+asset);
+ // Three small offline Snake assets extend the old 99-file cap by one after
+ // deduplicating a legacy entry; all secondary Wiki/data indexes remain lazy.
+ assert.ok(sw.accepted.length<=100,"Avoid full pre-caching of every optional feature");
 }
 // Invitation query tokens, unrelated resources and JSON indexes remain outside runtime CacheStorage.
 for(const path of ["welcome.html?invite=secret","private-player.html?code=secret","unknown.json","data/history.json"]){
