@@ -50,7 +50,7 @@ test("F07 existing user is never forced into setup and can restart it in setting
  await expect(page.locator("#onboarding-wizard")).not.toBeVisible();
  await page.locator("#onboarding-restart").click();
  await expect(page.locator("#onboarding-wizard")).toBeVisible();
- await page.locator("#onboarding-skip").toBeHidden();
+ await expect(page.locator("#onboarding-skip")).toBeHidden();
  await page.locator("#onboarding-later").click();
  expect(await page.evaluate(()=>localStorage.getItem("schmetterlinge.setupWizard.v1"))).toBe("0");
 });
