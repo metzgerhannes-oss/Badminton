@@ -13,3 +13,26 @@
 .today-match-pending{cursor:default;border-style:solid}
 .today-match-row:focus-visible{outline:3px solid #75c9ff;outline-offset:3px}
 @media(max-width:420px){.today-match-row{padding:.75rem .85rem;gap:.3rem .65rem}}
+
+/* F08: readable source-backed state labels without changing Home's navy shell. */
+.today-match-entity,.today-match-status{
+ display:inline-flex;align-items:center;min-height:26px;max-width:100%;
+ padding:.16rem .55rem;border-radius:7px;font-size:.82rem;line-height:1.4;
+ font-weight:700;background:#284e71;color:#f5faff;border:1px solid #83a9c7;
+}
+.today-match-row[data-kind="playing"] .today-match-status{
+ background:#a34b14;color:#fff;border-color:#f8c18b;
+}
+.today-match-row[data-kind="result"] .today-match-status{background:#245c4d;color:#fff;border-color:#98c9ae}
+.today-match-pairing{flex-basis:100%}
+.today-match-detail{flex-basis:100%;color:#e2effa;font-size:.93rem;overflow-wrap:anywhere}
+.today-match-row-score{font-weight:800;color:#fff;background:#235d50;padding:.18rem .6rem;border-radius:6px}
+.today-all-link{display:inline-flex;align-items:center;min-height:44px;
+ color:#d6efff;font-size:.94rem;font-weight:700;text-decoration:underline;
+ text-underline-offset:3px;padding:.4rem .15rem}
+.today-all-link[hidden]{display:none!important}
+.today-all-link:focus-visible{outline:3px solid #75c9ff;outline-offset:2px}
+@media(max-width:420px){
+ .today-match-row{gap:.3rem .45rem}
+ .today-match-status{font-size:.78rem}
+}
