@@ -19,6 +19,7 @@ on:
     paths:
       - '.github/workflows/private-dbv-directory.yml'
       - 'scripts/private-dbv-directory-import.py'
+      - 'scripts/update-ranking.py'
       - 'tests/test_private_dbv_directory.py'
       - 'supabase/functions/private-dbv-directory/index.ts'
 permissions:

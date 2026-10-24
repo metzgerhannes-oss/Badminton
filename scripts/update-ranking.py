@@ -130,6 +130,28 @@ def cohort_ranks(rows: list[dict]) -> dict[tuple[str,str],dict]:
                 ranked[k]=record
     return ranked
 
+def official_publication_stamp(html: str):
+    """Derive the official ISO week from the published timestamp.
+
+    The official /ranking HTML can omit a separate "Rangliste KW xx" label.
+    When such a label exists, it must agree with the timestamp; never
+    infer a current Excel from an archived week or conflicting metadata.
+    """
+    marker=re.search(r"zuletzt\s+aktualisiert\s*:",html,re.I)
+    if not marker:
+        raise ValueError("Official ranking publication timestamp missing")
+    found=re.search(r"(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2}:\d{2})",
+                    html[marker.end():marker.end()+14000])
+    if not found:
+        raise ValueError("Official ranking publication timestamp invalid")
+    source_dt=datetime.strptime(found.group(1)+" "+found.group(2),
+        "%d.%m.%Y %H:%M:%S").replace(tzinfo=ZoneInfo("Europe/Berlin"))
+    iso_year,published_week=iso_week(source_dt)
+    label=re.search(r"Rangliste\s+KW\s*(\d{1,2})\b",html,re.I)
+    if label and int(label.group(1))!=published_week:
+        raise ValueError("Official ranking week label conflicts with publication date")
+    return iso_year,published_week,source_dt
+
 def current_public_export():
     """Read the actual *current* official DBV Excel download (not only old week archives).
 
@@ -144,20 +166,7 @@ def current_public_export():
             raw=resp.read(5_000_001)
         if len(raw)>5_000_000:raise ValueError("Ranking page exceeds maximum size")
         html=raw.decode("utf-8","replace")
-        # Exact navigation label from the official page, e.g. "Rangliste KW 41".
-        match=re.search(r"Rangliste\s+KW\s*(\d{1,2})\b",html,re.I)
-        # Published timestamp is needed to determine the correct ISO week year.
-        updated_anchor=html.find("zuletzt aktualisiert:")
-        updated_match=re.search(r"(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2}:\d{2})",
-            html[updated_anchor:updated_anchor+14000]) if updated_anchor>=0 else None
-        if not match or not updated_match:
-            raise ValueError("Current ranking week or publication timestamp missing; do not guess")
-        source_dt=datetime.strptime(updated_match.group(1)+" "+updated_match.group(2),
-            "%d.%m.%Y %H:%M:%S").replace(tzinfo=ZoneInfo("Europe/Berlin"))
-        iso_year,published_week=iso_week(source_dt)
-        listed_week=int(match.group(1))
-        if published_week!=listed_week:
-            raise ValueError(f"Ranking label KW {listed_week} conflicts with published date KW {published_week}")
+        iso_year,published_week,source_dt=official_publication_stamp(html)
         headers={"User-Agent":"Schmetterlinge-Ranking/1.1 (weekly public export)",
                  "Accept":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream;q=0.9"}
         with urlopen(Request(export_url,headers=headers),timeout=50) as resp:
