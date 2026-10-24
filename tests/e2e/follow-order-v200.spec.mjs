@@ -26,9 +26,12 @@ test("v200: player ordering persists, keyboard focus survives, reset is explicit
  await moved.click();
  await expect(moved).toBeFocused();
  expect(await order()).toEqual(["98-900001","98-900003","98-900002"]);
+ await moved.click(); // At the top the up arrow is disabled: focus must fall back to down.
+ await expect(page.locator('[data-friend-move="98-900003"][data-direction="1"]')).toBeFocused();
+ expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
  await page.reload();
  await page.locator("#friend-manage-details summary").click();
- expect(await order()).toEqual(["98-900001","98-900003","98-900002"]);
+ expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
  await page.locator("#friend-order-reset").click();
  await expect(page.locator("#friend-order-reset")).toBeFocused();
  expect(await order()).toEqual(["98-900002","98-900003","98-900001"]);
@@ -59,6 +62,9 @@ test("v200: team order and reset persist without touching profile storage",async
  await moved.click();
  await expect(moved).toBeFocused();
  expect(await order()).toEqual(["nuliga:999999:3","nuliga:999999:2","nuliga:999999:1"]);
+ await moved.click(); // Boundary fallback must keep an enabled arrow focused.
+ await expect(page.locator('[data-team-move="nuliga:999999:2"][data-direction="1"]')).toBeFocused();
+ expect(await order()).toEqual(["nuliga:999999:2","nuliga:999999:3","nuliga:999999:1"]);
  await page.locator("#team-order-reset").click();
  await expect(page.locator("#team-order-reset")).toBeFocused();
  expect(await order()).toEqual(["nuliga:999999:1","nuliga:999999:2","nuliga:999999:3"]);
