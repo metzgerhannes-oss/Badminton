@@ -10,9 +10,11 @@ const friends=[
 const teamKeys=["nuliga:999999:3","nuliga:999999:1","nuliga:999999:2"];
 
 test("v200: player ordering persists, keyboard focus survives, reset is explicit, new follow appends",async({page})=>{
- await page.addInitScript(({own,friends})=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
-  players:[own],friends,officialLinks:[],activeProfileId:own.id,chosen:own.id,historyProfilesInitialized:true
- })),{own,friends});
+ await page.addInitScript(({own,friends})=>{
+  if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[own],friends,officialLinks:[],activeProfileId:own.id,chosen:own.id,historyProfilesInitialized:true
+  }));
+ },{own,friends});
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#spieler");
  const details=page.locator("#friend-manage-details");
@@ -41,10 +43,10 @@ test("v200: player ordering persists, keyboard focus survives, reset is explicit
 
 test("v200: team order and reset persist without touching profile storage",async({page})=>{
  await page.addInitScript(({own,teamKeys})=>{
-  localStorage.setItem("shuttleboard-v1",JSON.stringify({
+  if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
    players:[own],friends:[],officialLinks:[],activeProfileId:own.id,chosen:own.id,historyProfilesInitialized:true
   }));
-  localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(teamKeys));
+  if(!localStorage.getItem("schmetterlinge-followed-teams-v1"))localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(teamKeys));
  },{own,teamKeys});
  await page.setViewportSize({width:320,height:720});
  await page.goto("/#mannschaft");
