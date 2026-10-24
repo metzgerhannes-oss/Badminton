@@ -137,6 +137,6 @@ test("#289: following a team closes iPhone search without zoom or clipped naviga
   expect(view.scale).toBeLessThanOrEqual(1.02);
   expect(view.overflow).toBeLessThanOrEqual(2);
   expect(view.navRight).toBeLessThanOrEqual(view.viewport+2);
-  await page.evaluate(()=>localStorage.setItem("schmetterlinge.teamFollows.v1","[]"));
+  await page.evaluate(()=>localStorage.setItem("schmetterlinge-followed-teams-v1","[]"));
  }
 });
