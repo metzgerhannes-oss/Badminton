@@ -53,11 +53,11 @@ async function execute(action){
   if(action==="share"&&navigator.share){
    try{await navigator.share({title:"Einladung zu Schmetterlinge",
     text:"Mit diesem Link kannst du Schmetterlinge öffnen und belegte Badminton-Ergebnisse ansehen.",url});
-    status("App-Einladung zum Teilen geöffnet.");return;
+    status("Wähle eine App, um den Einladungslink zu teilen.");return;
    }catch(e){if(e?.name==="AbortError")return}
   }
   await copyText(url);
-  status("App-Einladungslink kopiert. Einlösbar für 30 Tage, bestehende Zugänge bleiben bis zum Widerruf aktiv.");
+  status("Einladungslink kopiert. Teile ihn über eine Nachricht. Der Link ist 30 Tage einlösbar; angenommene Zugänge bleiben bis zum Widerruf gültig.");
  }catch(e){status(e?.message||"Einladung konnte nicht erstellt werden.")}
  finally{busy=false;el("invite-share").disabled=false;el("invite-copy").disabled=false}
 }
