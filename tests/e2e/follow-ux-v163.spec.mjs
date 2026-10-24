@@ -98,3 +98,33 @@ test("#289: following a player keeps iPhone viewport stable and dismisses search
   })));
  }
 });
+
+test("#291: private followed-player order supports drag plus keyboard-safe arrows and persists",async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+  players:[{id:"05-070879",name:"Own synthetic profile"}],
+  friends:[{id:"05-123456",name:"First synthetic friend"},{id:"05-234567",name:"Second synthetic friend"}],
+  officialLinks:[],activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true
+ })));
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#spieler");
+ await page.locator("#friend-manage-details > summary").click();
+ const rows=page.locator("#friend-settings-list [data-friend-row]");
+ await expect(rows).toHaveCount(2);
+ await expect(rows.first()).toContainText("First synthetic friend");
+ const handle=page.locator("#friend-settings-list [data-friend-drag]").first();
+ await expect(handle).toHaveAttribute("draggable","true");
+ await expect(handle).toHaveAttribute("aria-label",/Sortieren/);
+ await handle.dragTo(rows.last());
+ await expect(rows.first()).toContainText("Second synthetic friend");
+ const afterDrag=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).friends.map(p=>p.id));
+ expect(afterDrag).toEqual(["05-234567","05-123456"]);
+ await page.locator('#friend-settings-list [data-friend-move="05-123456"][data-direction="-1"]').click();
+ await expect(rows.first()).toContainText("First synthetic friend");
+ await page.reload();
+ await page.locator("#friend-manage-details > summary").click();
+ await expect(rows.first()).toContainText("First synthetic friend");
+ const state=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(state.players.map(p=>p.id)).toEqual(["05-070879"]);
+ expect(state.friends.map(p=>p.id)).toEqual(["05-123456","05-234567"]);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
