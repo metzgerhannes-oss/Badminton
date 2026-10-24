@@ -182,13 +182,45 @@ function renderTeamSettings(){
  const container=$("team-settings-list");if(!container)return;
  container.innerHTML=follows.length?follows.map((key,i)=>{
   const team=rows.find(t=>t.follow_key===key&&t.season===season())||rows.find(t=>t.follow_key===key);
-  return '<article class="follow-manage-item"><div class="follow-manage-label"><strong>'+esc(team?displayTeamName(team):"Gespeicherte Mannschaft")+
+  return '<article class="follow-manage-item" data-team-row="'+esc(key)+'"><div class="follow-manage-label"><strong>'+esc(team?displayTeamName(team):"Gespeicherte Mannschaft")+
    '</strong><small>'+esc(team?team.league_name+" · "+team.season:key)+'</small></div>'+
-   '<div class="follow-manage-actions"><button type="button" data-team-move="'+esc(key)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="Mannschaft nach oben">↑</button>'+
+   '<div class="follow-manage-actions"><button type="button" class="follow-drag-handle" draggable="true" data-team-drag="'+esc(key)+'" aria-label="Mannschaft zum Sortieren ziehen" title="Ziehen oder mit Pfeiltasten sortieren">☰</button><button type="button" data-team-move="'+esc(key)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="Mannschaft nach oben">↑</button>'+
    '<button type="button" data-team-move="'+esc(key)+'" data-direction="1" '+(i===follows.length-1?'disabled':'')+' aria-label="Mannschaft nach unten">↓</button>'+
    '<button type="button" data-team-toggle="'+esc(key)+'" aria-label="Mannschaft nicht mehr folgen">Entfolgen</button></div></article>';
  }).join(""):'<p class="team-empty">Noch keine Mannschaften abonniert.</p>';
  wireCards(container);
+ // Optional drag-and-drop in edit mode; arrows remain usable on iOS,
+ // keyboard and VoiceOver. DataTransfer never contains team follow keys.
+ let dragTeam="";
+ const clearDrag=()=>container.querySelectorAll(".follow-drag-over").forEach(n=>n.classList.remove("follow-drag-over"));
+ container.querySelectorAll("[data-team-drag]").forEach(handle=>{
+  handle.addEventListener("dragstart",event=>{
+   dragTeam=handle.dataset.teamDrag||"";
+   if(!event.dataTransfer){dragTeam="";return}
+   event.dataTransfer.effectAllowed="move";
+   event.dataTransfer.setData("text/plain","personal-follow-order");
+  });
+  handle.addEventListener("dragend",()=>{dragTeam="";clearDrag()});
+ });
+ container.ondragover=event=>{
+  const row=event.target.closest?.("[data-team-row]");
+  if(!dragTeam||!row||row.dataset.teamRow===dragTeam)return;
+  event.preventDefault();
+  if(event.dataTransfer)event.dataTransfer.dropEffect="move";
+  clearDrag();row.classList.add("follow-drag-over");
+ };
+ container.ondrop=event=>{
+  const target=event.target.closest?.("[data-team-row]")?.dataset.teamRow;
+  clearDrag();
+  if(!dragTeam||!target||target===dragTeam)return;
+  event.preventDefault();
+  const from=follows.indexOf(dragTeam),to=follows.indexOf(target);
+  dragTeam="";
+  if(from<0||to<0)return;
+  const [item]=follows.splice(from,1);follows.splice(to,0,item);
+  if(!saveFollows()){readFollows();showStatus("Reihenfolge konnte nicht gespeichert werden.");}
+  renderFollowed();
+ };
  container.querySelectorAll("[data-team-move]").forEach(b=>b.addEventListener("click",()=>{
   const i=follows.indexOf(b.dataset.teamMove),next=i+Number(b.dataset.direction);
   if(i<0||next<0||next>=follows.length)return;
