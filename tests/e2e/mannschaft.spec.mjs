@@ -111,3 +111,32 @@ test("Official sourced team reports appear in the new report tab without copying
  await expect(page.locator("#team-detail-reports")).not.toContainText("Player names must be ignored");
  await expect(page.locator("#team-detail-reports")).not.toContainText("Foreign link");
 });
+
+test("#289: following a team closes iPhone search without zoom or clipped navigation",async({page})=>{
+ for(const width of [320,390,420]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+  await page.locator("#team-add-open").click();
+  await expect(page.locator("#team-discover")).toBeVisible();
+  await page.locator("#team-search").fill("mossingen");
+  await expect(page.locator("#team-results .team-card")).toHaveCount(2);
+  await page.locator('#team-results [data-team-toggle="nuliga:10777:2"]').click();
+  await expect(page.locator("#team-discover")).toBeHidden();
+  await expect(page.locator("#team-followed .team-card")).toHaveCount(1);
+  await expect(page.locator("#team-add-open")).toBeFocused();
+  const view=await page.evaluate(()=>{
+   const nav=document.querySelector(".bottom-nav").getBoundingClientRect();
+   return {scale:window.visualViewport?.scale??1,
+    overflow:document.documentElement.scrollWidth-window.innerWidth,
+    navRight:nav.right,viewport:window.innerWidth,
+    searchFocused:document.activeElement===document.querySelector("#team-search"),
+    searchSize:parseFloat(getComputedStyle(document.querySelector("#team-search")).fontSize)};
+  });
+  expect(view.searchSize).toBeGreaterThanOrEqual(16);
+  expect(view.searchFocused).toBe(false);
+  expect(view.scale).toBeLessThanOrEqual(1.02);
+  expect(view.overflow).toBeLessThanOrEqual(2);
+  expect(view.navRight).toBeLessThanOrEqual(view.viewport+2);
+  await page.evaluate(()=>localStorage.setItem("schmetterlinge.teamFollows.v1","[]"));
+ }
+});
