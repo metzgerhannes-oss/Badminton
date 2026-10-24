@@ -62,28 +62,34 @@ function safeRows(rows,player){
   [1,2].includes(row.player_side)&&[1,2].includes(row.winning_side)&&
   Array.isArray(row.games)&&Array.isArray(row.opponent_names));
 }
-async function readMemberMatches(player){
+async function readMemberMatches(player,isCurrent=()=>true){
  const output=[];
  const size=400;
  for(let offset=0;offset<MAX_ROWS;offset+=size){
+  if(!isCurrent())return null;
   const query=new URLSearchParams({
    select:"dbv_id,source_key,category,competition,discipline,event,round_label,match_date,match_year,player_side,winning_side,opponent_names,partner_names,games,outcome_evidence,source_name,source_kind,source_url",
    dbv_id:"eq."+player,order:"match_year.desc,match_date.desc.nullslast,source_key.asc",
    limit:String(size),offset:String(offset)
   });
   const {rows}=await readPublicRows("player_external_match_facts?"+query,{count:false});
+  if(!isCurrent())return null;
   output.push(...rows);
   if(rows.length<size)return safeRows(output,player);
  }
  throw Error("archive limit reached");
 }
-async function readAll(session,endpoint,base,player){
+async function readAll(session,endpoint,base,player,isCurrent=()=>true){
+ if(!isCurrent())return null;
  let first=await rpc(session,endpoint,{...base,p_kind:"match_card",p_offset:0,p_limit:PAGE_SIZE});
+ if(!isCurrent())return null;
  if(!first)return null;
  if(!validPage(first,player,0))throw Error("invalid archive response");
  const all=[...first.entries],total=first.total;
  for(let offset=PAGE_SIZE;offset<total;offset+=PAGE_SIZE){
+  if(!isCurrent())return null;
   const next=await rpc(session,endpoint,{...base,p_kind:"match_card",p_offset:offset,p_limit:PAGE_SIZE});
+  if(!isCurrent())return null;
   if(!validPage(next,player,offset)||next.total!==total||
      next.entries.length!==Math.min(PAGE_SIZE,total-offset))throw Error("archive page changed");
   all.push(...next.entries);
@@ -102,7 +108,9 @@ export function requestPrivateMatches(player,{force=false}={}){
  const old=states.get(player);
  if(old?.pending)return old.pending;
  if(!force&&old&&Date.now()-old.checkedAt<CACHE_MS)return Promise.resolve();
- const ticket=++revision;
+ // Generation changes only on profile switch/revocation, not when another
+ // authorized player starts loading. Concurrent family reads must both finish.
+ const ticket=revision,isCurrent=()=>ticket===revision;
  states.set(player,{state:"loading",rows:[],checkedAt:Date.now()});
  announce(player);
  const pending=(async()=>{
@@ -111,12 +119,15 @@ export function requestPrivateMatches(player,{force=false}={}){
    if(ticket!==revision)return;
    if(!session){states.set(player,{state:"protected",rows:[],checkedAt:Date.now()});return}
    // Server checks the independent grant for this exact player on every page.
-   let rows=member?await readMemberMatches(player):null;
-   if(!rows&&ownsLocalProfile(player))rows=await readAll(session,"private_player_owner_archive_read",{p_player_dbv_id:player},player);
+   let rows=member?await readMemberMatches(player,isCurrent):null;
+   if(!isCurrent())return;
+   if(!rows&&ownsLocalProfile(player))rows=await readAll(session,"private_player_owner_archive_read",{p_player_dbv_id:player},player,isCurrent);
+   if(!isCurrent())return;
    if(!rows){
     for(const id of acceptedIdsFor(player)){
      rows=await readAll(session,"private_player_archive_read",
-       {p_invitation_id:id},player);
+       {p_invitation_id:id},player,isCurrent);
+     if(!isCurrent())return;
      if(rows)break;
     }
    }

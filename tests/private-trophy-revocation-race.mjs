@@ -16,11 +16,11 @@ const proof={player_dbv_id:player,scope:"app_archive",results:[{
 const ok={ok:true,status:200,json:async()=>proof};
 const denied={ok:false,status:403,json:async()=>({message:"revoked"})};
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
-function harness({fetchImpl,getSession=async()=>({access_token:"synthetic"})}){
+function harness({fetchImpl,getSession=async()=>({access_token:"synthetic"}),onEvent=()=>{}}){
  const context={SUPABASE_ROOT:"https://example.invalid/rest/v1/",
   PUBLIC_KEY:"synthetic",fetch:fetchImpl,getPrivateSession:getSession,
   loadPlayerCopy:()=>null,localStorage:{getItem:()=>null},
-  window:{badmintonAppAccess:{allowed:true},dispatchEvent:()=>{}},
+  window:{badmintonAppAccess:{allowed:true},dispatchEvent:onEvent},
   CustomEvent:class{constructor(name,opts){this.type=name;this.detail=opts?.detail;}},
   AbortController,JSON,Date,Error,Promise,setTimeout,clearTimeout};
  vm.runInNewContext(source,vm.createContext(context),{filename:"private-trophy-source.mjs"});
@@ -78,3 +78,31 @@ function harness({fetchImpl,getSession=async()=>({access_token:"synthetic"})}){
  assert.notEqual(api.trophySnapshot(player).state,"ready");
 }
 console.log("F03: stale private trophies cannot reappear after revocation, refresh or pagehide.");
+
+// F05: a revoked private trophy view must be told immediately to redraw,
+// without waiting for a refresh RPC to resolve or fail.
+{
+ const observed=[];
+ const api=harness({fetchImpl:async()=>ok,onEvent:event=>observed.push(event.type)});
+ await api.requestPrivateTrophies(player);
+ assert.equal(api.trophySnapshot(player).state,"ready");
+ observed.length=0;
+ api.clearPrivateTrophyCache({refresh:false});
+ assert.deepEqual(observed,["badminton:private-trophies-updated"],
+  "Revocation must notify Home and Historie synchronously");
+ assert.notEqual(api.trophySnapshot(player).state,"ready");
+}
+
+// A syntactically successful but malformed/overlong authorized response is an
+// unavailable source, never a falsely complete empty or truncated trophy list.
+for(const invalid of [
+ {...proof,results:[{...proof.results[0],date:"invalid-date"}]},
+ {...proof,player_dbv_id:"99-000002"},
+ {...proof,results:Array.from({length:201},(_,i)=>({...proof.results[0],id:"fixture-"+i}))}
+]){
+ const api=harness({fetchImpl:async()=>({ok:true,status:200,json:async()=>invalid})});
+ await api.requestPrivateTrophies(player);
+ assert.equal(api.trophySnapshot(player).state,"unavailable",
+  "Invalid source payload must not be rendered as zero trophies");
+}
+console.log("F05 private trophy: immediate revocation notice and strict source integrity.");

@@ -34,11 +34,16 @@ async function rpc(name,args,session){
  }finally{clearTimeout(timeout)}
 }
 function validResult(response,player){
- if(!response||response.player_dbv_id!==player||!Array.isArray(response.results))return null;
+ if(response===null)return null; // Explicitly denied, try another scoped grant.
+ if(!response||response.player_dbv_id!==player||!Array.isArray(response.results))
+  throw Error("invalid private trophy response");
+ // Never silently convert a malformed or truncated authorized archive to zero.
+ if(response.results.length>200)throw Error("private trophy result limit exceeded");
  const list=response.results.filter(r=>r?.playerId===player&&typeof r.verified==="boolean"&&
   typeof r.id==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(r.date)&&
   Number.isInteger(r.place)&&r.place>=1&&r.place<=128&&
-  typeof r.source?.url==="string"&&r.source.url.startsWith("https://")).slice(0,200);
+  typeof r.source?.url==="string"&&r.source.url.startsWith("https://"));
+ if(list.length!==response.results.length)throw Error("invalid private trophy row");
  return {state:"ready",results:list,
   coverage:response.scope==="app_archive"?"sourced_placements_partial":"partial_not_exhaustively_verified"};
 }
@@ -99,6 +104,9 @@ export function clearPrivateTrophyCache({refresh=true}={}){
  generation++;
  const current=[...states.keys()];
  states.clear();
+ // Notify every view immediately: old private results must disappear at revoke,
+ // not only after a potentially slow or failed network refresh.
+ current.forEach(announce);
  if(refresh)current.forEach(player=>{requestPrivateTrophies(player,{force:true})});
 }
 if(typeof document!=="undefined"){
