@@ -140,5 +140,8 @@ if(root&&canvas){
  window.addEventListener("badminton:profile-selected",()=>{if(phase==="playing"||phase==="countdown")pause();renderProfiles()});
  window.addEventListener("badminton:arcade-profile-update",renderProfiles);
  renderProfiles();syncRoute();
- // app.js restores local profiles in its DOMContentLoaded handler. A direct\n // /#spiele launch must re-read them after that restore, not show a false empty state.\n document.addEventListener("DOMContentLoaded",()=>{renderProfiles();syncRoute()},{once:true});\n if(document.readyState==="complete")queueMicrotask(()=>{renderProfiles();syncRoute()});
+ // app.js restores local profiles in its DOMContentLoaded handler. A direct
+ // /#spiele launch must re-read them after that restore, not show a false empty state.
+ document.addEventListener("DOMContentLoaded",()=>{renderProfiles();syncRoute()},{once:true});
+ if(document.readyState==="complete")queueMicrotask(()=>{renderProfiles();syncRoute()});
 }
