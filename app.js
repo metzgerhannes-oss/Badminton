@@ -237,12 +237,16 @@ function renderFriends(){
   '<button type="button" data-edit-friend="'+esc(p.id)+'" aria-label="'+esc(p.name)+' bearbeiten">Bearbeiten</button>'+
   '<button type="button" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></div></article>'
  ).join(""):'<p class="team-empty">Noch keine Spieler abonniert.</p>';
+ const reset=el("friend-order-reset");if(reset)reset.disabled=state.friends.length<2;
  settings.querySelectorAll("[data-friend-move]").forEach(b=>b.addEventListener("click",()=>{
   const index=state.friends.findIndex(p=>p.id===b.dataset.friendMove);
   const target=index+Number(b.dataset.direction);
   if(index<0||target<0||target>=state.friends.length)return;
   const [friend]=state.friends.splice(index,1);
   state.friends.splice(target,0,friend);save();render();
+  Array.from(el("friend-settings-list")?.querySelectorAll("[data-friend-move]")||[])
+   .find(button=>button.dataset.friendMove===friend.id&&button.dataset.direction===b.dataset.direction)
+   ?.focus({preventScroll:true});
  }));
  settings.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
  settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollow)));
@@ -282,7 +286,7 @@ window.badmintonLibraryToggleFollow=player=>{
  const exists=state.friends.some(p=>p.id===id);
  if(exists)return {ok:false,message:"Du folgst diesem Spieler bereits. Entfolgen geht in deiner Freundeliste."};
  if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
- state.friends.unshift({
+ state.friends.push({
   id,name:String(player.name).trim().slice(0,80),
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
@@ -687,6 +691,18 @@ function setup(){
  window.openFriendForm=openFriendForm;
  el("dashboard-add-friend")?.addEventListener("click",event=>{event.preventDefault();showPlayerDiscover(true)});
  el("dashboard-friends-manage")?.addEventListener("click",()=>showPlayerDiscover(false,false));
+ el("friend-order-reset")?.addEventListener("click",()=>{
+  if(state.friends.length<2)return;
+  const before=state.friends.slice();
+  state.friends.sort((a,b)=>a.name.localeCompare(b.name,"de",{numeric:true,sensitivity:"base"})||a.id.localeCompare(b.id));
+  save();
+  try{
+   const saved=JSON.parse(localStorage.getItem(STORE)||"null");
+   if(saved?.friends?.map(p=>p.id).join("|")!==state.friends.map(p=>p.id).join("|"))throw Error("not persisted");
+  }catch{state.friends=before;render();toast("Reihenfolge konnte nicht gespeichert werden.");return;}
+  render();el("friend-order-reset")?.focus({preventScroll:true});
+  toast("Standardreihenfolge wiederhergestellt");
+ });
  el("followed-player-search")?.addEventListener("input",renderFriends);
  el("followed-show-all")?.addEventListener("click",()=>{const field=el("followed-player-search");if(field){field.value="";renderFriends();field.focus()}});
  el("player-add-open")?.addEventListener("click",()=>showPlayerDiscover(el("player-discover").hidden));
@@ -706,7 +722,7 @@ function setup(){
   const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club:String(data.get("club")||"").trim().slice(0,120),url:profileUrl};
   const isNewFriend=!editingFriendId;
   if(editingFriendId)state.friends=state.friends.map(p=>p.id===editingFriendId?friend:p);
-  else state.friends.unshift(friend);
+  else state.friends.push(friend);
   editingFriendId=null;
   if(isNewFriend)showPlayerDiscover(false,false);
    save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
