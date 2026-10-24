@@ -16,4 +16,19 @@ assert.match(js,/onboarding-restart/);
 assert.match(js,/team-add-open/);
 assert.match(js,/dbv-calendar-q/);
 assert.doesNotMatch(js,/removeItem\("shuttleboard-v1"\)|localStorage\.clear\(/);
-console.log("F07 v202 onboarding state and safe controls: OK");
+const wizardKeys=["Dein Profil","Dein erstes Spielerprofil ist bereit.","Weitere Spieler","Füge bei Bedarf weitere eigene Spielerprofile hinzu.","Spielerprofil hinzufügen","Suche eine Mannschaft, der du folgen möchtest.","Mannschaft suchen","Merke interessante Turniere mit + für dein Profil vor.","Turniere auswählen","Einrichtung","Überspringen","Später fortfahren","Einrichtung fortsetzen","Einrichtung erneut ansehen","Fertig","{step} von 4"];
+for(const code of ["de","en","fr","uk","ru","zh-Hans","tr","ar","it","es","pl"]){
+ const pack=JSON.parse(readFileSync("locales/"+code+".json","utf8"));
+ for(const key of wizardKeys){
+  assert.ok(typeof pack.messages[key]==="string"&&pack.messages[key].trim(),code+": missing wizard key "+key);
+ }
+ assert.ok(pack.messages["{step} von 4"].includes("{step}"),code+": missing progress placeholder");
+ assert.equal(pack.meta.direction,code==="ar"?"rtl":"ltr");
+}
+assert.match(js,/schmetterlinge:language-change/);
+assert.match(js,/SchmetterlingeI18n/);
+const sw=readFileSync("sw.js","utf8");
+const shell=sw.match(/const SHELL_ASSETS=\[([\s\S]*?)\];/);
+assert.ok(shell,"PWA shell asset list missing");
+for(const code of ["de","en","fr","uk","ru","zh-Hans","tr","ar","it","es","pl"])assert.ok(shell[1].includes('"./locales/'+code+'.json"'),code+": language pack not pre-cached for offline use");
+console.log("F07 v204 wizard locales, RTL and offline packs: OK");
