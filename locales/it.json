@@ -408,6 +408,22 @@
     "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Apri quindi Schmetterlinge dall’icona e crea lì il tuo profilo.",
     "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "I profili già salvati in Safari non vengono trasferiti automaticamente. Esportali con «Salva i miei dati» e importali nell’app.",
     "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "Dopo aver aperto dall’icona, crea un profilo. Nessun accesso necessario.",
-    "Profil anlegen": "Crea profilo"
+    "Profil anlegen": "Crea profilo",
+    "Dein Profil": "Il tuo profilo",
+    "Dein erstes Spielerprofil ist bereit.": "Il tuo primo profilo giocatore è pronto.",
+    "Weitere Spieler": "Altri giocatori",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "Se necessario, aggiungi altri profili giocatore personali.",
+    "Spielerprofil hinzufügen": "Aggiungi profilo giocatore",
+    "Suche eine Mannschaft, der du folgen möchtest.": "Cerca una squadra che vuoi seguire.",
+    "Mannschaft suchen": "Cerca squadra",
+    "Merke interessante Turniere mit + für dein Profil vor.": "Salva i tornei che ti interessano nel tuo profilo con +.",
+    "Turniere auswählen": "Scegli tornei",
+    "Einrichtung": "Configurazione",
+    "Überspringen": "Salta",
+    "Später fortfahren": "Continua più tardi",
+    "Einrichtung fortsetzen": "Riprendi la configurazione",
+    "Einrichtung erneut ansehen": "Rivedi la configurazione",
+    "Fertig": "Fine",
+    "{step} von 4": "{step} di 4"
   }
 }

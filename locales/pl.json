@@ -408,6 +408,22 @@
     "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "Następnie otwórz Schmetterlinge ikoną i utwórz tam profil.",
     "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Profile zapisane wcześniej w Safari nie są przenoszone automatycznie. Wyeksportuj je przez „Zapisz moje dane” i zaimportuj w aplikacji.",
     "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "Po otwarciu ikoną utwórz profil. Logowanie nie jest wymagane.",
-    "Profil anlegen": "Utwórz profil"
+    "Profil anlegen": "Utwórz profil",
+    "Dein Profil": "Twój profil",
+    "Dein erstes Spielerprofil ist bereit.": "Twój pierwszy profil zawodnika jest gotowy.",
+    "Weitere Spieler": "Więcej zawodników",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "W razie potrzeby dodaj kolejne własne profile zawodników.",
+    "Spielerprofil hinzufügen": "Dodaj profil zawodnika",
+    "Suche eine Mannschaft, der du folgen möchtest.": "Znajdź drużynę, którą chcesz obserwować.",
+    "Mannschaft suchen": "Znajdź drużynę",
+    "Merke interessante Turniere mit + für dein Profil vor.": "Zapisz interesujące turnieje w swoim profilu za pomocą +.",
+    "Turniere auswählen": "Wybierz turnieje",
+    "Einrichtung": "Konfiguracja",
+    "Überspringen": "Pomiń",
+    "Später fortfahren": "Kontynuuj później",
+    "Einrichtung fortsetzen": "Kontynuuj konfigurację",
+    "Einrichtung erneut ansehen": "Wyświetl konfigurację ponownie",
+    "Fertig": "Gotowe",
+    "{step} von 4": "{step} z 4"
   }
 }

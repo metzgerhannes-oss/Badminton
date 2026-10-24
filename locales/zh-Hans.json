@@ -408,6 +408,22 @@
     "Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.": "然后通过图标打开 Schmetterlinge，并在应用中创建个人资料。",
     "Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.": "Safari 中已保存的个人资料不会自动转移。请通过“备份我的数据”导出，再在应用中导入。",
     "Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.": "通过图标打开后创建个人资料，无需登录。",
-    "Profil anlegen": "创建个人资料"
+    "Profil anlegen": "创建个人资料",
+    "Dein Profil": "你的个人资料",
+    "Dein erstes Spielerprofil ist bereit.": "你的第一个球员资料已准备就绪。",
+    "Weitere Spieler": "更多球员",
+    "Füge bei Bedarf weitere eigene Spielerprofile hinzu.": "如有需要，可添加更多自己的球员资料。",
+    "Spielerprofil hinzufügen": "添加球员资料",
+    "Suche eine Mannschaft, der du folgen möchtest.": "查找你想关注的球队。",
+    "Mannschaft suchen": "查找球队",
+    "Merke interessante Turniere mit + für dein Profil vor.": "点击 + 将感兴趣的赛事保存到你的资料中。",
+    "Turniere auswählen": "选择赛事",
+    "Einrichtung": "初始设置",
+    "Überspringen": "跳过",
+    "Später fortfahren": "稍后继续",
+    "Einrichtung fortsetzen": "继续设置",
+    "Einrichtung erneut ansehen": "重新查看设置",
+    "Fertig": "完成",
+    "{step} von 4": "第 {step} 步，共 4 步"
   }
 }
