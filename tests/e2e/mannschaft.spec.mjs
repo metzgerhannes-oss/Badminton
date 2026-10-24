@@ -113,6 +113,7 @@ test("Official sourced team reports appear in the new report tab without copying
 });
 
 test("#289: following a team closes iPhone search without zoom or clipped navigation",async({page})=>{
+ test.setTimeout(90000); // Three full WebKit navigations under shared CI runners.
  for(const width of [320,390,420]){
   await page.setViewportSize({width,height:844});
   await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
