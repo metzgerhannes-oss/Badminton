@@ -48,6 +48,16 @@ try{
   assert.match(changed.message,/Unsafe/);
   await writeFile(path.join(dir,file),'select cron.schedule(1,2,3)');
   await assert.rejects(validatePrivateFiles(dir,[{...row,sha256:createHash('sha256').update('select cron.schedule(1,2,3)').digest('hex')}]),/Unsafe/);
+  for (const unsafe of [
+    "SELECT 1; \\! echo unsafe",
+    "SELECT 1; \\connect other_database",
+    "COPY test_fixture TO '/tmp/unsafe.csv';",
+    "CREATE EXTENSION IF NOT EXISTS postgres_fdw;"
+  ]) {
+    await writeFile(path.join(dir,file),unsafe);
+    const unsafeHash=createHash('sha256').update(unsafe).digest('hex');
+    await assert.rejects(validatePrivateFiles(dir,[{...row,sha256:unsafeHash}]),/Unsafe/);
+  }
   await writeFile(path.join(dir,file),'alter system set log_statement = all;');
   await assert.rejects(validatePrivateFiles(dir,[{...row,sha256:createHash('sha256').update('alter system set log_statement = all;').digest('hex')}]),/Unsafe/);
   await assert.rejects(validatePrivateFiles(dir,[row]),/digest mismatch/);
