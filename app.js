@@ -231,8 +231,8 @@ function renderFriends(){
  }
  if(!settings)return;
  settings.innerHTML=state.friends.length?state.friends.map((p,i)=>
-  '<article class="follow-manage-item"><div class="follow-manage-label"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+'</small></div>'+
-  '<div class="follow-manage-actions"><button type="button" data-friend-move="'+esc(p.id)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="'+esc(p.name)+' nach oben">↑</button>'+
+  '<article class="follow-manage-item" data-friend-row="'+esc(p.id)+'"><div class="follow-manage-label"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+'</small></div>'+
+  '<div class="follow-manage-actions"><button type="button" class="follow-drag-handle" draggable="true" data-friend-drag="'+esc(p.id)+'" aria-label="'+esc(p.name)+' zum Sortieren ziehen" title="Ziehen oder mit Pfeiltasten sortieren">☰</button><button type="button" data-friend-move="'+esc(p.id)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="'+esc(p.name)+' nach oben">↑</button>'+
   '<button type="button" data-friend-move="'+esc(p.id)+'" data-direction="1" '+(i===state.friends.length-1?'disabled':'')+' aria-label="'+esc(p.name)+' nach unten">↓</button>'+
   '<button type="button" data-edit-friend="'+esc(p.id)+'" aria-label="'+esc(p.name)+' bearbeiten">Bearbeiten</button>'+
   '<button type="button" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></div></article>'
@@ -244,6 +244,37 @@ function renderFriends(){
   const [friend]=state.friends.splice(index,1);
   state.friends.splice(target,0,friend);save();render();
  }));
+ // Drag-and-drop is an optional shortcut; the existing 44px arrows remain
+ // keyboard, VoiceOver and iOS fallbacks. Transfer data contains no player IDs.
+ let dragFriend="";
+ const clearDrag=()=>settings.querySelectorAll(".follow-drag-over").forEach(n=>n.classList.remove("follow-drag-over"));
+ settings.querySelectorAll("[data-friend-drag]").forEach(handle=>{
+  handle.addEventListener("dragstart",event=>{
+   dragFriend=handle.dataset.friendDrag||"";
+   if(!event.dataTransfer){dragFriend="";return;}
+   event.dataTransfer.effectAllowed="move";
+   event.dataTransfer.setData("text/plain","personal-follow-order");
+  });
+  handle.addEventListener("dragend",()=>{dragFriend="";clearDrag();});
+ });
+ settings.ondragover=event=>{
+  const row=event.target.closest?.("[data-friend-row]");
+  if(!dragFriend||!row||row.dataset.friendRow===dragFriend)return;
+  event.preventDefault();
+  if(event.dataTransfer)event.dataTransfer.dropEffect="move";
+  clearDrag();row.classList.add("follow-drag-over");
+ };
+ settings.ondrop=event=>{
+  const target=event.target.closest?.("[data-friend-row]")?.dataset.friendRow;
+  clearDrag();
+  if(!dragFriend||!target||target===dragFriend)return;
+  event.preventDefault();
+  const from=state.friends.findIndex(p=>p.id===dragFriend),to=state.friends.findIndex(p=>p.id===target);
+  dragFriend="";
+  if(from<0||to<0)return;
+  const [item]=state.friends.splice(from,1);state.friends.splice(to,0,item);
+  save();render();
+ };
  settings.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
  settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollow)));
 }
