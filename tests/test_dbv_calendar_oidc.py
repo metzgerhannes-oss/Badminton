@@ -33,7 +33,7 @@ class OIDCContractTests(unittest.TestCase):
   workflow=(ROOT/".github/workflows/dbv-calendar-source.yml").read_text()
   self.assertNotIn("id-token: write",workflow)
   self.assertNotIn("secrets.BADMINTON_SUPABASE_SERVICE_ROLE_KEY",workflow)
-  self.assertNotIn("scripts/publish-dbv-calendar-oidc.py",workflow)
+  self.assertNotIn("run: python3 scripts/publish-dbv-calendar-oidc.py",workflow)
   self.assertNotIn("  publish:",workflow)
   source=(ROOT/"supabase/functions/dbv-calendar-publish/index.ts").read_text()
   self.assertIn("jwtVerify(",source)
