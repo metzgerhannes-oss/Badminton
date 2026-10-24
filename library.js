@@ -167,6 +167,10 @@ function render(){
   if(!p)return;
   const result=window.badmintonLibraryToggleFollow?.(p);
   const msg=$("library-message");if(msg&&result?.message)msg.textContent=result.message;
+  // iOS can retain a focused search field/keyboard when the result button is
+  // replaced. Close only after a successful follow; leave the search open.
+  if(result?.ok&&$("player-discover")?.contains(document.activeElement)&&
+     document.activeElement?.matches?.("input,select,textarea"))document.activeElement.blur();
   render();
  }));
  area.querySelectorAll("[data-library-open]").forEach(button=>button.addEventListener("click",()=>{
