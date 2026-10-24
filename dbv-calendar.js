@@ -237,7 +237,7 @@ function render(){
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
     ' aria-label="'+esc(bookmarkState.playerId?(savedKeys.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarkState.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
     (bookmarkState.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+
-    (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p class="dbv-calendar-place">Ort: '+esc(t.place||"nicht angegeben")+'</p>'+
+    (savedKeys.has(t.key)?'✓':'+')+'</button>')+'</div><p class="dbv-calendar-place">'+esc(venueLabel(t.place))+'</p>'+
     (t.organizer?'<p>Veranstalter: '+esc(t.organizer)+'</p>':"")+
     '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+(isNationalU11Masters(t)?'<span>DBV · bundesweit</span>':'')+'</div>'+
     (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
