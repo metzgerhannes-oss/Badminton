@@ -59,6 +59,21 @@ class PrivateDirectoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"ranking coverage too low"):
             private.build_payload(rows,2026,42)
 
+    def test_official_ranking_date_without_week_heading(self):
+        # The current public page contains a timestamp but may omit the KW title.
+        ranking=private.load("scripts/update-ranking.py","current_ranking_stamp")
+        page='<a href="/ranking/download">Download Rangliste als Excel-Datei</a><p>zuletzt aktualisiert: 21.10.2026 11:30:00</p>'
+        year,week,stamp=ranking.official_publication_stamp(page)
+        self.assertEqual((year,week),(2026,43))
+        self.assertEqual(stamp.isoformat(),"2026-10-21T11:30:00+02:00")
+        self.assertEqual(ranking.official_publication_stamp("Rangliste KW 43 "+page)[:2],(2026,43))
+        with self.assertRaisesRegex(ValueError,"conflicts"):
+            ranking.official_publication_stamp("Rangliste KW 42 "+page)
+        with self.assertRaisesRegex(ValueError,"timestamp missing"):
+            ranking.official_publication_stamp("<html>No official ranking date</html>")
+        with self.assertRaisesRegex(ValueError,"timestamp invalid"):
+            ranking.official_publication_stamp("zuletzt aktualisiert: invalid")
+
     def test_unavailable_current_excel_never_imports_older_archive(self):
         # A successful scheduled run must not silently call last week's data
         # CURRENT when the official current download is HTML or unavailable.
