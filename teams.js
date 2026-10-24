@@ -196,9 +196,9 @@ function renderTeamSettings(){
   const [key]=follows.splice(i,1);follows.splice(next,0,key);
   if(!saveFollows()){readFollows();showStatus("Reihenfolge konnte nicht gespeichert werden.");}
   renderFollowed();
-  Array.from($("team-settings-list")?.querySelectorAll("[data-team-move]")||[])
-   .find(button=>button.dataset.teamMove===key&&button.dataset.direction===b.dataset.direction)
-   ?.focus({preventScroll:true});
+  const actions=Array.from($("team-settings-list")?.querySelectorAll("[data-team-move]")||[])
+   .filter(button=>button.dataset.teamMove===key&&!button.disabled);
+  (actions.find(button=>button.dataset.direction===b.dataset.direction)||actions[0])?.focus({preventScroll:true});
  }));
 }
 function setTeamDiscover(open,focus=true){
