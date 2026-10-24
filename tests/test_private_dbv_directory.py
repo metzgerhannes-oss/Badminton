@@ -59,6 +59,36 @@ class PrivateDirectoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"ranking coverage too low"):
             private.build_payload(rows,2026,42)
 
+    def test_unavailable_current_excel_never_imports_older_archive(self):
+        # A successful scheduled run must not silently call last week's data
+        # CURRENT when the official current download is HTML or unavailable.
+        class OfflineRanking:
+            def current_public_export(self):
+                return None
+            def published_export(self, *args, **kwargs):
+                raise AssertionError("stale archive fallback is forbidden")
+        with (
+            patch.object(private,"load",return_value=OfflineRanking()),
+            patch.object(private,"build_payload",side_effect=AssertionError("no payload")),
+        ):
+            with self.assertRaisesRegex(RuntimeError,"refusing stale archive"):
+                private.produce()
+
+    def test_current_week_payload_is_used_without_archives(self):
+        synthetic_rows=[{"id":"00-000001","firstName":"Test","lastName":"Player"}]
+        class OfflineRanking:
+            def current_public_export(self):
+                return (2026,43,"https://example.invalid/current.xlsx",synthetic_rows,
+                        "2026-10-21T11:30:00+02:00")
+            def published_export(self, *args, **kwargs):
+                raise AssertionError("archive fallback is forbidden")
+        with (
+            patch.object(private,"load",return_value=OfflineRanking()),
+            patch.object(private,"build_payload",return_value=b"synthetic") as build,
+        ):
+            self.assertEqual(private.produce(),b"synthetic")
+            build.assert_called_once_with(synthetic_rows,2026,43)
+
     def test_oidc_guard_before_network(self):
         env={"GITHUB_REPOSITORY":private.REPOSITORY,
              "GITHUB_REF":"refs/pull/15/merge",

@@ -8,7 +8,6 @@ import argparse
 import importlib.util
 import json
 import os
-from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -117,10 +116,11 @@ def produce():
     ranking=load("scripts/update-ranking.py","official_dbv_ranking")
     live=ranking.current_public_export()
     if live is None:
-        current=datetime.now(timezone.utc)
-        live=next(ranking.published_export(current,max_lookback=3),None)
-    if live is None:
-        raise RuntimeError("No verified official DBV Excel export available; no data changed")
+        # Never report a successful CURRENT weekly import from an older archive.
+        # If the current official XLSX is unavailable or is HTML instead,
+        # preserve the last verified snapshot and fail the scheduled job.
+        # In particular, do not re-label an archived KW42 as current KW43.
+        raise RuntimeError("Current official DBV Excel not verified; refusing stale archive; no data changed")
     year,week,_,rows=live[:4]
     return build_payload(rows,year,week)
 
