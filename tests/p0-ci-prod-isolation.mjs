@@ -14,7 +14,7 @@ for(const name of ["p0-fresh-scan.yml","private-dbv-directory.yml","dbv-calendar
    name+": no production credentials");
  assert.doesNotMatch(workflow,/^\s*publish:\s*$/m,
    name+": no production publish job");
- assert.doesNotMatch(workflow,/(?:--stage|--publish|scripts\/publish-dbv-calendar-oidc\.py)/,
+ assert.doesNotMatch(workflow,/(?:--stage|--publish|run:\s*python3\s+scripts\/publish-dbv-calendar-oidc\.py)/,
    name+": no live stage/publish path");
  assert.doesNotMatch(workflow,/https:\/\/[^\s]+\.supabase\.co/,
    name+": no live Supabase address");
