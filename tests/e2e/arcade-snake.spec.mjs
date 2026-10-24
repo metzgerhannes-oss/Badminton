@@ -50,3 +50,21 @@ test("F10 P2-A: only local private records; switching own profiles cannot adopt 
  await expect(page.locator("#arcade-no-profile")).toBeHidden();
  expect(await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"))).toContain("99-000001");
 });
+
+test("F10 P2-A: natural wall finish writes only a random local game identity, not DBV results",async({page})=>{
+ test.setTimeout(40_000);
+ await page.goto("/#spiele");
+ await page.locator("#arcade-start").click();
+ await expect(page.locator("#arcade-status")).toContainText("Runde beendet",{timeout:12000});
+ const stored=await page.evaluate(()=>({
+  game:JSON.parse(localStorage.getItem("schmetterlinge-arcade-v1")||"null"),
+  family:JSON.parse(localStorage.getItem("shuttleboard-v1")||"null")
+ }));
+ expect(stored.game.records).toHaveLength(1);
+ expect(stored.game.records[0]).toMatchObject({profileId:own[0].id,best:0,modeVersion:1});
+ expect(stored.game.records[0].arcadeId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+ expect(stored.game.records[0]).not.toHaveProperty("name");
+ expect(stored.family.players).toEqual(own);
+ await page.locator("#arcade-profile").selectOption(own[1].id);
+ await expect(page.locator("#arcade-best")).toHaveText("0");
+});
