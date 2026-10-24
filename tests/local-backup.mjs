@@ -54,6 +54,34 @@ assert.equal(legacy.summary.calendarEvents,null);
 assert.equal(parsed.data.historyProfilesInitialized,true);
 assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(parsed.data))).data,parsed.data);
 
+// F06: backup v2 must preserve ALL existing private tournament kinds, not
+// reject calendar/framework favorites or silently lose their venue on restore.
+const calendarFavorite={id:"dbv-calendar-44014",source:"dbv-calendar",url:"https://turniere.badminton.de/",
+ name:"Synthetischer C-Termin",playerId:"99-100001",startDate:"2026-01-17",endDate:"2026-01-18",place:"Reutlingen"};
+const frameworkFavorite={id:"bwbv-2027-c-1",source:"bwbv-framework",
+ url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
+ name:"Synthetischer 2027 Rahmentermin",playerId:"99-100002",
+ startDate:"2027-01-16",endDate:"2027-01-17",place:""};
+const mixed={...original,officialLinks:[...original.officialLinks,calendarFavorite,frameworkFavorite]};
+const mixedBackup=createLocalBackup(JSON.stringify(mixed),new Date("2026-10-24T07:00:00Z"));
+const mixedParsed=inspectLocalBackup(mixedBackup);
+assert.equal(mixedParsed.summary.tournaments,3);
+assert.equal(mixedParsed.data.officialLinks[1].source,"dbv-calendar");
+assert.equal(mixedParsed.data.officialLinks[1].place,"Reutlingen");
+assert.equal(mixedParsed.data.officialLinks[2].source,"bwbv-framework");
+assert.equal(mixedParsed.data.officialLinks[2].place,"");
+assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(mixedParsed.data))).data.officialLinks,
+ mixedParsed.data.officialLinks,"Roundtrip must preserve source, dates, player and venue");
+for(const changed of [
+ {...calendarFavorite,id:"dbv-calendar-unsafe"},
+ {...calendarFavorite,url:"https://evil.example/"},
+ {...calendarFavorite,playerId:"99-100003"},
+ {...frameworkFavorite,id:"bwbv-2027-c-999"},
+ {...frameworkFavorite,startDate:"2027-01-23"},
+ {...frameworkFavorite,url:"https://example.invalid/"},
+ {...frameworkFavorite,playerId:"99-100003"}
+])assert.throws(()=>createLocalBackup(JSON.stringify({...original,officialLinks:[changed]})));
+
 const damaged=change=>{
  const b=JSON.parse(created);change(b);return JSON.stringify(b);
 };

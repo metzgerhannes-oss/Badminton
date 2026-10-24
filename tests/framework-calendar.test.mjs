@@ -25,6 +25,8 @@ test("only the seven source-validated framework entries can be saved",()=>{
   {id:"bwbv-2027-c-99"},{id:"dbv-calendar-987"},{source:"example"},
   {url:"https://example.com/anything"},{url:"javascript:alert(1)"},
   {playerId:"all"},{startDate:"2026-01-16"},{startDate:"2027-02-30"},
+  {startDate:"2027-01-23"},{endDate:"2027-01-24"},
+  {url:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
   {endDate:"2027-01-15"}
  ])assert.equal(bookmarks.normalizeBookmark({...valid,...changes}),null);
 });

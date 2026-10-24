@@ -23,12 +23,15 @@ var SchmetterlingeBookmarks=(function(){
   const date=new Date(Date.UTC(year,month-1,day));
   return date.toISOString().slice(0,10)===value?value:"";
  }
- const FRAMEWORK_IDS=new Set(["bwbv-2027-c-1","bwbv-2027-c-2","bwbv-2027-c-3",
-  "bwbv-2027-c-4","bwbv-2027-b-3","dbv-bw-a-2027-2","dbv-bw-a-2027-4"]);
- const FRAMEWORK_SOURCES=new Set([
-  "https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf",
-  "https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"
- ]);
+ const FRAMEWORK_SPECS=Object.freeze({
+ "bwbv-2027-c-1":{start:"2027-01-16",end:"2027-01-17",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "bwbv-2027-b-3":{start:"2027-01-30",end:"2027-01-31",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "dbv-bw-a-2027-2":{start:"2027-02-20",end:"2027-02-21",url:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
+ "bwbv-2027-c-2":{start:"2027-02-27",end:"2027-02-28",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "dbv-bw-a-2027-4":{start:"2027-04-24",end:"2027-04-25",url:"https://www.badminton.de/news/badminton/turniervergabe-nachwuchsveranstaltungen-2027-1/"},
+ "bwbv-2027-c-3":{start:"2027-05-08",end:"2027-05-09",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"},
+ "bwbv-2027-c-4":{start:"2027-06-26",end:"2027-06-27",url:"https://bwbv.de/wp-content/uploads/2026/03/Termine-2026_2027_Jugend.pdf"}
+});
  function normalizeBookmark(value){
   // A BWBV framework date is an optional LOCAL reminder, not an actual
   // registered tournament with a turnier.de UUID or verified venue.
@@ -37,7 +40,8 @@ var SchmetterlingeBookmarks=(function(){
    const name=String(value.name||"").trim().slice(0,100);
    const playerId=String(value.playerId||"");
    const startDate=validDate(value.startDate),endDate=validDate(value.endDate);
-   if(!FRAMEWORK_IDS.has(id)||!FRAMEWORK_SOURCES.has(url)||!name||
+   const spec=FRAMEWORK_SPECS[id];
+   if(!spec||spec.url!==url||spec.start!==startDate||spec.end!==endDate||!name||
       !startDate||!startDate.startsWith("2027-")||!endDate||endDate<startDate||
       !playerId||playerId==="all")return null;
    return {id,url,name,playerId,startDate,endDate,source:"bwbv-framework",
