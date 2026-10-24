@@ -216,7 +216,13 @@ function wireCards(container){
   if(follows.includes(id))follows=follows.filter(x=>x!==id);
   else follows=normalizeFollows([id,...follows]);
   if(!saveFollows()){follows=old;showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");}
-  else if(!old.includes(id)){setTeamDiscover(false,false);queueTeamDemand(id);}
+  else if(!old.includes(id)){
+   setTeamDiscover(false,false);
+   // Move focus out of the now-hidden iOS search input to dismiss the keyboard
+   // without changing page scale, scroll position or the saved follow list.
+   $("team-add-open")?.focus({preventScroll:true});
+   queueTeamDemand(id);
+  }
   renderFollowed();renderSearchResults();
  }));
 }
