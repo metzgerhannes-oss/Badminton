@@ -114,3 +114,32 @@ test("invalid install-bootstrap URL never unlocks an app or calls Supabase",asyn
  await expect(page.locator("#install-status")).toContainText("Kein gültiger Einladungslink");
  expect(calls).toEqual([]);
 });
+
+test("#304: invite instructions distinguish existing app and installation with exact button labels",async({page})=>{
+ await simulateIOS(page);
+ const calls=await inviteApi(page);
+ await page.goto("/install-invite.html#appinvite="+SECRET,{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#install-copy")).toHaveText("Einladung sichern");
+ await expect(page.locator("#existing-installation > h2")).toHaveText("App bereits installiert?");
+ await expect(page.locator("#new-installation > h2")).toHaveText("App zum ersten Mal installieren?");
+ const existing=page.locator("#existing-installation li");
+ await expect(existing).toHaveCount(3);
+ await expect(existing.nth(0)).toContainText("Einladung sichern");
+ await expect(existing.nth(2)).toContainText("Einladung aus Zwischenablage übernehmen");
+ const fresh=page.locator("#new-installation li");
+ await expect(fresh).toHaveCount(7);
+ await expect(fresh.nth(2)).toContainText("Teilen");
+ await expect(fresh.nth(3)).toContainText("Zum Home-Bildschirm hinzufügen");
+ await expect(fresh.nth(6)).toContainText("Schmetterlinge");
+ await expect(page.locator("#existing-installation")).not.toContainText("Tippe unten");
+ await expect(page.locator("#new-installation")).not.toContainText("Code eingeben");
+ // Merely reading instructions never redeems access or makes a Supabase request.
+ expect(calls).toEqual([]);
+ for(const width of [320,390]){
+  await page.setViewportSize({width,height:844});
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow).toBeLessThanOrEqual(2);
+  const btn=await page.locator("#install-copy").boundingBox();
+  expect(btn?.width).toBeGreaterThanOrEqual(44);
+ }
+});
