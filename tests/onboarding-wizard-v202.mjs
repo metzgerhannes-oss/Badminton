@@ -30,5 +30,11 @@ assert.match(js,/SchmetterlingeI18n/);
 const sw=readFileSync("sw.js","utf8");
 const shell=sw.match(/const SHELL_ASSETS=\[([\s\S]*?)\];/);
 assert.ok(shell,"PWA shell asset list missing");
-for(const code of ["de","en","fr","uk","ru","zh-Hans","tr","ar","it","es","pl"])assert.ok(shell[1].includes('"./locales/'+code+'.json"'),code+": language pack not pre-cached for offline use");
+for(const code of ["de","en","fr","uk","ru","zh-Hans","tr","ar","it","es","pl"]){
+ assert.ok(sw.includes('"./locales/'+code+'.json"'),code+": language pack missing from lazy PWA cache allowlist");
+ assert.ok(!shell[1].includes('"./locales/'+code+'.json"'),code+": avoid costly all-locale installation precache");
+}
+const i18n=readFileSync("i18n.js","utf8");
+assert.match(i18n,/caches\.open\("schmetterlinge-i18n-v2"\)/);
+assert.match(i18n,/caches\.match\(url\)/);
 console.log("F07 v204 wizard locales, RTL and offline packs: OK");
