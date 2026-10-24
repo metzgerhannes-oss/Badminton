@@ -53,6 +53,8 @@ test("F10 P2-A: only local private records; switching own profiles cannot adopt 
 
 test("F10 P2-A: natural wall finish writes only a random local game identity, not DBV results",async({page})=>{
  test.setTimeout(40_000);
+ // Synthetic fixed food away from the starting trajectory; no chance-dependent score.
+ await page.addInitScript(()=>{Math.random=()=>0});
  await page.goto("/#spiele");
  await page.locator("#arcade-start").click();
  await expect(page.locator("#arcade-status")).toContainText("Runde beendet",{timeout:12000});
