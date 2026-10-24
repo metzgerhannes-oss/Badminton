@@ -389,3 +389,49 @@ test("v151: iPhone reads fresh official BWBV source file, not only fallback card
  await expect(page.locator("#dbv-calendar-results")).not.toContainText("BC Lörrach-Brombach");
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
 });
+
+
+test("F06: 2027 C planning + persists locally with honest unknown venue",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ const first=page.locator(".dbv-calendar-external-plan").first();
+ await expect(first.locator(".dbv-calendar-place")).toHaveText("Austragungsort noch nicht veröffentlicht");
+ await first.locator("[data-framework-toggle]").click();
+ await expect(first.locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator("#official-tournament-list")).toContainText("Rahmentermin · Anmeldung nicht bestätigt");
+ await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort noch nicht veröffentlicht");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved.filter(t=>t.source==="bwbv-framework")).toHaveLength(1);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","true");
+ await page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]").click();
+ await expect(page.locator("#official-tournament-list")).not.toContainText("Rahmentermin · Anmeldung nicht bestätigt");
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test("F06: verified 2026 Reutlingen C tournament + preserves exact source and place",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-year").selectOption("2026");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ await page.locator("#dbv-calendar-period").selectOption("all");
+ const first=page.locator(".dbv-calendar-external-result").first();
+ await expect(first).toContainText("1. C-RLT BAW Einzel/Doppel U11–U19");
+ await expect(first.locator(".dbv-calendar-place")).toHaveText("Austragungsort: Reutlingen");
+ await expect(first.locator('a[href*="dbv.turnier.de/tournament/"]')).toBeVisible();
+ await first.locator("[data-official-toggle]").click();
+ await expect(first.locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort: Reutlingen");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved.filter(t=>t.id==="52B3B803-279B-48CF-8143-F5078F5236DB")).toHaveLength(1);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
+ await page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]").click();
+ await expect(page.locator("#official-tournament-list")).not.toContainText("Austragungsort: Reutlingen");
+});

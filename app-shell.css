@@ -293,6 +293,8 @@
 .dbv-calendar-detail{min-width:0}
 .dbv-calendar-detail h5{margin:0 0 4px;font-size:15px;color:#183a54;overflow-wrap:anywhere}
 .dbv-calendar-detail p{margin:4px 0;font-size:12px;line-height:1.45;color:#576f81}
+.dbv-calendar-detail .dbv-calendar-place{display:block;margin:7px 0 5px;font-size:13px;font-weight:750;line-height:1.45;color:#234b65;overflow-wrap:anywhere}
+.saved-tournament-venue{margin-top:6px!important;font-size:12px!important;font-weight:650;color:inherit;line-height:1.5}
 .dbv-calendar-badges{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}
 .dbv-calendar-badges span{font-size:11px;font-weight:650;border-radius:7px;background:#eaf4fa;color:#235274;padding:4px 6px}
 .dbv-calendar-detail a{font-size:12px;font-weight:650;color:#136590;text-decoration:underline}

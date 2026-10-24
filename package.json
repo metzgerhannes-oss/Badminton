@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test:mobile": "playwright test",
-    "test:mobile:chromium": "playwright test --project=small-chromium"
+    "test:mobile:chromium": "playwright test --project=small-chromium",
+    "test:calendar": "node --test tests/framework-calendar.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"
