@@ -57,3 +57,38 @@ test("Gefolgte Spieler: all entries, name/club/ID filtering, no iPhone horizonta
  const excess=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
  expect(excess).toBeLessThanOrEqual(2);
 });
+
+test("#289: following a player keeps iPhone viewport stable and dismisses search keyboard",async({page})=>{
+ for(const width of [320,390,420]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+  await page.locator("#player-add-open").click();
+  await expect(page.locator("#player-discover")).toBeVisible();
+  const search=page.locator("#library-search");
+  await search.fill("Vinzent");
+  await expect(page.locator("#library-count")).toContainText("1 passende Spieler");
+  await expect(page.locator("[data-library-toggle='05-123456']")).toBeEnabled();
+  await page.locator("[data-library-toggle='05-123456']").click();
+  await expect(page.locator("[data-library-toggle='05-123456']")).toBeDisabled();
+  await expect(page.locator("#friend-list .followed-player-row")).toHaveCount(1);
+  await expect(page.locator("#player-discover")).toBeVisible();
+  const view=await page.evaluate(()=>{
+   const nav=document.querySelector(".bottom-nav").getBoundingClientRect();
+   const search=document.querySelector("#library-search");
+   return {scale:window.visualViewport?.scale??1,
+    overflow:document.documentElement.scrollWidth-window.innerWidth,
+    navRight:nav.right,viewport:window.innerWidth,
+    searchFocused:document.activeElement===search,
+    searchSize:parseFloat(getComputedStyle(search).fontSize)};
+  });
+  expect(view.searchSize).toBeGreaterThanOrEqual(16);
+  expect(view.searchFocused,"iOS keyboard must close after a successful follow").toBe(false);
+  expect(view.scale,"No automatic page zoom after follow").toBeLessThanOrEqual(1.02);
+  expect(view.overflow,"No horizontal overflow after follow").toBeLessThanOrEqual(2);
+  expect(view.navRight,"Last navigation target must remain on-screen").toBeLessThanOrEqual(view.viewport+2);
+  await page.evaluate(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"05-070879",name:"Startprofil"}],friends:[],officialLinks:[],
+   activeProfileId:"05-070879",chosen:"05-070879",historyProfilesInitialized:true
+  })));
+ }
+});
