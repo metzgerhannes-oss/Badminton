@@ -7,7 +7,7 @@ import {todayEvidence,followedTeamSelection,fixtureReadPath,berlinDay,hasVerifie
 import {followedRoster,followedSnapshotPath} from "./scripts/followed-live.mjs";
 import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {todayMatchRows} from "./scripts/today-presentation.mjs";
+import {todayDisplayRows} from "./scripts/today-presentation.mjs";
 
 const $=id=>document.getElementById(id);
 const hosts=["today-home","today-tournament"];
@@ -34,30 +34,37 @@ const context=()=>{
  return {groups,follows,teams:selection.teams,selection};
 };
 function buildCard(event){
- // Never offer a static fixture/group page as though it contained live scores.
- const hasReport=Boolean(event.url);
- const row=n(hasReport?"a":"div","today-match-row"+(hasReport?"":" today-match-pending"));
- if(hasReport){
-  row.href=event.url;
-  row.target="_blank";row.rel="noopener noreferrer";
-  row.setAttribute("aria-label","nuLiga-Spielbericht öffnen: Anpfiff "+event.kickoff+"; "+event.pairing);
+ const hasLink=Boolean(event.url),isPlayer=event.entity==="player";
+ const row=n(hasLink?"a":"div","today-match-row"+(hasLink?"":" today-match-pending"));
+ row.dataset.entity=event.entity;row.dataset.kind=event.kind;
+ const context=event.label+": "+event.status+"; "+
+  (isPlayer?event.name+(event.detail?"; "+event.detail:""):
+   "Anpfiff "+event.kickoff+"; "+event.pairing);
+ if(hasLink){
+  row.href=event.url;row.target="_blank";row.rel="noopener noreferrer";
+  row.setAttribute("aria-label",(isPlayer?"Badhub-Liveansicht öffnen: ":"nuLiga-Spielbericht öffnen: ")+context);
  }else{
-  row.setAttribute("aria-label","Anpfiff "+event.kickoff+"; "+event.pairing+
-   ". Noch kein offizieller Spielbericht veröffentlicht.");
+  row.setAttribute("aria-label",context+(event.kind==="scheduled"?
+   ". Noch kein offizieller Spielbericht veröffentlicht.":""));
  }
- row.append(n("span","today-match-kickoff","Anpfiff "+event.kickoff));
- row.append(n("strong","today-match-pairing",event.pairing));
+ row.append(n("span","today-match-entity",event.label));
+ row.append(n("span","today-match-status",event.status));
+ if(!isPlayer)row.append(n("span","today-match-kickoff","Anpfiff "+event.kickoff));
+ row.append(n("strong","today-match-pairing",isPlayer?event.name:event.pairing));
+ if(isPlayer&&event.detail)row.append(n("span","today-match-detail",event.detail));
+ if(event.score)row.append(n("span","today-match-row-score","Ergebnis "+event.score));
  return row;
 }
 function renderHost(host,model){
  if(!host)return;
  const list=host.querySelector("[data-today-cards]");
  if(!list)return;
- // No empty/error/coverage messages, statuses, results, controls or sources.
- // Source validation remains internal; linking requires a direct per-match report.
- const rows=todayMatchRows(model?.events||[],{limit:host.id==="today-home"?4:8});
+ const all=todayDisplayRows(model?.events||[],{now:Date.now(),limit:102});
+ const rows=host.id==="today-home"?all.slice(0,4):all;
  list.replaceChildren(...rows.map(buildCard));
  host.hidden=rows.length===0;
+ const more=host.querySelector("[data-today-more]");
+ if(more)more.hidden=all.length<=rows.length;
 }
 function render(){
  for(const id of hosts)renderHost($(id),last);
@@ -94,7 +101,7 @@ function informNav(){
 }
 async function refresh(force=false){
  if(!visible()||document.hidden)return;
- if(!window.badmintonAppAccess?.allowed){render(false,"access");return}
+ if(!window.badmintonAppAccess?.allowed){last=null;signature="";checked=0;render();informNav();scheduleLocalExpiry();return}
  const ctx=context(),today=berlinDay();
  const player=followedRoster(ctx.groups);
  const stamp=JSON.stringify([today,player.players.map(p=>p.id),ctx.follows,ctx.teams.map(t=>t.id)]);
