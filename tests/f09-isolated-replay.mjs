@@ -33,6 +33,7 @@ try{
     assert.equal(exe,'psql');
     assert.equal(options.env.PGPASSWORD,undefined);
     assert.equal(options.env.PGHOST,undefined);
+    assert.equal(options.env.PGPASSFILE,'/dev/null');
     assert.equal(options.env.PGSSLMODE,undefined);
     assert.ok(args.some(a=>a.startsWith('--dbname='+okUrl)));
     return {status:0,stdout:calls===1?'f09_replay_test:0\n':''};
@@ -47,6 +48,8 @@ try{
   assert.match(changed.message,/Unsafe/);
   await writeFile(path.join(dir,file),'select cron.schedule(1,2,3)');
   await assert.rejects(validatePrivateFiles(dir,[{...row,sha256:createHash('sha256').update('select cron.schedule(1,2,3)').digest('hex')}]),/Unsafe/);
+  await writeFile(path.join(dir,file),'alter system set log_statement = all;');
+  await assert.rejects(validatePrivateFiles(dir,[{...row,sha256:createHash('sha256').update('alter system set log_statement = all;').digest('hex')}]),/Unsafe/);
   await assert.rejects(validatePrivateFiles(dir,[row]),/digest mismatch/);
   await rm(path.join(dir,file));
   await symlink('/etc/hosts',path.join(dir,file));
