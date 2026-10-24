@@ -31,9 +31,15 @@ outside the repository with this schema:
     {"migrations":[{"version":"YYYYMMDDHHMMSS","sha256":"64 lowercase hex"}]}
 
 Then run LOCALLY, never in CI:
-    node scripts/f09-migration-lineage.mjs --manifest /private/metadata.json
+    node scripts/f09-migration-lineage.mjs --manifest /private/metadata.json --expected-applied-count N
+
+N must be freshly and independently verified using authorized read-only
+migration-history access; do not simply copy the manifest's array length,
+assume the old count of 70 is still current, or query production from CI.
+A partial manifest is always NOT READY even if every supplied SHA matches.
 
 Every missing SHA is an unverified comparison, never assumed equal.
+Missing or mismatched independently verified applied count also fails closed.
 Hashes compare exact SQL file bytes; statement-splitting/format
 differences must be manually reviewed, not silently normalized.
 Raw SQL and statement arrays are prohibited in the metadata input.

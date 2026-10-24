@@ -10,7 +10,12 @@ const verified=[
  {version:"20261010000001",sha256:a},
  {version:"20261010000002",sha256:b}
 ];
-const ok=auditLineage(local,verified,53);
+const ok=auditLineage(local,verified,53,2);
+assert.equal(ok.applied_count_verified,true);
+// Never trust a self-contained manifest to prove it is complete.
+assert.equal(auditLineage(local,verified,53).lineage_ready,false);
+assert.equal(auditLineage(local,verified,53,70).lineage_ready,false);
+assert.equal(auditLineage(local,[verified[0]],53,2).lineage_ready,false);
 assert.equal(ok.lineage_ready,true);
 assert.equal(ok.isolated_replay_verified,false);
 assert.equal(ok.hash_verified,2);

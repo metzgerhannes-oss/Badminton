@@ -12,7 +12,7 @@ import {pathToFileURL} from "node:url";
 const VERSIONED=/^(\d{14})_[a-zA-Z0-9_-]+\.sql$/;
 const HASH=/^[a-f0-9]{64}$/;
 
-export function auditLineage(local,applied,legacySqlCount=0){
+export function auditLineage(local,applied,legacySqlCount=0,expectedAppliedCount=null){
  if(!Array.isArray(local)||!Array.isArray(applied))
   throw new Error("Expected local/applied migration arrays");
  const localMap=new Map(),appliedMap=new Map();
@@ -45,12 +45,18 @@ export function auditLineage(local,applied,legacySqlCount=0){
  }
  let notApplied=0;
  for(const version of localMap.keys())if(!appliedMap.has(version))notApplied++;
- const lineageReady=appliedMap.size>0&&localMap.size>0&&duplicates===0&&
+ // A manifest is not evidence of completeness by itself: the expected
+ // count must be independently checked against the authorized DB read-only.
+ const appliedCountVerified=Number.isSafeInteger(expectedAppliedCount)&&
+  expectedAppliedCount>0&&applied.length===expectedAppliedCount&&
+  appliedMap.size===expectedAppliedCount;
+ const lineageReady=appliedCountVerified&&localMap.size>0&&duplicates===0&&
   invalid===0&&absentLocally===0&&notApplied===0&&
   unverifiedSql===0&&shaMismatch===0;
  return {
   local_versioned_sql:localMap.size,applied_migrations:appliedMap.size,
-  legacy_sql_files:legacySqlCount,duplicates,invalid_entries:invalid,
+  legacy_sql_files:legacySqlCount,applied_count_verified:appliedCountVerified,
+  duplicates,invalid_entries:invalid,
   applied_without_local_file:absentLocally,local_without_applied_record:notApplied,
   hash_missing:unverifiedSql,hash_mismatch:shaMismatch,hash_verified:shaMatched,
   lineage_ready:lineageReady,
@@ -76,7 +82,7 @@ export async function inspectLocal(root=process.cwd()){
 export function formatSafeReport(report){
  // Strict allowlist; never print supplied manifest text or migration names.
  const keys=["local_versioned_sql","applied_migrations","legacy_sql_files",
-  "duplicates","invalid_entries","applied_without_local_file",
+  "applied_count_verified","duplicates","invalid_entries","applied_without_local_file",
   "local_without_applied_record","hash_missing","hash_mismatch","hash_verified",
   "lineage_ready","isolated_replay_verified"];
  return ["F09 migration lineage (offline / counts only)",
@@ -84,23 +90,30 @@ export function formatSafeReport(report){
   "No reset/replay performed; never run a production db reset."].join("\n")+"\n";
 }
 async function main(){
- const [command,file,extra]=process.argv.slice(2);
- if(extra||!["--inventory-only","--manifest"].includes(command)||
-    (command==="--manifest"&&!file)||(command==="--inventory-only"&&file))
-  throw new Error("Use --inventory-only OR --manifest LOCAL_METADATA_JSON");
- if(command==="--manifest"&&(process.env.CI||process.env.GITHUB_ACTIONS))
+ const [command,file,flag,count,extra]=process.argv.slice(2);
+ const inventory=command==="--inventory-only";
+ const manifestMode=command==="--manifest";
+ if(inventory){
+  if(file!==undefined)throw new Error("Inventory takes no extra arguments");
+ }else if(manifestMode){
+  // A separately verified read-only count is required. A partial manifest
+  // must never make the audit report lineage_ready=true.
+  if(!file||flag!=="--expected-applied-count"||extra!==undefined||
+     !/^[1-9][0-9]*$/.test(count||"")||
+     !Number.isSafeInteger(Number(count)))
+   throw new Error("Use --manifest PRIVATE_JSON --expected-applied-count N");
+ }else throw new Error("Use --inventory-only OR --manifest PRIVATE_JSON --expected-applied-count N");
+ if(manifestMode&&(process.env.CI||process.env.GITHUB_ACTIONS))
   throw new Error("Private migration manifests are forbidden in CI");
  const {local,legacySqlCount}=await inspectLocal();
- if(command==="--inventory-only"){
+ if(inventory){
   process.stdout.write(formatSafeReport(auditLineage(local,[],legacySqlCount)));
   return;
  }
- // Local metadata only, format: {migrations:[{version,sha256?}]}.
- // A missing SHA must remain unverified, NOT be interpreted as a match.
  const manifest=JSON.parse(await readFile(file,"utf8"));
  if(!manifest||!Array.isArray(manifest.migrations))
   throw new Error("Expected migrations metadata array");
- const report=auditLineage(local,manifest.migrations,legacySqlCount);
+ const report=auditLineage(local,manifest.migrations,legacySqlCount,Number(count));
  process.stdout.write(formatSafeReport(report));
  if(!report.lineage_ready)process.exitCode=1;
 }
