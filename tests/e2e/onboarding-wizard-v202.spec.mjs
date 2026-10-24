@@ -1,0 +1,56 @@
+import {test,expect} from "./invited-member.fixture.mjs";
+const player={id:"99-900099",name:"Synthetisches Profil",club:"Testverein"};
+const store={players:[player],friends:[],officialLinks:[],activeProfileId:player.id,chosen:player.id,historyProfilesInitialized:true};
+test("F07 wizard resumes, reuses real controls and never clears local profiles",async({page})=>{
+ await page.addInitScript(data=>{
+  if(localStorage.getItem("shuttleboard-v1")===null)localStorage.setItem("shuttleboard-v1",JSON.stringify(data));
+  if(localStorage.getItem("schmetterlinge.setupWizard.v1")===null)localStorage.setItem("schmetterlinge.setupWizard.v1","0");
+ },store);
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#start");
+ const wizard=page.locator("#onboarding-wizard");
+ await expect(wizard).toBeVisible();
+ await expect(page.locator("#onboarding-progress")).toHaveText("1 von 4");
+ await page.locator("#onboarding-action").click();
+ await expect(page.locator("#onboarding-progress")).toHaveText("2 von 4");
+ await page.locator("#onboarding-action").click();
+ await expect(wizard).not.toBeVisible();
+ await expect(page.locator("#player-dialog")).toBeVisible();
+ await page.locator("#cancel-dialog").click();
+ await page.locator("#onboarding-resume").click();
+ await expect(page.locator("#onboarding-action")).toHaveText("Weiter");
+ await page.locator("#onboarding-action").click();
+ await expect(page.locator("#onboarding-progress")).toHaveText("3 von 4");
+ await page.locator("#onboarding-later").click();
+ await page.reload();
+ await expect(wizard).toBeVisible();
+ await expect(page.locator("#onboarding-progress")).toHaveText("3 von 4");
+ await page.locator("#onboarding-action").click();
+ await expect(page.locator("#team-discover")).toBeVisible();
+ await page.locator("#onboarding-resume").click();
+ await page.locator("#onboarding-action").click();
+ await expect(page.locator("#onboarding-progress")).toHaveText("4 von 4");
+ await page.locator("#onboarding-action").click();
+ await expect(page.locator("#dbv-calendar-q")).toBeFocused();
+ await page.locator("#onboarding-resume").click();
+ await page.locator("#onboarding-action").click();
+ await expect(wizard).not.toBeVisible();
+ await expect(page).toHaveURL(/#start$/);
+ expect(await page.evaluate(()=>localStorage.getItem("schmetterlinge.setupWizard.v1"))).toBeNull();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toEqual([player]);
+ await page.reload();
+ await expect(wizard).not.toBeVisible();
+});
+test("F07 existing user is never forced into setup and can restart it in settings",async({page})=>{
+ await page.addInitScript(data=>{
+  if(localStorage.getItem("shuttleboard-v1")===null)localStorage.setItem("shuttleboard-v1",JSON.stringify(data));
+ },store);
+ await page.goto("/#einstellungen/hilfe");
+ await expect(page.locator("#onboarding-wizard")).not.toBeVisible();
+ await page.locator("#onboarding-restart").click();
+ await expect(page.locator("#onboarding-wizard")).toBeVisible();
+ await page.locator("#onboarding-skip").toBeHidden();
+ await page.locator("#onboarding-later").click();
+ expect(await page.evaluate(()=>localStorage.getItem("schmetterlinge.setupWizard.v1"))).toBe("0");
+});
