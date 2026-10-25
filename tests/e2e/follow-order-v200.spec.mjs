@@ -9,35 +9,29 @@ const friends=[
 ];
 const teamKeys=["nuliga:999999:3","nuliga:999999:1","nuliga:999999:2"];
 
-test("v200: player ordering persists, keyboard focus survives, reset is explicit, new follow appends",async({page})=>{
+test("v217: direct player sorting persists and leaves own profiles intact",async({page})=>{
  await page.addInitScript(({own,friends})=>{
   if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
    players:[own],friends,officialLinks:[],activeProfileId:own.id,chosen:own.id,historyProfilesInitialized:true
   }));
  },{own,friends});
  await page.setViewportSize({width:390,height:844});
- await page.goto("/#spieler");
- const details=page.locator("#friend-manage-details");
- await details.locator("summary").click();
- const order=()=>page.locator('#friend-settings-list [data-friend-move][data-direction="-1"]')
-  .evaluateAll(buttons=>buttons.map(button=>button.dataset.friendMove));
+ await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ const order=()=>page.locator("#friend-list [data-follow-row]").evaluateAll(rows=>rows.map(n=>n.dataset.followRow));
  expect(await order()).toEqual(["98-900001","98-900002","98-900003"]);
- const moved=page.locator('[data-friend-move="98-900003"][data-direction="-1"]');
- await moved.click();
- await expect(moved).toBeFocused();
+ const grip=page.locator('[data-friend-grip="98-900003"]');
+ await grip.focus();
+ await page.keyboard.press("ArrowUp");
+ await expect(grip).toBeFocused();
  expect(await order()).toEqual(["98-900001","98-900003","98-900002"]);
- await moved.click(); // At the top the up arrow is disabled: focus must fall back to down.
- await expect(page.locator('[data-friend-move="98-900003"][data-direction="1"]')).toBeFocused();
+ await page.keyboard.press("ArrowUp");
  expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
- await page.reload();
- await page.locator("#friend-manage-details summary").click();
+ await page.reload({waitUntil:"domcontentloaded"});
  expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
- await page.locator("#friend-order-reset").click();
- await expect(page.locator("#friend-order-reset")).toBeFocused();
- expect(await order()).toEqual(["98-900002","98-900003","98-900001"]);
+ await expect(page.locator("#friend-manage-details")).toHaveCount(0);
  const result=await page.evaluate(()=>window.badmintonLibraryToggleFollow({id:"98-900004",name:"Delta Test"}));
  expect(result.ok).toBe(true);
- expect(await order()).toEqual(["98-900002","98-900003","98-900001","98-900004"]);
+ expect(await order()).toEqual(["98-900003","98-900001","98-900002","98-900004"]);
  const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(stored.players).toEqual([own]);
  expect(stored.friends.map(p=>p.id)).toEqual(await order());
@@ -81,40 +75,31 @@ test("v200: team order and reset persist without touching profile storage",async
 });
 
 for(const size of [0,1,5,20]){
- test("P2 #291: "+size+" followed players stay ordered, finish restores focus",async({page})=>{
+ test("v217: "+size+" followed player rows keep local order",async({page})=>{
   const friends=Array.from({length:size},(_,i)=>({
    id:"98-"+String(900100+i).padStart(6,"0"),name:"Synthetischer Spieler "+String(i).padStart(2,"0")
   }));
   await page.addInitScript(({friends})=>{
    if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
-    players:[{id:"99-900010",name:"Eigenes Testprofil"}],friends,
-    officialLinks:[],activeProfileId:"99-900010",chosen:"99-900010",
-    historyProfilesInitialized:true
+    players:[{id:"99-900010",name:"Eigenes Testprofil"}],friends,officialLinks:[],
+    activeProfileId:"99-900010",chosen:"99-900010",historyProfilesInitialized:true
    }));
   },{friends});
   await page.setViewportSize({width:size%2?390:320,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
-  const details=page.locator("#friend-manage-details");
-  await details.locator("summary").click();
-  const arrows=page.locator('#friend-settings-list [data-friend-move][data-direction="-1"]');
-  await expect(arrows).toHaveCount(size);
+  const rows=page.locator("#friend-list [data-follow-row]");
+  await expect(rows).toHaveCount(size);
+  await expect(page.locator("#friend-manage-details")).toHaveCount(0);
   if(size>1){
    const id=friends[size-1].id;
-   await page.locator('[data-friend-move="'+id+'"][data-direction="-1"]').click();
-   await page.locator("#friend-order-done").click();
-   await expect(details).not.toHaveAttribute("open");
-   await expect(details.locator("summary")).toBeFocused();
+   await page.locator('[data-friend-grip="'+id+'"]').focus();
+   await page.keyboard.press("ArrowUp");
    await page.reload({waitUntil:"domcontentloaded"});
-   await details.locator("summary").click();
-   const ordered=await arrows.evaluateAll(nodes=>nodes.map(el=>el.dataset.friendMove));
-   expect(ordered.at(-2)).toBe(id);
+   const ids=await rows.evaluateAll(nodes=>nodes.map(el=>el.dataset.followRow));
+   expect(ids.at(-2)).toBe(id);
    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
-   expect(saved.friends.map(p=>p.id)).toEqual(ordered);
+   expect(saved.friends.map(p=>p.id)).toEqual(ids);
    expect(saved.players).toHaveLength(1);
-  }else{
-   await expect(page.locator("#friend-order-reset")).toBeDisabled();
-   await page.locator("#friend-order-done").click();
-   await expect(details.locator("summary")).toBeFocused();
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
  });
