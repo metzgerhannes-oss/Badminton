@@ -72,9 +72,11 @@ test("v140: only verified disciplines are shown, with a compact empty state",asy
 
 test("v140: player search shows a verified name instead of repeating GitHub fallback",async({page})=>{
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
- await page.locator("#player-add-open").click();
+ // v217: the visible unified search opens the targeted DBV results directly.
+ const search=page.locator("#followed-player-search");
+ await expect(search).toBeVisible();
+ await search.fill("Muster");
  await expect(page.locator("#player-discover")).toBeVisible();
- await page.locator("#library-search").fill("Muster");
  await expect(page.locator("#library-results .library-player")).toHaveCount(1);
  await expect(page.locator("#library-results")).toContainText("Muster Spieler");
  await expect(page.locator("#library-results")).toContainText(SECOND);
