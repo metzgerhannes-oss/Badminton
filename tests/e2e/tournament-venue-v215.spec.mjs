@@ -64,6 +64,7 @@ test("v215: existing calendar favorite accepts a local venue without changing ca
  const card=page.locator("#official-tournament-list .tournament-card").first();
  await expect(card).toContainText("Austragungsort nicht erfasst");
  await card.locator("[data-edit-venue-id]").click();
+ await expect(page).toHaveURL(/#turniere$/);
  await expect(page.locator("#tournament-venue-dialog")).toHaveAttribute("open","");
  await page.locator("#tournament-venue-input").fill("Synthetische Halle");
  await page.locator("#tournament-venue-form button[type=submit]").click();
