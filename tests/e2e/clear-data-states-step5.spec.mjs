@@ -29,7 +29,7 @@ test("player search differentiates idle, real zero matches and unavailable ident
  await visibleSearch.fill("Nichtvorhanden");
  await expect(page.locator("#player-discover")).toBeVisible();
  await expect(results).toHaveAttribute("data-state","empty");
- await expect(results).toContainText("Keine bestätigten DBV-Treffer");
+ await expect(results).toContainText("Keine weiteren DBV-Spieler für diese Suche gefunden.");
  await expect(page.locator("#library-count")).toContainText("0 passende Spieler");
  await page.route("**/*.supabase.co/rest/v1/rpc/search_dbv_player_identity",route=>
   route.fulfill({status:503,headers,body:'{"message":"Simulierter Quellfehler"}'}));

@@ -74,6 +74,8 @@
  background:#234d76;color:#f3faff;border-color:#8eafca
  }
  #view-spieler .followed-search-label input{background:#123657;color:#fff;border-color:#79a4c7}
+ /* Search results sit on a navy card on desktop; keep their counter readable. */
+ #view-spieler #player-discover #library-count{color:var(--desktop-copy,#eef7ff)}
 }
 
 /* v217: reversible local unfollow, no permanent confirmation dialog. */

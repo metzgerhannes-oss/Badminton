@@ -324,8 +324,10 @@ function syncFollowSearch(){
  }
  renderFriends();
 }
+let pendingFollowSearchFocus=false;
 function showPlayerDiscover(open=true,focus=true){
  if(!open){
+  pendingFollowSearchFocus=false;
   const input=el("followed-player-search");if(input)input.value="";
   syncFollowSearch();return;
  }
@@ -335,6 +337,8 @@ function showPlayerDiscover(open=true,focus=true){
   input?.focus({preventScroll:true});
   input?.scrollIntoView({block:"center",behavior:"smooth"});
  };
+ // A delayed hashchange can otherwise steal focus back to the route heading.
+ pendingFollowSearchFocus=Boolean(focus&&location.hash!=="#spieler");
  if(location.hash!=="#spieler")navigatePrimary("spieler");
  syncFollowSearch();
  if(focus){
@@ -653,6 +657,10 @@ function setup(){
   try{render()}finally{
    SchmetterlingeRouter.renderPage(state);
    focusCurrentView();
+   if(pendingFollowSearchFocus){
+    pendingFollowSearchFocus=false;
+    if(state.page==="spieler")el("followed-player-search")?.focus({preventScroll:true});
+   }
   }
  });
  const playerDialog=el("player-dialog"),playerForm=el("player-form");

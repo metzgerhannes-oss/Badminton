@@ -1,11 +1,11 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 for(const width of [320,390,1280]){
  test("v217: "+width+"px one search, reorder, independent unfollow and persistent family",async({page})=>{
-  await page.addInitScript(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+  await page.addInitScript(()=>{if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
    players:[{id:"99-920001",name:"Eigenes Profil"}],
    friends:[{id:"98-920002",name:"Zoe Test"},{id:"98-920003",name:"Anna Test"},{id:"98-920004",name:"Max Test"}],
    activeProfileId:"99-920001",chosen:"99-920001",officialLinks:[],historyProfilesInitialized:true
-  })));
+  }));});
   await page.setViewportSize({width,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
   const order=()=>page.locator("#friend-list [data-follow-row]").evaluateAll(nodes=>nodes.map(x=>x.dataset.followRow));

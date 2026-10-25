@@ -465,7 +465,9 @@ test("v183: followed players use their canonical Spieler page and old bookmarks 
  await expect(page.locator("#friend-list")).toContainText("Sarah Storz");
  await expect(page.locator("#friend-manage-details")).toHaveCount(0);
  await expect(page.locator('#friend-list [data-follow-row]')).toHaveCount(1);
- await expect(page.locator('[data-friend-grip="'+FRIEND+'"]')).toBeDisabled();
+ // Filtered lists show an edit action, not a misleading disabled sort grip.
+ await expect(page.locator('[data-friend-grip="'+FRIEND+'"]')).toHaveCount(0);
+ await expect(page.locator('[data-edit-friend="'+FRIEND+'"]')).toBeEnabled();
  await page.locator("#followed-player-search").fill("");
  await expect(page.locator('[data-friend-grip="'+FRIEND+'"]')).toBeEnabled();
 
