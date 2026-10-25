@@ -8,9 +8,14 @@ assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","languag
  "Approved Home cascade must remain intact, with non-Home contrast layer last");
 assert.match(await readFile("spiele.css","utf8"),/\.arcade-shell\{/,"Arcade styles must remain scoped to the secondary screen");
 const tabs=[...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]);
-assert.deepEqual(tabs,["start","turniere","live","spieler","verein","mannschaft","berichte"]);
-assert.match(await readFile("teams.css","utf8"),/\.bottom-nav a\{width:20%!important/);
-assert.match(await readFile("teams.css","utf8"),/\.bottom-nav\.has-live-tab a\{width:16\.666%!important/);
+assert.deepEqual(tabs,["start","spieler","turniere","verein","mannschaft"],"Four fixed mobile tabs and the existing desktop club destination");
+const navigation=html.match(/<nav class="bottom-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||"";
+assert.doesNotMatch(navigation,/id="live-nav-tab"|data-page="berichte"/,"Live and reports are context routes, not permanent tabs");
+assert.match(html,/id="live-nav-tab" class="today-context-link"[^>]*hidden/);
+assert.match(html,/id="heading-spieler"[\s\S]*?href="#berichte"/);
+assert.match(html,/id="heading-mannschaft"[\s\S]*?href="#berichte"/);
+assert.match(await readFile("teams.css","utf8"),/\.bottom-nav a\{width:25%!important/);
+assert.doesNotMatch(await readFile("teams.css","utf8"),/\.bottom-nav\.has-live-tab/);
 assert.match(shell,/\.bottom-nav a\[hidden\]\{display:none!important\}/);
 assert.match(shell,/\.topbar-settings\{/);
 assert.match(shell,/@media\(max-width:410px\)/);

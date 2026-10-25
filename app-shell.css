@@ -37,24 +37,17 @@
 [dir="rtl"] .match-stats-values, [dir="rtl"] .match-stats-reference { font-variant-numeric:tabular-nums; }
 [dir="rtl"] input[name="id"], [dir="rtl"] input[name="url"], [dir="rtl"] input[name="startDate"], [dir="rtl"] input[name="endDate"] { direction:ltr; text-align:left; }
 
-/* v79: fifth LIVE destination is only shown on a confirmed tournament day. */
+/* UX2 A1: verified-day context must never rearrange the four main tabs. */
 .bottom-nav a[hidden]{display:none!important}
-/* Six slots: five main pages plus the LIVE tab. Five widths at 20% plus LIVE
-   previously exceeded a 320px phone viewport by 75px in WebKit. */
-.bottom-nav.has-live-tab a{width:calc(100% / 6)!important;flex:1 1 calc(100% / 6);min-width:0}
-/* A verified scheduled/current match makes Heute visible and conspicuously red.
-   A pale alert is visually distinct from the solid-red selected tab. */
-.bottom-nav.has-live-tab .live-nav-tab{color:#9f123b;background:#fff1f4;border:1px solid #c94e70;border-radius:12px;font-weight:800}
-.bottom-nav.has-live-tab .live-nav-tab[aria-current="page"]{color:#fff;background:#b91f4d;border-color:#9f123b}
-.bottom-nav.has-live-tab .live-nav-tab .nav-icon{stroke-width:2.1}
+.today-context-bar{display:flex;justify-content:flex-start}
+.today-context-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;margin:1px 0 10px;padding:8px 14px;border-radius:12px;border:1px solid #9f123b;background:#b91f4d;color:#fff;font-size:14px;font-weight:800;text-decoration:none}
+.today-context-link[hidden]{display:none!important}
+.today-context-link:focus-visible{outline:3px solid #8bd8ff;outline-offset:2px}
+.today-context-link .nav-icon{width:21px;height:21px}
+.context-reports-link{display:inline-flex;align-items:center;min-height:44px;margin:0 0 12px;padding:8px 4px;color:#186b9d;font-size:13px;font-weight:750;text-decoration:underline;text-underline-offset:3px}
 .live-tournaments-return{display:none}
 .app[data-current-view="live"] #view-turniere .live-hub-bookmarks{display:none}
 .app[data-current-view="live"] #view-turniere .live-tournaments-return{display:inline-flex;min-height:44px;align-items:center}
-@media(max-width:350px){
- .bottom-nav.has-live-tab a{padding-inline:2px}
- .bottom-nav.has-live-tab a small{font-size:10px}
- .bottom-nav.has-live-tab .nav-icon{width:22px;height:22px}
-}
 
 /* Release identity: quiet but always visible, including 320px-wide devices.
    Keep the settings target 44px high; the version is not a second button. */

@@ -61,12 +61,13 @@ test("iPhone bottom navigation: every destination works and only current tab is 
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#today-home .today-match-row")).toContainText("Anpfiff",{timeout:15000});
+ await expect(page.locator(".bottom-nav a:visible")).toHaveCount(4);
  await expect(page.locator("#live-nav-tab")).toBeVisible();
  await page.locator("#live-nav-tab").click();
  await expect(page.locator("#view-turniere")).toBeVisible();
  const paths=[
-  ["start","start"],["turniere","turniere"],["spieler","spieler"],
-  ["mannschaft","mannschaft"],["berichte","berichte"],["start","start"]
+  ["start","start"],["spieler","spieler"],["turniere","turniere"],
+  ["mannschaft","mannschaft"],["start","start"]
  ];
  for(const [tab,view] of paths){
   await page.locator('.bottom-nav a[data-page="'+tab+'"]').click();
@@ -76,14 +77,14 @@ test("iPhone bottom navigation: every destination works and only current tab is 
   await expect(page.locator('.bottom-nav a[data-page="'+tab+'"]')).toHaveAttribute("aria-current","page");
   await expect(page.locator('.bottom-nav a[aria-current="page"]')).toHaveCount(1);
  }
- // The latest v177 screenshot showed a pink Heute tab even on Home.
- // Use a real mocked verified fixture rather than forcibly unhiding the link.
+ // The old v177 screenshot showed a pink Heute tab shifting the main navigation.
+ // Use a verified fixture and require Heute to be outside the four stable tabs.
  const today=page.locator("#live-nav-tab");
  await expect(today).toBeVisible();
  await expect(today).not.toHaveAttribute("aria-current","page");
  const inactiveBg=await today.evaluate(e=>getComputedStyle(e).backgroundColor);
- expect(inactiveBg).not.toBe("rgb(185, 31, 77)");
- // A backed 'Heute' destination still opens Turniertag, and Home escapes it.
+ expect(inactiveBg).toBe("rgb(185, 31, 77)");
+ // Verified Heute still opens the #live deep link, and Home escapes it.
  await today.click();
  await expect(page.locator("#view-turniere")).toBeVisible();
  await expect(page.locator(".app")).toHaveAttribute("data-current-view","live");

@@ -8,7 +8,7 @@ const mandatory=["## 1. Inventur","## 2. Navigationsmatrix","## 3. Ziel-Menübau
  "#307","#306","#305","#291","320/390/1280/1440/1920","Keine zusätzlichen Netzwerkabfragen"];
 for(const term of mandatory)assert.ok(doc.includes(term),"Missing IA1 decision: "+term);
 const routes=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
-assert.deepEqual(routes,["start","turniere","live","spieler","verein","mannschaft","berichte"]);
+assert.deepEqual(routes,["start","spieler","turniere","verein","mannschaft"]);
 assert.match(html,/id="live-nav-tab"[^>]*hidden/);
 assert.match(app,/function navigatePrimary\(page,\{returnToOwn=true\}=\{\}\)/);
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\)/);

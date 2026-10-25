@@ -47,12 +47,12 @@ test.beforeEach(async ({page})=>{
   body:new URL(route.request().url()).pathname.endsWith("/rpc/app_access_status")?'{"allowed":true,"owner":false}':route.request().method()==="POST"?'{"queued":false}':"[]"
  }));
 });
-test("Only a verified scheduled fixture makes red Heute a prominent additional tab",async ({page})=>{
+test("Only a verified scheduled fixture makes red Heute a contextual action without moving four tabs",async ({page})=>{
  await mockVerifiedTodayTeam(page);
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#today-home .today-match-row")).toContainText("Anpfiff",{timeout:15000});
- await expect(page.locator(".bottom-nav a:visible")).toHaveCount(6);
+ await expect(page.locator(".bottom-nav a:visible")).toHaveCount(4);
  await expect(page.locator("#live-nav-tab")).toBeVisible();
  const rect=await page.locator("#live-nav-tab").boundingBox();
  expect(rect?.width).toBeGreaterThanOrEqual(44);
@@ -63,6 +63,7 @@ test("Only a verified scheduled fixture makes red Heute a prominent additional t
  await expect(page.locator("#live-radar-content")).toBeVisible();
  await expect(page.locator(".live-hub-bookmarks")).toBeHidden();
  await expect(page.locator("#live-nav-tab")).toHaveAttribute("aria-current","page");
+ await expect(page.locator('.bottom-nav a[data-page="turniere"]')).toHaveAttribute("aria-current","page");
  await page.locator("#live-player-select").selectOption(FRIEND);
  await expect(page).toHaveURL(/#live$/);
  await expect(page.locator(".focused-profile")).toContainText("Verfolgter Spieler");
@@ -82,7 +83,7 @@ test("Saved tournament alone never exposes red Heute; ordinary Turniere remains 
  },KEY);
  await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator("#live-nav-tab")).toBeHidden();
- await expect(page.locator(".bottom-nav a:visible")).toHaveCount(5);
+ await expect(page.locator(".bottom-nav a:visible")).toHaveCount(4);
  await page.locator('.bottom-nav a[data-page="turniere"]').click();
  await expect(page.locator("#live-radar-content")).toBeVisible();
 });
