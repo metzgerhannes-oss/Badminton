@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {assessCalendarHealth} from "../scripts/calendar-health-watch.mjs";
+import {assessCalendarHealth,assessPagesHealth} from "../scripts/calendar-health-watch.mjs";
 
 const now=new Date("2026-10-13T08:00:00Z");
 const good={source:"https://turniere.badminton.de/",capturedAt:"2026-10-13T05:40:00Z",
@@ -17,3 +17,29 @@ assert.deepEqual(check(good,[{...runs[0],event:"pull_request",conclusion:"failur
 assert.deepEqual(check(good,[{...runs[0],status:"in_progress"},...runs]).problems,[]);
 assert.match(check(good,[{...runs[0],created_at:"2026-10-09T03:00:00Z"}]).problems.join(" "),/72 Stunden/);
 console.log("Ops calendar health watch: fresh, failed, missing, stale and PR-only scenarios validated.");
+
+const pagesRun={id:123,name:"pages build and deployment",head_branch:"main",
+ event:"push",status:"completed",conclusion:"success",created_at:"2026-10-13T06:00:00Z",
+ head_sha:"0000000000000000000000000000000000000000"};
+const okJobs=["build","deploy","report-build-status"].map(name=>
+ ({name,status:"completed",conclusion:"success"}));
+assert.deepEqual(assessPagesHealth([pagesRun],okJobs).problems,[]);
+assert.equal(assessPagesHealth([pagesRun],okJobs).runId,123);
+assert.match(assessPagesHealth([],okJobs).problems.join(" "),/Kein abgeschlossenes/);
+assert.match(assessPagesHealth([{...pagesRun,conclusion:"failure"}],okJobs).problems.join(" "),/fehlgeschlagen/);
+assert.match(assessPagesHealth([pagesRun],okJobs.slice(0,2)).problems.join(" "),/report-build-status/);
+assert.match(assessPagesHealth([pagesRun],okJobs.map(j=>
+ j.name==="deploy"?{...j,conclusion:"failure"}:j)).problems.join(" "),/deploy/);
+assert.deepEqual(assessPagesHealth([
+ {...pagesRun,id:124,created_at:"2026-10-13T07:00:00Z",conclusion:"cancelled"},
+ pagesRun
+],okJobs).problems,[],"Superseded cancelled deployments do not raise alerts");
+assert.match(assessPagesHealth([
+ {...pagesRun,id:125,created_at:"2026-10-13T07:00:00Z",conclusion:"failure"},
+ pagesRun
+],okJobs).problems.join(" "),/fehlgeschlagen/,
+ "Latest failed deployment must never be masked by earlier successful run");
+assert.deepEqual(assessPagesHealth([
+ {...pagesRun,head_branch:"feature/test",created_at:"2026-10-14T07:00:00Z",conclusion:"failure"},
+ pagesRun
+],okJobs).problems,[],"Unrelated branch failures must not flag production");
