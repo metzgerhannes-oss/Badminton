@@ -403,6 +403,10 @@ function init(){
   renderFollowed();renderSearchResults();renderDetail();
  });
  $("team-refresh").addEventListener("click",load);
+ $("team-order-done")?.addEventListener("click",()=>{
+  const details=$("team-manage-details");if(!details)return;
+  details.open=false;details.querySelector("summary")?.focus({preventScroll:true});
+ });
  $("team-order-reset")?.addEventListener("click",()=>{
   if(follows.length<2)return;
   const before=follows.slice();

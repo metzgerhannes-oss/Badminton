@@ -79,3 +79,79 @@ test("v200: team order and reset persist without touching profile storage",async
  expect(saved.profile.players).toEqual([own]);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
 });
+
+for(const size of [0,1,5,20]){
+ test("P2 #291: "+size+" followed players stay ordered, finish restores focus",async({page})=>{
+  const friends=Array.from({length:size},(_,i)=>({
+   id:"98-"+String(900100+i).padStart(6,"0"),name:"Synthetischer Spieler "+String(i).padStart(2,"0")
+  }));
+  await page.addInitScript(({friends})=>{
+   if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
+    players:[{id:"99-900010",name:"Eigenes Testprofil"}],friends,
+    officialLinks:[],activeProfileId:"99-900010",chosen:"99-900010",
+    historyProfilesInitialized:true
+   }));
+  },{friends});
+  await page.setViewportSize({width:size%2?390:320,height:844});
+  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+  const details=page.locator("#friend-manage-details");
+  await details.locator("summary").click();
+  const arrows=page.locator('#friend-settings-list [data-friend-move][data-direction="-1"]');
+  await expect(arrows).toHaveCount(size);
+  if(size>1){
+   const id=friends[size-1].id;
+   await page.locator('[data-friend-move="'+id+'"][data-direction="-1"]').click();
+   await page.locator("#friend-order-done").click();
+   await expect(details).not.toHaveAttribute("open");
+   await expect(details.locator("summary")).toBeFocused();
+   await page.reload({waitUntil:"domcontentloaded"});
+   await details.locator("summary").click();
+   const ordered=await arrows.evaluateAll(nodes=>nodes.map(el=>el.dataset.friendMove));
+   expect(ordered.at(-2)).toBe(id);
+   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+   expect(saved.friends.map(p=>p.id)).toEqual(ordered);
+   expect(saved.players).toHaveLength(1);
+  }else{
+   await expect(page.locator("#friend-order-reset")).toBeDisabled();
+   await page.locator("#friend-order-done").click();
+   await expect(details.locator("summary")).toBeFocused();
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+ });
+ test("P2 #291: "+size+" followed teams stay ordered, finish restores focus",async({page})=>{
+  const teams=Array.from({length:size},(_,i)=>"nuliga:999999:"+(i+1));
+  await page.addInitScript(({teams})=>{
+   if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
+    players:[{id:"99-900010",name:"Eigenes Testprofil"}],friends:[],
+    officialLinks:[],activeProfileId:"99-900010",chosen:"99-900010",
+    historyProfilesInitialized:true
+   }));
+   if(!localStorage.getItem("schmetterlinge-followed-teams-v1"))
+    localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(teams));
+  },{teams});
+  await page.setViewportSize({width:size%2?390:320,height:844});
+  await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+  const details=page.locator("#team-manage-details");
+  await details.locator("summary").click();
+  const arrows=page.locator('#team-settings-list [data-team-move][data-direction="-1"]');
+  await expect(arrows).toHaveCount(size);
+  if(size>1){
+   const id=teams[size-1];
+   await page.locator('[data-team-move="'+id+'"][data-direction="-1"]').click();
+   await page.locator("#team-order-done").click();
+   await expect(details).not.toHaveAttribute("open");
+   await expect(details.locator("summary")).toBeFocused();
+   await page.reload({waitUntil:"domcontentloaded"});
+   await details.locator("summary").click();
+   const ordered=await arrows.evaluateAll(nodes=>nodes.map(el=>el.dataset.teamMove));
+   expect(ordered.at(-2)).toBe(id);
+   const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")));
+   expect(stored).toEqual(ordered);
+  }else{
+   await expect(page.locator("#team-order-reset")).toBeDisabled();
+   await page.locator("#team-order-done").click();
+   await expect(details.locator("summary")).toBeFocused();
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+ });
+}
