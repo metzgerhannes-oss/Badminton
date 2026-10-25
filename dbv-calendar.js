@@ -159,6 +159,9 @@ function updateControls(){
  }
 }
 function render(){
+ const activeFilters=["year","region","age","level","period","group"].filter(key=>settings[key]!==defaults[key]).length;
+ const summary=$("dbv-calendar-advanced-summary");
+ if(summary)summary.textContent=activeFilters?"Weitere Filter · "+activeFilters+" aktiv":"Weitere Filter";
  if(!loaded)return;
  const host=$("dbv-calendar-results");
  if(!host)return;
@@ -362,6 +365,16 @@ async function load(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!$("dbv-calendar-results"))return;
+ $("tournament-shortcuts")?.addEventListener("click",event=>{
+  const button=event.target.closest("button[data-tournament-shortcut]");
+  if(!button)return;
+  const find=button.dataset.tournamentShortcut==="find";
+  const target=find?$("dbv-calendar-q"):$("my-tournaments-title");
+  if(!target)return;
+  target.scrollIntoView({block:"start",behavior:"auto"});
+  if(!find)target.setAttribute("tabindex","-1");
+  target.focus({preventScroll:true});
+ });
  for(const key of ["year","region","age","level","period","group","q"]){
   const node=$("dbv-calendar-"+key);
   node?.addEventListener(key==="q"?"input":"change",()=>{

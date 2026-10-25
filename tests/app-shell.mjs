@@ -31,3 +31,8 @@ assert.match(cache,/schmetterlinge-shell-v[1-9][0-9]*/);
 assert.match(cache,/"\.\/app-shell.css"/);
 assert.equal(JSON.parse(manifest).theme_color,"#d9ecfb");
 console.log("v63 app shell: CSS precedence, four navigation tabs, current responsive header, full logo and offline cache verified.");
+
+assert.match(html,/id="tournament-shortcuts"[^>]*role="group"/,"Direct turnier quick paths exist");
+assert.match(html,/id="dbv-calendar-advanced" class="dbv-calendar-advanced"/,"Advanced facets can be collapsed");
+assert.ok(html.indexOf('id="my-tournaments-title"')<html.indexOf('id="dbv-calendar-heading"'),"Personal dates precede tournament directory");
+assert.ok(html.indexOf('id="dbv-calendar-heading"')<html.indexOf('class="live-dbv"'),"Calendar search precedes live detail");
