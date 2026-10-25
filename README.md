@@ -1,3 +1,23 @@
+# Schmetterlinge – Badminton-App
+
+**Produktvision:** „Öffnen. Erkennen. Tippen. Fertig.“ Eine intuitive, kostenlose, datensparsame PWA für Familien, Badminton-Spieler, Mannschaften, Turniere und belegte Ergebnisse. Das bisher freigegebene **Corporate Design (CD) bleibt verbindlich**; Navigation, Layout, Texte, Suchwege, Desktop-/iPhone-Struktur und Komponenten dürfen vollständig neu gestaltet werden.
+
+## Verbindliche Projektbeschreibung: UX-Redesign 2.0 (25.10.2026)
+
+**[Vollständige Projektbeschreibung und UX-Neuausrichtung lesen](docs/PROJEKTBESCHREIBUNG_UX_REDESIGN_2026-10-25.md)** – zentraler Projektmaßstab für kommende Gestaltungsentscheidungen. Enthält:
+
+- **UX-Grundlagen:** sichtbare Zustände, kurze erkennbare Wege, wenig aber sinnvoller Text, Progressive Disclosure, konsistente Such-/Ergebnis-/Profilaktionen, barrierearme Touch- und Desktop-Bedienung.
+- **Kritischer Benchmark:** ebad/BadNet (Badminton, Kinder, Verein), Sofascore (personalisierte Startseite), Flashscore (schnelle Scores), Badminton4U (Matchcenter), Spond (Termine). Geeignete Muster kombinieren, keine vollständige Kopie.
+- **Zielnavigation:** **Start · Spieler · Turniere · Teams** als vier *stabile* mobile Tabs. „Heute/LIVE“ nur als nachweisbasierter Kontext-Hinweis, Berichte bei Spieler/Team/Verein, Einstellungen über den Kopfbereich, Desktop mit großer Vereins-/Listen-/Detailansicht.
+- **Schlüsselaktionen:** eigenes Familienprofil eindeutig getrennt von gefolgten Spielern; vollwertige DBV-Suche, direktes Folgen und Sortieren; Turniertreffer mit eigener **Ort-Zeile** und **+ Merken**; Ergebnisse öffnen den **passenden Einzelnachweis**.
+- **Darstellung:** weniger Text, bessere Hierarchie, große Touchflächen, durchgängiger WCAG-Kontrast, keine iOS-Zoomsprünge; ursprüngliches CD und Logo bleiben erhalten. Bestehende CSS-Schichten langfristig konsolidieren.
+- **Umsetzungsfolge:** A Informationsarchitektur → B CD-Designsystem → C iPhone-Flows → D Desktop-Workspace → E automatische Gesamtabnahme und **eine** finale physische Geräte-To-do-Liste. Bestehende Backlog-/Releaseblocker und laufende PRs vor Änderungen prüfen.
+- **Invarianten:** keine Daten-/Profil-/Einladungsverluste, keine zweite Freigabecode-Eingabe, keine unbelegten Live-Daten, kein produktives Supabase in gewöhnlicher CI, kostenlose/freeplan-konforme und verhältnismäßig sichere Umsetzung.
+
+**Status:** Diese Zielbeschreibung ist dokumentiert, **nicht** als neue UI-Version implementiert oder live abgenommen. Frühere v37–v209-Nachweise unten dokumentieren die Entwicklungshistorie; bestehende Rechte, Quellengates und Releaseprüfungen gelten weiter.
+
+---
+
 ## v53 – Transparenz der Quellen, Korrekturen und aktiven Prüffristen
 
 Die Historie bezeichnet Wiederprüfungen jetzt korrekt als nachfrageabhängig. Unter „Daten & Datenschutz“ wird das 14-Tage-Fenster für **automatische Quellenprüfungen** ausdrücklich von einer juristischen Aufbewahrungs-/Löschfrist abgegrenzt. Der überprüfte [Datenkatalog und Korrekturablauf](docs/DATENKATALOG_BERICHTIGUNG_V53.md) trennt Familiengerät, Verzeichnis, externe Matchbelege, echte offizielle DBV-Matches und serverseitige Protokolle. Weiterhin offen: tatsächlicher Verantwortlicher/Kontakt, verbindliche Retention, Nutzungsrechte und reale Geräteabnahme.
