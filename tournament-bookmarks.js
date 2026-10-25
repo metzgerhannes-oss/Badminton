@@ -58,14 +58,14 @@ var SchmetterlingeBookmarks=(function(){
    if(!/^dbv-calendar-\d{2,12}$/.test(id)||!name||!startDate||!endDate||endDate<startDate||
       !playerId||playerId==="all"||value.url!=="https://turniere.badminton.de/")return null;
    return {id,url:"https://turniere.badminton.de/",name,playerId,startDate,endDate,source:"dbv-calendar",
-    place:String(value.place||"").trim().slice(0,120)};
+    place:String(value.place||"").trim().slice(0,120),deadline:validDate(value.deadline)};
   }
   const parsed=parseDbvTournamentLink(value?.url);
   if(!parsed)return null;
   const name=String(value.name||"").trim().slice(0,100)||"DBV-Turnier "+parsed.id.slice(0,8);
   return {id:parsed.id,url:parsed.url,name,playerId:String(value.playerId||"all"),
    startDate:validDate(value.startDate),endDate:validDate(value.endDate),
-   place:String(value.place||"").trim().slice(0,120)};
+   place:String(value.place||"").trim().slice(0,120),deadline:validDate(value.deadline)};
  }
  function localDay(date=new Date()){
   const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
