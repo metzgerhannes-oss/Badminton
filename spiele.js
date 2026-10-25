@@ -97,7 +97,7 @@ if(root&&canvas){
   $("arcade-board-help").textContent=phase==="over"?"Ergebnis: "+(game?.score||0)+" Punkte.":""; 
   const selector=$("arcade-game");
   if(selector){selector.dataset.snakeBusy=phase==="playing"||phase==="countdown"?"1":"0";
-   selector.disabled=selector.dataset.snakeBusy==="1"||selector.dataset.tileBusy==="1";}
+   selector.disabled=selector.dataset.snakeBusy==="1"||selector.dataset.tileBusy==="1"||selector.dataset.pongBusy==="1";}
  }
  function renderProfiles(){
   const options=profiles(),field=$("arcade-profile"),previous=selected;

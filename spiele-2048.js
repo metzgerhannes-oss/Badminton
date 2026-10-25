@@ -80,7 +80,7 @@ if(panel&&switcher){
   $('arcade-2048-start').disabled=!isOwn(selected);
   $('arcade-2048-profile').disabled=phase==='countdown'||phase==='playing';
   switcher.dataset.tileBusy=phase==='countdown'||phase==='playing'?'1':'0';
-  switcher.disabled=switcher.dataset.tileBusy==='1'||switcher.dataset.snakeBusy==='1';
+  switcher.disabled=switcher.dataset.tileBusy==='1'||switcher.dataset.snakeBusy==='1'||switcher.dataset.pongBusy==='1';
  }
  function renderProfiles(){
   const options=profiles(),field=$('arcade-2048-profile'),previous=selected;

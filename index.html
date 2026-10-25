@@ -59,6 +59,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
 <script defer src="./app.js"></script>
 <script type="module" src="./spiele.js"></script>
 <script type="module" src="./spiele-2048.js"></script>
+<script type="module" src="./spiele-pong.js"></script>
 <script defer src="./desktop-context-v173.js"></script>
 <script defer src="./settings-rooms.js"></script>
 <script type="module" src="./onboarding-wizard.js"></script>
@@ -117,7 +118,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v207" title="Version v207">v207</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v208" title="Version v208">v208</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -400,11 +401,11 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <section class="page" id="view-spiele" aria-labelledby="heading-spiele">
    <div class="section-heading"><h2 id="heading-spiele">Spielecke · Zeit bis zum nächsten Spiel?</h2><a class="outline-button" href="#turniere">← Turniertag</a></div>
    <div class="arcade-game-choice"><label for="arcade-game">Spiel auswählen
-    <select id="arcade-game" aria-label="Spiel auswählen"><option value="snake">Snake · 120 Sekunden</option><option value="2048">2048 · 180 Sekunden</option></select>
+    <select id="arcade-game" aria-label="Spiel auswählen"><option value="snake">Snake · 120 Sekunden</option><option value="2048">2048 · 180 Sekunden</option><option value="pong">Pong Solo · 90 Sekunden</option></select>
    </label></div>
    <div class="arcade-shell" id="arcade-snake-shell">
     <h2>Snake · 120 Sekunden</h2>
-    <p>20 × 20 Felder · 10 Punkte je Futter · festes Tempo. Dein Rekord bleibt privat auf diesem Gerät. Pong folgt separat.</p>
+    <p>20 × 20 Felder · 10 Punkte je Futter · festes Tempo. Dein Rekord bleibt privat auf diesem Gerät.</p>
     <label for="arcade-profile">Für welches eigene Spielerprofil?
      <select id="arcade-profile" aria-label="Eigenes Spielerprofil für Snake"></select>
     </label>
@@ -460,6 +461,29 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      <button type="button" id="arcade-2048-exit">Beenden · zum Turniertag</button>
     </div>
     <p class="arcade-footnote">Wischen oder Pfeiltasten. App-Wechsel pausiert automatisch. Abbruch und Neustart speichern keinen Punktestand. Keine Rangliste, keine Cloud-Anfragen.</p>
+   </div>
+   <div class="arcade-shell" id="arcade-pong-shell" hidden>
+    <h2>Pong Solo · 90 Sekunden</h2>
+    <p>Jeder Rückschlag mit deinem linken Schläger zählt einen Punkt. Rechts spielt der Computer. Keine Online-Gegner.</p>
+    <label for="arcade-pong-profile">Für welches eigene Spielerprofil?
+     <select id="arcade-pong-profile" aria-label="Eigenes Spielerprofil für Pong"></select>
+    </label>
+    <p id="arcade-pong-no-profile" hidden>Kein eigenes Profil vorhanden. <a href="#einstellungen/profile">Eigenes Profil einrichten →</a></p>
+    <div class="arcade-stats" aria-label="Pong Spielstand">
+     <div><small>Punkte</small><strong id="arcade-pong-score">0</strong></div>
+     <div><small>Zeit</small><strong id="arcade-pong-time">90 s</strong></div>
+     <div><small>Mein Rekord</small><strong id="arcade-pong-best">0</strong></div>
+    </div>
+    <p class="arcade-message" id="arcade-pong-status" role="status" aria-live="polite">Bereit für Pong.</p>
+    <canvas id="arcade-pong-board" width="400" height="240" role="img" aria-label="Pong: linken Schläger mit Finger, Maus oder Pfeiltasten auf und ab bewegen"></canvas>
+    <div class="arcade-actions">
+     <button type="button" id="arcade-pong-start">3 · 2 · 1 · Start</button>
+     <button type="button" id="arcade-pong-pause" hidden>Pause</button>
+     <button type="button" id="arcade-pong-resume" hidden>Fortsetzen</button>
+     <button type="button" id="arcade-pong-restart" disabled>Neustart</button>
+     <button type="button" id="arcade-pong-exit">Beenden · zum Turniertag</button>
+    </div>
+    <p class="arcade-footnote">Finger/Maus ziehen oder Pfeile/W/S nutzen. App-Wechsel pausiert. Abbruch speichert keinen Rekord. Keine Cloud-Anfragen.</p>
    </div>
   </section>
   <section class="page" id="view-berichte" aria-labelledby="heading-berichte">
@@ -568,7 +592,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v207 · Release-Informationen werden geladen</p>
+   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v208 · Release-Informationen werden geladen</p>
    <section class="player-management" aria-label="Meine eigenen Spielerprofile">
     <div class="player-management-head"><h3>Profile und Familie</h3><p>Verwalte hier nur deine eigenen Spielerprofile. Andere Spieler findest du unter Spieler → Gefolgte Spieler.</p></div>
     <div class="settings-section">
