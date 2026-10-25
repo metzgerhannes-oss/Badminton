@@ -471,6 +471,34 @@ function render(){
 }
 let editing=null;
 const tournamentSourceConflicts=new Map();
+let verifiedCalendarRows=[];
+function prefillVerifiedTournamentForm(form){
+ const note=el("tournament-official-source");
+ if(!note)return;
+ note.hidden=true;note.textContent="";
+ const data=new FormData(form);
+ const parsed=parseDbvTournamentLink(data.get("url"));
+ if(!parsed||!verifiedCalendarRows.length)return;
+ const draft=normalizeBookmark({url:parsed.url,playerId:String(data.get("playerId")||"all"),
+  name:data.get("name"),startDate:data.get("startDate"),endDate:data.get("endDate"),
+  place:data.get("place"),deadline:data.get("deadline")});
+ const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(draft,verifiedCalendarRows);
+ if(result.status==="unverified")return;
+ if(result.status==="conflict"){
+  note.textContent="DBV-Abweichung: "+result.reason+
+   (result.officialDate?" · Turniertag "+niceDay(result.officialDate):"")+
+   (result.officialDeadline?" · Meldeschluss "+niceDay(result.officialDeadline):"")+
+   ". Bitte prüfen; keine automatische Änderung.";
+  note.hidden=false;return;
+ }
+ let filled=0;
+ for(const key of ["name","startDate","endDate","place","deadline"]){
+  const field=form.elements.namedItem(key),value=result.updated?.[key];
+  if(field&&!String(field.value||"").trim()&&value){field.value=value;filled++}
+ }
+ note.textContent=filled?"Eindeutig zugeordnete DBV-Daten ergänzt.":"DBV-Turnierdaten stimmen überein.";
+ note.hidden=false;
+}
 function openTournamentForm(item=null){
  const dialog=el("tournament-dialog");
  const form=el("tournament-form");form.reset();
@@ -489,6 +517,7 @@ function openTournamentForm(item=null){
  el("tournament-save").textContent=item?"Änderungen speichern":"Turnier speichern";
  if(el("tournament-share"))el("tournament-share").checked=Boolean(item&&window.badmintonCommunity?.isShared(item));
  if(el("community-save-status")){el("community-save-status").hidden=true;el("community-save-status").textContent="";}
+ prefillVerifiedTournamentForm(form);
  SchmetterlingeRouter.openDialog(dialog);
 }
 function setup(){
@@ -744,6 +773,9 @@ function setup(){
  window.addEventListener("badminton:dbv-calendar-loaded",event=>{
   const entries=event.detail?.entries;
   if(!Array.isArray(entries)||!entries.length)return;
+  verifiedCalendarRows=entries;
+  const form=el("tournament-form");
+  if(el("tournament-dialog")?.open&&form)prefillVerifiedTournamentForm(form);
   let changed=false;
   tournamentSourceConflicts.clear();
   state.officialLinks=state.officialLinks.map(bookmark=>{
@@ -758,8 +790,10 @@ function setup(){
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());
  el("cancel-tournament").addEventListener("click",()=>tournamentDialog.close());
+ el("tournament-form").elements.namedItem("url").addEventListener("change",()=>prefillVerifiedTournamentForm(el("tournament-form")));
  el("tournament-form").addEventListener("submit",event=>{
   event.preventDefault();
+  prefillVerifiedTournamentForm(event.currentTarget);
   const data=new FormData(event.currentTarget);
   const parsed=parseDbvTournamentLink(data.get("url"));
   if(!parsed){toast("Bitte eine gültige DBV-Turnier-URL mit Turnier-ID verwenden");return}
