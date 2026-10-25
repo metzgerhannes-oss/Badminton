@@ -89,7 +89,7 @@ var SchmetterlingeBookmarks=(function(){
   const sameDay=(!bookmark.startDate||bookmark.startDate===start)&&
    (!bookmark.endDate||bookmark.endDate===end);
   // Reject obvious E/D/C/B/A category conflicts even when a pasted UUID matches.
-  const rank=s=>String(s||"").match(/\\b([A-E])[-\\s]*(?:RLT|Ranglistenturnier)\\b/i)?.[1]?.toUpperCase()||"";
+  const rank=s=>String(s||"").match(/\b([A-E])[-\s]*(?:RLT|Ranglistenturnier)\b/i)?.[1]?.toUpperCase()||"";
   const localRank=rank(bookmark.name),officialRank=rank(row.title);
   if(!sameDay||(localRank&&officialRank&&localRank!==officialRank)){
    return {status:"conflict",reason:!sameDay?"Termine weichen vom DBV-Kalender ab":"Turnierkategorie weicht vom DBV-Kalender ab",
