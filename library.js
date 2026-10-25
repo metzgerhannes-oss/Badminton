@@ -137,7 +137,7 @@ function render(){
  const own=new Set(localSelection().own),following=new Set(localSelection().following);
  const people=filtered().filter(p=>!own.has(p.id)&&!following.has(p.id)),count=$("library-count"),area=$("library-results");
  const shown=dbMode?people:people.slice(0,visible);
- if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
+ if(count)count.textContent=people.length.toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
   error(localMode?"Nur deine bereits bekannten Profile gefunden.":"Keine weiteren DBV-Spieler für diese Suche gefunden.",localMode?"limited":"empty");
@@ -324,8 +324,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("library-age").value="all";
   $("library-association").value="all";
   $("library-club-suggestions").innerHTML="";
-  clearTimeout(filterTimer);showIdle();
-  $("library-search").focus();
+  clearTimeout(filterTimer);
+  // The visible unified input owns the query. Reset both fields together.
+  const search=$("followed-player-search");
+  if(search){search.value="";search.dispatchEvent(new Event("input",{bubbles:true}));search.focus({preventScroll:true})}
+  else{$("library-search").focus();showIdle()}
+  showIdle();
  });
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
  window.addEventListener("hashchange",()=>{if(location.hash==="#spieler"&&hasCriteria()&&!loaded)load();});
