@@ -35,8 +35,11 @@ test("player search differentiates idle, real zero matches and unavailable ident
   route.fulfill({status:503,headers,body:'{"message":"Simulierter Quellfehler"}'}));
  await visibleSearch.fill("Anderer Testname");
  await expect(results).toHaveAttribute("data-state","limited",{timeout:20000});
- await expect(results).toContainText("Zentrale DBV-Suche derzeit eingeschränkt");
+ // A failed identity lookup must remain distinguishable from a genuine zero-result search.
+ // v217 preserves local cards and reports the source failure in its visible status line.
+ await expect(page.locator("#library-message")).toContainText("zentrale DBV-Spielersuche ist derzeit nicht erreichbar");
  await expect(page.locator("#library-source")).toContainText("Nur gespeicherte Profile");
+ await expect(results).not.toContainText("Keine weiteren DBV-Spieler für diese Suche gefunden.");
  const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(stored.activeProfileId).toBe("05-070879");
 });
