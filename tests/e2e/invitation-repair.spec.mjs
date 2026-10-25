@@ -42,6 +42,9 @@ test("confirmed directory search reselects existing DBV account without making a
  await page.locator("#welcome-selection-save").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
  await expect(page.locator(".focused-profile")).toContainText("Mira Muster");
+ // Reselecting a previously stored profile is not fresh consent: no auto-copy modal or pending key.
+ await expect(page.locator("#player-copy-dialog")).toBeHidden();
+ expect(await page.evaluate(()=>localStorage.getItem("schmetterlinge.pendingPlayerDataCopy.v1"))).toBeNull();
  const current=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(current.players).toHaveLength(1);
  expect(current.players[0].id).toBe("99-000001");
