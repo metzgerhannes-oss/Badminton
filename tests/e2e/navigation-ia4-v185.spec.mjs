@@ -64,8 +64,9 @@ test("IA-4: Home + opens the single player following search immediately",async({
  await page.locator("#dashboard-add-friend").click();
  await expect(page).toHaveURL(/#spieler$/);
  await expect(page.locator("#view-spieler")).toBeVisible();
- await expect(page.locator("#player-discover")).toBeVisible();
- await expect(page.locator("#library-search")).toBeVisible();
+ await expect(page.locator("#followed-player-search")).toBeVisible();
+ await expect(page.locator("#followed-player-search")).toBeFocused();
+ await expect(page.locator("#player-discover")).toBeHidden();
  await expect(page.locator("#view-einstellungen #friend-settings-list")).toHaveCount(0);
  const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(stored.players).toHaveLength(2);
