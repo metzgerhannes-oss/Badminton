@@ -34,10 +34,12 @@ test("search and modal entry remain readable on narrow iPhone and keyboard focus
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
  // Real user route: tap + at friends to reveal the (normally collapsed) search.
  await page.locator("#dashboard-add-friend").click();
- await expect(page.locator("#player-discover")).toBeVisible();
- const search=page.locator("#library-search");
+ await expect(page.locator("#player-discover")).toBeHidden();
+ const search=page.locator("#followed-player-search");
  await expect(search).toBeVisible();
  await search.focus();
+ await search.fill("Tester");
+ await expect(page.locator("#player-discover")).toBeVisible();
  expect(await search.evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
  await page.goto("/#einstellungen/profile",{waitUntil:"domcontentloaded"});
  await page.locator("#add-player").click();

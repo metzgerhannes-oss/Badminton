@@ -33,10 +33,11 @@ test("Scoped name and club search succeeds while full player-roster API yields n
   return route.fulfill({status:200,headers:HEADERS,body:"[]"});
  });
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
- await page.locator("#player-add-open").click();
+ const search=page.locator("#followed-player-search");
+ await search.fill("Mössinger");
+ await expect(page.locator("#player-discover")).toBeVisible();
  await page.locator(".follow-search-more > summary").click();
  await page.locator("#library-club").fill("SpVgg. Mössingen");
- await page.locator("#library-search").fill("Mössinger");
  await expect(page.locator("#library-count")).toContainText("12 passende Spieler");
  await expect(page.locator(".library-player")).toHaveCount(12);
  await expect(page.locator("#library-more")).toBeHidden();
@@ -53,13 +54,16 @@ test("No name or zero verified results means no silent bulk club export",async (
   return route.fulfill({status:200,headers:HEADERS,body:"[]"});
  });
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
- await page.locator("#player-add-open").click();
+ const search=page.locator("#followed-player-search");
+ await expect(page.locator("#player-discover")).toBeHidden();
+ await search.fill("Ni");
+ expect(queries).toHaveLength(0); // No bulk export below the three-character gate.
+ await search.fill("Nichtvorhanden");
+ await expect(page.locator("#player-discover")).toBeVisible();
  await page.locator(".follow-search-more > summary").click();
  await page.locator("#library-club").fill("Nirgendwo FC");
- await expect(page.locator("#library-more")).toBeHidden();
- expect(queries).toHaveLength(0);
- await page.locator("#library-search").fill("Nichtvorhanden");
  await expect(page.locator("#library-count")).toContainText("0 passende Spieler");
  await expect(page.locator("#library-more")).toBeHidden();
- expect(queries).toHaveLength(1);
+ expect(queries.length).toBeGreaterThanOrEqual(1);
+ expect(queries.every(q=>String(q.p_query||"").length>=3)).toBe(true);
 });

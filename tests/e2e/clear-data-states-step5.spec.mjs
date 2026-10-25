@@ -21,16 +21,19 @@ test("player search differentiates idle, real zero matches and unavailable ident
   return route.fulfill({status:200,headers,body:"[]"});
  });
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
- await page.locator("#player-add-open").click();
+ await expect(page.locator("#player-discover")).toBeHidden();
+ const visibleSearch=page.locator("#followed-player-search");
+ await expect(visibleSearch).toBeVisible();
  const results=page.locator("#library-results");
  await expect(results).toHaveAttribute("data-state","idle");
- await page.locator("#library-search").fill("Nichtvorhanden");
+ await visibleSearch.fill("Nichtvorhanden");
+ await expect(page.locator("#player-discover")).toBeVisible();
  await expect(results).toHaveAttribute("data-state","empty");
  await expect(results).toContainText("Keine bestätigten DBV-Treffer");
  await expect(page.locator("#library-count")).toContainText("0 passende Spieler");
  await page.route("**/*.supabase.co/rest/v1/rpc/search_dbv_player_identity",route=>
   route.fulfill({status:503,headers,body:'{"message":"Simulierter Quellfehler"}'}));
- await page.locator("#library-search").fill("Anderer Testname");
+ await visibleSearch.fill("Anderer Testname");
  await expect(results).toHaveAttribute("data-state","limited",{timeout:20000});
  await expect(results).toContainText("Zentrale DBV-Suche derzeit eingeschränkt");
  await expect(page.locator("#library-source")).toContainText("Nur gespeicherte Profile");
