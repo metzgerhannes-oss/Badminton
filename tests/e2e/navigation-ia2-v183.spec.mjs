@@ -24,10 +24,10 @@ test("v183: followed friends move only inside Spieler; family profile count unch
  await expect(page.locator("#view-spieler")).toBeVisible();
  await expect(page.locator("#friend-list [data-view-friend]")).toHaveCount(2);
  await expect(page.locator("#player-own-preview")).toBeHidden();
- await expect(page.locator("#friend-manage-details")).toBeVisible();
- await page.locator("#friend-manage-details summary").click();
- await expect(page.locator("#friend-settings-list [data-friend-move]")).toHaveCount(4);
- await page.locator('#friend-settings-list [data-friend-move="98-000004"][data-direction="-1"]').click();
+ await expect(page.locator("#friend-manage-details")).toHaveCount(0);
+ await expect(page.locator("#friend-list [data-friend-grip]")).toHaveCount(2);
+ await page.locator('#friend-list [data-friend-grip="98-000004"]').focus();
+ await page.keyboard.press("ArrowUp");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players.map(p=>p.id)).toEqual(["99-000001","99-000002"]);
  expect(saved.friends.map(p=>p.id)).toEqual(["98-000004","98-000003"]);
@@ -43,7 +43,7 @@ test("v183: old settings follow bookmarks resolve to canonical pages, no duplica
  await page.goto("/#einstellungen/spieler",{waitUntil:"domcontentloaded"});
  await expect(page).toHaveURL(/#spieler$/);
  await expect(page.locator("#view-spieler")).toBeVisible();
- await expect(page.locator("#player-add-open")).toBeVisible();
+ await expect(page.locator("#followed-player-search")).toBeVisible();
  await page.goto("/#einstellungen/mannschaften",{waitUntil:"domcontentloaded"});
  await expect(page).toHaveURL(/#mannschaft$/);
  await expect(page.locator("#view-mannschaft")).toBeVisible();
@@ -61,10 +61,9 @@ for(const width of [320,390,1280,1440,1920]){
   await page.setViewportSize({width,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#app-access-gate")).toBeHidden();
-  await page.locator("#friend-manage-details summary").click();
-  await expect(page.locator("#friend-settings-list [data-friend-move]")).toHaveCount(4);
+  await expect(page.locator("#friend-list [data-friend-grip]")).toHaveCount(2);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
-  const h=await page.locator("#friend-manage-details summary").evaluate(e=>e.getBoundingClientRect().height);
+  const h=await page.locator("#friend-list [data-friend-grip]").first().evaluate(e=>e.getBoundingClientRect().height);
   expect(h).toBeGreaterThanOrEqual(44);
  });
 }
