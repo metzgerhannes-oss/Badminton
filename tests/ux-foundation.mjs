@@ -29,7 +29,7 @@ assert.match(stats,/Bisher belegte Spiele/);
 assert.doesNotMatch(stats,/note\.textContent="Einzeln belegte Badhub-Spiele · kein offizieller DBV-Matchimport\./);
 
 const nav=[...html.matchAll(/data-page="([^"]+)"/g)].map(x=>x[1]);
-assert.deepEqual(nav,["start","turniere","live","spieler","verein","mannschaft","berichte"]);
+assert.deepEqual(nav,["start","spieler","turniere","verein","mannschaft"]);
 assert.match(html,/href="#einstellungen" aria-label="Einstellungen öffnen"/);
 assert.match(app,/function navigateHome\(\)/);
 assert.match(app,/function navigateHome\(\)\{return navigatePrimary\("start"\)\}/);
@@ -39,7 +39,7 @@ assert.match(app,/function focusCurrentView\(\)/);
 assert.match(router,/heading\.focus\(\{preventScroll:true\}\)/);
 assert.match(router,/requestAnimationFrame\(\(\)=>window\.scrollTo\(\{top:position,behavior:"auto"\}\)\)/,
  "Router must restore a remembered history position and scroll new routes to top");
-assert.match(router,/page==="historie"\|\|\(page==="live"&&liveHidden\)\?"turniere":page/);
+assert.match(router,/page==="historie"\|\|page==="live"\?"turniere":page/);
 assert.match(router,/document\.title=routeTitles\[page\]\+" · Schmetterlinge"/);
 assert.match(html,/<a class="skip-link" href="#hauptinhalt">Zum Inhalt springen<\/a>/);
 assert.match(html,/<main id="hauptinhalt" tabindex="-1">/);

@@ -40,7 +40,7 @@ assert.match(script,/readPublicRows\(fields\+"&limit=500&offset=0"/);
 assert.match(script,/readPublicRows\("league_fixtures\?/);
 assert.match(script,/readPublicRows\("league_table_rows\?/);
 assert.match(script,/localStorage\.setItem\(TEAM_FOLLOWS_KEY/);
-assert.match(css,/\.bottom-nav\.has-live-tab a\{width:16\.666%!important/);
+assert.match(css,/\.bottom-nav a\{width:25%!important/);
 assert.match(router,/mannschaft:"Mannschaft"/);
 assert.match(sw,/"\.\/teams\.js"/);
 assert.match(sw,/"\.\/teams\.css"/);
