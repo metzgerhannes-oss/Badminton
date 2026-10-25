@@ -52,7 +52,7 @@ function bwFrameworkHTML(filters,today){
  const saved=new Set(bookmarks.savedKeys||[]);
  return '<section class="dbv-calendar-cluster dbv-calendar-sourced-plan" aria-label="Offizielle Termine 2027">'+
   '<h4>Turniere 2027 <small>'+planned.length+'</small></h4>'+
-  planned.map(t=>'<article class="dbv-calendar-entry dbv-calendar-external-plan">'+
+  planned.map(t=>'<article class="dbv-calendar-entry dbv-calendar-external-plan card-open-surface">'+
     '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong><small>bis '+esc(formatDate(t.end))+'</small></div>'+
     '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
     '<button type="button" class="dbv-calendar-save'+(saved.has(t.key)?' is-saved':'')+'" data-framework-toggle="'+esc(t.key)+'"'+
@@ -62,7 +62,7 @@ function bwFrameworkHTML(filters,today){
     (saved.has(t.key)?'✓':'+')+'</button></div>'+
     '<p class="dbv-calendar-place">'+esc(venueLabel(t.place))+'</p>'+
     '<p>Level '+esc(t.level)+' · '+esc(t.level==="A"?"Ausrichter vergeben":t.ageCertain?filters.age+" vorgesehen":filters.age+" noch offen")+' · Rahmentermin</p>'+
-    '<a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">Terminquelle ↗</a></div>'+
+    '<a class="card-open-primary" href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">Terminquelle ↗</a></div>'+
   '</article>').join("")+'</section>';
 }
 function bwNextYearHint(filters){
@@ -115,7 +115,7 @@ function bwArchiveHTML(filters){
   const direct=t.sourceKind==="results"?window.SchmetterlingeBookmarks?.parseDbvTournamentLink?.(t.source):null;
   const own=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
   const saved=Boolean(direct&&(own.savedKeys||[]).includes(direct.id));
-  return '<article class="dbv-calendar-entry dbv-calendar-external-result">'+
+  return '<article class="dbv-calendar-entry dbv-calendar-external-result card-open-surface">'+
    '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+
      '<small>bis '+esc(formatDate(t.end))+'</small></div>'+
    '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
@@ -124,7 +124,7 @@ function bwArchiveHTML(filters){
     (own.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+(saved?'✓':'+')+'</button>':'')+'</div>'+
    '<p class="dbv-calendar-place">'+esc(venueLabel(t.place))+'</p>'+ 
     '<p>Level '+esc(t.level)+(t.detail?' · '+esc(t.detail):'')+'</p>'+
-   '<a href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">'+
+   '<a class="card-open-primary" href="'+esc(t.source)+'" target="_blank" rel="noopener noreferrer">'+
       (t.sourceKind==="results"?"Ergebnisse ansehen ↗":"Turnierinfo ↗")+'</a>'+ (t.report?'<a href="'+esc(t.report)+'" target="_blank" rel="noopener noreferrer">BWBV-Bericht ↗</a>':'')+'</div>'+
    '</article>';}).join("")+'</section>';
 }
@@ -234,7 +234,7 @@ function render(){
   html+='<section class="dbv-calendar-cluster"><h4>'+esc(cluster.label)+' <small>'+cluster.items.length+'</small></h4>';
   html+=visible.map(t=>{
    const closed=t.deadline&&t.deadline<localToday();
-   return '<article class="dbv-calendar-entry'+(t.historicalArchive?' dbv-calendar-entry--history':'')+'"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
+   return '<article class="dbv-calendar-entry card-open-surface'+(t.historicalArchive?' dbv-calendar-entry--history':'')+'"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
     '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
     (t.historicalArchive?'':'<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
@@ -244,7 +244,7 @@ function render(){
     (t.organizer?'<p>Veranstalter: '+esc(t.organizer)+'</p>':"")+
     '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+(isNationalU11Masters(t)?'<span>DBV · bundesweit</span>':'')+'</div>'+
     (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
-    '<a href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
+    '<a class="card-open-primary" href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
   }).join("");
   html+='</section>';
  }

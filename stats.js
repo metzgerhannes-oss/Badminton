@@ -111,7 +111,7 @@ function externalProof(m){
   :"Jahr "+esc(m.match_year);
  const opp=(m.opponent_names||[]).join(" / ");
  const partner=(m.partner_names||[]).join(" / ");
- return '<article class="match-proof"><div class="match-proof-head"><span class="'+
+ return '<article class="match-proof'+(u?' card-open-surface':'')+'"><div class="match-proof-head"><span class="'+
   (m.won?"match-win":"match-loss")+'">'+(m.won?"Sieg":"Niederlage")+
   '</span><time>'+esc(when)+'</time><span>'+esc(m.discipline)+'</span>'+ageProof(m)+'</div>'+
   '<strong>'+esc(m.competition||"Öffentlich belegtes Turnier")+'</strong>'+
@@ -119,17 +119,17 @@ function externalProof(m){
   ' · '+esc(m.scoring?.ruleSource==="badhub-bold-no-scores"
    ?"Ergebnis laut Badhub-Hervorhebung, ohne Satzstände"
    :"Sätze aus Spielersicht "+ownScore(m))+'</p>'+
-  (u?'<a href="'+esc(u)+'" rel="noopener noreferrer" target="_blank">Badhub-Quellbeleg ↗</a>':'')+
+  (u?'<a class="card-open-primary" href="'+esc(u)+'" rel="noopener noreferrer" target="_blank">Badhub-Quellbeleg ↗</a>':'')+
   '</article>';
 }
 function officialProof(m){
  const url=sourceUrl(m.source_url);
- return '<article class="match-proof"><div class="match-proof-head"><span class="'+
+ return '<article class="match-proof'+(url?' card-open-surface':'')+'"><div class="match-proof-head"><span class="'+
  (m.won?"match-win":"match-loss")+'">'+(m.won?"Sieg":"Niederlage")+
  '</span><time>'+esc(dateLabel(m.match_date))+'</time><span>'+esc(m.discipline)+'</span>'+ageProof(m)+'</div>'+
  '<strong>'+esc(m.tournament_name||"Turnier nicht benannt")+'</strong>'+
  '<p>Gegen '+esc(m.opponent_names)+(m.game_score?' · Sätze '+esc(m.game_score):'')+'</p>'+
- (url?'<a href="'+esc(url)+'" rel="noopener noreferrer" target="_blank">Originalbeleg ↗</a>':'')+
+ (url?'<a class="card-open-primary" href="'+esc(url)+'" rel="noopener noreferrer" target="_blank">Originalbeleg ↗</a>':'')+
  '</article>';
 }
 function render(){
