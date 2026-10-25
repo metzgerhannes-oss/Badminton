@@ -361,6 +361,11 @@ async function load(){
  catch{ /* remain on vetted official fallback when source refresh is unavailable */ }
  loading=false;loaded=true;
  updateControls();render();
+ // Only public, already loaded source metadata. No new provider call and no user data.
+ window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{detail:{entries:entries.map(t=>({
+  key:t.key,url:t.url,hasDirectLink:t.hasDirectLink,title:t.title,start:t.start,end:t.end,
+  place:t.place,deadline:t.deadline
+ }))}}));
  if(!entries.length&&problem)message(problem+" Offiziellen DBV-Kalender bei Bedarf direkt öffnen.","offline");
 }
 document.addEventListener("DOMContentLoaded",()=>{
