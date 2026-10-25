@@ -311,6 +311,8 @@ function showPlayerDiscover(open=true,focus=true){
  if(location.hash!=="#spieler"){
   window.addEventListener("hashchange",focusSearch,{once:true});
   navigatePrimary("spieler");
+  // Keep the unified search usable when iOS suppresses or delays hashchange.
+  if(focus)focusSearch();
  }else if(focus)focusSearch();
  syncFollowSearch();
 }
