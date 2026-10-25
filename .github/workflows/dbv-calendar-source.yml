@@ -1,7 +1,6 @@
-name: DBV-Kalender Import
+name: DBV-Kalender Import (offline)
+# No official source download or productive OIDC publication from Actions.
 on:
-  schedule:
-    - cron: '37 5 * * *'
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -14,6 +13,7 @@ on:
       - 'scripts/publish-dbv-calendar-oidc.py'
       - 'supabase/functions/dbv-calendar-publish/index.ts'
       - 'supabase/config.toml'
+      - 'tests/p0-ci-prod-isolation.mjs'
   push:
     branches: [main]
     paths:
@@ -24,20 +24,18 @@ on:
       - 'tests/test_dbv_calendar.py'
       - 'tests/test_dbv_calendar_oidc.py'
       - '.github/workflows/dbv-calendar-source.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
 permissions:
   contents: read
-concurrency:
-  group: badminton-dbv-calendar
-  cancel-in-progress: false
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Offline calendar parsing tests
+      - name: Synthetic calendar parsing and OIDC contract tests
         run: |
+          set -euo pipefail
           python3 -m unittest discover -s tests -p test_dbv_calendar.py -v
           python3 -m unittest discover -s tests -p test_dbv_calendar_oidc.py -v
-      - name: Validate official complete calendar table
-        run: python3 scripts/import-dbv-calendar.py
+          python3 -m py_compile scripts/import-dbv-calendar.py scripts/publish-dbv-calendar-oidc.py
