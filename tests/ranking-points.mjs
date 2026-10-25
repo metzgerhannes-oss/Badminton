@@ -19,6 +19,8 @@ const ctx=vm.createContext({
 });
 vm.runInContext(section,ctx,{filename:"dashboard-five-scores.js"});
 const format=entry=>vm.runInContext("renderFiveScores("+JSON.stringify(entry)+")",ctx);
+// Match the actual CSS class token, including card-open-surface added by v214.
+const countScoreRows=html=>(html.match(/class="ranking-score-row(?: [^"]+)?"/g)||[]).length;
 assert.equal(dataset.privacyMode,"private");
 assert.deepEqual(dataset.players,{},"Private ranking snapshots must not be released publicly");
 const snapshot=Object.fromEntries([["HE",2670],["HD",1322],["HM",1469]]
@@ -30,7 +32,7 @@ for(const [key,total] of [["HE",2670],["HD",1322],["HM",1469]]){
  assert.deepEqual(row.topFive,[],"Do not fill ranking valuations with guessed results");
  assert.equal(row.topFiveStatus,"not-in-public-export");
  const html=format(row);
- assert.equal((html.match(/class="ranking-score-row/g)||[]).length,0,"No five empty placeholder rows");
+ assert.equal(countScoreRows(html),0,"No five empty placeholder rows");
  assert.ok(html.includes("nicht zuverlässig"));
  assert.ok(html.includes("dbv.turnier.de/ranking/ranking.aspx?rid=238"),"Official per-player source shown");
  assert.ok(!html.includes(">0<"),"Do not invent zeros");
@@ -43,14 +45,15 @@ const verified=[
  {name:"Turnier Epsilon",date:"2025-12-03",points:170,url:"https://dbv.turnier.de/tournament/0477D9EC-DA56-4B16-938D-138CC817E8E2"}
 ];
 const good=format({points:2670,topFive:verified});
-assert.equal((good.match(/class="ranking-score-row"/g)||[]).length,5);
+assert.equal(countScoreRows(good),5);
+assert.ok(good.includes('class="ranking-score-row card-open-surface"'),"Verified rows retain navigable card surface");
 assert.ok(good.includes("2.670")===false,"Only the list is rendered here, not aggregate");
 assert.ok(good.includes("800")&&good.includes("700")&&good.includes("170"));
 const twoMismatch=format({points:1501,topFive:verified.slice(0,2)});
 assert.ok(twoMismatch.includes("nicht zuverlässig"),"Mismatched reduced valuations must not display");
-assert.ok(!twoMismatch.includes("class=\"ranking-score-row\""));
+assert.equal(countScoreRows(twoMismatch),0,"Unreconciled ranking must not emit scoring cards");
 const twoReal=format({points:1500,topFive:verified.slice(0,2)});
-assert.equal((twoReal.match(/class="ranking-score-row"/g)||[]).length,2,"Only two scored events means two rows, not five");
+assert.equal(countScoreRows(twoReal),2,"Only two scored events means two rows, not five");
 const invalid=format({points:2671,topFive:verified});
 assert.ok(invalid.includes("nicht zuverlässig"),"Never show nonreconciling valuations");
 assert.ok(!invalid.includes("ranking-score-row"),"No guessed score when sum mismatches");
