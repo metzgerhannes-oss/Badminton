@@ -85,6 +85,53 @@ test("Wiki: editorial release gate validates every card, source and SVG",async({
  });
  expect(result).toEqual({length:61,topics:{grundlagen:22,spielsituationen:26,jugend:13},problems:[]});
 });
+test("Wiki: all 61 diagram dialogs fit 320px and expose source and accessible artwork",async({page})=>{
+ // The final independent rule/graphic review and physical iPhone check remain F11 gates.
+ // One browser navigation evaluates every actual dialog, not only the first SVG.
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/wiki.html");
+ await expect(page.locator(".wiki-entry")).toHaveCount(61);
+ const result=await page.evaluate(()=>{
+  const problems=[];
+  const entries=[...document.querySelectorAll(".wiki-entry")];
+  const dialog=document.getElementById("wiki-detail");
+  for(const [index,entry] of entries.entries()){
+   entry.click();
+   const art=document.getElementById("detail-art");
+   const svg=art.querySelector("svg");
+   const source=document.getElementById("detail-source");
+   const label="Karte "+(index+1);
+   const bounds=dialog.getBoundingClientRect();
+   const graphic=svg?.getBoundingClientRect();
+   if(!dialog.open)problems.push(label+": Dialog nicht geöffnet");
+   if(!source.href.startsWith("https://"))problems.push(label+": keine HTTPS-Quelle");
+   if(!source.textContent.trim())problems.push(label+": Quelllink nicht benannt");
+   if(art.getAttribute("role")!=="img"||!art.getAttribute("aria-label"))
+    problems.push(label+": Grafik nicht zugänglich beschrieben");
+   if(!svg||!graphic||graphic.width<=0||graphic.height<=0)
+    problems.push(label+": fehlende sichtbare SVG-Grafik");
+   if(bounds.left < -1||bounds.right>innerWidth+1)
+    problems.push(label+": Dialog außerhalb Bildschirmbreite");
+   if(dialog.scrollWidth>dialog.clientWidth+1)
+    problems.push(label+": Dialog horizontal scrollbar");
+   if(document.documentElement.scrollWidth>innerWidth+2)
+    problems.push(label+": horizontales Seiten-Overflow");
+   dialog.close();
+  }
+  return {count:entries.length,problems};
+ });
+ expect(result.count).toBe(61);
+ expect(result.problems).toEqual([]);
+ // A real keyboard activation must also restore focus when Escape closes a dialog.
+ const first=page.locator(".wiki-entry").first();
+ await first.focus();
+ await page.keyboard.press("Enter");
+ await expect(page.getByRole("dialog")).toBeVisible();
+ await page.keyboard.press("Escape");
+ await expect(page.getByRole("dialog")).toBeHidden();
+ await expect(first).toBeFocused();
+});
+
 test("Wiki: DBV/BWBV critical rule cases show correct short answers",async({page})=>{
  await page.goto("/wiki.html");
  const checks=[
