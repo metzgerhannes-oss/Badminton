@@ -135,12 +135,12 @@ function render(){
  if(!hasCriteria()){showIdle();return;}
  if($("library-reset"))$("library-reset").hidden=false;
  const own=new Set(localSelection().own),following=new Set(localSelection().following);
- const people=filtered(),count=$("library-count"),area=$("library-results");
+ const people=filtered().filter(p=>!own.has(p.id)&&!following.has(p.id)),count=$("library-count"),area=$("library-results");
  const shown=dbMode?people:people.slice(0,visible);
  if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
-  error(localMode?"Zentrale DBV-Suche derzeit eingeschränkt. Auch auf diesem Gerät wurde kein passendes Profil gefunden.":"Keine bestätigten DBV-Treffer für diese Suchfilter. Bitte Namen oder Filter ändern.",localMode?"limited":"empty");
+  error(localMode?"Nur deine bereits bekannten Profile gefunden.":"Keine weiteren DBV-Spieler für diese Suche gefunden.",localMode?"limited":"empty");
   $("library-more").hidden=true;return;
  }
  area.dataset.state=localMode?"limited":"ready";

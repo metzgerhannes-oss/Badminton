@@ -536,15 +536,15 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </section>
   </section>
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
-   <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2><button type="button" class="subtle-button follow-add" id="player-add-open" aria-expanded="false" aria-controls="player-discover">+ Hinzufügen</button></div>
+   <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2></div>
    <a class="context-reports-link" href="#berichte">Berichte zu Spielern ansehen ↗</a>
    <section class="follow-hub" aria-label="Meine Spieler">
     <h3 hidden>Mein Startprofil</h3>
     <div id="player-own-preview" class="follow-stack" aria-live="polite" hidden></div>
     <div class="follow-hub-subheading"><h3>Gefolgte Spieler <span id="followed-player-count"></span></h3><button id="followed-show-all" type="button" class="subtle-button" hidden>Alle anzeigen</button></div>
-     <label class="followed-search-label">Gefolgte Spieler suchen<input id="followed-player-search" type="search" placeholder="Name, Verein oder DBV-ID" autocomplete="off"></label>
+     <label class="followed-search-label">Spieler suchen oder hinzufügen<input id="followed-player-search" type="search" placeholder="Name, Verein oder DBV-ID" autocomplete="off" aria-controls="friend-list library-results"></label>
     <div id="friend-list" class="friends-list follow-stack" aria-live="polite"></div>
-    <details id="friend-manage-details" class="follow-manage-details"><summary>Reihenfolge und Freundesverwaltung</summary><p class="follow-manage-help">Gefolgte Spieler sortieren, bearbeiten oder entfolgen. Eigene Profile bleiben unberührt.</p><button id="friend-order-reset" type="button" class="subtle-button follow-order-reset">Standardreihenfolge wiederherstellen</button><div id="friend-settings-list" class="friends-list follow-stack" aria-live="polite"></div><button id="friend-order-done" class="subtle-button follow-order-done" type="button">Fertig</button></details>
+
    </section>
    <section id="player-discover" class="follow-discovery" aria-labelledby="player-discover-heading" hidden>
     <div class="follow-hub-subheading"><h3 id="player-discover-heading">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>

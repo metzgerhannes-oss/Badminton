@@ -214,70 +214,107 @@ function unfollowPlayer(id){
  save();render();window.dispatchEvent(new Event("badminton:library-following"));
  toast(friend.name+" entfolgt");
 }
+function moveFollow(id, target, focus=true){
+ const query=String(el("followed-player-search")?.value||"").trim();
+ if(query)return false; // Sorting a filtered subset would mislead the user.
+ const from=state.friends.findIndex(p=>p.id===id);
+ if(from<0||target<0||target>=state.friends.length||from===target)return false;
+ const [player]=state.friends.splice(from,1);
+ state.friends.splice(target,0,player);
+ save();renderFriends();
+ if(focus){
+  const handles=Array.from(el("friend-list")?.querySelectorAll("[data-friend-grip]")||[]);
+  handles.find(x=>x.dataset.friendGrip===id)?.focus({preventScroll:true});
+ }
+ return true;
+}
 function renderFriends(){
- const root=el("friend-list"),settings=el("friend-settings-list");
- const query=String(el("followed-player-search")?.value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").trim();
- const matching=state.friends.filter(p=>!query||[p.name,p.id,p.club].some(value=>
-  String(value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").includes(query)));
+ const root=el("friend-list");if(!root)return;
+ const query=String(el("followed-player-search")?.value||"").normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("de").trim();
+ const matching=state.friends.filter(p=>!query||[p.name,p.id,p.club].some(v=>
+  String(v||"").normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("de").includes(query)));
  const count=el("followed-player-count");if(count)count.textContent="("+state.friends.length+")";
  const all=el("followed-show-all");if(all)all.hidden=!query;
- if(root){
-  root.innerHTML=matching.length?matching.map(p=>{
-   const current=state.viewingFriendId===p.id;
-   return '<article class="followed-player-row card-open-surface">'+
-    '<button type="button" class="friend-follow-item card-open-primary'+(current?' is-current':'')+'" data-view-friend="'+esc(p.id)+'">'+
-    '<span class="friend-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>'+
-    '<span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.club?' · '+esc(p.club):'')+'</small></span>'+
-    '<span class="follow-item-arrow" aria-hidden="true">›</span></button>'+
-    '<button type="button" class="followed-inline-remove" data-unfollow-inline="'+esc(p.id)+'" aria-label="'+esc(p.name)+' entfolgen">Entfolgen</button></article>';
-  }).join(""):'<p class="team-empty">'+(state.friends.length?'Keine gefolgten Spieler zu dieser Suche.':'Du folgst noch keinen Spielern. Über + Hinzufügen kannst du Spieler suchen.')+'</p>';
-  root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend)));
-  root.querySelectorAll("[data-unfollow-inline]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollowInline)));
- }
- if(!settings)return;
- settings.innerHTML=state.friends.length?state.friends.map((p,i)=>
-  '<article class="follow-manage-item"><div class="follow-manage-label"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+'</small></div>'+
-  '<div class="follow-manage-actions"><button type="button" data-friend-move="'+esc(p.id)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="'+esc(p.name)+' nach oben">↑</button>'+
-  '<button type="button" data-friend-move="'+esc(p.id)+'" data-direction="1" '+(i===state.friends.length-1?'disabled':'')+' aria-label="'+esc(p.name)+' nach unten">↓</button>'+
-  '<button type="button" data-edit-friend="'+esc(p.id)+'" aria-label="'+esc(p.name)+' bearbeiten">Bearbeiten</button>'+
-  '<button type="button" data-unfollow="'+esc(p.id)+'" aria-label="'+esc(p.name)+' nicht mehr folgen">Entfolgen</button></div></article>'
- ).join(""):'<p class="team-empty">Noch keine Spieler abonniert.</p>';
- const reset=el("friend-order-reset");if(reset)reset.disabled=state.friends.length<2;
- settings.querySelectorAll("[data-friend-move]").forEach(b=>b.addEventListener("click",()=>{
-  const index=state.friends.findIndex(p=>p.id===b.dataset.friendMove);
-  const target=index+Number(b.dataset.direction);
-  if(index<0||target<0||target>=state.friends.length)return;
-  const [friend]=state.friends.splice(index,1);
-  state.friends.splice(target,0,friend);save();render();
-  const actions=Array.from(el("friend-settings-list")?.querySelectorAll("[data-friend-move]")||[])
-   .filter(button=>button.dataset.friendMove===friend.id&&!button.disabled);
-  (actions.find(button=>button.dataset.direction===b.dataset.direction)||actions[0])?.focus({preventScroll:true});
+ root.innerHTML=matching.length?matching.map(p=>{
+  const current=state.viewingFriendId===p.id;
+  return '<article class="followed-player-row card-open-surface" data-follow-row="'+esc(p.id)+'">'+
+   '<button type="button" class="friend-follow-item card-open-primary'+(current?' is-current':'')+'" data-view-friend="'+esc(p.id)+'">'+
+   '<span class="friend-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>'+
+   '<span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.club?' · '+esc(p.club):'')+'</small></span>'+
+   '<span class="follow-item-arrow" aria-hidden="true">›</span></button>'+
+   '<button type="button" class="followed-reorder-grip" data-friend-grip="'+esc(p.id)+'" '+(query?'disabled':'')+
+    ' aria-label="'+esc(p.name)+' sortieren: ziehen oder Pfeiltasten nach oben oder unten" title="Ziehen oder Pfeiltasten">⠿</button>'+
+   '<button type="button" class="followed-inline-remove" data-unfollow-inline="'+esc(p.id)+'" aria-label="'+esc(p.name)+' entfolgen">−</button></article>';
+ }).join(""):'<p class="team-empty">'+(state.friends.length?"Keine gefolgten Spieler zu dieser Suche.":"Noch keine gefolgten Spieler. Suche oben nach Namen oder DBV-ID.")+'</p>';
+ root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend)));
+ root.querySelectorAll("[data-unfollow-inline]").forEach(b=>b.addEventListener("click",ev=>{
+  ev.preventDefault();ev.stopPropagation();unfollowPlayer(b.dataset.unfollowInline);
  }));
- settings.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",()=>window.openFriendForm?.(state.friends.find(p=>p.id===b.dataset.editFriend))));
- settings.querySelectorAll("[data-unfollow]").forEach(b=>b.addEventListener("click",()=>unfollowPlayer(b.dataset.unfollow)));
+ root.querySelectorAll("[data-friend-grip]").forEach(b=>{
+  b.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation()});
+  b.addEventListener("keydown",ev=>{
+   if(!["ArrowUp","ArrowDown"].includes(ev.key))return;
+   ev.preventDefault();ev.stopPropagation();
+   const i=state.friends.findIndex(p=>p.id===b.dataset.friendGrip);
+   moveFollow(b.dataset.friendGrip,i+(ev.key==="ArrowUp"?-1:1));
+  });
+  let start=null;
+  b.addEventListener("pointerdown",ev=>{
+   if(b.disabled||ev.button!==0)return;
+   start={id:b.dataset.friendGrip,x:ev.clientX,y:ev.clientY,pointer:ev.pointerId};
+   b.setPointerCapture?.(ev.pointerId);
+  });
+  b.addEventListener("pointercancel",()=>{start=null});
+  b.addEventListener("pointerup",ev=>{
+   if(!start||start.pointer!==ev.pointerId)return;
+   const move=start;start=null;
+   if(Math.hypot(ev.clientX-move.x,ev.clientY-move.y)<10)return;
+   const rows=Array.from(root.querySelectorAll("[data-follow-row]"));
+   // Pointer capture keeps the handle active; use target row bounds to find the destination.
+   const target=rows.reduce((best,row)=>{
+    const r=row.getBoundingClientRect();
+    const distance=Math.abs(ev.clientY-(r.top+r.height/2));
+    return distance<best.distance?{distance,id:row.dataset.followRow}:best;
+   },{distance:Infinity,id:""});
+   if(!target.id)return;
+   const i=state.friends.findIndex(p=>p.id===target.id);
+   moveFollow(move.id,i);
+  });
+ });
+}
+
+function syncFollowSearch(){
+ const input=el("followed-player-search");if(!input)return;
+ const term=input.value.trim();
+ const active=term.length>=3;
+ const panel=el("player-discover");
+ if(panel)panel.hidden=!active;
+ const secondary=el("library-search");
+ const value=active?term:"";
+ if(secondary&&secondary.value!==value){
+  secondary.value=value;
+  // Reuse existing debounce, three-character minimum, and rate budget.
+  secondary.dispatchEvent(new Event("input",{bubbles:true}));
+ }
+ renderFriends();
 }
 function showPlayerDiscover(open=true,focus=true){
- const panel=el("player-discover"),trigger=el("player-add-open");
- if(!panel||!trigger)return;
- panel.hidden=!open;
- trigger.setAttribute("aria-expanded",String(open));
- trigger.textContent=open?"Suche schließen":"+ Hinzufügen";
- if(open&&focus){
-  const focusSearch=()=>requestAnimationFrame(()=>{
-   panel.scrollIntoView({block:"start",behavior:"smooth"});
-   el("library-search")?.focus({preventScroll:true});
-  });
-  if(location.hash!=="#spieler"){
-   // Route focus runs on hashchange. Re-focus the search only after it has
-   // finished, otherwise the page heading steals the typing caret.
-   window.addEventListener("hashchange",focusSearch,{once:true});
-   navigatePrimary("spieler");
-   // An installed iPhone may dispatch hashchange late; keep the search usable
-   // immediately instead of leaving the user on Home with a hidden input.
-   focusSearch();
-  }else focusSearch();
+ if(!open){
+  const input=el("followed-player-search");if(input)input.value="";
+  syncFollowSearch();return;
  }
+ const focusSearch=()=>{
+  const input=el("followed-player-search");
+  input?.focus({preventScroll:true});
+  input?.scrollIntoView({block:"center",behavior:"smooth"});
+ };
+ if(location.hash!=="#spieler"){
+  window.addEventListener("hashchange",focusSearch,{once:true});
+  navigatePrimary("spieler");
+ }else if(focus)focusSearch();
+ syncFollowSearch();
 }
+
 // The verified shared DBV roster is public; following a player is only local.
 if(typeof window!=="undefined"){
 window.badmintonLibraryGetState=()=>({
@@ -745,9 +782,9 @@ function setup(){
   render();el("friend-order-reset")?.focus({preventScroll:true});
   toast("Standardreihenfolge wiederhergestellt");
  });
- el("followed-player-search")?.addEventListener("input",renderFriends);
- el("followed-show-all")?.addEventListener("click",()=>{const field=el("followed-player-search");if(field){field.value="";renderFriends();field.focus()}});
- el("player-add-open")?.addEventListener("click",()=>showPlayerDiscover(el("player-discover").hidden));
+ el("followed-player-search")?.addEventListener("input",syncFollowSearch);
+ el("followed-show-all")?.addEventListener("click",()=>{const field=el("followed-player-search");if(field){field.value="";syncFollowSearch();field.focus()}});
+ // Search and add share #followed-player-search; no second + panel.
   el("player-discover-close")?.addEventListener("click",()=>showPlayerDiscover(false,false));
   el("add-friend-manual").addEventListener("click",()=>openFriendForm());
  el("cancel-friend").addEventListener("click",()=>friendDialog.close());
