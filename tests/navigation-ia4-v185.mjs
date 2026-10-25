@@ -18,7 +18,7 @@ assert.match(app,/navigatePrimary\(dest\)/);
 assert.match(app,/navigatePrimary\("spieler"\)/,
  "Home add friend must navigate directly to canonical player discovery");
 assert.match(app,/\["start","turniere","live","spieler","verein","mannschaft","berichte","historie","spiele"\]/);
-assert.doesNotMatch(html,/<a\\b[^>]*href="#spiele"/,
+assert.doesNotMatch(html,/<a\b[^>]*href="#spiele"/,
  "F10 pause: Home and Turniertag must not advertise the arcade");
 assert.match(html,/<section class="page" id="view-spiele"/,
  "Existing #spiele direct links must remain backwards-compatible");
