@@ -66,13 +66,14 @@ function bookmark(row,owns){
  const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
  if(startDate&&endDate&&endDate<startDate)fail("Turnierende vor Turnierbeginn");
  const place=text(row.place,120,"Austragungsort");
+ const deadline=isDate(row.deadline);
  const name=text(row.name,100,"Turniername");
  if(row.source==="dbv-calendar"){
   const id=text(row.id,80,"DBV-Kalenderkennung",true);
   if(!/^dbv-calendar-\d{2,12}$/.test(id)||raw!=="https://turniere.badminton.de/"||
      !owns.has(playerId)||!startDate||!endDate||endDate<startDate||!name)
    fail("DBV-Kalendervormerkung ungültig");
-  return {id,url:raw,name,playerId,startDate,endDate,source:"dbv-calendar",place};
+  return {id,url:raw,name,playerId,startDate,endDate,source:"dbv-calendar",place,deadline};
  }
  if(row.source==="bwbv-framework"){
   const id=text(row.id,80,"Rahmenterminkennung",true),spec=FRAMEWORK_SPECS[id];
@@ -88,7 +89,7 @@ function bookmark(row,owns){
  if(!matched)fail("DBV-Turnier-ID fehlt");
  const id=matched[1].toUpperCase();
  return {id,url:"https://dbv.turnier.de/tournament/"+id,
-  name:name||"DBV-Turnier "+id.slice(0,8),playerId,startDate,endDate,place};
+  name:name||"DBV-Turnier "+id.slice(0,8),playerId,startDate,endDate,place,deadline};
 }
 export function normalizeLocalData(data){
  if(!record(data))fail("Kein gültiger Schmetterlinge-Datensatz");
