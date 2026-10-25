@@ -37,6 +37,8 @@ assert.match(html,/id="dbv-calendar-advanced" class="dbv-calendar-advanced"/,"Ad
 assert.ok(html.indexOf('id="my-tournaments-title"')<html.indexOf('id="dbv-calendar-heading"'),"Personal dates precede tournament directory");
 assert.ok(html.indexOf('id="dbv-calendar-heading"')<html.indexOf('class="live-dbv"'),"Calendar search precedes live detail");
 
-for(const id of ["friend-order-done","team-order-done"]){
- assert.match(html,new RegExp('id="'+id+'"[^>]*type="button"'),"Explicit sorted-list Finish button");
-}
+assert.doesNotMatch(html,/id="friend-order-done"/,"Player order is now changed directly at the row");
+assert.doesNotMatch(html,/id="friend-manage-details"/,"There must be no duplicate player management screen");
+assert.match(html,/id="followed-player-search"/,"Player search and follow share one entry point");
+assert.match(app,/data-friend-grip/,"Player ordering handles are accessible directly in the list");
+assert.match(html,/id="team-order-done"[^>]*type="button"/,"Team sorting still has the original Finish button");
