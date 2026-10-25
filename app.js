@@ -777,15 +777,18 @@ function setup(){
   const form=el("tournament-form");
   if(el("tournament-dialog")?.open&&form)prefillVerifiedTournamentForm(form);
   let changed=false;
+  const previousWarnings=JSON.stringify([...tournamentSourceConflicts.entries()]);
   tournamentSourceConflicts.clear();
-  state.officialLinks=state.officialLinks.map(bookmark=>{
+  const reconciled=state.officialLinks.map(bookmark=>{
    const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(bookmark,entries);
    if(result.status==="conflict")tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,result);
    if(result.status==="matched"&&result.updated!==bookmark){changed=true;return result.updated}
    return bookmark;
   });
-  if(changed)save();
-  render();
+  const warningsChanged=JSON.stringify([...tournamentSourceConflicts.entries()])!==previousWarnings;
+  if(changed){state.officialLinks=reconciled;save()}
+  // Background calendar reads must not reset the active profile or ranking view.
+  if(changed||warningsChanged)render();
  });
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());
