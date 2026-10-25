@@ -7,8 +7,8 @@ const sw=await readFile("sw.js","utf8");
 const state={page:"historie"}, seen={scroll:0,focus:0,render:0};
 const attr=()=>({attrs:{},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]}});
 const pages=["start","historie","turniere","spieler","mannschaft","berichte","einstellungen"].map(name=>({...attr(),id:"view-"+name,classList:{active:false,toggle(k,yes){this.active=yes}}}));
-const tabs=["start","turniere","live","spieler","mannschaft","berichte"].map(name=>({...attr(),dataset:{page:name}}));
-const app=attr(),settings=attr(),liveLink={hidden:true};
+const tabs=["start","spieler","turniere","mannschaft"].map(name=>({...attr(),dataset:{page:name}}));
+const app=attr(),settings=attr(),liveLink={...attr(),hidden:true};
 const heading={setAttribute(){},focus(options){assert.equal(options.preventScroll,true);seen.focus++}};
 const document={
  title:"",
@@ -57,9 +57,13 @@ run("SchmetterlingeRouter.renderPage(state)");
 assert.equal(document.title,"Live-Matches · Schmetterlinge");
 assert.equal(app.attrs["data-current-view"],"live");
 assert.equal(pages.find(x=>x.id==="view-turniere").classList.active,true);
-assert.equal(tabs.find(x=>x.dataset.page==="live").attrs["aria-current"],"page");
+assert.equal(tabs.find(x=>x.dataset.page==="turniere").attrs["aria-current"],"page");
+assert.equal(liveLink.attrs["aria-current"],"page","Today context link is current while deep-linked into #live");
 liveLink.hidden=true;run("SchmetterlingeRouter.renderPage(state)");
 assert.equal(tabs.find(x=>x.dataset.page==="turniere").attrs["aria-current"],"page");
+state.page="berichte";run("SchmetterlingeRouter.renderPage(state)");
+assert.equal(tabs.filter(x=>x.attrs["aria-current"]==="page").length,0,"Reports are a context route with no extra main tab");
+assert.equal(liveLink.attrs["aria-current"],undefined);
 state.page="mannschaft";run("SchmetterlingeRouter.renderPage(state)");
 assert.equal(document.title,"Mannschaft · Schmetterlinge");
 assert.equal(pages.find(x=>x.id==="view-mannschaft").classList.active,true);

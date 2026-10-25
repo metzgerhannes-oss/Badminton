@@ -31,7 +31,7 @@ test("Mannschaft has its own mobile tab, persistent following, fixtures and offi
  await page.setViewportSize({width:320,height:568});
  await page.goto("/#mannschaft");
  await expect(page.locator("#view-mannschaft")).toBeVisible();
- await expect(page.locator(".bottom-nav a:visible")).toHaveCount(5);
+ await expect(page.locator(".bottom-nav a:visible")).toHaveCount(4);
  await expect(page.locator(".bottom-nav a[data-page=mannschaft]")).toHaveAttribute("aria-current","page");
  await expect(page.locator("#team-discover")).toBeHidden();
   await expect(page.locator("#team-results .team-card")).toHaveCount(0);

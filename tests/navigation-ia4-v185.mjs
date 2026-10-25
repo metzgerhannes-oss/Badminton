@@ -24,14 +24,14 @@ assert.match(html,/<section class="page" id="view-spiele"/,
  "Existing #spiele direct links must remain backwards-compatible");
 assert.match(router,/"spiele"/,"Router must retain the legacy #spiele route");
 assert.doesNotMatch(html,/<a[^>]*data-page="spiele"/,"Spielecke must not become a sixth main navigation tab");
-assert.match(router,/page==="historie"\|\|\(page==="live"&&liveHidden\)\?"turniere"/);
+assert.match(router,/page==="historie"\|\|page==="live"\?"turniere"/);
 assert.match(html,/class="home-stats-link" href="#historie"/);
 assert.match(html,/class="live-tournaments-return" href="#turniere"|class="history-inline-link live-tournaments-return" href="#turniere"/);
 assert.match(html,/id="home-live-peek"/);
 assert.match(html,/id="live-nav-tab"[^>]*hidden/);
 assert.match(app,/todayNav\.matchToday&&todayNav\.day===localDay\(\)/,
  "Today remains source-gated and never red without verified scheduled match");
-assert.match(css,/\.bottom-nav\.has-live-tab \.live-nav-tab/);
+assert.match(css,/\.today-context-link\{/);
 assert.match(html,/id="profile-list"/);
 assert.match(settings,/id:"einladungen",title:"Zugänge & Freigaben"/);
 assert.doesNotMatch(app,/localStorage\.clear\(|sessionStorage\.clear\(/);

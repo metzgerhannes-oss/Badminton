@@ -1,6 +1,5 @@
-/* Schmetterlinge Mannschaft – five permanent navigation destinations. */
-.bottom-nav a{width:20%!important;flex:1 1 20%}
-.bottom-nav.has-live-tab a{width:16.666%!important;flex:1 1 16.666%}
+/* UX2 A1: exactly four stable mobile destinations; Verein is desktop-only. */
+.bottom-nav a{width:25%!important;flex:1 1 25%}
 .bottom-nav a small{font-size:clamp(9px,2.5vw,12px)}
 .bottom-nav .nav-icon{width:23px;height:23px}
 @media(max-width:380px){

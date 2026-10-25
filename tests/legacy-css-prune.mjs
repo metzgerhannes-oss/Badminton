@@ -4,7 +4,7 @@ const [html,css,shell,components,cache]=await Promise.all([
  "index.html","styles.css","app-shell.css","ui-components.css","sw.js"
 ].map(path=>readFile(path,"utf8")));
 
-// These were part of the abandoned prototype screen, not of the four-tab app.
+// These were part of the abandoned prototype screen, not of the UX2 four-mobile-tab app.
 // Protect against accidentally reintroducing its confusing parallel controls.
 const retired=[
  ".hero{",".hero-crest{",".hero h1{",".player-pills{",".pill{",
@@ -29,5 +29,5 @@ assert.ok(shell.includes(".bottom-nav a{width:25%!important"));
 assert.ok(components.includes(".ranking-tile.ranking-compact{"));
 assert.match(cache,/schmetterlinge-shell-v[1-9][0-9]*/);
 assert.deepEqual([...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]),
- ["start","turniere","live","spieler","verein","mannschaft","berichte"]);
+ ["start","spieler","turniere","verein","mannschaft"]);
 console.log("v68: unused prototype CSS retired; active four-tab navigation, dialogs, PWA and approved crest intact.");

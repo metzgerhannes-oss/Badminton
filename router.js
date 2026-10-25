@@ -72,8 +72,12 @@ function focusCurrentView(state){
  const routeTitles={start:"Übersicht",historie:"Turnierhistorie",turniere:"Turniertag",live:"Live-Matches",
   spieler:"Spieler",verein:"Vereinsübersicht",mannschaft:"Mannschaft",berichte:"Berichte",spiele:"Spielecke",einstellungen:"Einstellungen"};
  document.title=routeTitles[page]+" · Schmetterlinge";
- const liveHidden=document.querySelector("#live-nav-tab")?.hidden!==false;
-  const activeTab=page==="historie"||(page==="live"&&liveHidden)?"turniere":page;
+ const activeTab=page==="historie"||page==="live"?"turniere":page;
+ const todayShortcut=document.querySelector("#live-nav-tab");
+ if(todayShortcut){
+  if(page==="live")todayShortcut.setAttribute("aria-current","page");
+  else todayShortcut.removeAttribute("aria-current");
+ }
  document.querySelectorAll(".bottom-nav a").forEach(a=>{
   if(a.dataset.page===activeTab)a.setAttribute("aria-current","page");
   else a.removeAttribute("aria-current");

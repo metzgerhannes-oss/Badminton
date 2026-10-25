@@ -118,13 +118,14 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v209" title="Version v209">v209</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v210" title="Version v210">v210</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
    <strong>Keine Verbindung gemeldet</strong>
    <span>Du kannst vorhandene Ansichten weiter nutzen. Neue Ergebnisse werden bei Verbindung wieder geladen.</span>
  </div>
+ <div class="today-context-bar"><a href="#live" id="live-nav-tab" class="today-context-link" aria-label="Live-Matches am Turniertag" hidden><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.4 4.4a11 11 0 0 0 0 15.2M19.6 4.4a11 11 0 0 1 0 15.2"/></svg></span><small>Heute</small></a></div>
  <main id="hauptinhalt" tabindex="-1">
   <section class="focused-profile" id="focused-profile" aria-live="polite" aria-label="Aktuell angezeigtes Spielerprofil"></section>
   <section class="page active" id="view-start" aria-labelledby="heading-start">
@@ -519,6 +520,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </section>
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
    <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2><button type="button" class="subtle-button follow-add" id="player-add-open" aria-expanded="false" aria-controls="player-discover">+ Hinzufügen</button></div>
+   <a class="context-reports-link" href="#berichte">Berichte zu Spielern ansehen ↗</a>
    <section class="follow-hub" aria-label="Meine Spieler">
     <h3 hidden>Mein Startprofil</h3>
     <div id="player-own-preview" class="follow-stack" aria-live="polite" hidden></div>
@@ -552,6 +554,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </section>
   <section class="page" id="view-mannschaft" aria-labelledby="heading-mannschaft">
    <div class="section-heading follow-hub-header"><h2 id="heading-mannschaft">Mannschaften</h2><button id="team-add-open" class="subtle-button follow-add" type="button" aria-expanded="false" aria-controls="team-discover">+ Hinzufügen</button></div>
+   <a class="context-reports-link" href="#berichte">Berichte zu Teams ansehen ↗</a>
    <div class="follow-season"><label for="team-season">Saison</label><select id="team-season"><option value="2026/27">2026/27</option></select><button id="team-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
    <section class="team-section" aria-labelledby="team-followed-heading">
     <div class="follow-hub-subheading"><h3 id="team-followed-heading">Meine Mannschaften</h3></div>
@@ -722,13 +725,11 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </section>
  </main>
  <nav class="bottom-nav" aria-label="Hauptnavigation">
-  <a href="#start" data-page="start" aria-current="page"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></a>
-  <a href="#turniere" data-page="turniere"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span><small>Turniere</small></a>
-  <a href="#live" data-page="live" id="live-nav-tab" class="live-nav-tab" aria-label="Live-Matches am Turniertag" hidden><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.4 4.4a11 11 0 0 0 0 15.2M19.6 4.4a11 11 0 0 1 0 15.2"/></svg></span><small>LIVE</small></a>
+  <a href="#start" data-page="start" aria-current="page"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><small>Start</small></a>
   <a href="#spieler" data-page="spieler"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><small>Spieler</small></a>
+  <a href="#turniere" data-page="turniere"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span><small>Turniere</small></a>
   <a href="#verein" data-page="verein" class="desktop-club-nav"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 21V5l9-3 9 3v16M3 9h18M8 9v12M16 9v12M3 21h18"/></svg></span><small>Verein</small></a>
-  <a href="#mannschaft" data-page="mannschaft"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><circle cx="12" cy="5" r="3"/><path d="M3 8a3 3 0 0 1 4-3M21 8a3 3 0 0 0-4-3"/></svg></span><small>Mannschaft</small></a>
-  <a href="#berichte" data-page="berichte"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg></span><small>Berichte</small></a>
+  <a href="#mannschaft" data-page="mannschaft"><span aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><circle cx="12" cy="5" r="3"/><path d="M3 8a3 3 0 0 1 4-3M21 8a3 3 0 0 0-4-3"/></svg></span><small>Teams</small></a>
  </nav>
 </div>
 <dialog id="first-run-dialog" class="first-run-dialog" aria-label="Startprofil auswählen">

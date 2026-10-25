@@ -39,7 +39,7 @@ test("v64 app chrome keeps four readable, non-overlapping tabs from SE to tablet
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   const tabs=page.locator(".bottom-nav a:visible");
-  await expect(tabs).toHaveCount(5);
+  await expect(tabs).toHaveCount(4);
   await expect(page.locator(".topbar-settings")).toBeVisible();
   await expect(page.locator(".brand-logo")).toBeVisible();
   const frames=[];
@@ -117,7 +117,12 @@ for(const width of [320,375,390]){
   expect(brand.clip).toBe("none");
   expect(brand.mask).toBe("none");
   for(const view of ["turniere","spieler","berichte"]){
-   await page.locator('.bottom-nav a[data-page="'+view+'"]').click();
+   if(view==="berichte"){
+    await expect(page.locator('.bottom-nav a[data-page="berichte"]')).toHaveCount(0);
+    await page.locator('#view-spieler a.context-reports-link[href="#berichte"]').click();
+   }else{
+    await page.locator('.bottom-nav a[data-page="'+view+'"]').click();
+   }
    await expect(page.locator("#view-"+view)).toBeVisible();
   }
   await page.locator('.bottom-nav a[data-page="spieler"]').click();
@@ -140,7 +145,7 @@ for(const width of [320,375,390,768]){
   await page.setViewportSize({width,height:700});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   const tabs=page.locator(".bottom-nav a:visible");
-  await expect(tabs).toHaveCount(5);
+  await expect(tabs).toHaveCount(4);
   await expect(page.locator(".focused-profile")).toContainText("Philipp");
   const chrome=await page.evaluate(()=>{
    const nav=getComputedStyle(document.querySelector(".bottom-nav"));

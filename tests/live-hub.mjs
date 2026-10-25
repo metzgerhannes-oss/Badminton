@@ -24,9 +24,9 @@ assert.ok(tournament.indexOf('id="dbv-live-advanced"')<tournament.indexOf('id="d
  "Unused DBV query behind details");
 assert.equal((tournament.match(/id="live-radar-refresh"/g)||[]).length,1);
 assert.deepEqual([...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]),
- ["start","turniere","live","spieler","verein","mannschaft","berichte"],
- "Five main destinations, one conditional LIVE and a desktop-only club view");
-assert.match(html,/data-page="start".*?<small>Home<\/small>/s);
+ ["start","spieler","turniere","verein","mannschaft"],
+ "Four stable mobile destinations, contextual LIVE and desktop-only club");
+assert.match(html,/data-page="start".*?<small>Start<\/small>/s);
 assert.match(app,/function navigateHome\(\)/);
 assert.match(app,/SchmetterlingeStorage\.showOwn\(state\);/,"Home must return to locally selected own profile");
 assert.match(app,/window\.badmintonSelectViewer/);
@@ -69,4 +69,4 @@ assert.equal(liveView({...base,payload:{...base.payload,running:{sets:[[18,21]],
 assert.equal(setText({sets:[[18,21]],is_team1:0}),"21:18");
 assert.equal(playerOutcome({team1_won:true,is_team1:0}),"loss");
 assert.equal(liveView({...base,checked_at:"2026-10-10T11:54:00Z"},id,Date.parse(t)).status,"stale");
-console.log("Live hub: consolidated single task, in-place own/friend switch, Home-first freshness, lazy advanced feed, 6-tab nav and data-quality checks passed.");
+console.log("Live hub: own/friend selection, Home freshness, lazy advanced feed, four stable mobile tabs and data quality verified.");

@@ -17,20 +17,23 @@ test("320px and 390px: subtle tap feedback, instant view change, intact keyboard
   await page.setViewportSize({width,height:720});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#view-start")).toBeVisible();
-  const nav=page.locator('.bottom-nav a[data-page="berichte"]');
+  const nav=page.locator('.bottom-nav a[data-page="spieler"]');
   const icon=nav.locator(":scope > span");
   await expect(icon).toHaveCSS("transition-property","transform");
   await expect(icon).toHaveCSS("transition-duration","0.14s");
+  await expect(page.locator('.bottom-nav a[data-page="berichte"]')).toHaveCount(0);
   await nav.click();
-  await expect(page.locator("#view-berichte")).toBeVisible();
+  await expect(page.locator("#view-spieler")).toBeVisible();
   await expect(nav).toHaveAttribute("aria-current","page");
+  await page.locator('#view-spieler a.context-reports-link[href="#berichte"]').click();
+  await expect(page.locator("#view-berichte")).toBeVisible();
   const heading=page.locator("#view-berichte h2").first();
   await expect(heading).toBeFocused();
   const button=page.locator("#report-refresh");
   await expect(button).toHaveCSS("transition-property",/transform/);
   const computed=await page.evaluate(()=>({
    pageAnimation:getComputedStyle(document.querySelector(".page.active")).animationName,
-   navTarget:document.querySelector('.bottom-nav a[data-page="berichte"]').getBoundingClientRect().height,
+   navTarget:document.querySelector('.bottom-nav a[data-page="spieler"]').getBoundingClientRect().height,
    zoom:document.querySelector('meta[name="viewport"]').content,
    overflow:getComputedStyle(document.body).overflowX
   }));
@@ -63,7 +66,9 @@ test("nav changes do not affect local profile/friends storage or desktop Navy",a
  await expect(page.locator("#view-verein")).toBeVisible();
  await expect(page.locator(".club-overview-panel")).toHaveCSS("background-color","rgb(17, 44, 81)");
  const before=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
- await page.locator('.bottom-nav a[data-page="berichte"]').click();
+ await page.locator('.bottom-nav a[data-page="spieler"]').click();
+ await expect(page.locator("#view-spieler")).toBeVisible();
+ await page.locator('#view-spieler a.context-reports-link[href="#berichte"]').click();
  await expect(page.locator("#view-berichte")).toBeVisible();
  const after=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
  expect(after).toBe(before);

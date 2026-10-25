@@ -37,7 +37,7 @@ function routeTo(page){
 }
 function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
 /** Native-feeling primary navigation: source of truth is the tapped destination,
- * not a deferred hashchange from installed WebKit. All six navigation links use
+ * not a deferred hashchange from installed WebKit. The four stable mobile tabs and the desktop club link use
  * the same route. This does not touch stored players, friends or invitations.
  */
 function navigatePrimary(page,{returnToOwn=true}={}){
@@ -433,7 +433,7 @@ function updateLiveNavigation(){
  const shouldShow=todayNav.matchToday&&todayNav.day===localDay();
  const changed=tab.hidden===shouldShow;
  tab.hidden=!shouldShow;
- tab.parentElement?.classList.toggle("has-live-tab",shouldShow);
+ // A verified-day shortcut stays separate from the four stable main tabs.
  const caption=tab.querySelector("small");if(caption)caption.textContent="Heute";
  tab.setAttribute("aria-label","Heute angesetzte oder laufende Spiele");
  return changed;
