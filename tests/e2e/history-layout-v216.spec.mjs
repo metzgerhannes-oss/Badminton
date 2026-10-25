@@ -27,6 +27,14 @@ for(const width of [320,390,1280]){
   const source=page.locator("#external-match-source-details");
   await expect(source).not.toHaveAttribute("open",/.+/);
   await expect(source.locator("summary")).toHaveText("Quellenstand und Abweichungen anzeigen");
+  // Verify native keyboard disclosure without depending on live/private source data.
+  await page.locator("#external-match-history").evaluate(el=>{el.hidden=false});
+  await source.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(source).toHaveJSProperty("open",true);
+  await page.locator("#external-match-year").dispatchEvent("change");
+  await expect(source).toHaveJSProperty("open",true);
+
   await page.locator('#view-historie a.history-inline-link[href="#start"]').click();
   await expect(page).toHaveURL(/#start$/);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
