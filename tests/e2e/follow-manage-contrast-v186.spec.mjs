@@ -12,8 +12,7 @@ function contrast(foreground,background){
  return (a+0.05)/(b+0.05);
 }
 for(const [view,hash,details,list] of [
- ["Mannschaften","#mannschaft","team-manage-details","team-settings-list"],
- ["Spieler","#spieler","friend-manage-details","friend-settings-list"]
+ ["Mannschaften","#mannschaft","team-manage-details","team-settings-list"]
 ]){
  for(const width of [390,1280,1440,1920]){
   test(`#332: ${view} sorting has readable text and buttons at ${width}px`,async({page})=>{
@@ -72,4 +71,36 @@ for(const [view,hash,details,list] of [
    }
   });
  }
+}
+
+for(const width of [320,390,1280,1440]){
+ test("#332/v217: inline player sort and unfollow buttons are legible "+width+"px",async({page})=>{
+  await page.addInitScript(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"99-700001",name:"Eigenes Testprofil"}],
+   friends:[{id:"98-700002",name:"Gefolgter Testspieler",club:"Testverein"}],
+   activeProfileId:"99-700001",chosen:"99-700001",officialLinks:[],historyProfilesInitialized:true
+  })));
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+  const row=page.locator('#friend-list [data-follow-row="98-700002"]');
+  await expect(row).toBeVisible();
+  const value=await row.evaluate(root=>{
+   const grip=root.querySelector("[data-friend-grip]");
+   const minus=root.querySelector("[data-unfollow-inline]");
+   const style=e=>getComputedStyle(e),bounds=e=>e.getBoundingClientRect();
+   return {
+    controls:[grip,minus].map(el=>({
+     color:style(el).color,background:style(el).backgroundColor,
+     width:bounds(el).width,height:bounds(el).height
+    })),
+    overflow:document.documentElement.scrollWidth-innerWidth
+   };
+  });
+  for(const control of value.controls){
+   expect(control.width).toBeGreaterThanOrEqual(44);
+   expect(control.height).toBeGreaterThanOrEqual(44);
+   expect(contrast(control.color,control.background)).toBeGreaterThanOrEqual(4.5);
+  }
+  expect(value.overflow).toBeLessThanOrEqual(2);
+ });
 }
