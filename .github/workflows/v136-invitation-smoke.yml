@@ -9,6 +9,9 @@ on:
       - "app-access.js"
       - "app-access.css"
       - "invite.js"
+      - "welcome.js"
+      - "consented-player-data.js"
+      - "tests/e2e/invitation-repair.spec.mjs"
       - "index.html"
       - "player-data-status.js"
       - "tests/e2e/invite-only-access.spec.mjs"
@@ -46,4 +49,4 @@ jobs:
       - name: Enforce offline Supabase browser test contract
         run: node tests/browser-qa-supabase-isolation.mjs
       - name: Verify invited entry and revocation
-        run: npx playwright test tests/e2e/invite-only-access.spec.mjs tests/e2e/v138-player-shell.spec.mjs tests/e2e/v138-owner-invites.spec.mjs tests/e2e/v138-member-copy.spec.mjs --workers=2 --retries=0 --reporter=line
+        run: npx playwright test tests/e2e/invite-only-access.spec.mjs tests/e2e/v138-player-shell.spec.mjs tests/e2e/v138-owner-invites.spec.mjs tests/e2e/v138-member-copy.spec.mjs tests/e2e/invitation-repair.spec.mjs --workers=2 --retries=0 --reporter=line
