@@ -799,6 +799,15 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <button class="primary-button" id="tournament-save" type="submit">Turnier speichern</button>
  </form>
 </dialog>
+<dialog id="tournament-venue-dialog" aria-labelledby="tournament-venue-heading">
+ <form id="tournament-venue-form" class="modal">
+  <div class="section-heading"><h2 id="tournament-venue-heading">Austragungsort ergänzen</h2><button id="cancel-tournament-venue" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <label for="tournament-venue-input">Austragungsort / Hallenadresse <span class="muted">(optional)</span></label>
+  <input id="tournament-venue-input" name="place" maxlength="120" autocomplete="off" placeholder="z. B. Musterhalle, Musterstraße 1">
+  <p class="small muted">Nur lokal gespeichert. Turnierdatum, Kategorie und Quellenlink bleiben unverändert.</p>
+  <button class="primary-button" type="submit">Ort speichern</button>
+ </form>
+</dialog>
 <dialog id="spond-source-dialog" aria-labelledby="spond-source-heading">
  <div class="modal spond-source">
   <div class="spond-source-top"><h2 id="spond-source-heading">Spond-Termine übernehmen</h2><button type="button" id="spond-source-close" class="icon-button" aria-label="Schließen">×</button></div>
