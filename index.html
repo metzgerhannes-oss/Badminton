@@ -254,6 +254,20 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </div>
     <a class="history-inline-link" href="#historie">Turnierhistorie und Auszeichnungen ansehen ↗</a>
      <a class="history-inline-link live-tournaments-return" href="#turniere"><span aria-hidden="true">←</span> <span>Turniere</span></a>
+   <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
+    <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
+    <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
+    <div id="official-tournament-list" class="tournament-list"></div>
+    <section class="spond-panel" aria-labelledby="spond-title">
+      <div class="spond-simple-head">
+        <div><h3 id="spond-title">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
+        <button id="spond-quick-import" class="primary-button" type="button">Termine übernehmen</button>
+      </div>
+      <div id="spond-events" class="spond-events" aria-live="polite"></div>
+      <p id="spond-status" class="settings-hint" role="status" aria-live="polite"></p>
+    </section>
+    <a class="live-hub-official-link" href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
+   </section>
    <section class="dbv-calendar-panel" aria-labelledby="dbv-calendar-heading">
      <div class="section-heading"><h3 id="dbv-calendar-heading">DBV-Turnierkalender</h3><button id="dbv-calendar-refresh" class="subtle-button" type="button">Aktualisieren</button></div>
      <p class="settings-hint">Offizielle Turniere filtern und mit + für dein aktives Spielerprofil vormerken. Eine Vormerkung ist keine bestätigte Anmeldung.</p>
@@ -275,20 +289,6 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      <div id="dbv-calendar-results" class="dbv-calendar-results" aria-live="polite"></div>
      <button id="dbv-calendar-more" class="subtle-button" type="button" hidden>Weitere Turniere anzeigen</button>
      <p class="settings-hint dbv-calendar-source">Quelle: <a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offizieller DBV-Turnierkalender ↗</a>. Ausrichtender Landesverband und geografischer Spielort sind nicht immer identisch. Aktuelle Meldungen und persönliche Teilnahmen werden hier nicht behauptet.</p>
-   </section>
-   <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
-    <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
-    <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
-    <div id="official-tournament-list" class="tournament-list"></div>
-    <section class="spond-panel" aria-labelledby="spond-title">
-      <div class="spond-simple-head">
-        <div><h3 id="spond-title">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
-        <button id="spond-quick-import" class="primary-button" type="button">Termine übernehmen</button>
-      </div>
-      <div id="spond-events" class="spond-events" aria-live="polite"></div>
-      <p id="spond-status" class="settings-hint" role="status" aria-live="polite"></p>
-    </section>
-    <a class="live-hub-official-link" href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
    </section>
    <section class="live-dbv" aria-labelledby="dbv-live-title">
     <div class="live-hub-toolbar">
