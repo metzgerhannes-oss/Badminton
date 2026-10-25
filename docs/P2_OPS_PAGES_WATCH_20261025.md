@@ -1,0 +1,9 @@
+# P2 #162 · kostenlose Deployment-Betriebsüberwachung
+
+Erweitert den **bestehenden** täglich geplanten `.github/workflows/calendar-health-watch.yml`-Check (08:23 UTC), ohne neuen Cron, zusätzliche GitHub-Workflow-Minuten außerhalb dieses einen vorhandenen Laufs, Supabase-Zugriffe, Tokens, personenbezogene Daten, Import-Trigger oder Cloud-Dienst.
+
+Der vorhandene öffentliche DBV-Kalender-Check prüft weiterhin Snapshot-Frische und den letzten abgeschlossenen Import. Zusätzlich holt er mit dem bereits vorhandenen GitHub-Token (`contents:read`, `actions:read`) die jüngsten `main`-Workflow-Läufe. Der letzte relevante abgeschlossene Pages-Lauf muss `success` melden; **build**, **deploy** und **report-build-status** müssen einzeln erfolgreich abgeschlossen sein. Fehlgeschlagene Teiljobs erzeugen einen roten Workflow; durch neue Releases abgebrochene ältere Deployments gelten nicht als Fehler, wenn ein gültiger Erfolg besteht. Ruhiger Main mit länger zurückliegendem erfolgreichen Deployment löst keine künstliche Zeitwarnung aus.
+
+Acht positive/negative reine Offline-Unitfälle ergänzen die vorhandenen Tests; keine reale GitHub-API in Node-Unit/Playwright, API-Zugriff ausschließlich im zeitgesteuerten normalen Betriebswächter. **Ein roter GitHub-Actions-Status garantiert keine E-Mail- oder Push-Benachrichtigung.** Der Betreiber muss die bestehende GitHub-Actions-Benachrichtigung aktiv haben; ChatGPT-Automationsbenachrichtigungen sind derzeit abgeschaltet. Die Zustellung bleibt ein separater zu bestätigender Betriebspunkt.
+
+**Weiter offen:** tatsächliche private Supabase-Cron-Fehlerwarnung, positive vollständige autorisierte Quellenimport-Prüfung, Monats-Billing/Log-Ingestion #255 und Live-Edge-Deploy-Version; diese Nachweise werden nicht vorgetäuscht. Freigegebene App-PWA-Version bleibt unverändert, weil nur ein GitHub-Betriebsskript geändert wird.

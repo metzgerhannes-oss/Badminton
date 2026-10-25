@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Offline guard and simulated failure cases
         run: node tests/calendar-health-watch.mjs
-      - name: Check last source import and calendar age without exposing personal data
+      - name: Check source freshness and latest Pages build, deploy and report
         run: node scripts/calendar-health-watch.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
