@@ -66,7 +66,7 @@ jobs:
       - name: Targeted Chromium and WebKit smoke (R1)
         if: needs.classify.outputs.tier == 'smoke'
         run: |
-          npx playwright test tests/e2e/release-gate.spec.mjs tests/e2e/invite-only-access.spec.mjs --grep "Compact iPhone layout and dialog buttons remain operable|without an accepted invitation the app shell stays hidden" --workers=2 --retries=0 --reporter=line
+          npx playwright test tests/e2e/release-gate.spec.mjs tests/e2e/invite-only-access.spec.mjs tests/e2e/wiki.spec.mjs --grep "Compact iPhone layout and dialog buttons remain operable|without an accepted invitation the app shell stays hidden|Wiki: all 61 diagram dialogs fit 320px" --workers=2 --retries=0 --reporter=line
       - name: Preserve failing screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
