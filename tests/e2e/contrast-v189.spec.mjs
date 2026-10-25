@@ -194,6 +194,14 @@ test("v211: local club accent remains authoritative on selected mobile tab",asyn
  });
  expect(actual.current).toBe("page");
  expect(actual.branded).toBe(true);
- expect(actual.background,"Selected branded tab must not have transparent background").not.toBe("rgba(0, 0, 0, 0)");
- expect(ratio(actual.color,actual.background),"Branded selected tab").toBeGreaterThanOrEqual(4.5);
+ // The app deliberately animates background/color for 150ms. Check the final
+ // rendered club palette, not the initial transparent transition frame.
+ await expect.poll(async()=>start.evaluate(el=>getComputedStyle(el).backgroundColor),
+  {message:"Selected branded tab must finish at the configured club accent"}).toBe("rgb(22, 75, 120)");
+ await expect.poll(async()=>start.evaluate(el=>getComputedStyle(el).color),
+  {message:"Selected branded tab must finish with the configured contrast ink"}).toBe("rgb(255, 255, 255)");
+ const settled=await start.evaluate(el=>({
+  color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor
+ }));
+ expect(ratio(settled.color,settled.background),"Branded selected tab").toBeGreaterThanOrEqual(4.5);
 });
