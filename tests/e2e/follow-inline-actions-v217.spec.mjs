@@ -60,3 +60,20 @@ test("v217: pointer drag reorders the main list and persists after reload",async
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toEqual([own]);
 });
+
+test("v217: inline minus offers one-click Undo restoring previous order",async({page})=>{
+ await seed(page);
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await page.locator('[data-unfollow-inline="98-800002"]').click();
+ expect(await ids(page)).toEqual(["98-800001","98-800003"]);
+ const undo=page.locator("#toast .toast-undo");
+ await expect(undo).toBeVisible();
+ await undo.click();
+ expect(await ids(page)).toEqual(friends.map(p=>p.id));
+ await page.reload({waitUntil:"domcontentloaded"});
+ expect(await ids(page)).toEqual(friends.map(p=>p.id));
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.players).toEqual([own]);
+ await expect(page.locator("#friend-manage-details")).toHaveCount(0);
+});

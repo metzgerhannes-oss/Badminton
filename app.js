@@ -16,6 +16,16 @@ function restore(){SchmetterlingeStorage.restore(state,normalizeBookmark)}
 function save(){SchmetterlingeStorage.save(state)}
 let toastTimer;
 function toast(message){const node=el("toast");node.textContent=message;node.classList.add("visible");clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove("visible"),2800)}
+function toastUndo(message,undo){
+ const node=el("toast");if(!node)return;
+ clearTimeout(toastTimer);node.textContent=message+" · ";
+ const button=document.createElement("button");
+ button.type="button";button.className="toast-undo";button.textContent="Rückgängig";
+ button.setAttribute("aria-label","Entfolgen rückgängig machen");
+ button.addEventListener("click",()=>{clearTimeout(toastTimer);undo()});
+ node.append(button);node.classList.add("visible");
+ toastTimer=setTimeout(()=>node.classList.remove("visible"),6000);
+}
 function selectedLinks(){return SchmetterlingeBookmarks.visible(state)}
 function bookmarkPhase(t){return SchmetterlingeBookmarks.phase(t)}
 function currentProfile(){
@@ -209,10 +219,18 @@ function renderFriendQuick(){
  }));
 }
 function unfollowPlayer(id){
- const friend=state.friends.find(p=>p.id===id);
- if(!friend||!SchmetterlingeStorage.unfollow(state,id))return;
+ const index=state.friends.findIndex(p=>p.id===id);
+ if(index<0)return;
+ const friend=state.friends[index];
+ if(!SchmetterlingeStorage.unfollow(state,id))return;
  save();render();window.dispatchEvent(new Event("badminton:library-following"));
- toast(friend.name+" entfolgt");
+ toastUndo(friend.name+" entfolgt",()=>{
+  // Restore only the device-local follow and its previous position, not a family profile.
+  if(state.friends.some(p=>p.id===id))return;
+  state.friends.splice(Math.min(index,state.friends.length),0,friend);
+  save();render();window.dispatchEvent(new Event("badminton:library-following"));
+  toast(friend.name+" wieder gefolgt");
+ });
 }
 function moveFollow(id, target, focus=true){
  const query=String(el("followed-player-search")?.value||"").trim();

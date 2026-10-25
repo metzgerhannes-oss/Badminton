@@ -16,4 +16,6 @@ assert.match(library,/!own\.has\(p\.id\)&&!following\.has\(p\.id\)/,"No duplicat
 assert.match(css,/width:44px;min-width:44px;height:44px;min-height:44px/);
 assert.match(css,/touch-action:none/);
 assert.match(css,/font-size:16px/,"Prevent iOS search-input zoom");
+assert.match(app,/function toastUndo\(/);
+assert.match(app,/state\.friends\.splice\(Math\.min\(index,state\.friends\.length\),0,friend\)/);
 console.log("v217 single search, privacy-safe follow, compact action and direct reorder contract.");
