@@ -4,10 +4,10 @@ const player={id:"99-900011",name:"Synthetisches Familienprofil"};
 const uuidA="11111111-2222-4333-8444-555555555555";
 const uuidB="22222222-3333-4444-8555-666666666666";
 const link=id=>"https://dbv.turnier.de/tournament/"+id;
-const seed=page=>page.addInitScript(player=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
- players:[player],friends:[],officialLinks:[],activeProfileId:player.id,
+const seed=(page,links=[])=>page.addInitScript(({player,links})=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+ players:[player],friends:[],officialLinks:links,activeProfileId:player.id,
  chosen:player.id,historyProfilesInitialized:true
-})),player);
+})),{player,links});
 
 for(const width of [320,390,1280]){
  test("v215 "+width+"px: manual venue survives edit and reload without a source request",async({page})=>{
@@ -39,15 +39,10 @@ for(const width of [320,390,1280]){
 }
 
 test("v215: unrelated E/D tournament UUIDs never borrow each other's venue or date",async({page})=>{
- await seed(page);
- await page.addInitScript(({a,b,player})=>{
-  const key="shuttleboard-v1",s=JSON.parse(localStorage.getItem(key));
-  s.officialLinks=[
-   {id:a,url:"https://dbv.turnier.de/tournament/"+a,playerId:player.id,name:"E-RLT Musterstadt",startDate:"2026-11-15",endDate:""},
-   {id:b,url:"https://dbv.turnier.de/tournament/"+b,playerId:player.id,name:"D-RLT Musterstadt",startDate:"2026-11-22",endDate:"",place:"Offiziell nicht zugeordnete Musterhalle"}
-  ];
-  localStorage.setItem(key,JSON.stringify(s));
- },{a:uuidA,b:uuidB,player});
+ await seed(page,[
+  {id:uuidA,url:link(uuidA),playerId:player.id,name:"E-RLT Musterstadt",startDate:"2026-11-15",endDate:""},
+  {id:uuidB,url:link(uuidB),playerId:player.id,name:"D-RLT Musterstadt",startDate:"2026-11-22",endDate:"",place:"Offiziell nicht zugeordnete Musterhalle"}
+ ]);
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  const a=page.locator('[data-edit-id="'+uuidA+'"]').locator("xpath=ancestor::article");
  const b=page.locator('[data-edit-id="'+uuidB+'"]').locator("xpath=ancestor::article");
