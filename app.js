@@ -100,11 +100,19 @@ function renderTournaments(){
   const planning=t.source==="bwbv-framework";
   const calendar=t.source==="dbv-calendar"||planning;
   const venue=t.place?"Austragungsort: "+t.place:"Austragungsort nicht erfasst";
-  return '<article class="tournament-card card-open-surface"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p><p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  return '<article class="tournament-card card-open-surface"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p><p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'<button class="remove-button" data-edit-venue-id="'+esc(t.id)+'" data-edit-venue-player="'+esc(t.playerId)+'" type="button">'+(t.place?'Ort ändern':'Ort ergänzen')+'</button>':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
   if(item)openTournamentForm(item);
+ }));
+ section.querySelectorAll("[data-edit-venue-id]").forEach(button=>button.addEventListener("click",()=>{
+  const item=state.officialLinks.find(t=>t.id===button.dataset.editVenueId&&t.playerId===button.dataset.editVenuePlayer);
+  if(!item)return;
+  const dialog=el("tournament-venue-dialog");
+  dialog.dataset.tournamentId=item.id;dialog.dataset.tournamentPlayer=item.playerId;
+  el("tournament-venue-input").value=item.place||"";
+  SchmetterlingeRouter.openDialog(dialog);
  }));
  section.querySelectorAll("[data-private-invite-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.privateInviteId&&t.playerId===button.dataset.privateInvitePlayer);
@@ -734,6 +742,17 @@ function setup(){
   if(isNewFriend)showPlayerDiscover(false,false);
    save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
   if(isNewFriend)window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
+ });
+ const venueDialog=el("tournament-venue-dialog");
+ el("cancel-tournament-venue").addEventListener("click",()=>venueDialog.close());
+ el("tournament-venue-form").addEventListener("submit",event=>{
+  event.preventDefault();
+  const item=state.officialLinks.find(t=>t.id===venueDialog.dataset.tournamentId&&t.playerId===venueDialog.dataset.tournamentPlayer);
+  if(!item){venueDialog.close();return}
+  // Update only the local venue: preserve calendar ID, exact dates, profile,
+  // existing private invite grants and all unknown forward-compatible fields.
+  item.place=String(el("tournament-venue-input").value||"").trim().slice(0,120);
+  save();render();venueDialog.close();toast("Austragungsort lokal gespeichert");
  });
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());
