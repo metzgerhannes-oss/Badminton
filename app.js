@@ -330,17 +330,22 @@ function showPlayerDiscover(open=true,focus=true){
   syncFollowSearch();return;
  }
  const focusSearch=()=>{
+  if(location.hash!=="#spieler"||!el("view-spieler")?.classList.contains("active"))return;
   const input=el("followed-player-search");
   input?.focus({preventScroll:true});
   input?.scrollIntoView({block:"center",behavior:"smooth"});
  };
- if(location.hash!=="#spieler"){
-  window.addEventListener("hashchange",focusSearch,{once:true});
-  navigatePrimary("spieler");
-  // Keep the unified search usable when iOS suppresses or delays hashchange.
-  if(focus)focusSearch();
- }else if(focus)focusSearch();
+ if(location.hash!=="#spieler")navigatePrimary("spieler");
  syncFollowSearch();
+ if(focus){
+  // First focus synchronously from the tap for the iOS keyboard.
+  focusSearch();
+  // The router's queued hashchange may focus the heading afterwards.
+  // Restore the input on the next frame, even when WebKit drops hashchange.
+  requestAnimationFrame(()=>{
+   if(location.hash==="#spieler"&&document.activeElement!==el("followed-player-search"))focusSearch();
+  });
+ }
 }
 
 // The verified shared DBV roster is public; following a player is only local.
