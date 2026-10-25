@@ -141,6 +141,7 @@ jobs:
           node tests/upcoming-tournaments.mjs
           node tests/dbv-calendar.mjs
           node tests/friends.mjs
+          node tests/follow-ux-v217.mjs
           node tests/friend-home-entry.mjs
           node tests/profile-switch.mjs
           node tests/local-backup.mjs
