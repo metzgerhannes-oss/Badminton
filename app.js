@@ -230,9 +230,9 @@ function moveFollow(id, target, focus=true){
 }
 function renderFriends(){
  const root=el("friend-list");if(!root)return;
- const query=String(el("followed-player-search")?.value||"").normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("de").trim();
+ const query=String(el("followed-player-search")?.value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").trim();
  const matching=state.friends.filter(p=>!query||[p.name,p.id,p.club].some(v=>
-  String(v||"").normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("de").includes(query)));
+  String(v||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").includes(query)));
  const count=el("followed-player-count");if(count)count.textContent="("+state.friends.length+")";
  const all=el("followed-show-all");if(all)all.hidden=!query;
  root.innerHTML=matching.length?matching.map(p=>{
