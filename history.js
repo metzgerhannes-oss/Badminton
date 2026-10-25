@@ -97,8 +97,9 @@ function renderPending(){
   }).join("");
 }
 function render(){
-  const source=$("history-source"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
+  const source=$("history-source"),coverage=$("history-source-coverage"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
+  if(coverage){coverage.hidden=true;coverage.textContent=""}
   if(error){source.hidden=false;source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
   // The history opens directly with the trophies. Show a notice only if loading fails.
   source.hidden=true;
@@ -122,12 +123,17 @@ function render(){
   }
   // All sourced placements are displayed in the chronology. Only verified
   // top-four finishes produce trophies. Coverage may be incomplete.
-  source.hidden=false;
-  source.textContent=state.coverage==="device_snapshot"
+  source.hidden=true;source.textContent="";
+  // Partial-coverage notes are accessible behind the existing source disclosure.
+  // Authentication, loading and failure notices stay visibly on the page.
+  if(coverage){
+   coverage.hidden=false;
+   coverage.textContent=state.coverage==="device_snapshot"
     ?"Lokale Datenkopie vom "+new Date(state.fetchedAt).toLocaleDateString("de-DE")+": belegte Top-4-Platzierungen. Keine automatische Aktualisierung."
     :state.coverage==="sourced_placements_partial"
     ?"Belegte Platzierungen aller Ränge im aktuellen Quellenbestand. Im Trophäenschrank zählen nur bestätigte Top-4-Ergebnisse. Die Historie kann Lücken enthalten."
     :"Geschütztes Teilarchiv: Belegte Top-4-Platzierungen. Weitere Ergebnisse können fehlen.";
+  }
   const playerRecords=state.results.filter(r=>r.playerId===lastPlayer);
   // Fragment is only a display pointer; authorization always comes from the
   // exact already-granted player snapshot, never from a URL-supplied identity.
