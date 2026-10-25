@@ -32,20 +32,27 @@ function render(){
  if(root.hidden)return;
  const progressEl=$("external-match-progress"),list=$("external-match-list"),
    count=$("external-match-count"),years=$("external-match-year"),more=$("external-match-more"),
-   retry=$("external-match-retry");
+   retry=$("external-match-retry"),brief=$("external-match-brief");
  retry.hidden=!failed;
+ if(brief){brief.hidden=true;brief.textContent=""}
  if(!loaded){
-  progressEl.textContent="Öffentliche Matchbelege werden geladen …";
+  progressEl.textContent="";
+  if(brief){brief.textContent="Matchbelege werden geladen …";brief.hidden=false}
   list.innerHTML="";count.textContent="";more.hidden=true;return;
  }
  if(failed){
-  progressEl.textContent="Die historischen Einzelspiele sind gerade nicht erreichbar. Bitte erneut laden.";
+  progressEl.textContent="";
+  if(brief){brief.textContent="Die historischen Einzelspiele sind gerade nicht erreichbar. Bitte erneut laden.";brief.hidden=false}
   count.textContent="Der Datenstand kann derzeit nicht geprüft werden.";
   years.innerHTML='<option value="all">Alle Jahre</option>';
   list.innerHTML="";more.hidden=true;return;
  }
  const all=computeExternalStats(rows);
  const state=progress?.status||"";
+ if(brief&&(state==="queued"||state==="loading"||state==="checking"||partial)){
+  brief.hidden=false;
+  brief.textContent=partial?"Historische Einzelspiele: nur ein Teil der Quellen geladen.":"Quellenabgleich läuft; belegte Spiele bleiben sichtbar.";
+ }
  let info;
  if(state==="queued"||state==="loading"||state==="checking"){
   info="Der Quellenabgleich läuft. Bereits geprüfte Spiele bleiben sichtbar.";

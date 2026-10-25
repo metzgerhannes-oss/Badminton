@@ -134,7 +134,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    
     <div id="dashboard-next" class="dashboard-next"></div>
    <section id="match-stats" class="match-stats" aria-labelledby="match-stats-heading">
-    <div class="section-heading match-stats-heading"><h2 id="match-stats-heading">Meine Spielstatistik</h2><a class="home-stats-link" href="#historie">Alle Spiele ↗</a></div>
+    <div class="section-heading match-stats-heading"><h2 id="match-stats-heading">Meine Spielstatistik</h2><a class="home-stats-link" href="#historie">Komplette Statistik</a></div>
     <div id="match-stats-values" class="match-stats-values" aria-live="polite"><p class="match-stats-empty">Belegte Spiele werden geladen …</p></div>
     <span id="match-stats-source" class="match-stats-source">Bisher belegte Spiele</span>
     <details id="home-match-filter-panel" class="home-match-filter-panel"><summary>Statistik filtern</summary>
@@ -188,43 +188,22 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <a class="wiki-home-link" href="./wiki.html" aria-label="Badminton-Regeln im Wiki suchen"><span class="wiki-home-icon" aria-hidden="true">▧</span><span class="wiki-home-copy"><strong>Regeln & Wissen</strong><small>61 Grafikkarten · Suche · offline</small></span><span class="wiki-home-arrow" aria-hidden="true">↗</span></a>
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
-   <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#turniere">← Turniertag</a></div>
-   <p class="small muted">Alle belegten Einzelmatches und Turnierplatzierungen für eingeladene Nutzer. Nur bestätigte Top-4-Platzierungen zählen im Trophäenschrank.</p>
-   <details id="history-source-details" class="history-source-details">
-    <summary>Datenstand und Quellen</summary>
-     <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
-   </details>
-   <section id="external-match-history" class="external-match-history" aria-labelledby="external-match-title" hidden>
-    <div class="section-heading"><h3 id="external-match-title">Historische Einzelspiele</h3><span class="career-source-label">Badhub · Quellennachweise</span></div>
-    <p class="external-match-intro">Einzelne Begegnungen aus der öffentlichen Spielerhistorie, mit Gegner und Satzständen. Keine offiziellen DBV-Match-IDs.</p>
-    <div id="external-match-progress" class="external-match-progress" role="status" aria-live="polite"></div>
-     <button id="external-match-retry" type="button" class="outline-button" hidden>Historische Einzelspiele erneut laden</button>
-    <div class="external-match-filters">
-      <label>Jahr<select id="external-match-year"><option value="all">Alle Jahre</option></select></label>
-      <label>Disziplin<select id="external-match-discipline"><option value="all">Alle</option><option>Einzel</option><option>Doppel</option><option>Mixed</option></select></label>
-      <label>Spielart<select id="external-match-category"><option value="all">Alle</option><option value="tournament">Turniere</option><option value="league">Liga</option></select></label>
-    </div>
-    <div id="external-match-count" class="external-match-count"></div>
-    <div id="external-match-list" class="external-match-list"></div>
-    <button id="external-match-more" class="subtle-button" type="button" hidden>Weitere Spiele anzeigen</button>
-   </section>
-   <section id="career-history" class="career-history" aria-labelledby="career-heading" hidden>
-     <div class="section-heading"><h3 id="career-heading">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
-     <div id="career-summary" class="career-summary"></div>
-     <div class="career-history-filters">
-       <label>Jahr<select id="career-year"><option value="all">Alle Jahre</option></select></label>
-       <label>Disziplin der Beispiele<select id="career-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
-     </div>
-     <div id="career-years" class="career-years" aria-live="polite"></div>
-     <div id="career-highlights" class="career-highlights"></div>
-     <p id="career-citation" class="career-citation"></p>
-   </section>
+   <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#start">Zurück zur Übersicht</a></div>
    <section class="trophy-section" aria-labelledby="trophy-heading">
     <div class="section-heading"><h3 id="trophy-heading">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
     <div id="trophy-shelf" class="trophy-shelf" role="group" aria-label="Auszeichnungen nach Platzierung"></div>
     <div class="trophy-awards-heading"><h3 id="trophy-awards-heading">Auszeichnungen</h3><button id="trophy-show-all" class="subtle-button" type="button">Alle anzeigen</button></div>
     <div id="trophy-awards" class="trophy-awards" aria-live="polite"></div>
    </section>
+   
+   <details id="history-source-details" class="history-source-details">
+    <summary>Datenstand und Quellen</summary>
+     <div id="history-import-status" class="history-import-status" role="status" aria-live="polite" hidden></div>
+     <p id="history-source-coverage" class="small muted" hidden></p>
+   </details>
+
+
+
    <div id="history-source" class="notice" role="status" hidden></div>
    <div id="history-summary" class="history-summary"></div>
    <div id="history-pending" class="history-pending" aria-live="polite"></div>
@@ -238,7 +217,36 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <div id="history-timeline" class="history-timeline"></div>
    <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine belastbare Verlaufsgrafik benötigt mehrere datierte Ranglistenstände. Platzierungen unterschiedlicher Altersklassen werden nicht miteinander vermischt.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Offizielle DBV-Rangliste öffnen ↗</a></div>
   </section>
-  <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
+
+   <section id="career-history" class="career-history" aria-labelledby="career-heading" hidden>
+     <div class="section-heading"><h3 id="career-heading">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
+     <div id="career-summary" class="career-summary"></div>
+     <div class="career-history-filters">
+       <label>Jahr<select id="career-year"><option value="all">Alle Jahre</option></select></label>
+       <label>Disziplin der Beispiele<select id="career-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
+     </div>
+     <div id="career-years" class="career-years" aria-live="polite"></div>
+     <div id="career-highlights" class="career-highlights"></div>
+     <p id="career-citation" class="career-citation"></p>
+   </section>
+   <section id="external-match-history" class="external-match-history" aria-labelledby="external-match-title" hidden>
+    <div class="section-heading"><h3 id="external-match-title">Historische Einzelspiele</h3><span class="career-source-label">Badhub · Quellennachweise</span></div>
+    <p class="external-match-intro">Einzelne Begegnungen aus der öffentlichen Spielerhistorie, mit Gegner und Satzständen. Keine offiziellen DBV-Match-IDs.</p>
+    <p id="external-match-brief" class="external-match-brief" role="status" aria-live="polite" hidden></p>
+    <details id="external-match-source-details" class="external-match-source-details">
+     <summary>Quellenstand und Abweichungen anzeigen</summary>
+     <div id="external-match-progress" class="external-match-progress" role="status" aria-live="polite"></div>
+    </details>
+     <button id="external-match-retry" type="button" class="outline-button" hidden>Historische Einzelspiele erneut laden</button>
+    <div class="external-match-filters">
+      <label>Jahr<select id="external-match-year"><option value="all">Alle Jahre</option></select></label>
+      <label>Disziplin<select id="external-match-discipline"><option value="all">Alle</option><option>Einzel</option><option>Doppel</option><option>Mixed</option></select></label>
+      <label>Spielart<select id="external-match-category"><option value="all">Alle</option><option value="tournament">Turniere</option><option value="league">Liga</option></select></label>
+    </div>
+    <div id="external-match-count" class="external-match-count"></div>
+    <div id="external-match-list" class="external-match-list"></div>
+    <button id="external-match-more" class="subtle-button" type="button" hidden>Weitere Spiele anzeigen</button>
+   </section>  <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
    <div class="section-heading"><h2 id="heading-turniere">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
    <p class="live-hub-lead">Dein Spieltag auf einen Blick.</p>
    <div class="tournament-shortcuts" id="tournament-shortcuts" role="group" aria-label="Turniere schnell öffnen">
