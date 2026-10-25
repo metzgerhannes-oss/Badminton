@@ -21,3 +21,21 @@
 .arcade-message{min-height:2.5em;font-weight:700;text-align:center}
 .arcade-footnote{font-size:12px}
 @media(max-width:350px){.arcade-shell{padding:10px}.arcade-entry{flex-wrap:wrap}.arcade-entry .outline-button{width:100%}}
+
+.arcade-game-choice{max-width:650px;margin:10px auto 0;color:#eaf5ff}
+.arcade-game-choice label{display:grid;gap:7px;font-weight:700;font-size:14px}
+.arcade-game-choice select{background:#102a49;color:#fff;border:1px solid #82b7dd;border-radius:10px;padding:11px;min-height:44px;font:inherit}
+.arcade-game-choice select:focus-visible{outline:3px solid #b7f4ff;outline-offset:3px}
+.arcade-shell[hidden]{display:none}
+.arcade-2048-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:6px;width:min(100%,420px);aspect-ratio:1;margin:12px auto;padding:7px;background:#09203b;border:2px solid #72b7d8;border-radius:10px;touch-action:none;user-select:none}
+.arcade-2048-cell{display:grid;place-items:center;min-width:0;min-height:0;overflow:hidden;border-radius:7px;background:#234260;color:#fff;font-size:clamp(18px,5.5vw,30px);font-weight:800;font-variant-numeric:tabular-nums}
+.arcade-2048-cell[data-value="2"],.arcade-2048-cell[data-value="4"]{background:#d5e5ef;color:#153049}
+.arcade-2048-cell[data-value="8"],.arcade-2048-cell[data-value="16"]{background:#b5d8ef;color:#12304d}
+.arcade-2048-cell[data-value="32"],.arcade-2048-cell[data-value="64"]{background:#81c9df;color:#09283e}
+.arcade-2048-cell[data-value="128"],.arcade-2048-cell[data-value="256"]{background:#4cabc4;color:#fff}
+.arcade-2048-cell[data-value="512"],.arcade-2048-cell[data-value="1024"],.arcade-2048-cell[data-value="2048"]{background:#2b8ba6;color:#fff;font-size:clamp(16px,4.7vw,26px)}
+.arcade-2048-cell[data-value="4096"],.arcade-2048-cell[data-value="8192"]{font-size:clamp(15px,4.5vw,24px)}
+.arcade-controls [data-2048-direction="up"]{grid-column:2;grid-row:1}
+.arcade-controls [data-2048-direction="left"]{grid-column:1;grid-row:2}
+.arcade-controls [data-2048-direction="down"]{grid-column:2;grid-row:2}
+.arcade-controls [data-2048-direction="right"]{grid-column:3;grid-row:2}

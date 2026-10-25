@@ -58,6 +58,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
 <script defer src="./matchday-view.js"></script>
 <script defer src="./app.js"></script>
 <script type="module" src="./spiele.js"></script>
+<script type="module" src="./spiele-2048.js"></script>
 <script defer src="./desktop-context-v173.js"></script>
 <script defer src="./settings-rooms.js"></script>
 <script type="module" src="./onboarding-wizard.js"></script>
@@ -398,9 +399,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </section>
   <section class="page" id="view-spiele" aria-labelledby="heading-spiele">
    <div class="section-heading"><h2 id="heading-spiele">Spielecke · Zeit bis zum nächsten Spiel?</h2><a class="outline-button" href="#turniere">← Turniertag</a></div>
-   <div class="arcade-shell">
+   <div class="arcade-game-choice"><label for="arcade-game">Spiel auswählen
+    <select id="arcade-game" aria-label="Spiel auswählen"><option value="snake">Snake · 120 Sekunden</option><option value="2048">2048 · 180 Sekunden</option></select>
+   </label></div>
+   <div class="arcade-shell" id="arcade-snake-shell">
     <h2>Snake · 120 Sekunden</h2>
-    <p>20 × 20 Felder · 10 Punkte je Futter · festes Tempo. Dein Rekord bleibt privat auf diesem Gerät. 2048 und Pong folgen separat.</p>
+    <p>20 × 20 Felder · 10 Punkte je Futter · festes Tempo. Dein Rekord bleibt privat auf diesem Gerät. Pong folgt separat.</p>
     <label for="arcade-profile">Für welches eigene Spielerprofil?
      <select id="arcade-profile" aria-label="Eigenes Spielerprofil für Snake"></select>
     </label>
@@ -427,6 +431,35 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      <button type="button" id="arcade-exit">Beenden · zum Turniertag</button>
     </div>
     <p class="arcade-footnote">Wischen oder Pfeiltasten/WASD. App-Wechsel pausiert automatisch. Abbruch und Neustart speichern keinen Punktestand. Keine Rangliste, keine Cloud-Anfragen.</p>
+   </div>
+   <div class="arcade-shell" id="arcade-2048-shell" hidden>
+    <h2>2048 · 180 Sekunden</h2>
+    <p>4 × 4 Felder · gleiche Kacheln zusammenführen · klassische 2048-Punkte. Dein Rekord bleibt privat auf diesem Gerät.</p>
+    <label for="arcade-2048-profile">Für welches eigene Spielerprofil?
+     <select id="arcade-2048-profile" aria-label="Eigenes Spielerprofil für 2048"></select>
+    </label>
+    <p id="arcade-2048-no-profile" hidden>Kein eigenes Profil vorhanden. <a href="#einstellungen/profile">Eigenes Profil einrichten →</a></p>
+    <div class="arcade-stats" aria-label="2048 Spielstand">
+     <div><small>Punkte</small><strong id="arcade-2048-score">0</strong></div>
+     <div><small>Zeit</small><strong id="arcade-2048-time">180 s</strong></div>
+     <div><small>Mein Rekord</small><strong id="arcade-2048-best">0</strong></div>
+    </div>
+    <p class="arcade-message" id="arcade-2048-status" role="status" aria-live="polite">Bereit für 2048.</p>
+    <div id="arcade-2048-board" class="arcade-2048-board" role="grid" aria-label="2048-Spielfeld mit vier Zeilen und vier Spalten; Pfeiltasten oder wischen"></div>
+    <div class="arcade-controls" role="group" aria-label="2048 steuern">
+     <button type="button" data-2048-direction="up" aria-label="Nach oben">↑</button>
+     <button type="button" data-2048-direction="left" aria-label="Nach links">←</button>
+     <button type="button" data-2048-direction="down" aria-label="Nach unten">↓</button>
+     <button type="button" data-2048-direction="right" aria-label="Nach rechts">→</button>
+    </div>
+    <div class="arcade-actions">
+     <button type="button" id="arcade-2048-start">3 · 2 · 1 · Start</button>
+     <button type="button" id="arcade-2048-pause" hidden>Pause</button>
+     <button type="button" id="arcade-2048-resume" hidden>Fortsetzen</button>
+     <button type="button" id="arcade-2048-restart" disabled>Neustart</button>
+     <button type="button" id="arcade-2048-exit">Beenden · zum Turniertag</button>
+    </div>
+    <p class="arcade-footnote">Wischen oder Pfeiltasten. App-Wechsel pausiert automatisch. Abbruch und Neustart speichern keinen Punktestand. Keine Rangliste, keine Cloud-Anfragen.</p>
    </div>
   </section>
   <section class="page" id="view-berichte" aria-labelledby="heading-berichte">

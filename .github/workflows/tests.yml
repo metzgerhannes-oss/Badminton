@@ -89,6 +89,8 @@ jobs:
           node --check scripts/today-evidence.mjs
           node --check spiele.js
           node --check games/snake.mjs
+          node --check games/2048.mjs
+          node --check spiele-2048.js
           node --check scripts/today-presentation.mjs
           node --check teams.js
           node --check scripts/team-directory-utils.mjs
@@ -144,6 +146,7 @@ jobs:
           node tests/profile-transitions.mjs
           node tests/router.mjs
           node tests/arcade-snake.mjs
+          node tests/arcade-2048.mjs
           node tests/charlotte-profile.mjs
           node tests/dashboard.mjs
           node tests/ranking-points.mjs
