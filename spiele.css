@@ -39,3 +39,5 @@
 .arcade-controls [data-2048-direction="left"]{grid-column:1;grid-row:2}
 .arcade-controls [data-2048-direction="down"]{grid-column:2;grid-row:2}
 .arcade-controls [data-2048-direction="right"]{grid-column:3;grid-row:2}
+
+#arcade-pong-board{display:block;width:min(100%,420px);height:auto;aspect-ratio:5/3;margin:12px auto;border:2px solid #72b7d8;border-radius:9px;touch-action:none;user-select:none}
