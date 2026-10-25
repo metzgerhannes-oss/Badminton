@@ -47,7 +47,7 @@ for(const [hash,destination]of [
  "Existing bookmark must redirect to its canonical destination: "+hash);
 for(const id of ["profile-list","owner-admin-panel","owner-activation-setup",
  "app-language","club-branding-form","invite-share","backup-export",
- "backup-restore","friend-settings-list","team-settings-list"]){
+ "backup-restore","followed-player-search","team-settings-list"]){
  assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1,
  "Do not create duplicates or remove existing controls: "+id);
 }
