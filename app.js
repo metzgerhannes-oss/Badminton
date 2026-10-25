@@ -101,7 +101,10 @@ function renderTournaments(){
   const calendar=t.source==="dbv-calendar"||planning;
   const venue=t.place?"Austragungsort: "+t.place:"Austragungsort nicht erfasst";
   const deadline=t.deadline?'<p class="saved-tournament-deadline">Meldeschluss: '+esc(niceDay(t.deadline))+'</p>':"";
-  return '<article class="tournament-card card-open-surface"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p>'+deadline+'<p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  const discrepancy=tournamentSourceConflicts.get(t.id+"|"+t.playerId);
+  const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+'. DBV-Spieltag: '+esc(niceDay(discrepancy.officialDate))+(
+   discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+'. Angaben prüfen.</p>':"";
+  return '<article class="tournament-card card-open-surface"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p>'+deadline+sourceNote+'<p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
@@ -467,6 +470,7 @@ function render(){
  SchmetterlingeRouter.renderPage(state);
 }
 let editing=null;
+const tournamentSourceConflicts=new Map();
 function openTournamentForm(item=null){
  const dialog=el("tournament-dialog");
  const form=el("tournament-form");form.reset();
@@ -736,6 +740,20 @@ function setup(){
   if(isNewFriend)showPlayerDiscover(false,false);
    save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
   if(isNewFriend)window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
+ });
+ window.addEventListener("badminton:dbv-calendar-loaded",event=>{
+  const entries=event.detail?.entries;
+  if(!Array.isArray(entries)||!entries.length)return;
+  let changed=false;
+  tournamentSourceConflicts.clear();
+  state.officialLinks=state.officialLinks.map(bookmark=>{
+   const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(bookmark,entries);
+   if(result.status==="conflict")tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,result);
+   if(result.status==="matched"&&result.updated!==bookmark){changed=true;return result.updated}
+   return bookmark;
+  });
+  if(changed)save();
+  render();
  });
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());
