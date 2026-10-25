@@ -36,3 +36,7 @@ assert.match(html,/id="tournament-shortcuts"[^>]*role="group"/,"Direct turnier q
 assert.match(html,/id="dbv-calendar-advanced" class="dbv-calendar-advanced"/,"Advanced facets can be collapsed");
 assert.ok(html.indexOf('id="my-tournaments-title"')<html.indexOf('id="dbv-calendar-heading"'),"Personal dates precede tournament directory");
 assert.ok(html.indexOf('id="dbv-calendar-heading"')<html.indexOf('class="live-dbv"'),"Calendar search precedes live detail");
+
+for(const id of ["friend-order-done","team-order-done"]){
+ assert.match(html,new RegExp('id="'+id+'"[^>]*type="button"'),"Explicit sorted-list Finish button");
+}

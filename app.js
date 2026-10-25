@@ -692,6 +692,10 @@ function setup(){
  window.openFriendForm=openFriendForm;
  el("dashboard-add-friend")?.addEventListener("click",event=>{event.preventDefault();showPlayerDiscover(true)});
  el("dashboard-friends-manage")?.addEventListener("click",()=>showPlayerDiscover(false,false));
+ el("friend-order-done")?.addEventListener("click",()=>{
+  const details=el("friend-manage-details");if(!details)return;
+  details.open=false;details.querySelector("summary")?.focus({preventScroll:true});
+ });
  el("friend-order-reset")?.addEventListener("click",()=>{
   if(state.friends.length<2)return;
   const before=state.friends.slice();
