@@ -118,7 +118,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v211" title="Version v211">v211</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v212" title="Version v212">v212</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -241,6 +241,10 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
    <div class="section-heading"><h2 id="heading-turniere">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
    <p class="live-hub-lead">Dein Spieltag auf einen Blick.</p>
+   <div class="tournament-shortcuts" id="tournament-shortcuts" role="group" aria-label="Turniere schnell öffnen">
+    <button type="button" data-tournament-shortcut="saved">Meine Turniere</button>
+    <button type="button" data-tournament-shortcut="find">Turnier finden</button>
+   </div>
    <section class="today-evidence" id="today-tournament" aria-label="Heute im Einsatz · Spieler und Mannschaften" hidden>
  <div data-today-cards aria-label="Heutige Spieler- und Mannschaftsereignisse"></div>
 </section>
@@ -250,6 +254,42 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </div>
     <a class="history-inline-link" href="#historie">Turnierhistorie und Auszeichnungen ansehen ↗</a>
      <a class="history-inline-link live-tournaments-return" href="#turniere"><span aria-hidden="true">←</span> <span>Turniere</span></a>
+   <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
+    <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
+    <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
+    <div id="official-tournament-list" class="tournament-list"></div>
+    <section class="spond-panel" aria-labelledby="spond-title">
+      <div class="spond-simple-head">
+        <div><h3 id="spond-title">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
+        <button id="spond-quick-import" class="primary-button" type="button">Termine übernehmen</button>
+      </div>
+      <div id="spond-events" class="spond-events" aria-live="polite"></div>
+      <p id="spond-status" class="settings-hint" role="status" aria-live="polite"></p>
+    </section>
+    <a class="live-hub-official-link" href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
+   </section>
+   <section class="dbv-calendar-panel" aria-labelledby="dbv-calendar-heading">
+     <div class="section-heading"><h3 id="dbv-calendar-heading">DBV-Turnierkalender</h3><button id="dbv-calendar-refresh" class="subtle-button" type="button">Aktualisieren</button></div>
+     <p class="settings-hint">Offizielle Turniere filtern und mit + für dein aktives Spielerprofil vormerken. Eine Vormerkung ist keine bestätigte Anmeldung.</p>
+     <label class="dbv-calendar-quick-search" for="dbv-calendar-q">Turnier oder Ort suchen
+      <input id="dbv-calendar-q" type="search" placeholder="Name oder Ort" autocomplete="off">
+     </label>
+     <details id="dbv-calendar-advanced" class="dbv-calendar-advanced">
+      <summary id="dbv-calendar-advanced-summary">Weitere Filter</summary>
+      <div class="dbv-calendar-filters" role="group" aria-label="DBV-Turniere filtern">
+       <label>Jahr<select id="dbv-calendar-year"><option value="all">Alle Jahre</option></select></label>
+       <label>Bundesland / Verband<select id="dbv-calendar-region"><option value="all">Alle Regionen</option></select></label>
+       <label>Altersklasse<select id="dbv-calendar-age"><option value="all">Alle Altersklassen</option></select></label>
+       <label>Level<select id="dbv-calendar-level"><option value="all">Alle Level</option></select></label>
+       <label>Zeitraum<select id="dbv-calendar-period"><option value="upcoming">Bevorstehend</option><option value="all">Alle importierten</option></select></label>
+       <label>Gruppieren nach<select id="dbv-calendar-group"><option value="region">Bundesland / Verband</option><option value="age">Altersklasse</option><option value="level">Level</option><option value="date">Chronologisch</option></select></label>
+      </div>
+     </details>
+     <p id="dbv-calendar-status" class="settings-hint" role="status" aria-live="polite">DBV-Turniere werden geladen …</p>
+     <div id="dbv-calendar-results" class="dbv-calendar-results" aria-live="polite"></div>
+     <button id="dbv-calendar-more" class="subtle-button" type="button" hidden>Weitere Turniere anzeigen</button>
+     <p class="settings-hint dbv-calendar-source">Quelle: <a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offizieller DBV-Turnierkalender ↗</a>. Ausrichtender Landesverband und geografischer Spielort sind nicht immer identisch. Aktuelle Meldungen und persönliche Teilnahmen werden hier nicht behauptet.</p>
+   </section>
    <section class="live-dbv" aria-labelledby="dbv-live-title">
     <div class="live-hub-toolbar">
      <label for="live-player-select">Wen möchtest du verfolgen?</label>
@@ -346,37 +386,6 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      <p>Die Spielerkacheln zeigen nur öffentliche Badhub-Daten eigener und gefolgter Spieler (maximal sechs, bedarfsgesteuert). Der offizielle Turniermatch-Bereich zeigt ausschließlich verifiziert importierte DBV-Matches. Die beiden Quellen werden nicht zu einem vermeintlich vollständigen Turnier-Spielplan vermischt. Bei über zwei Minuten alten Spielersnapshots erscheinen keine Live-Sätze.</p>
     </details>
 
-   </section>
-   <section class="dbv-calendar-panel" aria-labelledby="dbv-calendar-heading">
-     <div class="section-heading"><h3 id="dbv-calendar-heading">DBV-Turnierkalender</h3><button id="dbv-calendar-refresh" class="subtle-button" type="button">Aktualisieren</button></div>
-     <p class="settings-hint">Offizielle Turniere filtern und mit + für dein aktives Spielerprofil vormerken. Eine Vormerkung ist keine bestätigte Anmeldung.</p>
-     <div class="dbv-calendar-filters" role="group" aria-label="DBV-Turniere filtern">
-       <label>Jahr<select id="dbv-calendar-year"><option value="all">Alle Jahre</option></select></label>
-       <label>Bundesland / Verband<select id="dbv-calendar-region"><option value="all">Alle Regionen</option></select></label>
-       <label>Altersklasse<select id="dbv-calendar-age"><option value="all">Alle Altersklassen</option></select></label>
-       <label>Level<select id="dbv-calendar-level"><option value="all">Alle Level</option></select></label>
-       <label>Zeitraum<select id="dbv-calendar-period"><option value="upcoming">Bevorstehend</option><option value="all">Alle importierten</option></select></label>
-       <label>Gruppieren nach<select id="dbv-calendar-group"><option value="region">Bundesland / Verband</option><option value="age">Altersklasse</option><option value="level">Level</option><option value="date">Chronologisch</option></select></label>
-       <label class="dbv-calendar-search">Suche<input id="dbv-calendar-q" type="search" placeholder="Turnier oder Ort" autocomplete="off"></label>
-     </div>
-     <p id="dbv-calendar-status" class="settings-hint" role="status" aria-live="polite">DBV-Turniere werden geladen …</p>
-     <div id="dbv-calendar-results" class="dbv-calendar-results" aria-live="polite"></div>
-     <button id="dbv-calendar-more" class="subtle-button" type="button" hidden>Weitere Turniere anzeigen</button>
-     <p class="settings-hint dbv-calendar-source">Quelle: <a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offizieller DBV-Turnierkalender ↗</a>. Ausrichtender Landesverband und geografischer Spielort sind nicht immer identisch. Aktuelle Meldungen und persönliche Teilnahmen werden hier nicht behauptet.</p>
-   </section>
-   <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
-    <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
-    <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
-    <div id="official-tournament-list" class="tournament-list"></div>
-    <section class="spond-panel" aria-labelledby="spond-title">
-      <div class="spond-simple-head">
-        <div><h3 id="spond-title">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
-        <button id="spond-quick-import" class="primary-button" type="button">Termine übernehmen</button>
-      </div>
-      <div id="spond-events" class="spond-events" aria-live="polite"></div>
-      <p id="spond-status" class="settings-hint" role="status" aria-live="polite"></p>
-    </section>
-    <a class="live-hub-official-link" href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
    </section>
    <aside class="desktop-tournament-context" id="desktop-tournament-context" aria-labelledby="desktop-tournament-context-heading">
     <section class="desktop-context-group" aria-labelledby="desktop-tournament-context-heading">

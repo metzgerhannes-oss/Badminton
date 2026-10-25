@@ -362,3 +362,30 @@
 
 /* Historical verified DBV rows are result records, not new registrations. */
 .dbv-calendar-entry--history .dbv-calendar-save{display:none}
+
+
+/* UX2 C1: selected Turniere opens personal saved dates and a single primary search.
+   The verified matchday stays its own #live context route; desktop navy is intact. */
+.tournament-shortcuts{display:none}
+.dbv-calendar-quick-search{display:grid;gap:6px;margin:11px 0 13px;
+ color:#254862;font-weight:750;font-size:14px;line-height:1.4}
+.dbv-calendar-quick-search input{width:100%;min-width:0;min-height:46px;border:1px solid #9bbdd1;
+ border-radius:12px;background:#f8fcff;color:#153b57;font:inherit;font-size:16px;padding:10px 12px}
+.dbv-calendar-advanced{margin:0 0 10px}
+.dbv-calendar-advanced>summary{display:flex;align-items:center;min-height:44px;
+ cursor:pointer;font-size:13px;font-weight:750;color:#155779;list-style:revert}
+.dbv-calendar-advanced .dbv-calendar-filters{margin:3px 0 12px}
+.dbv-calendar-quick-search input:focus-visible,.dbv-calendar-advanced>summary:focus-visible,
+.tournament-shortcuts button:focus-visible{outline:3px solid #117ab9;outline-offset:2px}
+#view-turniere #my-tournaments-title,#view-turniere #dbv-calendar-heading,
+#view-turniere #dbv-calendar-q{scroll-margin-top:18px}
+.app[data-current-view="live"] #view-turniere .dbv-calendar-panel{display:none}
+@media(max-width:1079px){
+ .app[data-current-view="turniere"] #view-turniere .tournament-shortcuts{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0 10px}
+ .tournament-shortcuts button{min-height:46px;border:1px solid #8db8d1;
+  border-radius:12px;background:#f5fbff;color:#154f74;font:inherit;
+  font-size:13px;font-weight:800;padding:9px 7px}
+ .tournament-shortcuts button:active{background:#e3f2fc}
+}
+@media(prefers-reduced-motion:reduce){.tournament-shortcuts button{transition:none}}

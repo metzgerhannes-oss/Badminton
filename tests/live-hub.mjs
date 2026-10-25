@@ -18,8 +18,9 @@ const start=html.indexOf('id="view-turniere"'),finish=html.indexOf('id="view-ber
 const tournament=html.slice(start,finish);
 assert.ok(tournament.indexOf('id="live-player-select"')<tournament.indexOf('id="live-radar-content"'),
  "Player selection precedes live score");
-assert.ok(tournament.indexOf('id="live-radar-content"')<tournament.indexOf('id="official-tournament-list"'),
- "Live view precedes bookmarks");
+assert.ok(tournament.indexOf('id="official-tournament-list"')<tournament.indexOf('id="dbv-calendar-q"')&&
+ tournament.indexOf('id="dbv-calendar-q"')<tournament.indexOf('id="live-radar-content"'),
+ "UX2 C1: saved personal events and calendar search precede live detail");
 assert.ok(tournament.indexOf('id="dbv-live-advanced"')<tournament.indexOf('id="dbv-live-results"'),
  "Unused DBV query behind details");
 assert.equal((tournament.match(/id="live-radar-refresh"/g)||[]).length,1);
