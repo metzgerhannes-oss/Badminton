@@ -179,11 +179,21 @@ test("v211: source link ink meets AA on actual light report card",async({page})=
 test("v211: local club accent remains authoritative on selected mobile tab",async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
- const actual=await page.locator('.bottom-nav a[data-page="start"]').evaluate(el=>{
+ // A club accent belongs to the selected tab only. DOMContentLoaded is not
+ // enough: the async router still has to mark this route as aria-current.
+ const start=page.locator('.bottom-nav a[data-page="start"]');
+ await expect(page.locator("#view-start")).toBeVisible();
+ await expect(start).toHaveAttribute("aria-current","page");
+ const actual=await start.evaluate(el=>{
   document.documentElement.classList.add("club-themed");
   document.documentElement.style.setProperty("--club-accent","#164b78");
   document.documentElement.style.setProperty("--club-contrast","#ffffff");
-  return {color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor};
+  return {color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor,
+   current:el.getAttribute("aria-current"),
+   branded:document.documentElement.classList.contains("club-themed")};
  });
+ expect(actual.current).toBe("page");
+ expect(actual.branded).toBe(true);
+ expect(actual.background,"Selected branded tab must not have transparent background").not.toBe("rgba(0, 0, 0, 0)");
  expect(ratio(actual.color,actual.background),"Branded selected tab").toBeGreaterThanOrEqual(4.5);
 });
