@@ -51,7 +51,7 @@ function renderFiveScores(entry){
  }
  const rows=raw.map((result,i)=>{
   const href=/^https:\/\/(?:dbv\.turnier\.de|www\.turnier\.de|turnier\.de)\/tournament\/[a-f0-9-]+\/?$/i.test(result.url||"")?result.url:null;
-  return '<div class="ranking-score-row"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><strong>'+escape(result.name)+'</strong><small>'+escape(result.date)+'</small></span><strong class="ranking-score-value">'+num(result.points)+'</strong>'+(href?'<a class="ranking-score-link" href="'+escape(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Turnier öffnen">↗</a>':'')+'</div>';
+  return '<div class="ranking-score-row'+(href?' card-open-surface':'')+'"><span class="ranking-score-position">'+(i+1)+'</span><span class="ranking-score-event"><strong>'+escape(result.name)+'</strong><small>'+escape(result.date)+'</small></span><strong class="ranking-score-value">'+num(result.points)+'</strong>'+(href?'<a class="ranking-score-link card-open-primary" href="'+escape(href)+'" target="_blank" rel="noopener noreferrer" aria-label="Turnier öffnen">↗</a>':'')+'</div>';
  }).join("");
  return '<section class="ranking-score-section" aria-label="Verifizierte Ranglistenwertungen">'+
   '<div class="ranking-score-head"><h3>Die besten '+raw.length+' Wertungen</h3><span>letzte 12 Monate</span></div>'+

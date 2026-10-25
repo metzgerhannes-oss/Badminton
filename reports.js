@@ -57,12 +57,12 @@ import {getPrivateSession} from "./private-invites.js";
   }
   box.innerHTML=matches.map(a=>{
    const link=safeUrl(a.url),type=CATEGORIES[a.report_sources?.category]||"Bericht";
-   return '<article class="report-card">'+
+   return '<article class="report-card'+(link?' card-open-surface':'')+'">'+
      '<div class="report-card-meta"><span>'+esc(a.report_sources?.name||type)+'</span><time>'+esc(date(a.published_on))+'</time></div>'+
      '<h3>'+esc(a.title)+'</h3>'+
      (a.summary?'<p>'+esc(a.summary)+'</p>':"")+
      '<div class="report-card-footer"><span>'+esc(mentions.has(a.id)?"Spieler namentlich erwähnt":type)+'</span>'+
-     (link?'<a href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">Originalbericht öffnen ↗</a>':"")+'</div>'+
+     (link?'<a class="card-open-primary" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">Originalbericht öffnen ↗</a>':"")+'</div>'+
      '</article>';
   }).join("");
  }

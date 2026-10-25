@@ -98,3 +98,26 @@
   transition:none!important;
  }
 }
+
+/* UX2 v214: whole-card primary action, with independent secondary controls. */
+.app .card-open-surface{position:relative;min-width:0;isolation:isolate}
+.app .card-open-surface:has(.card-open-primary){cursor:pointer}
+.app .card-open-surface .card-open-primary{position:static}
+.app .card-open-surface .card-open-primary::after{
+ content:"";position:absolute;inset:0;z-index:1;cursor:pointer
+}
+.app .card-open-surface :is(a,button,summary,input,select,textarea):not(.card-open-primary){
+ position:relative;z-index:2
+}
+.app .card-open-surface:has(.card-open-primary:focus-visible){
+ outline:3px solid #1590c7;outline-offset:2px
+}
+.app .card-open-surface .card-open-primary:focus-visible{outline-offset:3px}
+.app .card-open-surface .card-open-plain{
+ display:block;width:0;height:0;min-width:0;min-height:0;
+ margin:0;padding:0;border:0;background:transparent;opacity:0
+}
+@media(hover:hover){
+ .app .card-open-surface:has(.card-open-primary:hover){box-shadow:0 3px 12px #234f762b}
+}
+@media(prefers-reduced-motion:reduce){.app .card-open-surface{transition:none}}

@@ -17,7 +17,7 @@ function render(roster,rows,remaining,error=""){
   return;
  }
  for(const card of followedCards(roster,rows)){
-  const tile=node("article","followed-live-card"+(card.kind==="current"?" followed-live-current":""));
+  const tile=node("article","followed-live-card card-open-surface"+(card.kind==="current"?" followed-live-current":""));
   const head=node("div","followed-live-card-head");
   head.appendChild(node("strong","",card.name));
   const mark=node("span","followed-live-role",card.roleLabel);head.appendChild(mark);
@@ -35,7 +35,7 @@ function render(roster,rows,remaining,error=""){
    tile.appendChild(node("small","followed-live-time","Badhub · Stand "+stamp));
   }
   const actions=node("div","followed-live-actions");
-  const detail=node("button","followed-live-detail-button","Meine Spiele ansehen");
+  const detail=node("button","followed-live-detail-button card-open-primary","Meine Spiele ansehen");
   detail.type="button";detail.addEventListener("click",()=>{
    if(window.badmintonSelectViewer?.(card.id,{stayOnPage:true})){
     document.querySelector('[data-matchday-view="mine"]')?.click();
