@@ -27,7 +27,8 @@ for(const width of [320,390]){
   const search=page.locator("#followed-player-search");
   await search.fill("Alpha");
   await expect(page.locator("#friend-list [data-follow-row]")).toHaveCount(1);
-  await expect(page.locator('[data-friend-grip="98-800001"]')).toBeDisabled();
+  await expect(page.locator('[data-friend-grip="98-800001"]')).toHaveCount(0);
+  await expect(page.locator('[data-edit-friend="98-800001"]')).toBeEnabled();
   await search.fill("");
   expect(await ids(page)).toEqual(friends.map(p=>p.id));
   const before=await page.evaluate(()=>location.hash);

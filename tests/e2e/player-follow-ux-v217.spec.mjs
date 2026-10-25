@@ -24,7 +24,8 @@ for(const width of [320,390,1280]){
   await search.fill("Anna");
   await expect(page.locator("#friend-list [data-follow-row]")).toHaveCount(1);
   await expect(page.locator("#player-discover")).toBeVisible();
-  await expect(page.locator("[data-friend-grip]")).toBeDisabled();
+  await expect(page.locator("[data-friend-grip]")).toHaveCount(0);
+  await expect(page.locator("[data-edit-friend]")).toBeEnabled();
   await search.fill("");
   expect(await order()).toEqual(["98-920002","98-920004","98-920003"]);
   await page.locator('[data-unfollow-inline="98-920004"]').click();

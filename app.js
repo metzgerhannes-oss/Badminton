@@ -260,13 +260,21 @@ function renderFriends(){
    '<span class="friend-avatar" aria-hidden="true">'+esc(p.name.trim().charAt(0).toUpperCase())+'</span>'+
    '<span class="friend-details"><strong>'+esc(p.name)+'</strong><small>DBV '+esc(p.id)+(p.club?' · '+esc(p.club):'')+'</small></span>'+
    '<span class="follow-item-arrow" aria-hidden="true">›</span></button>'+
-   '<button type="button" class="followed-reorder-grip" data-friend-grip="'+esc(p.id)+'" '+(query?'disabled':'')+
-    ' aria-label="'+esc(p.name)+' sortieren: ziehen oder Pfeiltasten nach oben oder unten" title="Ziehen oder Pfeiltasten">⠿</button>'+
+   (query
+    ?'<button type="button" class="followed-reorder-grip" data-edit-friend="'+esc(p.id)+'"'+
+      ' aria-label="'+esc(p.name)+' Angaben bearbeiten" title="Spielerangaben bearbeiten">✎</button>'
+    :'<button type="button" class="followed-reorder-grip" data-friend-grip="'+esc(p.id)+'"'+
+      ' aria-label="'+esc(p.name)+' sortieren: ziehen oder Pfeiltasten nach oben oder unten" title="Ziehen oder Pfeiltasten">⠿</button>')+
    '<button type="button" class="followed-inline-remove" data-unfollow-inline="'+esc(p.id)+'" aria-label="'+esc(p.name)+' entfolgen">−</button></article>';
  }).join(""):'<p class="team-empty">'+(state.friends.length?"Keine gefolgten Spieler zu dieser Suche.":"Noch keine gefolgten Spieler. Suche oben nach Namen oder DBV-ID.")+'</p>';
  root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend)));
  root.querySelectorAll("[data-unfollow-inline]").forEach(b=>b.addEventListener("click",ev=>{
   ev.preventDefault();ev.stopPropagation();unfollowPlayer(b.dataset.unfollowInline);
+ }));
+ root.querySelectorAll("[data-edit-friend]").forEach(b=>b.addEventListener("click",ev=>{
+  ev.preventDefault();ev.stopPropagation();
+  const player=state.friends.find(p=>p.id===b.dataset.editFriend);
+  if(player)window.openFriendForm?.(player);
  }));
  root.querySelectorAll("[data-friend-grip]").forEach(b=>{
   b.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation()});
