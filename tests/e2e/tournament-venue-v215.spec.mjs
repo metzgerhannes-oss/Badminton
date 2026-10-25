@@ -23,7 +23,7 @@ for(const width of [320,390,1280]){
   await page.locator("#tournament-save").click();
   const card=page.locator("#official-tournament-list .tournament-card").first();
   await expect(card).toContainText("Austragungsort: Musterhalle, Musterstraße 1");
-  await expect(card).toContainText("15.11.2026");
+  await expect(card).toContainText(/15\.\s*Nov\.?\s*2026/);
   await page.reload({waitUntil:"domcontentloaded"});
   await expect(card).toContainText("Austragungsort: Musterhalle, Musterstraße 1");
   await card.locator("[data-edit-id]").click();
@@ -52,9 +52,9 @@ test("v215: unrelated E/D tournament UUIDs never borrow each other's venue or da
  const a=page.locator('[data-edit-id="'+uuidA+'"]').locator("xpath=ancestor::article");
  const b=page.locator('[data-edit-id="'+uuidB+'"]').locator("xpath=ancestor::article");
  await expect(a).toContainText("Austragungsort nicht erfasst");
- await expect(a).toContainText("15.11.2026");
+ await expect(a).toContainText(/15\.\s*Nov\.?\s*2026/);
  await expect(b).toContainText("Offiziell nicht zugeordnete Musterhalle");
- await expect(b).toContainText("22.11.2026");
+ await expect(b).toContainText(/22\.\s*Nov\.?\s*2026/);
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
  expect(saved.find(x=>x.id===uuidA).place).toBe("");
  expect(saved.find(x=>x.id===uuidB).startDate).toBe("2026-11-22");
