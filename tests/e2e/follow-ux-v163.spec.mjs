@@ -68,10 +68,11 @@ test("#289: following a player keeps iPhone viewport stable and dismisses search
   if(firstWidth){await page.goto("/#spieler",{waitUntil:"load"});firstWidth=false;}
   else await page.reload({waitUntil:"load"});
   await expect(page.locator("#player-discover")).toBeHidden();
-  await page.locator("#followed-player-search").focus();
-  await expect(page.locator("#player-discover")).toBeVisible();
   const search=page.locator("#followed-player-search");
+  await search.focus();
+  await expect(page.locator("#player-discover")).toBeHidden();
   await search.fill("Vinzent");
+  await expect(page.locator("#player-discover")).toBeVisible();
   await expect(page.locator("#library-count")).toContainText("1 passende Spieler");
   await expect(page.locator("[data-library-toggle='05-123456']")).toBeEnabled();
   await page.locator("[data-library-toggle='05-123456']").click();
