@@ -37,6 +37,13 @@ assert.equal(parsed.data.activeProfileId,"99-100001");
 assert.equal(parsed.data.chosen,"99-100001","Viewing a friend must not replace the own Home profile");
 assert.deepEqual(parsed.data.friends,[{id:"99-100003",name:"Testperson C",club:"Musterverein",url:""}]);
 assert.equal(parsed.data.officialLinks[0].url,tournament);
+const withDetails={...original,officialLinks:[{...original.officialLinks[0],
+ place:"Sporthalle Musterort, Hauptstraße 22",deadline:"2026-10-01"}]};
+const withDetailsRestored=inspectLocalBackup(createLocalBackup(JSON.stringify(withDetails)));
+assert.equal(withDetailsRestored.data.officialLinks[0].place,"Sporthalle Musterort, Hauptstraße 22");
+assert.equal(withDetailsRestored.data.officialLinks[0].deadline,"2026-10-01");
+assert.equal(withDetailsRestored.data.officialLinks[0].startDate,"2026-10-11");
+
 assert.equal(parsed.calendarEvents.length,1);
 assert.equal(parsed.calendarEvents[0].source,"spond");
 assert.match(parsed.calendarEvents[0].id,/^calendar-[0-9a-f]{8}$/);

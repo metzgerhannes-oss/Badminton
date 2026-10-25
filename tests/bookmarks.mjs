@@ -35,4 +35,12 @@ assert.ok(!content.includes('fetch('),"Tournament bookmarks must not scrape offi
 const html=await readFile("index.html","utf8");
 assert.ok(html.includes('id="tournament-dialog-heading"'));
 assert.ok(html.includes('id="tournament-save"'));
+assert.ok(html.includes('name="place"'),"Tournament editor offers an optional venue field");
+assert.ok(html.includes('id="tournament-official-source"'),"The editor reports trusted metadata or source conflicts");
+assert.ok(content.includes("prefillVerifiedTournamentForm"),"Manual link entry should reuse already loaded official metadata");
+assert.ok(content.includes("verifiedCalendarRows=entries"),"Metadata prefill is in-memory, without additional source requests");
+assert.ok(html.includes('name="deadline"'),"Meldeschluss is not a start date");
+assert.ok(content.includes('Austragungsort nicht erfasst'),"Unknown local venue is not called unpublished");
+assert.ok(content.includes('place:data.get("place"),deadline:data.get("deadline")'),"Editor must persist manual venue and deadline");
+
 console.log("DBV bookmark tests passed: IDs, URL safety, URL-only entry, optional metadata, editing, persistence.");

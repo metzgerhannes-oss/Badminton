@@ -19,14 +19,12 @@ for(const width of [320,390,1280]){
   await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
   const card=page.locator("#official-tournament-list .tournament-card").first();
   await expect(card).toContainText(saved.name);
+  await expect(card).toBeVisible();
   const link=card.locator("a.card-open-primary");
   await expect(link).toHaveAttribute("href",saved.url);
-  const pseudo=await link.evaluate(el=>({
-   position:getComputedStyle(el,"::after").position,
-   inset:getComputedStyle(el,"::after").inset
-  }));
-  expect(pseudo.position).toBe("absolute");
-  expect(pseudo.inset).toBe("0px");
+  // WebKit can finish stylesheet calculation after DOMContentLoaded; assert the actual interactive hit-layer once ready.
+  await expect.poll(()=>link.evaluate(el=>getComputedStyle(el,"::after").position)).toBe("absolute");
+  await expect.poll(()=>link.evaluate(el=>getComputedStyle(el,"::after").inset)).toBe("0px");
   // Repoint to a local route so this click never fetches real tournament sources.
   await link.evaluate(el=>{el.href="#spieler";el.removeAttribute("target")});
   const title=await card.locator("h3").boundingBox();
@@ -49,15 +47,21 @@ test("v214: card and nested secondary button each activate only their own action
  await seed(page);
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await page.evaluate(()=>{
-  document.querySelector("#official-tournament-list").innerHTML=
-   '<article class="card-open-surface" id="synthetic-card"><h3>Details öffnen</h3>'+
+  // Isolate this click contract from subsequent asynchronous tournament list re-renders.
+  // Keep the synthetic surface within .app, so the production CSS rules still apply.
+  const host=document.querySelector(".app");
+  host.insertAdjacentHTML("beforeend",
+   '<article class="card-open-surface" id="synthetic-card" style="position:fixed;top:84px;left:16px;z-index:9999;width:260px;padding:14px;background:white"><h3>Details öffnen</h3>'+
    '<button class="card-open-primary" type="button" id="card-main">Details</button>'+
-   '<button type="button" id="card-save">+ Merken</button></article>';
+   '<button type="button" id="card-save">+ Merken</button></article>');
   window.__cardCounts={primary:0,secondary:0};
   document.querySelector("#card-main").onclick=()=>window.__cardCounts.primary++;
   document.querySelector("#card-save").onclick=()=>window.__cardCounts.secondary++;
  });
+ await expect(page.locator("#synthetic-card")).toBeVisible();
+ await expect.poll(()=>page.locator("#card-main").evaluate(el=>getComputedStyle(el,"::after").position)).toBe("absolute");
  const bounds=await page.locator("#synthetic-card h3").boundingBox();
+ expect(bounds).toBeTruthy();
  await page.mouse.click(bounds.x+bounds.width/2,bounds.y+bounds.height/2);
  expect(await page.evaluate(()=>window.__cardCounts)).toEqual({primary:1,secondary:0});
  await page.locator("#card-save").click();

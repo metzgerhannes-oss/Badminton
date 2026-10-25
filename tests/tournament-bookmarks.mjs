@@ -24,6 +24,15 @@ assert.equal(normalized.name,"DBV-Turnier E24DC6EE");
 assert.equal(normalized.startDate,"","Invalid stored dates must be cleared on restore");
 assert.equal(normalized.endDate,"2028-02-29");
 assert.equal(bookmarks.normalizeBookmark({url:"http://dbv.turnier.de/tournament/"+id}),null);
+const manualWithVenue=bookmarks.normalizeBookmark({url,playerId:"05-070879",name:"3. D-RLT Gomaringen",
+ startDate:"2026-11-22",endDate:"2026-11-22",deadline:"2026-11-15",
+ place:"Sport- und Kulturhalle, Haydnstraße 22, 72810 Gomaringen"});
+assert.equal(manualWithVenue.startDate,"2026-11-22","Event start must never be replaced by registration deadline");
+assert.equal(manualWithVenue.deadline,"2026-11-15","Meldeschluss is separate from game day");
+assert.match(manualWithVenue.place,/Haydnstraße 22/);
+assert.equal(bookmarks.normalizeBookmark({...manualWithVenue,deadline:"2026-11-31"}).deadline,"",
+ "Invalid deadlines must not be persisted");
+
 
 const calendar={
  source:"dbv-calendar",id:"dbv-calendar-44094",url:"https://turniere.badminton.de/",
@@ -32,6 +41,41 @@ const calendar={
 };
 assert.equal(bookmarks.normalizeBookmark(calendar).id,calendar.id,"Official calendar IDs may be bookmarked privately without inventing tournament UUIDs");
 assert.equal(bookmarks.normalizeBookmark(calendar).source,"dbv-calendar");
+assert.equal(bookmarks.normalizeBookmark({...calendar,deadline:"2026-10-31"}).deadline,"2026-10-31");
+const officialRow={key:"dbv-calendar-44094",url,hasDirectLink:true,
+ title:"3. D-RLT BAW SW U11-U19 Gomaringen",start:"2026-11-22",end:"2026-11-22",
+ deadline:"2026-11-15",place:"Sport- und Kulturhalle, Haydnstraße 22, Gomaringen"};
+const correct=bookmarks.normalizeBookmark({url,name:"3. D-RLT Gomaringen",
+ startDate:"2026-11-22",endDate:"2026-11-22",playerId:"05-070879"});
+const enriched=bookmarks.reconcileOfficialMetadata(correct,[officialRow]);
+assert.equal(enriched.status,"matched");
+assert.match(enriched.updated.place,/Haydnstraße 22/);
+assert.equal(enriched.updated.deadline,"2026-11-15");
+assert.equal(enriched.updated.startDate,"2026-11-22");
+assert.equal(correct.place,"","Source reconciliation must never mutate the original stored object");
+const wrongDate=bookmarks.reconcileOfficialMetadata(
+ {...correct,startDate:"2026-11-15"},[officialRow]);
+assert.equal(wrongDate.status,"conflict","Registration deadline must never replace official match date");
+assert.equal(wrongDate.officialDate,"2026-11-22");
+assert.equal(bookmarks.reconcileOfficialMetadata({...correct,name:"3. E-RLT Gomaringen"},
+ [officialRow]).status,"conflict","E-RLT and D-RLT must not silently coalesce");
+assert.equal(bookmarks.reconcileOfficialMetadata(correct,[{...officialRow,hasDirectLink:false}]).status,
+ "unverified","A generic calendar URL cannot verify a tournament UUID");
+assert.equal(bookmarks.reconcileOfficialMetadata(correct,[officialRow,officialRow]).status,
+ "unverified","Ambiguous duplicate sources must not update private records");
+assert.equal(bookmarks.reconcileOfficialMetadata(correct,[{...officialRow,url:"https://turniere.badminton.de/",hasDirectLink:false,place:"Gomaringen"}]).status,
+ "unverified","Venue-only matches are forbidden");
+const calendarMatch=bookmarks.reconcileOfficialMetadata(bookmarks.normalizeBookmark(calendar),[
+ {key:calendar.id,url:"https://turniere.badminton.de/",hasDirectLink:false,
+  title:calendar.name,start:calendar.startDate,end:calendar.endDate,
+  place:"Lübeck",deadline:"2026-10-31"}]);
+assert.equal(calendarMatch.status,"matched","An exact imported DBV calendar ID identifies its own event");
+assert.equal(calendarMatch.updated.place,"Lübeck");
+assert.equal(calendarMatch.updated.deadline,"2026-10-31");
+assert.equal(bookmarks.reconcileOfficialMetadata(bookmarks.normalizeBookmark(calendar),
+ [{...officialRow,key:"dbv-calendar-00000"}]).status,"unverified",
+ "Another DBV calendar ID must not overwrite this event");
+
 assert.equal(bookmarks.normalizeBookmark({...calendar,id:"dbv-calendar-OTHER"}),null);
 assert.equal(bookmarks.normalizeBookmark({...calendar,url:"https://example.com/"}),null);
 assert.equal(bookmarks.normalizeBookmark({...calendar,playerId:"all"}),null,"Calendar entries must be linked to one real own profile");
