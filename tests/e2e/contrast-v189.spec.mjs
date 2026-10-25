@@ -132,3 +132,76 @@ for(const width of [390,1280]){
   }
  });
 }
+
+/* UX2 B1: assert final computed colors (not CSS token declarations), including
+   navigation at 320px and optional local club accent. No external requests. */
+for(const width of [320,390]){
+ test("v211 "+width+"px: four main tab labels meet AA and stay readable",async({page})=>{
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#view-start")).toBeVisible();
+  const nav=await page.locator(".bottom-nav").evaluate(root=>{
+   const background=getComputedStyle(root).backgroundColor;
+   const anchors=[...root.querySelectorAll('a[data-page]:not(.desktop-club-nav)')];
+   return {background,items:anchors.map(link=>{
+    const style=getComputedStyle(link),small=getComputedStyle(link.querySelector("small"));
+    return {name:link.dataset.page,color:small.color,size:parseFloat(small.fontSize),
+     height:link.getBoundingClientRect().height,linkColor:style.color};
+   })};
+  });
+  expect(nav.items.map(x=>x.name)).toEqual(["start","spieler","turniere","mannschaft"]);
+  for(const item of nav.items){
+   expect(ratio(item.color,nav.background),item.name+" "+width+"px effective label contrast").toBeGreaterThanOrEqual(4.5);
+   expect(item.size,item.name+" "+width+"px label size").toBeGreaterThanOrEqual(12);
+   expect(item.height,item.name+" "+width+"px touch height").toBeGreaterThanOrEqual(44);
+  }
+  await page.locator('.bottom-nav a[data-page="spieler"]').click();
+  await expect(page.locator("#view-spieler")).toBeVisible();
+  await expect(page.locator('.bottom-nav a[data-page="spieler"]')).toHaveAttribute("aria-current","page");
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+ });
+}
+test("v211: source link ink meets AA on actual light report card",async({page})=>{
+ await page.goto("/#berichte",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-berichte")).toBeVisible();
+ const sample=await page.locator("#view-berichte").evaluate(root=>{
+  const card=document.createElement("article");
+  card.className="report-card";
+  const foot=document.createElement("div");
+  foot.className="report-card-footer";
+  const link=document.createElement("a");
+  link.href="#berichte";link.textContent="Synthetischer Bericht";
+  foot.append(link);card.append(foot);root.append(card);
+  return {color:getComputedStyle(link).color,background:getComputedStyle(card).backgroundColor};
+ });
+ expect(ratio(sample.color,sample.background),"Report link on actual card").toBeGreaterThanOrEqual(4.5);
+});
+test("v211: local club accent remains authoritative on selected mobile tab",async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ // A club accent belongs to the selected tab only. DOMContentLoaded is not
+ // enough: the async router still has to mark this route as aria-current.
+ const start=page.locator('.bottom-nav a[data-page="start"]');
+ await expect(page.locator("#view-start")).toBeVisible();
+ await expect(start).toHaveAttribute("aria-current","page");
+ const actual=await start.evaluate(el=>{
+  document.documentElement.classList.add("club-themed");
+  document.documentElement.style.setProperty("--club-accent","#164b78");
+  document.documentElement.style.setProperty("--club-contrast","#ffffff");
+  return {color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor,
+   current:el.getAttribute("aria-current"),
+   branded:document.documentElement.classList.contains("club-themed")};
+ });
+ expect(actual.current).toBe("page");
+ expect(actual.branded).toBe(true);
+ // The app deliberately animates background/color for 150ms. Check the final
+ // rendered club palette, not the initial transparent transition frame.
+ await expect.poll(async()=>start.evaluate(el=>getComputedStyle(el).backgroundColor),
+  {message:"Selected branded tab must finish at the configured club accent"}).toBe("rgb(22, 75, 120)");
+ await expect.poll(async()=>start.evaluate(el=>getComputedStyle(el).color),
+  {message:"Selected branded tab must finish with the configured contrast ink"}).toBe("rgb(255, 255, 255)");
+ const settled=await start.evaluate(el=>({
+  color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor
+ }));
+ expect(ratio(settled.color,settled.background),"Branded selected tab").toBeGreaterThanOrEqual(4.5);
+});

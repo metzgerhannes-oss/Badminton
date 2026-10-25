@@ -6,6 +6,8 @@
   --sky:#e5f4ff;--sky-deep:#cce8fb;--panel:#ffffffea;
   --ink:#0b2a52;--ink-soft:#456588;--link:#087dc3;
   --hairline:#b8dcef;--shadow:0 7px 26px #5488ab19;
+  /* UX2 B1: CD-matched readable ink for translucent pale navigation and light report cards. */
+  --ux2-nav-ink:#355f80;--ux2-nav-active:#075a91;--ux2-report-link:#066b9f;
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   color:var(--ink);background:#d4ebfc;
 }
@@ -45,7 +47,7 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .report-card-meta,.report-card-footer span{color:#5c7b96}
 .report-card h3{color:#0e3560}
 .report-card p{color:#4f6d88}
-.report-card-footer a,.report-source-entry a{color:#047ebd}
+.report-card-footer a,.report-source-entry a{color:var(--ux2-report-link)}
 .report-source-directory summary{color:#153d5f}
 .report-source-directory>p,.report-source-status,.report-source-entry small{color:#577892}
 .report-source-entry{border-color:#d3e8f4}
@@ -63,8 +65,8 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
   background:#f9fcffef;border-top:1px solid #c5ddeb;
   box-shadow:0 -7px 25px #4b83a523;backdrop-filter:blur(18px)}
 .bottom-nav a{min-width:0;min-height:51px;padding:6px 0;gap:3px;
-  display:grid;place-content:center;justify-items:center;color:#597c9e;overflow:hidden}
-.bottom-nav a[aria-current=page]{color:#0a86d0}
+  display:grid;place-content:center;justify-items:center;color:var(--ux2-nav-ink);overflow:hidden}
+.bottom-nav a[aria-current=page]{color:var(--ux2-nav-active)}
 .bottom-nav a>span{height:25px;display:grid;place-items:center}
 .bottom-nav .nav-icon{display:block;width:24px;height:24px}
 .bottom-nav a small{font-size:clamp(8px,2.1vw,11px);line-height:1.1;color:inherit;font-weight:760;

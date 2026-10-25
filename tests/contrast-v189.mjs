@@ -1,8 +1,8 @@
 /** Offline contract for v189: explicit WCAG 2.2 AA color pairs, scoped PWA cache and unchanged Home. */
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-const [css,index,welcome,wiki,sw,release,ui,wikiCss,welcomeCss] = await Promise.all(
- ["contrast-v189.css","index.html","welcome.html","wiki.html","sw.js","app-release.js","ui-components.css","wiki.css","welcome.css"].map(p=>readFile(p,"utf8")));
+const [css,index,welcome,wiki,sw,release,ui,wikiCss,welcomeCss,design,teams,accessible] = await Promise.all(
+ ["contrast-v189.css","index.html","welcome.html","wiki.html","sw.js","app-release.js","ui-components.css","wiki.css","welcome.css","design-v2.css","teams.css","accessibility-v182.css"].map(p=>readFile(p,"utf8")));
 const completePalette=css+"\n"+ui+"\n"+wikiCss+"\n"+welcomeCss;
 const toRgb=value=>{
  const hex=value.replace(/^#/,"");
@@ -35,6 +35,20 @@ for(const [label,fg,bg,required] of pairs){
  assert.ok(contrast(fg,bg)>=required,label+": "+contrast(fg,bg).toFixed(2)+":1");
  assert.ok(completePalette.includes(fg)&&completePalette.includes(bg),"Audited color pairing: "+label);
 }
+const ux2pairs=[
+ ["Inactive nav ink","#355f80","#f9fcff",4.5],
+ ["Current nav ink","#075a91","#f9fcff",4.5],
+ ["Report link ink","#066b9f","#ffffff",4.5]
+];
+for(const [name,foreground,background,minimum] of ux2pairs){
+ assert.ok(contrast(foreground,background)>=minimum,name+": "+contrast(foreground,background).toFixed(2)+":1");
+ assert.ok(design.includes(foreground),name+": semantic CD shade must exist in source");
+}
+assert.match(design,/--ux2-nav-ink:#355f80;--ux2-nav-active:#075a91;--ux2-report-link:#066b9f/);
+assert.match(design,/\.bottom-nav a\[aria-current=page\]\{color:var\(--ux2-nav-active\)\}/);
+assert.match(design,/\.report-card-footer a,\.report-source-entry a\{color:var\(--ux2-report-link\)\}/);
+assert.match(teams,/\.bottom-nav a small\{font-size:12px!important;letter-spacing:0\}/);
+assert.match(accessible,/\.bottom-nav a small\{font-size:clamp\(12px,3vw,13px\);line-height:1\.22\}/);
 assert.match(css,/\.app \.page:not\(#view-start\)/,"Home excluded from application page overrides");
 assert.doesNotMatch(css,/(^|\n)\s*(?:#view-start|\.focused-profile|\.dashboard-ranking-grid|\.topbar)\s*\{/,
  "Do not rewrite Home visuals");

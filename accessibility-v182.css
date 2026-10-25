@@ -30,7 +30,7 @@
  #view-start .friends-empty{color:var(--a11y-on-light);font-size:12px}
  #view-start .dashboard-add-friend{min-width:44px;min-height:44px}
  .bottom-nav .nav-icon{width:24px;height:24px}
- .bottom-nav a small{font-size:clamp(9px,2.5vw,12px);line-height:1.22}
+ .bottom-nav a small{font-size:clamp(12px,3vw,13px);line-height:1.22}
  .app .page :is(input:not([type="checkbox"]),select,textarea){font-size:max(16px,1rem)}
 }
 @media(max-width:350px){

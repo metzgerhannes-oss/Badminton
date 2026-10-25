@@ -1,10 +1,10 @@
 /* UX2 A1: exactly four stable mobile destinations; Verein is desktop-only. */
 .bottom-nav a{width:25%!important;flex:1 1 25%}
-.bottom-nav a small{font-size:clamp(9px,2.5vw,12px)}
+.bottom-nav a small{font-size:clamp(12px,3vw,13px)}
 .bottom-nav .nav-icon{width:23px;height:23px}
 @media(max-width:380px){
  .bottom-nav a{padding-inline:1px!important;min-width:44px}
- .bottom-nav a small{font-size:9px!important;letter-spacing:-.15px}
+ .bottom-nav a small{font-size:12px!important;letter-spacing:0}
  .bottom-nav .nav-icon{width:21px;height:21px}
 }
 .team-controls{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:10px;margin:16px 0}
