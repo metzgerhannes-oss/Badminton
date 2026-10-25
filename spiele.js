@@ -95,6 +95,9 @@ if(root&&canvas){
   $("arcade-start").disabled=!isOwn(selected);
   $("arcade-profile").disabled=phase==="countdown"||phase==="playing";
   $("arcade-board-help").textContent=phase==="over"?"Ergebnis: "+(game?.score||0)+" Punkte.":""; 
+  const selector=$("arcade-game");
+  if(selector){selector.dataset.snakeBusy=phase==="playing"||phase==="countdown"?"1":"0";
+   selector.disabled=selector.dataset.snakeBusy==="1"||selector.dataset.tileBusy==="1";}
  }
  function renderProfiles(){
   const options=profiles(),field=$("arcade-profile"),previous=selected;
@@ -119,6 +122,7 @@ if(root&&canvas){
  $("arcade-resume").addEventListener("click",resume);
  $("arcade-restart").addEventListener("click",()=>{abort();start()});
  $("arcade-exit").addEventListener("click",()=>{abort();location.hash="#turniere"});
+ $("arcade-game")?.addEventListener("change",()=>{if($("arcade-game").value!=="snake"&&phase!=="idle")abort("Snake-Runde verworfen.")});
  $("arcade-profile").addEventListener("change",event=>{if(phase!=="idle"&&phase!=="over")abort("Spielerwechsel: Runde verworfen.");selected=event.target.value;paint()});
  root.querySelectorAll("[data-snake-direction]").forEach(button=>button.addEventListener("click",()=>direction(button.dataset.snakeDirection)));
  document.addEventListener("keydown",event=>{

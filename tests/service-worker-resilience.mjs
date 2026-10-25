@@ -145,9 +145,11 @@ for(const path of ["/Badminton/","/Badminton/index.html?fresh=1"]){
  assert.ok(!sw.accepted.some(path=>path.includes("/data/")),"No player indexes during worker installation");
  for(const asset of ["./spiele.js","./spiele.css","./games/snake.mjs"])
   assert.ok(sw.accepted.includes(asset),"Snake must work offline on first installed launch: "+asset);
- // Three small offline Snake assets extend the old 99-file cap by one after
- // deduplicating a legacy entry; all secondary Wiki/data indexes remain lazy.
- assert.ok(sw.accepted.length<=100,"Avoid full pre-caching of every optional feature");
+ for(const asset of ["./spiele-2048.js","./games/2048.mjs"])
+  assert.ok(sw.accepted.includes(asset),"2048 must work offline on first installed launch: "+asset);
+ // v207 adds exactly two small 2048 modules to the bounded v206 install set.
+ // All secondary Wiki/data indexes remain lazy; do not grow this budget silently.
+ assert.ok(sw.accepted.length<=102,"Avoid full pre-caching of every optional feature");
 }
 // Invitation query tokens, unrelated resources and JSON indexes remain outside runtime CacheStorage.
 for(const path of ["welcome.html?invite=secret","private-player.html?code=secret","unknown.json","data/history.json"]){

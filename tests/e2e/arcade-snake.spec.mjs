@@ -16,7 +16,9 @@ test("F10 P2-A: private Snake route, pause and own-profile-only records on 320px
  await expect(page.locator("#arcade-profile")).not.toContainText("Gefolgt");
  await expect(page.locator("#arcade-time")).toHaveText("120 s");
  await expect(page.locator("#arcade-score")).toHaveText("0");
- const buttons=page.locator(".arcade-controls button");
+ await expect(page.locator("#arcade-snake-shell")).toBeVisible();
+ await expect(page.locator("#arcade-2048-shell")).toBeHidden();
+ const buttons=page.locator("#arcade-snake-shell .arcade-controls button");
  for(const b of await buttons.all()){const box=await b.boundingBox();expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44)}
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
  await page.locator("#arcade-start").click();
