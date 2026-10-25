@@ -1,16 +1,7 @@
-name: Mannschaftsberichte automatisch importieren
+name: Mannschaftsberichte (offline source contract)
+# The actual editorial-source scan/publish is blocked pending #56.
 on:
-  schedule:
-    - cron: '42 6 * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/import-team-reports.py'
-      - 'scripts/discover-reports.py'
-      - 'data/report-sources.json'
-      - 'tests/test_team_report_discovery.py'
-      - '.github/workflows/team-report-import.yml'
   pull_request:
     branches: [main]
     paths:
@@ -18,47 +9,30 @@ on:
       - 'scripts/discover-reports.py'
       - 'data/report-sources.json'
       - 'tests/test_team_report_discovery.py'
+      - 'tests/test_report_discovery.py'
       - '.github/workflows/team-report-import.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/import-team-reports.py'
+      - 'scripts/discover-reports.py'
+      - 'data/report-sources.json'
+      - 'tests/test_team_report_discovery.py'
+      - 'tests/test_report_discovery.py'
+      - '.github/workflows/team-report-import.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
 permissions:
   contents: read
-concurrency:
-  group: badminton-team-report-import
-  cancel-in-progress: false
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Test official-source, privacy and deduplication rules
-        run: |
-          python3 -m unittest discover -s tests -p 'test_report_discovery.py' -v
-          python3 -m unittest discover -s tests -p 'test_team_report_discovery.py' -v
-  publish:
-    needs: validate
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Import verified official club match report links only
-        run: python3 scripts/import-team-reports.py
-      - name: Publish only neutral team report links if changed
+      - name: Synthetic report discovery, privacy and deduplication tests
         run: |
           set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/team-report-links.json
-          if git diff --cached --quiet; then
-            echo "Official report link index is unchanged"
-            exit 0
-          fi
-          git commit -m 'data: refresh verified club team-report links [skip ci]'
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main
-            if git push origin HEAD:main; then exit 0; fi
-            if [ "$attempt" = 3 ]; then exit 1; fi
-          done
+          python3 -m unittest discover -s tests -p test_report_discovery.py -v
+          python3 -m unittest discover -s tests -p test_team_report_discovery.py -v
+          python3 -m py_compile scripts/import-team-reports.py scripts/discover-reports.py

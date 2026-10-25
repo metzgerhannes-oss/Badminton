@@ -1,7 +1,7 @@
-name: Baden-Württemberg Jugend A/B/C Historie
+name: Baden-Württemberg Jugend A/B/C Historie (offline)
+# Source acquisition and publication require separate rights approval (#56).
+# This workflow is strictly synthetic and never refreshes production data.
 on:
-  schedule:
-    - cron: '17 6 * * *'
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -9,71 +9,24 @@ on:
       - 'scripts/import-bw-youth-archive.py'
       - 'tests/test_bw_youth_archive.py'
       - '.github/workflows/bw-youth-archive.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
   push:
     branches: [main]
     paths:
       - 'scripts/import-bw-youth-archive.py'
       - 'tests/test_bw_youth_archive.py'
       - '.github/workflows/bw-youth-archive.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
 permissions:
   contents: read
-concurrency:
-  group: bw-youth-archive
-  cancel-in-progress: false
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Offline parser and classification tests
-        run: python3 -m unittest discover -s tests -p test_bw_youth_archive.py -v
-      - name: Verify full-year DBV source (not remaining dates)
-        run: |
-          python3 scripts/import-bw-youth-archive.py --write-json
-          python3 -c 'import json; p=json.load(open("data/bw-youth-calendar-archive.json",encoding="utf-8")); print("PUBLIC_BW_ARCHIVE="+json.dumps(p,ensure_ascii=False,separators=(",",":")))'
-
-  publish:
-    if: github.event_name != 'pull_request'
-    needs: check
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    permissions:
-      contents: write
-      pages: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Refresh verified public historical BW archive
-        run: python3 scripts/import-bw-youth-archive.py --write-json
-      - name: Commit source-backed archive only when it changes
-        id: publish
+      - name: Synthetic BW archive parser and classification tests
         run: |
           set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/bw-youth-calendar-archive.json
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'data: refresh public BW youth A/B/C calendar archive [skip ci]'
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main
-            if git push origin HEAD:main; then echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-            if [ "$attempt" = 3 ]; then exit 1; fi
-          done
-      # GITHUB_TOKEN pushes do not trigger automatic branch-based Pages builds.
-      # Request a new build explicitly only when a source-backed file changed.
-      - name: Publish updated archive to GitHub Pages
-        if: steps.publish.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          status=$(curl --silent --show-error -o "$RUNNER_TEMP/pages-request.json" -w '%{http_code}' \
-            -X POST "https://api.github.com/repos/metzgerhannes-oss/Badminton/pages/builds" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "X-GitHub-Api-Version: 2022-11-28")
-          if [ "$status" != 201 ]; then
-            echo "Pages rebuild request failed (HTTP $status)"
-            exit 1
-          fi
+          python3 -m unittest discover -s tests -p test_bw_youth_archive.py -v
+          python3 -m py_compile scripts/import-bw-youth-archive.py

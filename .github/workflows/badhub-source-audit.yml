@@ -1,21 +1,38 @@
-name: Badhub source audit (bounded)
+name: Badhub source audit (synthetic offline)
+# Real Badhub source audit and named-player requests are disabled pending #56.
 on:
-  pull_request:
-    paths:
-      - scripts/badhub-history-parser.mjs
-      - scripts/badhub-source-audit.mjs
-      - .github/workflows/badhub-source-audit.yml
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/badhub-history-parser.mjs'
+      - 'scripts/badhub-source-audit.mjs'
+      - '.github/workflows/badhub-source-audit.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/badhub-history-parser.mjs'
+      - 'scripts/badhub-source-audit.mjs'
+      - '.github/workflows/badhub-source-audit.yml'
+      - 'tests/p0-ci-prod-isolation.mjs'
 permissions:
   contents: read
 jobs:
   source-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check source card parsing without storing HTML
-        run: node scripts/badhub-source-audit.mjs
+      - name: Synthetic match parsing and nonplayed-round regression
+        run: |
+          set -euo pipefail
+          node --check scripts/badhub-history-parser.mjs
+          node --check scripts/badhub-source-audit.mjs
+          node tests/badhub-tournament-view-parser.mjs
+          node tests/nonplayed-rounds.mjs
+          node tests/external-match-parser.mjs
+          node tests/p0-ci-prod-isolation.mjs
