@@ -54,3 +54,24 @@ test("v215: unrelated E/D tournament UUIDs never borrow each other's venue or da
  expect(saved.find(x=>x.id===uuidA).place).toBe("");
  expect(saved.find(x=>x.id===uuidB).startDate).toBe("2026-11-22");
 });
+
+test("v215: existing calendar favorite accepts a local venue without changing calendar ID or dates",async({page})=>{
+ const calendar={source:"dbv-calendar",id:"dbv-calendar-44094",url:"https://turniere.badminton.de/",
+  playerId:player.id,name:"Synthetischer Kalendereintrag",startDate:"2026-11-22",endDate:"2026-11-22"};
+ await seed(page,[calendar]);
+ await page.setViewportSize({width:320,height:844});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ const card=page.locator("#official-tournament-list .tournament-card").first();
+ await expect(card).toContainText("Austragungsort nicht erfasst");
+ await card.locator("[data-edit-venue-id]").click();
+ await expect(page.locator("#tournament-venue-dialog")).toHaveAttribute("open","");
+ await page.locator("#tournament-venue-input").fill("Synthetische Halle");
+ await page.locator("#tournament-venue-form button[type=submit]").click();
+ await expect(card).toContainText("Austragungsort: Synthetische Halle");
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(card).toContainText("Austragungsort: Synthetische Halle");
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved).toHaveLength(1);
+ expect(saved[0]).toMatchObject({...calendar,place:"Synthetische Halle"});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+});
