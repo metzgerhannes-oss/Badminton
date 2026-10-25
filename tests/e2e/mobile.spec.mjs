@@ -305,7 +305,9 @@ test("Historical source failure has real retry and does not claim zero matches",
  await page.route("**/player_external_match_facts?*",route=>
   fail?route.fulfill({status:503,headers,body:'{"error":"temporary"}'}):route.fallback());
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#external-match-progress")).toContainText("gerade nicht erreichbar");
+ await expect(page.locator("#external-match-brief")).toBeVisible();
+ await expect(page.locator("#external-match-brief")).toContainText("gerade nicht erreichbar");
+ await expect(page.locator("#external-match-source-details")).not.toHaveAttribute("open",/./);
  await expect(page.locator("#external-match-count")).toContainText("nicht geprüft");
  await expect(page.locator("#external-match-retry")).toBeVisible();
  fail=false;
