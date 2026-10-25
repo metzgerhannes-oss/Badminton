@@ -1,6 +1,6 @@
 # v215 · P1 #386: lokaler Austragungsort ohne unsicheren DBV-Abgleich
 
-- Das private Turnierformular speichert einen optionalen Austragungsort/Hallenadresse (max. 120 Zeichen) in der bereits vorhandenen lokalen Bookmark-Struktur. Vorhandene Einträge behalten ihre UUID, Profilbindung, Datumswerte und Freigaben; beim Bearbeiten wird der Ort wieder geladen.
+- Das private Turnierformular speichert einen optionalen Austragungsort/Hallenadresse (max. 120 Zeichen) in der bereits vorhandenen lokalen Bookmark-Struktur. Auch bereits gespeicherte DBV-Kalender-/Rahmentermin-Favoriten können den Ort über eine eigene lokale Aktion ergänzen, ohne ihre nicht-UUID-basierte Quelle oder Termine zu verändern. Vorhandene Einträge behalten ihre UUID, Profilbindung, Datumswerte und Freigaben; beim Bearbeiten wird der Ort wieder geladen.
 - Fehlt ein lokaler Ort, steht in „Meine Turniere“ nun korrekt „Austragungsort nicht erfasst“. „Noch nicht veröffentlicht“ wäre ohne geprüfte offizielle Quelle eine unbewiesene Aussage.
 - „Turnierbeginn“ wird explizit vom Meldeschluss unterschieden. Weder Datum noch Kategorie noch Ort werden allein anhand ähnlicher Orts-/Titeltexte automatisch geändert.
 - Synthetische Offline-Tests decken zwei verschiedene E-/D-Turnier-UUIDs, Ortsänderung, Reload und 320/390/1280px ab. Kein externer Fetch, keine DB-/RLS-Migration, keine personenbezogenen Echtdaten.
