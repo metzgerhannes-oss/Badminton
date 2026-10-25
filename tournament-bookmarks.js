@@ -67,6 +67,42 @@ var SchmetterlingeBookmarks=(function(){
    startDate:validDate(value.startDate),endDate:validDate(value.endDate),
    place:String(value.place||"").trim().slice(0,120),deadline:validDate(value.deadline)};
  }
+ // Use only an already loaded official-calendar row with an exact source key or UUID.
+ // A similar venue/name is NEVER sufficient to join two distinct tournaments.
+ function reconcileOfficialMetadata(bookmark,rows){
+  if(!bookmark||!Array.isArray(rows))return {status:"unverified"};
+  const isCalendar=bookmark.source==="dbv-calendar";
+  if(bookmark.source==="bwbv-framework")return {status:"unverified"};
+  const own=!isCalendar&&parseDbvTournamentLink(bookmark.url);
+  if(!isCalendar&&!own)return {status:"unverified"};
+  const matching=rows.filter(row=>{
+   if(!row||typeof row!=="object")return false;
+   if(isCalendar)return row.key===bookmark.id;
+   // A general DBV calendar landing page never confirms a tournament identity.
+   const direct=row.hasDirectLink===true?parseDbvTournamentLink(row.url):null;
+   return Boolean(direct&&direct.id===own.id);
+  });
+  if(matching.length!==1)return {status:"unverified"};
+  const row=matching[0];
+  const start=validDate(row.start),end=validDate(row.end);
+  if(!start||!end||end<start)return {status:"unverified"};
+  const sameDay=(!bookmark.startDate||bookmark.startDate===start)&&
+   (!bookmark.endDate||bookmark.endDate===end);
+  // Reject obvious E/D/C/B/A category conflicts even when a pasted UUID matches.
+  const rank=s=>String(s||"").match(/\\b([A-E])[-\\s]*(?:RLT|Ranglistenturnier)\\b/i)?.[1]?.toUpperCase()||"";
+  const localRank=rank(bookmark.name),officialRank=rank(row.title);
+  if(!sameDay||(localRank&&officialRank&&localRank!==officialRank)){
+   return {status:"conflict",reason:!sameDay?"Termine weichen vom DBV-Kalender ab":"Turnierkategorie weicht vom DBV-Kalender ab",
+    officialDate:start,officialDeadline:validDate(row.deadline)};
+  }
+  const patch={};
+  if(!bookmark.place&&typeof row.place==="string"&&row.place.trim())patch.place=row.place.trim().slice(0,120);
+  if(!bookmark.deadline&&validDate(row.deadline))patch.deadline=validDate(row.deadline);
+  if(!bookmark.startDate)patch.startDate=start;
+  if(!bookmark.endDate)patch.endDate=end;
+  if(!isCalendar&&/^DBV-Turnier [0-9a-f]{8}$/i.test(bookmark.name||"")&&row.title)patch.name=String(row.title).trim().slice(0,100);
+  return {status:"matched",updated:Object.keys(patch).length?{...bookmark,...patch}:bookmark};
+ }
  function localDay(date=new Date()){
   const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
   const values=Object.fromEntries(parts.filter(p=>["year","month","day"].includes(p.type)).map(p=>[p.type,p.value]));
@@ -100,5 +136,5 @@ var SchmetterlingeBookmarks=(function(){
     a.name.localeCompare(b.name,"de");
   });
  }
- return Object.freeze({parseDbvTournamentLink,normalizeBookmark,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
+ return Object.freeze({parseDbvTournamentLink,normalizeBookmark,reconcileOfficialMetadata,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
 })();
