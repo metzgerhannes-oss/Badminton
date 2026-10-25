@@ -24,6 +24,15 @@ assert.equal(normalized.name,"DBV-Turnier E24DC6EE");
 assert.equal(normalized.startDate,"","Invalid stored dates must be cleared on restore");
 assert.equal(normalized.endDate,"2028-02-29");
 assert.equal(bookmarks.normalizeBookmark({url:"http://dbv.turnier.de/tournament/"+id}),null);
+const manualWithVenue=bookmarks.normalizeBookmark({url,playerId:"05-070879",name:"3. D-RLT Gomaringen",
+ startDate:"2026-11-22",endDate:"2026-11-22",deadline:"2026-11-15",
+ place:"Sport- und Kulturhalle, Haydnstraße 22, 72810 Gomaringen"});
+assert.equal(manualWithVenue.startDate,"2026-11-22","Event start must never be replaced by registration deadline");
+assert.equal(manualWithVenue.deadline,"2026-11-15","Meldeschluss is separate from game day");
+assert.match(manualWithVenue.place,/Haydnstraße 22/);
+assert.equal(bookmarks.normalizeBookmark({...manualWithVenue,deadline:"2026-11-31"}).deadline,"",
+ "Invalid deadlines must not be persisted");
+
 
 const calendar={
  source:"dbv-calendar",id:"dbv-calendar-44094",url:"https://turniere.badminton.de/",
@@ -32,6 +41,7 @@ const calendar={
 };
 assert.equal(bookmarks.normalizeBookmark(calendar).id,calendar.id,"Official calendar IDs may be bookmarked privately without inventing tournament UUIDs");
 assert.equal(bookmarks.normalizeBookmark(calendar).source,"dbv-calendar");
+assert.equal(bookmarks.normalizeBookmark({...calendar,deadline:"2026-10-31"}).deadline,"2026-10-31");
 assert.equal(bookmarks.normalizeBookmark({...calendar,id:"dbv-calendar-OTHER"}),null);
 assert.equal(bookmarks.normalizeBookmark({...calendar,url:"https://example.com/"}),null);
 assert.equal(bookmarks.normalizeBookmark({...calendar,playerId:"all"}),null,"Calendar entries must be linked to one real own profile");
