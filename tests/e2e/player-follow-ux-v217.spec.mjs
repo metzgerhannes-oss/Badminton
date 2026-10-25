@@ -56,3 +56,24 @@ test("v217 touch/pointer grip reorder does not open a player card",async({page})
  await expect(page.locator("#view-spieler")).toBeVisible();
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).activeProfileId)).toBe("99-930001");
 });
+
+test("v217: manual followed player can still be edited from settings without modifying family",async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+  players:[{id:"99-940001",name:"Eigenes Profil"}],
+  friends:[{id:"98-940002",name:"Manueller Test",club:"Alter Verein"}],
+  activeProfileId:"99-940001",chosen:"99-940001",officialLinks:[],historyProfilesInitialized:true
+ })));
+ await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ const details=page.locator("#manual-follow-edit");
+ await details.locator("summary").click();
+ await page.locator("#friend-edit-select").selectOption("98-940002");
+ await page.locator("#friend-edit-open").click();
+ await expect(page.locator("#friend-dialog")).toBeVisible();
+ await expect(page.locator('#friend-form input[name="id"]')).toHaveJSProperty("readOnly",true);
+ await page.locator('#friend-form input[name="club"]').fill("Neuer Verein");
+ await page.locator('#friend-form button[type="submit"]').click();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(saved.friends).toHaveLength(1);
+ expect(saved.friends[0].club).toBe("Neuer Verein");
+ expect(saved.players.map(p=>p.id)).toEqual(["99-940001"]);
+});

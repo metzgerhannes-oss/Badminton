@@ -234,6 +234,14 @@ function renderFriends(){
  const matching=state.friends.filter(p=>!query||[p.name,p.id,p.club].some(v=>
   String(v||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("de").includes(query)));
  const count=el("followed-player-count");if(count)count.textContent="("+state.friends.length+")";
+ const editSelect=el("friend-edit-select");
+ if(editSelect){
+  const selected=editSelect.value;
+  editSelect.innerHTML='<option value="">Spieler auswählen</option>'+state.friends.map(p=>
+   '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join("");
+  editSelect.value=state.friends.some(p=>p.id===selected)?selected:"";
+  const editButton=el("friend-edit-open");if(editButton)editButton.disabled=!editSelect.value;
+ }
  const all=el("followed-show-all");if(all)all.hidden=!query;
  root.innerHTML=matching.length?matching.map(p=>{
   const current=state.viewingFriendId===p.id;
@@ -764,6 +772,15 @@ function setup(){
   SchmetterlingeRouter.openDialog(friendDialog);
  }
  window.openFriendForm=openFriendForm;
+ el("friend-edit-select")?.addEventListener("change",()=>{
+  const button=el("friend-edit-open"),selected=el("friend-edit-select")?.value;
+  if(button)button.disabled=!selected;
+ });
+ el("friend-edit-open")?.addEventListener("click",()=>{
+  const selected=el("friend-edit-select")?.value;
+  const player=state.friends.find(p=>p.id===selected);
+  if(player)openFriendForm(player);
+ });
  el("dashboard-add-friend")?.addEventListener("click",event=>{event.preventDefault();showPlayerDiscover(true)});
  el("dashboard-friends-manage")?.addEventListener("click",()=>showPlayerDiscover(false,false));
  el("friend-order-done")?.addEventListener("click",()=>{

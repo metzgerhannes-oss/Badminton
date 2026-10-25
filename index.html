@@ -622,6 +622,13 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <p id="current-account-label" class="current-account-label" aria-live="polite"></p>
    </section>
 
+   <details class="settings-section" id="manual-follow-edit">
+    <summary>Gefolgte Spieler bearbeiten</summary>
+    <p class="settings-hint">Lokale Angaben bearbeiten; eigene Familienprofile bleiben getrennt.</p>
+    <label for="friend-edit-select">Gefolgter Spieler</label>
+    <select id="friend-edit-select"><option value="">Spieler auswählen</option></select>
+    <button id="friend-edit-open" type="button" class="subtle-button" disabled>Bearbeiten</button>
+   </details>
    <section class="settings-card" id="owner-admin-panel" aria-labelledby="owner-admin-title" hidden>
     <h3 id="owner-admin-title">Eigentümerverwaltung – private Spieler</h3>
     <p class="settings-hint">Du verwaltest die Freigabe deiner eigenen Spieler. Die Berechtigung wird auf dem Server geprüft – lokale Profile allein geben keinen Zugriff.</p>
