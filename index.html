@@ -118,7 +118,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v214" title="Version v214">v214</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v215" title="Version v215">v215</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -788,7 +788,9 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <label>Spieler<select name="playerId" id="tournament-player" required></select></label>
   <label>DBV-Turnierlink (Pflicht)<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>
   <label>Turniername <span class="muted">(optional)</span><input name="name" maxlength="100" placeholder="z. B. Jugend-RLT Mössingen"></label>
-  <div class="tournament-dates"><label>Beginn <span class="muted">(optional)</span><input name="startDate" type="date"></label><label>Ende <span class="muted">(optional)</span><input name="endDate" type="date"></label></div>
+  <div class="tournament-dates"><label>Turnierbeginn <span class="muted">(nicht Meldeschluss, optional)</span><input name="startDate" type="date"></label><label>Ende <span class="muted">(optional)</span><input name="endDate" type="date"></label></div>
+   <label>Austragungsort / Hallenadresse <span class="muted">(optional)</span><input name="place" maxlength="120" autocomplete="off" placeholder="z. B. Musterhalle, Musterstraße 1"></label>
+   <p class="small muted">Ort und Termin sind eigene lokale Angaben. Offizielle Daten werden erst bei eindeutig belegter Turnier-ID übernommen.</p>
   <label class="community-share-optin"><input type="checkbox" id="tournament-share" name="publicShare">
    <span><strong>Für Follower öffentlich melden</strong><small>Nur mit geprüfter Berechtigung für dieses Spielerprofil. Ohne Häkchen bleibt der Termin privat auf deinem Gerät. Die Meldung ist keine bestätigte Teilnahme.</small></span>
   </label>

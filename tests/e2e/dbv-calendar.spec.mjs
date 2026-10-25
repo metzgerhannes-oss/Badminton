@@ -423,7 +423,7 @@ test("F06: 2027 C planning + persists locally with honest unknown venue",async({
  await first.locator("[data-framework-toggle]").click();
  await expect(first.locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","true");
  await expect(page.locator("#official-tournament-list")).toContainText("Rahmentermin · Anmeldung nicht bestätigt");
- await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort noch nicht veröffentlicht");
+ await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort nicht erfasst");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
  expect(saved.filter(t=>t.source==="bwbv-framework")).toHaveLength(1);
  await page.reload({waitUntil:"domcontentloaded"});

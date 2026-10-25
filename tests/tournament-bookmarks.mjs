@@ -23,6 +23,10 @@ const normalized=bookmarks.normalizeBookmark({url,name:"",playerId:"05-070879",s
 assert.equal(normalized.name,"DBV-Turnier E24DC6EE");
 assert.equal(normalized.startDate,"","Invalid stored dates must be cleared on restore");
 assert.equal(normalized.endDate,"2028-02-29");
+const syntheticVenue=bookmarks.normalizeBookmark({url:"https://dbv.turnier.de/tournament/11111111-2222-4333-8444-555555555555",playerId:"99-900011",name:"Synthetisches E-RLT",startDate:"2026-11-15",place:"  Musterhalle, Musterstraße 1  "});
+assert.equal(syntheticVenue.place,"Musterhalle, Musterstraße 1","Manually entered venue is stored locally without external lookup");
+assert.equal(syntheticVenue.startDate,"2026-11-15","Manual tournament date is never inferred from a registration deadline");
+assert.equal(bookmarks.normalizeBookmark({...syntheticVenue,place:""}).place,"","Unknown venue stays unknown; never infer from similar tournament title");
 assert.equal(bookmarks.normalizeBookmark({url:"http://dbv.turnier.de/tournament/"+id}),null);
 
 const calendar={
