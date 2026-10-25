@@ -37,3 +37,14 @@ Diese Kennzahlen sind eine Momentaufnahme und keine garantierten aktuellen Daten
 Ein `HTTP 401` an der separaten nuLiga-/DBV-API ist **kein** Hinweis auf fehlende Berechtigungen für Supabase. Quellzugriff und Datenbankzugriff sind unabhängig zu prüfen.
 
 Bei Fehlern über Projektverfügbarkeit immer zuerst die obige Projekt-ID prüfen und die Ergebnisse dokumentieren. Keine Vermutungen über Zugangssperren als Tatsachen darstellen.
+
+## UX-Projektbeschreibung · 25.10.2026 (verbindliche Zielausrichtung)
+
+**Zentrale Quelle:** [Schmetterlinge UX-Redesign 2.0](docs/PROJEKTBESCHREIBUNG_UX_REDESIGN_2026-10-25.md). Vor UI-Änderungen den aktuellen Code/Backlog und dieses Konzept gegeneinander prüfen.
+
+- **Alles außer Corporate Design veränderbar:** Navigation, Layout, Informationsarchitektur, Microcopy, Suchwege und Desktop/iPhone-Workflows können umfassend neu gestaltet werden. **Original-Logo, freigegebene Marken-/Vereinsfarben und CD-Identität bewahren**; den positiven Home-Look nicht versehentlich verschlechtern.
+- **UX-Soll:** vier stabile mobile Ziele **Start · Spieler · Turniere · Teams**; LIVE als nachweisbasiertes kontextuelles Highlight, nicht als zusätzlicher verrutschender Haupttab. Berichte, Ranglisten, Statistik und Verein kontextbezogen.
+- **Ein Pflegeweg pro Aufgabe:** eigene Familienprofile klar getrennt von gefolgten Personen, aber gut erreichbar im Spielerbereich; direkte Such-/Folge-/Sortieraktionen, konkrete Turnierorte als eigene Zeile, `+ Merken` ohne Umweg, Ergebnis → korrekter Einzelbeleg.
+- **Technische Regeln unverändert:** alte Routen/Storage/Freigaben erhalten, kostenlose Freeplan-konforme Lösung, kein produktives Supabase in gewöhnlichen Unit/CI/Playwright-Tests, keine erfundenen Live-/Matchdaten, keine ungeprüften externen Quellennutzungen.
+- **Lieferung:** vorhandene PRs/Gates und Issues (insb. #13, #306, #333, #305, #17, #56) zuerst abgleichen; Feature-Pakete sequenziell und mit technischen Prüfungen bis Main/Pages abschließen. **Keine manuellen Zwischenabnahmen**, eine physische iPhone-/Desktop-Schlussabnahme nach Gesamtabarbeitung.
+- **Konzeptstatus:** Beschreibung, nicht implementiert oder freigegeben. Niemals aufgrund dieser Dokumentation „live“ oder „fertig“ behaupten.
