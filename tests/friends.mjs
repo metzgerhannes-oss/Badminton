@@ -50,7 +50,8 @@ assert.ok(html.includes('id="first-run-dialog"')&&html.includes('id="first-run-n
 assert.ok(html.includes('id="dashboard-friends"'));
 assert.ok(code.includes('freshDevice')&&code.includes('first-run-choices')&&code.includes('first-run-new'));
 assert.ok(code.includes('data-friend-quick')&&code.includes('renderFriendQuick()'));
-assert.ok(code.includes("data-view-friend")&&code.includes("data-unfollow")&&code.includes("data-edit-friend"));
+assert.ok(code.includes("data-view-friend")&&code.includes("data-unfollow-inline")&&code.includes("data-edit-friend"));
+assert.ok(code.includes("window.openFriendForm?.(player)"),"Existing manual friend editing must remain reachable when filtering");
 assert.ok(code.includes("window.renderDashboard?.(state.chosen,viewedProfiles"));
 assert.ok(dashboard.includes('viewMode==="friend"')&&dashboard.includes('friendNoHistory'));
 assert.ok(history.includes('trophySnapshot(lastPlayer)')&&history.includes('playerId===lastPlayer'),

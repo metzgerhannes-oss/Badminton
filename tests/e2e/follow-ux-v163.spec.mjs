@@ -19,14 +19,14 @@ test("Home + opens search, follow remains open and inline unfollow is one action
  await expect(page.locator("#dashboard-add-friend")).toBeVisible();
  await page.locator("#dashboard-add-friend").click();
  await expect(page).toHaveURL(/#spieler$/);
- await expect(page.locator("#player-discover")).toBeVisible();
- await expect(page.locator("#library-search")).toBeFocused();
+ await expect(page.locator("#player-discover")).toBeHidden();
+ await expect(page.locator("#followed-player-search")).toBeFocused();
  await expect(page.locator("#spvgg-active-roster")).toHaveCount(0);
- await page.locator("#library-search").fill("Vinzent");
+ await page.locator("#followed-player-search").fill("Vinzent");
  await expect(page.locator("#library-count")).toContainText("1 passende Spieler");
  await page.locator("[data-library-toggle='05-123456']").click();
  await expect(page.locator("#player-discover")).toBeVisible();
- await expect(page.locator("[data-library-toggle='05-123456']")).toBeDisabled();
+ await expect(page.locator("[data-library-toggle='05-123456']")).toHaveCount(0);
  await expect(page.locator("#friend-list .followed-player-row")).toHaveCount(1);
  await page.locator("#followed-player-search").fill("unbekannt");
  await expect(page.locator("#friend-list .followed-player-row")).toHaveCount(0);
@@ -68,19 +68,20 @@ test("#289: following a player keeps iPhone viewport stable and dismisses search
   if(firstWidth){await page.goto("/#spieler",{waitUntil:"load"});firstWidth=false;}
   else await page.reload({waitUntil:"load"});
   await expect(page.locator("#player-discover")).toBeHidden();
-  await page.locator("#player-add-open").click();
-  await expect(page.locator("#player-discover")).toBeVisible();
-  const search=page.locator("#library-search");
+  const search=page.locator("#followed-player-search");
+  await search.focus();
+  await expect(page.locator("#player-discover")).toBeHidden();
   await search.fill("Vinzent");
+  await expect(page.locator("#player-discover")).toBeVisible();
   await expect(page.locator("#library-count")).toContainText("1 passende Spieler");
   await expect(page.locator("[data-library-toggle='05-123456']")).toBeEnabled();
   await page.locator("[data-library-toggle='05-123456']").click();
-  await expect(page.locator("[data-library-toggle='05-123456']")).toBeDisabled();
+  await expect(page.locator("[data-library-toggle='05-123456']")).toHaveCount(0);
   await expect(page.locator("#friend-list .followed-player-row")).toHaveCount(1);
   await expect(page.locator("#player-discover")).toBeVisible();
   const view=await page.evaluate(()=>{
    const nav=document.querySelector(".bottom-nav").getBoundingClientRect();
-   const search=document.querySelector("#library-search");
+   const search=document.querySelector("#followed-player-search");
    return {scale:window.visualViewport?.scale??1,
     overflow:document.documentElement.scrollWidth-window.innerWidth,
     navRight:nav.right,viewport:window.innerWidth,

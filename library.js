@@ -135,12 +135,12 @@ function render(){
  if(!hasCriteria()){showIdle();return;}
  if($("library-reset"))$("library-reset").hidden=false;
  const own=new Set(localSelection().own),following=new Set(localSelection().following);
- const people=filtered(),count=$("library-count"),area=$("library-results");
+ const people=filtered().filter(p=>!own.has(p.id)&&!following.has(p.id)),count=$("library-count"),area=$("library-results");
  const shown=dbMode?people:people.slice(0,visible);
- if(count)count.textContent=(dbMode?dbTotal:people.length).toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
+ if(count)count.textContent=people.length.toLocaleString("de-DE")+(localMode?" passende lokale Profile":" passende Spieler")+" · nach Verein gruppiert";
  if(!area)return;
  if(!people.length){
-  error(localMode?"Zentrale DBV-Suche derzeit eingeschränkt. Auch auf diesem Gerät wurde kein passendes Profil gefunden.":"Keine bestätigten DBV-Treffer für diese Suchfilter. Bitte Namen oder Filter ändern.",localMode?"limited":"empty");
+  error(localMode?"Nur deine bereits bekannten Profile gefunden.":"Keine weiteren DBV-Spieler für diese Suche gefunden.",localMode?"limited":"empty");
   $("library-more").hidden=true;return;
  }
  area.dataset.state=localMode?"limited":"ready";
@@ -169,8 +169,13 @@ function render(){
   const msg=$("library-message");if(msg&&result?.message)msg.textContent=result.message;
   // iOS can retain a focused search field/keyboard when the result button is
   // replaced. Close only after a successful follow; leave the search open.
-  if(result?.ok&&$("player-discover")?.contains(document.activeElement)&&
-     document.activeElement?.matches?.("input,select,textarea"))document.activeElement.blur();
+  if(result?.ok){
+   // The only visible search now lives above the followed list, outside discovery.
+   // Dismiss the iPhone keyboard without changing the search query or viewport.
+   $("followed-player-search")?.blur();
+   if($("player-discover")?.contains(document.activeElement)&&
+      document.activeElement?.matches?.("input,select,textarea"))document.activeElement.blur();
+  }
   render();
  }));
  area.querySelectorAll("[data-library-open]").forEach(button=>button.addEventListener("click",()=>{
@@ -319,8 +324,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("library-age").value="all";
   $("library-association").value="all";
   $("library-club-suggestions").innerHTML="";
-  clearTimeout(filterTimer);showIdle();
-  $("library-search").focus();
+  clearTimeout(filterTimer);
+  // The visible unified input owns the query. Reset both fields together.
+  const search=$("followed-player-search");
+  if(search){search.value="";search.dispatchEvent(new Event("input",{bubbles:true}));search.focus({preventScroll:true})}
+  else{$("library-search").focus();showIdle()}
+  showIdle();
  });
  $("library-reload").addEventListener("click",()=>{summary=null;memory.clear();load();});
  window.addEventListener("hashchange",()=>{if(location.hash==="#spieler"&&hasCriteria()&&!loaded)load();});

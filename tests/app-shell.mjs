@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-const [html,legacy,components,design,shell,cache,manifest]=await Promise.all([
- "index.html","styles.css","ui-components.css","design-v2.css","app-shell.css","sw.js","manifest.webmanifest"
+const [html,legacy,components,design,shell,cache,manifest,app]=await Promise.all([
+ "index.html","styles.css","ui-components.css","design-v2.css","app-shell.css","sw.js","manifest.webmanifest","app.js"
 ].map(path=>readFile(path,"utf8")));
 const href=[...html.matchAll(/<link rel="stylesheet" href="\.\/([^"]+)"/g)].map(m=>m[1]);
 assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","teams.css","club-roster.css","private-sharing.css","settings-rooms.css","onboarding-wizard.css","spiele.css","home-v137.css","desktop-dashboard.css","club-overview.css","follow-ux.css","ux-polish.css","desktop-shell-v172.css","desktop-tournament-v173.css","desktop-workspace-v176.css","pwa-update.css","today-in-action.css","accessibility-v182.css","canonical-follows-v183.css","contrast-v189.css"],
@@ -37,6 +37,8 @@ assert.match(html,/id="dbv-calendar-advanced" class="dbv-calendar-advanced"/,"Ad
 assert.ok(html.indexOf('id="my-tournaments-title"')<html.indexOf('id="dbv-calendar-heading"'),"Personal dates precede tournament directory");
 assert.ok(html.indexOf('id="dbv-calendar-heading"')<html.indexOf('class="live-dbv"'),"Calendar search precedes live detail");
 
-for(const id of ["friend-order-done","team-order-done"]){
- assert.match(html,new RegExp('id="'+id+'"[^>]*type="button"'),"Explicit sorted-list Finish button");
-}
+assert.doesNotMatch(html,/id="friend-order-done"/,"Player order is now changed directly at the row");
+assert.doesNotMatch(html,/id="friend-manage-details"/,"There must be no duplicate player management screen");
+assert.match(html,/id="followed-player-search"/,"Player search and follow share one entry point");
+assert.match(app,/data-friend-grip/,"Player ordering handles are accessible directly in the list");
+assert.match(html,/id="team-order-done"[^>]*type="button"/,"Team sorting still has the original Finish button");

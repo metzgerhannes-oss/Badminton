@@ -463,9 +463,13 @@ test("v183: followed players use their canonical Spieler page and old bookmarks 
  await expect(page.locator("#friend-list")).toContainText("Keine gefolgten Spieler zu dieser Suche");
  await page.locator("#followed-player-search").fill("Sarah");
  await expect(page.locator("#friend-list")).toContainText("Sarah Storz");
- await page.locator("#friend-manage-details summary").click();
- await expect(page.locator("#friend-settings-list")).toBeVisible();
- await expect(page.locator("#friend-settings-list")).toContainText("Sarah Storz");
+ await expect(page.locator("#friend-manage-details")).toHaveCount(0);
+ await expect(page.locator('#friend-list [data-follow-row]')).toHaveCount(1);
+ // Filtered lists show an edit action, not a misleading disabled sort grip.
+ await expect(page.locator('[data-friend-grip="'+FRIEND+'"]')).toHaveCount(0);
+ await expect(page.locator('[data-edit-friend="'+FRIEND+'"]')).toBeEnabled();
+ await page.locator("#followed-player-search").fill("");
+ await expect(page.locator('[data-friend-grip="'+FRIEND+'"]')).toBeEnabled();
 
  // Bookmarked links have one canonical destination and never become dead rooms.
  await page.goto("/#einstellungen/spieler",{waitUntil:"domcontentloaded"});

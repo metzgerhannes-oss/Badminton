@@ -27,13 +27,13 @@ test("follow-first Spieler and Mannschaft tabs; only family profiles in Einstell
  assert.doesNotMatch(html,/src="\.\/friend-search\.js"/);
  assert.doesNotMatch(html,/id="friend-search"/);
  assert.equal((html.match(/id="library-search"/g)||[]).length,1);
- for(const id of ["add-player","add-friend-manual","friend-list","profile-list","friend-settings-list","team-settings-list"]){
+ for(const id of ["add-player","add-friend-manual","friend-list","profile-list","followed-player-search","team-settings-list"]){
   assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1);
  }
- for(const id of ["friend-list","player-discover","player-add-open","team-followed","team-discover","team-add-open"]){
+ for(const id of ["friend-list","player-discover","followed-player-search","team-followed","team-discover","team-add-open"]){
   assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'),id);
  }
- for(const id of ["friend-settings-list","team-settings-list"]){
+ for(const id of ["team-settings-list"]){
   assert.ok(html.indexOf('id="'+id+'"')<html.indexOf('id="view-einstellungen"'),id);
  }
  assert.ok(html.indexOf('id="profile-list"')>html.indexOf('id="view-einstellungen"'));
@@ -41,6 +41,10 @@ test("follow-first Spieler and Mannschaft tabs; only family profiles in Einstell
   assert.doesNotMatch(html,new RegExp('id="'+id+'"'));
  }
  assert.match(html,/id="player-discover"[^>]*hidden/);
+ assert.doesNotMatch(html,/id="player-add-open"/);
+ assert.doesNotMatch(html,/id="friend-manage-details"/);
+ assert.doesNotMatch(html,/id="friend-settings-list"/);
+ assert.match(html,/id="followed-player-search"[^>]*aria-controls="friend-list library-results"/);
  assert.match(html,/id="team-discover"[^>]*hidden/);
  assert.match(html,/id="dashboard-friends-manage"[^>]*href="#spieler" hidden/);
  assert.match(html,/id="dashboard-add-friend"[^>]*href="#spieler"/);

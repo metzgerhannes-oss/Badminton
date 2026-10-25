@@ -6,7 +6,7 @@ const player=html.slice(html.indexOf('id="view-spieler"'),html.indexOf('id="view
 const team=html.slice(html.indexOf('id="view-mannschaft"'),html.indexOf('id="view-einstellungen"'));
 const prefs=html.slice(html.indexOf('id="view-einstellungen"'),html.indexOf('</main>'));
 for(const [name,region,ids] of [
- ["Spieler",player,["friend-list","friend-settings-list","player-add-open","add-friend-manual"]],
+ ["Spieler",player,["friend-list","followed-player-search","add-friend-manual"]],
  ["Mannschaften",team,["team-followed","team-settings-list","team-add-open"]],
  ["Familie",prefs,["profile-list","add-player","owner-admin-panel","owner-activation-setup"]]
  ]){
@@ -22,7 +22,10 @@ assert.match(settings, /"#einstellungen\/spieler":"#spieler"/);
 assert.match(settings, /"#einstellungen\/mannschaften":"#mannschaft"/);
 assert.doesNotMatch(settings, /\{id:"spieler"/);
 assert.doesNotMatch(settings, /\{id:"mannschaften"/);
-assert.match(app, /data-friend-move/);
+assert.match(app, /data-friend-grip/);
+assert.doesNotMatch(player,/id="friend-manage-details"/);
+assert.doesNotMatch(player,/id="friend-settings-list"/);
+assert.doesNotMatch(player,/id="player-add-open"/);
 assert.match(teams, /data-team-move/);
 assert.match(app, /SchmetterlingeStorage\.unfollow\(state,id\)/);
 assert.match(storage, /selectOwn/);

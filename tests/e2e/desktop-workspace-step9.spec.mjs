@@ -89,7 +89,9 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
 test("desktop PR3: player search opens alongside followed profiles and keeps focus",async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
- await page.locator("#player-add-open").click();
+ const search=page.locator("#followed-player-search");
+ await expect(page.locator("#player-discover")).toBeHidden();
+ await search.fill("Vinzent");
  await expect(page.locator("#player-discover")).toBeVisible();
  const m=await page.evaluate(()=>{
   const rect=id=>{const r=document.getElementById(id).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top}};
@@ -99,25 +101,24 @@ test("desktop PR3: player search opens alongside followed profiles and keeps foc
  expect(m.cols).toBe(2);
  expect(m.find.left).toBeGreaterThanOrEqual(m.follow+8);
  expect(m.overflow).toBeLessThanOrEqual(2);
- await expect(page.locator("#library-search")).toBeVisible();
- // Regression: mobile's pale discovery card must not retain a white desktop
- // heading. Measure rendered contrast rather than only checking CSS strings.
+ await expect(search).toBeVisible();
+ // The duplicate search label and heading are intentionally hidden now;
+ // check the visible result counter against its actual card background.
  const contrast=await page.locator("#player-discover").evaluate(panel=>{
   const parse=value=>value.match(/[0-9.]+/g).slice(0,3).map(Number);
   const lum=rgb=>rgb.map(v=>{
    const c=v/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;
   }).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
   const background=lum(parse(getComputedStyle(panel).backgroundColor));
-  const heading=lum(parse(getComputedStyle(panel.querySelector("h3")).color));
-  return (Math.max(background,heading)+.05)/(Math.min(background,heading)+.05);
+  const label=lum(parse(getComputedStyle(panel.querySelector("#library-count")).color));
+  return (Math.max(background,label)+.05)/(Math.min(background,label)+.05);
  });
- expect(contrast,"Desktop discovery heading must be readable").toBeGreaterThan(7);
- await page.locator("#player-discover-close").focus();
+ expect(contrast,"Desktop search results must be readable on their card").toBeGreaterThan(7);
+ await search.focus();
+ await expect(search).toBeFocused();
  await page.keyboard.press("Tab");
- await expect(page.locator("#library-reload")).toBeFocused();
- await page.keyboard.press("Tab");
- await expect(page.locator("#library-search")).toBeFocused();
- await page.locator("#player-discover-close").click();
+ await expect(page.locator(".follow-search-more > summary")).toBeFocused();
+ await search.fill("");
  await expect(page.locator("#player-discover")).toBeHidden();
 });
 
@@ -154,7 +155,7 @@ test("desktop PR3: tablet/iPhone keep familiar stacked views and original nav",a
    expect(m.pages).toBe(1);
    expect(m.navCount).toBe(1);
    expect(m.scroll-m.innerWidth,route+" mobile overflow at "+width).toBeLessThanOrEqual(2);
-   if(width===320&&route==="spieler")await expect(page.locator("#player-add-open")).toBeVisible();
+   if(width===320&&route==="spieler")await expect(page.locator("#followed-player-search")).toBeVisible();
   }
  }
 });

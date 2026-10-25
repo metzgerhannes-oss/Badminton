@@ -16,8 +16,9 @@ assert.match(hub,/className="settings-room-back"/);
 assert.match(hub,/room\.hidden=id!==key/);
 assert.match(hub,/"#einstellungen\/spieler":"#spieler"/);
 assert.match(hub,/"#einstellungen\/mannschaften":"#mannschaft"/);
-assert.match(index,/id="player-add-open"/);
-assert.match(index,/id="friend-settings-list"/);
+assert.match(index,/id="followed-player-search"/);
+assert.doesNotMatch(index,/id="player-add-open"/);
+assert.doesNotMatch(index,/id="friend-settings-list"/);
 assert.match(index,/id="team-settings-list"/);
 for(const selector of [".player-management","#owner-admin-panel","#owner-activation-setup",
  ".language-settings",".club-branding-card",".invitation-card",".backup-card"])
