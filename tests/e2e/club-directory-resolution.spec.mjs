@@ -38,6 +38,9 @@ test("Scoped name and club search succeeds while full player-roster API yields n
  await expect(page.locator("#player-discover")).toBeVisible();
  await page.locator(".follow-search-more > summary").click();
  await page.locator("#library-club").fill("SpVgg. Mössingen");
+ // WebKit may render the first name-only response before the club-scoped request.
+ // Require the actual scoped RPC to have been issued, not just 12 cached cards.
+ await expect.poll(()=>queries.some(q=>q.p_query==="Mössinger"&&q.p_club==="SpVgg. Mössingen"),{timeout:15000}).toBe(true);
  await expect(page.locator("#library-count")).toContainText("12 passende Spieler");
  await expect(page.locator(".library-player")).toHaveCount(12);
  await expect(page.locator("#library-more")).toBeHidden();
