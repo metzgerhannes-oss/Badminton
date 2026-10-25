@@ -53,7 +53,7 @@ test("v214: card and nested secondary button each activate only their own action
   host.insertAdjacentHTML("beforeend",
    '<article class="card-open-surface" id="synthetic-card" style="position:fixed;top:84px;left:16px;z-index:9999;width:260px;padding:14px;background:white"><h3>Details öffnen</h3>'+
    '<button class="card-open-primary" type="button" id="card-main">Details</button>'+
-   '<button type="button" id="card-save">+ Merken</button></article>';
+   '<button type="button" id="card-save">+ Merken</button></article>');
   window.__cardCounts={primary:0,secondary:0};
   document.querySelector("#card-main").onclick=()=>window.__cardCounts.primary++;
   document.querySelector("#card-save").onclick=()=>window.__cardCounts.secondary++;
