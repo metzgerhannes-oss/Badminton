@@ -168,8 +168,8 @@ function renderFollowed(){
 }
 function card(team,mode="search"){
  const followed=follows.includes(team.follow_key),selected=selectedId===team.id;
- return '<article class="team-card'+(selected?' is-selected':'')+'">'+
-  '<button class="team-card-main" type="button" data-team-open="'+esc(team.id)+'">'+
+ return '<article class="team-card card-open-surface'+(selected?' is-selected':'')+'">'+
+  '<button class="team-card-main card-open-primary" type="button" data-team-open="'+esc(team.id)+'">'+
    '<strong>'+esc(displayTeamName(team))+'</strong>'+
    '<span>'+esc(team.league_name)+' · '+esc(team.season)+'</span>'+
    '<small>Platz '+(Number.isInteger(team.position)?team.position:"–")+
