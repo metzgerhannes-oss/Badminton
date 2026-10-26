@@ -9,11 +9,16 @@ contains("CREATE OR REPLACE FUNCTION private_content.record_import_health_weekly
 contains("SECURITY INVOKER");
 contains("SET search_path TO 'pg_catalog', 'pg_temp'");
 contains("REVOKE ALL ON FUNCTION private_content.record_import_health_weekly() FROM PUBLIC, anon, authenticated");
-for(const metric of ["import_count_mismatch","import_count_excess_facts","import_count_shortfall"])
+for(const metric of ["import_count_mismatch","import_count_excess_facts","import_count_shortfall",
+ "import_count_missing_counter"])
   contains("'"+metric+"'","Missing diagnostic "+metric);
 
 assert.ok(!sql.includes("OR (counts->>'import_count_mismatch')::int > 0"),
   "Cumulative canonical facts are not comparable to one import job counter");
+contains("OR (counts->>'import_count_shortfall')::int > 0",
+  "A genuine shortage of canonical match facts must still raise attention");
+contains("OR (counts->>'import_count_missing_counter')::int > 0",
+  "Missing import evidence must still raise attention");
 contains("OR (counts->>'stage_cards_unreconciled')::int > 0",
   "Unreconciled staging cards must remain an attention signal");
 for(const metric of ["bad_import_status","match_archive_mismatch",
