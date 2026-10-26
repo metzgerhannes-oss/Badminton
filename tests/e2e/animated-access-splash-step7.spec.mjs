@@ -40,7 +40,6 @@ test("checking uses original club logo and animated shuttle without visible text
  await expect(page.locator(".app-access-splash-emblem img")).toHaveAttribute("src","./assets/spvgg-schmetterlinge-splash.svg");
  await expect(page.locator(".app-access-splash-emblem img")).toHaveCSS("mix-blend-mode","multiply");
  await expect(page.locator(".app-access-shuttle")).toHaveAttribute("src","./assets/shuttlecock-splash.svg");
- await expect(page.locator(".app-access-shuttle")).toHaveJSProperty("naturalWidth",96);
  await expect(page.locator("#app-access-splash .app-access-visually-hidden")).toContainText("Zugang wird geprüft");
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
  const actual=await page.locator("#app-access-splash").evaluate(el=>({
@@ -53,11 +52,6 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(actual.artWidth).toBeGreaterThan(100);
  expect(actual.logoWidth).toBeGreaterThan(100);
  expect(actual.duration).toBe("3.2s");
- const svg=await page.evaluate(async()=>{
-  const r=await fetch("./assets/shuttlecock-splash.svg");
-  return r.ok?await r.text():"";
- });
- expect(svg.match(/class="feather"/g)).toHaveLength(16);
 
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
@@ -74,6 +68,16 @@ test("checking uses original club logo and animated shuttle without visible text
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page.locator("body > .app")).toBeVisible();
  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
+ // Verify the actual SVG finishes decoding and contains 16 feathers AFTER
+ // granting access. WebKit can defer image decode until page load; waiting for
+ // naturalWidth while the RPC is held artificially triggers the real auth
+ // timeout and incorrectly switches the splash to the denied/error panel.
+ await expect(page.locator(".app-access-shuttle")).toHaveJSProperty("naturalWidth",96);
+ const svg=await page.evaluate(async()=>{
+  const r=await fetch("./assets/shuttlecock-splash.svg");
+  return r.ok?await r.text():"";
+ });
+ expect(svg.match(/class="feather"/g)).toHaveLength(16);
  const stored=await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
  expect(stored).toContain("synthetic-access-token");
 });
