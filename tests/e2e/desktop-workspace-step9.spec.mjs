@@ -48,8 +48,8 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
     expect(Math.min(...color),route+" filter label must be light on navy").toBeGreaterThanOrEqual(180);
    }
    if(width===1440&&route==="start"){
-    // Real screenshot regression: inherited light-theme ink on the dark
-    // dashboard made headings unreadable, while a pale trophy card needs ink.
+    // Contrast regression: dark dashboard headings must be light, but both
+    // pale friend and trophy panels need dark ink.
     const colors=await page.evaluate(()=>{
      const channels=selector=>Array.from(getComputedStyle(document.querySelector(selector)).color.matchAll(/[0-9.]+/g))
       .slice(0,3).map(match=>Number(match[0]));
@@ -60,8 +60,9 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
       trophy:channels("#view-start .home-trophy-heading h2")
      };
     });
-    for(const key of ["heading","friends","empty"])
+    for(const key of ["heading","empty"])
      expect(Math.min(...colors[key]),key+" must remain light on navy").toBeGreaterThanOrEqual(180);
+    expect(Math.max(...colors.friends),"Pale friends card needs dark readable heading").toBeLessThan(130);
     expect(Math.max(...colors.trophy),"Pale trophy card needs dark readable heading").toBeLessThan(130);
    }
    if(width===1440&&route==="einstellungen"){
