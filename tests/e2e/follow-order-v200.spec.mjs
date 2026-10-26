@@ -17,6 +17,7 @@ test("v217: direct player sorting persists and leaves own profiles intact",async
  },{own,friends});
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  const order=()=>page.locator("#friend-list [data-follow-row]").evaluateAll(rows=>rows.map(n=>n.dataset.followRow));
  expect(await order()).toEqual(["98-900001","98-900002","98-900003"]);
  const grip=page.locator('[data-friend-grip="98-900003"]');
@@ -27,6 +28,7 @@ test("v217: direct player sorting persists and leaves own profiles intact",async
  await page.keyboard.press("ArrowUp");
  expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
  await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
  await expect(page.locator("#friend-manage-details")).toHaveCount(0);
  const result=await page.evaluate(()=>window.badmintonLibraryToggleFollow({id:"98-900004",name:"Delta Test"}));
@@ -48,6 +50,7 @@ test("v222: team order, reset and minus work on primary cards without changing f
  },{own,teamKeys});
  await page.setViewportSize({width:320,height:720});
  await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await expect(page.locator("#team-manage-details")).toHaveCount(0);
  const order=()=>page.locator('#team-followed [data-team-move][data-direction="-1"]')
   .evaluateAll(buttons=>buttons.map(button=>button.dataset.teamMove));
@@ -64,6 +67,7 @@ test("v222: team order, reset and minus work on primary cards without changing f
  await expect(page.locator("#team-order-reset")).toBeFocused();
  expect(await order()).toEqual(["nuliga:999999:1","nuliga:999999:2","nuliga:999999:3"]);
  await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  expect(await order()).toEqual(["nuliga:999999:1","nuliga:999999:2","nuliga:999999:3"]);
  await page.locator('#team-followed [data-team-toggle="nuliga:999999:2"]').click();
  await expect(page.locator('#team-followed [data-team-toggle="nuliga:999999:2"]')).toHaveCount(0);
@@ -90,6 +94,7 @@ for(const size of [0,1,5,20]){
   },{friends});
   await page.setViewportSize({width:size%2?390:320,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   const rows=page.locator("#friend-list [data-follow-row]");
   await expect(rows).toHaveCount(size);
   await expect(page.locator("#friend-manage-details")).toHaveCount(0);
@@ -98,6 +103,7 @@ for(const size of [0,1,5,20]){
    await page.locator('[data-friend-grip="'+id+'"]').focus();
    await page.keyboard.press("ArrowUp");
    await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
    const ids=await rows.evaluateAll(nodes=>nodes.map(el=>el.dataset.followRow));
    expect(ids.at(-2)).toBe(id);
    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
@@ -119,6 +125,7 @@ for(const size of [0,1,5,20]){
   },{teams});
   await page.setViewportSize({width:size%2?390:320,height:844});
   await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   await expect(page.locator("#team-manage-details")).toHaveCount(0);
   const arrows=page.locator('#team-followed [data-team-move][data-direction="-1"]');
   await expect(arrows).toHaveCount(size);
@@ -126,6 +133,7 @@ for(const size of [0,1,5,20]){
    const id=teams[size-1];
    await page.locator('[data-team-move="'+id+'"][data-direction="-1"]').click();
    await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
    const ordered=await arrows.evaluateAll(nodes=>nodes.map(el=>el.dataset.teamMove));
    expect(ordered.at(-2)).toBe(id);
    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")));
