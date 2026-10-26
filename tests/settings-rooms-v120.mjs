@@ -19,7 +19,9 @@ assert.match(hub,/"#einstellungen\/mannschaften":"#mannschaft"/);
 assert.match(index,/id="followed-player-search"/);
 assert.doesNotMatch(index,/id="player-add-open"/);
 assert.doesNotMatch(index,/id="friend-settings-list"/);
-assert.match(index,/id="team-settings-list"/);
+assert.match(index,/id="team-followed"/);
+assert.match(index,/id="team-order-reset"/);
+assert.doesNotMatch(index,/id="team-settings-list"|id="team-manage-details"/);
 for(const selector of [".player-management","#owner-admin-panel","#owner-activation-setup",
  ".language-settings",".club-branding-card",".invitation-card",".backup-card"])
  assert.ok(hub.includes(selector),"Missing original settings control: "+selector);
