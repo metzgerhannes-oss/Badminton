@@ -17,7 +17,6 @@ test("v217: direct player sorting persists and leaves own profiles intact",async
  },{own,friends});
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
- await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  const order=()=>page.locator("#friend-list [data-follow-row]").evaluateAll(rows=>rows.map(n=>n.dataset.followRow));
  expect(await order()).toEqual(["98-900001","98-900002","98-900003"]);
  const grip=page.locator('[data-friend-grip="98-900003"]');
@@ -28,7 +27,6 @@ test("v217: direct player sorting persists and leaves own profiles intact",async
  await page.keyboard.press("ArrowUp");
  expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
  await page.reload({waitUntil:"domcontentloaded"});
- await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  expect(await order()).toEqual(["98-900003","98-900001","98-900002"]);
  await expect(page.locator("#friend-manage-details")).toHaveCount(0);
  const result=await page.evaluate(()=>window.badmintonLibraryToggleFollow({id:"98-900004",name:"Delta Test"}));
@@ -40,40 +38,41 @@ test("v217: direct player sorting persists and leaves own profiles intact",async
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
 });
 
-test("v200: team order and reset persist without touching profile storage",async({page})=>{
+test("v222: team order, reset and minus work on primary cards without changing family storage",async({page})=>{
  await page.addInitScript(({own,teamKeys})=>{
   if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
    players:[own],friends:[],officialLinks:[],activeProfileId:own.id,chosen:own.id,historyProfilesInitialized:true
   }));
-  if(!localStorage.getItem("schmetterlinge-followed-teams-v1"))localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(teamKeys));
+  if(!localStorage.getItem("schmetterlinge-followed-teams-v1"))
+   localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify(teamKeys));
  },{own,teamKeys});
  await page.setViewportSize({width:320,height:720});
- await page.goto("/#mannschaft");
- await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
- await expect(page.locator('#team-settings-list [data-team-move][data-direction="-1"]')).toHaveCount(3);
- await page.locator("#team-manage-details summary").click();
- const order=()=>page.locator('#team-settings-list [data-team-move][data-direction="-1"]')
+ await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#team-manage-details")).toHaveCount(0);
+ const order=()=>page.locator('#team-followed [data-team-move][data-direction="-1"]')
   .evaluateAll(buttons=>buttons.map(button=>button.dataset.teamMove));
+ await expect(page.locator('#team-followed [data-team-move][data-direction="-1"]')).toHaveCount(3);
  expect(await order()).toEqual(teamKeys);
  const moved=page.locator('[data-team-move="nuliga:999999:2"][data-direction="-1"]');
  await moved.click();
  await expect(moved).toBeFocused();
  expect(await order()).toEqual(["nuliga:999999:3","nuliga:999999:2","nuliga:999999:1"]);
- await moved.click(); // Boundary fallback must keep an enabled arrow focused.
+ await moved.click(); // Boundary fallback must retain a visible action.
  await expect(page.locator('[data-team-move="nuliga:999999:2"][data-direction="1"]')).toBeFocused();
  expect(await order()).toEqual(["nuliga:999999:2","nuliga:999999:3","nuliga:999999:1"]);
  await page.locator("#team-order-reset").click();
  await expect(page.locator("#team-order-reset")).toBeFocused();
  expect(await order()).toEqual(["nuliga:999999:1","nuliga:999999:2","nuliga:999999:3"]);
- await page.reload();
- await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
- await page.locator("#team-manage-details summary").click();
+ await page.reload({waitUntil:"domcontentloaded"});
  expect(await order()).toEqual(["nuliga:999999:1","nuliga:999999:2","nuliga:999999:3"]);
+ await page.locator('#team-followed [data-team-toggle="nuliga:999999:2"]').click();
+ await expect(page.locator('#team-followed [data-team-toggle="nuliga:999999:2"]')).toHaveCount(0);
+ expect(await order()).toEqual(["nuliga:999999:1","nuliga:999999:3"]);
  const saved=await page.evaluate(()=>({
   teams:JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")),
   profile:JSON.parse(localStorage.getItem("shuttleboard-v1"))
  }));
- expect(saved.teams).toEqual(["nuliga:999999:1","nuliga:999999:2","nuliga:999999:3"]);
+ expect(saved.teams).toEqual(["nuliga:999999:1","nuliga:999999:3"]);
  expect(saved.profile.players).toEqual([own]);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
 });
@@ -91,7 +90,6 @@ for(const size of [0,1,5,20]){
   },{friends});
   await page.setViewportSize({width:size%2?390:320,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
-  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   const rows=page.locator("#friend-list [data-follow-row]");
   await expect(rows).toHaveCount(size);
   await expect(page.locator("#friend-manage-details")).toHaveCount(0);
@@ -100,7 +98,6 @@ for(const size of [0,1,5,20]){
    await page.locator('[data-friend-grip="'+id+'"]').focus();
    await page.keyboard.press("ArrowUp");
    await page.reload({waitUntil:"domcontentloaded"});
-   await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
    const ids=await rows.evaluateAll(nodes=>nodes.map(el=>el.dataset.followRow));
    expect(ids.at(-2)).toBe(id);
    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
@@ -109,7 +106,7 @@ for(const size of [0,1,5,20]){
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
  });
- test("P2 #291: "+size+" followed teams stay ordered, finish restores focus",async({page})=>{
+ test("v222: "+size+" followed teams keep inline buttons and persisted order",async({page})=>{
   const teams=Array.from({length:size},(_,i)=>"nuliga:999999:"+(i+1));
   await page.addInitScript(({teams})=>{
    if(!localStorage.getItem("shuttleboard-v1"))localStorage.setItem("shuttleboard-v1",JSON.stringify({
@@ -122,28 +119,19 @@ for(const size of [0,1,5,20]){
   },{teams});
   await page.setViewportSize({width:size%2?390:320,height:844});
   await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
-  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
-  const details=page.locator("#team-manage-details");
-  await details.locator("summary").click();
-  const arrows=page.locator('#team-settings-list [data-team-move][data-direction="-1"]');
+  await expect(page.locator("#team-manage-details")).toHaveCount(0);
+  const arrows=page.locator('#team-followed [data-team-move][data-direction="-1"]');
   await expect(arrows).toHaveCount(size);
   if(size>1){
    const id=teams[size-1];
    await page.locator('[data-team-move="'+id+'"][data-direction="-1"]').click();
-   await page.locator("#team-order-done").click();
-   await expect(details).not.toHaveAttribute("open");
-   await expect(details.locator("summary")).toBeFocused();
    await page.reload({waitUntil:"domcontentloaded"});
-   await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
-   await details.locator("summary").click();
    const ordered=await arrows.evaluateAll(nodes=>nodes.map(el=>el.dataset.teamMove));
    expect(ordered.at(-2)).toBe(id);
    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")));
    expect(stored).toEqual(ordered);
   }else{
    await expect(page.locator("#team-order-reset")).toBeDisabled();
-   await page.locator("#team-order-done").click();
-   await expect(details.locator("summary")).toBeFocused();
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
  });

@@ -112,6 +112,50 @@ test("Official sourced team reports appear in the new report tab without copying
  await expect(page.locator("#team-detail-reports")).not.toContainText("Foreign link");
 });
 
+test("v222 inline team sorting keeps missing entries, focus, profile and 320/1280px widths",async({page})=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem("schmetterlinge-followed-teams-v1",JSON.stringify([
+   "nuliga:10777:1","nuliga:999999:9","nuliga:10777:2"
+  ]));
+ });
+ const ids=()=>page.locator("#team-followed [data-team-follow]")
+  .evaluateAll(nodes=>nodes.map(node=>node.dataset.teamFollow));
+ for(const width of [320,1280]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#team-followed [data-team-follow]")).toHaveCount(3);
+  expect(await ids()).toEqual(["nuliga:10777:1","nuliga:999999:9","nuliga:10777:2"]);
+  await expect(page.locator("#team-detail")).toBeHidden();
+  const last=page.locator('#team-followed [data-team-move="nuliga:10777:2"][data-direction="-1"]');
+  await last.click();
+  await expect(last).toBeFocused();
+  expect(await ids()).toEqual(["nuliga:10777:1","nuliga:10777:2","nuliga:999999:9"]);
+  await expect(page.locator("#team-detail")).toBeHidden();
+  const unknown=page.locator('#team-followed [data-team-follow="nuliga:999999:9"]');
+  await expect(unknown).toContainText("Noch keine bestätigten Saisondaten");
+  await unknown.locator('[data-team-toggle="nuliga:999999:9"]').click();
+  await expect(unknown).toHaveCount(0);
+  expect(await ids()).toEqual(["nuliga:10777:1","nuliga:10777:2"]);
+  const metrics=await page.locator("#team-followed").evaluate(node=>({
+   overflow:document.documentElement.scrollWidth-innerWidth,
+   buttons:[...node.querySelectorAll(".team-inline-controls button")].map(b=>{
+    const r=b.getBoundingClientRect();return {w:r.width,h:r.height};
+   })
+  }));
+  expect(metrics.overflow).toBeLessThanOrEqual(2);
+  for(const b of metrics.buttons){expect(b.w).toBeGreaterThanOrEqual(44);expect(b.h).toBeGreaterThanOrEqual(44);}
+  const saved=await page.evaluate(()=>({
+   teams:JSON.parse(localStorage.getItem("schmetterlinge-followed-teams-v1")),
+   own:JSON.parse(localStorage.getItem("shuttleboard-v1")).players
+  }));
+  expect(saved.teams).toEqual(["nuliga:10777:1","nuliga:10777:2"]);
+  expect(saved.own).toEqual(own.players);
+  // Restore an isolated fixture for the next viewport, never mutate production.
+  await page.evaluate(()=>localStorage.setItem("schmetterlinge-followed-teams-v1",
+   JSON.stringify(["nuliga:10777:1","nuliga:999999:9","nuliga:10777:2"])));
+ }
+});
+
 test("#289: following a team closes iPhone search without zoom or clipped navigation",async({page})=>{
  test.setTimeout(90000); // Three full WebKit navigations under shared CI runners.
  // A hash-only goto to the same URL may preserve the current document.
