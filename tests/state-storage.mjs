@@ -31,27 +31,27 @@ let first=makeVM();
 assert.equal(first.run("SchmetterlingeStorage.SCHEMA_VERSION"),1);
 assert.equal(first.run("SchmetterlingeStorage.STORE"),key);
 first.run("restore()");
-assert.equal(first.run("state.activeProfileId"),"05-071969");
+assert.equal(first.run("state.activeProfileId"),"local-charlotte");
 assert.equal(first.run("state.viewingFriendId"),null);
 assert.equal(first.run("state.friends[0].id"),"05-061350");
-assert.equal(first.run("state.officialLinks[0].playerId"),"05-071969");
+assert.equal(first.run("state.officialLinks[0].playerId"),"local-charlotte");
 first.run('state.viewingFriendId="05-061350";state.chosen="05-061350"');
 first.run("save()");
 const saved=JSON.parse(items.get(key));
-assert.deepEqual(saved.players.map(p=>p.id),["05-070879","05-071969"]);
+assert.deepEqual(saved.players.map(p=>p.id),["05-070879","local-charlotte"],"No hardcoded person identity migration");
 assert.equal(saved.chosen,saved.activeProfileId);
-assert.equal(saved.activeProfileId,"05-071969");
+assert.equal(saved.activeProfileId,"local-charlotte");
 assert.equal(saved.friends.length,1);
-assert.equal(saved.officialLinks[0].playerId,"05-071969");
+assert.equal(saved.officialLinks[0].playerId,"local-charlotte","Old favorites keep their actual device owner");
 assert.equal(saved.viewingFriendId,undefined);
 assert.equal(items.get("separate-setting"),"do-not-touch");
 const second=makeVM();
 second.run("restore()");
-assert.equal(second.run("state.activeProfileId"),"05-071969");
+assert.equal(second.run("state.activeProfileId"),"local-charlotte");
 assert.equal(second.run("state.friends.length"),1);
 assert.equal(second.run("state.officialLinks.length"),1);
-// Restore a previous user's duplicate Philipp (one local without ID, one
-// confirmed DBV player). Do not lose tournaments attached to the old alias.
+// Restore a local first-name alias and a DBV player with matching first name.
+// Do not guess they are the same human or reassign private bookmarks.
 const aliasStore=new Map([[key,JSON.stringify({
  players:[
   {id:"local-older",name:"Philipp",club:"SpVgg Mössingen"},
@@ -64,10 +64,10 @@ const aliasStore=new Map([[key,JSON.stringify({
 const aliasApp=makeVM(aliasStore);
 aliasApp.run("restore();save()");
 const aliasData=JSON.parse(aliasStore.get(key));
-assert.deepEqual(aliasData.players.map(p=>p.id),["05-070879","05-071969"]);
-assert.equal(aliasData.activeProfileId,"05-070879");
-assert.equal(aliasData.chosen,"05-070879");
-assert.equal(aliasData.officialLinks[0].playerId,"05-070879");
+assert.deepEqual(aliasData.players.map(p=>p.id),["local-older","05-070879","05-071969"]);
+assert.equal(aliasData.activeProfileId,"local-older");
+assert.equal(aliasData.chosen,"local-older");
+assert.equal(aliasData.officialLinks[0].playerId,"local-older");
 assert.equal(aliasData.officialLinks[0].startDate,"2026-11-21");
 assert.equal(aliasData.friends[0].id,"05-061350");
 const conflictStore=new Map([[key,JSON.stringify({
@@ -79,6 +79,17 @@ const conflictApp=makeVM(conflictStore);
 conflictApp.run("restore();save()");
 assert.equal(JSON.parse(conflictStore.get(key)).players.length,2,
  "Different known birth years must not merge into one profile");
+const sameNameDifferentPeople=new Map([[key,JSON.stringify({
+ players:[{id:"local-candidate",name:"Anna Muster",club:"Testclub",birthYear:2012},
+ {id:"99-000001",name:"Anna Muster",club:"Testclub",birthYear:2012}],
+ activeProfileId:"local-candidate",officialLinks:[{
+ id:"old",url:tournament,name:"Eigener Favorit",playerId:"local-candidate",startDate:"2026-10-22"
+ }],friends:[]})]]);
+const isolated=makeVM(sameNameDifferentPeople);isolated.run("restore();save()");
+const own=JSON.parse(sameNameDifferentPeople.get(key));
+assert.equal(own.players.length,2,"Identical full name, birth year and club are not proven identity");
+assert.equal(own.activeProfileId,"local-candidate");
+assert.equal(own.officialLinks[0].playerId,"local-candidate","Never steal old local favorites");
 
 const corrupt=new Map([[key,"invalid json"]]);
 const damaged=makeVM(corrupt);
