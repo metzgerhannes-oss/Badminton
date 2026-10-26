@@ -67,8 +67,12 @@ test("desktop PR 1: medium desktop, RTL and unchanged narrow-screen navigation",
  }
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ // With the short cold-start beat, DOMContentLoaded can precede the verified
+ // shell unlock. Measure RTL only after the actual navigable desktop is ready.
+ await expect(page.locator("#view-start")).toBeVisible();
+ await page.evaluate(()=>{document.documentElement.dir="rtl";});
+ await expect(page.locator(".bottom-nav")).toHaveCSS("right","24px");
  const rtl=await page.evaluate(()=>{
-  document.documentElement.dir="rtl";
   const nav=document.querySelector(".bottom-nav").getBoundingClientRect();
   const main=document.querySelector("#hauptinhalt").getBoundingClientRect();
   return {navLeft:nav.left,mainRight:main.right,overflow:document.documentElement.scrollWidth-innerWidth};
