@@ -4,9 +4,9 @@ import {parseDbvReference,normalizeProfile,addProfileToStore,invitationUrl,STORE
 import {invitationCandidates,searchInvitationPlayers} from "../scripts/invitation-search.mjs";
 
 assert.equal(STORE,"shuttleboard-v1","Legacy storage key must remain unchanged");
-const playerId=parseDbvReference("05-070879");
+const playerId=parseDbvReference("05-900001");
 assert.equal(playerId.valid,true);
-assert.equal(playerId.id,"05-070879");
+assert.equal(playerId.id,"05-900001");
 assert.equal(playerId.url,"");
 const url=parseDbvReference("https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153");
 assert.equal(url.valid,true);
@@ -37,26 +37,26 @@ assert.equal(fresh.name,"Neue Spielerin");
 assert.equal(fresh.birthYear,2015);
 assert.equal(fresh.club,"SV Beispiel");
 const added=addProfileToStore(null,fresh);
-assert.equal(added.players.length,1,"Invited users must NOT receive Philipp/Charlotte as their own profiles");
+assert.equal(added.players.length,1,"Invited users must NOT receive Person/Person B as their own profiles");
 assert.equal(added.activeProfileId,"05-999999");
 assert.equal(added.historyProfilesInitialized,true);
 assert.deepEqual(added.officialLinks,[]);
 
 const existing={
- players:[{id:"05-070879",name:"Philipp",club:"SpVgg Mössingen"}],
- activeProfileId:"05-070879",chosen:"05-070879",
+ players:[{id:"05-900001",name:"Person",club:"SpVgg Mössingen"}],
+ activeProfileId:"05-900001",chosen:"05-900001",
  friends:[{id:"05-123456",name:"Freund"}],
- officialLinks:[{id:"TID",playerId:"05-070879",name:"Vereinsturnier"}],
+ officialLinks:[{id:"TID",playerId:"05-900001",name:"Vereinsturnier"}],
  historyProfilesInitialized:true,customSetting:"keep-this",
 };
 const further=addProfileToStore(existing,fresh);
 assert.equal(further.players.length,2);
-assert.equal(further.activeProfileId,"05-070879","Existing preferred profile must survive invitation");
+assert.equal(further.activeProfileId,"05-900001","Existing preferred profile must survive invitation");
 assert.deepEqual(further.friends,existing.friends);
 assert.deepEqual(further.officialLinks,existing.officialLinks);
 assert.equal(further.customSetting,"keep-this");
 assert.equal(existing.players.length,1,"Original stored object must not be modified");
-assert.throws(()=>addProfileToStore(existing,{...fresh,id:"05-070879"}),/bereits/);
+assert.throws(()=>addProfileToStore(existing,{...fresh,id:"05-900001"}),/bereits/);
 // A search result has a genuine DBV-ID. It must become the visible own profile
 // even when an older local family profile was selected.
 const selectedOwn=addProfileToStore(existing,fresh,{confirmed:true});
@@ -65,46 +65,59 @@ assert.equal(selectedOwn.chosen,fresh.id);
 assert.equal(selectedOwn.players.length,2);
 assert.equal(selectedOwn.players.find(p=>p.id===fresh.id).name,fresh.name);
 assert.equal(selectedOwn.friends.length,1);
-assert.equal(existing.activeProfileId,"05-070879","Source state must be immutable");
-// The same player can already exist with DBV data: reuse, never create a twin.
+assert.equal(existing.activeProfileId,"05-900001","Source state must be immutable");
+// Exact confirmed DBV ID may be reselected, but a local first-name alias
+// remains separate: name, club and age do not prove device ownership.
 const knownWithAlias={
- players:[{id:"local-42",name:"Philipp",club:"SpVgg Mössingen"},
-  {id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen",
+ players:[{id:"local-42",name:"Person",club:"SpVgg Mössingen"},
+  {id:"05-900001",name:"Person Alpha",birthYear:2016,club:"SpVgg Mössingen",
    url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
-  {id:"05-071969",name:"Charlotte Metzger"}],
+  {id:"05-900002",name:"Person Beta"}],
  activeProfileId:"local-42",chosen:"local-42",
- friends:[{id:"05-070879",name:"Philipp Metzger"},{id:"05-061350",name:"Sarah"}],
+ friends:[{id:"05-900001",name:"Person Alpha"},{id:"05-900003",name:"Person C"}],
  officialLinks:[{id:"T1",playerId:"local-42",name:"Turnier 1",startDate:"2026-12-01"},
-  {id:"T2",playerId:"05-071969",name:"Turnier 2"}],
+  {id:"T2",playerId:"05-900002",name:"Turnier 2"}],
  customSetting:"still-here"
 };
-const verified=normalizeProfile({mode:"dbv",reference:"05-070879",name:"Philipp Metzger",
+const verified=normalizeProfile({mode:"dbv",reference:"05-900001",name:"Person Alpha",
  birthYear:"2016",club:"SpVgg Mössingen"});
 const repaired=addProfileToStore(knownWithAlias,verified,{confirmed:true});
-assert.deepEqual(repaired.players.map(p=>p.id),["05-070879","05-071969"]);
-assert.equal(repaired.activeProfileId,"05-070879");
-assert.equal(repaired.chosen,"05-070879");
-assert.equal(repaired.officialLinks[0].playerId,"05-070879","Next tournaments are migrated");
-assert.equal(repaired.officialLinks[1].playerId,"05-071969");
-assert.equal(repaired.players[0].url,knownWithAlias.players[1].url,"Existing official link survives");
-assert.deepEqual(repaired.friends.map(f=>f.id),["05-061350"]);
+assert.deepEqual(repaired.players.map(p=>p.id),["local-42","05-900001","05-900002"]);
+assert.equal(repaired.activeProfileId,"05-900001");
+assert.equal(repaired.chosen,"05-900001");
+assert.equal(repaired.officialLinks[0].playerId,"local-42","Keep old locally owned tournament separate");
+assert.equal(repaired.officialLinks[1].playerId,"05-900002");
+assert.equal(repaired.players[1].url,knownWithAlias.players[1].url,"Existing official link survives");
+assert.deepEqual(repaired.friends.map(f=>f.id),["05-900003"]);
 assert.equal(repaired.customSetting,"still-here");
 assert.equal(knownWithAlias.players.length,3,"Must not mutate previous storage");
-const localOnly={players:[{id:"local-1",name:"Philipp Metzger"}],
+const localOnly={players:[{id:"local-1",name:"Person Alpha"}],
  officialLinks:[{id:"T3",playerId:"local-1",startDate:"2026-11-21"}]};
 const replacedLocal=addProfileToStore(localOnly,verified,{confirmed:true});
-assert.equal(replacedLocal.players.length,1);
-assert.equal(replacedLocal.players[0].id,"05-070879");
-assert.equal(replacedLocal.officialLinks[0].playerId,"05-070879");
-assert.throws(()=>addProfileToStore(null,{id:"local-123",name:"Philipp"},{confirmed:true}),/DBV-ID/);
-const differentBirth={players:[{id:"local-1",name:"Philipp",birthYear:2013},
- {id:"05-070879",name:"Philipp Metzger",birthYear:2016}]};
+assert.equal(replacedLocal.players.length,2);
+assert.equal(replacedLocal.players[0].id,"local-1");
+assert.equal(replacedLocal.players[1].id,"05-900001");
+assert.equal(replacedLocal.officialLinks[0].playerId,"local-1");
+assert.throws(()=>addProfileToStore(null,{id:"local-123",name:"Person"},{confirmed:true}),/DBV-ID/);
+const differentBirth={players:[{id:"local-1",name:"Person",birthYear:2013},
+ {id:"05-900001",name:"Person Alpha",birthYear:2016}]};
 assert.equal(addProfileToStore(differentBirth,verified,{confirmed:true}).players.length,2,
  "Conflicting birth years must never be silently merged");
-const ambiguous={players:[{id:"local-1",name:"Philipp"},
- {id:"local-2",name:"Philipp"}, {id:"05-070879",name:"Philipp Metzger"}]};
+const ambiguous={players:[{id:"local-1",name:"Person"},
+ {id:"local-2",name:"Person"}, {id:"05-900001",name:"Person Alpha"}]};
 assert.equal(addProfileToStore(ambiguous,verified,{confirmed:true}).players.length,3,
  "Two same-name local profiles must not be guessed into one");
+
+const sameFullName={players:[
+ {id:"local-private",name:"Sina Beispiel",birthYear:2015,club:"Testverein"}],
+ officialLinks:[{id:"Private-Turnier",playerId:"local-private"}],
+ activeProfileId:"local-private",friends:[]};
+const verifiedHomonym={id:"99-000002",name:"Sina Beispiel",birthYear:2015,club:"Testverein"};
+const twoSinas=addProfileToStore(sameFullName,verifiedHomonym,{confirmed:true});
+assert.deepEqual(twoSinas.players.map(p=>p.id),["local-private","99-000002"]);
+assert.equal(twoSinas.officialLinks[0].playerId,"local-private","Never transfer third-party local favorites");
+assert.equal(twoSinas.activeProfileId,"99-000002","New explicit selection may become active");
+assert.equal(sameFullName.players.length,1,"Never mutate source owner store");
 
 const direct=normalizeProfile({mode:"dbv",name:"Neu",reference:url.url});
 assert.match(direct.id,/^local-/,"Do not misrepresent UUID as numeric DBV ID");
@@ -140,22 +153,22 @@ assert.match(sw,/scripts\/invitation-search\.mjs/);
 assert.match(sw,/scripts\/friend-search\.mjs/);
 assert.match(sw,/scripts\/supabase-read\.mjs/);
 assert.equal(invitationCandidates([
- {dbv_id:"05-061350",name:"Sarah Storz",birth_year:2010,club:"SpVgg Mössingen"},
- {dbv_id:"05-061350",name:"Duplicate Sarah"},
+ {dbv_id:"05-900003",name:"Person Gamma",birth_year:2010,club:"SpVgg Mössingen"},
+ {dbv_id:"05-900003",name:"Duplicate Person"},
  {dbv_id:"invalid",name:"Wrong ID"}
 ]).length,1,"Search must deduplicate and reject unverified IDs");
 const responses=(value)=>({ok:true,json:async()=>value,headers:{get:()=>null}});
-const live=await searchInvitationPlayers("Sarah Storz",{
+const live=await searchInvitationPlayers("Person Gamma",{
  fetchImpl:async (url,{method,body})=>{
   assert.equal(method,"POST");
   const parsed=new URL(url);
   assert.equal(parsed.pathname,"/rest/v1/rpc/search_dbv_player_identity");
-  assert.equal(JSON.parse(body).p_query,"Sarah Storz");
-  return responses([{dbv_id:"05-061350",name:"Sarah Storz",club:"SpVgg Mössingen",age_class:"U17"}]);
+  assert.equal(JSON.parse(body).p_query,"Person Gamma");
+  return responses([{dbv_id:"05-900003",name:"Person Gamma",club:"SpVgg Mössingen",age_class:"U17"}]);
  }
 });
 assert.equal(live.source,"dbv");
-assert.equal(live.players[0].id,"05-061350");
+assert.equal(live.players[0].id,"05-900003");
 assert.equal(live.players[0].birthYear,undefined,"Public identity lookup must not return birth years");
 const empty=await searchInvitationPlayers("S");
 assert.deepEqual(empty,{players:[],source:"none"});
@@ -164,14 +177,14 @@ const backedUp=await searchInvitationPlayers("Storz",{
   const path=String(url);
   if(path.includes("/rpc/search_dbv_player_identity"))throw Error("offline");
   if(path.endsWith("/index.json"))return responses({schemaVersion:1,ageGroups:[{age:"U17"}]});
-  if(path.endsWith("/U17.json"))return responses({players:[{id:"05-061350",name:"Sarah Storz",birthYear:2010,club:"SpVgg Mössingen"}]});
+  if(path.endsWith("/U17.json"))return responses({players:[{id:"05-900003",name:"Person Gamma",birthYear:2010,club:"SpVgg Mössingen"}]});
   throw Error("Unexpected request: "+path);
  }
 });
 assert.equal(backedUp.source,"backup");
-assert.equal(backedUp.players[0].id,"05-061350");
+assert.equal(backedUp.players[0].id,"05-900003");
 const aborted=new AbortController();
 aborted.abort();
-await assert.rejects(()=>searchInvitationPlayers("Sarah",{signal:aborted.signal,fetchImpl:async()=>{throw Error("No fetch on abort")}}));
+await assert.rejects(()=>searchInvitationPlayers("Person C",{signal:aborted.signal,fetchImpl:async()=>{throw Error("No fetch on abort")}}));
 
 console.log("Invitation tests passed: shareable URL, DBV reference validation, fresh setup, existing-data preservation, guided install.");
