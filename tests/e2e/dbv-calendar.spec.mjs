@@ -571,3 +571,78 @@ test("v219: 2027 planning venue remains unknown even after a Reutlingen history 
  await expect(plans.first().locator(".dbv-calendar-place")).toHaveText("Austragungsort noch nicht veröffentlicht");
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-external-result")).toHaveCount(0);
 });
+
+
+test("P1 #386: exact DBV UUID silently corrects legacy E/D rank and Meldeschluss/date",async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-turniere")).toBeVisible();
+ // Let the initial synthetic DBV-calendar mirror finish loading BEFORE
+ // injecting the independently verified fixture. Otherwise the background
+ // load can overwrite the event and cause a racy WebKit-only failure.
+ await expect(page.locator("#dbv-calendar-status")).toContainText("passende Turniere");
+ const id="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+ const url="https://dbv.turnier.de/tournament/"+id;
+ const official={key:"dbv-calendar-95555",url,hasDirectLink:true,
+  title:"3. D-RLT BAW U11-U19 Gomaringen",start:"2026-11-22",end:"2026-11-22",
+  deadline:"2026-11-15",place:"Sport- und Kulturhalle Gomaringen"};
+ await page.evaluate(row=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[row]}
+ })),official);
+ await page.locator("#add-tournament").click();
+ await expect(page.locator("#tournament-dialog")).toBeVisible();
+ const form=page.locator("#tournament-form");
+ await form.locator('[name="url"]').fill(url);
+ await form.locator('[name="name"]').fill("3. E-RLT Gomaringen");
+ await form.locator('[name="startDate"]').fill("2026-11-15");
+ await form.locator('[name="endDate"]').fill("2026-11-15");
+ await form.locator("#tournament-save").click();
+ // DBV's event facts win; the private player association stays in local data.
+ await expect(page.locator("#tournament-dialog")).toBeHidden();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved).toHaveLength(1);
+ expect(saved[0].startDate).toBe("2026-11-22");
+ expect(saved[0].endDate).toBe("2026-11-22");
+ expect(saved[0].deadline).toBe("2026-11-15");
+ expect(saved[0].name).toBe(official.title);
+ expect(saved[0].place).toBe(official.place);
+ await expect(page.locator("#official-tournament-list")).toContainText(official.place);
+ await expect(page.locator("#official-tournament-list")).not.toContainText("3. E-RLT Gomaringen");
+ // A later authoritative update corrects existing cached official facts too.
+ await page.evaluate(row=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[{...row,place:"Neue Sporthalle Gomaringen"}]}
+ })),official);
+ await expect(page.locator("#official-tournament-list")).toContainText("Neue Sporthalle Gomaringen");
+ const updated=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(updated).toHaveLength(1);
+ expect(updated[0].id).toBe(id);
+ expect(updated[0].playerId).toBe(saved[0].playerId);
+ expect(updated[0].place).toBe("Neue Sporthalle Gomaringen");
+});
+
+test("P1 #386: different UUID is never blocked based on Gomaringen location or title",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-turniere")).toBeVisible();
+ const other="CCCCCCCC-1111-4222-8333-444444444444";
+ await page.evaluate(()=>{
+  window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+   detail:{entries:[{key:"dbv-calendar-95555",
+    url:"https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5",
+    hasDirectLink:true,title:"3. D-RLT BAW U11-U19 Gomaringen",
+    start:"2026-11-22",end:"2026-11-22",deadline:"2026-11-15",
+    place:"Gomaringen"}]}
+  }));
+ });
+ await page.locator("#add-tournament").click();
+ const form=page.locator("#tournament-form");
+ await form.locator('[name="url"]').fill("https://dbv.turnier.de/tournament/"+other);
+ await form.locator('[name="name"]').fill("3. E-RLT Gomaringen");
+ await form.locator('[name="startDate"]').fill("2026-11-15");
+ await form.locator('[name="endDate"]').fill("2026-11-15");
+ await form.locator("#tournament-save").click();
+ await expect(page.locator("#tournament-dialog")).toBeHidden();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved).toHaveLength(1);
+ expect(saved[0].id).toBe(other);
+ expect(saved[0].name).toContain("E-RLT");
+});

@@ -86,22 +86,20 @@ var SchmetterlingeBookmarks=(function(){
   const row=matching[0];
   const start=validDate(row.start),end=validDate(row.end);
   if(!start||!end||end<start)return {status:"unverified"};
-  const sameDay=(!bookmark.startDate||bookmark.startDate===start)&&
-   (!bookmark.endDate||bookmark.endDate===end);
-  // Reject obvious E/D/C/B/A category conflicts even when a pasted UUID matches.
-  const rank=s=>String(s||"").match(/\b([A-E])[-\s]*(?:RLT|Ranglistenturnier)\b/i)?.[1]?.toUpperCase()||"";
-  const localRank=rank(bookmark.name),officialRank=rank(row.title);
-  if(!sameDay||(localRank&&officialRank&&localRank!==officialRank)){
-   return {status:"conflict",reason:!sameDay?"Termine weichen vom DBV-Kalender ab":"Turnierkategorie weicht vom DBV-Kalender ab",
-    officialDate:start,officialDeadline:validDate(row.deadline)};
-  }
+  // Source-first rule: a unique, official DBV source identity decides event
+  // metadata. Local bookmarks own only the player association and reminder.
+  // Never identify two events by venue/title/age alone.
+  const officialName=String(row.title||"").trim().slice(0,100);
+  const officialPlace=String(row.place||"").trim().slice(0,120);
+  const officialDeadline=validDate(row.deadline);
   const patch={};
-  if(!bookmark.place&&typeof row.place==="string"&&row.place.trim())patch.place=row.place.trim().slice(0,120);
-  if(!bookmark.deadline&&validDate(row.deadline))patch.deadline=validDate(row.deadline);
-  if(!bookmark.startDate)patch.startDate=start;
-  if(!bookmark.endDate)patch.endDate=end;
-  if(!isCalendar&&/^DBV-Turnier [0-9a-f]{8}$/i.test(bookmark.name||"")&&row.title)patch.name=String(row.title).trim().slice(0,100);
-  return {status:"matched",updated:Object.keys(patch).length?{...bookmark,...patch}:bookmark};
+  if(officialName&&bookmark.name!==officialName)patch.name=officialName;
+  if(bookmark.startDate!==start)patch.startDate=start;
+  if(bookmark.endDate!==end)patch.endDate=end;
+  if(officialPlace&&bookmark.place!==officialPlace)patch.place=officialPlace;
+  if(officialDeadline&&bookmark.deadline!==officialDeadline)patch.deadline=officialDeadline;
+  return {status:"matched",sourceCorrected:Object.keys(patch).length>0,
+   updated:Object.keys(patch).length?{...bookmark,...patch}:bookmark};
  }
  function localDay(date=new Date()){
   const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
