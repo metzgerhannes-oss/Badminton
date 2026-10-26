@@ -172,7 +172,7 @@ assert.equal(live.players[0].id,"05-900003");
 assert.equal(live.players[0].birthYear,undefined,"Public identity lookup must not return birth years");
 const empty=await searchInvitationPlayers("S");
 assert.deepEqual(empty,{players:[],source:"none"});
-const backedUp=await searchInvitationPlayers("Storz",{
+const backedUp=await searchInvitationPlayers("Gamma",{
  fetchImpl:async (url)=>{
   const path=String(url);
   if(path.includes("/rpc/search_dbv_player_identity"))throw Error("offline");
