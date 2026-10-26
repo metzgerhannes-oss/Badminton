@@ -8,6 +8,9 @@
 #view-spieler .followed-player-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch;min-width:0}
 #view-spieler .followed-player-row>.friend-follow-item{min-width:0;min-height:64px;padding:9px 10px}
 #view-spieler .followed-player-row .friend-details{min-width:0}
+/* Friend rows are PALE, unlike the navy Home chips. Old global helper text
+   (#a6bcd3) had about 2:1 contrast on white. */
+#view-spieler .friend-follow-item .friend-details small{color:#365570}
 #view-spieler .followed-inline-remove{min-width:92px;min-height:44px;padding:7px 9px;border:1px solid #bbccd9;background:#eff5fa;color:#204b6f;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer}
 #view-spieler .followed-inline-remove:hover{background:#e1eef8}
 #view-spieler #followed-player-count{font-weight:600;color:#54758f;font-size:13px}
