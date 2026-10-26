@@ -4,14 +4,10 @@ const data=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 const sourceTotal=data.entries.length;
 const entries2026=data.entries.filter(e=>e.start_date?.startsWith("2026"));
 const bwArchive=JSON.parse(await readFile("data/bw-youth-calendar-archive.json","utf8"));
-// The app merges six source-backed BW archive events with the 2026 snapshot.
-// Four are intentionally displayed via the separately verified curated
-// result cards, so they are not counted twice in the imported event grid.
-const curatedArchiveKeys=new Set([
- "dbv-calendar-44014","dbv-calendar-44018","dbv-calendar-44019","dbv-calendar-44020"
-]);
+// v218 retains distinct archived DBV rows unless the same verified tournament
+// UUID proves identity with a curated card. Similar city/date/title is not proof.
 const unique2026=new Map([...entries2026,...bwArchive.entries.filter(e=>
- e.start_date?.startsWith("2026")&&!curatedArchiveKeys.has(e.source_key)
+ e.start_date?.startsWith("2026")
 )].map(e=>[e.source_key,e]));
 const expected2026=unique2026.size;
 const countBW2026=[...unique2026.values()].filter(e=>e.bundesland==="Baden-Württemberg").length;
@@ -135,7 +131,7 @@ test("v148: BW U13 C presents real 2026 tournament results instead of source exp
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-level").selectOption("C");
  await page.locator("#dbv-calendar-period").selectOption("all");
- await expect(page.locator("#dbv-calendar-status")).toContainText("4 passende Turniere");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("7 passende Turniere");
  const cards=page.locator("#dbv-calendar-results .dbv-calendar-external-result");
  await expect(cards).toHaveCount(3);
  await expect(cards.nth(0)).toContainText("Reutlingen");
@@ -157,7 +153,7 @@ test("v148: BW U13 historic A/B/C results distinguish Hexen-Cup A from C",async(
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-period").selectOption("all");
  for(const [level,count,curated,venues] of [
-  ["C",4,3,["Reutlingen","Friedrichshafen","Mössingen"]],
+  ["C",7,3,["Reutlingen","Friedrichshafen","Mössingen"]],
   ["A",2,2,["Eggenstein","Konstanz"]],
   ["B",1,1,["Waghäusel"]]
  ]){
@@ -169,7 +165,9 @@ test("v148: BW U13 historic A/B/C results distinguish Hexen-Cup A from C",async(
  }
  await page.locator("#dbv-calendar-level").selectOption("all");
  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(6);
- await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(17);
+ const visible=Number((await page.locator("#dbv-calendar-status").textContent()).match(/(\d+) passende Turniere/)?.[1]);
+ expect(visible).toBeGreaterThan(17);
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(visible);
 });
 
 test("v148: upcoming period has direct one-click access to past results",async({page})=>{
@@ -277,7 +275,7 @@ test("v150: BW U11/U13/U15/U17/U19 C histories are source-backed and age-filtere
  await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
  await page.locator("#dbv-calendar-level").selectOption("C");
  await page.locator("#dbv-calendar-period").selectOption("all");
- for(const [age,curated,total,hexen] of [["U11",3,4,false],["U13",3,4,false],["U15",4,5,true],["U17",4,6,true],["U19",4,5,true]]){
+ for(const [age,curated,total,hexen] of [["U11",3,7,false],["U13",3,7,false],["U15",4,9,true],["U17",4,10,true],["U19",4,9,true]]){
   await page.locator("#dbv-calendar-age").selectOption(age);
   const results=page.locator("#dbv-calendar-results");
   await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(curated);
@@ -330,7 +328,7 @@ test("v150: U17 2026 C missing imported events suggests past verified events and
  await expect(results.locator("[data-calendar-show-history]")).toBeVisible();
  await results.locator("[data-calendar-show-history]").click();
  await expect(results.locator(".dbv-calendar-external-result")).toHaveCount(4);
- await expect(page.locator("#dbv-calendar-status")).toContainText("6 passende Turniere");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("10 passende Turniere");
  await expect(results.locator("[data-calendar-show-2027]")).toBeVisible();
  await results.locator("[data-calendar-show-2027]").click();
  await expect(page.locator("#dbv-calendar-year")).toHaveValue("2027");
@@ -338,7 +336,7 @@ test("v150: U17 2026 C missing imported events suggests past verified events and
 });
 
 
-test("v150: real source archive adds historical U13/C records and removes duplicate curated cards",async({page})=>{
+test("v218: separate archive records remain visible without matching verified UUID",async({page})=>{
  const raw={
   source_key:"dbv-calendar-999991",title:"SYNTHETISCHER TEST-C-RLT U13",start_date:"2026-06-06",
   end_date:"2026-06-07",location_text:"Waiblingen",organizer:"Baden-Württemberg",
@@ -363,12 +361,14 @@ test("v150: real source archive adds historical U13/C records and removes duplic
  await page.locator("#dbv-calendar-age").selectOption("U13");
  await page.locator("#dbv-calendar-level").selectOption("C");
  await page.locator("#dbv-calendar-period").selectOption("all");
- await expect(page.locator("#dbv-calendar-status")).toContainText("4 passende Turniere");
+ await expect(page.locator("#dbv-calendar-status")).toContainText("5 passende Turniere");
  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(3);
  await expect(page.locator("#dbv-calendar-results")).toContainText("Waiblingen");
  await expect(page.locator("#dbv-calendar-results")).toContainText("SYNTHETISCHER TEST");
- await expect(page.locator("#dbv-calendar-results")).not.toContainText("dbv-calendar-999992");
- await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(4);
+ // Same title, city and date as a curated card do not authorize collapsing
+ // either synthetic archive record without an identical verified DBV UUID.
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry--history")).toHaveCount(2);
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(5);
  await expect(page.locator(".dbv-calendar-entry--history .dbv-calendar-save")).toBeHidden();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
 });

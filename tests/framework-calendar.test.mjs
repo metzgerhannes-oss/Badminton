@@ -1,3 +1,4 @@
+import {isVerifiedCalendarDuplicate} from "../scripts/dbv-calendar-utils.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
@@ -57,4 +58,24 @@ test("verified Reutlingen 2026 result preserves venue and DBV UUID",()=>{
   startDate:"2026-01-17",endDate:"2026-01-18",place:"Reutlingen"});
  assert.equal(direct.id,"52B3B803-279B-48CF-8143-F5078F5236DB");
  assert.equal(direct.place,"Reutlingen");
+});
+
+const syntheticUUID="52b3b803-279b-48cf-8143-f5078f5236db";
+const otherUUID="a8a3b4d2-1211-4f5e-8a66-132c55eadee9";
+const syntheticRow={hasDirectLink:true,url:"https://dbv.turnier.de/tournament/"+syntheticUUID,
+ start:"2026-01-17",place:"Reutlingen",level:"C"};
+const syntheticArchive={sourceKind:"results",source:"https://dbv.turnier.de/tournament/"+syntheticUUID.toUpperCase(),
+ start:"2026-01-17",place:"Reutlingen",level:"C"};
+
+test("calendar dedup requires the same official UUID, not just date, city or C-level",()=>{
+ assert.equal(isVerifiedCalendarDuplicate(syntheticRow,syntheticArchive),true);
+ assert.equal(isVerifiedCalendarDuplicate({...syntheticRow,url:"https://dbv.turnier.de/tournament/"+otherUUID},syntheticArchive),false);
+ assert.equal(isVerifiedCalendarDuplicate({...syntheticRow,hasDirectLink:false},syntheticArchive),false);
+});
+
+test("calendar dedup rejects overview, announcements and misleading URLs",()=>{
+ assert.equal(isVerifiedCalendarDuplicate({...syntheticRow,url:"https://turniere.badminton.de/"},syntheticArchive),false);
+ assert.equal(isVerifiedCalendarDuplicate(syntheticRow,{...syntheticArchive,sourceKind:"announcement"}),false);
+ assert.equal(isVerifiedCalendarDuplicate(syntheticRow,{...syntheticArchive,source:"https://dbv.turnier.de.evil.example/tournament/"+syntheticUUID}),false);
+ assert.equal(isVerifiedCalendarDuplicate(syntheticRow,{...syntheticArchive,source:syntheticArchive.source+"?from=search"}),false);
 });
