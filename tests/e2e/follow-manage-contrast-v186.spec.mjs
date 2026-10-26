@@ -11,8 +11,8 @@ function contrast(foreground,background){
  const [a,b]=[lum(foreground),lum(background)].sort((x,y)=>y-x);
  return (a+0.05)/(b+0.05);
 }
-for(const [view,hash,details,list] of [
- ["Mannschaften","#mannschaft","team-manage-details","team-settings-list"]
+for(const [view,hash,list] of [
+ ["Mannschaften","#mannschaft","team-followed"]
 ]){
  for(const width of [390,1280,1440,1920]){
   test(`#332: ${view} sorting has readable text and buttons at ${width}px`,async({page})=>{
@@ -29,22 +29,20 @@ for(const [view,hash,details,list] of [
    await page.setViewportSize({width,height:900});
    await page.goto("/"+hash,{waitUntil:"domcontentloaded"});
    await expect(page.locator("#app-access-gate")).toBeHidden();
-   await expect(page.locator("#"+details)).toBeVisible();
-   await page.locator("#"+details+" summary").click();
    const root=page.locator("#"+list);
    await root.evaluate(node=>{
-    node.innerHTML='<article class="follow-manage-item">'+
-      '<div class="follow-manage-label"><strong>SpVgg Mössingen Testmannschaft I</strong>'+
+    node.innerHTML='<article class="team-card" data-team-follow="nuliga:999999:1">'+
+      '<div class="team-card-main"><strong>SpVgg Mössingen Testmannschaft I</strong>'+
       '<small>Landesliga · 2026/27</small></div>'+
-      '<div class="follow-manage-actions"><button type="button">↑</button>'+
-      '<button type="button">↓</button>'+
-      '<button type="button">Entfolgen</button></div></article>';
+      '<span class="team-inline-controls" role="group">'+
+      '<button type="button">↑</button><button type="button">↓</button>'+
+      '<button type="button">−</button></span></article>';
    });
-   const colors=await root.locator(".follow-manage-item").evaluate(card=>{
+   const colors=await root.locator(".team-card").evaluate(card=>{
     const style=e=>getComputedStyle(e);
     const label=card.querySelector("strong");
     const secondary=card.querySelector("small");
-    const action=card.querySelector("button");
+    const action=card.querySelector(".team-inline-controls button");
     const buttonBounds=action.getBoundingClientRect();
     return {
      card:style(card).backgroundColor,
