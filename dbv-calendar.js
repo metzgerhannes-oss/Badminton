@@ -357,7 +357,7 @@ async function load(){
  // source cards remain visible if the independent archive is unavailable.
  try{
   const historical=await readBWArchive();
-  entries=[...new Map([...entries,...historical].map(row=>[row.key,row])).values()]
+  entries=[...new Map([...historical,...entries].map(row=>[row.key,row])).values()]
    .sort((a,b)=>a.start.localeCompare(b.start));
  }catch{ /* keep current source and directly verified entries */ }
  // Display independently published BW/DBV planning instead of stale hardcoded cards.
