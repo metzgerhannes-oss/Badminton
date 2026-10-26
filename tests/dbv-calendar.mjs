@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels,isNationalU11Masters} from "../scripts/dbv-calendar-utils.mjs";
+import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels,isNationalU11Masters,preferCurrentDBVRows} from "../scripts/dbv-calendar-utils.mjs";
 
 const sample=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 assert.equal(sample.schemaVersion,1);
@@ -8,6 +8,16 @@ assert.ok(sample.entries.length>=100,"Observed DBV source set should not silentl
 const rows=sample.entries.map(calendarEntry).filter(Boolean);
 assert.equal(rows.length,sample.entries.length,"Every stored DBV record must normalize");
 assert.equal(new Set(rows.map(x=>x.key)).size,rows.length,"Official source keys must be unique");
+const current={key:"dbv-calendar-777777",start:"2026-11-22",name:"Aktueller DBV-Titel",place:"Gomaringen",historicalArchive:false};
+const obsolete={...current,start:"2026-11-15",name:"Alter E-RLT-Eintrag",historicalArchive:true};
+const separateArchive={key:"dbv-calendar-777778",start:"2026-10-10",name:"Anderes Turnier",historicalArchive:true};
+const preferred=preferCurrentDBVRows([current],[obsolete,separateArchive]);
+assert.equal(preferred.length,2,"Only exact matching DBV source keys are deduplicated");
+assert.equal(preferred.find(x=>x.key===current.key).name,"Aktueller DBV-Titel","Current DBV name wins");
+assert.equal(preferred.find(x=>x.key===current.key).start,"2026-11-22","Archive may not revert current official day");
+assert.equal(preferred.find(x=>x.key===current.key).historicalArchive,false,"Current event remains interactive");
+assert.ok(preferred.some(x=>x.key===separateArchive.key),"Other archived tournaments stay separate");
+
 const year2026=rows.filter(t=>t.start.startsWith("2026"));
 const year2027=rows.filter(t=>t.start.startsWith("2027"));
 assert.ok(year2026.length>=100,"2026 source snapshot must remain");
