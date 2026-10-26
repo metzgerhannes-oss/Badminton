@@ -55,8 +55,8 @@ test("v225: homonyms remain separate from roster identities on desktop",async({p
  await expect(matches).toHaveCount(3);
  const official=matches.filter({hasText:"Vereinsquelle"});
  await expect(official).toHaveCount(1);
- await expect(official.locator("td").nth(2)).toHaveText("Nicht erfasst");
- await expect(official.locator("td").nth(3)).toHaveText("–");
+ await expect(official.locator("td").nth(1)).toHaveText("Nicht erfasst");
+ await expect(official.locator("td").nth(2)).toHaveText("–");
  await expect(official.locator("[data-open-profile]")).toHaveCount(0);
  await expect(official).toContainText("Namensgleichheit nicht verifiziert");
  const own=matches.filter({hasText:"Nur lokal"});
