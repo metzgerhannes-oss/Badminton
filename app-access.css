@@ -31,7 +31,7 @@ html[data-app-access="checking"] #app-access-gate {
  background:radial-gradient(circle at 50% 38%,#1b4d76 0,#112f54 45%,#091e3b 100%);
 }
 html[data-app-access="checking"] .app-access-panel {display:none!important}
-/* v220: splash visible only while checking. The invitation/error panel
+/* v221: splash visible only while checking. The invitation/error panel
    stays visible for denied access and no overlay survives successful access. */
 html[data-app-access="checking"] #app-access-splash {
  width:100%; max-width:360px; min-height:265px;
@@ -57,8 +57,9 @@ html[data-app-access="checking"] #app-access-splash {
  position:absolute;width:76px;height:auto;aspect-ratio:96/118;
  right:-15%;bottom:-15%;pointer-events:none;user-select:none;
  filter:drop-shadow(0 8px 6px #061d3880);transform-origin:49% 81%;
- will-change:transform,opacity;animation:app-access-shuttle-flight 3.2s linear infinite both;
+ will-change:transform,opacity;animation:app-access-shuttle-flight 2.5s linear infinite both;
 }
+/* Fixed 2.5s flight; the 0.8s cold-start beat is separate from the CSS loop. */
 /* Segmented, air-drag easing; no permanent rotation or forced load duration. */
 @keyframes app-access-shuttle-flight {
  0% {opacity:0;transform:translate3d(98px,-70px,0) rotate(-34deg) scale(.87);animation-timing-function:cubic-bezier(.2,.1,.45,.72)}

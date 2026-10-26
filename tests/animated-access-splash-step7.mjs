@@ -20,14 +20,20 @@ assert.doesNotMatch(css,/html:not\(\[data-app-access="checking"\]\)\s*#app-acces
 assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 assert.match(css,/mix-blend-mode:multiply/);
 assert.match(css,/@keyframes app-access-shuttle-flight/);
-assert.match(css,/3\.2s linear infinite both/);
+assert.match(css,/2\.5s linear infinite both/);
 assert.match(css,/env\(safe-area-inset-top\)/);
 assert.match(js,/root\.dataset\.appAccess="denied"/);
 assert.match(js,/root\.dataset\.appAccess="checking"/);
 assert.match(js,/withCheckDeadline/);
+assert.match(js,/const COLD_START_MIN_MS=800/);
+assert.match(js,/COLD_START_MIN_MS-\(performance\.now\(\)-coldStartStartedAt\)/);
+assert.match(js,/document\.visibilityState==="visible"/);
+assert.match(js,/prefers-reduced-motion: reduce/);
+assert.match(js,/await grantAfterIntro\(\)/);
+assert.match(js,/await grantAfterIntro\(\{member:false\}\)/);
 assert.match(js,/12000/);
-assert.match(js,/if\(permission==="member"\)\{grant\(\);return;\}/);
-assert.match(js,/if\(permission==="player"\)\{grant\(\{member:false\}\);return;\}/);
+assert.match(js,/if\(permission==="member"\)\{await grantAfterIntro\(\);return;\}/);
+assert.match(js,/if\(permission==="player"\)\{await grantAfterIntro\(\{member:false\}\);return;\}/);
 assert.doesNotMatch(css,/display:none!important;\s*$/m); // no accidental blanket hiding of errors
 const current=release.match(/version:"(v\d+)"/)?.[1];
 assert.ok(current,"Current PWA release identifier missing");

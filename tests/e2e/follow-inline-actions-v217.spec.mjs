@@ -23,6 +23,7 @@ for(const width of [320,390]){
   await seed(page);
   await page.setViewportSize({width,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   await expect(page.locator("#friend-list [data-follow-row]")).toHaveCount(3);
   const search=page.locator("#followed-player-search");
   await search.fill("Alpha");
@@ -47,6 +48,7 @@ test("v217: pointer drag reorders the main list and persists after reload",async
  await seed(page);
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  const grip=page.locator('[data-friend-grip="98-800003"]');
  const first=page.locator('[data-follow-row="98-800001"]');
  const a=await grip.boundingBox(),b=await first.boundingBox();
@@ -57,6 +59,7 @@ test("v217: pointer drag reorders the main list and persists after reload",async
  await page.mouse.up();
  expect(await ids(page)).toEqual(["98-800003","98-800001","98-800002"]);
  await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  expect(await ids(page)).toEqual(["98-800003","98-800001","98-800002"]);
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toEqual([own]);
@@ -66,6 +69,7 @@ test("v217: inline minus offers one-click Undo restoring previous order",async({
  await seed(page);
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await page.locator('[data-unfollow-inline="98-800002"]').click();
  expect(await ids(page)).toEqual(["98-800001","98-800003"]);
  const undo=page.locator("#toast .toast-undo");
@@ -73,6 +77,7 @@ test("v217: inline minus offers one-click Undo restoring previous order",async({
  await undo.click();
  expect(await ids(page)).toEqual(friends.map(p=>p.id));
  await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  expect(await ids(page)).toEqual(friends.map(p=>p.id));
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toEqual([own]);
