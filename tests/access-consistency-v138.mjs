@@ -21,5 +21,5 @@ assert.match(controller,/mountOwnerInviteOverview/);
 assert.match(reader,/readMemberMatches/);
 assert.match(reader,/readPublicRows\("player_external_match_facts\?"/);
 assert.match(gate,/private_player_access_read/);
-assert.match(gate,/grant\(\{member:false\}\)/);
+assert.match(gate,/grantAfterIntro\(\{member:false\}\)/);
 console.log("v138: narrow player access and aggregate owner invitation overview contracts verified.");
