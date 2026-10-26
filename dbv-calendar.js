@@ -98,19 +98,27 @@ const BW_YOUTH_ARCHIVE_2026=[
   source:"https://bwbv.de/wp-content/uploads/2026/04/hx26-ausschreibung-de_nachbearbeitet.pdf",sourceKind:"announcement"}
 ];
 function bwArchiveDates(filters){
- if(filters.region!=="Baden-Württemberg"||!BW_YOUTH_AGES.includes(filters.age)||
-  filters.year!=="2026"||filters.period!=="all")return [];
  const search=String(filters.q||"").normalize("NFKC").toLocaleLowerCase("de").trim();
+ const normal=filters.region==="Baden-Württemberg"&&BW_YOUTH_AGES.includes(filters.age)&&
+  filters.year==="2026"&&filters.period==="all";
+ // The primary name/place search must also find an already verified 2026
+ // result without requiring four hidden filter changes. Never call it a
+ // future registration or silently relabel a 2027 planning date.
+ const discover=search.length>=3&&["all","Baden-Württemberg"].includes(filters.region)&&
+  ["all","2026"].includes(filters.year)&&
+  (filters.age==="all"||BW_YOUTH_AGES.includes(filters.age));
+ if(!normal&&!discover)return [];
  return BW_YOUTH_ARCHIVE_2026.filter(t=>
-  t.ages.includes(filters.age)&&
+  (filters.age==="all"||t.ages.includes(filters.age))&&
   (filters.level==="all"||filters.level===t.level)&&
+  (!discover||filters.period!=="upcoming"||t.sourceKind==="results")&&
   (!search||(t.title+" "+t.place+" "+t.level+" "+t.detail).normalize("NFKC").toLocaleLowerCase("de").includes(search)));
 }
 function bwArchiveHTML(filters){
  const found=bwArchiveDates(filters);
  if(!found.length)return "";
  return '<section class="dbv-calendar-cluster dbv-calendar-sourced-results" aria-label="Verifizierte Turniere 2026">'+
-  '<h4>Turniere 2026 <small>'+found.length+'</small></h4>'+
+  '<h4>'+(String(filters.q||"").trim().length>=3&&filters.period==="upcoming"?'Vergangene Turniere 2026 · Ergebnisse':'Turniere 2026')+' <small>'+found.length+'</small></h4>'+
   found.map(t=>{
   const direct=t.sourceKind==="results"?window.SchmetterlingeBookmarks?.parseDbvTournamentLink?.(t.source):null;
   const own=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};

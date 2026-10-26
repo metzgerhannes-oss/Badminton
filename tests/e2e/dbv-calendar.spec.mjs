@@ -528,3 +528,46 @@ test("UX2 C1: desktop keeps navy workspace, saved date and source search",async(
  const bg=await page.locator("#desktop-tournament-context").evaluate(el=>getComputedStyle(el).backgroundColor);
  expect(bg).toBe("rgb(16, 43, 75)");
 });
+
+
+test("v219: Reutlingen quick search shows the verified past C result without hidden filters",async({page})=>{
+ await page.setViewportSize({width:320,height:568});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#dbv-calendar-advanced")).not.toHaveAttribute("open","");
+ await page.locator("#dbv-calendar-q").fill("Reutlingen");
+ const result=page.locator("#dbv-calendar-results .dbv-calendar-external-result").filter({hasText:"1. C-RLT BAW"});
+ await expect(result).toHaveCount(1);
+ await expect(result).toContainText("17.01.2026");
+ await expect(result.locator(".dbv-calendar-place")).toHaveText("Austragungsort: Reutlingen");
+ await expect(page.locator("#dbv-calendar-results")).toContainText("Vergangene Turniere 2026 · Ergebnisse");
+ await expect(result.locator('a[href*="dbv.turnier.de/tournament/"]')).toHaveAttribute("href",/52b3b803-279b-48cf-8143-f5078f5236db/i);
+ const save=result.locator("[data-official-toggle]");
+ await expect(save).toHaveText("+");
+ await save.click();
+ await expect(result.locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
+ await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort: Reutlingen");
+ const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(stored.officialLinks.filter(x=>x.id==="52B3B803-279B-48CF-8143-F5078F5236DB"&&x.playerId==="05-070879")).toHaveLength(1);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-external-result").filter({hasText:"Reutlingen"}).locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
+ await page.locator("#dbv-calendar-advanced").evaluate(el=>{el.open=true});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-external-result")).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test("v219: 2027 planning venue remains unknown even after a Reutlingen history search",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await page.locator("#dbv-calendar-q").fill("Reutlingen");
+ await expect(page.locator(".dbv-calendar-external-result").first()).toBeVisible();
+ await page.locator("#dbv-calendar-q").fill("");
+ await page.locator("#dbv-calendar-advanced").evaluate(el=>{el.open=true});
+ await page.locator("#dbv-calendar-year").selectOption("2027");
+ await page.locator("#dbv-calendar-region").selectOption("Baden-Württemberg");
+ await page.locator("#dbv-calendar-age").selectOption("U13");
+ await page.locator("#dbv-calendar-level").selectOption("C");
+ const plans=page.locator("#dbv-calendar-results .dbv-calendar-external-plan");
+ await expect(plans).toHaveCount(4);
+ await expect(plans.first().locator(".dbv-calendar-place")).toHaveText("Austragungsort noch nicht veröffentlicht");
+ await expect(page.locator("#dbv-calendar-results .dbv-calendar-external-result")).toHaveCount(0);
+});
