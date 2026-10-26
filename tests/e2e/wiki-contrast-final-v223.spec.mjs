@@ -25,13 +25,17 @@ for(const width of [320,390,1280]){
   await page.goto("/wiki.html");
   await expect(page.locator(".wiki-entry")).toHaveCount(61);
   const pale=await page.evaluate(()=>{
-   const css=selector=>getComputedStyle(document.querySelector(selector)).color;
+   const css=selector=>{
+    const el=document.querySelector(selector);
+    if(!el)throw Error("Wiki selector missing: "+selector);
+    return getComputedStyle(el).color;
+   };
    return {
     eyebrow:css(".intro .eyebrow"),
     introduction:css(".intro p"),
     count:css(".result-head span"),
     category:css(".entry-copy small"),
-    excerpt:css(".entry-copy em"),
+    title:css(".entry-copy strong"),
     footer:css(".wiki-footer"),
     brand:css(".wiki-brand small")
    };
@@ -39,7 +43,7 @@ for(const width of [320,390,1280]){
   // The brightest stop of the actual pale-blue page gradient is the strictest background.
   for(const key of ["eyebrow","introduction","count","footer","brand"])
    expect(contrast(pale[key],"#e6f4ff"),key+" on pale background").toBeGreaterThanOrEqual(4.5);
-  for(const key of ["category","excerpt"])
+  for(const key of ["category","title"])
    expect(contrast(pale[key],"#ffffff"),key+" on white card").toBeGreaterThanOrEqual(4.5);
   await page.locator(".wiki-entry").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
