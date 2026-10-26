@@ -174,7 +174,13 @@
  color:#d3e7fa!important;
 }
 @media(min-width:1080px){
- /* The desktop friends module is pale (#f8fcff), not navy. */
+ /* Restore the original pale desktop card: broad club-overview.css sets
+    #122e50 !important and had made its intended dark ink unreadable. */
+ #view-start .dashboard-friends-section{
+  background:#f8fcff!important;
+  color:#123b5e!important;
+  border-color:#bddded!important;
+ }
  #view-start .dashboard-friends-section .section-heading h2{
   color:#123b5e!important;
  }
