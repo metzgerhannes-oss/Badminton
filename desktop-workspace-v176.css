@@ -22,10 +22,16 @@
  /* Screenshot QA: several older light-theme widgets retain ink-blue text on
     the navy workspace. Scope light text to dark surfaces only: the trophy
     panel and the small statistic tiles intentionally remain pale. */
- #view-start>.dashboard-heading h1,
- #view-start .dashboard-friends-section>.section-heading h2,
- #view-start .dashboard-friends-section .section-heading h2 {
-   color:#eef8ff!important;
+ #view-start>.dashboard-heading h1 {color:#eef8ff!important;}
+ /* Home tournaments sit on navy, friends on a pale desktop surface. */
+ #view-start .dashboard-friends-section .section-heading h2{
+   color:#123b5e!important;
+ }
+ #view-start .dashboard-friends-section .dashboard-friends-manage{
+   color:#0e557e!important;
+ }
+ #view-start .dashboard-friends-section .friend-quick-add{
+   color:#12496f!important;border-color:#7197b4;
  }
  #view-start .dashboard-heading .muted,
  #view-start .upcoming-tournaments-empty,
