@@ -10,16 +10,17 @@ const store={
   url:"https://dbv.turnier.de/tournament/11111111-2222-4333-8444-555555555555",
   name:"Fiktives Turnier",playerId:"local-older",startDate:"2026-12-01",endDate:""}]
 };
-test("existing local Mira is merged into DBV Mira, upcoming bookmarks remain visible",async ({page})=>{
+test("unverified first-name match keeps local Mira and DBV Mira independent",async ({page})=>{
  await page.addInitScript(saved=>localStorage.setItem("shuttleboard-v1",JSON.stringify(saved)),store);
  await page.goto("/#start");
- await expect(page.locator(".focused-profile")).toContainText("DBV 99-000001");
- await expect(page.locator(".focused-profile")).toContainText("Mira Muster");
- await expect(page.locator(".focus-switcher")).toHaveCount(0);
+ await expect(page.locator(".focused-profile")).toContainText("Mira");
+ await expect(page.locator(".focused-profile")).toContainText("Ohne DBV-ID");
+ await expect(page.locator(".focused-profile")).not.toContainText("DBV 99-000001");
+ await expect(page.locator(".focus-switcher")).toBeVisible();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(saved.players.map(p=>p.id)).toEqual(["99-000001"]);
- expect(saved.activeProfileId).toBe("99-000001");
- expect(saved.officialLinks[0].playerId).toBe("99-000001");
+ expect(saved.players.map(p=>p.id)).toEqual(["local-older","99-000001"]);
+ expect(saved.activeProfileId).toBe("local-older");
+ expect(saved.officialLinks[0].playerId).toBe("local-older");
  await expect(page.locator("#dashboard-next")).toContainText("Fiktives Turnier");
 });
 
