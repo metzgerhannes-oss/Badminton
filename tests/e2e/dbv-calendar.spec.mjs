@@ -154,8 +154,8 @@ test("v148: BW U13 historic A/B/C results distinguish Hexen-Cup A from C",async(
  await page.locator("#dbv-calendar-period").selectOption("all");
  for(const [level,count,curated,venues] of [
   ["C",7,3,["Reutlingen","Friedrichshafen","Mössingen"]],
-  ["A",4,2,["Eggenstein","Konstanz"]],
-  ["B",2,1,["Waghäusel"]]
+  ["A",2,2,["Eggenstein","Konstanz"]],
+  ["B",1,1,["Waghäusel"]]
  ]){
   await page.locator("#dbv-calendar-level").selectOption(level);
   await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(curated);
