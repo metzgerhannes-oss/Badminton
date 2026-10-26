@@ -28,6 +28,10 @@ test("checking uses original club logo and animated shuttle without visible text
   await checking;
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
+ // Always release the intercepted synthetic RPC, including when an assertion
+ // fails. Otherwise a pending Playwright route can stall WebKit teardown and
+ // hide the real assertion failure behind a workflow timeout.
+ try {
  await page.setViewportSize({width:320,height:640});
  await page.goto("/",{waitUntil:"commit"});
  await expect(page.locator("#app-access-splash")).toBeVisible();
@@ -64,7 +68,9 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(screenReaderOnly.clip).not.toBe("auto");
 
  // Finish access only after checking-state measurements, then verify cleanup.
- finishCheck();
+ } finally {
+  finishCheck();
+ }
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page.locator("body > .app")).toBeVisible();
  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
