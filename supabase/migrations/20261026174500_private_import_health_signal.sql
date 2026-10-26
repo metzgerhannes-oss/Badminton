@@ -146,5 +146,5 @@ BEGIN
   WHERE checked_on < (now() AT TIME ZONE 'UTC')::date - 90;
   RETURN result;
 END;
-$function$
+$function$;
 REVOKE ALL ON FUNCTION private_content.record_import_health_weekly() FROM PUBLIC, anon, authenticated;
