@@ -40,6 +40,27 @@ export function isNationalU11Masters(t){
    t.organizer==="DBV"&&!t.bundesland&&
    /(?:german\s+masters|masters\s+finale).*u\s*11|u\s*11.*masters/i.test(t.title||""));
 }
+
+/**
+ * Only a verified identical DBV tournament UUID can collapse archive/calendar
+ * cards. Matching date, city, level or title cannot prove event identity.
+ * Pure local comparison: no network calls and no personal data.
+ */
+export function isVerifiedCalendarDuplicate(row,curated){
+ if(!row?.hasDirectLink||curated?.sourceKind!=="results")return false;
+ const directId=value=>{
+  try{
+   const url=new URL(String(value||""));
+   if(url.protocol!=="https:"||url.hostname!=="dbv.turnier.de"||
+      url.username||url.password||url.search||url.hash)return "";
+   const match=url.pathname.match(/^\/tournament\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
+   return match?match[1].toUpperCase():"";
+  }catch{return ""}
+ };
+ const a=directId(row.url),b=directId(curated.source);
+ return Boolean(a&&a===b);
+}
+
 export function filterCalendar(entries,{region="all",age="all",level="all",year="all",q="",period="upcoming",group="region",today="",includeNationalU11Masters=false}={}){
  const search=String(q).normalize("NFKC").trim().toLocaleLowerCase("de");
  const filtered=entries.filter(t=>{
