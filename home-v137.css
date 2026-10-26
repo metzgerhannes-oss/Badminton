@@ -19,7 +19,7 @@
 .focus-profile-copy{display:grid;gap:1px;min-width:0}
 .focus-profile-copy strong{font-size:clamp(15px,4vw,19px);line-height:1.2}
 .focus-profile-copy .focus-profile-meta,.focus-profile-copy .focus-profile-id{
- display:block;color:#486a8c;font-size:11px;line-height:1.25;overflow-wrap:anywhere}
+ display:block;color:#d3e7fa;font-size:11px;line-height:1.25;overflow-wrap:anywhere}
 .focus-settings,.focus-switcher>summary{min-height:44px;min-width:44px;
  padding:7px!important;border-radius:10px;font-size:11px}
 .focus-switcher>summary{gap:3px}
@@ -34,7 +34,7 @@
 #view-start .upcoming-tournaments-header h2{font-size:16px;line-height:1.25}
 #view-start .upcoming-tournaments-header a{font-size:11px;min-height:38px;display:flex;align-items:center}
 #view-start .upcoming-tournament-row{display:flex;align-items:center;gap:9px;min-height:54px;
- padding:6px 2px;color:#143a62;text-decoration:none}
+ padding:6px 2px;color:#f2f9ff;text-decoration:none}
 #view-start .upcoming-tournament-row:focus-visible{outline-offset:-2px}
 #view-start .upcoming-tournament-date{display:flex;flex-direction:column;align-items:center;
  justify-content:center;min-width:48px;width:48px;min-height:46px;gap:1px;padding:4px 3px;
@@ -46,7 +46,7 @@
 #view-start .upcoming-tournament-info{gap:2px}
 #view-start .upcoming-tournament-info strong{font-size:13px;line-height:1.26;font-weight:820}
 #view-start .upcoming-tournament-info small{font-size:10px;line-height:1.3}
-#view-start .upcoming-tournament-label{font-size:10px;color:#58788e;line-height:1.3}
+#view-start .upcoming-tournament-label{font-size:10px;color:#d3e7f9;line-height:1.3}
 #view-start .upcoming-tournament-arrow{font-size:18px;padding-right:1px}
 #view-start .upcoming-tournaments-empty{padding:7px 0 12px;line-height:1.5}
 /* Source-grounded match KPIs before filters. The small phone retains four values. */

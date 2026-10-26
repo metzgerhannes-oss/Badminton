@@ -155,51 +155,54 @@ function showStatus(message){
  const n=$("team-directory-status");if(n)n.textContent=message;
 }
 function season(){return $("team-season")?.value||"2026/27"}
-function teamsForSeason(){
- return follows.map(key=>rows.find(t=>t.follow_key===key&&t.season===season())).filter(Boolean);
+// The canonical list includes all saved follows, even when the season changes
+// or the official directory has not provided that team's data yet.
+function followedTeam(key){
+ return rows.find(t=>t.follow_key===key&&t.season===season())||
+  rows.find(t=>t.follow_key===key)||null;
+}
+function teamActions(key,label,i){
+ return '<span class="team-inline-controls" role="group" aria-label="Mannschaft sortieren oder entfolgen: '+esc(label)+'">'+
+  '<button type="button" data-team-move="'+esc(key)+'" data-direction="-1" aria-label="'+esc(label)+': nach oben"'+(i===0?' disabled':'')+'>↑</button>'+
+  '<button type="button" data-team-move="'+esc(key)+'" data-direction="1" aria-label="'+esc(label)+': nach unten"'+(i===follows.length-1?' disabled':'')+'>↓</button>'+
+  '<button type="button" data-team-toggle="'+esc(key)+'" aria-label="'+esc(label)+': nicht mehr folgen">−</button>'+
+  '</span>';
 }
 function renderFollowed(){
  const container=$("team-followed");if(!container)return;
- const found=teamsForSeason();
- container.innerHTML=found.length?found.map(team=>card(team,"followed")).join(""):
-  '<p class="team-empty">'+(loading?'Mannschaften werden geladen …':follows.length?'In dieser Saison sind für deine gefolgten Mannschaften noch keine bestätigten Daten verfügbar.':'Du folgst noch keiner Mannschaft. Tippe auf „+ Hinzufügen“.')+'</p>';
+ container.innerHTML=follows.length?follows.map((key,i)=>{
+  const team=followedTeam(key);
+  if(team?.season===season())return card(team,"followed",i);
+  const name=team?displayTeamName(team):"Gespeicherte Mannschaft";
+  return '<article class="team-card team-card-unavailable" data-team-follow="'+esc(key)+'">'+
+   '<div class="team-card-main team-card-unavailable-content"><strong>'+esc(name)+'</strong>'+
+   '<small>'+(team?'Für '+esc(season())+' noch keine bestätigten Daten':'Noch keine bestätigten Saisondaten')+
+   '</small><small>Gemerkt: '+esc(key)+'</small></div>'+teamActions(key,name,i)+'</article>';
+ }).join(""):'<p class="team-empty">'+(loading?'Mannschaften werden geladen …':'Du folgst noch keiner Mannschaft. Tippe auf „+ Hinzufügen“.')+'</p>';
+ const reset=$("team-order-reset");if(reset)reset.disabled=follows.length<2;
  wireCards(container);
- renderTeamSettings();
 }
-function card(team,mode="search"){
+function card(team,mode="search",index=-1){
  const followed=follows.includes(team.follow_key),selected=selectedId===team.id;
- return '<article class="team-card card-open-surface'+(selected?' is-selected':'')+'">'+
+ const label=displayTeamName(team);
+ return '<article class="team-card card-open-surface'+(selected?' is-selected':'')+'"'+
+  (mode==="followed"?' data-team-follow="'+esc(team.follow_key)+'"':'')+'>'+
   '<button class="team-card-main card-open-primary" type="button" data-team-open="'+esc(team.id)+'">'+
-   '<strong>'+esc(displayTeamName(team))+'</strong>'+
+   '<strong>'+esc(label)+'</strong>'+
    '<span>'+esc(team.league_name)+' · '+esc(team.season)+'</span>'+
    '<small>Platz '+(Number.isInteger(team.position)?team.position:"–")+
    ' · Tabellenpunkte '+esc(tablePoints(team))+' · Stand '+esc(dateOnly(team.source_checked_at))+'</small>'+
-  '</button>'+(mode==="followed"?'':'<button type="button" class="team-follow-button" data-team-toggle="'+esc(team.follow_key)+'"'+
-  ' aria-label="'+(followed?"Nicht mehr folgen: ":"Folgen: ")+esc(displayTeamName(team))+'">'+
+  '</button>'+(mode==="followed"?teamActions(team.follow_key,label,index):
+   '<button type="button" class="team-follow-button" data-team-toggle="'+esc(team.follow_key)+'"'+
+   ' aria-label="'+(followed?"Nicht mehr folgen: ":"Folgen: ")+esc(label)+'">'+
    (followed?'✓ Gefolgt':'+ Folgen')+'</button>')+'</article>';
 }
-function renderTeamSettings(){
- const container=$("team-settings-list");if(!container)return;
- container.innerHTML=follows.length?follows.map((key,i)=>{
-  const team=rows.find(t=>t.follow_key===key&&t.season===season())||rows.find(t=>t.follow_key===key);
-  return '<article class="follow-manage-item"><div class="follow-manage-label"><strong>'+esc(team?displayTeamName(team):"Gespeicherte Mannschaft")+
-   '</strong><small>'+esc(team?team.league_name+" · "+team.season:key)+'</small></div>'+
-   '<div class="follow-manage-actions"><button type="button" data-team-move="'+esc(key)+'" data-direction="-1" '+(i===0?'disabled':'')+' aria-label="Mannschaft nach oben">↑</button>'+
-   '<button type="button" data-team-move="'+esc(key)+'" data-direction="1" '+(i===follows.length-1?'disabled':'')+' aria-label="Mannschaft nach unten">↓</button>'+
-   '<button type="button" data-team-toggle="'+esc(key)+'" aria-label="Mannschaft nicht mehr folgen">Entfolgen</button></div></article>';
- }).join(""):'<p class="team-empty">Noch keine Mannschaften abonniert.</p>';
- wireCards(container);
- const reset=$("team-order-reset");if(reset)reset.disabled=follows.length<2;
- container.querySelectorAll("[data-team-move]").forEach(b=>b.addEventListener("click",()=>{
-  const i=follows.indexOf(b.dataset.teamMove),next=i+Number(b.dataset.direction);
-  if(i<0||next<0||next>=follows.length)return;
-  const [key]=follows.splice(i,1);follows.splice(next,0,key);
-  if(!saveFollows()){readFollows();showStatus("Reihenfolge konnte nicht gespeichert werden.");}
-  renderFollowed();
-  const actions=Array.from($("team-settings-list")?.querySelectorAll("[data-team-move]")||[])
-   .filter(button=>button.dataset.teamMove===key&&!button.disabled);
-  (actions.find(button=>button.dataset.direction===b.dataset.direction)||actions[0])?.focus({preventScroll:true});
- }));
+function focusFollowControl(key,direction){
+ const controls=Array.from($("team-followed")?.querySelectorAll("[data-team-move]")||[])
+  .filter(button=>button.dataset.teamMove===key&&!button.disabled);
+ (controls.find(button=>button.dataset.direction===direction)||controls[0]||
+  $("team-followed")?.querySelector('[data-team-follow="'+key+'"] .team-card-main')||
+  $("team-add-open"))?.focus({preventScroll:true});
 }
 function setTeamDiscover(open,focus=true){
  const panel=$("team-discover"),button=$("team-add-open");if(!panel||!button)return;
@@ -215,9 +218,19 @@ function setTeamDiscover(open,focus=true){
 }
 function wireCards(container){
  container.querySelectorAll("[data-team-open]").forEach(b=>b.addEventListener("click",()=>selectTeam(b.dataset.teamOpen)));
+ container.querySelectorAll("[data-team-move]").forEach(b=>b.addEventListener("click",()=>{
+  const key=b.dataset.teamMove,dir=Number(b.dataset.direction),i=follows.indexOf(key),j=i+dir;
+  if(i<0||j<0||j>=follows.length)return;
+  const previous=follows.slice();
+  // Swap whole-list neighbors; no hidden-year or unknown entries are discarded.
+  [follows[i],follows[j]]=[follows[j],follows[i]];
+  if(!saveFollows()){follows=previous;showStatus("Reihenfolge konnte nicht gespeichert werden.");}
+  renderFollowed();focusFollowControl(key,b.dataset.direction);
+ }));
  container.querySelectorAll("[data-team-toggle]").forEach(b=>b.addEventListener("click",()=>{
-  const id=b.dataset.teamToggle,old=follows.slice();
-  if(follows.includes(id))follows=follows.filter(x=>x!==id);
+  const id=b.dataset.teamToggle,old=follows.slice(),removed=old.includes(id);
+  const oldIndex=old.indexOf(id);
+  if(removed)follows=follows.filter(x=>x!==id);
   else follows=normalizeFollows([...follows,id]);
   if(!saveFollows()){follows=old;showStatus("Folgen konnte auf diesem Gerät nicht gespeichert werden.");}
   else if(!old.includes(id)){
@@ -228,6 +241,12 @@ function wireCards(container){
    queueTeamDemand(id);
   }
   renderFollowed();renderSearchResults();
+  if(removed){
+   const neighbor=follows[oldIndex]||follows[oldIndex-1];
+   const next=Array.from($("team-followed")?.querySelectorAll("[data-team-toggle]")||[])
+    .find(el=>el.dataset.teamToggle===neighbor);
+   (next||$("team-add-open"))?.focus({preventScroll:true});
+  }
  }));
 }
 function renderClubDirectory(){
@@ -403,15 +422,11 @@ function init(){
   renderFollowed();renderSearchResults();renderDetail();
  });
  $("team-refresh").addEventListener("click",load);
- $("team-order-done")?.addEventListener("click",()=>{
-  const details=$("team-manage-details");if(!details)return;
-  details.open=false;details.querySelector("summary")?.focus({preventScroll:true});
- });
  $("team-order-reset")?.addEventListener("click",()=>{
   if(follows.length<2)return;
   const before=follows.slice();
   const label=key=>{
-   const team=rows.find(t=>t.follow_key===key&&t.season===season())||rows.find(t=>t.follow_key===key);
+   const team=followedTeam(key);
    return team?displayTeamName(team):key;
   };
   follows.sort((a,b)=>label(a).localeCompare(label(b),"de",{numeric:true,sensitivity:"base"})||a.localeCompare(b));

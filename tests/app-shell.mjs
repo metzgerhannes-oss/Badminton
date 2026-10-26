@@ -41,4 +41,6 @@ assert.doesNotMatch(html,/id="friend-order-done"/,"Player order is now changed d
 assert.doesNotMatch(html,/id="friend-manage-details"/,"There must be no duplicate player management screen");
 assert.match(html,/id="followed-player-search"/,"Player search and follow share one entry point");
 assert.match(app,/data-friend-grip/,"Player ordering handles are accessible directly in the list");
-assert.match(html,/id="team-order-done"[^>]*type="button"/,"Team sorting still has the original Finish button");
+assert.match(html,/id="team-order-reset"[^>]*type="button"/,"Team order reset remains available on the list");
+assert.doesNotMatch(html,/id="team-order-done"|id="team-manage-details"/,"No duplicated team management route");
+assert.match(await readFile("teams.js","utf8"),/data-team-move/,"Team sorting actions are in the followed list");

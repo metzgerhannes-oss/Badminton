@@ -47,7 +47,9 @@ test("v183: old settings follow bookmarks resolve to canonical pages, no duplica
  await page.goto("/#einstellungen/mannschaften",{waitUntil:"domcontentloaded"});
  await expect(page).toHaveURL(/#mannschaft$/);
  await expect(page.locator("#view-mannschaft")).toBeVisible();
- await expect(page.locator("#team-manage-details")).toBeVisible();
+ // v222: the duplicate hidden management room is gone; controls live on
+ // the canonical team cards reached by the legacy settings bookmark.
+ await expect(page.locator("#team-manage-details")).toHaveCount(0);
  await expect(page.locator("#team-followed")).toBeVisible();
  await page.locator('nav.bottom-nav [data-page="start"]').click();
  await expect(page.locator("#view-start")).toBeVisible();
