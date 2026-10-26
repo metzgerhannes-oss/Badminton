@@ -66,7 +66,8 @@ assert.equal(selectedOwn.players.length,2);
 assert.equal(selectedOwn.players.find(p=>p.id===fresh.id).name,fresh.name);
 assert.equal(selectedOwn.friends.length,1);
 assert.equal(existing.activeProfileId,"05-070879","Source state must be immutable");
-// The same player can already exist with DBV data: reuse, never create a twin.
+// Exact confirmed DBV ID may be reselected, but a local first-name alias
+// remains separate: name, club and age do not prove device ownership.
 const knownWithAlias={
  players:[{id:"local-42",name:"Philipp",club:"SpVgg Mössingen"},
   {id:"05-070879",name:"Philipp Metzger",birthYear:2016,club:"SpVgg Mössingen",
@@ -81,21 +82,22 @@ const knownWithAlias={
 const verified=normalizeProfile({mode:"dbv",reference:"05-070879",name:"Philipp Metzger",
  birthYear:"2016",club:"SpVgg Mössingen"});
 const repaired=addProfileToStore(knownWithAlias,verified,{confirmed:true});
-assert.deepEqual(repaired.players.map(p=>p.id),["05-070879","05-071969"]);
+assert.deepEqual(repaired.players.map(p=>p.id),["local-42","05-070879","05-071969"]);
 assert.equal(repaired.activeProfileId,"05-070879");
 assert.equal(repaired.chosen,"05-070879");
-assert.equal(repaired.officialLinks[0].playerId,"05-070879","Next tournaments are migrated");
+assert.equal(repaired.officialLinks[0].playerId,"local-42","Keep old locally owned tournament separate");
 assert.equal(repaired.officialLinks[1].playerId,"05-071969");
-assert.equal(repaired.players[0].url,knownWithAlias.players[1].url,"Existing official link survives");
+assert.equal(repaired.players[1].url,knownWithAlias.players[1].url,"Existing official link survives");
 assert.deepEqual(repaired.friends.map(f=>f.id),["05-061350"]);
 assert.equal(repaired.customSetting,"still-here");
 assert.equal(knownWithAlias.players.length,3,"Must not mutate previous storage");
 const localOnly={players:[{id:"local-1",name:"Philipp Metzger"}],
  officialLinks:[{id:"T3",playerId:"local-1",startDate:"2026-11-21"}]};
 const replacedLocal=addProfileToStore(localOnly,verified,{confirmed:true});
-assert.equal(replacedLocal.players.length,1);
-assert.equal(replacedLocal.players[0].id,"05-070879");
-assert.equal(replacedLocal.officialLinks[0].playerId,"05-070879");
+assert.equal(replacedLocal.players.length,2);
+assert.equal(replacedLocal.players[0].id,"local-1");
+assert.equal(replacedLocal.players[1].id,"05-070879");
+assert.equal(replacedLocal.officialLinks[0].playerId,"local-1");
 assert.throws(()=>addProfileToStore(null,{id:"local-123",name:"Philipp"},{confirmed:true}),/DBV-ID/);
 const differentBirth={players:[{id:"local-1",name:"Philipp",birthYear:2013},
  {id:"05-070879",name:"Philipp Metzger",birthYear:2016}]};
@@ -105,6 +107,17 @@ const ambiguous={players:[{id:"local-1",name:"Philipp"},
  {id:"local-2",name:"Philipp"}, {id:"05-070879",name:"Philipp Metzger"}]};
 assert.equal(addProfileToStore(ambiguous,verified,{confirmed:true}).players.length,3,
  "Two same-name local profiles must not be guessed into one");
+
+const sameFullName={players:[
+ {id:"local-private",name:"Sina Beispiel",birthYear:2015,club:"Testverein"}],
+ officialLinks:[{id:"Private-Turnier",playerId:"local-private"}],
+ activeProfileId:"local-private",friends:[]};
+const verifiedHomonym={id:"99-000002",name:"Sina Beispiel",birthYear:2015,club:"Testverein"};
+const twoSinas=addProfileToStore(sameFullName,verifiedHomonym,{confirmed:true});
+assert.deepEqual(twoSinas.players.map(p=>p.id),["local-private","99-000002"]);
+assert.equal(twoSinas.officialLinks[0].playerId,"local-private","Never transfer third-party local favorites");
+assert.equal(twoSinas.activeProfileId,"99-000002","New explicit selection may become active");
+assert.equal(sameFullName.players.length,1,"Never mutate source owner store");
 
 const direct=normalizeProfile({mode:"dbv",name:"Neu",reference:url.url});
 assert.match(direct.id,/^local-/,"Do not misrepresent UUID as numeric DBV ID");
