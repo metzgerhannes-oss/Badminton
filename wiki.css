@@ -5,7 +5,7 @@ button,input,a{font:inherit}a{color:#0874ae}button{cursor:pointer}.skip-link{pos
 .back{text-decoration:none;font-weight:750;color:#19608a;white-space:nowrap;min-height:44px;display:flex;align-items:center;gap:4px}.back:first-letter{font-size:25px}
 .wiki-brand{display:flex;gap:8px;align-items:center;font-weight:850;font-size:17px;line-height:1.1}.wiki-brand img{object-fit:contain}.wiki-brand small{font-size:9px;display:block;margin-top:4px;letter-spacing:1.5px;color:#50718b}
 main{max-width:740px;margin:auto;padding:8px 16px calc(30px + env(safe-area-inset-bottom))}
-.intro{margin:9px 3px 19px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.6px;color:#397eaa;font-weight:800}
+.intro{margin:9px 3px 19px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.6px;color:#255e80;font-weight:800}
 h1{margin:5px 0;font-size:clamp(29px,8vw,40px);letter-spacing:-1.2px;line-height:1.08}.intro p{margin:7px 0;color:#58758c;font-size:15px}
 .search-wrap{background:#fff;border:1px solid #bbd8eb;box-shadow:0 7px 22px #437fa821;border-radius:20px;padding:14px 15px}
 .search-wrap label{font-weight:750;font-size:13px;display:block;margin-bottom:8px}.search-wrap input{width:100%;min-height:48px;padding:11px 13px;border:1px solid #a9cde3;border-radius:11px;background:#f6fbff;color:#173f60;font-size:16px}
