@@ -84,7 +84,15 @@ test("iPhone browser-only choice accepts the invite without infinite installatio
  const calls=await inviteApi(page);
  await page.goto("/index.html#appinvite="+SECRET,{waitUntil:"domcontentloaded"});
  await expect(page.locator("#browser-only")).toBeVisible();
+ // Synchronize with the synthetic membership response: under CI contention
+ // WebKit can defer loading the access module after the browser-only click.
+ // The gate must still close after the server has verified membership.
+ const membershipResponse=page.waitForResponse(response=>
+  response.url().endsWith("/rpc/app_access_status")&&
+  response.request().method()==="POST"&&response.status()===200,
+  {timeout:30000});
  await page.locator("#browser-only").click();
+ await membershipResponse;
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page).toHaveURL(/\/index\.html#start$/);
  const acceptance=calls.findIndex(x=>x.path.endsWith("/rpc/app_access_invite_accept"));
