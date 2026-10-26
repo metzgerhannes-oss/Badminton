@@ -27,19 +27,16 @@ export function buildClubRows(roster,profiles=[],club=DEFAULT_CLUB){
   if(!p || !norm(p.name) || !norm(p.club) ||
    !(isSpvgg?rosterMatchesClub(p.club):norm(p.club)===norm(club)))continue;
   const name=String(p.name).trim(),key=norm(name);
-  // A matching name only identifies a shared display row, NOT an official DBV mapping.
-  // The device-owned profile remains a separately disclosed local reference.
-  const existing=byName.get(key);
-  if(existing){
-   existing.local=true;
-   existing.localNameMatch=true;
-   if(validId(p.id)){existing.dbvId=String(p.id);existing.localPlayerId=String(p.id);}
-   if(/^U(?:11|13|15|17|19|22)$/.test(p.ageClass||""))existing.ageClass=p.ageClass;
-   existing.source="Vereinsquelle + lokal";
-  }else{
-   byName.set(key,{key,name,teams:[],ageClass:/^U(?:11|13|15|17|19|22)$/.test(p.ageClass||"")?p.ageClass:"",
-    dbvId:validId(p.id)?String(p.id):"",localPlayerId:validId(p.id)?String(p.id):"",source:"Nur lokal",local:true});
-  }
+  // A roster caption contains only a printed name, NEVER proof of a DBV
+  // person ID. A homonym on this device remains a distinct local row with
+  // its own validated ID; never attach it to the official team-membership row.
+  const sameRosterName=byName.has(key);
+  const localKey="local:"+String(p.id||key);
+  // Keep multiple different local players with identical names distinct too.
+  if(byName.has(localKey))continue;
+  byName.set(localKey,{key:localKey,name,teams:[],ageClass:/^U(?:11|13|15|17|19|22)$/.test(p.ageClass||"")?p.ageClass:"",
+   dbvId:validId(p.id)?String(p.id):"",localPlayerId:validId(p.id)?String(p.id):"",
+   source:"Nur lokal",local:true,localNameMatch:sameRosterName});
  }
  return [...byName.values()].sort((a,b)=>a.name.localeCompare(b.name,"de"));
 }
