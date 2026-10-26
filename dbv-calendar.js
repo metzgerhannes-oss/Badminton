@@ -1,6 +1,6 @@
 /** Public DBV calendar from Badminton Supabase, with static source fallback. */
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels,isNationalU11Masters} from "./scripts/dbv-calendar-utils.mjs";
+import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels,isNationalU11Masters,isVerifiedCalendarDuplicate} from "./scripts/dbv-calendar-utils.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const formatDate=s=>new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z"));
@@ -168,14 +168,10 @@ function render(){
  const today=localToday();
  // Prefer direct result cards when DBV's archive contains the same tournament.
  // Public events are not counted twice.
- const normalizedPlace=x=>String(x||"").normalize("NFKD").replace(/\p{M}/gu,"").toLocaleLowerCase("de").replace(/[^a-z0-9]/g,"");
- const isCuratedDuplicate=t=>BW_YOUTH_ARCHIVE_2026.some(curated=>{
-  const place=normalizedPlace(t.place),known=normalizedPlace(curated.place);
-  return t.start===curated.start&&t.level===curated.level&&
-   curated.ages.some(age=>t.ages.includes(age))&&
-   known.length>=6&&place.length>=6&&(place.includes(known)||known.includes(place));
- });
- const selected=filterCalendar(entries.filter(t=>!isCuratedDuplicate(t)),{...settings,today,includeNationalU11Masters:true});
+ // Collapse only matching official DBV UUIDs, never similar city/date/level.
+ const selected=filterCalendar(entries.filter(t=>
+  !BW_YOUTH_ARCHIVE_2026.some(curated=>isVerifiedCalendarDuplicate(t,curated))),
+  {...settings,today,includeNationalU11Masters:true});
  const frameworkHTML=bwFrameworkHTML(settings,today);
  const nextYearHint=bwNextYearHint(settings);
  const archiveHTML=bwArchiveHTML(settings);
