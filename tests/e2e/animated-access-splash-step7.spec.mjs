@@ -19,11 +19,19 @@ async function withExistingSession(page){
 }
 test("checking uses original club logo and animated shuttle without visible text or invitation controls",async({page})=>{
  await withExistingSession(page);
+ // Keep the synthetic RPC in flight until all visual assertions have completed.
+ // A fixed 3.5s delay raced with slow WebKit screenshot/layout evaluation.
+ let finishCheck;
+ const checking=new Promise(resolve=>{finishCheck=resolve});
  await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
-  await new Promise(resolve=>setTimeout(resolve,3500));
+  await checking;
   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
  });
+ // Always release the intercepted synthetic RPC, including when an assertion
+ // fails. Otherwise a pending Playwright route can stall WebKit teardown and
+ // hide the real assertion failure behind a workflow timeout.
+ try {
  await page.setViewportSize({width:320,height:640});
  await page.goto("/",{waitUntil:"commit"});
  await expect(page.locator("#app-access-splash")).toBeVisible();
@@ -32,9 +40,19 @@ test("checking uses original club logo and animated shuttle without visible text
  await expect(page.locator(".app-access-splash-emblem img")).toHaveAttribute("src","./assets/spvgg-schmetterlinge-splash.svg");
  await expect(page.locator(".app-access-splash-emblem img")).toHaveCSS("mix-blend-mode","multiply");
  await expect(page.locator(".app-access-shuttle")).toHaveAttribute("src","./assets/shuttlecock-splash.svg");
- await expect(page.locator(".app-access-shuttle")).toHaveJSProperty("naturalWidth",96);
  await expect(page.locator("#app-access-splash .app-access-visually-hidden")).toContainText("Zugang wird geprüft");
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
+ const actual=await page.locator("#app-access-splash").evaluate(el=>({
+  display:getComputedStyle(el).display,
+  artWidth:el.querySelector(".app-access-splash-art").getBoundingClientRect().width,
+  logoWidth:el.querySelector(".app-access-splash-emblem").getBoundingClientRect().width,
+  duration:getComputedStyle(el.querySelector(".app-access-shuttle")).animationDuration
+ }));
+ expect(actual.display).toBe("grid");
+ expect(actual.artWidth).toBeGreaterThan(100);
+ expect(actual.logoWidth).toBeGreaterThan(100);
+ expect(actual.duration).toBe("3.2s");
+
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
   clip:getComputedStyle(el).clip
@@ -43,9 +61,23 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(screenReaderOnly.height).toBeLessThanOrEqual(1);
  expect(screenReaderOnly.clip).not.toBe("auto");
 
+ // Finish access only after checking-state measurements, then verify cleanup.
+ } finally {
+  finishCheck();
+ }
  await expect(page.locator("#app-access-gate")).toBeHidden();
  await expect(page.locator("body > .app")).toBeVisible();
  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
+ // Verify the actual SVG finishes decoding and contains 16 feathers AFTER
+ // granting access. WebKit can defer image decode until page load; waiting for
+ // naturalWidth while the RPC is held artificially triggers the real auth
+ // timeout and incorrectly switches the splash to the denied/error panel.
+ await expect(page.locator(".app-access-shuttle")).toHaveJSProperty("naturalWidth",96);
+ const svg=await page.evaluate(async()=>{
+  const r=await fetch("./assets/shuttlecock-splash.svg");
+  return r.ok?await r.text():"";
+ });
+ expect(svg.match(/class="feather"/g)).toHaveLength(16);
  const stored=await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
  expect(stored).toContain("synthetic-access-token");
 });
