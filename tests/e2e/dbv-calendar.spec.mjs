@@ -571,3 +571,70 @@ test("v219: 2027 planning venue remains unknown even after a Reutlingen history 
  await expect(plans.first().locator(".dbv-calendar-place")).toHaveText("Austragungsort noch nicht veröffentlicht");
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-external-result")).toHaveCount(0);
 });
+
+
+test("P1 #386: verified UUID rejects E/D rank and Meldeschluss/date mismatch before saving",async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-turniere")).toBeVisible();
+ const id="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+ const url="https://dbv.turnier.de/tournament/"+id;
+ // Synthetic canonical source, already loaded in memory: no external request.
+ await page.evaluate(url=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[{key:"dbv-calendar-95555",url,hasDirectLink:true,
+   title:"3. D-RLT BAW U11-U19 Gomaringen",start:"2026-11-22",end:"2026-11-22",
+   deadline:"2026-11-15",place:"Sport- und Kulturhalle Gomaringen"}]}
+ })),url);
+ await page.locator("#add-tournament").click();
+ await expect(page.locator("#tournament-dialog")).toBeVisible();
+ const form=page.locator("#tournament-form");
+ await form.locator('[name="url"]').fill(url);
+ await form.locator('[name="name"]').fill("3. E-RLT Gomaringen");
+ await form.locator('[name="startDate"]').fill("2026-11-15");
+ await form.locator('[name="endDate"]').fill("2026-11-15");
+ await form.locator("#tournament-save").click();
+ await expect(page.locator("#tournament-official-source")).toContainText("DBV-Abweichung");
+ await expect(page.locator("#tournament-official-source")).toContainText("nicht gespeichert");
+ await expect(page.locator("#tournament-dialog")).toBeVisible();
+ const noSave=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")||"{}").officialLinks||[]);
+ expect(noSave).toHaveLength(0);
+ // Correct the specific known mismatch; never silently rewrite the saved user text.
+ await form.locator('[name="name"]').fill("3. D-RLT BAW U11-U19 Gomaringen");
+ await form.locator('[name="startDate"]').fill("2026-11-22");
+ await form.locator('[name="endDate"]').fill("2026-11-22");
+ await form.locator('[name="deadline"]').fill("2026-11-15");
+ await form.locator("#tournament-save").click();
+ await expect(page.locator("#tournament-dialog")).toBeHidden();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved).toHaveLength(1);
+ expect(saved[0].startDate).toBe("2026-11-22");
+ expect(saved[0].deadline).toBe("2026-11-15");
+ expect(saved[0].name).toContain("D-RLT");
+});
+
+test("P1 #386: different UUID is never blocked based on Gomaringen location or title",async({page})=>{
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#view-turniere")).toBeVisible();
+ const other="CCCCCCCC-1111-4222-8333-444444444444";
+ await page.evaluate(()=>{
+  window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+   detail:{entries:[{key:"dbv-calendar-95555",
+    url:"https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5",
+    hasDirectLink:true,title:"3. D-RLT BAW U11-U19 Gomaringen",
+    start:"2026-11-22",end:"2026-11-22",deadline:"2026-11-15",
+    place:"Gomaringen"}]}
+  }));
+ });
+ await page.locator("#add-tournament").click();
+ const form=page.locator("#tournament-form");
+ await form.locator('[name="url"]').fill("https://dbv.turnier.de/tournament/"+other);
+ await form.locator('[name="name"]').fill("3. E-RLT Gomaringen");
+ await form.locator('[name="startDate"]').fill("2026-11-15");
+ await form.locator('[name="endDate"]').fill("2026-11-15");
+ await form.locator("#tournament-save").click();
+ await expect(page.locator("#tournament-dialog")).toBeHidden();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
+ expect(saved).toHaveLength(1);
+ expect(saved[0].id).toBe(other);
+ expect(saved[0].name).toContain("E-RLT");
+});
