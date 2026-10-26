@@ -1,6 +1,6 @@
 /** Public DBV calendar from Badminton Supabase, with static source fallback. */
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels,isNationalU11Masters,isVerifiedCalendarDuplicate} from "./scripts/dbv-calendar-utils.mjs";
+import {AGE_OPTIONS,LEVEL_OPTIONS,calendarEntry,regionLabel,filterCalendar,alternativeCalendarLevels,isNationalU11Masters,isVerifiedCalendarDuplicate,preferCurrentDBVRows} from "./scripts/dbv-calendar-utils.mjs";
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const formatDate=s=>new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"}).format(new Date(s+"T12:00:00Z"));
@@ -357,8 +357,7 @@ async function load(){
  // source cards remain visible if the independent archive is unavailable.
  try{
   const historical=await readBWArchive();
-  entries=[...new Map([...historical,...entries].map(row=>[row.key,row])).values()]
-   .sort((a,b)=>a.start.localeCompare(b.start));
+  entries=preferCurrentDBVRows(entries,historical);
  }catch{ /* keep current source and directly verified entries */ }
  // Display independently published BW/DBV planning instead of stale hardcoded cards.
  try{BW_YOUTH_FRAMEWORK_2027=await readBWBVFramework()}
