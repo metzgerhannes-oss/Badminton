@@ -61,6 +61,8 @@ BEGIN
        WHERE importer_verified IS NOT NULL AND facts>importer_verified),
     'import_count_shortfall',count(*) FILTER (
        WHERE importer_verified IS NOT NULL AND facts<importer_verified),
+    'import_count_missing_counter',count(*) FILTER (
+       WHERE importer_verified IS NULL),
     'match_archive_mismatch',count(*) FILTER (
        WHERE facts<>archived_facts OR missing_archive_keys>0),
     'placement_archive_mismatch',count(*) FILTER (
@@ -124,6 +126,8 @@ BEGIN
       OR (counts->>'players_without_match_proof')::int > 0
       OR (counts->>'players_without_latest_ranking')::int > 0
       OR (counts->>'bad_import_status')::int > 0
+      OR (counts->>'import_count_shortfall')::int > 0
+      OR (counts->>'import_count_missing_counter')::int > 0
       OR (counts->>'stage_cards_unreconciled')::int > 0
       OR (counts->>'match_archive_mismatch')::int > 0
       OR (counts->>'placement_archive_mismatch')::int > 0
