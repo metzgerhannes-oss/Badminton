@@ -6,9 +6,12 @@ const seed={players:[{id:"99-900001",name:"Kind Muster",club:"Testverein"}],
  friends:[{id:"98-900002",name:"Gefolgter Spieler",club:"Testverein"}],
  activeProfileId:"99-900001",chosen:"99-900001",officialLinks:[],
  historyProfilesInitialized:true};
-const hex=rgb=>{
- const parts=String(rgb).match(/[\d.]+/g)?.slice(0,3).map(Number);
- if(!parts||parts.length!==3)throw Error("Unexpected RGB "+rgb);
+const hex=color=>{
+ const text=String(color);
+ if(/^#[0-9a-f]{6}$/i.test(text))
+  return [1,3,5].map(i=>parseInt(text.slice(i,i+2),16)/255);
+ const parts=text.match(/[\d.]+/g)?.slice(0,3).map(Number);
+ if(!parts||parts.length!==3)throw Error("Unexpected RGB "+color);
  return parts.map(x=>Math.round(x)/255);
 };
 const lum=color=>hex(color).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4)
