@@ -8,11 +8,11 @@ const history=JSON.parse(await readFile("data/history.json","utf8"));
 const localKey="shuttleboard-v1";
 const store=new Map([[localKey,JSON.stringify({
   players:[
-    {id:"05-070879",name:"Philipp Metzger",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
-    {id:"local-charlotte",name:"Charlotte Metzger",birthYear:2014,url:""}
+    {id:"05-900001",name:"Person Alpha",birthYear:2016,url:"https://dbv.turnier.de/player-profile/A7CCCDAE-8A57-4D13-BB2A-5B6084671153"},
+    {id:"local-charlotte",name:"Person Beta",birthYear:2014,url:""}
   ],
   activeProfileId:"local-charlotte",chosen:"local-charlotte",
-  officialLinks:[{id:"E24DC6EE-152A-454D-B00C-E625B751D7D5",playerId:"local-charlotte",name:"Charlottes Turnier",url:"https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5",startDate:"2026-10-12",endDate:""}],
+  officialLinks:[{id:"E24DC6EE-152A-454D-B00C-E625B751D7D5",playerId:"local-charlotte",name:"Privates Turnier",url:"https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5",startDate:"2026-10-12",endDate:""}],
   historyProfilesInitialized:true
 })]]);
 const context=vm.createContext({URL,Intl,Date,document:{addEventListener(){}},
@@ -22,18 +22,19 @@ vm.runInContext(bookmarksCode,context,{filename:"tournament-bookmarks.js"});
 vm.runInContext(code,context,{filename:"app.js"});
 const run=script=>vm.runInContext(script,context);
 run("restore()");
-assert.equal(run("state.activeProfileId"),"05-071969","Old Charlotte active profile must be migrated");
-assert.equal(run("state.chosen"),"05-071969");
-assert.equal(run('state.players.filter(p=>p.id==="05-071969").length'),1);
-assert.equal(run('state.players.filter(p=>p.id==="local-charlotte").length'),0);
-assert.equal(run('state.players.find(p=>p.id==="05-071969").birthYear'),2014);
-assert.equal(run('state.players.find(p=>p.id==="05-071969").name'),"Charlotte Metzger");
-assert.equal(run('selectedLinks()[0].playerId'),"05-071969","Charlotte's saved tournaments must survive");
+assert.equal(run("state.activeProfileId"),"local-charlotte","Legacy device ID remains owned locally");
+assert.equal(run("state.chosen"),"local-charlotte");
+assert.equal(run('state.players.filter(p=>p.id==="05-071969").length'),0,
+ "A hardcoded DBV identity must not be fabricated");
+assert.equal(run('state.players.filter(p=>p.id==="local-charlotte").length'),1);
+assert.equal(run('state.players.find(p=>p.id==="local-charlotte").birthYear'),2014);
+assert.equal(run('state.players.find(p=>p.id==="local-charlotte").name'),"Person Beta");
+assert.equal(run('selectedLinks()[0].playerId'),"local-charlotte","Saved tournament ownership must survive");
 run("save()");
 const copy=JSON.parse(store.get(localKey));
-assert.equal(copy.activeProfileId,"05-071969");
-assert.equal(copy.officialLinks[0].playerId,"05-071969");
-assert.equal(copy.players.filter(p=>p.id==="05-071969").length,1);
+assert.equal(copy.activeProfileId,"local-charlotte");
+assert.equal(copy.officialLinks[0].playerId,"local-charlotte");
+assert.equal(copy.players.filter(p=>p.id==="local-charlotte").length,1);
 assert.equal(history.privacyMode,"private");
 assert.deepEqual(history.results,[],"Historical family results must not be in the public static build");
 const freshStore=new Map();
@@ -45,5 +46,5 @@ vm.runInContext(bookmarksCode,fresh,{filename:"tournament-bookmarks.js"});
 vm.runInContext(code,fresh,{filename:"app.js"});
 assert.equal(vm.runInContext("state.players.length",fresh),0,"New installs must never inherit someone else's family profiles");
 assert.equal(vm.runInContext("state.activeProfileId",fresh),"","New installs need explicit setup");
-assert.doesNotMatch(code,/DEFAULT_PLAYERS|name:"Charlotte Metzger"|name:"Philipp Metzger"/);
-console.log("Legacy local DBV-ID migration and bookmarks preserved; new devices start without personal family profiles.");
+assert.doesNotMatch(code,/DEFAULT_PLAYERS|local-charlotte|05-071969/);
+console.log("Legacy local identity and own bookmarks preserved; new devices remain empty.");

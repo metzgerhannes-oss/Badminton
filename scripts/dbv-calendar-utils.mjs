@@ -96,3 +96,14 @@ export function alternativeCalendarLevels(entries,settings){
   level,count:filterCalendar(entries,{...settings,level}).total
  })).filter(x=>x.count>0);
 }
+
+/** The current official DBV source outranks supplemental historical snapshots.
+ * Entries are normalized and independently validated before reaching here.
+ * Only identical verified source keys match; not title, location or date.
+ */
+export function mergeOfficialCalendarRows(current=[],archive=[]){
+ const byKey=new Map();
+ for(const row of archive)byKey.set(row.key,row);
+ for(const row of current)byKey.set(row.key,row);
+ return [...byKey.values()].sort((a,b)=>a.start.localeCompare(b.start));
+}

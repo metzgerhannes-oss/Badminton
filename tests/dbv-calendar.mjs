@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels,isNationalU11Masters} from "../scripts/dbv-calendar-utils.mjs";
+import {calendarEntry,filterCalendar,regionLabel,alternativeCalendarLevels,isNationalU11Masters,mergeOfficialCalendarRows} from "../scripts/dbv-calendar-utils.mjs";
 
 const sample=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 assert.equal(sample.schemaVersion,1);
@@ -64,6 +64,20 @@ assert.deepEqual(filterCalendar(rows,{region:"Baden-Württemberg",age:"U11",leve
  .every(t=>t.bundesland==="Baden-Württemberg"&&t.ages.includes("U11")&&t.level==="C"),true);
 assert.equal(calendarEntry({...sample.entries[0],source_key:"from-unknown-site"}),null);
 assert.equal(calendarEntry({...sample.entries[0],event_url:"https://evil.example/"}).hasDirectLink,false);
+// Synthetic overlap must never roll back corrections from a current official feed.
+const currentOfficial={...rows[0],key:"dbv-calendar-999998",title:"Aktuelles D-RLT",
+ start:"2026-12-01",end:"2026-12-01",place:"Neue Halle"};
+const staleArchive={...currentOfficial,title:"Veraltetes E-RLT",start:"2026-11-15",
+ end:"2026-11-15",place:"Alter Ort",historicalArchive:true};
+const otherArchive={...staleArchive,key:"dbv-calendar-999997"};
+const merged=mergeOfficialCalendarRows([currentOfficial],[staleArchive,otherArchive]);
+assert.equal(merged.length,2,"Only identical official source keys deduplicate");
+assert.equal(merged.find(t=>t.key===currentOfficial.key),currentOfficial,
+ "Current DBV metadata wins over stale archive without mutation");
+assert.equal(merged.find(t=>t.key===otherArchive.key),otherArchive,
+ "Distinct source keys must remain separate even with similar metadata");
+assert.equal(merged.find(t=>t.key===currentOfficial.key).historicalArchive,undefined);
+
 const index=await readFile("index.html","utf8");
 const sw=await readFile("sw.js","utf8");
 const app=await readFile("dbv-calendar.js","utf8");
@@ -98,7 +112,8 @@ assert.ok(app.includes("2027-06-27"),"Official BWBV 2027 framework includes June
 assert.ok(app.includes("dbv-calendar-external-plan")&&app.includes("dbv-calendar-external-result"),
  "Official plans and completed real tournament results must be visually and technically distinct");
 
-assert.ok(app.includes("readBWArchive"),"Full-year verified BW archive must be consumed by the calendar");
+assert.ok(app.includes("readBWArchive")&&app.includes("mergeOfficialCalendarRows(entries,historical)"),
+ "Calendar must use current-first source precedence on archive overlap");
 assert.ok(app.includes("./data/bw-youth-calendar-archive.json"),"Historical BW archive must remain a separate verifiable source");
 assert.ok(app.includes("isVerifiedCalendarDuplicate")&&!app.includes("isCuratedDuplicate"),
  "Do not hide a distinct event based only on shared city, date, age or level; collapse only exact DBV UUIDs");

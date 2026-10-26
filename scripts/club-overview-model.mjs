@@ -14,6 +14,7 @@ export function clubChoices(profiles=[]){
 export function buildClubRows(roster,profiles=[],club=DEFAULT_CLUB){
  const isSpvgg=rosterMatchesClub(club);
  const byName=new Map();
+ const localRows=[];
  if(isSpvgg && roster){
   validateSpvggRoster(roster);
   for(const team of roster.teams)for(const name of team.members){
@@ -27,21 +28,18 @@ export function buildClubRows(roster,profiles=[],club=DEFAULT_CLUB){
   if(!p || !norm(p.name) || !norm(p.club) ||
    !(isSpvgg?rosterMatchesClub(p.club):norm(p.club)===norm(club)))continue;
   const name=String(p.name).trim(),key=norm(name);
-  // A matching name only identifies a shared display row, NOT an official DBV mapping.
-  // The device-owned profile remains a separately disclosed local reference.
-  const existing=byName.get(key);
-  if(existing){
-   existing.local=true;
-   existing.localNameMatch=true;
-   if(validId(p.id)){existing.dbvId=String(p.id);existing.localPlayerId=String(p.id);}
-   if(/^U(?:11|13|15|17|19|22)$/.test(p.ageClass||""))existing.ageClass=p.ageClass;
-   existing.source="Vereinsquelle + lokal";
-  }else{
-   byName.set(key,{key,name,teams:[],ageClass:/^U(?:11|13|15|17|19|22)$/.test(p.ageClass||"")?p.ageClass:"",
-    dbvId:validId(p.id)?String(p.id):"",localPlayerId:validId(p.id)?String(p.id):"",source:"Nur lokal",local:true});
-  }
+  // Team roster names are source labels, not DBV identity evidence. Keep
+  // even same-name device profiles separate from the official roster rows.
+  const rosterRow=byName.get(key);
+  if(rosterRow)rosterRow.localNameMatch=true;
+  const id=String(p.id||"").trim();
+  const localPlayerId=/^(?:\d{2}-\d{6}|local-[A-Za-z0-9_-]{1,80})$/.test(id)?id:"";
+  localRows.push({key:"local:"+id,name,teams:[],
+   ageClass:/^U(?:11|13|15|17|19|22)$/.test(p.ageClass||"")?p.ageClass:"",
+   dbvId:validId(id)?id:"",localPlayerId,source:"Nur lokal",local:true,
+   localNameMatch:!!rosterRow});
  }
- return [...byName.values()].sort((a,b)=>a.name.localeCompare(b.name,"de"));
+ return [...byName.values(),...localRows].sort((a,b)=>a.name.localeCompare(b.name,"de")||Number(a.local)-Number(b.local));
 }
 export function filterClubRows(rows,{query="",team="all",age="all",sort="name"}={}){
  const search=norm(query);

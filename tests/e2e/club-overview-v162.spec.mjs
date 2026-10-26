@@ -39,3 +39,31 @@ test("v162 mobile: club menu remains invisible and ordinary navigation is unchan
  expect(c.nav).toBe("row");
  expect(c.overflow).toBeLessThanOrEqual(2);
 });
+
+
+test("v225: homonyms remain separate from roster identities on desktop",async({page})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.addInitScript(()=>localStorage.setItem("shuttleboard-v1",JSON.stringify({
+  players:[{id:"05-123456",name:"Spieler Eins",club:"SpVgg Mössingen",ageClass:"U15"},
+   {id:"05-654321",name:"Spieler Eins",club:"SpVgg Mössingen",ageClass:"U13"}],
+  friends:[],officialLinks:[],activeProfileId:"05-123456"
+ })));
+ await page.route("**/data/spvgg-active-roster.json",route=>
+  route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(fixture)}));
+ await page.goto("/#verein");
+ const matches=page.locator("#club-overview-table tbody tr").filter({hasText:"Spieler Eins"});
+ await expect(matches).toHaveCount(3);
+ const official=matches.filter({hasText:"Vereinsquelle"});
+ await expect(official).toHaveCount(1);
+ await expect(official.locator("td").nth(1)).toHaveText("Nicht erfasst");
+ await expect(official.locator("td").nth(2)).toHaveText("–");
+ await expect(official.locator("[data-open-profile]")).toHaveCount(0);
+ await expect(official).toContainText("Namensgleichheit nicht verifiziert");
+ const own=matches.filter({hasText:"Nur lokal"});
+ await expect(own).toHaveCount(2);
+ await expect(own.locator("[data-open-profile]")).toHaveCount(2);
+ await expect(own.locator("[data-open-profile='05-123456']")).toHaveCount(1);
+ await expect(own.locator("[data-open-profile='05-654321']")).toHaveCount(1);
+ await page.locator("#club-overview-team").selectOption("I");
+ await expect(page.locator("#club-overview-table tbody tr")).toHaveCount(5);
+});
