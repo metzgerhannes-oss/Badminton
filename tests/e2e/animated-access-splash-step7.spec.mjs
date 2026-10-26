@@ -35,6 +35,22 @@ test("checking uses original club logo and animated shuttle without visible text
  await expect(page.locator(".app-access-shuttle")).toHaveJSProperty("naturalWidth",96);
  await expect(page.locator("#app-access-splash .app-access-visually-hidden")).toContainText("Zugang wird geprüft");
  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
+ const actual=await page.locator("#app-access-splash").evaluate(el=>({
+  display:getComputedStyle(el).display,
+  artWidth:el.querySelector(".app-access-splash-art").getBoundingClientRect().width,
+  logoWidth:el.querySelector(".app-access-splash-emblem").getBoundingClientRect().width,
+  duration:getComputedStyle(el.querySelector(".app-access-shuttle")).animationDuration
+ }));
+ expect(actual.display).toBe("grid");
+ expect(actual.artWidth).toBeGreaterThan(100);
+ expect(actual.logoWidth).toBeGreaterThan(100);
+ expect(actual.duration).toBe("3.2s");
+ const svg=await page.evaluate(async()=>{
+  const r=await fetch("./assets/shuttlecock-splash.svg");
+  return r.ok?await r.text():"";
+ });
+ expect(svg.match(/class="feather"/g)).toHaveLength(16);
+
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
   clip:getComputedStyle(el).clip

@@ -15,12 +15,12 @@ assert.match(html,/<p id="app-access-status" role="status" aria-live="polite"><\
 assert.match(css,/html\[data-app-access="checking"\] \.app-access-panel \{display:none!important\}/);
 assert.match(html,/html:not\(\[data-app-access="checking"\]\) #app-access-splash\{display:none!important\}/,
  "Critical inline CSS prevents the splash persisting after access resolves");
-assert.match(css,/html:not\(\[data-app-access="checking"\]\)[\s\S]*?#app-access-splash\s*\{/,
- "External CSS keeps the splash art scoped to its access state");
+assert.match(css,/html\[data-app-access="checking"\] #app-access-splash\s*\{/,"Checking state must style visible splash");
+assert.doesNotMatch(css,/html:not\(\[data-app-access="checking"\]\)\s*#app-access-splash\s*\{/,"Splash must not style only hidden state");
 assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 assert.match(css,/mix-blend-mode:multiply/);
 assert.match(css,/@keyframes app-access-shuttle-flight/);
-assert.match(css,/3\.4s ease-in-out infinite/);
+assert.match(css,/3\.2s linear infinite both/);
 assert.match(css,/env\(safe-area-inset-top\)/);
 assert.match(js,/root\.dataset\.appAccess="denied"/);
 assert.match(js,/root\.dataset\.appAccess="checking"/);
@@ -44,6 +44,9 @@ assert.match(transparentClub,/<feColorMatrix[^>]+type="matrix"[^>]+values="[^"]*
 assert.match(transparentClub,/filter="url\(#remove-white-matte\)"/);
 assert.match(shuttle,/viewBox="0 0 96 118"/);
 assert.match(shuttle,/linearGradient id="cork"/);
+assert.equal((shuttle.match(/class="feather"/g)||[]).length,16,"Shuttle needs sixteen individual vanes");
+assert.ok(Buffer.byteLength(shuttle)<=200000,"Offline feather asset must be under 200 KB");
+assert.doesNotMatch(shuttle,/<image\b[^>]+href="https?:/i,"No external image requests");
 for(const listName of ["ASSETS","SHELL_ASSETS","ESSENTIAL"]){
  const match=sw.match(new RegExp("const "+listName+"=(\\[[^\\n]+\\]);"));
  assert.ok(match,"SW missing "+listName);
