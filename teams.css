@@ -103,3 +103,18 @@
  .follow-discovery{padding:10px}
  .follow-manage-actions{width:100%;justify-content:flex-start}
 }
+
+/* UX #396: one followed-team list, inline controls with 44px touch targets. */
+#team-followed .team-card{min-width:0;gap:6px}
+#team-followed .team-card-main{min-width:0;flex:1 1 0;overflow-wrap:anywhere}
+#team-followed .team-card-main strong{font-size:clamp(14px,2vw,16px);line-height:1.35}
+#team-followed .team-card-main small{font-size:12px;line-height:1.4}
+#team-followed .team-inline-controls{display:grid;grid-template-columns:repeat(3,44px);gap:3px;flex:none;min-width:0}
+#team-followed .team-inline-controls button{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;display:grid;place-items:center;border:1px solid #8db9d4;border-radius:11px;background:#e5f4ff;color:#17496f;font-size:23px;font-weight:800;cursor:pointer;touch-action:manipulation}
+#team-followed .team-inline-controls button:disabled{opacity:.38;cursor:not-allowed}
+#team-followed .team-inline-controls button:focus-visible,#team-order-reset:focus-visible{outline:3px solid #167bbb;outline-offset:2px}
+#team-followed .team-card-unavailable{border-style:dashed}
+#team-followed .team-card-unavailable-content{cursor:default}
+#view-mannschaft .follow-order-reset{min-height:44px;font-size:12px;line-height:1.25;white-space:normal;text-align:center;max-width:160px}
+@media(max-width:370px){#team-followed .team-card{padding:7px 5px;gap:3px}#team-followed .team-card-main{padding:4px 2px}#team-followed .team-inline-controls{gap:2px}#team-followed .team-card-main small{font-size:11px}}
+@media(min-width:1080px){#team-followed .team-inline-controls button{background:#234d76;color:#f3faff;border-color:#8eafca}#team-followed .team-card-main strong{font-size:16px}#team-followed .team-card-main small{font-size:13px}}
