@@ -62,7 +62,7 @@ function bookmark(row,owns){
  if(!record(row))fail("Ungültiger Turnierfavorit");
  const raw=text(row.url,1200,"Turnierlink",true);
  const playerId=text(row.playerId||"all",80,"Turnierspieler");
- if(playerId!=="all"&&!owns.has(playerId)&&playerId!=="local-charlotte")fail("Turnier verweist auf unbekannten Spieler");
+ if(playerId!=="all"&&!owns.has(playerId))fail("Turnier verweist auf unbekannten Spieler");
  const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
  if(startDate&&endDate&&endDate<startDate)fail("Turnierende vor Turnierbeginn");
  const place=text(row.place,120,"Austragungsort");
@@ -113,8 +113,8 @@ export function normalizeLocalData(data){
   seen.add(key);
  }
  const original=text(data.activeProfileId||data.chosen,80,"Aktives Profil",true);
- const activeProfileId=original==="local-charlotte"&&owns.has("05-071969")
-  ?"05-071969":original;
+ // Backup ownership is authoritative. Never map a device-local alias to a DBV ID.
+ const activeProfileId=original;
  if(!owns.has(activeProfileId))fail("Das aktive Profil ist kein eigenes Spielerprofil");
  return {players,friends,officialLinks:links,activeProfileId,
   chosen:activeProfileId,historyProfilesInitialized:true};

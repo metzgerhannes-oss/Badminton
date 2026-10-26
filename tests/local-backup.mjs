@@ -61,6 +61,27 @@ assert.equal(legacy.summary.calendarEvents,null);
 assert.equal(parsed.data.historyProfilesInitialized,true);
 assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(parsed.data))).data,parsed.data);
 
+// A device-local ID is an independent identity, even when another official
+// profile has the same display name. Neither favorites nor Home choice move.
+const sameNameLocal={...original,
+ players:[{id:"local-charlotte",name:"Testperson B"},{id:"99-100002",name:"Testperson B"}],
+ friends:[],
+ officialLinks:[{...original.officialLinks[0],playerId:"local-charlotte"},
+  {...original.officialLinks[0],playerId:"99-100002"}],
+ activeProfileId:"local-charlotte",chosen:"99-100002"};
+const sameNameRestored=inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameLocal)));
+assert.deepEqual(sameNameRestored.data.players.map(p=>p.id),["local-charlotte","99-100002"]);
+assert.deepEqual(sameNameRestored.data.officialLinks.map(t=>t.playerId),["local-charlotte","99-100002"]);
+assert.equal(sameNameRestored.data.activeProfileId,"local-charlotte");
+assert.equal(sameNameRestored.data.chosen,"local-charlotte");
+assert.equal(inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameRestored.data))).data.activeProfileId,"local-charlotte");
+assert.throws(()=>createLocalBackup(JSON.stringify({...sameNameLocal,
+ players:[{id:"99-100002",name:"Testperson B"}]})),
+ /unbekannten Spieler/,"A removed local owner must not silently transfer a tournament");
+assert.throws(()=>inspectLocalBackup(JSON.stringify({...JSON.parse(created),
+ data:{...original,activeProfileId:"local-charlotte"}})),
+ /kein eigenes Spielerprofil/,"A stale active alias must not select an unrelated official profile");
+
 // F06: backup v2 must preserve ALL existing private tournament kinds, not
 // reject calendar/framework favorites or silently lose their venue on restore.
 const calendarFavorite={id:"dbv-calendar-44014",source:"dbv-calendar",url:"https://turniere.badminton.de/",
