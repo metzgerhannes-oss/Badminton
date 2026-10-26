@@ -47,10 +47,11 @@ for(const [hash,destination]of [
  "Existing bookmark must redirect to its canonical destination: "+hash);
 for(const id of ["profile-list","owner-admin-panel","owner-activation-setup",
  "app-language","club-branding-form","invite-share","backup-export",
- "backup-restore","followed-player-search","team-settings-list"]){
+ "backup-restore","followed-player-search","team-followed","team-order-reset"]){
  assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1,
  "Do not create duplicates or remove existing controls: "+id);
 }
+assert.doesNotMatch(html,/id="team-settings-list"|id="team-manage-details"/);
 assert.match(css,/\.settings-room-link\{[^}]*min-height:83px/);
 assert.match(css,/\.settings-room-link:focus-visible/);
 assert.match(css,/@media\(min-width:640px\)/);
