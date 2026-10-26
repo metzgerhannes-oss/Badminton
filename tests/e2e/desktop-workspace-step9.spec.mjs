@@ -61,8 +61,9 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
       trophy:channels("#view-start .home-trophy-heading h2")
      };
     });
-    for(const key of ["heading","friends","empty"])
+    for(const key of ["heading","empty"])
      expect(Math.min(...colors[key]),key+" must remain light on navy").toBeGreaterThanOrEqual(180);
+    expect(Math.max(...colors.friends),"Pale friends card needs dark readable heading").toBeLessThan(130);
     expect(Math.max(...colors.trophy),"Pale trophy card needs dark readable heading").toBeLessThan(130);
    }
    if(width===1440&&route==="einstellungen"){
