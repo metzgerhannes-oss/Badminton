@@ -7,7 +7,7 @@ function luminance(color){
  let rgb;
  if(/^#[0-9a-f]{6}$/i.test(value))rgb=[1,3,5].map(i=>parseInt(value.slice(i,i+2),16));
  else {
-  const parts=value.match(/[\\d.]+/g);
+  const parts=value.match(/[0-9.]+/g);
   if(!parts||parts.length<3)throw Error("Unexpected color: "+value);
   rgb=parts.slice(0,3).map(Number);
  }
