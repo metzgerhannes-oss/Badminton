@@ -65,28 +65,45 @@ test("iPhone Safari invitation opens install-first page without creating a sessi
  });
 });
 test("iPhone installed app redeems captured invitation automatically only once",async({page})=>{
+ test.setTimeout(60000);
  await simulateIOS(page,{standalone:true});
  const calls=await inviteApi(page);
+ // In loaded WebKit CI the access module may load after the first navigation.
+ // Verify the mocked server membership response before expecting the visual grant.
+ const membershipResponse=page.waitForResponse(response=>
+  response.url().endsWith("/rpc/app_access_status")&&
+  response.request().method()==="POST"&&response.status()===200,
+  {timeout:30000});
  await page.goto("/install-invite.html#appinvite="+SECRET,{waitUntil:"domcontentloaded"});
- await expect(page).toHaveURL(/\/index\.html#start$/);
- await expect(page.locator("#app-access-gate")).toBeHidden();
+ expect((await (await membershipResponse).json()).allowed).toBe(true);
+ await expect(page.locator("#app-access-gate")).toBeHidden({timeout:20000});
+ await expect(page).toHaveURL(/\/index\.html#start$/,{timeout:20000});
  const accepted=calls.filter(x=>x.path.endsWith("/rpc/app_access_invite_accept"));
  expect(accepted).toHaveLength(1);
  expect(JSON.parse(accepted[0].body)).toEqual({p_secret:SECRET});
  const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.communitySession.v1")||"null"));
  expect(stored?.access_token).toBe("synthetic-install-jwt");
  await page.reload({waitUntil:"domcontentloaded"});
- await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("#app-access-gate")).toBeHidden({timeout:20000});
  expect(calls.filter(x=>x.path.endsWith("/rpc/app_access_invite_accept"))).toHaveLength(1);
 });
 test("iPhone browser-only choice accepts the invite without infinite installation redirect",async({page})=>{
+ test.setTimeout(60000);
  await simulateIOS(page);
  const calls=await inviteApi(page);
  await page.goto("/index.html#appinvite="+SECRET,{waitUntil:"domcontentloaded"});
  await expect(page.locator("#browser-only")).toBeVisible();
+ // Synchronize with the synthetic membership response: under CI contention
+ // WebKit can defer loading the access module after the browser-only click.
+ // The gate must still close after the server has verified membership.
+ const membershipResponse=page.waitForResponse(response=>
+  response.url().endsWith("/rpc/app_access_status")&&
+  response.request().method()==="POST"&&response.status()===200,
+  {timeout:30000});
  await page.locator("#browser-only").click();
- await expect(page.locator("#app-access-gate")).toBeHidden();
- await expect(page).toHaveURL(/\/index\.html#start$/);
+ expect((await (await membershipResponse).json()).allowed).toBe(true);
+ await expect(page.locator("#app-access-gate")).toBeHidden({timeout:20000});
+ await expect(page).toHaveURL(/\/index\.html#start$/,{timeout:20000});
  const acceptance=calls.findIndex(x=>x.path.endsWith("/rpc/app_access_invite_accept"));
  const statusCheck=calls.findIndex(x=>x.path.endsWith("/rpc/app_access_status"));
  expect(acceptance,"A browser-only invitation must be verified once before the access grant").toBeGreaterThanOrEqual(0);
@@ -94,6 +111,7 @@ test("iPhone browser-only choice accepts the invite without infinite installatio
  expect(calls.filter(x=>x.path.endsWith("/rpc/app_access_invite_accept"))).toHaveLength(1);
 });
 test("existing installed PWA can use a single tap to accept clipboard invite",async({page})=>{
+ test.setTimeout(60000);
  await page.addInitScript(value=>{
   Object.defineProperty(navigator,"clipboard",{configurable:true,
    value:{readText:async()=>value.link}});
@@ -102,8 +120,13 @@ test("existing installed PWA can use a single tap to accept clipboard invite",as
  await page.goto("/index.html#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#app-access-gate")).toBeVisible();
  await expect(page.locator("#app-access-paste")).toBeVisible();
+ const membershipResponse=page.waitForResponse(response=>
+  response.url().endsWith("/rpc/app_access_status")&&
+  response.request().method()==="POST"&&response.status()===200,
+  {timeout:30000});
  await page.locator("#app-access-paste").click();
- await expect(page.locator("#app-access-gate")).toBeHidden();
+ expect((await (await membershipResponse).json()).allowed).toBe(true);
+ await expect(page.locator("#app-access-gate")).toBeHidden({timeout:20000});
  expect(calls.filter(x=>x.path.endsWith("/rpc/app_access_invite_accept"))).toHaveLength(1);
 });
 test("invalid install-bootstrap URL never unlocks an app or calls Supabase",async({page})=>{

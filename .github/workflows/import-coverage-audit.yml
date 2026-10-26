@@ -6,12 +6,16 @@ on:
     paths:
       - 'scripts/import-coverage-audit.mjs'
       - 'scripts/import-coverage-audit.test.mjs'
+      - 'scripts/match-reconciliation-audit.mjs'
+      - 'scripts/match-reconciliation-audit.test.mjs'
       - '.github/workflows/import-coverage-audit.yml'
   push:
     branches: [main]
     paths:
       - 'scripts/import-coverage-audit.mjs'
       - 'scripts/import-coverage-audit.test.mjs'
+      - 'scripts/match-reconciliation-audit.mjs'
+      - 'scripts/match-reconciliation-audit.test.mjs'
       - '.github/workflows/import-coverage-audit.yml'
 permissions:
   contents: read
@@ -25,4 +29,6 @@ jobs:
         with:
           node-version: '22'
       - name: Ausschließlich synthetische Offline-Fixtures, keine Produktionsabfragen
-        run: node scripts/import-coverage-audit.test.mjs
+        run: |
+          node scripts/import-coverage-audit.test.mjs
+          node scripts/match-reconciliation-audit.test.mjs
