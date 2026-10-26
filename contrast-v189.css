@@ -157,21 +157,47 @@
  }
 }
 
-/* #396 / v222: Home-specific contrast repair. The historical non-Home rules
-   above remain unchanged. These are the final cascade overrides because
-   accessibility-v182.css previously overrode the correct surface-aware
-   colors with light-on-light or dark-on-dark ink. Preserve the navy CD. */
-#view-start .upcoming-tournament-row .upcoming-tournament-info strong{
- color:#f2f9ff!important;
+/* #396 / v223 P0 regression: Home colors MUST match the actual card surface.
+   The earlier v222 repair used navy-only ink at every viewport. On iPhone the
+   cards are pale (#fff -> #edf8ff), making titles and profile metadata white
+   on white. Preserve approved colors while separating responsive surfaces. */
+@media(max-width:1079px){
+ #view-start .upcoming-tournament-row{
+  color:#123b5e!important;
+ }
+ #view-start .upcoming-tournament-row .upcoming-tournament-info strong{
+  color:#123b5e!important;
+  font-size:clamp(14px,3.8vw,16px);
+  line-height:1.34;
+ }
+ #view-start .upcoming-tournament-row .upcoming-tournament-info small,
+ #view-start .upcoming-tournament-row .upcoming-tournament-venue,
+ #view-start .upcoming-tournament-row .upcoming-tournament-label{
+  color:#365570!important;
+  font-size:clamp(12px,3.2vw,14px);
+  line-height:1.42;
+ }
+ #focused-profile .focus-profile-copy .focus-profile-meta,
+ #focused-profile .focus-profile-copy .focus-profile-id{
+  color:#365570!important;
+  font-size:clamp(12px,3.3vw,14px);
+  line-height:1.36;
+ }
 }
-#view-start .upcoming-tournament-row .upcoming-tournament-info small,
-#view-start .upcoming-tournament-row .upcoming-tournament-venue,
-#view-start .upcoming-tournament-row .upcoming-tournament-label{
- color:#d3e7f9!important;
-}
-#focused-profile .focus-profile-copy .focus-profile-meta,
-#focused-profile .focus-profile-copy .focus-profile-id{
- color:#d3e7fa!important;
+/* Desktop retains pale ink on the actual navy surface. */
+@media(min-width:1080px){
+ #view-start .upcoming-tournament-row .upcoming-tournament-info strong{
+  color:#f2f9ff!important;
+ }
+ #view-start .upcoming-tournament-row .upcoming-tournament-info small,
+ #view-start .upcoming-tournament-row .upcoming-tournament-venue,
+ #view-start .upcoming-tournament-row .upcoming-tournament-label{
+  color:#d3e7f9!important;
+ }
+ #focused-profile .focus-profile-copy .focus-profile-meta,
+ #focused-profile .focus-profile-copy .focus-profile-id{
+  color:#d3e7fa!important;
+ }
 }
 @media(min-width:1080px){
  /* Restore the original pale desktop card: broad club-overview.css sets
