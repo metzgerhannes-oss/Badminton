@@ -55,10 +55,18 @@ assert.equal(enriched.updated.startDate,"2026-11-22");
 assert.equal(correct.place,"","Source reconciliation must never mutate the original stored object");
 const wrongDate=bookmarks.reconcileOfficialMetadata(
  {...correct,startDate:"2026-11-15"},[officialRow]);
-assert.equal(wrongDate.status,"conflict","Registration deadline must never replace official match date");
-assert.equal(wrongDate.officialDate,"2026-11-22");
-assert.equal(bookmarks.reconcileOfficialMetadata({...correct,name:"3. E-RLT Gomaringen"},
- [officialRow]).status,"conflict","E-RLT and D-RLT must not silently coalesce");
+assert.equal(wrongDate.status,"matched","Official DBV date overrides legacy local registration deadline");
+assert.equal(wrongDate.updated.startDate,"2026-11-22");
+assert.equal(wrongDate.updated.deadline,"2026-11-15");
+assert.equal(wrongDate.sourceCorrected,true);
+const wrongCategory=bookmarks.reconcileOfficialMetadata({...correct,name:"3. E-RLT Gomaringen"},
+ [officialRow]);
+assert.equal(wrongCategory.status,"matched","An independently verified SAME UUID identifies the event");
+assert.equal(wrongCategory.updated.name,officialRow.title,"DBV title/category beats legacy E-RLT");
+assert.equal(wrongCategory.updated.playerId,correct.playerId,"Player association is not source metadata");
+assert.equal(bookmarks.reconcileOfficialMetadata({...correct,name:"3. E-RLT Gomaringen"},[
+ {...officialRow,url:"https://dbv.turnier.de/tournament/CCCCCCCC-1111-4222-8333-444444444444"}
+]).status,"unverified","Different verified UUID must never overwrite another event");
 assert.equal(bookmarks.reconcileOfficialMetadata(correct,[{...officialRow,hasDirectLink:false}]).status,
  "unverified","A generic calendar URL cannot verify a tournament UUID");
 assert.equal(bookmarks.reconcileOfficialMetadata(correct,[officialRow,officialRow]).status,
