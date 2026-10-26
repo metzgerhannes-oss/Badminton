@@ -51,7 +51,7 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(actual.display).toBe("grid");
  expect(actual.artWidth).toBeGreaterThan(100);
  expect(actual.logoWidth).toBeGreaterThan(100);
- expect(actual.duration).toBe("3.2s");
+ expect(actual.duration).toBe("2.5s");
 
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
@@ -81,6 +81,25 @@ test("checking uses original club logo and animated shuttle without visible text
  const stored=await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
  expect(stored).toContain("synthetic-access-token");
 });
+test("v221 fast successful cold launch shows intro for 0.8s; warm navigation never restarts splash",async({page})=>{
+ await withExistingSession(page);
+ await page.route(API+"/rest/v1/rpc/app_access_status",route=>
+  route.request().method()==="OPTIONS"
+   ?route.fulfill({status:204,headers,body:""})
+   :route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'}));
+ await page.goto("/",{waitUntil:"commit"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted",{timeout:12000});
+ // Navigation-relative clock: the fast synthetic membership RPC cannot cut
+ // the intro short. Slow asset loads can legitimately make total time longer.
+ expect(await page.evaluate(()=>performance.now())).toBeGreaterThanOrEqual(780);
+ await page.evaluate(()=>{location.hash="#spieler"});
+ await expect(page.locator("#view-spieler")).toBeVisible();
+ await expect(page.locator("#app-access-splash")).toBeHidden();
+ await page.evaluate(()=>{location.hash="#start"});
+ await expect(page.locator("#view-start")).toBeVisible();
+ await expect(page.locator("#app-access-splash")).toBeHidden();
+});
+
 test("a failed status check shows the actionable error and does not trap the user in animation",async({page})=>{
  await withExistingSession(page);
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>

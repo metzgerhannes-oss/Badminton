@@ -3,6 +3,10 @@ import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {getPrivateSession} from "./private-invites.js";
 const TOKEN=/^[a-f0-9]{64}$/;
 let session=null,allowed=false,busy=false;
+// The first successful cold launch has a short, consistent visual beat.
+// Authentication still runs immediately; no delay for errors or a resumed PWA.
+const COLD_START_MIN_MS=800;
+const coldStartStartedAt=performance.now();
 const root=document.documentElement;
 const gate=document.getElementById("app-access-gate");
 const code=document.getElementById("app-access-code");
@@ -44,6 +48,16 @@ function grant({member=true}={}){
   window.dispatchEvent(new Event("hashchange"));
  }
  window.dispatchEvent(new CustomEvent(member?"badminton:app-access-granted":"badminton:player-shell-granted"));
+}
+async function grantAfterIntro(options){
+ // Only hold an already VERIFIED grant, never a failed/revoked invitation.
+ // In background tabs or reduced-motion mode, avoid an artificial wait.
+ if(document.visibilityState==="visible"&&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches){
+  const remaining=COLD_START_MIN_MS-(performance.now()-coldStartStartedAt);
+  if(remaining>0)await new Promise(resolve=>setTimeout(resolve,remaining));
+ }
+ grant(options);
 }
 function inform(message){status.textContent=message;}
 // Bound the visual check: a stalled Auth/connection request must never leave
@@ -95,7 +109,7 @@ async function accept(raw){
    const permission=await rpc("app_access_status",{},session.access_token);
    if(permission?.allowed!==true)throw Error("Die Einladung wurde nicht freigeschaltet.");
   })());
-  grant();
+  await grantAfterIntro();
  }catch(error){
   root.dataset.appAccess="denied";
   inform(error?.message||"Einladung konnte nicht geprüft werden.");
@@ -154,8 +168,8 @@ async function initialize(){
    if(result?.allowed===true)return "member";
    return await hasAcceptedPlayerLink(session.access_token)?"player":null;
   })());
-  if(permission==="member"){grant();return;}
-  if(permission==="player"){grant({member:false});return;}
+  if(permission==="member"){await grantAfterIntro();return;}
+  if(permission==="player"){await grantAfterIntro({member:false});return;}
  }catch(error){
   // An unavailable server never turns a private session into authorization.
   root.dataset.appAccess="denied";

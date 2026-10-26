@@ -26,7 +26,7 @@ assert.match(gate,/id="app-access-paste"[^>]*hidden/);
 assert.match(css,/#app-access-paste:focus-visible/);
 assert.match(app,/rpc\("app_access_invite_accept"/);
 assert.match(app,/rpc\("app_access_status"/);
-assert.match(app,/if\(permission==="member"\)\{grant\(\);return;\}/);
+assert.match(app,/if\(permission==="member"\)\{await grantAfterIntro\(\);return;\}/);
 assert.match(app,/history\.replaceState\(null/);
 assert.doesNotMatch(install,/auth\/v1|supabase\.co|localStorage|analytics|fetch\(/);
 assert.doesNotMatch(app,/new URLSearchParams\(location\.search\)\.set\("appinvite"/);
