@@ -23,8 +23,8 @@ const ratio=(a,b)=>{
 test.beforeEach(async({page})=>{
  await page.addInitScript(value=>localStorage.setItem("shuttleboard-v1",JSON.stringify(value)),seed);
 });
-for(const width of [390,1080,1280,1440,1920]){
- test("Navy Home: tournament title, metadata, status and player at "+width+"px",async({page})=>{
+for(const width of [320,375,390,420,768,1079,1080,1280,1440,1920]){
+ test("Surface-aware Home: tournament title, metadata, status and player at "+width+"px",async({page})=>{
   await page.setViewportSize({width,height:900});
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   await expect(page.locator("#view-start")).toBeVisible();
@@ -45,15 +45,29 @@ for(const width of [390,1080,1280,1440,1920]){
     status:c(".upcoming-tournament-label"),
     date:c(".upcoming-tournament-date"),
     dateBg:getComputedStyle(root.querySelector(".upcoming-tournament-date")).backgroundColor,
+    panelBg:getComputedStyle(root.querySelector(".upcoming-tournaments-section")).background,
+    titleSize:parseFloat(getComputedStyle(root.querySelector(".upcoming-tournament-info strong")).fontSize),
+    metaSize:parseFloat(getComputedStyle(root.querySelector(".upcoming-tournament-info small")).fontSize),
     overflow:document.documentElement.scrollWidth-innerWidth
    };
   });
-  // #265778 is the brightest gradient stop in the actual Home panel.
+  // At small widths the physical iPhone shows WHITE cards. Desktop has navy
+  // cards. The old test assumed navy at every width and missed the P0 bug!
+  const light=width<1080;
+  if(light)
+   expect(colors.panelBg,"iPhone must have a pale tournament card").toMatch(/rgb\(255, 255, 255\)|#fff/);
+  else
+   expect(colors.panelBg,"desktop must have a dark tournament card").toMatch(/rgb\(18, 46, 80\)|#122e50|rgb\(38, 87, 120\)/);
+  const against=light?"#ffffff":"#265778";
   for(const key of ["title","owner","venue","status"])
-   expect(ratio(colors[key],"#265778"),key+" contrast on navy").toBeGreaterThanOrEqual(4.5);
+   expect(ratio(colors[key],against),key+" must read on "+(light?"white mobile":"navy desktop")).toBeGreaterThanOrEqual(4.5);
+  if(light){
+   expect(colors.titleSize,"mobile tournament names").toBeGreaterThanOrEqual(14);
+   expect(colors.metaSize,"mobile tournament details").toBeGreaterThanOrEqual(12);
+  }
   expect(ratio(colors.date,colors.dateBg),"date badge").toBeGreaterThanOrEqual(4.5);
   expect(colors.overflow).toBeLessThanOrEqual(2);
-  const meta=await page.locator("#focused-profile").evaluate(root=>{
+  const profile=await page.locator("#focused-profile").evaluate(root=>{
    let node=root.querySelector(".focus-profile-meta");
    if(!node){
     const parent=root.querySelector(".focus-profile-copy");
@@ -63,10 +77,20 @@ for(const width of [390,1080,1280,1440,1920]){
     node.textContent="Kind · Testverein";
     parent.append(node);
    }
-   return getComputedStyle(node).color;
+   return {color:getComputedStyle(node).color,
+    size:parseFloat(getComputedStyle(node).fontSize),
+    bg:getComputedStyle(root).background};
   });
-  expect(meta).toBeTruthy();
-  expect(ratio(meta,"#2b5c82"),"player metadata on navy").toBeGreaterThanOrEqual(4.5);
+  expect(profile?.color).toBeTruthy();
+  // The screenshot's own-player header is pale on iPhone, but desktop can
+  // intentionally use the navy club theme; test the correct actual surface.
+  if(light){
+   expect(profile.bg,"iPhone profile surface").toMatch(/rgb\(255, 255, 255\)|#fff/);
+   expect(ratio(profile.color,"#ffffff"),"iPhone player metadata on white").toBeGreaterThanOrEqual(4.5);
+   expect(profile.size,"mobile player details").toBeGreaterThanOrEqual(12);
+  }else{
+   expect(ratio(profile.color,"#2b5c82"),"desktop player metadata on navy").toBeGreaterThanOrEqual(4.5);
+  }
  });
 }
 for(const width of [1080,1280,1440,1920]){
