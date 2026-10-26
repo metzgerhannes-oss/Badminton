@@ -30,6 +30,7 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
   await page.setViewportSize({width,height:900});
   for(const route of ["start","spieler","verein","mannschaft","berichte","historie","einstellungen"]){
    await page.goto("/#"+route,{waitUntil:"domcontentloaded"});
+   await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
    await expect(page.locator("#view-"+route)).toBeVisible();
    const m=await bounds(page);
    expect(m.pages,route+" should display only one main route").toBe(1);
@@ -89,6 +90,7 @@ test("desktop PR3: wide existing views use the shell without clipping or duplica
 test("desktop PR3: player search opens alongside followed profiles and keeps focus",async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  const search=page.locator("#followed-player-search");
  await expect(page.locator("#player-discover")).toBeHidden();
  await search.fill("Vinzent");
@@ -125,6 +127,7 @@ test("desktop PR3: player search opens alongside followed profiles and keeps foc
 test("desktop PR3: selected team details and report cards fit in two columns",async({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  // Synthetic presentation-only team selection, no source data is fabricated.
  const m=await page.evaluate(()=>{
   const d=document.getElementById("team-detail");d.hidden=false;
@@ -139,6 +142,7 @@ test("desktop PR3: selected team details and report cards fit in two columns",as
  expect(m.detailWidth).toBeGreaterThan(300);
  expect(m.overflow).toBeLessThanOrEqual(2);
  await page.goto("/#berichte",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await expect(page.locator("#report-list")).toBeAttached();
  const cols=await page.locator("#report-list").evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length);
  expect(cols).toBe(2);
@@ -150,6 +154,7 @@ test("desktop PR3: tablet/iPhone keep familiar stacked views and original nav",a
   await page.setViewportSize({width,height:844});
   for(const route of ["start","spieler","mannschaft","berichte","einstellungen"]){
    await page.goto("/#"+route,{waitUntil:"domcontentloaded"});
+   await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
    await expect(page.locator("#view-"+route)).toBeVisible();
    const m=await bounds(page);
    expect(m.pages).toBe(1);

@@ -8,6 +8,7 @@ for(const width of [320,390,1280]){
   }));});
   await page.setViewportSize({width,height:844});
   await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   const order=()=>page.locator("#friend-list [data-follow-row]").evaluateAll(nodes=>nodes.map(x=>x.dataset.followRow));
   expect(await order()).toEqual(["98-920002","98-920003","98-920004"]);
   const search=page.locator("#followed-player-search");
@@ -20,6 +21,7 @@ for(const width of [320,390,1280]){
   await expect(grip).toBeFocused();
   expect(await order()).toEqual(["98-920002","98-920004","98-920003"]);
   await page.reload({waitUntil:"domcontentloaded"});
+  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   expect(await order()).toEqual(["98-920002","98-920004","98-920003"]);
   await search.fill("Anna");
   await expect(page.locator("#friend-list [data-follow-row]")).toHaveCount(1);
@@ -44,6 +46,7 @@ test("v217 touch/pointer grip reorder does not open a player card",async({page})
  })));
  await page.setViewportSize({width:390,height:844});
  await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  const grip=page.locator('[data-friend-grip="98-930004"]');
  const top=page.locator('[data-follow-row="98-930002"]');
  const from=await grip.boundingBox(),to=await top.boundingBox();

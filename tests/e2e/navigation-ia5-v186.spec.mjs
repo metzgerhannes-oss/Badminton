@@ -13,6 +13,7 @@ for(const width of [320,390,1280,1440,1920]){
   await seed(page);
   await page.setViewportSize({width,height:844});
   await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
   await expect(page.locator("#app-access-gate")).toBeHidden();
   await expect(page.locator("#settings-room-hub")).toBeVisible();
   const links=page.locator("#settings-room-hub .settings-room-link");
@@ -38,6 +39,7 @@ for(const width of [320,390,1280,1440,1920]){
 test("IA-5: browser Back/Forward and keyboard activation of all rooms",async({page})=>{
  await seed(page);
  await page.goto("/#einstellungen",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  for(const area of ["profile","darstellung","einladungen","daten","hilfe"]){
   await page.locator('[data-settings-target="'+area+'"]').focus();
   await page.keyboard.press("Enter");

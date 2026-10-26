@@ -13,6 +13,7 @@ async function seed(page,friends=FRIENDS){
 test("Home previews three friends plus overflow, without horizontal clipping",async ({page})=>{
  await seed(page);
  await page.goto("/#start");
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(3);
  await expect(page.locator("#dashboard-friends .friend-quick-more")).toHaveText(/\+6 weitere/);
  await expect(page.locator("#dashboard-friends .friend-quick-name").first()).toHaveText("Sarah");
@@ -42,6 +43,7 @@ test("Home previews three friends plus overflow, without horizontal clipping",as
 test("current followed profile remains visible among Home shortcuts; Home returns to own",async ({page})=>{
  await seed(page);
  await page.goto("/#start");
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await page.evaluate(id=>window.badmintonSelectViewer(id),FRIENDS[8].id);
  await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(3);
  await expect(page.locator("#dashboard-friends .friend-quick.is-current")).toHaveCount(1);
@@ -57,6 +59,7 @@ test("current followed profile remains visible among Home shortcuts; Home return
 test("a single followed player remains directly accessible",async ({page})=>{
  await seed(page,FRIENDS.slice(0,1));
  await page.goto("/#start");
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await expect(page.locator("#dashboard-friends .friend-quick")).toHaveCount(1);
  await expect(page.locator("#dashboard-friends .friend-quick-more")).toHaveCount(0);
  await page.locator("#dashboard-friends [data-friend-quick]").click();
@@ -66,6 +69,7 @@ test("a single followed player remains directly accessible",async ({page})=>{
 test("empty friends offers one search entry point",async ({page})=>{
  await seed(page,[]);
  await page.goto("/#start");
+ await expect(page.locator("html")).toHaveAttribute("data-app-access","granted");
  await expect(page.locator("#dashboard-add-friend")).toBeVisible();
  await expect(page.locator("#dashboard-friends")).toContainText("Noch keine Freunde");
  await expect(page.locator("#dashboard-friends-manage")).toBeHidden();
