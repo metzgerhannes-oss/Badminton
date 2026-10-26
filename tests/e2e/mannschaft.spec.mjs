@@ -120,9 +120,15 @@ test("v222 inline team sorting keeps missing entries, focus, profile and 320/128
  });
  const ids=()=>page.locator("#team-followed [data-team-follow]")
   .evaluateAll(nodes=>nodes.map(node=>node.dataset.teamFollow));
+ let firstViewport=true;
  for(const width of [320,1280]){
   await page.setViewportSize({width,height:844});
-  await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+  // Reinitialize module state after restoring localStorage: a hash-only goto
+  // to the same route does not reload teams.js in Chromium or WebKit.
+  if(firstViewport){
+   await page.goto("/#mannschaft",{waitUntil:"domcontentloaded"});
+   firstViewport=false;
+  }else await page.reload({waitUntil:"domcontentloaded"});
   await expect(page.locator("#team-followed [data-team-follow]")).toHaveCount(3);
   expect(await ids()).toEqual(["nuliga:10777:1","nuliga:999999:9","nuliga:10777:2"]);
   await expect(page.locator("#team-detail")).toBeHidden();
