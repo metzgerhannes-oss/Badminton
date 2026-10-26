@@ -96,3 +96,11 @@ export function alternativeCalendarLevels(entries,settings){
   level,count:filterCalendar(entries,{...settings,level}).total
  })).filter(x=>x.count>0);
 }
+
+/** Only an exact DBV source key may identify the same event across current
+ * and archival snapshots. In a duplicate, CURRENT official facts always win.
+ * Similar name/place/date never justify collapsing distinct source keys. */
+export function preferCurrentDBVRows(current=[],historical=[]){
+ return [...new Map([...historical,...current].map(row=>[row.key,row])).values()]
+  .sort((a,b)=>a.start.localeCompare(b.start));
+}
