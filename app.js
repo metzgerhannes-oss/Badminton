@@ -890,6 +890,20 @@ function setup(){
   if(start&&end&&end<start){toast("Das Enddatum liegt vor dem Beginn");return}
   const bookmark=normalizeBookmark({url:parsed.url,playerId,name:data.get("name"),startDate:start,endDate:end,
    place:data.get("place"),deadline:data.get("deadline")});
+  // Only the EXACT verified UUID can block a conflicting saved tournament.
+  // A shared venue, similar name or unsourced calendar row is never proof.
+  // Do not turn a registration deadline into the match day on save.
+  const officialCheck=SchmetterlingeBookmarks.reconcileOfficialMetadata(bookmark,verifiedCalendarRows);
+  if(officialCheck.status==="conflict"){
+   const warning=el("tournament-official-source");
+   const message="DBV-Abweichung: "+officialCheck.reason+
+    (officialCheck.officialDate?" · Turniertag "+niceDay(officialCheck.officialDate):"")+
+    (officialCheck.officialDeadline?" · Meldeschluss "+niceDay(officialCheck.officialDeadline):"")+
+    ". Bitte Datum oder Turniername korrigieren; nicht gespeichert.";
+   if(warning){warning.textContent=message;warning.hidden=false}
+   toast("Angaben widersprechen dem eindeutig verknüpften DBV-Turnier.");
+   return;
+  }
   const duplicate=state.officialLinks.some(t=>t.id===bookmark.id&&t.playerId===bookmark.playerId&&(!editing||t.id!==editing.id||t.playerId!==editing.playerId));
   if(duplicate){toast("Das Turnier ist für diesen Spieler bereits gespeichert");return}
   const previous=editing?state.officialLinks.find(t=>t.id===editing.id&&t.playerId===editing.playerId):null;
