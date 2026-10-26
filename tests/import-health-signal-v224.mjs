@@ -8,6 +8,10 @@ const contains=(needle,message)=>assert.ok(sql.includes(needle),message||"Missin
 contains("CREATE OR REPLACE FUNCTION private_content.record_import_health_weekly()");
 contains("SECURITY INVOKER");
 contains("SET search_path TO 'pg_catalog', 'pg_temp'");
+// PostgreSQL requires a semicolon AFTER the closing dollar quote, before
+// REVOKE. The previous migration passed text-only tests but failed SQL DDL.
+assert.match(sql,/END;\s*\$function\$;\s*REVOKE ALL ON FUNCTION/,
+ "The PL/pgSQL definition must end before REVOKE (DB syntax regression)");
 contains("REVOKE ALL ON FUNCTION private_content.record_import_health_weekly() FROM PUBLIC, anon, authenticated");
 for(const metric of ["import_count_mismatch","import_count_excess_facts","import_count_shortfall",
  "import_count_missing_counter"])
