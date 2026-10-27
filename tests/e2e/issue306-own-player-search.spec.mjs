@@ -47,15 +47,27 @@ test("Own-player lookup selects between same-name results but saves only on subm
  expect(after.players[1]).toMatchObject({id:"99-000004",name:"Alex Beispiel",club:"Testverein B",birthYear:2014});
  expect(after.friends).toHaveLength(1);
 });
-test("Existing own and followed players cannot be selected as new own profiles",async({page})=>{
+test("Existing own profile is blocked, but a followed DBV player can become an own profile",async({page})=>{
  await page.locator("#own-player-search").fill("Kind");
  const buttons=page.locator("#own-player-search-results button");
  await expect(buttons).toHaveCount(2);
  await expect(buttons.nth(0)).toBeDisabled();
- await expect(buttons.nth(1)).toBeDisabled();
+ await expect(buttons.nth(1)).toBeEnabled();
  await expect(page.locator('#player-form input[name="id"]')).toHaveValue("");
+ const before=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(before.players).toHaveLength(1);
+ expect(before.friends).toHaveLength(1);
+ await buttons.nth(1).click();
+ await expect(page.locator('#player-form input[name="id"]')).toHaveValue("99-000002");
+ const selected=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(selected.players).toHaveLength(1);
+ await page.locator('#player-form button[type="submit"]').click();
+ await expect(page.locator("#player-dialog")).toBeHidden();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
- expect(saved.players).toHaveLength(1);
+ expect(saved.players).toHaveLength(2);
+ expect(saved.players[1]).toMatchObject({id:"99-000002",name:"Gefolgtes Kind"});
+ expect(saved.friends).toHaveLength(1);
+ expect(saved.friends[0].id).toBe("99-000002");
 });
 test("Restricted public source is transparent and manual profile entry stays possible",async({page})=>{
  await page.route("**/rpc/search_dbv_player_identity",route=>
