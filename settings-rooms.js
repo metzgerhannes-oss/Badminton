@@ -59,6 +59,17 @@
  // Owner grants and activation live beside app invitations, never in family
  // profile editing or a duplicated management screen.
  appendTo("einladungen",".invitation-card");
+ // When the owner session is missing, do not silently remove every way to
+ // create invitations: explain the restriction and allow a fresh server check.
+ const inviteHelp=document.createElement("section");
+ inviteHelp.id="invite-access-help";
+ inviteHelp.className="settings-card invite-access-help";
+ inviteHelp.hidden=true;
+ inviteHelp.innerHTML='<h3>Neue Freigabe</h3>'+
+  '<p id="invite-access-message" role="status" aria-live="polite">Betreiberberechtigung wird geprüft …</p>'+
+  '<button id="invite-access-recheck" class="outline-button" type="button">Berechtigung erneut prüfen</button>'+
+  '<p class="settings-hint">Familien-Einladungen können nur durch ein bestätigtes Betreiberkonto erstellt werden. Ein einzelnes Spielerprofil teilst du unter „Profile &amp; Familie“ über „Profil privat teilen“, wenn deine Berechtigung bestätigt ist.</p>';
+ rooms.get("einladungen").room.append(inviteHelp);
  appendTo("einladungen","#owner-admin-panel");
  appendTo("einladungen","#owner-activation-setup");
  appendTo("daten",".backup-card");
