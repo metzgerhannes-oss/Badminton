@@ -50,10 +50,10 @@ async function mockMembership(context){
 }
 test("Safari backup is explicitly restored in a separate installed PWA storage context",async({browser},info)=>{
  test.setTimeout(90000);
- const options={
-  baseURL:BASE,serviceWorkers:"block",
-  proxy:{server:"http://127.0.0.1:1",bypass:"127.0.0.1,localhost"}
- };
+ // Context routing is fail-closed for every non-loopback request.
+ // Do not attach a per-context dead proxy: WebKit and Chromium can stall
+ // while loading even local pages through that proxy.
+ const options={baseURL:BASE,serviceWorkers:"block"};
  const safari=await browser.newContext({...options,acceptDownloads:true});
  const installed=await browser.newContext(options);
  try{
@@ -92,7 +92,7 @@ test("Safari backup is explicitly restored in a separate installed PWA storage c
    calendar:localStorage.getItem("schmetterlinge.calendarEvents.v1")
   }));
 
-  await to.goto("/#einstellungen/daten",{waitUntil:"load"});
+  await to.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
   await expect(to.locator("#settings-room-daten")).toBeVisible({timeout:20000});
   const before=await to.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
   expect(String(before)).not.toContain(PLAYER);
