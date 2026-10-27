@@ -84,10 +84,17 @@ function parseXlsx(bytes:Uint8Array):any[] {
     throw new ImportError("xlsx_invalid");
   let files:Record<string,Uint8Array>;
   try {
+    // Reject ZIP bombs from central-directory metadata BEFORE inflation.
+    // The parser accepts at most twelve sheets plus one shared-strings file.
+    let selected=0,declaredUnzipped=0;
     files=unzipSync(bytes,{filter:file=>{
       const name=file.name;
-      return (name==="xl/sharedStrings.xml"||/^xl\/worksheets\/sheet\d+\.xml$/.test(name))&&
-        file.originalSize<=MAX_UNZIPPED;
+      if(name!=="xl/sharedStrings.xml"&&!/^xl\/worksheets\/sheet\d+\.xml$/.test(name))
+        return false;
+      if(!Number.isSafeInteger(file.originalSize)||file.originalSize<0||
+         ++selected>13||(declaredUnzipped+=file.originalSize)>MAX_UNZIPPED)
+        throw Error("xlsx_inflated_limit");
+      return true;
     }});
     if(Object.values(files).reduce((n,b)=>n+b.byteLength,0)>MAX_UNZIPPED)
       throw Error("xlsx_inflated_limit");
