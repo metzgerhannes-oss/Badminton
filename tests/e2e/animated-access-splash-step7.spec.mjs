@@ -53,6 +53,21 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(actual.logoWidth).toBeGreaterThan(100);
  expect(actual.duration).toBe("2.5s");
 
+ // Validate visual choreography in the actual browser rather than only
+ // checking that some animation-name exists. This caught the 27.10 iPhone report.
+ const trajectory=await page.locator(".app-access-shuttle").evaluate(img=>{
+  const animation=img.getAnimations().find(a=>a.effect?.getKeyframes);
+  return (animation?.effect?.getKeyframes()||[]).filter(frame=>frame.transform)
+   .map(frame=>{const matrix=new DOMMatrix(frame.transform);return {x:matrix.m41,y:matrix.m42};});
+ });
+ expect(trajectory.length).toBeGreaterThanOrEqual(5);
+ expect(trajectory[0].x).toBeGreaterThan(140);
+ expect(trajectory[0].y).toBeLessThan(-150);
+ expect(trajectory.some(({x,y})=>x>110&&y>=-30&&y<=60)).toBe(true);
+ expect(trajectory.at(-1).x).toBeLessThan(50);
+ expect(trajectory.at(-1).y).toBeGreaterThan(140);
+
+
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
   clip:getComputedStyle(el).clip
