@@ -1,0 +1,42 @@
+name: P0 invitation and profile targeted iOS regression
+on:
+  push:
+    branches:
+      - fix/p0-417-private-member-reads-20261027
+    paths:
+      - .github/workflows/p0-invite-profile-smoke.yml
+      - invite.js
+      - settings-rooms.js
+      - contrast-v189.css
+      - tests/e2e/invite-owner-recheck-p0.spec.mjs
+      - tests/e2e/own-profile-card-contrast-p0.spec.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify production Supabase isolation
+        run: node tests/browser-qa-supabase-isolation.mjs
+      - name: Profile contrast and owner invite browser regression (Chromium and WebKit)
+        run: npx playwright test tests/e2e/invite-owner-recheck-p0.spec.mjs tests/e2e/own-profile-card-contrast-p0.spec.mjs --workers=2 --retries=0 --reporter=line
+      - name: Preserve failed screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-invite-profile-screens
+          path: test-results/
+          retention-days: 3
