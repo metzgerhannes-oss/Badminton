@@ -11,6 +11,12 @@ assert.ok(page.includes('id="dashboard-kpis"'));
 assert.ok(page.includes('id="dashboard-next"'));
 assert.ok(js.includes('upcomingTournaments(bookmarks,selection,today)'),"Dashboard must select three upcoming tournaments for active player");
 assert.ok(js.includes('Nächste Turniere'),"Upcoming panel title");
+assert.ok(js.includes('location?"Austragungsort: "+location:"Austragungsort nicht erfasst"'),
+ "A missing local bookmark venue must not claim that DBV has not published it");
+assert.ok(!js.includes("Austragungsort noch nicht veröffentlicht"),
+ "Home must distinguish missing local data from missing official publication");
+assert.ok(js.includes('profiles.slice().reverse().find(x=>x.id===selection)'),
+ "Friend KPI must prefer the Follow role for an ID also owned locally");
 assert.ok(page.indexOf('id="dashboard-next"') < page.indexOf('id="match-stats-values"'),"Upcoming tournaments precede match KPIs");
 assert.ok(page.indexOf('id="match-stats-values"') < page.indexOf('id="home-match-filter-panel"'),"Verified KPIs precede optional filters");
 assert.ok(page.indexOf('id="dashboard-kpis"') < page.indexOf('home-ranking-section'),"Trophies precede rankings");
