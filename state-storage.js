@@ -24,7 +24,8 @@ function restore(state,normalizeBookmark){
  }catch{}
  // Preserve the user's own stored fields; do not infer a family club or birth year.
  if(!state.players.some(p=>p.id===state.activeProfileId))state.activeProfileId=state.players[0]?.id||"";
- state.friends=state.friends.filter(p=>!state.players.some(own=>own.id===p.id));
+ // Own profile and Follow are independent roles, even for the same official DBV ID.
+ // Never erase a Follow merely because that person is also device-owned.
  state.chosen=state.activeProfileId;
 }
 function save(state){
