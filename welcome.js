@@ -2,6 +2,7 @@ import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scri
 import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
 import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
 import {shouldOfferInstallationFirst} from "./scripts/welcome-flow.mjs";
+import {LOCAL_STORE_KEY,SPOND_STORE_KEY,createLocalBackup} from "./scripts/local-backup.mjs";
 import {WIZARD_KEY,isFirstProfile} from "./scripts/onboarding-wizard-state.mjs";
 const $=id=>document.getElementById(id);
 const t=key=>window.SchmetterlingeI18n?.t(key)||key;
@@ -46,6 +47,29 @@ function isStandaloneApp(){
 }
 function readSaved(){
  try{const value=localStorage.getItem(STORE);return value?JSON.parse(value):null}catch{return null}
+}
+// A user-initiated, offline file download. Safari and installed iOS apps
+// may have independent storage; never try to transfer private data via URLs.
+function exportExistingSafariProfiles(){
+ const status=$("install-backup-feedback");
+ status.textContent="";
+ status.dataset.error="false";
+ try{
+  const archive=createLocalBackup(localStorage.getItem(LOCAL_STORE_KEY),
+   new Date(),localStorage.getItem(SPOND_STORE_KEY));
+  const url=URL.createObjectURL(new Blob([archive],{type:"application/json;charset=utf-8"}));
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="schmetterlinge-sicherung-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  status.textContent=t("Sicherung erstellt. Die Datei bleibt auf deinem Gerät, bis du sie selbst teilst oder löschst.");
+ }catch(error){
+  status.dataset.error="true";
+  status.textContent=t(error?.message||"Sicherung konnte nicht erstellt werden.");
+ }
 }
 function persistAndContinue(profile,{confirmed=false}={}){
  if(confirmed&&!/^\d{2}-\d{6}$/.test(profile?.id))throw Error("Der ausgewählte Spieler hat keine gültige DBV-ID. Bitte erneut suchen.");
@@ -211,6 +235,9 @@ function showInstallFirst(hasProfiles=false){
  $("progress-install").classList.remove("done");
  $("install-title").textContent=t("Zuerst Schmetterlinge zum Home-Bildschirm hinzufügen");
  $("install-intro").textContent=t("Öffne Schmetterlinge anschließend über das Symbol und lege dort dein Profil an.");
+ $("install-existing-backup").hidden=!hasProfiles;
+ $("install-backup-feedback").textContent="";
+ $("install-backup-export").textContent=t("Meine Daten sichern");
  $("install-hint").textContent=hasProfiles
   ?t("Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.")
   :t("Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.");
@@ -276,6 +303,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("install-ios").addEventListener("click",()=>showPlatform("ios"));
  $("install-android").addEventListener("click",()=>showPlatform("android"));
  $("install-back").addEventListener("click",showProfileForm);
+ $("install-backup-export").addEventListener("click",exportExistingSafariProfiles);
  const known=readSaved()?.players;
  const hasProfiles=Array.isArray(known)&&known.length>0;
  $("welcome-existing").hidden=!hasProfiles;
