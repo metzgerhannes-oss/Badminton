@@ -29,3 +29,22 @@ Stand 27.10.2026. Diese Implementierung ist zunächst ausschließlich Quellcode 
 - Bis zur externen Quellenfreigabe #17/#56: #414 technisch bearbeiten, nicht aktivieren. Anschließend #370 gezielt abschließen, ohne #414 fälschlich zu schließen.
 
 Keine manuellen Zwischenabnahmen. Die einmalige finale iPhone-/Desktop-Abnahme #28 bleibt separat.
+
+
+## Konkrete manuelle Aktivierung – NICHT vor #17/#56 und Runtime-Nachweis ausführen
+
+Diese Befehle sind ausschließlich ein Betriebsrunbook. Keine GitHub-Action darf sie ausführen. Der Freigabeverantwortliche muss vorher die Quellen-/Verarbeitungsrechte und die private Authentifizierung dokumentiert prüfen.
+
+1. Im Badminton-Supabase-Projekt die neue SQL-Migration nach Audit anwenden; Funktion in einem isolierten, synthetischen Transaktions-/Rollback-Test prüfen. Keine neuen RLS- oder öffentlichen Grants.
+2. Edge-Funktion private-dbv-weekly mit verify_jwt=false und den beiden ausschließlich serverseitigen Secrets PRIVATE_DBV_CRON_TOKEN und DBV_SOURCE_RIGHTS_APPROVED=true ausrollen. Die Quellrechtsfreigabe ist Voraussetzung für dieses Flag. Token per CSPRNG erzeugen (mindestens 32 zufällige Zeichen), nicht im Repository ablegen.
+3. Im selben Badminton-Projekt pg_net installieren und über Supabase Vault die Namen private_dbv_weekly_url und private_dbv_weekly_token hinterlegen. URL muss exakt https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/private-dbv-weekly sein; Token muss identisch mit dem Edge-Secret sein. Token nicht in SQL-Abfragen, Cron-Kommandos oder Logs ausgeben.
+4. Nach erfolgreichem synthetischem Auth-/DB-/Rollback-Test und CPU-/RAM-Budgetprüfung den Datenbank-Schalter enabled=true setzen und ausschließlich die folgenden festen, in GitHub nicht vorhandenen Cron-Kommandos als postgres einrichten:
+
+    SELECT cron.schedule('badminton-private-dbv-friday', '15 9 * * 5',
+      'SELECT private_content.dispatch_private_dbv_weekly()');
+    SELECT cron.schedule('badminton-private-dbv-sunday', '15 9 * * 0',
+      'SELECT private_content.dispatch_private_dbv_weekly()');
+
+5. Erst nach einer tatsächlich neu veröffentlichten offiziellen KW in der privaten DB über die service-role-only Health-RPC und einen aggregierten SELECT die neue KW, amtlichen Zeitstempel, Tausende Ranking-Einträge, max. acht Wochen, 13er Vereinsstichprobe und Erfolgscode belegen. Kein Statuswechsel allein wegen erfolgreichem Cron-Dispatch.
+
+**Not-Aus:** Zuerst enabled=false, anschließend beide Cron-Jobs per cron.unschedule mit ihren Jobnamen deaktivieren, dann Vault-Token und Edge-Secret rotieren. Kein Re-Enable der alten GitHub-OIDC-Publish-Strecke.
