@@ -16,25 +16,20 @@ export function diagnosis(job,history,stored,valid,now=Date.now()){
  if(!job)return history?"not_started":"facts_without_queue";
  const state=String(job.status||"unknown");
  const updated=parsedTime(job.last_started_at||job.updated_at);
- const checked=parsedTime(job.last_finished_at);
- const expected=goodNumber(job.verified_count);
- const cursor=goodNumber(job.cursor_offset);
- const gap=stored<expected;
+   const expected=goodNumber(job.verified_count);
+  // verified_count counts the last source scan, not all canonical facts.
+ // Cursor is a processing position, NOT the number of persisted matches.
+ const scanKnown=Number.isSafeInteger(job.verified_count)&&job.verified_count>=0;
  if(state==="error")return "import_error";
  if(state==="awaiting_source")return "source_unavailable";
  if(state==="loading"&&parsedTime(job.lease_until)!==null &&
      parsedTime(job.lease_until)<now)return "expired_lease";
  if(state==="loading"&&updated!==null&&now-updated>15*60000)return "loading_delayed";
  if(state==="queued"&&updated!==null&&now-updated>3*3600000)return "queued_delayed";
- if(gap&&cursor>=expected&&["complete","partial"].includes(state))
-  return "processed_but_missing";
- if(gap&&cursor<expected&&updated!==null&&now-updated>3*3600000)
-  return "batch_backlog";
- if(stored>expected&&expected>0)return "status_behind_facts";
  if(stored>0&&valid===0)return "no_countable_proofs";
  if(state==="partial"&&job.rejected_count>0)return "sources_excluded";
  if(state==="queued"||state==="loading")return "in_progress";
- if(gap)return "import_not_finished";
+ if(scanKnown&&stored!==expected)return "batch_scope_not_comparable";
  return "not_proven_complete";
 }
 export const FINDING_DE={
@@ -43,15 +38,12 @@ export const FINDING_DE={
  expired_lease:"Import-Lease abgelaufen",
  loading_delayed:"Import lädt ungewöhnlich lange",
  queued_delayed:"Auftrag ungewöhnlich lange vorgemerkt",
- processed_but_missing:"Verarbeitet, aber weniger Quellbelege gespeichert",
- batch_backlog:"Teilimport wartet auf Folgepaket",
- status_behind_facts:"Importstatus älter als vorhandene Belege",
+ batch_scope_not_comparable:"Importlauf und historischer Speicherstand haben unterschiedliche Zählbasis",
  no_countable_proofs:"Quellkarten vorhanden, aber keine zählbar",
  sources_excluded:"Import mit ausgeschlossenen Quellen",
  not_started:"Nur Historienauftrag; kein Einzelmatch-Importstatus",
  facts_without_queue:"Weder Importauftrag noch verifizierte Historienqueue",
  in_progress:"In Bearbeitung",
- import_not_finished:"Teilimport noch nicht abgeschlossen",
  not_proven_complete:"Kein aktueller Fehler erkennbar; Karrierevollständigkeit unbekannt"
 };
 export function makeReport(historyRows,jobRows,factRows,{now=Date.now()}={}){
