@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="de">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="referrer" content="no-referrer">
+ <meta name="robots" content="noindex,nofollow,noarchive">
+ <meta name="theme-color" content="#112f54">
+ <title>Schmetterlinge · Eigentümergerät übernehmen</title>
+ <style>
+  *{box-sizing:border-box}body{margin:0;background:#112f54;color:#193b55;font:normal 18px/1.5 system-ui,-apple-system,sans-serif}
+  main{max-width:620px;padding:clamp(20px,5vw,44px);margin:4vh auto;background:#fff;border-radius:20px}
+  h1{font-size:clamp(1.6rem,5vw,2rem);line-height:1.2;margin:0 0 20px}p{margin:0 0 18px}
+  label{display:block;font-weight:700;margin-top:18px}input{display:block;width:100%;font:inherit;padding:15px;border:2px solid #91a9b8;border-radius:10px}
+  input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #3787bf;outline-offset:3px}
+  button{display:block;width:100%;background:#1d577e;color:white;font:700 1.1rem system-ui;padding:17px;border:0;border-radius:10px;margin-top:20px;cursor:pointer}
+  button:disabled{opacity:.6;cursor:wait}small{display:block;color:#436276;margin-top:14px;font-size:.85rem}
+  #status{min-height:2.5rem;font-weight:700;margin-top:18px}a{color:#155e8e}
+ </style>
+</head>
+<body>
+<main>
+ <h1>Eigentümerzugang auf dieses Gerät übernehmen</h1>
+ <p>Dein bisheriges Eigentümerkonto bleibt erhalten. Zur Übertragung brauchst du den Einladungslink aus deiner bisherigen App und einen einmaligen Übertragungscode.</p>
+ <form id="handover-form" autocomplete="off">
+  <label for="invitation">1. Einladungslink aus der bisherigen App</label>
+  <input id="invitation" type="text" required autocapitalize="off" spellcheck="false" autocomplete="off" placeholder="Einladungslink oder 64-stelliger Code">
+  <label for="handover">2. Einmaliger Eigentümer-Übertragungscode</label>
+  <input id="handover" type="password" required autocomplete="off" spellcheck="false" placeholder="Übertragungscode">
+  <button id="transfer-submit" type="submit">Eigentümerzugang übernehmen</button>
+ </form>
+ <p id="status" role="status" aria-live="polite"></p>
+ <small>Keine Supabase-Sitzung und kein Wiederherstellungsschlüssel wird in eine URL geschrieben. Jeder Code wird nur für die einmalige Prüfung an Supabase übertragen. Die bisherige Eigentümerberechtigung bleibt zunächst gültig.</small>
+ <p><a href="./index.html">Zurück zur App</a></p>
+</main>
+<script type="module" src="./owner-device-transfer.js"></script>
+</body>
+</html>
