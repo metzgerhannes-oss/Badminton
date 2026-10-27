@@ -27,10 +27,18 @@ export async function searchDbvIdentities(raw,{
  const q=validDbvLookup(raw);
  if(!q)return [];
  if(Date.now()<blockedUntil)throw rateLimitedError();
+ // P0 #417: the SECURITY DEFINER search RPC is member-only. No guest probe.
+ const member=typeof window!=="undefined"?window.badmintonAppAccess:null;
+ const token=member?.allowed===true?await member.getAccessToken?.():null;
+ if(typeof token!=="string"||!token){
+  const error=new Error("DBV-Suche nur mit bestätigtem Familienzugang verfügbar");
+  error.status=403;throw error;
+ }
  const optional=(s,max)=>String(s??"").trim().slice(0,max)||null;
  const response=await fetchImpl(SUPABASE_ROOT+"rpc/search_dbv_player_identity",{
   method:"POST",cache:"no-store",signal,
-  headers:{apikey:PUBLIC_KEY,"Content-Type":"application/json",Accept:"application/json"},
+  headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+token,
+   "Content-Type":"application/json",Accept:"application/json"},
   body:JSON.stringify({p_query:q,p_age_class:ageClass||null,
    p_club:optional(club,90),p_association:association&&association!=="all"?optional(association,50):null})
  });
