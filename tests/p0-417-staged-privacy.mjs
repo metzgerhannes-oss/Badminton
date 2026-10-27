@@ -34,7 +34,7 @@ assert.match(legacy,/Authorization:"Bearer "\+token/);
 const legacyLive=await read("live.js");
 assert.match(legacyLive,/member\?\.allowed!==true/);
 assert.match(legacyLive,/Authorization:"Bearer "\+token/);
-for(const path of ["dbv-calendar.js","teams.js","library.js"]){
+for(const path of ["dbv-calendar.js","teams.js","library.js","shared-tournaments.js"]){
  assert.match(await read(path),/badminton:app-access-granted/);
 }
 console.log("P0 #417: staged reversible member-only RLS, protected RPC, verified-JWT clients, no live network.");
