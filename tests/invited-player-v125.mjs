@@ -28,6 +28,11 @@ assert.equal(existing.friends[0].name,"Old display","Do not mutate prior state")
 const ownsSame=addAcceptedPlayerToLocalStore({players:[{id:person.dbv_id,name:"Philipp"}],friends:[]},person);
 assert.equal(ownsSame.friends.length,0,"Existing owned profile must not duplicate into following");
 
+// Offline fixture: family-member session required for the remote identity RPC.
+// Local accepted-player metadata remains available to guests without remote reads.
+const previousWindow=globalThis.window;
+globalThis.window={badmintonAppAccess:{allowed:true,
+ getAccessToken:async()=>"synthetic-accepted-family-member"}};
 let scopedLookups=0;
 const local=await searchInvitationPlayers("Philipp",{savedCandidates:added.friends,fetchImpl:async url=>{
  scopedLookups++;
@@ -63,4 +68,6 @@ assert.match(sql,/i\.accepted_by=auth\.uid\(\)/);
 assert.match(sql,/g\.revoked_at is null/);
 assert.match(sql,/'birth_year',p\.birth_year/);
 assert.doesNotMatch(sql,/grant select|drop table|truncate/i);
+if(previousWindow===undefined)delete globalThis.window;
+else globalThis.window=previousWindow;
 console.log("v125 private invite: scoped metadata prefills followed player, privacy restrictions preserved.");
