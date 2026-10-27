@@ -45,3 +45,10 @@
     touch-action: manipulation;
   }
 }
+
+/* v232: explicit local Safari backup before changing to the isolated iOS app storage. */
+.welcome-existing-backup{display:grid;gap:10px;margin:13px 0 16px;padding:13px;
+ border:1px solid #769fba;border-radius:12px;background:#173b59}
+.welcome-existing-backup>.welcome-secondary{width:100%;text-align:center;font-size:14px;min-height:48px}
+#install-backup-feedback{margin:0!important;overflow-wrap:anywhere}
+#install-backup-feedback[data-error="true"]{color:#ffd3da!important}
