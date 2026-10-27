@@ -35,15 +35,18 @@ export function compareDbvMatchReference(reference,observed,{readFailed=false}={
 export function dbvReferenceMessage(reference,observed,options={}){
  const comparison=compareDbvMatchReference(reference,observed,options);
  if(!reference)return "";
+ // A non-official screenshot must never be presented as a DBV profile fact.
+ // The caller explicitly supplies Badhub only for the saved Badhub snapshot.
+ const scope=options.provider==="Badhub"?"Badhub-Karrierestand":"DBV-Profilstand";
  if(comparison==="unknown")
   return "Der Stand der Einzelbelege ist derzeit nicht zuverlässig abrufbar. Ein Abgleich ist nicht möglich.";
  if(comparison==="mismatch")
   return "Der angezeigte Einzelbeleg-Teilbestand ("+observed.total+
    " Spiele; "+observed.wins+" Siege, "+observed.losses+
-   " Niederlagen) weicht von diesem DBV-Profilstand ab. "+
+   " Niederlagen) weicht von diesem "+scope+" ab. "+
    "Die Differenz ist kein Nachweis für eine bestimmte Zahl fehlender Spiele; "+
    "mehrfach erfasste oder nicht eindeutig zugeordnete Quellkarten sind möglich.";
- return "Die Summen stimmen mit diesem DBV-Profilstand überein. "+
+ return "Die Summen stimmen mit diesem "+scope+" überein. "+
   "Eine vollständige, einzeln bestätigte Karrierehistorie ist damit noch nicht nachgewiesen.";
 }
 
