@@ -42,6 +42,9 @@ test("confirmed directory search reselects existing DBV account without making a
  await expect(page.locator("#welcome-selection-detail")).toContainText("DBV 99-000001");
  await page.locator("#welcome-selection-save").click();
  await expect(page).toHaveURL(/\/index\.html#start$/);
+ // Navigation updates the URL before slow WebKit has finished loading app.js.
+ // Synchronize on the actual destination document; retain the strict profile assertion.
+ await page.waitForLoadState("load");
  await expect(page.locator(".focused-profile")).toContainText("Mira Muster");
  // Reselecting a previously stored profile is not fresh consent: no auto-copy modal or pending key.
  await expect(page.locator("#player-copy-dialog")).toBeHidden();

@@ -22,6 +22,12 @@ const idConflict=clone(match);idConflict.games=[[21,10],[21,17]];
 const zeroScore=clone(rekey);zeroScore.source_key="synthetic-zero";
 zeroScore.games=[];zeroScore.outcome_evidence=null;
 const quarantined=clone(match);quarantined.source_key="synthetic-quarantine";
+const missingSameKey=clone(match);missingSameKey.games=[];missingSameKey.outcome_evidence=null;
+const metadataSameKey=clone(match);metadataSameKey.source_name="Synthetic archive label";
+const missingOpponentSameKey=clone(match);missingOpponentSameKey.opponent_names=[];
+const winnerConflict=clone(match);winnerConflict.winning_side=2;
+const resultWithoutSets=clone(match);resultWithoutSets.games=[];
+resultWithoutSets.outcome_evidence="synthetic confirmed winner";
 
 const report=summarizeMatchReconciliation({
  current:[match],
@@ -32,28 +38,38 @@ const report=summarizeMatchReconciliation({
   {dbv_id:partial.dbv_id,source_key:partial.source_key,payload:partial},
   {dbv_id:unrelated.dbv_id,source_key:unrelated.source_key,payload:unrelated},
   {dbv_id:zeroScore.dbv_id,source_key:zeroScore.source_key,payload:zeroScore},
-  {dbv_id:quarantined.dbv_id,source_key:quarantined.source_key,payload:quarantined}
+  {dbv_id:quarantined.dbv_id,source_key:quarantined.source_key,payload:quarantined},
+  missingSameKey,metadataSameKey,missingOpponentSameKey,winnerConflict
  ],
  backup:[impostor],
  quarantine:[quarantined]
 });
-assert.equal(report.totals.stage,7);
+assert.equal(report.totals.stage,11);
 assert.equal(report.totals.backup,1);
 assert.equal(report.stage.canonical_same_key,1);
-assert.equal(report.stage.conflicting_same_key,1);
+assert.equal(report.stage.conflicting_same_key,2);
+assert.equal(report.stage.same_key_insufficient_evidence,2);
+assert.equal(report.stage.same_key_metadata_difference,1);
 assert.equal(report.stage.strict_rekey_candidate,1);
 assert.equal(report.stage.partial_overlap_review,1);
 assert.equal(report.stage.unresolved,2);
 assert.equal(report.stage.already_quarantined,1);
+assert.equal(report.totals.unmatched_source_keys.stage,4);
+assert.equal(report.totals.unmatched_source_keys.backup,1);
+assert.equal(report.totals.sport_fact_gaps,"not_determinable");
 assert.equal(report.backup.unresolved,1,"identical names or event links never merge different DBV IDs");
 const output=renderAggregateReport(report);
 assert.match(output,/Historisches Backup/);
 assert.match(output,/Teilübereinstimmung/);
+assert.match(output,/Tatsächlich fehlende Sportfakten: nicht bestimmbar/);
+assert.match(output,/unvollständige Belege/);
+const noSets=summarizeMatchReconciliation({current:[resultWithoutSets],stage:[resultWithoutSets]});
+assert.equal(noSets.stage.canonical_same_key,1,"A documented winner without set points remains valid");
 for(const privatePart of ["99-000001","99-000002","Synthetic Opponent",
  "tournament:synthetic", "https://example.invalid"]){
  assert.equal(output.includes(privatePart),false,"No source data leaked to stdout");
 }
 assert.throws(()=>summarizeMatchReconciliation({stage:[{}],current:{}}),/Invalid/);
 const year2026=report.years.stage["2026"];
-assert.equal(Object.values(year2026).reduce((a,b)=>a+b,0),7);
+assert.equal(Object.values(year2026).reduce((a,b)=>a+b,0),11);
 console.log("Synthetic match audit: identity, outcome and provenance checks passed; no live network access.");
