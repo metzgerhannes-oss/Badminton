@@ -14,16 +14,17 @@ const MAX_PAGE=5_000_000,MAX_XLSX=12_000_000,MAX_UNZIPPED=65_000_000;
 const codes=new Set(["source_forbidden","source_throttled","source_unavailable",
   "publication_invalid","xlsx_invalid","coverage_invalid","database_error","internal_error"]);
 class ImportError extends Error {
-  constructor(code){super(code);this.code=code;}
+  code:string;
+  constructor(code:string){super(code);this.code=code;}
 }
-const response=(status,body)=>Response.json(body,{
+const response=(status:number,body:Record<string,unknown>)=>Response.json(body,{
   status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}
 });
-async function authorized(req) {
+async function authorized(req:Request):Promise<boolean> {
   return tokenMatches(Deno.env.get("PRIVATE_DBV_CRON_TOKEN")||"",
     req.headers.get("x-private-dbv-cron-token")||"");
 }
-function secretKey() {
+function secretKey():string|null {
   const legacy=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if(legacy)return legacy;
   try {
@@ -31,14 +32,14 @@ function secretKey() {
     return typeof keys.default==="string"?keys.default:null;
   }catch{return null;}
 }
-async function dbRpc(name,args) {
+async function dbRpc(name:string,args:Record<string,unknown>):Promise<any> {
   if(!["claim_private_dbv_weekly","finish_private_dbv_weekly","ingest_private_dbv_weekly"].includes(name))
     throw new ImportError("database_error");
   const key=secretKey();
   if(!key||Deno.env.get("SUPABASE_URL")!==ROOT)throw new ImportError("database_error");
-  const headers={"apikey":key,"content-type":"application/json","accept":"application/json"};
+  const headers:Record<string,string>={"apikey":key,"content-type":"application/json","accept":"application/json"};
   if(key.startsWith("eyJ"))headers.authorization="Bearer "+key;
-  let r;
+  let r:Response;
   try {
     r=await fetch(ROOT+"/rest/v1/rpc/"+name,{
       method:"POST",headers,body:JSON.stringify(args),signal:AbortSignal.timeout(65000)
@@ -47,11 +48,11 @@ async function dbRpc(name,args) {
   if(!r.ok)throw new ImportError("database_error");
   try{return await r.json();}catch{throw new ImportError("database_error");}
 }
-async function readLimited(res,max) {
+async function readLimited(res:Response,max:number):Promise<Uint8Array> {
   if(!res.body)throw new ImportError("source_unavailable");
   const claimed=Number(res.headers.get("content-length")||0);
   if(claimed>max)throw new ImportError("source_unavailable");
-  const reader=res.body.getReader(),chunks=[];
+  const reader=res.body.getReader(),chunks:Uint8Array[]=[];
   let length=0;
   while(true){
     const {done,value}=await reader.read();
@@ -65,8 +66,8 @@ async function readLimited(res,max) {
   for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
   return bytes;
 }
-async function source(url,accept,max,timeout) {
-  let r;
+async function source(url:string,accept:string,max:number,timeout:number):Promise<Uint8Array> {
+  let r:Response;
   try {
     r=await fetch(url,{redirect:"error",headers:{"accept":accept,
       "user-agent":"Schmetterlinge-Private-Ranking/2.0 (rights-approved-only)"},
@@ -78,10 +79,10 @@ async function source(url,accept,max,timeout) {
     throw new ImportError("source_unavailable");
   return readLimited(r,max);
 }
-function parseXlsx(bytes) {
+function parseXlsx(bytes:Uint8Array):any[] {
   if(bytes.length<100||bytes[0]!==0x50||bytes[1]!==0x4b)
     throw new ImportError("xlsx_invalid");
-  let files;
+  let files:Record<string,Uint8Array>;
   try {
     files=unzipSync(bytes,{filter:file=>{
       const name=file.name;
@@ -93,7 +94,7 @@ function parseXlsx(bytes) {
     return parseOfficialXlsxXml(files);
   }catch{throw new ImportError("xlsx_invalid");}
 }
-Deno.serve(async req=>{
+Deno.serve(async (req:Request)=>{
   if(req.method!=="POST")return response(405,{ok:false,code:"method_not_allowed"});
   if(!await authorized(req))return response(403,{ok:false,code:"not_authorized"});
   // Dual fail-closed gates: operator environment AND private DB state.
