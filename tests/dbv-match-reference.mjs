@@ -30,6 +30,19 @@ assert.equal(compareDbvMatchReference(career,{total:60,wins:26,losses:34}),"coun
 assert.equal(compareDbvMatchReference(career,{total:0,wins:0,losses:0},{readFailed:true}),"unknown");
 assert.match(dbvReferenceMessage(career,{total:42,wins:21,losses:21}),/kein Nachweis/);
 assert.match(dbvReferenceMessage(career,{total:60,wins:26,losses:34}),/noch nicht nachgewiesen/);
+const syntheticReference={total:5,wins:3,losses:2};
+const syntheticPartial={total:2,wins:1,losses:1};
+const badhubMismatch=dbvReferenceMessage(syntheticReference,syntheticPartial,{provider:"Badhub"});
+assert.match(badhubMismatch,/Badhub-Karrierestand/);
+assert.doesNotMatch(badhubMismatch,/DBV-Profilstand/,
+ "A third-party reference must not be mislabelled as an official DBV snapshot");
+assert.match(dbvReferenceMessage(syntheticReference,syntheticPartial),/DBV-Profilstand/);
+assert.match(dbvReferenceMessage(syntheticReference,syntheticReference,{provider:"Badhub"}),
+ /Badhub-Karrierestand/);
+assert.doesNotMatch(dbvReferenceMessage(syntheticReference,syntheticReference,{provider:"Badhub"}),
+ /DBV-Profilstand/);
+assert.match(dbvReferenceMessage(syntheticReference,syntheticPartial,{provider:"unknown"}),
+ /DBV-Profilstand/,"Unknown labels cannot spoof source attribution");
 assert.equal(dbvMatchReferences["05-070879"].career.wins+dbvMatchReferences["05-070879"].career.losses,60);
 const [home,history,html,sw]=await Promise.all(["stats.js","external-matches.js","index.html","sw.js"].map(f=>readFile(f,"utf8")));
 assert.match(home,/getBadhubMatchReference/);
@@ -37,6 +50,11 @@ assert.doesNotMatch(home,/DBV · Kontrollstand|dbvReferenceMessage|dbv-secondary
 assert.match(home,/match-stats-reference/);
 assert.match(history,/getDbvMatchReference/);
 assert.match(history,/dbvReferenceMessage/);
+assert.match(history,/provider:"Badhub"/,"Badhub screenshot must use non-official source label");
+assert.match(history,/nichtamtlicher Screenshot/);
+assert.ok(history.indexOf("const reference=getDbvMatchReference(selected")<
+ history.indexOf("const badhub=getBadhubMatchReference(selected"),
+ "The official DBV comparison must precede the Badhub comparison");
 assert.match(html,/id="match-stats-reference"/);
 assert.match(sw,/scripts\/dbv-match-reference\.mjs/);
 console.log("DBV screenshot snapshot is dated, scope-guarded and never treated as live or exhaustive.");
