@@ -81,5 +81,5 @@ html[data-app-access="checking"] #app-access-splash {
  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
 }
 @media (prefers-reduced-motion:reduce) {
- .app-access-shuttle {animation:none;opacity:1;transform:translate3d(0,0,0) rotate(-9deg) scale(.95);will-change:auto}
+ .app-access-shuttle {animation:none;opacity:1;transform:translate3d(88px,118px,0) rotate(18deg) scale(.95);will-change:auto}
 }
