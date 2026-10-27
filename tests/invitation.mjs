@@ -157,6 +157,15 @@ assert.equal(invitationCandidates([
  {dbv_id:"05-900003",name:"Duplicate Person"},
  {dbv_id:"invalid",name:"Wrong ID"}
 ]).length,1,"Search must deduplicate and reject unverified IDs");
+const previousWindow=globalThis.window;
+// A guest cannot initiate a DBV search, even when a mock network exists.
+let guestRequests=0;
+await assert.deepEqual(await searchInvitationPlayers("Person Gamma",{
+ fetchImpl:async()=>{guestRequests++;throw Error("Guest must not fetch");}
+}),{players:[],source:"restricted"});
+assert.equal(guestRequests,0);
+globalThis.window={badmintonAppAccess:{allowed:true,
+ getAccessToken:async()=>"synthetic-verified-member-token"}};
 const responses=(value)=>({ok:true,json:async()=>value,headers:{get:()=>null}});
 const live=await searchInvitationPlayers("Person Gamma",{
  fetchImpl:async (url,{method,body})=>{
@@ -169,7 +178,7 @@ const live=await searchInvitationPlayers("Person Gamma",{
 });
 assert.equal(live.source,"dbv");
 assert.equal(live.players[0].id,"05-900003");
-assert.equal(live.players[0].birthYear,undefined,"Public identity lookup must not return birth years");
+assert.equal(live.players[0].birthYear,undefined,"Member identity lookup must not return birth years");
 const empty=await searchInvitationPlayers("S");
 assert.deepEqual(empty,{players:[],source:"none"});
 const backedUp=await searchInvitationPlayers("Gamma",{
@@ -187,4 +196,6 @@ const aborted=new AbortController();
 aborted.abort();
 await assert.rejects(()=>searchInvitationPlayers("Person C",{signal:aborted.signal,fetchImpl:async()=>{throw Error("No fetch on abort")}}));
 
+if(previousWindow===undefined)delete globalThis.window;
+else globalThis.window=previousWindow;
 console.log("Invitation tests passed: shareable URL, DBV reference validation, fresh setup, existing-data preservation, guided install.");
