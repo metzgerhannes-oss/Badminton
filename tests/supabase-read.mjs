@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import {readPublicRows,PublicReadError,SUPABASE_ROOT} from "../scripts/supabase-read.mjs";
 const query="players?select=dbv_id,name&limit=40&offset=0";
+const oldWindow=globalThis.window;
+let deniedCalls=0;
+globalThis.window={badmintonAppAccess:{allowed:false,getAccessToken:async()=>null}};
+await assert.rejects(()=>readPublicRows(query,{fetchImpl:async()=>{deniedCalls++;throw Error("guest network")},retries:0}),
+ error=>error instanceof PublicReadError&&error.kind==="restricted"&&error.status===403);
+assert.equal(deniedCalls,0,"Guest must not query ANY Supabase REST table");
+globalThis.window={badmintonAppAccess:{allowed:true,getAccessToken:async()=>"synthetic-family-jwt"}};
 const result={dbv_id:"05-123456",name:"Muster"};
 let calls=0,last;
 const success=async(url,options)=>{
@@ -12,6 +19,7 @@ assert.deepEqual(await readPublicRows(query,{fetchImpl:success}),{rows:[result],
 assert.equal(calls,1);
 assert.equal(last.url,SUPABASE_ROOT+query);
 assert.equal(last.options.method,"GET");
+assert.equal(last.options.headers.Authorization,"Bearer synthetic-family-jwt");
 assert.equal(last.options.cache,"no-store");
 assert.equal(last.options.headers.Prefer,"count=exact");
 assert.equal(last.options.signal.aborted,false);
@@ -96,4 +104,6 @@ try{
  else globalThis.window=previousWindow;
 }
 
-console.log("Public Supabase read-only client: bounded GET, pagination, timeouts, transient retries and safe failures.");
+if(oldWindow===undefined)delete globalThis.window;
+else globalThis.window=oldWindow;
+console.log("P0 #417 member-only Supabase REST: guest denied before network, verified JWT and bounded safe GET.");
