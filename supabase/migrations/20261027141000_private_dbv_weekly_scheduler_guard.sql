@@ -189,6 +189,14 @@ BEGIN
     IF v_prior.payload_md5<>v_hash OR v_prior.published_at<>p_source_published_at THEN
       RAISE EXCEPTION 'Changed same-week DBV publication requires explicit review';
     END IF;
+    UPDATE private_content.dbv_weekly_attempts SET
+      finished_at=now(),code='unchanged',
+      player_count=v_prior.players,ranking_count=v_prior.rankings,
+      source_year=p_year,source_week=p_week
+      WHERE id=p_attempt_id;
+    UPDATE private_content.dbv_weekly_state SET
+      attempt_id=NULL,lease_until=NULL,last_code='unchanged',
+      next_allowed_at=now()+interval '2 days',updated_at=now() WHERE id=1;
     RETURN pg_catalog.jsonb_build_object('snapshot',p_year::text||'-KW'||lpad(p_week::text,2,'0'),
       'read',v_prior.players,'rankings_imported',v_prior.rankings,'idempotent',true);
   END IF;
