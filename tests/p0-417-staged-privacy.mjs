@@ -31,6 +31,9 @@ assert.match(identity,/member\?\.allowed===true/);
 assert.match(identity,/Authorization:"Bearer "\+token/);
 assert.match(legacy,/window\.badmintonAppAccess\?\.allowed!==true/);
 assert.match(legacy,/Authorization:"Bearer "\+token/);
+const legacyLive=await read("live.js");
+assert.match(legacyLive,/member\?\.allowed!==true/);
+assert.match(legacyLive,/Authorization:"Bearer "\+token/);
 for(const path of ["dbv-calendar.js","teams.js","library.js"]){
  assert.match(await read(path),/badminton:app-access-granted/);
 }
