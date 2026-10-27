@@ -90,7 +90,8 @@ export function importCompleteness(status,loadedCount){
  const rejected=Number.isSafeInteger(status?.rejected_count)&&status.rejected_count>0
   ?status.rejected_count:0;
  let message=available
-  ?available+" belegte Quellkarten derzeit in der App verfügbar."
+  ?available+(available===1?" belegte Quellkarte":" belegte Quellkarten")+
+    " derzeit in der App verfügbar."
   :"Noch keine Einzelmatchbelege in der App verfügbar.";
  if(batch!==null){
   message+=" Letzter Quellenlauf: "+batch+" als gültig erkannt.";
