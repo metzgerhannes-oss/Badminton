@@ -57,17 +57,31 @@ assert.equal(computeExternalStats(data,{year:"2025"}).total,2);
 assert.equal(computeExternalStats(data,{year:"2026"}).total,2);
 assert.equal(computeExternalStats(data,{discipline:"Mixed"}).total,1);
 assert.equal(computeExternalStats([]).rate,null);
-assert.match(importCompleteness({verified_count:608,cursor_offset:240,rejected_count:69},240),/240 von 608/);
-assert.match(importCompleteness({verified_count:42,cursor_offset:42,rejected_count:20},42),/20 unklare/);
-const discrepancy=importCompleteness({status:"partial",verified_count:608,cursor_offset:240,rejected_count:20},42);
-assert.match(discrepancy,/42 von 608/,"Read-back rows, not cursor, determine the visible amount");
-assert.match(discrepancy,/240 Quellkarten verarbeitet/);
-assert.doesNotMatch(discrepancy,/240 von 608/,"Cursor cannot impersonate stored match count");
-assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"error"},0),/0 von 42/);
-assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"error"},0),/nicht erfolgreich/);
-assert.match(importCompleteness(null,5),/5 Quellkarten/);
-assert.match(importCompleteness({verified_count:40,cursor_offset:40,status:"complete"},42),/42 Quellkarten/);
-assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"complete",last_finished_at:"2026-10-10T12:00:00Z"},42),/Letzter dokumentierter Importversuch/);
+const first=importCompleteness({verified_count:608,cursor_offset:240,rejected_count:69},240);
+assert.match(first,/240 belegte Quellkarten/);
+assert.match(first,/Quellenlauf: 608/);
+assert.doesNotMatch(first,/240 von 608/,"Never divide lifetime facts by a source-run count");
+assert.match(importCompleteness({verified_count:42,cursor_offset:42,rejected_count:20},42),
+ /20 unklare.*protokollierten Quellenlauf/);
+const discrepancy=importCompleteness({status:"partial",verified_count:608,
+ cursor_offset:240,rejected_count:20},42);
+assert.match(discrepancy,/42 belegte Quellkarten/);
+assert.match(discrepancy,/Quellenlauf: 608/);
+assert.match(discrepancy,/Importposition: 240/);
+assert.match(discrepancy,/nicht als vollständig bestätigt/);
+assert.doesNotMatch(discrepancy,/42 von 608|240 von 608/);
+const missing=importCompleteness({verified_count:42,cursor_offset:42,status:"error"},0);
+assert.match(missing,/Noch keine Einzelmatchbelege/);
+assert.match(missing,/nicht erfolgreich/);
+assert.doesNotMatch(missing,/0 von 42/);
+assert.match(importCompleteness(null,5),/5 belegte Quellkarten/);
+const retained=importCompleteness({verified_count:40,cursor_offset:40,status:"complete"},42);
+assert.match(retained,/42 belegte Quellkarten/);
+assert.match(retained,/Quellenlauf: 40/);
+assert.doesNotMatch(retained,/älter oder unvollständig/,
+ "More retained cards than one batch cannot prove an outdated status");
+assert.match(importCompleteness({verified_count:42,cursor_offset:42,status:"complete",
+ last_finished_at:"2026-10-10T12:00:00Z"},42),/Letzter dokumentierter Importversuch/);
 const [stats,html,history,claim,cron,sw]=await Promise.all([
  "stats.js","index.html","history-demand.js","database/external-match-import.sql",
  "database/external-match-cron.sql","sw.js"].map(f=>readFile(f,"utf8")));
