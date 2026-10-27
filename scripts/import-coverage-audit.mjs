@@ -16,8 +16,8 @@ export function diagnosis(job,history,stored,valid,now=Date.now()){
  if(!job)return history?"not_started":"facts_without_queue";
  const state=String(job.status||"unknown");
  const updated=parsedTime(job.last_started_at||job.updated_at);
-   const expected=goodNumber(job.verified_count);
-  // verified_count counts the last source scan, not all canonical facts.
+ const expected=goodNumber(job.verified_count);
+ // verified_count counts the last source scan, not all canonical facts.
  // Cursor is a processing position, NOT the number of persisted matches.
  const scanKnown=Number.isSafeInteger(job.verified_count)&&job.verified_count>=0;
  if(state==="error")return "import_error";
