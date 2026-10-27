@@ -249,6 +249,7 @@ jobs:
           node tests/welcome-i18n.mjs
           node tests/onboarding-wizard-v202.mjs
           node scripts/validate-i18n.mjs
+          node tests/invite-feedback.mjs
           node tests/auth-singleflight.mjs
           node tests/owner-device-transfer.mjs
           node tests/private-pages-build.mjs
