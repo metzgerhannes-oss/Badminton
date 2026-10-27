@@ -160,7 +160,9 @@ test("Import coverage counts stored rows, never invents a processing cursor",asy
   return route.fallback();
  });
  await page.goto("/#historie",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#external-match-progress")).toContainText("1 von 5");
+ await expect(page.locator("#external-match-progress")).toContainText("1 belegte Quellkarte");
+ await expect(page.locator("#external-match-progress")).toContainText("Letzter Quellenlauf: 5");
+ await expect(page.locator("#external-match-progress")).not.toContainText("1 von 5");
  await expect(page.locator("#external-match-progress")).not.toContainText("4 von 5");
  await expect(page.locator("#external-match-progress")).toContainText("Letzter dokumentierter Importversuch");
  await expect(page.locator("#external-match-count")).toContainText("1 einzeln belegte Spiele");
