@@ -255,3 +255,53 @@ END
 $dispatch$;
 REVOKE ALL ON FUNCTION private_content.dispatch_private_dbv_weekly()
 FROM PUBLIC, anon, authenticated, service_role;
+
+-- Service-role-only aggregate health: never returns names, DBV IDs, source rows.
+CREATE OR REPLACE FUNCTION public.private_dbv_weekly_health()
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = pg_catalog, pg_temp AS $health$
+DECLARE
+  v_latest record;
+  v_state private_content.dbv_weekly_state%ROWTYPE;
+  v_entries integer;
+  v_players integer;
+  v_club integer;
+  v_age integer;
+  v_bytes bigint;
+  v_last_attempt record;
+BEGIN
+  SELECT w.id,w.year,w.week,w.source_published_at,w.imported_at INTO v_latest
+    FROM public.ranking_weeks w ORDER BY w.year DESC,w.week DESC LIMIT 1;
+  SELECT * INTO v_state FROM private_content.dbv_weekly_state WHERE id=1;
+  SELECT a.started_at,a.code INTO v_last_attempt
+    FROM private_content.dbv_weekly_attempts a
+    ORDER BY a.started_at DESC LIMIT 1;
+  SELECT count(*),count(DISTINCT e.player_id) INTO v_entries,v_players
+    FROM public.ranking_entries e WHERE e.week_id=v_latest.id;
+  SELECT count(*) INTO v_club FROM public.players p
+    WHERE p.club_id='spvgg-moessingen' AND EXISTS(
+      SELECT 1 FROM public.ranking_entries e
+      WHERE e.week_id=v_latest.id AND e.player_id=p.id);
+  v_age := CASE WHEN v_latest.source_published_at IS NULL THEN NULL
+    ELSE floor(extract(epoch FROM now()-v_latest.source_published_at)/86400)::integer END;
+  v_bytes := pg_catalog.pg_database_size(pg_catalog.current_database());
+  RETURN pg_catalog.jsonb_build_object(
+    'scheduler_enabled',v_state.enabled,'last_code',v_state.last_code,
+    'last_attempt_at',v_last_attempt.started_at,
+    'last_success_at',v_state.last_success_at,
+    'latest_year',v_latest.year,'latest_week',v_latest.week,
+    'published_at',v_latest.source_published_at,
+    'imported_at',v_latest.imported_at,
+    'entries',v_entries,'players',v_players,
+    'club_players_with_ranking',v_club,
+    'publication_age_days',v_age,
+    'age_7d',v_age IS NULL OR v_age>=7,
+    'age_14d',v_age IS NULL OR v_age>=14,
+    'database_bytes',v_bytes,
+    'storage_warn_250mb',v_bytes>=250*1024*1024,
+    'storage_block_350mb',v_bytes>=350*1024*1024);
+END
+$health$;
+REVOKE ALL ON FUNCTION public.private_dbv_weekly_health()
+FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.private_dbv_weekly_health() TO service_role;
