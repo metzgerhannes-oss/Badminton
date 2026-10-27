@@ -239,6 +239,7 @@ jobs:
           node tests/contrast-v189.mjs
           node tests/animated-access-splash-step7.mjs
           node tests/ios-invite-install.mjs
+          node tests/welcome-safari-backup-v232.mjs
           node tests/pwa-updates-v175.mjs
           node tests/desktop-shell-step9.mjs
           node tests/desktop-tournament-step9.mjs
