@@ -53,29 +53,33 @@ html[data-app-access="checking"] #app-access-splash {
     the white photographic matte multiplies into the pale round badge, never a square. */
  mix-blend-mode:multiply;
 }
+/* VIS-LOAD-01: the shuttle flies in screen space beside the badge,
+   instead of orbiting around a bottom-right anchor. Positions are relative
+   to the centre of the 224–260px stage; no keyframe intersects the emblem. */
 .app-access-shuttle {
  position:absolute;width:76px;height:auto;aspect-ratio:96/118;
- right:-15%;bottom:-15%;pointer-events:none;user-select:none;
+ left:50%;top:50%;pointer-events:none;user-select:none;
  filter:drop-shadow(0 8px 6px #061d3880);transform-origin:49% 81%;
  will-change:transform,opacity;animation:app-access-shuttle-flight 2.5s linear infinite both;
 }
-/* Fixed 2.5s flight; the 0.8s cold-start beat is separate from the CSS loop. */
-/* Segmented, air-drag easing; no permanent rotation or forced load duration. */
+/* 0–0.25s rest, upper-right entry, drag-limited descent, exit below logo.
+   The cork points into the downward-left flight vector; no endless spin.
+   Looping never holds access open: the access controller owns dismissal. */
 @keyframes app-access-shuttle-flight {
- 0% {opacity:0;transform:translate3d(98px,-70px,0) rotate(-34deg) scale(.87);animation-timing-function:cubic-bezier(.2,.1,.45,.72)}
- 12% {opacity:1;transform:translate3d(63px,-57px,0) rotate(-24deg) scale(.91);animation-timing-function:cubic-bezier(.26,.2,.45,1)}
- 34% {opacity:1;transform:translate3d(10px,-17px,0) rotate(-5deg) scale(1);animation-timing-function:cubic-bezier(.25,.64,.72,1)}
- 55% {opacity:1;transform:translate3d(-14px,9px,0) rotate(4deg) scale(1.015);animation-timing-function:cubic-bezier(.34,.18,.72,.8)}
- 72% {opacity:.9;transform:translate3d(-47px,49px,0) rotate(14deg) scale(.95)}
- 82%,100% {opacity:0;transform:translate3d(-77px,82px,0) rotate(18deg) scale(.89)}
+ 0%,10% {opacity:0;transform:translate3d(178px,-205px,0) rotate(29deg) scale(.86)}
+ 24% {opacity:1;transform:translate3d(148px,-125px,0) rotate(33deg) scale(.91);animation-timing-function:cubic-bezier(.25,.43,.56,.93)}
+ 42% {opacity:1;transform:translate3d(129px,-30px,0) rotate(26deg) scale(.98);animation-timing-function:cubic-bezier(.24,.57,.65,.96)}
+ 63% {opacity:1;transform:translate3d(117px,54px,0) rotate(34deg) scale(1);animation-timing-function:cubic-bezier(.3,.53,.75,1)}
+ 79% {opacity:.88;transform:translate3d(88px,110px,0) rotate(24deg) scale(.97)}
+ 92%,100% {opacity:0;transform:translate3d(22px,172px,0) rotate(18deg) scale(.9)}
 }
 @media (max-width:350px) {
- .app-access-shuttle {width:68px;right:-13%;bottom:-12%}
+ .app-access-shuttle {width:68px}
 }
 .app-access-visually-hidden {
  position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;
  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
 }
 @media (prefers-reduced-motion:reduce) {
- .app-access-shuttle {animation:none;opacity:1;transform:translate3d(0,0,0) rotate(-9deg) scale(.95);will-change:auto}
+ .app-access-shuttle {animation:none;opacity:1;transform:translate3d(88px,118px,0) rotate(18deg) scale(.95);will-change:auto}
 }
