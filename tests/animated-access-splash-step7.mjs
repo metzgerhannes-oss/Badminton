@@ -20,6 +20,19 @@ assert.doesNotMatch(css,/html:not\(\[data-app-access="checking"\]\)\s*#app-acces
 assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 assert.match(css,/mix-blend-mode:multiply/);
 assert.match(css,/@keyframes app-access-shuttle-flight/);
+
+/* Regression: the iPhone shuttle must not stay anchored beside the badge. */
+const flightPlacement=css.match(/\.app-access-shuttle\s*\{([^}]+)\}/)?.[1]||"";
+assert.match(flightPlacement,/left:50%;top:50%/,"Flight must use the stage centre");
+assert.doesNotMatch(flightPlacement,/(?:^|;)\s*(?:right|bottom):/,"No static bottom-right anchor");
+const flightFrames=css.match(/@keyframes app-access-shuttle-flight\s*\{([\s\S]*?)\n\}/)?.[1]||"";
+const flightPoints=[...flightFrames.matchAll(/translate3d\((-?\d+)px,(-?\d+)px,0\)/g)]
+ .map(([,x,y])=>({x:Number(x),y:Number(y)}));
+assert.ok(flightPoints.length>=5,"Flight needs segmented trajectory");
+assert.ok(flightPoints[0].x>140&&flightPoints[0].y< -150,"Enter from upper right, not beside the badge");
+assert.ok(flightPoints.some(({x,y})=>x>110&&y>=-30&&y<=60),"Travel past emblem's right edge");
+assert.ok(flightPoints.at(-1).x<50&&flightPoints.at(-1).y>140,"Exit below emblem");
+
 assert.match(css,/2\.5s linear infinite both/);
 assert.match(css,/env\(safe-area-inset-top\)/);
 assert.match(js,/root\.dataset\.appAccess="denied"/);
