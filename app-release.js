@@ -2,7 +2,7 @@
 /* Single browser-visible release identifier. The Pages build stamps commit/build
    into this file; PWA cache and current UI are deployed from the same artifact. */
 (function () {
-  const release = Object.freeze({version:"v232", build:"source", commit:""});
+  const release = Object.freeze({version:"v233", build:"source", commit:""});
   function renderVersion() {
     const detail = release.commit
       ? "Version " + release.version + " · Build " + release.build + " · Commit " + release.commit

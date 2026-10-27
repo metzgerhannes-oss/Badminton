@@ -919,12 +919,23 @@ function setup(){
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
   });
+  // An installed PWA with no own profile must be able to import a Safari
+  // backup first. Do not bypass verified access or merge any identities.
+  el("first-run-restore").addEventListener("click",()=>{
+   welcome.close();
+   window.location.hash="#einstellungen/daten";
+   render();
+  });
   // A fast member check may finish before DOMContentLoaded; installed WebKit
   // may also restore this document on pageshow after "Zur App". Recheck the
   // existing server-verified grant without ever treating local storage as auth.
   const showFirstRunWhenGranted=()=>{
    if(state.players.length||state.friends.length||welcome.open)return;
    if(window.badmintonAppAccess?.allowed!==true)return;
+   // A new installed PWA has no profile yet. Do not let onboarding cover
+   // the explicitly requested local backup restore screen; the server-side
+   // app-access gate remains mandatory and no new profile is fabricated.
+   if(window.location.hash==="#einstellungen/daten")return;
    if(document.querySelector("dialog[open]"))return;
    SchmetterlingeRouter.openDialog(welcome);
   };
