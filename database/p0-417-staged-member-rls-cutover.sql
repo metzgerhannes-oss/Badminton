@@ -7,6 +7,9 @@ BEGIN;
 DO $audit$
 DECLARE
   unsafe_count integer;
+  total_select_policies integer;
+  rls_enabled_count integer;
+  explicit_column_acl_count integer;
 BEGIN
   SELECT count(*) INTO unsafe_count
   FROM pg_policies p
@@ -27,6 +30,38 @@ BEGIN
     AND p.roles @> ARRAY['anon','authenticated']::name[];
   IF unsafe_count<>10 THEN
     RAISE EXCEPTION 'P0-417 policy drift: expected 10 public SELECT policies, found %',unsafe_count;
+  END IF;
+  -- RLS policies are OR-combined. Reject ANY additional SELECT/ALL policy
+  -- rather than silently leaving another public path after cutover.
+  SELECT count(*) INTO total_select_policies
+  FROM pg_policies p
+  WHERE p.schemaname='public'
+    AND p.tablename=ANY(ARRAY['clubs','dbv_calendar_entries','events',
+      'league_clubs','league_fixtures','league_table_rows','league_teams',
+      'ranking_weeks','report_sources','tournaments'])
+    AND p.cmd IN ('SELECT','ALL');
+  IF total_select_policies<>10 THEN
+    RAISE EXCEPTION 'P0-417 extra SELECT/ALL policy drift: %',total_select_policies;
+  END IF;
+  SELECT count(*) INTO rls_enabled_count
+  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+  WHERE n.nspname='public' AND c.relrowsecurity
+    AND c.relname=ANY(ARRAY['clubs','dbv_calendar_entries','events',
+      'league_clubs','league_fixtures','league_table_rows','league_teams',
+      'ranking_weeks','report_sources','tournaments']);
+  IF rls_enabled_count<>10 THEN
+    RAISE EXCEPTION 'P0-417 RLS disabled or table missing: %',rls_enabled_count;
+  END IF;
+  SELECT count(*) INTO explicit_column_acl_count
+  FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid
+  JOIN pg_namespace n ON n.oid=c.relnamespace
+  WHERE n.nspname='public' AND a.attnum>0 AND NOT a.attisdropped
+    AND a.attacl IS NOT NULL
+    AND c.relname=ANY(ARRAY['clubs','dbv_calendar_entries','events',
+      'league_clubs','league_fixtures','league_table_rows','league_teams',
+      'ranking_weeks','report_sources','tournaments']);
+  IF explicit_column_acl_count<>0 THEN
+    RAISE EXCEPTION 'P0-417 unexpected column-level ACLs: %',explicit_column_acl_count;
   END IF;
 END
 $audit$;
