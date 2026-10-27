@@ -51,3 +51,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/private-dbv-weekly-model.test.mjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno check supabase/functions/private-dbv-weekly/index.ts
