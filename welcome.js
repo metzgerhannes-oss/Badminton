@@ -239,7 +239,7 @@ function showInstallFirst(hasProfiles=false){
  $("install-backup-feedback").textContent="";
  $("install-backup-export").textContent=t("Meine Daten sichern");
  $("install-hint").textContent=hasProfiles
-  ?t("Bereits in Safari gespeicherte Profile werden nicht automatisch übertragen. Sichere sie über „Meine Daten sichern“ und importiere sie in der App.")
+  ?t("Safari-Daten werden nicht automatisch übertragen. Jetzt sichern; später in der installierten App unter Einstellungen → Meine Daten sichern die Datei auswählen und die Wiederherstellung bestätigen.")
   :t("Nach dem Öffnen über das Symbol: Profil anlegen. Ohne Anmeldung.");
  $("install-back").textContent=t("Ohne Installation im Browser fortfahren");
  $("open-app").hidden=true;
