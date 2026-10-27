@@ -925,6 +925,10 @@ function setup(){
   const showFirstRunWhenGranted=()=>{
    if(state.players.length||state.friends.length||welcome.open)return;
    if(window.badmintonAppAccess?.allowed!==true)return;
+   // A new installed PWA has no profile yet. Do not let onboarding cover
+   // the explicitly requested local backup restore screen; the server-side
+   // app-access gate remains mandatory and no new profile is fabricated.
+   if(window.location.hash==="#einstellungen/daten")return;
    if(document.querySelector("dialog[open]"))return;
    SchmetterlingeRouter.openDialog(welcome);
   };
