@@ -71,6 +71,8 @@ await assert.rejects(()=>readPublicRows(query,{retries:1,fetchImpl:async()=>{
 }}),error=>error.kind==="offline");
 assert.equal(networkAttempts,2);
 
+// P0 #417: all routes, including formerly public ones, are member-only.
+globalThis.window={badmintonAppAccess:{allowed:false,getAccessToken:async()=>null}};
 // F03: a player-invite guest must never query member-only REST tables.
 // The accepted invitation uses its own narrow private RPC instead.
 const restricted=[
