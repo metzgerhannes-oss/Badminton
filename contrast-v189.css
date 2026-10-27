@@ -331,3 +331,84 @@
  outline:3px solid #0d88bc!important;
  outline-offset:3px;
 }
+
+
+/* P0 profile management: source-aware contrast for active navy and idle pale cards.
+   The shared ui-components.css paints heading ink for pale cards while the active
+   own-profile retains a navy gradient; rules must target actual surface, not app theme. */
+.app #view-einstellungen #profile-list .own-profile.profile-active{
+ background:linear-gradient(135deg,#214c70,#112b46)!important;
+ border-color:#7abde7!important;
+ color:#f3faff!important;
+}
+.app #view-einstellungen #profile-list .own-profile.profile-active .profile-main h3{
+ color:#f6fbff!important;
+ font-size:clamp(16px,3.9vw,19px);
+ line-height:1.35;
+}
+.app #view-einstellungen #profile-list .own-profile.profile-active .profile-main p,
+.app #view-einstellungen #profile-list .own-profile.profile-active .profile-main .profile-club{
+ color:#d9eafa!important;
+ font-size:clamp(14px,3.45vw,16px);
+ line-height:1.45;
+ opacity:1;
+}
+.app #view-einstellungen #profile-list .own-profile.profile-active .active-profile-chip{
+ background:#d6efff!important;
+ color:#153c59!important;
+ border:1px solid #9bcde9;
+ font-size:14px;
+ font-weight:850;
+ line-height:1.3;
+ opacity:1;
+}
+.app #view-einstellungen #profile-list .own-profile.profile-active .profile-main a{
+ color:#c4ebff!important;
+ font-size:15px;
+ font-weight:800;
+}
+.app #view-einstellungen #profile-list .own-profile:not(.profile-active){
+ background:linear-gradient(145deg,#ffffff,#f1f9ff)!important;
+ border-color:#b8d8e9!important;
+ color:#133a59!important;
+}
+.app #view-einstellungen #profile-list .own-profile:not(.profile-active) .profile-main h3{
+ color:#153b59!important;
+ font-size:clamp(16px,3.9vw,19px);
+ line-height:1.35;
+}
+.app #view-einstellungen #profile-list .own-profile:not(.profile-active) .profile-main p,
+.app #view-einstellungen #profile-list .own-profile:not(.profile-active) .profile-main .profile-club{
+ color:#37566e!important;
+ font-size:clamp(14px,3.45vw,16px);
+ line-height:1.45;
+ opacity:1;
+}
+.app #view-einstellungen #profile-list .own-profile:not(.profile-active) .profile-main a{
+ color:#145d8b!important;
+ font-size:15px;
+ font-weight:800;
+}
+.app #view-einstellungen #profile-list .own-profile .profile-actions button{
+ min-height:44px;
+ font-size:14px;
+ font-weight:800;
+ opacity:1;
+}
+.app #view-einstellungen #profile-list .own-profile.profile-active .profile-actions :is(.remove-button,.outline-button){
+ color:#113c5b!important;
+ background:#e7f6ff!important;
+ border:1px solid #9bc8e3!important;
+ border-radius:11px;
+}
+.app #view-einstellungen #profile-list .own-profile:not(.profile-active) .profile-actions :is(.remove-button,.outline-button){
+ color:#154e75!important;
+ background:#e8f4fc!important;
+ border:1px solid #9bc8e3!important;
+ border-radius:11px;
+}
+.app #view-einstellungen #profile-list .own-profile .profile-actions button:focus-visible,
+.app #view-einstellungen #profile-list .own-profile .profile-main a:focus-visible{
+ outline:3px solid #0096db!important;
+ outline-offset:3px;
+}
