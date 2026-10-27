@@ -1,4 +1,7 @@
 import test from "node:test";
+import {webcrypto} from "node:crypto";
+import {readFileSync} from "node:fs";
+import {tokenMatches} from "../supabase/functions/private-dbv-weekly/auth.mjs";
 import assert from "node:assert/strict";
 import {officialPublication,buildWeeklyPayload,importDecision} from "../scripts/private-dbv-weekly-model.mjs";
 import {parseOfficialXlsxXml} from "../supabase/functions/private-dbv-weekly/xlsx.mjs";
@@ -59,4 +62,24 @@ test("restricted XLSX XML parses shared strings and complete synthetic rows",()=
   assert.equal(parsed.length,5001);
   assert.equal(buildWeeklyPayload(parsed,stamp).rankingTotal,5001);
   assert.throws(()=>parseOfficialXlsxXml({"xl/worksheets/sheet1.xml":"<!DOCTYPE x><worksheet/>"}),/xml_rejected/);
+});
+
+test("private cron token uses bounded constant-time digest, not public credentials",async()=>{
+  const secret="synthetic-private-token-not-for-production-12345";
+  assert.equal(await tokenMatches(secret,secret,webcrypto),true);
+  assert.equal(await tokenMatches(secret,secret.slice(0,-1)+"x",webcrypto),false);
+  assert.equal(await tokenMatches("short","short",webcrypto),false);
+  assert.equal(await tokenMatches(secret,"",webcrypto),false);
+});
+test("scheduler remains disabled without source rights and never restores GitHub publish",()=>{
+  const workflow=readFileSync(new URL("../.github/workflows/private-dbv-directory.yml",import.meta.url),"utf8");
+  const edge=readFileSync(new URL("../supabase/functions/private-dbv-weekly/index.ts",import.meta.url),"utf8");
+  const sql=readFileSync(new URL("../supabase/migrations/20261027141000_private_dbv_weekly_scheduler_guard.sql",import.meta.url),"utf8");
+  assert.doesNotMatch(workflow,/id-token:\s*write|\bpublish:\s*\n|secrets\./);
+  assert.match(edge,/DBV_SOURCE_RIGHTS_APPROVED/);
+  assert.match(edge,/claim_private_dbv_weekly/);
+  assert.match(sql,/enabled boolean NOT NULL DEFAULT false/);
+  assert.doesNotMatch(sql,/cron\.schedule\s*\(/);
+  assert.doesNotMatch(sql,/CREATE EXTENSION IF NOT EXISTS pg_net/i);
+  assert.match(sql,/REVOKE EXECUTE ON FUNCTION public\.ingest_private_dbv_directory/);
 });

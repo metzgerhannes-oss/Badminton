@@ -2,7 +2,8 @@
 // Never invoked by GitHub Actions. The scheduler is not deployed or enabled
 // until operator/source permissions #17/#56 are independently proven.
 import {unzipSync} from "npm:fflate@0.8.2";
-import {officialPublication,buildWeeklyPayload,importDecision} from "../../../scripts/private-dbv-weekly-model.mjs";
+import {officialPublication,buildWeeklyPayload,importDecision} from "./model.mjs";
+import {tokenMatches} from "./auth.mjs";
 import {parseOfficialXlsxXml} from "./xlsx.mjs";
 
 const PROJECT="yadexibmjmnjfmfabrug";
@@ -19,16 +20,8 @@ const response=(status,body)=>Response.json(body,{
   status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}
 });
 async function authorized(req) {
-  const expected=Deno.env.get("PRIVATE_DBV_CRON_TOKEN")||"";
-  const supplied=req.headers.get("x-private-dbv-cron-token")||"";
-  if(expected.length<32||expected.length>256||supplied.length<32||supplied.length>256)return false;
-  const bytes=new TextEncoder();
-  const [a,b]=await Promise.all([crypto.subtle.digest("SHA-256",bytes.encode(expected)),
-    crypto.subtle.digest("SHA-256",bytes.encode(supplied))]);
-  const x=new Uint8Array(a),y=new Uint8Array(b);
-  let diff=0;
-  for(let i=0;i<x.length;i++)diff|=x[i]^y[i];
-  return diff===0;
+  return tokenMatches(Deno.env.get("PRIVATE_DBV_CRON_TOKEN")||"",
+    req.headers.get("x-private-dbv-cron-token")||"");
 }
 function secretKey() {
   const legacy=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
