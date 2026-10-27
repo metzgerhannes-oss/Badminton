@@ -12,7 +12,16 @@
  const statuses={unknown:"Status offen",scheduled:"Angesetzt",called:"Aufgerufen",playing:"Läuft",finished:"Beendet",cancelled:"Abgesagt",walkover:"Kampflos"};
  let currentId="",requestId=0,loading=false;
  async function get(path){
-  const response=await fetch(BASE+"/rest/v1/"+path,{headers:{"apikey":API_KEY,"accept":"application/json"},cache:"no-store"});
+  // P0 #417: even this legacy advanced live panel must never probe PostgREST
+  // with a publishable key alone or with an unverified Anonymous Auth session.
+  const member=window.badmintonAppAccess;
+  if(member?.allowed!==true)throw Error("Member-only live data");
+  const token=await member.getAccessToken?.();
+  if(typeof token!=="string"||!token)throw Error("Member session unavailable");
+  const response=await fetch(BASE+"/rest/v1/"+path,{
+   headers:{"apikey":API_KEY,Authorization:"Bearer "+token,"accept":"application/json"},
+   cache:"no-store"
+  });
   if(!response.ok)throw Error("Supabase "+response.status);
   return response.json();
  }
