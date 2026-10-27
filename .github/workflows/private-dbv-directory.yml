@@ -54,4 +54,6 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - run: deno check supabase/functions/private-dbv-weekly/index.ts
+      # Resolve only the pinned npm ZIP library needed for a static Deno typecheck.
+      # This is dependency installation, not a live DBV/Supabase import.
+      - run: deno check --node-modules-dir=auto supabase/functions/private-dbv-weekly/index.ts
