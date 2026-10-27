@@ -439,5 +439,14 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("badminton:tournament-bookmarks",()=>{if(loaded)render()});
  $("dbv-calendar-more")?.addEventListener("click",()=>{batchLimit+=36;render()});
  $("dbv-calendar-refresh")?.addEventListener("click",()=>{loaded=false;batchLimit=36;void load()});
+ // Initial guest view may show a vetted static snapshot. Once the family JWT
+ // is confirmed, retry the member-only DB source without racing the first load.
+ window.addEventListener("badminton:app-access-granted",()=>{
+  const refresh=()=>{
+   if(loading){setTimeout(refresh,100);return;}
+   loaded=false;void load();
+  };
+  refresh();
+ });
  void load();
 });
