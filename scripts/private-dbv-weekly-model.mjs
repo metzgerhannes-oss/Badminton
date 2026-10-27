@@ -144,7 +144,7 @@ export function importDecision(latest,publication) {
   const previous=latest.year*100+latest.week;
   if(current<previous)throw Error("publication_older_than_database");
   if(current===previous) {
-    if(latest.sourcePublishedAt===publication.publishedAt)return "unchanged";
+    if(latest.sourcePublishedAt&&Date.parse(latest.sourcePublishedAt)===Date.parse(publication.publishedAt))return "unchanged";
     throw Error("publication_same_week_unverified");
   }
   return "new";
