@@ -126,7 +126,7 @@ export function renderAggregateReport(report){
    "Geprüfte Zeilen: "+report.totals[origin]);
   for(const [status,n] of Object.entries(report[origin]))
    lines.push("- "+(headings[status]||"Unbekannter Status")+": "+n);
-  lines.push("Schlüssel ohne belegten aktuellen oder Quarantäne-Gegenpart: "+
+  lines.push("Quellschlüssel ohne identischen aktuellen oder Quarantäne-Schlüssel: "+
    report.totals.unmatched_source_keys[origin]);
   lines.push("Jahresverteilung: "+
    Object.entries(report.years[origin]).sort(([a],[b])=>a.localeCompare(b))
