@@ -67,6 +67,27 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(trajectory.at(-1).x).toBeLessThan(50);
  expect(trajectory.at(-1).y).toBeGreaterThan(140);
 
+ // Short cold starts must show more than a one-pixel glimpse on a 320px phone.
+ // Freeze this synthetic frame after 0.8s: do not add a longer login delay.
+ const earlyFlight=await page.locator(".app-access-shuttle").evaluate(img=>{
+  const animation=img.getAnimations().find(a=>a.effect?.getKeyframes);
+  if(!animation)return null;
+  animation.pause();
+  animation.currentTime=800;
+  const stage=img.closest(".app-access-splash-art").getBoundingClientRect();
+  const badge=img.parentElement.querySelector(".app-access-splash-emblem").getBoundingClientRect();
+  const frame=img.getBoundingClientRect();
+  const info={visibleWidth:Math.max(0,Math.min(frame.right,innerWidth)-Math.max(frame.left,0)),
+   clearsBadge:frame.left>=badge.right-2, badgeRight:badge.right,
+   viewport:innerWidth,stageWidth:stage.width};
+  animation.play();
+  return info;
+ });
+ expect(earlyFlight).not.toBeNull();
+ expect(earlyFlight.viewport).toBe(320);
+ expect(earlyFlight.visibleWidth).toBeGreaterThan(38);
+ expect(earlyFlight.clearsBadge).toBe(true);
+
 
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,

@@ -62,16 +62,17 @@ html[data-app-access="checking"] #app-access-splash {
  filter:drop-shadow(0 8px 6px #061d3880);transform-origin:49% 81%;
  will-change:transform,opacity;animation:app-access-shuttle-flight 2.5s linear infinite both;
 }
-/* 0–0.25s rest, upper-right entry, drag-limited descent, exit below logo.
+/* A visible entry within the 0.8s cold-start minimum, drag-limited descent, exit below logo.
    The cork points into the downward-left flight vector; no endless spin.
    Looping never holds access open: the access controller owns dismissal. */
 @keyframes app-access-shuttle-flight {
- 0%,10% {opacity:0;transform:translate3d(178px,-205px,0) rotate(29deg) scale(.86)}
- 24% {opacity:1;transform:translate3d(148px,-125px,0) rotate(33deg) scale(.91);animation-timing-function:cubic-bezier(.25,.43,.56,.93)}
- 42% {opacity:1;transform:translate3d(129px,-30px,0) rotate(26deg) scale(.98);animation-timing-function:cubic-bezier(.24,.57,.65,.96)}
- 63% {opacity:1;transform:translate3d(117px,54px,0) rotate(34deg) scale(1);animation-timing-function:cubic-bezier(.3,.53,.75,1)}
- 79% {opacity:.88;transform:translate3d(88px,110px,0) rotate(24deg) scale(.97)}
- 92%,100% {opacity:0;transform:translate3d(22px,172px,0) rotate(18deg) scale(.9)}
+ 0%,6% {opacity:0;transform:translate3d(178px,-205px,0) rotate(29deg) scale(.86)}
+ 16% {opacity:.96;transform:translate3d(139px,-93px,0) rotate(32deg) scale(.91);animation-timing-function:cubic-bezier(.2,.4,.57,.9)}
+ 32% {opacity:1;transform:translate3d(113px,-6px,0) rotate(28deg) scale(.96);animation-timing-function:cubic-bezier(.22,.45,.65,.95)}
+ 48% {opacity:1;transform:translate3d(110px,57px,0) rotate(31deg) scale(1);animation-timing-function:cubic-bezier(.26,.46,.71,.96)}
+ 67% {opacity:.98;transform:translate3d(88px,112px,0) rotate(26deg) scale(.99);animation-timing-function:cubic-bezier(.3,.52,.76,.98)}
+ 82% {opacity:.66;transform:translate3d(58px,144px,0) rotate(21deg) scale(.94)}
+ 93%,100% {opacity:0;transform:translate3d(22px,172px,0) rotate(18deg) scale(.9)}
 }
 @media (max-width:350px) {
  .app-access-shuttle {width:68px}
