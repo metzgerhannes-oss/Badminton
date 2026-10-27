@@ -919,6 +919,13 @@ function setup(){
   el("first-run-new").addEventListener("click",()=>{
    welcome.close();window.location.assign("./welcome.html?from=app");
   });
+  // An installed PWA with no own profile must be able to import a Safari
+  // backup first. Do not bypass verified access or merge any identities.
+  el("first-run-restore").addEventListener("click",()=>{
+   welcome.close();
+   window.location.hash="#einstellungen/daten";
+   render();
+  });
   // A fast member check may finish before DOMContentLoaded; installed WebKit
   // may also restore this document on pageshow after "Zur App". Recheck the
   // existing server-verified grant without ever treating local storage as auth.

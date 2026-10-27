@@ -92,7 +92,13 @@ test("Safari backup is explicitly restored in a separate installed PWA storage c
    calendar:localStorage.getItem("schmetterlinge.calendarEvents.v1")
   }));
 
-  await to.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
+  // Exercise the real first-run restore entry: a new PWA must import before
+  // setting up its first profile, without bypassing membership permissions.
+  await to.goto("/#start",{waitUntil:"domcontentloaded"});
+  await expect(to.locator("#first-run-dialog")).toBeVisible({timeout:20000});
+  await to.locator("#first-run-restore").click();
+  await expect(to).toHaveURL(/#einstellungen\/daten$/);
+  await expect(to.locator("#first-run-dialog")).not.toBeVisible();
   await expect(to.locator("#settings-room-daten")).toBeVisible({timeout:20000});
   const before=await to.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
   expect(String(before)).not.toContain(PLAYER);
