@@ -95,21 +95,53 @@ async function revoke(){
  }catch(e){status(e?.message||"Widerruf fehlgeschlagen.", "error")}
  finally{busy=false}
 }
-async function init(){
+let listenersReady=false,checking=false;
+async function checkOwnerAccess(){
+ if(checking)return;
  const card=document.querySelector(".invitation-card");
+ const help=document.getElementById("invite-access-help");
+ const message=document.getElementById("invite-access-message");
+ const button=document.getElementById("invite-access-recheck");
+ // The settings DOM is composed by settings-rooms.js on DOMContentLoaded.
+ if(!card||!help||!message)return;
+ checking=true;
+ if(button)button.disabled=true;
+ message.textContent="Betreiberberechtigung wird geprüft …";
  try{
   session=await getPrivateSession(false);
-  if(!session)return;
+  if(!session){
+   owner=false;card.hidden=true;help.hidden=false;
+   message.textContent="Auf diesem Gerät ist keine gültige Betreiber-Sitzung gespeichert. Bestehende Familienzugänge bleiben unverändert.";
+   return;
+  }
   const result=await rpc("app_access_status");
   owner=result?.owner===true;
-  if(!owner)return;
-  card.hidden=false;
+  if(!owner){
+   card.hidden=true;help.hidden=false;
+   message.textContent="Deine aktuelle Sitzung besitzt keine Betreiberrechte. Deshalb sind die Einladungsbuttons ausgeblendet. Ein neuer Einladungslink würde diese Rechte nicht vergeben.";
+   return;
+  }
+  card.hidden=false;help.hidden=true;
   draw();
-  mountOwnerInviteOverview({card,rpc,read,write,draw,status});
-  el("invite-share").addEventListener("click",()=>execute("share"));
-  el("invite-copy").addEventListener("click",()=>execute("copy"));
-  el("invite-revoke").addEventListener("click",revoke);
-  status("Nur Betreiber können App-Zugänge einladen. Persönliche Spieler-Verwaltungsrechte werden nicht übertragen.");
- }catch{/* No account or network check means no ability to issue invitations. */}
+  if(!listenersReady){
+   listenersReady=true;
+   mountOwnerInviteOverview({card,rpc,read,write,draw,status});
+   el("invite-share").addEventListener("click",()=>execute("share"));
+   el("invite-copy").addEventListener("click",()=>execute("copy"));
+   el("invite-revoke").addEventListener("click",revoke);
+  }
+  status("Du kannst einen Familienzugang erstellen und teilen. Spieler-Verwaltungsrechte werden nicht übertragen.");
+ }catch{
+  owner=false;card.hidden=true;help.hidden=false;
+  message.textContent="Die Betreiberberechtigung konnte nicht geprüft werden. Bitte Verbindung prüfen und „Berechtigung erneut prüfen“ wählen.";
+ }finally{checking=false;if(button)button.disabled=false;}
+}
+function init(){
+ document.getElementById("invite-access-recheck")?.addEventListener("click",checkOwnerAccess);
+ void checkOwnerAccess();
+ window.addEventListener("badminton:app-access-granted",checkOwnerAccess);
+ window.addEventListener("hashchange",()=>{
+  if(location.hash.startsWith("#einstellungen"))void checkOwnerAccess();
+ });
 }
 document.addEventListener("DOMContentLoaded",init);
