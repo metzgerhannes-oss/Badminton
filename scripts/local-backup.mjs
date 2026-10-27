@@ -99,10 +99,14 @@ export function normalizeLocalData(data){
  if(!Array.isArray(data.officialLinks)||data.officialLinks.length>40)fail("Maximal 40 Turnierfavoriten");
  const players=data.players.map(x=>profile(x,"eigenes"));
  const friends=data.friends.map(x=>profile(x,"Freundes"));
- const ids=new Set();
- for(const x of [...players,...friends]){
-  if(ids.has(x.id))fail("Doppelte Spieler-ID in der Sicherung");
-  ids.add(x.id);
+ // A DBV identity may be both an own profile and an independently followed
+ // player. Reject duplicates *within* a role, not across distinct roles.
+ for(const list of [players,friends]){
+  const ids=new Set();
+  for(const x of list){
+   if(ids.has(x.id))fail("Doppelte Spieler-ID in der Sicherung");
+   ids.add(x.id);
+  }
  }
  const owns=new Set(players.map(x=>x.id));
  const links=data.officialLinks.map(x=>bookmark(x,owns));

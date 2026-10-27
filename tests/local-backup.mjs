@@ -82,6 +82,21 @@ assert.throws(()=>inspectLocalBackup(JSON.stringify({...JSON.parse(created),
  data:{...original,activeProfileId:"local-charlotte"}})),
  /kein eigenes Spielerprofil/,"A stale active alias must not select an unrelated official profile");
 
+// A person can be an own profile and independently followed with the same
+// official DBV ID; these are roles, not evidence of a new ownership grant.
+const dualRole={...original,friends:[{id:"99-100001",name:"Testperson A"}]};
+const dualRestored=inspectLocalBackup(createLocalBackup(JSON.stringify(dualRole)));
+assert.equal(dualRestored.data.players[0].id,"99-100001");
+assert.equal(dualRestored.data.friends[0].id,"99-100001");
+assert.equal(dualRestored.data.officialLinks[0].playerId,"99-100001");
+assert.equal(dualRestored.data.activeProfileId,"99-100001");
+assert.throws(()=>createLocalBackup(JSON.stringify({
+ ...dualRole,players:[...dualRole.players,dualRole.players[0]]
+})),/Doppelte Spieler-ID/,"Duplicate owned profiles are still rejected");
+assert.throws(()=>createLocalBackup(JSON.stringify({
+ ...dualRole,friends:[...dualRole.friends,dualRole.friends[0]]
+})),/Doppelte Spieler-ID/,"Duplicate follows are still rejected");
+
 // F06: backup v2 must preserve ALL existing private tournament kinds, not
 // reject calendar/framework favorites or silently lose their venue on restore.
 const calendarFavorite={id:"dbv-calendar-44014",source:"dbv-calendar",url:"https://turniere.badminton.de/",

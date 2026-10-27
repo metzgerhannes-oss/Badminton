@@ -98,6 +98,28 @@ assert.equal(collision.activeProfileId,"local-charlotte");
 assert.doesNotMatch(storageScript,/resolveLocalAliases|05-071969|local-charlotte/,
  "No hardcoded private identity or automatic alias coalescing in application code");
 
+// An official player may have two independent local roles. Restoring and
+// unfollowing must not silently remove the owned profile or its tournaments.
+const dualRoleStore=new Map([[key,JSON.stringify({
+ players:[{id:"05-900001",name:"Person Alpha"}],
+ friends:[{id:"05-900001",name:"Person Alpha"}],
+ officialLinks:[{url:tournament,name:"Own tournament",playerId:"05-900001"}],
+ activeProfileId:"05-900001"
+})]]);
+const dualRole=makeVM(dualRoleStore);
+dualRole.run("restore();save()");
+assert.equal(dualRole.run("state.players.length"),1);
+assert.equal(dualRole.run("state.friends.length"),1);
+assert.equal(dualRole.run("SchmetterlingeStorage.selectFriend(state,'05-900001')"),true);
+assert.equal(dualRole.run("state.viewingFriendId"),"05-900001");
+assert.equal(dualRole.run("state.activeProfileId"),"05-900001");
+dualRole.run("SchmetterlingeStorage.unfollow(state,'05-900001');save()");
+const dualSaved=JSON.parse(dualRoleStore.get(key));
+assert.equal(dualSaved.players.length,1);
+assert.equal(dualSaved.friends.length,0);
+assert.equal(dualSaved.activeProfileId,"05-900001");
+assert.equal(dualSaved.officialLinks[0].playerId,"05-900001");
+
 const corrupt=new Map([[key,"invalid json"]]);
 const damaged=makeVM(corrupt);
 assert.doesNotThrow(()=>damaged.run("restore()"));

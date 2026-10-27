@@ -215,7 +215,7 @@ function renderFriendQuick(){
  root.querySelector(".friend-quick-more")?.addEventListener("click",()=>showPlayerDiscover(false,false));
  root.querySelectorAll("[data-friend-quick]").forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.isOwn==="true"){navigateHome();return;}
-  window.badmintonSelectViewer(b.dataset.friendQuick);
+  window.badmintonSelectViewer(b.dataset.friendQuick,{preferFriend:true});
  }));
 }
 function unfollowPlayer(id){
@@ -267,7 +267,7 @@ function renderFriends(){
       ' aria-label="'+esc(p.name)+' sortieren: ziehen oder Pfeiltasten nach oben oder unten" title="Ziehen oder Pfeiltasten">⠿</button>')+
    '<button type="button" class="followed-inline-remove" data-unfollow-inline="'+esc(p.id)+'" aria-label="'+esc(p.name)+' entfolgen">−</button></article>';
  }).join(""):'<p class="team-empty">'+(state.friends.length?"Keine gefolgten Spieler zu dieser Suche.":"Noch keine gefolgten Spieler. Suche oben nach Namen oder DBV-ID.")+'</p>';
- root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend)));
+ root.querySelectorAll("[data-view-friend]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.viewFriend,{preferFriend:true})));
  root.querySelectorAll("[data-unfollow-inline]").forEach(b=>b.addEventListener("click",ev=>{
   ev.preventDefault();ev.stopPropagation();unfollowPlayer(b.dataset.unfollowInline);
  }));
@@ -361,7 +361,7 @@ window.badmintonLibraryGetState=()=>({
 window.badmintonLibraryToggleFollow=player=>{
  const id=String(player?.id||"");
  if(!/^\d{2}-\d{6}$/.test(id)||!String(player?.name||"").trim())return {ok:false,message:"Kein bestätigtes DBV-Spielerprofil."};
- if(state.players.some(p=>p.id===id))return {ok:false,message:"Dieser Spieler ist bereits dein eigenes Profil."};
+ // Following does not grant ownership and must not erase an existing own role.
  const exists=state.friends.some(p=>p.id===id);
  if(exists)return {ok:false,message:"Du folgst diesem Spieler bereits. Entfolgen geht in deiner Freundeliste."};
  if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
@@ -375,8 +375,11 @@ window.badmintonLibraryToggleFollow=player=>{
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
 // One selection action for Home, player library and Turniertag.
-window.badmintonSelectViewer=(id,{stayOnPage=false}={})=>{
- if(state.players.some(p=>p.id===id)){
+window.badmintonSelectViewer=(id,{stayOnPage=false,preferFriend=false}={})=>{
+ // An explicit Follow click must keep its role even if the DBV ID is also owned.
+ if(preferFriend&&SchmetterlingeStorage.selectFriend(state,id)){
+  save();
+ }else if(state.players.some(p=>p.id===id)){
   setActiveProfile(id);
  }else if(SchmetterlingeStorage.selectFriend(state,id)){
   save();
@@ -501,7 +504,7 @@ window.badmintonLiveViewerOptions=()=>({
 });
 window.badmintonLibraryView=id=>{
  if(!state.friends.some(p=>p.id===id))return false;
- return window.badmintonSelectViewer(id);
+ return window.badmintonSelectViewer(id,{preferFriend:true});
 };
 }
 let todayNav={day:"",matchToday:false};
@@ -686,11 +689,11 @@ function setup(){
    const button=document.createElement("button");
    button.type="button";
    button.className="friend-follow-item";
-   button.disabled=isOwn||isFriend;
+   button.disabled=isOwn;
    const detail=[player.club,player.birthYear,player.ageClass,player.id].filter(Boolean).join(" · ");
-   button.textContent=player.name+" — "+detail+(isOwn?" (bereits eigenes Profil)":isFriend?" (bereits Freund)":"");
+   button.textContent=player.name+" — "+detail+(isOwn?" (bereits eigenes Profil)":isFriend?" (bereits gefolgt)":"");
    button.addEventListener("click",()=>{
-    if(state.players.some(p=>p.id===player.id)||state.friends.some(p=>p.id===player.id)){
+    if(state.players.some(p=>p.id===player.id)){
      toast("Dieser Spieler ist bereits vorhanden");return;
     }
     playerForm.elements.namedItem("name").value=player.name;
@@ -776,7 +779,7 @@ function setup(){
   const isNewOwn=!editingPlayerId;
   if(editingPlayerId)state.players=state.players.map(p=>p.id===editingPlayerId?record:p);
   else{
-   if(state.friends.some(p=>p.id===id)){toast("Diese Spieler-ID ist bereits ein Freund");return}
+   // An already followed DBV player can also become a separately owned profile.
    state.players.push(record);
    if(activatingNewProfile||!state.activeProfileId)state.activeProfileId=id;
    if(activatingNewProfile){SchmetterlingeStorage.showOwn(state);location.hash="#start";}
@@ -831,7 +834,7 @@ function setup(){
   const id=String(data.get("id")||"").trim();
   const birth=Number(data.get("birthYear"));
   if(!name||!/^\d{2}-\d{6}$/.test(id)){toast("Name und gültige DBV-ID erforderlich");return}
-  if((!editingFriendId&&state.friends.some(p=>p.id===id))||state.players.some(p=>p.id===id)){toast("Dieser Spieler ist bereits gespeichert");return}
+  if(state.friends.some(p=>p.id===id&&p.id!==editingFriendId)){toast("Dieser Spieler wird bereits gefolgt");return}
   if(!editingFriendId&&state.friends.length>=30){toast("Maximal 30 Freunde");return}
   const profileUrl=safeUrl(data.get("url")||"");
   const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club:String(data.get("club")||"").trim().slice(0,120),url:profileUrl};
