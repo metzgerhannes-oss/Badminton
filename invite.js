@@ -21,7 +21,11 @@ async function rpc(endpoint,body={}){
  if(!response.ok)throw Error("Einladungsdienst nicht erreichbar oder Zugriff abgelehnt.");
  return response.json();
 }
-function status(text){el("invite-status").textContent=text;}
+function status(text,kind="info"){
+ const target=el("invite-status");
+ target.dataset.state=kind;
+ target.textContent=text;
+}
 function draw(){
  const record=read(),valid=active(record);
  const preview=el("invite-link-preview");
@@ -41,25 +45,44 @@ async function ensureInvite(){
  write(record);draw();return record;
 }
 async function copyText(text){
- if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);
- else window.prompt("Einladung kopieren:",text);
+ if(navigator.clipboard?.writeText){
+  await navigator.clipboard.writeText(text);
+  return true;
+ }
+ // Prompt cannot confirm whether the user actually copied the token.
+ window.prompt("Einladung zum manuellen Kopieren:",text);
+ return false;
 }
 async function execute(action){
  if(busy)return;
  busy=true;
- el("invite-share").disabled=true;el("invite-copy").disabled=true;
+ const copyButton=el("invite-copy");
+ const previousText=copyButton.textContent;
+ el("invite-share").disabled=true;copyButton.disabled=true;
+ if(action==="copy")copyButton.textContent="Wird kopiert …";
+ status(action==="copy"?"Einladungslink wird vorbereitet …":"Einladung wird vorbereitet …");
  try{
   const record=await ensureInvite(),url=link(record.secret);
   if(action==="share"&&navigator.share){
    try{await navigator.share({title:"Einladung zu Schmetterlinge",
     text:"Mit diesem Link kannst du Schmetterlinge öffnen und belegte Badminton-Ergebnisse ansehen.",url});
-    status("Wähle eine App, um den Einladungslink zu teilen.");return;
-   }catch(e){if(e?.name==="AbortError")return}
+    status("Teilen geöffnet. Wähle eine App und einen Empfänger.");return;
+   }catch(e){if(e?.name==="AbortError"){status("Teilen abgebrochen.");return;}}
   }
-  await copyText(url);
-  status("Einladungslink kopiert. Teile ihn über eine Nachricht. Der Link ist 30 Tage einlösbar; angenommene Zugänge bleiben bis zum Widerruf gültig.");
- }catch(e){status(e?.message||"Einladung konnte nicht erstellt werden.")}
- finally{busy=false;el("invite-share").disabled=false;el("invite-copy").disabled=false}
+  const copied=await copyText(url);
+  if(copied){
+   copyButton.textContent="✓ Link kopiert";
+   status("✓ Einladungslink kopiert. Du kannst ihn jetzt in der privaten App verwenden.", "success");
+  }else{
+   status("Der Link wurde angezeigt. Bitte manuell kopieren; automatisches Kopieren ist nicht verfügbar.");
+  }
+ }catch(e){
+  status("Kopieren nicht möglich. Bitte die Zwischenablage freigeben oder „Aktuellen Einladungslink öffnen“ nutzen.", "error");
+ }finally{
+  busy=false;el("invite-share").disabled=false;copyButton.disabled=false;
+  if(action!=="copy"||copyButton.textContent==="Wird kopiert …")
+   copyButton.textContent=previousText;
+ }
 }
 async function revoke(){
  const record=read();if(!record?.id||busy)return;
@@ -68,8 +91,8 @@ async function revoke(){
   const done=await rpc("app_access_invite_revoke",{p_invitation_id:record.id});
   if(done!==true)throw Error("Widerruf nicht bestätigt.");
   write({...record,revoked:true});draw();
-  status("Einladungslink und alle darüber freigeschalteten Zugänge wurden widerrufen.");
- }catch(e){status(e?.message||"Widerruf fehlgeschlagen.")}
+  status("Einladungslink und zugehörige Zugänge wurden widerrufen.", "success");
+ }catch(e){status(e?.message||"Widerruf fehlgeschlagen.", "error")}
  finally{busy=false}
 }
 async function init(){
