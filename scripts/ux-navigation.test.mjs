@@ -80,8 +80,8 @@ test("Home and friends use one profile navigation mechanism",()=>{
  assert.match(app,/navigatePrimary\(page,\{returnToOwn:false\}\)/);
  assert.ok(app.includes('document.querySelector(".bottom-nav")?.addEventListener("click"'));
  assert.ok(app.includes("SchmetterlingeRouter.renderPage(state);"));
- assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.friendQuick\)/);
- assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.viewFriend\)/);
+ assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.friendQuick,\{preferFriend:true\}\)/);
+ assert.match(app,/window\.badmintonSelectViewer\(b\.dataset\.viewFriend,\{preferFriend:true\}\)/);
  assert.match(app,/window\.badmintonSelectViewer\(button\.dataset\.switchProfile\)/);
  assert.match(router,/data-current-view/);
 });

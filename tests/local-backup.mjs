@@ -133,7 +133,7 @@ for(const bad of [
  damaged(b=>b.data.players=[]),
  damaged(b=>b.data.players.push(b.data.players[0])),
  damaged(b=>b.data.friends[0].id="javascript:alert(1)"),
- damaged(b=>b.data.friends[0].id="99-100001"),
+ // Same DBV ID in an own profile and Follow is now a valid dual-role case.
  damaged(b=>b.data.players[0].url="javascript:alert(1)"),
  damaged(b=>b.data.officialLinks[0].url="https://evil.example/tournament/11111111-2222-4333-8444-555555555555"),
  damaged(b=>b.data.officialLinks[0].endDate="2026-01-01"),
