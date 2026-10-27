@@ -12,6 +12,26 @@ const fields=["source_name","source_kind","category","competition_id",
  "event","match_date","discipline","round_label","player_side","winning_side",
  "opponent_names","partner_names","games","outcome_evidence"];
 const equal=(a,b)=>JSON.stringify(a??null)===JSON.stringify(b??null);
+const sportFields=["competition_id","match_date","discipline","round_label",
+ "player_side","winning_side","opponent_names","partner_names","games","outcome_evidence"];
+const present=value=>value!==null&&value!==undefined&&value!==""&&
+ (!Array.isArray(value)||value.length>0);
+const minimumProof=row=>validId(row?.dbv_id)&&Boolean(row.match_date&&row.competition_id&&row.discipline)&&
+ Array.isArray(row.opponent_names)&&row.opponent_names.length>0&&
+ ((Array.isArray(row.games)&&row.games.length>0)||Boolean(row.outcome_evidence));
+function sameKeyStatus(a,b){
+ // Contradictory sport values must be supported by BOTH records.
+ // Missing scores/opponents are incomplete evidence, not a fabricated conflict.
+ if(sportFields.some(f=>present(a[f])&&present(b[f])&&!equal(a[f],b[f])))
+  return "conflicting_same_key";
+ if(!minimumProof(a)||!minimumProof(b)||
+    sportFields.some(f=>present(a[f])!==present(b[f])))
+  return "same_key_insufficient_evidence";
+ if(!sportFields.every(f=>equal(a[f],b[f])))
+  return "same_key_insufficient_evidence";
+ return fields.every(f=>equal(a[f],b[f]))?
+  "canonical_same_key":"same_key_metadata_difference";
+}
 const shape=row=>row&&typeof row==="object"&&
  row.payload&&typeof row.payload==="object"&&!Array.isArray(row.payload)
  ?{...row.payload,dbv_id:row.dbv_id,source_key:row.source_key}:row;
@@ -45,10 +65,14 @@ export function classifyRow(original,currentById,quarantineById){
  const row=shape(original);
  if(!validId(row?.dbv_id)||!row?.source_key)return "invalid_identity";
  const current=currentById.get(row.dbv_id)||[];
- if(current.some(c=>c.source_key===row.source_key)){
-  // A reused ID with conflicting contents must not count as a clean match.
-  return current.some(c=>c.source_key===row.source_key&&proofMatches(row,c))
-   ?"canonical_same_key":"conflicting_same_key";
+ const sameKey=current.filter(c=>c.source_key===row.source_key);
+ if(sameKey.length){
+  const statuses=sameKey.map(c=>sameKeyStatus(row,c));
+  // Even one contradictory canonical record must remain visible for review.
+  if(statuses.includes("conflicting_same_key"))return "conflicting_same_key";
+  if(statuses.includes("canonical_same_key"))return "canonical_same_key";
+  if(statuses.includes("same_key_metadata_difference"))return "same_key_metadata_difference";
+  return "same_key_insufficient_evidence";
  }
  if((quarantineById.get(row.dbv_id)||[]).some(q=>q.source_key===row.source_key))
   return "already_quarantined";
@@ -65,11 +89,14 @@ export function summarizeMatchReconciliation({stage=[],backup=[],current=[],quar
  }
  const byId=groups(current),quarantineById=groups(quarantine);
  const result={stage:{},backup:{},years:{stage:{},backup:{}},
-  totals:{stage:stage.length,backup:backup.length,current:current.length,quarantine:quarantine.length}};
+  totals:{stage:stage.length,backup:backup.length,current:current.length,quarantine:quarantine.length,
+   unmatched_source_keys:{stage:0,backup:0},sport_fact_gaps:"not_determinable"}};
  for(const origin of ["stage","backup"]){
   for(const original of origin==="stage"?stage:backup){
    const status=classifyRow(original,byId,quarantineById);
    result[origin][status]=(result[origin][status]||0)+1;
+   if(["strict_rekey_candidate","ambiguous_rekey_candidate","partial_overlap_review","unresolved"].includes(status))
+    result.totals.unmatched_source_keys[origin]++;
    const row=shape(original);
    const year=Number(row?.match_year||String(row?.match_date||"").slice(0,4));
    const label=Number.isInteger(year)&&year>=1900&&year<=2100?String(year):"unknown";
@@ -82,7 +109,9 @@ export function summarizeMatchReconciliation({stage=[],backup=[],current=[],quar
 export function renderAggregateReport(report){
  // Report receives aggregate-only input and never prints names, IDs or links.
  const headings={canonical_same_key:"Identischer aktueller Schlüssel und Beleg",
-  conflicting_same_key:"Gleicher Schlüssel, widersprüchlicher Inhalt",
+  conflicting_same_key:"Gleicher Schlüssel, widersprüchliche belegte Sportfelder",
+  same_key_insufficient_evidence:"Gleicher Schlüssel, unvollständige Belege",
+  same_key_metadata_difference:"Gleicher Schlüssel, abweichende Quellmetadaten",
   already_quarantined:"Bereits in Quarantäne",
   strict_rekey_candidate:"Fachlich identisch, anderer Schlüssel – prüfen",
   ambiguous_rekey_candidate:"Mehrere identische Kandidaten – prüfen",
@@ -97,10 +126,13 @@ export function renderAggregateReport(report){
    "Geprüfte Zeilen: "+report.totals[origin]);
   for(const [status,n] of Object.entries(report[origin]))
    lines.push("- "+(headings[status]||"Unbekannter Status")+": "+n);
+  lines.push("Schlüssel ohne belegten aktuellen oder Quarantäne-Gegenpart: "+
+   report.totals.unmatched_source_keys[origin]);
   lines.push("Jahresverteilung: "+
    Object.entries(report.years[origin]).sort(([a],[b])=>a.localeCompare(b))
     .map(([y,counts])=>y+"="+Object.values(counts).reduce((a,b)=>a+b,0)).join(", "));
  }
+ lines.push("","Tatsächlich fehlende Sportfakten: nicht bestimmbar (keine Quellbeweise).");
  return lines.join("\n")+"\n";
 }
 export async function fromLocalBackup(path){
