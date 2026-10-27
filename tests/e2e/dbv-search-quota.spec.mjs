@@ -1,6 +1,6 @@
-import {test,expect} from "./supabase-isolated.fixture.mjs";
+import {test,expect} from "./invited-member.fixture.mjs";
 
-// F03 #327: synthetic 429 from the public DBV identity RPC. All Supabase
+// F03 #327: synthetic 429 from the member-only DBV identity RPC. All Supabase
 // traffic stays behind the hard offline browser firewall.
 const HEADERS={
  "Access-Control-Allow-Origin":"*",
