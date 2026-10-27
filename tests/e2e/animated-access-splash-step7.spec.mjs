@@ -17,7 +17,7 @@ async function withExistingSession(page){
   }));
  });
 }
-test("checking uses original club logo and animated shuttle without visible text or invitation controls",async({page})=>{
+test("checking uses original club logo and animated shuttle without visible text or invitation controls",async({page},testInfo)=>{
  await withExistingSession(page);
  // Keep the synthetic RPC in flight until all visual assertions have completed.
  // A fixed 3.5s delay raced with slow WebKit screenshot/layout evaluation.
@@ -88,6 +88,23 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(earlyFlight.visibleWidth).toBeGreaterThan(38);
  expect(earlyFlight.clearsBadge).toBe(true);
 
+ // Preserve reproducible 320px Chromium AND iPhone-WebKit visual evidence.
+ // Synthetic session only; never screenshot a real player's private data.
+ // Freeze at exact times, rather than relying on nondeterministic screenshot timing.
+ const shuttle=page.locator(".app-access-shuttle");
+ for(const [ms,label] of [[800,"entry-800ms"],[1650,"descent-1650ms"],[2250,"exit-2250ms"]]){
+  await shuttle.evaluate((img,time)=>{
+   const animation=img.getAnimations().find(a=>a.effect?.getKeyframes);
+   if(!animation)throw Error("Missing shuttle animation for visual evidence");
+   animation.pause();
+   animation.currentTime=time;
+  },ms);
+  await testInfo.attach("splash-"+label+"-"+testInfo.project.name,{
+   body:await page.screenshot({fullPage:false,animations:"allow"}),
+   contentType:"image/png"
+  });
+ }
+ await shuttle.evaluate(img=>img.getAnimations().forEach(animation=>animation.play()));
 
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
