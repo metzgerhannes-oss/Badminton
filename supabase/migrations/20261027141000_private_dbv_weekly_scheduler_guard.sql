@@ -126,8 +126,8 @@ BEGIN
   END IF;
   UPDATE private_content.dbv_weekly_attempts SET
     finished_at=now(),code=p_code,
-    duration_ms=pg_catalog.least(2147483647,
-      pg_catalog.greatest(0,(extract(epoch FROM now()-started_at)*1000)::bigint))::integer
+    duration_ms=least(2147483647,
+      greatest(0,(extract(epoch FROM now()-started_at)*1000)::bigint))::integer
     WHERE id=p_attempt_id AND finished_at IS NULL;
   UPDATE private_content.dbv_weekly_state SET
     attempt_id=NULL,lease_until=NULL,last_code=p_code,updated_at=now(),
@@ -213,8 +213,8 @@ BEGIN
   UPDATE private_content.dbv_weekly_attempts SET
     finished_at=now(),code='ok',player_count=p_total,ranking_count=v_rankings,
     source_year=p_year,source_week=p_week,
-    duration_ms=pg_catalog.least(2147483647,
-      pg_catalog.greatest(0,(extract(epoch FROM now()-started_at)*1000)::bigint))::integer
+    duration_ms=least(2147483647,
+      greatest(0,(extract(epoch FROM now()-started_at)*1000)::bigint))::integer
     WHERE id=p_attempt_id;
   UPDATE private_content.dbv_weekly_state SET
     attempt_id=NULL,lease_until=NULL,last_code='ok',
