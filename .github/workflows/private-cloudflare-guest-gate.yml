@@ -1,0 +1,50 @@
+name: "P0 #417 private Cloudflare Access external guest-deny"
+on:
+  push:
+    branches:
+      - fix/p0-417-private-member-reads-20261027
+    paths:
+      - .github/workflows/private-cloudflare-guest-gate.yml
+      - scripts/build-private-pages.mjs
+      - tests/private-pages-build.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deny-guest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: "Anonymous browser must not receive the private PWA"
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://schmetterlinge-familie.pages.dev"
+          # Both the canonical domain and the exact currently deployed build
+          # must block anonymous requests, including direct JS/JSON paths.
+          for host in "$base" "https://17d7f2b3.schmetterlinge-familie.pages.dev"; do
+            for path in "/" "/index.html" "/scripts/supabase-read.mjs" "/data/dbv-calendar.json"; do
+              headers="$(mktemp)"
+              body="$(mktemp)"
+              code="$(curl --silent --show-error --max-time 20 --connect-timeout 10 \
+                --dump-header "$headers" --output "$body" --write-out '%{http_code}' \
+                "$host$path")"
+              case "$code" in
+                401|403) ;;
+                301|302|303|307|308)
+                  # A redirect is acceptable only to the Cloudflare Access
+                  # authentication flow, not a public asset mirror.
+                  if ! grep -Eiq '^location:[[:space:]]*https?://[^[:space:]]*\.cloudflareaccess\.com(/|[[:space:]]|\?)|^location:[[:space:]]*/cdn-cgi/access/' "$headers"; then
+                    echo "::error::Unexpected unprotected redirect for $host$path (HTTP $code)"
+                    exit 1
+                  fi
+                  ;;
+                *)
+                  echo "::error::Anonymous content exposed or unverified: $host$path HTTP $code"
+                  exit 1
+                  ;;
+              esac
+              echo "Private guest deny OK: $host$path HTTP $code"
+              rm -f "$headers" "$body"
+            done
+          done
