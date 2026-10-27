@@ -76,35 +76,39 @@ export function computeExternalStats(rows,{discipline="all",year="all"}={}){
  * accessible match facts. Report only actual REST rows as available. The
  * provider overview and match evidence are not guaranteed to be exhaustive.
  */
+/**
+ * The scan's verified_count/cursor_offset describe a single import run.
+ * Stored cards can span years and earlier runs; never display "N of M" as
+ * if those two independent counters measure the same source population.
+ */
 export function importCompleteness(status,loadedCount){
  const available=Number.isSafeInteger(loadedCount)&&loadedCount>=0?loadedCount:0;
- const total=Number.isSafeInteger(status?.verified_count)&&status.verified_count>0
+ const batch=Number.isSafeInteger(status?.verified_count)&&status.verified_count>=0
   ?status.verified_count:null;
- const cursor=Number.isSafeInteger(status?.cursor_offset)&&status.cursor_offset>=0
-  ?status.cursor_offset:0;
+ const cursor=Number.isSafeInteger(status?.cursor_offset)&&status.cursor_offset>0
+  ?status.cursor_offset:null;
  const rejected=Number.isSafeInteger(status?.rejected_count)&&status.rejected_count>0
   ?status.rejected_count:0;
- let message;
- if(total===null){
-  message=available
-   ?available+" Quellkarten derzeit in der App abrufbar. Gesamtumfang des Imports noch nicht bekannt."
-   :"Importbestand noch nicht vollständig abgeglichen.";
- }else if(available<total){
-  message=available+" von "+total+" als importierbar erkannten Quellkarten derzeit in der App abrufbar.";
-  if(cursor>available){
-   message+=" Der Import hat "+cursor+" Quellkarten verarbeitet; das bestätigt nicht, dass alle bereits in der App verfügbar sind.";
-  }else if(status.status==="loading"||status.status==="queued"){
-   message+=" Der Quellenabgleich läuft.";
-  }else{
-   message+=" Weitere Ergebnisse sind in der App noch nicht belegt.";
-  }
- }else{
-  message=available+" Quellkarten derzeit in der App abrufbar.";
-  if(available>total)message+=" Der gespeicherte Quellumfang im Importstatus ist älter oder unvollständig.";
+ let message=available
+  ?available+(available===1?" belegte Quellkarte":" belegte Quellkarten")+
+    " derzeit in der App verfügbar."
+  :"Noch keine Einzelmatchbelege in der App verfügbar.";
+ if(batch!==null){
+  message+=" Letzter Quellenlauf: "+batch+" als gültig erkannt.";
+  message+=" Diese Laufzahl ist keine Gesamtzahl der Spielerhistorie.";
  }
- if(rejected)message+=" "+rejected+" unklare Matchkarten beim Import ausgeschlossen.";
- if(status?.status==="awaiting_source")message+=" Die externe Quelle ist derzeit nicht abrufbar.";
- if(status?.status==="error")message+=" Der letzte Importversuch war nicht erfolgreich.";
+ if(cursor!==null&&status?.status!=="complete")
+  message+=" Importposition: "+cursor+" (keine Anzahl gespeicherter Spiele).";
+ if(status?.status==="loading"||status?.status==="queued")
+  message+=" Der Quellenabgleich läuft.";
+ if(status?.status==="partial")
+  message+=" Der letzte Import war teilweise abgeschlossen.";
+ if(rejected)
+  message+=" "+rejected+" unklare Matchkarten im protokollierten Quellenlauf ausgeschlossen.";
+ if(status?.status==="awaiting_source")
+  message+=" Die externe Quelle ist derzeit nicht abrufbar.";
+ if(status?.status==="error")
+  message+=" Der letzte Importversuch war nicht erfolgreich.";
  const checked=Date.parse(status?.last_finished_at||"");
  if(Number.isFinite(checked)){
   message+=" Letzter dokumentierter Importversuch: "+
@@ -112,5 +116,5 @@ export function importCompleteness(status,loadedCount){
     hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"})
     .format(new Date(checked))+".";
  }
- return message;
+ return message+" Die gesamte Spielhistorie ist damit nicht als vollständig bestätigt.";
 }

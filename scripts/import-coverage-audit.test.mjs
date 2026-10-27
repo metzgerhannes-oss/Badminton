@@ -19,7 +19,7 @@ assert.equal(report.history_jobs,3);
 assert.equal(report.match_jobs,2);
 assert.equal(report.stored,1);
 assert.equal(report.countable,1);
-assert.equal(report.items.find(x=>x.dbv_id==="99-000001").finding,"processed_but_missing");
+assert.equal(report.items.find(x=>x.dbv_id==="99-000001").finding,"batch_scope_not_comparable");
 assert.equal(report.items.find(x=>x.dbv_id==="99-000002").finding,"source_unavailable");
 assert.equal(report.items.find(x=>x.dbv_id==="99-000003").finding,"not_started");
 const message=printReport(report,{history:false,imports:false,facts:false});
@@ -27,13 +27,19 @@ assert.match(message,/Tatsächlich gespeicherte Quellkarten: 1/);
 assert.doesNotMatch(message,/99-000001|99-000002|99-000003/);
 assert.doesNotMatch(message,/\b\d{2}-\d{6}\b/);
 assert.equal(publicSummary(report,{}).items,undefined);
-assert.equal(publicSummary(report,{}).grouped.processed_but_missing,1);
+assert.equal(publicSummary(report,{}).grouped.batch_scope_not_comparable,1);
 assert.doesNotMatch(message,/Testgegner/);
 assert.equal(diagnosis({status:"loading",lease_until:"2026-10-10T13:00:00Z"},
  true,0,0,time),"expired_lease");
 assert.equal(diagnosis({status:"partial",cursor_offset:20,verified_count:200,
- last_started_at:"2026-10-09T00:00:00Z"},true,20,20,time),"batch_backlog");
+ last_started_at:"2026-10-09T00:00:00Z"},true,20,20,time),"batch_scope_not_comparable");
 assert.equal(diagnosis({status:"complete",cursor_offset:2,verified_count:2},
  true,2,2,time),"not_proven_complete");
+assert.equal(diagnosis({status:"complete",verified_count:2,cursor_offset:2},
+ true,12,12,time),"batch_scope_not_comparable",
+ "Retained facts can exceed the most recent batch without a stale-import claim");
+assert.equal(diagnosis({status:"complete",verified_count:120,cursor_offset:120},
+ true,12,12,time),"batch_scope_not_comparable",
+ "A smaller lifetime subset is not proven missing by a batch-only count");
 assert.match(printReport(report,{facts:true}),/Stichprobe gekappt/);
 console.log("Offline coverage audit: only aggregate counts, no DBV IDs or private rows.");
