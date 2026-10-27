@@ -1,4 +1,4 @@
-/** Read-only, bounded public Supabase client. No family data is written remotely. */
+/** P0 #417: bounded, read-only Supabase REST client for verified family members. */
 export const SUPABASE_ROOT="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
 export const PUBLIC_KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
 
@@ -35,14 +35,15 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   if(signal)signal.addEventListener("abort",onAbort,{once:true});
   const timer=setTimeout(()=>{timedOut=true;controller.abort()},timeoutMs);
   try{
-   const protectedRoute=/^(?:player_external_match_facts|tournament_placements|player_live_snapshots)[?]/.test(path);
-   const sessionToken=protectedRoute&&typeof window!=="undefined"
-    ?await window.badmintonAppAccess?.getAccessToken?.():null;
-   // All member-only row sources require an actual app membership token.
-   // An accepted, player-scoped invitation is NOT a global member grant.
-   // Reject locally before fetching: do not create direct REST probes as a guest.
-   if(protectedRoute&&!sessionToken)
-    throw new PublicReadError("restricted","Member-only data require app membership",403);
+   // P0 #417: every PostgREST table read requires a verified family member.
+   // Supabase Anonymous Auth also uses the "authenticated" DB role; an
+   // accepted player-scoped link must NEVER be treated as global membership.
+   const member=typeof window!=="undefined"?window.badmintonAppAccess:null;
+   if(member?.allowed!==true)
+    throw new PublicReadError("restricted","Verified family membership required",403);
+   const sessionToken=await member.getAccessToken?.();
+   if(typeof sessionToken!=="string"||!sessionToken)
+    throw new PublicReadError("restricted","Verified family session unavailable",403);
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
     headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),
@@ -91,10 +92,6 @@ export async function readMatchImportProgress(id,{signal}={}){
    last_finished_at:d.last_import||null,
    birth_year:Number.isInteger(d.birth_year)?d.birth_year:null};
  }
- const path="player_external_match_imports?"+new URLSearchParams({
-  select:"status,verified_count,source_count,rejected_count,last_finished_at",
-  dbv_id:"eq."+id,limit:"1"
- });
- const data=await readPublicRows(path,{signal,count:false});
- return data.rows[0]||null;
+ // No anonymous status fallback: member-only coverage RPC is authoritative.
+ return null;
 }
