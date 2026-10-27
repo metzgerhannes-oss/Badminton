@@ -67,18 +67,20 @@ function render(){
  }
  if(all.excluded)info+=" "+fmt(all.excluded)+" unklare oder doppelte Quellkarten wurden nicht als Spiel gezählt.";
  if(partial)info+=" Es konnten höchstens "+fmt(MAX_ROWS)+" Quellkarten geladen werden; die Historie ist möglicherweise unvollständig.";
- const badhub=getBadhubMatchReference(selected,{year,discipline,category});
- if(badhub){
-  info+=" Badhub-Karriereübersicht vom "+badhub.capturedOn+": "+
-   badhub.total+" Spiele ("+badhub.wins+" Siege / "+badhub.losses+" Niederlagen). "+
-   dbvReferenceMessage(badhub,computeExternalStats(rows,{year,discipline}));
- }
+ // The dated official DBV snapshot comes first. Badhub totals are a separate,
+ // non-official historical comparison, never a substitute for DBV evidence.
  const reference=getDbvMatchReference(selected,{year,discipline,category});
  if(reference){
   const evidence=computeExternalStats(rows,{year,discipline});
   info+=" DBV-Profilstand "+reference.period+" vom "+reference.capturedOn+": "+
    reference.total+" Spiele ("+reference.wins+" Siege / "+reference.losses+" Niederlagen). "+
    dbvReferenceMessage(reference,evidence);
+ }
+ const badhub=getBadhubMatchReference(selected,{year,discipline,category});
+ if(badhub){
+  info+=" Badhub-Vergleich (nichtamtlicher Screenshot vom "+badhub.capturedOn+"): "+
+   badhub.total+" Spiele ("+badhub.wins+" Siege / "+badhub.losses+" Niederlagen). "+
+   dbvReferenceMessage(badhub,computeExternalStats(rows,{year,discipline}),{provider:"Badhub"});
  }
  const playedUnscored=getReportedPlayedWithoutScores(selected,{year,discipline,category});
  if(playedUnscored){
