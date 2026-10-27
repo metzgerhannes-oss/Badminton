@@ -48,3 +48,32 @@ jobs:
               rm -f "$headers" "$body"
             done
           done
+
+      - name: "iOS Home Screen icon is a real PNG without Access login"
+        shell: bash
+        run: |
+          set -euo pipefail
+          for host in "https://schmetterlinge-familie.pages.dev" "https://17d7f2b3.schmetterlinge-familie.pages.dev"; do
+            headers="$(mktemp)"
+            png="$(mktemp)"
+            code="$(curl --silent --show-error --max-time 20 --connect-timeout 10 \
+              --dump-header "$headers" --output "$png" --write-out '%{http_code}' \
+              "$host/assets/schmetterlinge-apple-touch-icon-180.png")"
+            if [ "$code" != "200" ]; then
+              echo "::error::iOS cannot fetch touch icon without Access cookies: HTTP $code at $host"
+              exit 1
+            fi
+            if ! grep -Eiq '^content-type:[[:space:]]*image/png' "$headers"; then
+              echo "::error::Touch icon response is not image/png at $host"
+              exit 1
+            fi
+            python3 - "$png" <<'PY'
+          import sys,struct
+          with open(sys.argv[1],"rb") as f:
+              head=f.read(24)
+          assert len(head)==24 and head[:8]==b"\x89PNG\r\n\x1a\n", "Missing PNG signature"
+          assert struct.unpack(">II",head[16:24])==(180,180), "Wrong iOS touch icon dimensions"
+          PY
+            echo "iOS touch icon OK (200, image/png, 180x180): $host"
+            rm -f "$headers" "$png"
+          done
