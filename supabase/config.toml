@@ -5,3 +5,8 @@ verify_jwt = false
 [functions.private-dbv-directory]
 # Signed GitHub OIDC is validated inside the function, no public or anonymous writer.
 verify_jwt = false
+
+[functions.private-dbv-weekly]
+# #414: Custom constant-time Vault/Edge cron token AND two disabled-by-default
+# source-rights gates; never publish or invoke from GitHub Actions.
+verify_jwt = false
