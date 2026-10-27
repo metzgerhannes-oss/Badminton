@@ -130,6 +130,10 @@ window.badmintonCommunity={
 };
 window.addEventListener("badminton:profile-change",event=>refresh(event.detail?.playerId));
 window.addEventListener("badminton:community-refresh",()=>refresh(selected));
+// P0 #417: an initial guest read is intentionally blocked; retry only after
+// the server has verified the family session. Never grant on local profile alone.
+window.addEventListener("badminton:app-access-granted",()=>
+ refresh(selected||window.badmintonActivePlayerId||""));
 window.addEventListener("badminton:tournament-bookmarks",()=>{if(hasRendered)render(latest)});
 window.addEventListener("badminton:share-tournament",async event=>{
  const {bookmark,previous,publicShare,removed}=event.detail||{};
