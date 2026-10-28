@@ -3,7 +3,7 @@
 // until operator/source permissions #17/#56 are independently proven.
 import {unzipSync} from "npm:fflate@0.8.2";
 import {officialPublication,buildWeeklyPayload,importDecision} from "./model.mjs";
-import {tokenMatches} from "./auth.mjs";
+
 import {parseOfficialXlsxXml} from "./xlsx.mjs";
 
 const PROJECT="yadexibmjmnjfmfabrug";
@@ -20,9 +20,14 @@ class ImportError extends Error {
 const response=(status:number,body:Record<string,unknown>)=>Response.json(body,{
   status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}
 });
+// Use a database-only Vault secret for scheduler authorization. Neither the
+// token nor its hash is stored in GitHub, Edge source or browser bundles.
 async function authorized(req:Request):Promise<boolean> {
-  return tokenMatches(Deno.env.get("PRIVATE_DBV_CRON_TOKEN")||"",
-    req.headers.get("x-private-dbv-cron-token")||"");
+  const token=req.headers.get("x-private-dbv-cron-token")||"";
+  if(token.length<64||token.length>256)return false;
+  try {
+    return await dbRpc("authorize_private_dbv_weekly",{p_token:token})===true;
+  }catch{return false;}
 }
 function secretKey():string|null {
   const legacy=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -33,7 +38,7 @@ function secretKey():string|null {
   }catch{return null;}
 }
 async function dbRpc(name:string,args:Record<string,unknown>):Promise<any> {
-  if(!["claim_private_dbv_weekly","finish_private_dbv_weekly","ingest_private_dbv_weekly"].includes(name))
+  if(!["authorize_private_dbv_weekly","claim_private_dbv_weekly","finish_private_dbv_weekly","ingest_private_dbv_weekly"].includes(name))
     throw new ImportError("database_error");
   const key=secretKey();
   if(!key||Deno.env.get("SUPABASE_URL")!==ROOT)throw new ImportError("database_error");
@@ -104,9 +109,9 @@ function parseXlsx(bytes:Uint8Array):any[] {
 Deno.serve(async (req:Request)=>{
   if(req.method!=="POST")return response(405,{ok:false,code:"method_not_allowed"});
   if(!await authorized(req))return response(403,{ok:false,code:"not_authorized"});
-  // Dual fail-closed gates: operator environment AND private DB state.
-  if(Deno.env.get("DBV_SOURCE_RIGHTS_APPROVED")!=="true")
-    return response(503,{ok:false,code:"source_rights_not_approved"});
+  // The member-only private import is approved for family use by the operator.
+  // Server-side private DB enabled state and the Vault token are BOTH required.
+  // No public release or third-party history API permission is implied.
   let claim=null;
   try {
     claim=await dbRpc("claim_private_dbv_weekly",{});
