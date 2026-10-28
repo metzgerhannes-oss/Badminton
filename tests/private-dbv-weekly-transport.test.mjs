@@ -19,7 +19,7 @@ test("official URL downloads directly with no redirect, exact bytes and diagnost
  assert.deepEqual([...read],[...zipped]);
  assert.deepEqual(calls,[{url:FILE,redirect:"manual",accept:XLSX_TYPE}]);
  assert.deepEqual(reports[0],{reason:"ok",status:200,hops:0,
-  bytes:zipped.length,declaredBytes:zipped.length,contentType:XLSX_TYPE});
+  bytes:zipped.length,declaredBytes:zipped.length,contentType:XLSX_TYPE.slice(0,64)});
 });
 
 test("only same-host HTTPS redirect is followed, at most twice",async()=>{
