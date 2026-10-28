@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-const [html,css,js,sw,release,welcome,club,transparentClub,shuttle]=await Promise.all([
+const [html,css,js,sw,release,welcome,club,transparentClub,shuttle,shellCss]=await Promise.all([
  "index.html","app-access.css","app-access.js","sw.js","app-release.js","welcome.html",
- "assets/spvgg-schmetterlinge.svg","assets/spvgg-schmetterlinge-splash.svg","assets/shuttlecock-splash.svg"
+ "assets/spvgg-schmetterlinge.svg","assets/spvgg-schmetterlinge-splash.svg","assets/shuttlecock-splash.svg","app-shell.css"
 ].map(file=>readFile(file,"utf8")));
 assert.match(html,/<html lang="de" data-app-access="checking">/);
+assert.match(html,/<link rel="stylesheet" href="\.\/app-access\.css">\s*<link rel="stylesheet" href="\.\/app-shell\.css">/,
+ "Splash CSS must load directly before the app shell, not via delayed nested @import on iOS WebKit");
+assert.doesNotMatch(shellCss,/@import\s+url\(["\']?\.\/app-access\.css/,
+ "App shell must not duplicate or delay critical access CSS via @import");
 assert.match(html,/<style>[\s\S]*?html\[data-app-access="checking"\] \.app-access-panel\{display:none!important\}/,"Invitation panel must be hidden on first paint without external CSS");
 assert.match(html,/id="app-access-splash"[^>]+role="status"/);
 assert.match(html,/class="app-access-visually-hidden">Zugang wird geprüft\.<\/span>/);
