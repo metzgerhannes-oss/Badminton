@@ -62,6 +62,24 @@ test("direct DBV URL is used only when the matching source calendar key confirms
  await expect(calendar.locator(".card-open-primary")).toHaveText("DBV-Kalender öffnen ↗");
  await expect(masters.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
  await expect(masters.locator("h3")).toHaveText("German Masters U11");
+ const technical=masters.locator(".saved-tournament-technical");
+ await expect(technical).not.toHaveAttribute("open","");
+ await expect(technical.locator("code")).toBeHidden();
+ await technical.locator("summary").click();
+ await expect(technical).toHaveAttribute("open","");
+ await expect(technical.locator("code")).toHaveText(UUID);
+ await technical.locator("summary").click();
+ await expect(technical.locator("code")).toBeHidden();
+ const layout=await masters.evaluate(node=>{
+  const actions=node.querySelector(".local-shortcut-actions").getBoundingClientRect();
+  const footer=node.querySelector(".saved-tournament-player").getBoundingClientRect();
+  return {actionsHeight:actions.height,footerBelow:footer.top>=actions.bottom,
+   overflow:document.documentElement.scrollWidth-innerWidth};
+ });
+ expect(layout.actionsHeight).toBeLessThanOrEqual(150);
+ expect(layout.footerBelow).toBe(true);
+ expect(layout.overflow).toBeLessThanOrEqual(2);
+
  await expect(masters.locator(".saved-tournament-venue")).toHaveText("Austragungsort nicht erfasst");
  await page.evaluate(({id,url})=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
   detail:{entries:[{key:id,hasDirectLink:true,url,title:"3. D-RLT BAW SW U11-U19",
