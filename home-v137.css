@@ -146,3 +146,29 @@
 #view-historie .history-proof-feedback{background:#153352;color:#edf8ff;border:1px solid #72b9e8;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5}
 #view-historie .history-result.is-proof-target{outline:3px solid #75c9ff;outline-offset:4px;border-radius:10px;scroll-margin-top:100px}
 #view-historie .history-detail-note{font-weight:700;font-size:13px;color:#d9edff;line-height:1.45}
+
+/* P1 F08 / UX: saved tournament card hierarchy and direct Home deep link. */
+#view-turniere .saved-tournament-top h3{
+ overflow-wrap:anywhere;line-height:1.28
+}
+#view-turniere .saved-tournament-dates{
+ margin-top:8px!important
+}
+#view-turniere .saved-tournament-player{
+ margin-top:12px!important;padding-top:10px;
+ border-top:1px solid #bcd9e8;
+ color:#365e77!important;font-size:13px!important;font-weight:650
+}
+#view-turniere .tournament-card[data-saved-tournament-id]{
+ scroll-margin-top:calc(env(safe-area-inset-top,0px) + 16px)
+}
+#view-turniere .tournament-card[data-saved-tournament-id]:focus{
+ outline:3px solid #147bac;outline-offset:3px
+}
+#view-turniere .tournament-card .local-shortcut-actions{
+ gap:8px 13px;align-items:center
+}
+#view-turniere .tournament-card .card-open-primary{
+ color:#17688f!important;text-decoration:underline;text-underline-offset:3px;
+ min-height:44px;display:inline-flex;align-items:center;font-size:14px
+}
