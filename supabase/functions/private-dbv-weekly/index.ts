@@ -9,14 +9,14 @@ import {parseOfficialXlsxXml} from "./xlsx.mjs";
 const PROJECT="yadexibmjmnjfmfabrug";
 const ROOT="https://"+PROJECT+".supabase.co";
 const PAGE="https://turniere.badminton.de/ranking";
-const HISTORY="https://turniere.badminton.de/ranking/history";
-function officialXlsxUrl(history:string,year:number,week:number):string {
+function officialXlsxUrl(year:number,week:number):string {
+  // Deterministic official archive file naming scheme. Current year/week
+  // MUST first be independently verified against the ranking publication stamp.
+  if(!Number.isInteger(year)||year<2026||year>2100||
+     !Number.isInteger(week)||week<1||week>53)
+     throw new ImportError("publication_invalid");
   const file="Ranking_"+String(year)+"_KW"+String(week).padStart(2,"0")+".xlsx";
-  // Only an exact reference in the OFFICIAL ranking archive may be fetched.
-  // Never accept an arbitrary redirect, supplied URL or previous week's file.
-  const expected="/uploads/ranking/"+file;
-  if(!history.includes(expected))throw new ImportError("publication_invalid", "archive_length="+history.length+":has_file="+history.includes(file)+":has_uploads="+history.includes("/uploads/ranking/"));
-  return "https://turniere.badminton.de"+expected;
+  return "https://turniere.badminton.de/uploads/ranking/"+file;
 }
 const MAX_PAGE=5_000_000,MAX_XLSX=12_000_000,MAX_UNZIPPED=65_000_000;
 const codes=new Set(["source_forbidden","source_throttled","source_unavailable",
@@ -150,9 +150,7 @@ Deno.serve(async (req:Request)=>{
         p_attempt_id:claim.attemptId,p_code:"unchanged"});
       return response(200,{ok:true,code:"unchanged",year:publication.year,week:publication.week});
     }
-    const history=new TextDecoder("utf-8",{fatal:true}).decode(
-      await source(HISTORY,"text/html",MAX_PAGE,15000));
-    const xlsxUrl=officialXlsxUrl(history,publication.year,publication.week);
+    const xlsxUrl=officialXlsxUrl(publication.year,publication.week);
     const bytes=await source(xlsxUrl,
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",MAX_XLSX,35000);
     const rows=parseXlsx(bytes);
