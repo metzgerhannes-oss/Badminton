@@ -151,18 +151,35 @@ export function importDecision(latest,publication) {
 }
 
 /**
- * Two existing endpoints on the same official DBV host. Only a date-stamped,
- * independently confirmed newer week may reach either endpoint.
- * Never guess another week, third-party mirror, redirect or player-data API.
+ * The archive's *actual published HTML href*, not an inferred filename,
+ * is the only permitted weekly download. /ranking may already carry next
+ * week's timestamp while that XLSX has not been released into /history.
+ * Return [] until a matching, visibly labelled official archive row exists.
  */
-export function officialXlsxCandidates(publication){
+export function officialXlsxCandidates(publication,historyHtml){
  const year=publication?.year,week=publication?.week;
  if(!Number.isInteger(year)||year<2026||year>2100||
     !Number.isInteger(week)||week<1||week>53)
    throw Error("publication_invalid");
+ if(typeof historyHtml!=="string"||historyHtml.length>5_000_000)
+   throw Error("archive_page_invalid");
  const file="Ranking_"+year+"_KW"+String(week).padStart(2,"0")+".xlsx";
- return [
-  "https://turniere.badminton.de/uploads/ranking/"+file,
-  "https://turniere.badminton.de/ranking/download"
- ];
+ const rows=historyHtml.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi)||[];
+ const matching=new Set();
+ for(const row of rows){
+  // The filename must be VISIBLE within the same table row as its link.
+  const label=row.replace(/<[^>]*>/g," ").replace(/&nbsp;/gi," ");
+  if(!label.includes(file))continue;
+  const links=row.matchAll(/<a\b[^>]*\bhref\s*=\s*(["'])(.*?)\1[^>]*>/gi);
+  for(const link of links){
+   let url;
+   try{url=new URL(link[2].replace(/&amp;/gi,"&"),"https://turniere.badminton.de/ranking/history");}
+   catch{continue;}
+   if(url.protocol!=="https:"||url.hostname!=="turniere.badminton.de"||
+      url.port||url.username||url.password||url.search||url.hash)continue;
+   if(url.pathname==="/uploads/ranking/"+file)matching.add(url.href);
+  }
+ }
+ // Duplicate or ambiguous matching rows are not silently accepted.
+ return matching.size===1?[...matching]:[];
 }
