@@ -135,6 +135,38 @@ test("checking uses original club logo and animated shuttle without visible text
  const stored=await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
  expect(stored).toContain("synthetic-access-token");
 });
+
+// Responsive visual contract: the shuttle is visible AND does not cross the logo.
+// The full 320px screenshot test above also checks the invitation/access lifecycle.
+for(const width of [351,390,430]){
+ test("responsive shuttle keeps clear of badge at "+width+"px",async({page})=>{
+  await withExistingSession(page);
+  let release;
+  const pending=new Promise(resolve=>{release=resolve});
+  await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
+   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
+   await pending;
+   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+  });
+  try{
+   await page.setViewportSize({width,height:780});
+   await page.goto("/",{waitUntil:"commit"});
+   await expect(page.locator("#app-access-splash")).toBeVisible();
+   const frame=await page.locator(".app-access-shuttle").evaluate(img=>{
+    const a=img.getAnimations().find(a=>a.effect?.getKeyframes);
+    if(!a)return null;
+    a.pause();a.currentTime=800;
+    const bird=img.getBoundingClientRect();
+    const badge=img.parentElement.querySelector(".app-access-splash-emblem").getBoundingClientRect();
+    return {left:bird.left,right:bird.right,badgeRight:badge.right,viewport:innerWidth};
+   });
+   expect(frame).not.toBeNull();
+   expect(frame.left).toBeGreaterThanOrEqual(frame.badgeRight-2);
+   expect(frame.right).toBeLessThanOrEqual(frame.viewport+2);
+  }finally{release();}
+  await expect(page.locator("#app-access-gate")).toBeHidden();
+ });
+}
 test("v221 fast successful cold launch shows intro for 0.8s; warm navigation never restarts splash",async({page})=>{
  await withExistingSession(page);
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>
