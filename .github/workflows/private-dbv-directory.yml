@@ -17,6 +17,7 @@ on:
       - 'scripts/private-dbv-weekly-model.mjs'
       - 'tests/private-dbv-weekly-model.test.mjs'
       - 'supabase/migrations/20261027141000_private_dbv_weekly_scheduler_guard.sql'
+      - 'supabase/migrations/20261028220000_private_dbv_archive_week_u09.sql'
       - 'supabase/migrations/20261016190000_private_dbv_directory_import.sql'
   push:
     branches: [main]
@@ -30,6 +31,7 @@ on:
       - 'scripts/private-dbv-weekly-model.mjs'
       - 'tests/private-dbv-weekly-model.test.mjs'
       - 'supabase/migrations/20261027141000_private_dbv_weekly_scheduler_guard.sql'
+      - 'supabase/migrations/20261028220000_private_dbv_archive_week_u09.sql'
 permissions:
   contents: read
 concurrency:
