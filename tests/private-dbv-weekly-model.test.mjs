@@ -21,18 +21,27 @@ test("official Berlin publication stamp is authoritative and DST-safe",()=>{
   assert.throws(()=>officialPublication("Rangliste KW 43",Date.UTC(2026,9,27)),/stamp_missing/);
   assert.throws(()=>officialPublication(page,Date.UTC(2026,9,19)),/out_of_range/);
 });
-test("only existing same-host official XLSX URLs are candidates for verified current week",()=>{
- const candidates=officialXlsxCandidates(stamp);
- assert.deepEqual(candidates,[
-  "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW43.xlsx",
-  "https://turniere.badminton.de/ranking/download"
- ]);
- assert.throws(()=>officialXlsxCandidates({year:2026,week:0}),/publication_invalid/);
- assert.throws(()=>officialXlsxCandidates({year:2026,week:54}),/publication_invalid/);
+test("archive link must actually be listed with the same week, never synthesized",()=>{
+ const row=(week,href)=>'<tr><td>Ranking_2026_KW'+week+'.xlsx</td><td><a href="'+href+'">herunterladen</a></td></tr>';
+ const kw43="/uploads/ranking/Ranking_2026_KW43.xlsx";
+ const html="<table>"+row("43",kw43)+row("42","/uploads/ranking/Ranking_2026_KW42.xlsx")+"</table>";
+ assert.deepEqual(officialXlsxCandidates(stamp,html),["https://turniere.badminton.de"+kw43]);
+ const kw44={...stamp,week:44,publishedAt:"2026-10-28T10:45:00.000Z"};
+ assert.deepEqual(officialXlsxCandidates(kw44,html),[],
+   "newer /ranking timestamp does not prove that a KW44 archive exists");
+ assert.deepEqual(officialXlsxCandidates(stamp,"<table></table>"),[]);
+ assert.deepEqual(officialXlsxCandidates(stamp,"<p>"+kw43+"</p>"),[],
+   "a filename without a real link is not enough");
+ assert.deepEqual(officialXlsxCandidates(stamp,"<table>"+row("43","https://other.example"+kw43)+"</table>"),[],
+   "never follow a third-party archive host");
+ assert.deepEqual(officialXlsxCandidates(stamp,"<table>"+row("43","/uploads/ranking/Ranking_2026_KW44.xlsx")+"</table>"),[],
+   "visible filename and the linked binary must be identical");
+ assert.throws(()=>officialXlsxCandidates({year:2026,week:0},html),/publication_invalid/);
  const edge=readFileSync(new URL("../supabase/functions/private-dbv-weekly/index.ts",import.meta.url),"utf8");
+ assert.match(edge,/source\(ARCHIVE,"text\/html"/);
+ assert.match(edge,/officialXlsxCandidates\(publication,archiveHtml\)/);
+ assert.doesNotMatch(edge,/\/ranking\/download/);
  assert.match(edge,/fetchCurrentOfficialRows\(publication\)/);
- assert.match(edge,/error\.code==="source_forbidden"\|\|error\.code==="source_throttled"\)throw error/);
- assert.doesNotMatch(edge,/fetch\(.*(?:bing|google|archive\.org)/i);
 });
 
 test("full synthetic ranking, deterministic identity and discipline totals",()=>{
