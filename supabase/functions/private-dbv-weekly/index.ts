@@ -104,7 +104,16 @@ function parseXlsx(bytes:Uint8Array):any[] {
     if(Object.values(files).reduce((n,b)=>n+b.byteLength,0)>MAX_UNZIPPED)
       throw Error("xlsx_inflated_limit");
     return parseOfficialXlsxXml(files);
-  }catch{throw new ImportError("xlsx_invalid");}
+  }catch(error){
+    // Aggregate-only format diagnostics. No player rows, names, file content,
+    // headers, token or match metadata is ever logged.
+    console.error("private_dbv_xlsx_validation",{
+      size:bytes.byteLength,
+      zip_signature:bytes[0]===0x50&&bytes[1]===0x4b,
+      reason:error instanceof Error?error.message.slice(0,72):"unknown"
+    });
+    throw new ImportError("xlsx_invalid");
+  }
 }
 Deno.serve(async (req:Request)=>{
   if(req.method!=="POST")return response(405,{ok:false,code:"method_not_allowed"});
