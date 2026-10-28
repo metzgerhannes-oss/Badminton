@@ -5,7 +5,8 @@ import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const PUBLIC="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
-const ORIGIN="https://metzgerhannes-oss.github.io";
+const ALLOWED_ORIGINS=new Set(["https://schmetterlinge-familie.pages.dev",
+  "https://metzgerhannes-oss.github.io"]);
 // v136: PostgREST verifies the user JWT and the server-side invite membership.
 // Origin and publishable key are never accepted as a substitute for this.
 async function isInvitedMember(req:Request):Promise<boolean>{
@@ -24,7 +25,7 @@ async function isInvitedMember(req:Request):Promise<boolean>{
 }
 const headers=(origin:string|null)=>({
  "Content-Type":"application/json","Cache-Control":"no-store","Vary":"Origin",
- "Access-Control-Allow-Origin":origin===ORIGIN?ORIGIN:"null",
+ "Access-Control-Allow-Origin":origin&&ALLOWED_ORIGINS.has(origin)?origin:"null",
  "Access-Control-Allow-Methods":"POST,OPTIONS",
  "Access-Control-Allow-Headers":"content-type,apikey,authorization"
 });
@@ -81,7 +82,7 @@ Deno.serve(async req=>{
  const origin=req.headers.get("origin");
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:headers(origin)});
  if(req.method!=="POST")return respond(405,{error:"post_required"},origin);
- if(origin&&origin!==ORIGIN)return respond(403,{error:"disallowed_origin"},origin);
+ if(origin&&!ALLOWED_ORIGINS.has(origin))return respond(403,{error:"disallowed_origin"},origin);
  // The publishable key is not authentication: reject oversized input
  // BEFORE allocating an unbounded JSON body or touching the database.
  let data:any;
@@ -189,7 +190,8 @@ Deno.serve(async req=>{
   });
   return respond(200,{
    queued:true,stored:written.length,scoreless_evidence_count:scoreless.length,progress,eligible:all.length,
-   source_cards:cardCount,excluded,completed:finished&&!sources.missing.length,
+   source_cards:cardCount,excluded,remaining_eligible:Math.max(0,all.length-progress),
+   completed:finished&&!sources.missing.length,
    unavailable_categories:sources.missing,
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
@@ -204,7 +206,8 @@ Deno.serve(async req=>{
      detail:"Quellenabgleich fehlgeschlagen; vorhandene belegte Matches bleiben gespeichert"});
    }
   }catch{}
-  console.error("External source import failed",id,String(error).slice(0,250));
+  // Never log player IDs, source URLs or raw provider/database errors.
+  console.error("External source import failed (private source/validation path)");
   return respond(502,{error:"source_import_unavailable"},origin);
  }
 });
