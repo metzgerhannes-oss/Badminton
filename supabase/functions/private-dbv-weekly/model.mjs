@@ -84,7 +84,7 @@ export function buildWeeklyPayload(rows,publication) {
   const {year,week,publishedAt}=publication||{};
   if(!Number.isInteger(year)||year<2026||year>2100||
      !Number.isInteger(week)||week<1||week>53||
-     typeof publishedAt!=="string"||!Number.isFinite(Date.parse(publishedAt)))
+     !(publishedAt===null||(typeof publishedAt==="string"&&Number.isFinite(Date.parse(publishedAt)))))
     throw Error("invalid_publication");
   const tag=String(year)+"-KW"+String(week).padStart(2,"0");
   const byId=new Map(),conflicts=new Set(),valid=[];
@@ -144,6 +144,7 @@ export function importDecision(latest,publication) {
   const previous=latest.year*100+latest.week;
   if(current<previous)throw Error("publication_older_than_database");
   if(current===previous) {
+    if(publication.publishedAt===null)return "unchanged";
     if(latest.sourcePublishedAt&&Date.parse(latest.sourcePublishedAt)===Date.parse(publication.publishedAt))return "unchanged";
     throw Error("publication_same_week_unverified");
   }
@@ -182,4 +183,30 @@ export function officialXlsxCandidates(publication,historyHtml){
  }
  // Duplicate or ambiguous matching rows are not silently accepted.
  return matching.size===1?[...matching]:[];
+}
+
+/** The /ranking timestamp bounds the week, not the release date of older XLSX. */
+export function selectOfficialArchive(historyHtml,pagePublication) {
+ if(!pagePublication||!Number.isInteger(pagePublication.year)||
+    !Number.isInteger(pagePublication.week))throw Error("publication_invalid");
+ if(typeof historyHtml!=="string"||historyHtml.length>5_000_000)
+    throw Error("archive_page_invalid");
+ const rows=historyHtml.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi)||[];
+ const found=new Map();
+ for(const row of rows) {
+   const filenames=row.match(/Ranking_(20\d{2})_KW(\d{2})\.xlsx/g)||[];
+   for(const filename of filenames) {
+     const m=/^Ranking_(20\d{2})_KW(\d{2})\.xlsx$/.exec(filename);
+     if(!m)continue;
+     const year=Number(m[1]),week=Number(m[2]);
+     if(week<1||week>53||year>pagePublication.year||
+       (year===pagePublication.year&&week>pagePublication.week))continue;
+     const urls=officialXlsxCandidates({year,week},row);
+     if(urls.length===1)found.set(String(year)+"-"+String(week).padStart(2,"0"),urls[0]);
+   }
+ }
+ if(found.size===0)return null;
+ const key=[...found.keys()].sort().at(-1);
+ const [year,week]=key.split("-").map(Number);
+ return {year,week,publishedAt:null,downloadUrl:found.get(key),publicationKind:"official-archive"};
 }
