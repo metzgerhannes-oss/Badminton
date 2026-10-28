@@ -44,6 +44,16 @@ test("full synthetic ranking, deterministic identity and discipline totals",()=>
   assert.equal(payload.sourcePublishedAt,stamp.publishedAt);
   assert.equal(new Set(payload.players.map(x=>x.id)).size,5001);
 });
+test("full official U09 cohort must not be dropped from a weekly XLSX",()=>{
+ const youngest=rows(256).map((r,i)=>({...r,id:"09-"+String(i+1).padStart(6,"0"),
+  ageClass:"U09",birthYear:2018,gender:"M"}));
+ const payload=buildWeeklyPayload([...rows(),...youngest],stamp);
+ assert.equal(payload.total,5257);
+ assert.equal(payload.rankingTotal,5257);
+ assert.equal(payload.players.filter(p=>p.ageClass==="U09").length,256);
+ assert.equal(payload.players.filter(p=>p.ageClass==="U09"&&p.rankings.length===1).length,256);
+});
+
 test("reject missing coverage, duplicate identity contradictions and old weeks",()=>{
   assert.throws(()=>buildWeeklyPayload(rows(4999),stamp),/source_row_coverage/);
   const bad=rows();
