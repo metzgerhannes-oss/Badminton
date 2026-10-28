@@ -10,6 +10,7 @@ import {fetchOfficialBytes,DbvTransportError} from "./transport.mjs";
 const PROJECT="yadexibmjmnjfmfabrug";
 const ROOT="https://"+PROJECT+".supabase.co";
 const PAGE="https://turniere.badminton.de/ranking";
+const ARCHIVE="https://turniere.badminton.de/ranking/history";
 const MAX_PAGE=5_000_000,MAX_XLSX=12_000_000,MAX_UNZIPPED=65_000_000;
 const codes=new Set(["source_forbidden","source_throttled","source_unavailable",
   "publication_invalid","xlsx_invalid","coverage_invalid","database_error","internal_error"]);
@@ -57,7 +58,7 @@ async function dbRpc(name:string,args:Record<string,unknown>):Promise<any> {
 // The DBV response may be valid from a browser but empty to Edge; these
 // aggregate diagnostics distinguish redirects, network faults and 0 bytes.
 async function source(url:string,accept:string,max:number,timeout:number):Promise<Uint8Array> {
- const phase=url===PAGE?"publication":"xlsx";
+ const phase=url===PAGE?"publication":url===ARCHIVE?"archive":"xlsx";
  try{
   return await fetchOfficialBytes(url,{accept,maxBytes:max,timeoutMs:timeout,
    report:detail=>console.info("private-dbv-source",JSON.stringify({phase,...detail}))});
@@ -93,20 +94,21 @@ function parseXlsx(bytes:Uint8Array):any[] {
 // Both URLs belong to DBV and must represent the SAME independently validated
 // publication week. HTTP 401/403/429 are terminal; do not bypass restrictions.
 async function fetchCurrentOfficialRows(publication:{year:number,week:number}):Promise<any[]> {
- let last:ImportError|null=null;
- for(const url of officialXlsxCandidates(publication)) {
-  try{
-   const bytes=await source(url,
-     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",MAX_XLSX,35000);
-   return parseXlsx(bytes);
-  }catch(error){
-   if(!(error instanceof ImportError))throw error;
-   if(error.code==="source_forbidden"||error.code==="source_throttled")throw error;
-   if(error.code!=="source_unavailable"&&error.code!=="xlsx_invalid")throw error;
-   last=error;
-  }
- }
- throw last||new ImportError("source_unavailable");
+ // Archive metadata is a separate official publication gate. A page stamp
+ // alone must NEVER be used to construct a speculative XLSX URL.
+ const archiveHtml=new TextDecoder("utf-8",{fatal:true}).decode(
+   await source(ARCHIVE,"text/html",MAX_PAGE,15000));
+ let candidates:string[];
+ try{candidates=officialXlsxCandidates(publication,archiveHtml);}
+ catch{throw new ImportError("publication_invalid");}
+ console.info("private-dbv-archive",JSON.stringify({
+   requestedYear:publication.year,requestedWeek:publication.week,
+   listed:candidates.length===1
+ }));
+ if(candidates.length!==1)throw new ImportError("source_unavailable");
+ const bytes=await source(candidates[0],
+   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",MAX_XLSX,35000);
+ return parseXlsx(bytes);
 }
 
 Deno.serve(async (req:Request)=>{
