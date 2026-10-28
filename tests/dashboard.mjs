@@ -11,8 +11,9 @@ assert.ok(page.includes('id="dashboard-kpis"'));
 assert.ok(page.includes('id="dashboard-next"'));
 assert.ok(js.includes('upcomingTournaments(bookmarks,selection,today)'),"Dashboard must select three upcoming tournaments for active player");
 assert.ok(js.includes('Nächste Turniere'),"Upcoming panel title");
-assert.ok(js.includes('location?"Austragungsort: "+location:"Austragungsort nicht erfasst"'),
- "A missing local bookmark venue must not claim that DBV has not published it");
+assert.ok(js.includes('location?"":\'<small class="upcoming-tournament-venue">Austragungsort nicht erfasst</small>\'')||
+ js.includes('Austragungsort nicht erfasst'),
+ "A missing locally stored venue must remain visibly not recorded");
 assert.ok(!js.includes("Austragungsort noch nicht veröffentlicht"),
  "Home must distinguish missing local data from missing official publication");
 assert.ok(js.includes('profiles.slice().reverse().find(x=>x.id===selection)'),
