@@ -23,6 +23,21 @@ assert.ok(page.indexOf('id="dashboard-kpis"') < page.indexOf('home-ranking-secti
 assert.ok(!page.includes('Für eingeladene Nutzer: Belegte Badminton-Ergebnisse'),"Technical Home introduction removed");
 assert.ok(page.includes('href="./home-v137.css"'),"Compact Home stylesheet linked");
 assert.ok(js.includes('upcoming-tournament-row')&&js.includes('upcoming-tournament-date'),"Each row has date and DBV link");
+assert.ok(js.includes('const target="#turniere/"+encodeURIComponent(String(t.id))+"/"+encodeURIComponent(String(t.playerId))'),
+ "Home tournament row must deep-link directly to the exact stored tournament, not generic #turniere");
+assert.ok(app.includes('function focusSavedTournamentFromHash()')&&
+ app.includes('card.scrollIntoView({behavior:"auto",block:"start"})'),
+ "Deep-linked tournament must be focused and scrolled into view after native iPhone navigation");
+assert.ok(app.includes('data-saved-tournament-id=')&&app.includes('data-saved-tournament-player='),
+ "Tournament identity is selected by both bookmark ID and attached player");
+assert.ok(app.includes("heading=venue")&&app.includes("name+\" · \"+venue"),
+ "Saved event shows verified or manually recorded venue in its heading");
+assert.ok(app.includes('class="saved-tournament-player"')&&
+ app.indexOf('class="saved-tournament-player"')>app.indexOf('class="local-shortcut-actions"'),
+ "The player attribution belongs below the tournament actions");
+assert.ok(app.includes('row.key===t.id&&row.hasDirectLink===true'),
+ "A source-linked direct event URL is available only for an identical official calendar key");
+
 assert.ok(page.includes('src="./dashboard.js"'));
 assert.ok(page.includes('href="#start" data-page="start"'));
 assert.ok(!page.includes('class="hero"'),"No verbose hero on landing page");
