@@ -1,7 +1,9 @@
 name: Schmetterlinge Tests
 on:
+  # Backend-only branch: run the same synthetic, read-only suite before private deploy.
+  # No production Supabase/DBV credentials or source requests in these jobs.
   push:
-    branches: [main]
+    branches: [main, ops/private-dbv-import-20261028]
   pull_request:
     branches: [main]
   workflow_dispatch:
