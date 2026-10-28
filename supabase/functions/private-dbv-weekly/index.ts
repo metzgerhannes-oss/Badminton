@@ -15,7 +15,7 @@ function officialXlsxUrl(history:string,year:number,week:number):string {
   // Only an exact reference in the OFFICIAL ranking archive may be fetched.
   // Never accept an arbitrary redirect, supplied URL or previous week's file.
   const expected="/uploads/ranking/"+file;
-  if(!history.includes(expected))throw new ImportError("publication_invalid");
+  if(!history.includes(expected))throw new ImportError("publication_invalid", "archive_length="+history.length+":has_file="+history.includes(file)+":has_uploads="+history.includes("/uploads/ranking/"));
   return "https://turniere.badminton.de"+expected;
 }
 const MAX_PAGE=5_000_000,MAX_XLSX=12_000_000,MAX_UNZIPPED=65_000_000;
@@ -177,6 +177,6 @@ Deno.serve(async (req:Request)=>{
         p_attempt_id:claim.attemptId,p_code:code});}catch{/* preserve original failure */}
     }
     return response(503,{ok:false,code,
-      diagnostic: code==="xlsx_invalid" && error instanceof ImportError?error.diagnostic:undefined});
+      diagnostic: (code==="xlsx_invalid"||code==="publication_invalid") && error instanceof ImportError?error.diagnostic:undefined});
   }
 });
