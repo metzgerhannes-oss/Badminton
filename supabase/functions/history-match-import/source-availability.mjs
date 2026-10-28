@@ -42,7 +42,11 @@ export function reconcileMatchBatch(rows,storedKeys,batchSize=120){
   if(known.has(key))present++;
   else missing.push(row);
  }
- const selected=missing.slice(0,batchSize);
+ // A newly evidenced scoreless card may precede the old cursor. Prioritize
+ // it inside the SAME bounded batch, never append extra writes beyond quota.
+ const scoreless=selectUnstoredScoreless(rows,known);
+ const priorityKeys=new Set(scoreless.map(row=>row.source_key));
+ const selected=scoreless.concat(missing.filter(row=>!priorityKeys.has(row.source_key))).slice(0,batchSize);
  const progress=present+selected.length;
  return {selected,progress,remaining_eligible:missing.length-selected.length,
   finished:progress===rows.length};
