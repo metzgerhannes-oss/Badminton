@@ -21,16 +21,16 @@
 <body>
 <main>
  <h1>Eigentümerzugang auf dieses Gerät übernehmen</h1>
- <p>Dein bisheriges Eigentümerkonto bleibt erhalten. Zur Übertragung brauchst du den Einladungslink aus deiner bisherigen App und einen einmaligen Übertragungscode.</p>
+ <p>Der bisherige Betreiberzugang bleibt zunächst erhalten. Gib die zwei nur für dich ausgestellten Einmalcodes ein. Damit aktivierst du die Betreiberberechtigung auf genau diesem Gerät.</p>
  <form id="handover-form" autocomplete="off">
-  <label for="invitation">1. Einladungslink aus der bisherigen App</label>
-  <input id="invitation" type="text" required autocapitalize="off" spellcheck="false" autocomplete="off" placeholder="Einladungslink oder 64-stelliger Code">
-  <label for="handover">2. Einmaliger Eigentümer-Übertragungscode</label>
+  <label for="invitation">1. Einmaliger Familien-Freigabecode</label>
+  <input id="invitation" type="text" required autocapitalize="off" spellcheck="false" autocomplete="off" placeholder="Ersten 64-stelligen Code hier einfügen">
+  <label for="handover">2. Einmaliger Betreiber-Übertragungscode</label>
   <input id="handover" type="password" required autocomplete="off" spellcheck="false" placeholder="Übertragungscode">
   <button id="transfer-submit" type="submit">Eigentümerzugang übernehmen</button>
  </form>
  <p id="status" role="status" aria-live="polite"></p>
- <small>Keine Supabase-Sitzung und kein Wiederherstellungsschlüssel wird in eine URL geschrieben. Jeder Code wird nur für die einmalige Prüfung an Supabase übertragen. Die bisherige Eigentümerberechtigung bleibt zunächst gültig.</small>
+ <small>Keine Supabase-Sitzung und kein Wiederherstellungsschlüssel wird in eine URL geschrieben. Jeder Code wird nur für die einmalige Prüfung an Supabase übertragen. Dein bisheriger Betreiberzugang bleibt zunächst gültig.</small>
  <p><a href="./index.html">Zurück zur App</a></p>
 </main>
 <script type="module" src="./owner-device-transfer.js"></script>
