@@ -3,7 +3,7 @@ import {webcrypto} from "node:crypto";
 import {readFileSync} from "node:fs";
 import {tokenMatches} from "../supabase/functions/private-dbv-weekly/auth.mjs";
 import assert from "node:assert/strict";
-import {officialPublication,buildWeeklyPayload,importDecision,officialXlsxCandidates} from "../scripts/private-dbv-weekly-model.mjs";
+import {officialPublication,buildWeeklyPayload,importDecision,officialXlsxCandidates,selectOfficialArchive} from "../scripts/private-dbv-weekly-model.mjs";
 import {parseOfficialXlsxXml} from "../supabase/functions/private-dbv-weekly/xlsx.mjs";
 const stamp={year:2026,week:43,publishedAt:"2026-10-21T09:30:00.000Z"};
 function rows(n=5001) {
@@ -39,11 +39,31 @@ test("archive link must actually be listed with the same week, never synthesized
  assert.throws(()=>officialXlsxCandidates({year:2026,week:0},html),/publication_invalid/);
  const edge=readFileSync(new URL("../supabase/functions/private-dbv-weekly/index.ts",import.meta.url),"utf8");
  assert.match(edge,/source\(ARCHIVE,"text\/html"/);
- assert.match(edge,/officialXlsxCandidates\(publication,archiveHtml\)/);
+ assert.match(edge,/selectOfficialArchive\(html,pagePublication\)/);
  assert.doesNotMatch(edge,/\/ranking\/download/);
- assert.match(edge,/fetchCurrentOfficialRows\(publication\)/);
+ assert.match(edge,/readArchiveSelection\(publication\)/);
 });
 
+test("KW44 page selects real KW43 XLSX without inventing a KW43 publication timestamp",()=>{
+ const row=w=>'<tr><td>Ranking_2026_KW'+w+'.xlsx</td><td><a href="/uploads/ranking/Ranking_2026_KW'+w+'.xlsx">download</a></td></tr>';
+ const archive='<table>'+row("43")+row("42")+'</table>';
+ const selected=selectOfficialArchive(archive,{year:2026,week:44,publishedAt:"2026-10-28T10:45:00.000Z"});
+ assert.deepEqual([selected.year,selected.week,selected.publishedAt],[2026,43,null]);
+ assert.equal(selected.downloadUrl,"https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW43.xlsx");
+ assert.equal(importDecision({year:2026,week:42},selected),"new");
+ assert.equal(importDecision({year:2026,week:43},selected),"unchanged");
+ assert.throws(()=>importDecision({year:2026,week:44},selected),/older/);
+ assert.equal(selectOfficialArchive(row("44")+archive,{year:2026,week:44}).week,44);
+ assert.equal(selectOfficialArchive(row("43"),{year:2026,week:42}),null);
+ assert.equal(selectOfficialArchive('<tr><td>Ranking_2026_KW43.xlsx</td><td>no URL</td></tr>',{year:2026,week:44}),null);
+ const payload=buildWeeklyPayload(rows(),selected);
+ assert.equal(payload.sourcePublishedAt,null);
+ assert.equal(payload.week,43);
+ const edge=readFileSync(new URL("../supabase/functions/private-dbv-weekly/index.ts",import.meta.url),"utf8");
+ assert.match(edge,/readArchiveSelection\(publication\)/);
+ assert.match(edge,/buildWeeklyPayload\(rows,selected\)/);
+ assert.doesNotMatch(edge,/\/ranking\/download/);
+});
 test("full synthetic ranking, deterministic identity and discipline totals",()=>{
   const payload=buildWeeklyPayload(rows(),stamp);
   assert.equal(payload.total,5001);
@@ -114,7 +134,7 @@ test("private scheduler still requires Vault and database authorization and neve
   assert.match(edge,/claim_private_dbv_weekly/,"Database backoff is checked before source download");
   assert.match(edge,/source_forbidden/);
   assert.match(edge,/source_throttled/);
-  assert.match(edge,/fetchCurrentOfficialRows/);
+  assert.match(edge,/readArchiveSelection/);
   assert.match(edge,/claim_private_dbv_weekly/);
   assert.match(sql,/enabled boolean NOT NULL DEFAULT false/);
   assert.doesNotMatch(sql,/cron\.schedule\s*\(/);
