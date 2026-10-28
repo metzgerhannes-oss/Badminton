@@ -60,7 +60,7 @@ assert.equal(wrongDate.updated.startDate,"2026-11-22");
 assert.equal(wrongDate.updated.deadline,"2026-11-15");
 assert.equal(wrongDate.sourceCorrected,true);
 assert.deepEqual(Array.from(bookmarks.describeOfficialChanges({...correct,startDate:"2026-11-15"},wrongDate.updated)),
- ["Spieltag","Austragungsort","Meldeschluss"],
+ ["Titel/Kategorie","Spieltag","Austragungsort","Meldeschluss"],
  "The UI must explicitly name corrected game date, venue and separate registration deadline");
 assert.deepEqual(Array.from(bookmarks.describeOfficialChanges(correct,correct)),[],
  "No invented corrections when verified DBV metadata already matches");
