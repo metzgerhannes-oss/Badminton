@@ -641,9 +641,13 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <ul id="owner-admin-grants"></ul>
    </section>
    <details class="settings-card" id="owner-activation-setup">
-    <summary>Eigentümeraktivierung (nur Betreiber)</summary>
-    <p class="settings-hint">Der erste App-Eigentümer kann sich mit einem einmaligen Aktivierungscode auf diesem Gerät legitimieren. Besucher benötigen keine Anmeldung.</p>
-    <p><a href="./owner-activate.html">Einmaligen Eigentümercode auf diesem Gerät eingeben ↗</a></p>
+    <summary>Betreiberzugang auf diesem Gerät einrichten</summary>
+    <p class="settings-hint">Beim Wechsel auf die private App wird die bisherige Betreiberberechtigung nicht automatisch übertragen. Die Übernahme ist einmalig und wird in Supabase geprüft; bestehende Spielerprofile müssen nicht übernommen werden.</p>
+    <p><a class="settings-grant-action" href="./owner-device-transfer.html">Betreiberzugang einmalig übernehmen ↗</a></p>
+    <details>
+     <summary>Nur bei der allerersten Betreiberaktivierung</summary>
+     <p><a href="./owner-activate.html">Ursprüngliche Eigentümeraktivierung öffnen ↗</a></p>
+    </details>
    </details>
    <section class="settings-card language-settings" aria-labelledby="language-title">
     <h3 id="language-title">Sprache</h3>
