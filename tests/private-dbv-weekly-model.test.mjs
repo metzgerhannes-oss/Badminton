@@ -142,3 +142,20 @@ test("private scheduler still requires Vault and database authorization and neve
   assert.doesNotMatch(sql,/CREATE EXTENSION IF NOT EXISTS pg_net/i);
   assert.match(sql,/REVOKE EXECUTE ON FUNCTION public\.ingest_private_dbv_directory/);
 });
+
+
+test("KW43 database migration keeps U09 and nullable archive timestamp private",()=>{
+ const migration=readFileSync(new URL("../supabase/migrations/20261028220000_private_dbv_archive_week_u09.sql",import.meta.url),"utf8");
+ assert.match(migration,/ALTER COLUMN published_at DROP NOT NULL/i);
+ assert.match(migration,/\('U09','U11','U13','U15','U17','U19','U22'\)/);
+ assert.match(migration,/p_source_published_at IS NULL THEN/);
+ assert.match(migration,/Future official DBV archive week rejected/);
+ assert.match(migration,/v_prior\.published_at IS DISTINCT FROM p_source_published_at/);
+ assert.match(migration,/source_url=CASE WHEN p_source_published_at IS NULL/);
+ assert.match(migration,/REVOKE ALL ON FUNCTION public\.ingest_private_dbv_directory/);
+ assert.match(migration,/REVOKE ALL ON FUNCTION public\.ingest_private_dbv_weekly/);
+ assert.doesNotMatch(migration,/GRANT\s+SELECT\s+ON\s+/i);
+ assert.doesNotMatch(migration,/GRANT\s+EXECUTE[^;]*TO\s+(?:PUBLIC|anon|authenticated)/i);
+ assert.doesNotMatch(migration,/\bcron\.schedule\s*\(/);
+ assert.equal((migration.match(/END\s*\n\$function\$;/g)||[]).length,2);
+});
