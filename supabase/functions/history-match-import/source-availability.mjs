@@ -47,3 +47,13 @@ export function reconcileMatchBatch(rows,storedKeys,batchSize=120){
  return {selected,progress,remaining_eligible:missing.length-selected.length,
   finished:progress===rows.length};
 }
+
+/** Backfill only previously unseen scoreless evidence. Rewriting already
+ * persisted facts on every on-demand refresh wastes quota and makes the
+ * response's 'stored' count falsely suggest new evidence. */
+export function selectUnstoredScoreless(rows,storedKeys){
+ if(!Array.isArray(rows)||!(Array.isArray(storedKeys)||storedKeys instanceof Set))
+  throw Error("invalid_scoreless_input");
+ const known=new Set(storedKeys);
+ return rows.filter(row=>row?.outcome_evidence==="badhub-bold-dash"&&!known.has(row.source_key));
+}
