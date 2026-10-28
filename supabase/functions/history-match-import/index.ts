@@ -1,5 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,importStatusForBatch,missingSourceStatus} from "./source-availability.mjs";
+import {assessSourceAvailability,importStatusForBatch,missingSourceStatus,reconcileMatchBatch} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
@@ -54,6 +54,22 @@ async function hasStoredMatchFact(id:string):Promise<boolean>{
   encodeURIComponent(id)+"&limit=1");
  if(!Array.isArray(facts))throw Error("Unexpected source fact read");
  return facts.length>0;
+}
+// A numeric cursor is not proof of completeness when the external feed reorders.
+// Read only this already-authorized profile's persisted source keys, in bounded pages.
+async function readStoredSourceKeys(id:string):Promise<Set<string>>{
+ const result=new Set<string>(),pageSize=500,maxRows=10000;
+ for(let offset=0;offset<maxRows;offset+=pageSize){
+  const rows=await api("player_external_match_facts?select=source_key&dbv_id=eq."+
+   encodeURIComponent(id)+"&order=source_key.asc&limit="+pageSize+"&offset="+offset);
+  if(!Array.isArray(rows)||rows.length>pageSize)throw Error("Invalid source-key page");
+  for(const row of rows){
+   if(typeof row?.source_key!=="string"||!row.source_key)throw Error("Invalid persisted source key");
+   result.add(row.source_key);
+  }
+  if(rows.length<pageSize)return result;
+ }
+ throw Error("Persisted source-key pagination limit");
 }
 async function updateNoNewSource(id:string,detail:string){
  const saved=await hasStoredMatchFact(id);
@@ -150,10 +166,12 @@ Deno.serve(async req=>{
   }
   if(all.length<Math.floor(cardCount*0.55))
    throw Error("Match parser rejected unexpected amount of source cards");
-  // A partial source can reorder/shorten the feed: never resume at an old
-  // offset and silently skip verified matches from the accessible category.
-  const start=sources.missing.length?0:Math.min(Number(claim.cursor)||0,all.length);
-  const selected=all.slice(start,start+120);
+  // Reconcile every fresh, verified source_key against actual persisted proof.
+  // This also finds older missing cards after source reordering; old numeric
+  // cursor_offset and stale source_count are never used to infer completeness.
+  const storedKeys=await readStoredSourceKeys(id);
+  const batch=reconcileMatchBatch(all,storedKeys,120);
+  const selected=batch.selected;
   // A newly recognized scoreless result may sort BEFORE the old cursor.
   // Explicitly backfill just those independently evidenced outcomes, with
   // source-key deduplication. Never reset a large player's ordinary cursor.
@@ -167,8 +185,8 @@ Deno.serve(async req=>{
     body:JSON.stringify(written.slice(i,i+25))
    });
   }
-  const progress=start+selected.length;
-  const finished=progress>=all.length;
+  const progress=batch.progress;
+  const finished=batch.finished;
   const excluded=Math.max(0,cardCount-all.length);
   const incomplete=sources.missing.length
    ?" · "+sources.missing.join(" und ")+"-Quelle derzeit nicht abrufbar; Gesamtbestand unvollständig":"";
@@ -190,7 +208,7 @@ Deno.serve(async req=>{
   });
   return respond(200,{
    queued:true,stored:written.length,scoreless_evidence_count:scoreless.length,progress,eligible:all.length,
-   source_cards:cardCount,excluded,remaining_eligible:Math.max(0,all.length-progress),
+   source_cards:cardCount,excluded,remaining_eligible:batch.remaining_eligible,
    completed:finished&&!sources.missing.length,
    unavailable_categories:sources.missing,
    provenance:"Badhub – public match cards, not official DBV match IDs"

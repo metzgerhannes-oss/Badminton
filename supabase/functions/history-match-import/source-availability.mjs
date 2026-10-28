@@ -25,3 +25,25 @@ export function importStatusForBatch(finished,excluded,missing){
 export function missingSourceStatus(hasStoredMatchFact){
  return hasStoredMatchFact===true?"partial":"awaiting_source";
 }
+
+/** Pure, source-key based reconciliation of one authorized player's freshly parsed cards.
+ * Old numeric cursors are not completeness proof when new source cards sort before them.
+ * This helper performs no network requests and never estimates missing matches. */
+export function reconcileMatchBatch(rows,storedKeys,batchSize=120){
+ if(!Array.isArray(rows)||!(Array.isArray(storedKeys)||storedKeys instanceof Set)||
+    !Number.isInteger(batchSize)||batchSize<1||batchSize>120)
+  throw Error("invalid_reconciliation_input");
+ const known=new Set(storedKeys),seen=new Set(),missing=[];
+ let present=0;
+ for(const row of rows){
+  const key=row?.source_key;
+  if(typeof key!=="string"||!key||seen.has(key))throw Error("invalid_or_duplicate_source_key");
+  seen.add(key);
+  if(known.has(key))present++;
+  else missing.push(row);
+ }
+ const selected=missing.slice(0,batchSize);
+ const progress=present+selected.length;
+ return {selected,progress,remaining_eligible:missing.length-selected.length,
+  finished:progress===rows.length};
+}
