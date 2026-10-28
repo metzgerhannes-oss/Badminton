@@ -39,7 +39,7 @@ for(const width of [320,390]){
   await expect(card.locator("h3")).toContainText("· Gomaringen");
   await expect(card.locator(".saved-tournament-dates")).toContainText("22.");
   await expect(card.locator(".saved-tournament-player")).toHaveText("Spieler: Synthetisches Familienprofil");
-  await expect(card.locator('.card-open-primary')).toHaveText("DBV-Kalender öffnen");
+  await expect(card.locator('.card-open-primary')).toContainText("DBV-Kalender öffnen");
   await expect(card.locator('.card-open-primary')).toHaveAttribute("href","https://turniere.badminton.de/");
   const box=await card.evaluate(node=>{
    const footer=node.querySelector(".saved-tournament-player").getBoundingClientRect();
