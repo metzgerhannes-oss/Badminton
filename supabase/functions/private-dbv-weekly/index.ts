@@ -2,7 +2,7 @@
 // Never invoked by GitHub Actions. The scheduler is not deployed or enabled
 // until operator/source permissions #17/#56 are independently proven.
 import {unzipSync} from "npm:fflate@0.8.2";
-import {officialPublication,buildWeeklyPayload,importDecision,officialXlsxCandidates} from "./model.mjs";
+import {officialPublication,buildWeeklyPayload,importDecision,selectOfficialArchive} from "./model.mjs";
 
 import {parseOfficialXlsxXml} from "./xlsx.mjs";
 import {fetchOfficialBytes,DbvTransportError} from "./transport.mjs";
@@ -90,23 +90,23 @@ function parseXlsx(bytes:Uint8Array):any[] {
     return parseOfficialXlsxXml(files);
   }catch{throw new ImportError("xlsx_invalid");}
 }
-// A one-attempt, two-endpoint fallback only for transient source delivery faults.
-// Both URLs belong to DBV and must represent the SAME independently validated
-// publication week. HTTP 401/403/429 are terminal; do not bypass restrictions.
-async function fetchCurrentOfficialRows(publication:{year:number,week:number}):Promise<any[]> {
- // Archive metadata is a separate official publication gate. A page stamp
- // alone must NEVER be used to construct a speculative XLSX URL.
- const archiveHtml=new TextDecoder("utf-8",{fatal:true}).decode(
+// Archive entries, not the timestamp on /ranking, define the actual file week.
+async function readArchiveSelection(pagePublication:{year:number,week:number}) {
+ const html=new TextDecoder("utf-8",{fatal:true}).decode(
    await source(ARCHIVE,"text/html",MAX_PAGE,15000));
- let candidates:string[];
- try{candidates=officialXlsxCandidates(publication,archiveHtml);}
+ let selected;
+ try{selected=selectOfficialArchive(html,pagePublication);}
  catch{throw new ImportError("publication_invalid");}
  console.info("private-dbv-archive",JSON.stringify({
-   requestedYear:publication.year,requestedWeek:publication.week,
-   listed:candidates.length===1
+   pageYear:pagePublication.year,pageWeek:pagePublication.week,
+   selectedYear:selected?.year??null,selectedWeek:selected?.week??null,
+   listed:!!selected
  }));
- if(candidates.length!==1)throw new ImportError("source_unavailable");
- const bytes=await source(candidates[0],
+ if(!selected)throw new ImportError("source_unavailable");
+ return selected;
+}
+async function fetchSelectedOfficialRows(selection:{downloadUrl:string}):Promise<any[]> {
+ const bytes=await source(selection.downloadUrl,
    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",MAX_XLSX,35000);
  return parseXlsx(bytes);
 }
@@ -127,17 +127,18 @@ Deno.serve(async (req:Request)=>{
       await source(PAGE,"text/html",MAX_PAGE,15000));
     let publication;
     try{publication=officialPublication(html);}catch{throw new ImportError("publication_invalid");}
+    const selected=await readArchiveSelection(publication);
     let decision;
-    try{decision=importDecision(claim.latest,publication);}
+    try{decision=importDecision(claim.latest,selected);}
     catch{throw new ImportError("publication_invalid");}
     if(decision==="unchanged") {
       await dbRpc("finish_private_dbv_weekly",{
         p_attempt_id:claim.attemptId,p_code:"unchanged"});
-      return response(200,{ok:true,code:"unchanged",year:publication.year,week:publication.week});
+      return response(200,{ok:true,code:"unchanged",year:selected.year,week:selected.week});
     }
-    const rows=await fetchCurrentOfficialRows(publication);
+    const rows=await fetchSelectedOfficialRows(selected);
     let payload;
-    try{payload=buildWeeklyPayload(rows,publication);}
+    try{payload=buildWeeklyPayload(rows,selected);}
     catch{throw new ImportError("coverage_invalid");}
     const saved=await dbRpc("ingest_private_dbv_weekly",{
       p_attempt_id:claim.attemptId,p_year:payload.year,p_week:payload.week,
