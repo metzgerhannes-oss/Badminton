@@ -22,8 +22,13 @@ assert.match(sql,/FOR SELECT TO authenticated USING \(\(SELECT public\.app_acces
 assert.match(sql,/IF public\.app_access_is_member\(\) IS DISTINCT FROM true THEN RETURN; END IF;/);
 assert.match(sql,/REVOKE EXECUTE ON FUNCTION public\.search_dbv_player_identity\(text,text,text,text\) FROM PUBLIC, anon;/);
 assert.doesNotMatch(sql,/app_access_invite_accept[^\n]*(?:REVOKE|DROP)/i);
-assert.match(rollback,/EMERGENCY ROLLBACK \(restores former PUBLIC READ exposure\)/);
-assert.match(rollback,/GRANT SELECT ON [^;]+ TO anon,authenticated;/);
+// The cutover is already live. A historical emergency script must never
+// restore anonymous access, even if somebody executes it manually.
+assert.match(rollback,/public-read rollback permanently disabled/i);
+assert.match(rollback,/RAISE EXCEPTION/);
+assert.doesNotMatch(rollback,/\bGRANT\s+(?:SELECT|EXECUTE)\b/i);
+assert.doesNotMatch(rollback,/\bCREATE\s+POLICY\b/i);
+assert.doesNotMatch(rollback,/\bDROP\s+POLICY\b/i);
 assert.match(client,/member\?\.allowed!==true/);
 assert.match(client,/Authorization:"Bearer "\+sessionToken/);
 assert.doesNotMatch(client,/const protectedRoute=/);
