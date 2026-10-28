@@ -199,7 +199,7 @@ export function selectOfficialArchive(historyHtml,pagePublication) {
      const m=/^Ranking_(20\d{2})_KW(\d{2})\.xlsx$/.exec(filename);
      if(!m)continue;
      const year=Number(m[1]),week=Number(m[2]);
-     if(week<1||week>53||year>pagePublication.year||
+     if(year<2026||year>2100||week<1||week>53||year>pagePublication.year||
        (year===pagePublication.year&&week>pagePublication.week))continue;
      const urls=officialXlsxCandidates({year,week},row);
      if(urls.length===1)found.set(String(year)+"-"+String(week).padStart(2,"0"),urls[0]);
