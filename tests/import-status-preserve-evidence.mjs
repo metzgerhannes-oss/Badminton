@@ -24,7 +24,7 @@ assert.match(edge,/https:\/\/schmetterlinge-familie\.pages\.dev/);
 assert.match(edge,/origin&&ALLOWED_ORIGINS\.has\(origin\)/);
 assert.match(edge,/if\(origin&&!ALLOWED_ORIGINS\.has\(origin\)\)/);
 assert.doesNotMatch(edge,/console\.error\([^\n]*,id,/);
-assert.match(edge,/remaining_eligible:Math\.max\(0,all\.length-progress\)/,
+assert.match(edge,/remaining_eligible:batch\.remaining_eligible/,
  "Cursor counts accepted, individually verified cards, not raw source cards");
 // Synthetic source has 10 raw cards, 7 individually verified, 3 excluded.
 // At verified cursor 5 there are 2 eligible cards left, NOT 5 missing matches.
