@@ -46,7 +46,8 @@ test("archive link must actually be listed with the same week, never synthesized
 
 test("KW44 page selects real KW43 XLSX without inventing a KW43 publication timestamp",()=>{
  const row=w=>'<tr><td>Ranking_2026_KW'+w+'.xlsx</td><td><a href="/uploads/ranking/Ranking_2026_KW'+w+'.xlsx">download</a></td></tr>';
- const archive='<table>'+row("43")+row("42")+'</table>';
+ const archive='<table>'+row("43")+row("42")+
+   '<tr><td>Ranking_2025_KW52.xlsx</td><td><a href="/uploads/ranking/Ranking_2025_KW52.xlsx">download</a></td></tr></table>';
  const selected=selectOfficialArchive(archive,{year:2026,week:44,publishedAt:"2026-10-28T10:45:00.000Z"});
  assert.deepEqual([selected.year,selected.week,selected.publishedAt],[2026,43,null]);
  assert.equal(selected.downloadUrl,"https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW43.xlsx");
