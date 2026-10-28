@@ -207,10 +207,14 @@ assert.match(cron,/private\.continue_external_match_import/);
 assert.match(fn,/parsePublicHistory/);
 assert.match(fn,/claim_external_match_import/);
 assert.match(fn,/on_conflict=dbv_id,source_key/);
-assert.match(fn,/all\.filter\(m=>m\.outcome_evidence==="badhub-bold-dash"\)/,
- "An old cursor must not skip newly recognized unscored results");
-assert.match(fn,/const toStore=new Map\(selected\.concat\(scoreless\)/,
- "Scoreless backfill must deduplicate against ordinary cursor batches");
+assert.match(fn,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/,
+ "Fresh source-key reconciliation must include newly recognized unscored evidence");
+assert.match(fn,/const written=batch\.selected/,
+ "Scoreless and scored evidence share the same 120-row quota");
+assert.match(fn,/const scoreless=written\.filter\(row=>row\.outcome_evidence==="badhub-bold-dash"\)/,
+ "Scoreless evidence is counted only from the bounded selected batch");
+assert.doesNotMatch(fn,/selected\.concat\(scoreless\)/,
+ "Old unbounded scoreless append must not be restored");
 assert.match(fn,/written\.slice\(i,i\+25\)/,
  "Backfill persists in the same bounded idempotent batches");
 assert.match(fn,/src=.+saison=all/);
