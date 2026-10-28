@@ -5,6 +5,7 @@ import {unzipSync} from "npm:fflate@0.8.2";
 import {officialPublication,buildWeeklyPayload,importDecision,officialXlsxCandidates} from "./model.mjs";
 
 import {parseOfficialXlsxXml} from "./xlsx.mjs";
+import {fetchOfficialBytes,DbvTransportError} from "./transport.mjs";
 
 const PROJECT="yadexibmjmnjfmfabrug";
 const ROOT="https://"+PROJECT+".supabase.co";
@@ -52,36 +53,18 @@ async function dbRpc(name:string,args:Record<string,unknown>):Promise<any> {
   if(!r.ok)throw new ImportError("database_error");
   try{return await r.json();}catch{throw new ImportError("database_error");}
 }
-async function readLimited(res:Response,max:number):Promise<Uint8Array> {
-  if(!res.body)throw new ImportError("source_unavailable");
-  const claimed=Number(res.headers.get("content-length")||0);
-  if(claimed>max)throw new ImportError("source_unavailable");
-  const reader=res.body.getReader(),chunks:Uint8Array[]=[];
-  let length=0;
-  while(true){
-    const {done,value}=await reader.read();
-    if(done)break;
-    length+=value.byteLength;
-    if(length>max){await reader.cancel();throw new ImportError("source_unavailable");}
-    chunks.push(value);
-  }
-  const bytes=new Uint8Array(length);
-  let offset=0;
-  for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
-  return bytes;
-}
+// Never include URLs, headers, player IDs, or payload bytes in logs.
+// The DBV response may be valid from a browser but empty to Edge; these
+// aggregate diagnostics distinguish redirects, network faults and 0 bytes.
 async function source(url:string,accept:string,max:number,timeout:number):Promise<Uint8Array> {
-  let r:Response;
-  try {
-    r=await fetch(url,{redirect:"error",headers:{"accept":accept,
-      "user-agent":"Schmetterlinge-Private-Ranking/2.0 (rights-approved-only)"},
-      signal:AbortSignal.timeout(timeout)});
-  }catch{throw new ImportError("source_unavailable");}
-  if(r.status===401||r.status===403)throw new ImportError("source_forbidden");
-  if(r.status===429)throw new ImportError("source_throttled");
-  if(r.status!==200||new URL(r.url).hostname!=="turniere.badminton.de")
-    throw new ImportError("source_unavailable");
-  return readLimited(r,max);
+ const phase=url===PAGE?"publication":"xlsx";
+ try{
+  return await fetchOfficialBytes(url,{accept,maxBytes:max,timeoutMs:timeout,
+   report:detail=>console.info("private-dbv-source",JSON.stringify({phase,...detail}))});
+ }catch(error){
+  if(error instanceof DbvTransportError)throw new ImportError(error.code);
+  throw new ImportError("source_unavailable");
+ }
 }
 function parseXlsx(bytes:Uint8Array):any[] {
   if(bytes.length===0)throw new ImportError("source_unavailable");
