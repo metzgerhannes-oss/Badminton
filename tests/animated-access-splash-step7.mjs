@@ -13,6 +13,8 @@ assert.match(html,/class="app-access-shuttle"[^>]+src="\.\/assets\/shuttlecock-s
 assert.match(html,/class="brand"[\s\S]*?src="\.\/assets\/spvgg-schmetterlinge\.svg"/);
 assert.match(html,/<p id="app-access-status" role="status" aria-live="polite"><\/p>/);
 assert.match(html,/id="app-access-retry"[^>]+hidden>Zugang erneut prüfen<\/button>/);
+assert.match(html,/Die Anmeldung per E-Mail-Code erfolgt über Cloudflare/);
+assert.doesNotMatch(html,/Keine E-Mail-Adresse und kein Passwort erforderlich/);
 assert.match(css,/#app-access-retry\[hidden\] \{ display:none!important; \}/);
 assert.match(js,/retry\?\.addEventListener\("click"/);
 assert.match(css,/html\[data-app-access="checking"\] \.app-access-panel \{display:none!important\}/);
