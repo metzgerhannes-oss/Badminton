@@ -4,7 +4,7 @@ const [html,legacy,components,design,shell,cache,manifest,app]=await Promise.all
  "index.html","styles.css","ui-components.css","design-v2.css","app-shell.css","sw.js","manifest.webmanifest","app.js"
 ].map(path=>readFile(path,"utf8")));
 const href=[...html.matchAll(/<link rel="stylesheet" href="\.\/([^"]+)"/g)].map(m=>m[1]);
-assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","teams.css","club-roster.css","private-sharing.css","settings-rooms.css","onboarding-wizard.css","spiele.css","home-v137.css","desktop-dashboard.css","club-overview.css","follow-ux.css","ux-polish.css","desktop-shell-v172.css","desktop-tournament-v173.css","desktop-workspace-v176.css","pwa-update.css","today-in-action.css","accessibility-v182.css","canonical-follows-v183.css","contrast-v189.css"],
+assert.deepEqual(href,["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-access.css","app-shell.css","teams.css","club-roster.css","private-sharing.css","settings-rooms.css","onboarding-wizard.css","spiele.css","home-v137.css","desktop-dashboard.css","club-overview.css","follow-ux.css","ux-polish.css","desktop-shell-v172.css","desktop-tournament-v173.css","desktop-workspace-v176.css","pwa-update.css","today-in-action.css","accessibility-v182.css","canonical-follows-v183.css","contrast-v189.css"],
  "Approved Home cascade must remain intact, with non-Home contrast layer last");
 assert.match(await readFile("spiele.css","utf8"),/\.arcade-shell\{/,"Arcade styles must remain scoped to the secondary screen");
 const tabs=[...html.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]);
