@@ -41,8 +41,12 @@ jobs:
   mobile-browser:
     needs: classify
     if: needs.classify.outputs.tier != 'none'
-    name: Mobile UX · Chromium and WebKit
+    name: Mobile UX · ${{ matrix.project }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [small-chromium, mobile-webkit]
     # Official image includes matching Chromium/WebKit and system libraries.
     # Avoid repeated 20-minute APT mirror stalls on hosted runners.
     container:
@@ -62,16 +66,16 @@ jobs:
         run: node tests/browser-qa-supabase-isolation.mjs
       - name: Complete offline Chromium and WebKit regression (R2/daily)
         if: needs.classify.outputs.tier == 'full'
-        run: npm run test:mobile
+        run: npm run test:mobile -- --project=${{ matrix.project }}
       - name: Targeted Chromium and WebKit smoke (R1)
         if: needs.classify.outputs.tier == 'smoke'
         run: |
-          npx playwright test tests/e2e/release-gate.spec.mjs tests/e2e/invite-only-access.spec.mjs tests/e2e/wiki.spec.mjs --grep "Compact iPhone layout and dialog buttons remain operable|without an accepted invitation the app shell stays hidden|Wiki: all 61 diagram dialogs fit 320px" --workers=2 --retries=0 --reporter=line
+          npx playwright test tests/e2e/release-gate.spec.mjs tests/e2e/invite-only-access.spec.mjs tests/e2e/wiki.spec.mjs --grep "Compact iPhone layout and dialog buttons remain operable|without an accepted invitation the app shell stays hidden|Wiki: all 61 diagram dialogs fit 320px" --project=${{ matrix.project }} --workers=2 --retries=0 --reporter=line
       - name: Preserve failing screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mobile-browser-diagnostics
+          name: mobile-browser-diagnostics-${{ matrix.project }}
           path: |
             playwright-report/
             test-results/
