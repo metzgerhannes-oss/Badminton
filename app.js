@@ -45,7 +45,25 @@ function routeTo(page){
  if(!navigatePrimary(page,{returnToOwn:false}))
   SchmetterlingeRouter.routeTo(state,page,render);
 }
-function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
+function focusSavedTournamentFromHash(){
+ const match=location.hash.match(/^#turniere\/([^/]+)\/([^/]+)$/);
+ if(!match||state.page!=="turniere")return;
+ let id,player;
+ try{id=decodeURIComponent(match[1]);player=decodeURIComponent(match[2])}catch{return}
+ const card=[...document.querySelectorAll("#official-tournament-list [data-saved-tournament-id]")]
+  .find(node=>node.dataset.savedTournamentId===id&&node.dataset.savedTournamentPlayer===player);
+ if(!card)return;
+ card.setAttribute("tabindex","-1");
+ card.focus({preventScroll:true});
+ card.scrollIntoView({behavior:"auto",block:"start"});
+}
+function focusCurrentView(){
+ SchmetterlingeRouter.focusCurrentView(state);
+ // The router restores scroll on its next frame. Focus the exact bookmarked
+ // card afterwards, including when a Home deep link is reopened on iOS PWA.
+ if(location.hash.startsWith("#turniere/"))
+  requestAnimationFrame(()=>requestAnimationFrame(focusSavedTournamentFromHash));
+}
 /** Native-feeling primary navigation: source of truth is the tapped destination,
  * not a deferred hashchange from installed WebKit. The four stable mobile tabs and the desktop club link use
  * the same route. This does not touch stored players, friends or invitations.
@@ -109,12 +127,23 @@ function renderTournaments(){
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
   const planning=t.source==="bwbv-framework";
   const calendar=t.source==="dbv-calendar"||planning;
-  const venue=t.place?"Austragungsort: "+t.place:"Austragungsort nicht erfasst";
+  const venue=String(t.place||"").trim();
+  const name=String(t.name||"").trim();
+  const heading=venue&&!name.toLocaleLowerCase("de").includes(venue.toLocaleLowerCase("de"))?name+" · "+venue:name;
+  const missingVenue=venue?"":'<p class="saved-tournament-venue">Austragungsort nicht erfasst</p>';
+  // Calendar keys and turnier.de UUIDs are different identities. Only an
+  // exact official calendar key with a source-backed event URL gets a direct link.
+  const sourceLinks=t.source==="dbv-calendar"?verifiedCalendarRows.filter(row=>
+   row.key===t.id&&row.hasDirectLink===true&&typeof row.url==="string"&&
+   /^https:\/\/(?:turniere\.badminton\.de|dbv\.turnier\.de)\//.test(row.url)):[];
+  const directSource=sourceLinks.length===1?sourceLinks[0].url:"";
+  const destination=directSource||t.url;
+  const sourceLabel=planning?"Terminquelle ↗":directSource||!calendar?"Offizielle Turnierseite ↗":"DBV-Kalender öffnen ↗";
   const deadline=t.deadline?'<p class="saved-tournament-deadline">Meldeschluss: '+esc(niceDay(t.deadline))+'</p>':"";
   const discrepancy=tournamentSourceConflicts.get(t.id+"|"+t.playerId);
   const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+'. DBV-Spieltag: '+esc(niceDay(discrepancy.officialDate))+(
    discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+'. Angaben prüfen.</p>':"";
-  return '<article class="tournament-card card-open-surface"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p>'+deadline+sourceNote+'<p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  return '<article class="tournament-card card-open-surface" data-saved-tournament-id="'+esc(t.id)+'" data-saved-tournament-player="'+esc(t.playerId)+'"><div class="saved-tournament-top"><h3>'+esc(heading)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p class="saved-tournament-dates">'+esc(dates)+'</p>'+missingVenue+deadline+sourceNote+'<p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(destination)+'" rel="noopener noreferrer" target="_blank">'+sourceLabel+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div><p class="saved-tournament-player">Spieler: '+esc(profile)+'</p></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
