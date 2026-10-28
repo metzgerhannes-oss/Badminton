@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {reconcileMatchBatch} from "../supabase/functions/history-match-import/source-availability.mjs";
+import {reconcileMatchBatch,selectUnstoredScoreless} from "../supabase/functions/history-match-import/source-availability.mjs";
 const cards=["new","old-1","old-2","old-3"].map(source_key=>({source_key}));
 const before=["old-1","old-2","old-3"];
 const first=reconcileMatchBatch(cards,before,2);
@@ -21,10 +21,22 @@ assert.equal(shortened.remaining_eligible,0);
 assert.equal(shortened.progress,2);
 assert.throws(()=>reconcileMatchBatch([cards[0],cards[0]],[]),/duplicate/);
 assert.throws(()=>reconcileMatchBatch(cards,[],121),/invalid/);
+const scorelessCards=[
+ {source_key:"old-dash",outcome_evidence:"badhub-bold-dash"},
+ {source_key:"new-dash",outcome_evidence:"badhub-bold-dash"},
+ {source_key:"normal",outcome_evidence:"score"},
+ {source_key:"new-dash-2",outcome_evidence:"badhub-bold-dash"}
+];
+assert.deepEqual(selectUnstoredScoreless(scorelessCards,new Set(["old-dash"])).map(x=>x.source_key),
+ ["new-dash","new-dash-2"],"Known scoreless facts must not be rewritten or counted as new");
+assert.deepEqual(selectUnstoredScoreless(scorelessCards,new Set(["old-dash","new-dash","new-dash-2"])),[],
+ "Repeated on-demand import must produce no redundant scoreless upserts");
+assert.throws(()=>selectUnstoredScoreless(scorelessCards,null),/invalid/);
 const edge=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 assert.match(edge,/if\(!\(await isInvitedMember\(req\)\)\)/,"Membership gate remains mandatory");
 assert.match(edge,/const storedKeys=await readStoredSourceKeys\(id\)/);
 assert.match(edge,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/);
+assert.match(edge,/const scoreless=selectUnstoredScoreless\(all,storedKeys\)/);
 assert.doesNotMatch(edge,/all\.slice\(start,start\+120\)/,"Old cursor must not skip reordered source matches");
 assert.match(edge,/on_conflict=dbv_id,source_key/,"Upserts remain idempotent");
 console.log("Synthetic source-key reconciliation, reorder backfill, pagination guard and auth gate verified.");
