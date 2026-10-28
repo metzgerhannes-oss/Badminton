@@ -63,7 +63,7 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(trajectory.length).toBeGreaterThanOrEqual(5);
  expect(trajectory[0].x).toBeGreaterThan(140);
  expect(trajectory[0].y).toBeLessThan(-150);
- expect(trajectory.some(({x,y})=>x>110&&y>=-30&&y<=60)).toBe(true);
+ expect(trajectory.some(({x,y})=>x>=80&&x<=100&&y>=-30&&y<=60)).toBe(true);
  expect(trajectory.at(-1).x).toBeLessThan(50);
  expect(trajectory.at(-1).y).toBeGreaterThan(140);
 
@@ -79,13 +79,14 @@ test("checking uses original club logo and animated shuttle without visible text
   const frame=img.getBoundingClientRect();
   const info={visibleWidth:Math.max(0,Math.min(frame.right,innerWidth)-Math.max(frame.left,0)),
    clearsBadge:frame.left>=badge.right-2, badgeRight:badge.right,
-   viewport:innerWidth,stageWidth:stage.width};
+   viewport:innerWidth,stageWidth:stage.width,visibleRight:frame.right};
   animation.play();
   return info;
  });
  expect(earlyFlight).not.toBeNull();
  expect(earlyFlight.viewport).toBe(320);
- expect(earlyFlight.visibleWidth).toBeGreaterThan(38);
+ expect(earlyFlight.visibleWidth).toBeGreaterThan(55);
+ expect(earlyFlight.visibleRight).toBeLessThanOrEqual(324);
  expect(earlyFlight.clearsBadge).toBe(true);
 
  // Preserve reproducible 320px Chromium AND iPhone-WebKit visual evidence.
