@@ -22,6 +22,9 @@ html:not([data-app-access="granted"]) dialog { display:none !important; }
 #app-access-paste[hidden]{display:none!important}
 #app-access-paste:focus-visible{outline:3px solid #086ca7;outline-offset:2px}
 #app-access-status { min-height:2.6em; }
+#app-access-retry { display:block; width:100%; min-height:44px; margin-top:8px; padding:11px 14px; color:#174b75; background:#eef7ff; border:1px solid #8bb4cd; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer; }
+#app-access-retry[hidden] { display:none!important; }
+#app-access-retry:focus-visible { outline:3px solid #086ca7; outline-offset:2px; }
 
 
 /* U7 / #286: only the actual access check has a graphic splash.
