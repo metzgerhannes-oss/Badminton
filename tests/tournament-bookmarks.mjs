@@ -127,4 +127,40 @@ assert.equal(bookmarks.hasTournamentToday({...state,players:[{id:"05-070879"}],o
 assert.deepEqual(owned.map(p=>p.id),["future","past","today","unknown","other"],
  "Sorting must not mutate saved local bookmark order");
 assert.doesNotMatch(source,/\bfetch\s*\(|XMLHttpRequest|localStorage|service_role|supabaseUrl/i);
+
+const appSource=await readFile("app.js","utf8");
+const prefillStart=appSource.indexOf("function prefillVerifiedTournamentForm(form){");
+const prefillEnd=appSource.indexOf("\nfunction openTournamentForm(",prefillStart);
+assert.ok(prefillStart>=0&&prefillEnd>prefillStart,"Verified tournament form helper must exist");
+function testPrefill(rows,link){
+ const note={hidden:true,textContent:""};
+ const values={url:link,playerId:"05-070879",name:"3. E-RLT Gomaringen",
+  startDate:"2026-11-15",endDate:"2026-11-15",place:"",deadline:""};
+ const fields=Object.fromEntries(Object.entries(values).map(([key,value])=>[key,{value}]));
+ const form={values,elements:{namedItem:key=>fields[key]||null}};
+ class MockFormData{constructor(source){this.source=source}get(key){return this.source.values[key]||""}}
+ const scope=vm.createContext({el:key=>key==="tournament-official-source"?note:null,
+  FormData:MockFormData,parseDbvTournamentLink:bookmarks.parseDbvTournamentLink,
+  normalizeBookmark:bookmarks.normalizeBookmark,SchmetterlingeBookmarks:bookmarks,
+  verifiedCalendarRows:rows});
+ vm.runInContext(appSource.slice(prefillStart,prefillEnd),scope);
+ scope.prefillVerifiedTournamentForm(form);
+ return {note,fields};
+}
+const noCalendarPrefill=testPrefill([],url);
+assert.equal(noCalendarPrefill.note.hidden,false,"Unavailable official data must not silently look verified");
+assert.match(noCalendarPrefill.note.textContent,/nicht verfügbar.*ungeprüft/);
+assert.equal(noCalendarPrefill.fields.startDate.value,"2026-11-15","Unverified form must not change the date");
+const otherUuid="CCCCCCCC-1111-4222-8333-444444444444";
+const wrongIdentityPrefill=testPrefill([{...officialRow,url:"https://dbv.turnier.de/tournament/"+otherUuid}],url);
+assert.equal(wrongIdentityPrefill.note.hidden,false,"Unmatched UUID needs explicit feedback");
+assert.match(wrongIdentityPrefill.note.textContent,/nicht eindeutig bestätigt.*ungeprüft/);
+assert.equal(wrongIdentityPrefill.fields.place.value,"","Wrong UUID must never inject a venue");
+const matchedPrefill=testPrefill([officialRow],url);
+assert.equal(matchedPrefill.note.hidden,false);
+assert.match(matchedPrefill.note.textContent,/Spieltag.*Meldeschluss/);
+assert.equal(matchedPrefill.fields.startDate.value,"2026-11-22","Only verified UUID corrects the game date");
+assert.equal(matchedPrefill.fields.deadline.value,"2026-11-15","Registration deadline stays separate");
+assert.equal(testPrefill([officialRow],"https://invalid.example/").note.hidden,true);
+
 console.log("Tournament bookmarks v61: official URL, strict calendar dates, Berlin day, own/friend boundaries and stable sort verified.");

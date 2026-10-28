@@ -555,12 +555,21 @@ function prefillVerifiedTournamentForm(form){
  note.hidden=true;note.textContent="";
  const data=new FormData(form);
  const parsed=parseDbvTournamentLink(data.get("url"));
- if(!parsed||!verifiedCalendarRows.length)return;
+ if(!parsed)return;
+ if(!verifiedCalendarRows.length){
+  note.textContent="DBV-Abgleich derzeit nicht verfügbar. Angaben bleiben lokal und ungeprüft.";
+  note.hidden=false;
+  return;
+ }
  const draft=normalizeBookmark({url:parsed.url,playerId:String(data.get("playerId")||"all"),
   name:data.get("name"),startDate:data.get("startDate"),endDate:data.get("endDate"),
   place:data.get("place"),deadline:data.get("deadline")});
  const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(draft,verifiedCalendarRows);
- if(result.status!=="matched")return;
+ if(result.status!=="matched"){
+  note.textContent="Turnier-ID in den geladenen DBV-Daten nicht eindeutig bestätigt. Angaben bleiben lokal und ungeprüft.";
+  note.hidden=false;
+  return;
+ }
  let corrected=0;
  for(const key of ["name","startDate","endDate","place","deadline"]){
   const field=form.elements.namedItem(key),value=result.updated?.[key];
