@@ -156,6 +156,11 @@ const wrongIdentityPrefill=testPrefill([{...officialRow,url:"https://dbv.turnier
 assert.equal(wrongIdentityPrefill.note.hidden,false,"Unmatched UUID needs explicit feedback");
 assert.match(wrongIdentityPrefill.note.textContent,/nicht eindeutig bestätigt.*ungeprüft/);
 assert.equal(wrongIdentityPrefill.fields.place.value,"","Wrong UUID must never inject a venue");
+const genericCalendarPrefill=testPrefill([{...officialRow,url:"https://turniere.badminton.de/",hasDirectLink:false}],url);
+assert.match(genericCalendarPrefill.note.textContent,/nicht eindeutig bestätigt.*ungeprüft/,
+ "A generic DBV calendar landing page is not proof of a tournament UUID");
+assert.equal(genericCalendarPrefill.fields.startDate.value,"2026-11-15",
+ "Unverified calendar landing pages must not silently overwrite the event date");
 const matchedPrefill=testPrefill([officialRow],url);
 assert.equal(matchedPrefill.note.hidden,false);
 assert.match(matchedPrefill.note.textContent,/Spieltag.*Meldeschluss/);
