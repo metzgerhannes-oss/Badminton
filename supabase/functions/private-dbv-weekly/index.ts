@@ -2,22 +2,13 @@
 // Never invoked by GitHub Actions. The scheduler is not deployed or enabled
 // until operator/source permissions #17/#56 are independently proven.
 import {unzipSync} from "npm:fflate@0.8.2";
-import {officialPublication,buildWeeklyPayload,importDecision} from "./model.mjs";
+import {officialPublication,buildWeeklyPayload,importDecision,officialXlsxCandidates} from "./model.mjs";
 
 import {parseOfficialXlsxXml} from "./xlsx.mjs";
 
 const PROJECT="yadexibmjmnjfmfabrug";
 const ROOT="https://"+PROJECT+".supabase.co";
 const PAGE="https://turniere.badminton.de/ranking";
-function officialXlsxUrl(year:number,week:number):string {
-  // Deterministic official archive file naming scheme. Current year/week
-  // MUST first be independently verified against the ranking publication stamp.
-  if(!Number.isInteger(year)||year<2026||year>2100||
-     !Number.isInteger(week)||week<1||week>53)
-     throw new ImportError("publication_invalid");
-  const file="Ranking_"+String(year)+"_KW"+String(week).padStart(2,"0")+".xlsx";
-  return "https://turniere.badminton.de/uploads/ranking/"+file;
-}
 const MAX_PAGE=5_000_000,MAX_XLSX=12_000_000,MAX_UNZIPPED=65_000_000;
 const codes=new Set(["source_forbidden","source_throttled","source_unavailable",
   "publication_invalid","xlsx_invalid","coverage_invalid","database_error","internal_error"]);
@@ -115,6 +106,26 @@ function parseXlsx(bytes:Uint8Array):any[] {
     return parseOfficialXlsxXml(files);
   }catch{throw new ImportError("xlsx_invalid");}
 }
+// A one-attempt, two-endpoint fallback only for transient source delivery faults.
+// Both URLs belong to DBV and must represent the SAME independently validated
+// publication week. HTTP 401/403/429 are terminal; do not bypass restrictions.
+async function fetchCurrentOfficialRows(publication:{year:number,week:number}):Promise<any[]> {
+ let last:ImportError|null=null;
+ for(const url of officialXlsxCandidates(publication)) {
+  try{
+   const bytes=await source(url,
+     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",MAX_XLSX,35000);
+   return parseXlsx(bytes);
+  }catch(error){
+   if(!(error instanceof ImportError))throw error;
+   if(error.code==="source_forbidden"||error.code==="source_throttled")throw error;
+   if(error.code!=="source_unavailable"&&error.code!=="xlsx_invalid")throw error;
+   last=error;
+  }
+ }
+ throw last||new ImportError("source_unavailable");
+}
+
 Deno.serve(async (req:Request)=>{
   if(req.method!=="POST")return response(405,{ok:false,code:"method_not_allowed"});
   if(!await authorized(req))return response(403,{ok:false,code:"not_authorized"});
@@ -139,10 +150,7 @@ Deno.serve(async (req:Request)=>{
         p_attempt_id:claim.attemptId,p_code:"unchanged"});
       return response(200,{ok:true,code:"unchanged",year:publication.year,week:publication.week});
     }
-    const xlsxUrl=officialXlsxUrl(publication.year,publication.week);
-    const bytes=await source(xlsxUrl,
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",MAX_XLSX,35000);
-    const rows=parseXlsx(bytes);
+    const rows=await fetchCurrentOfficialRows(publication);
     let payload;
     try{payload=buildWeeklyPayload(rows,publication);}
     catch{throw new ImportError("coverage_invalid");}
