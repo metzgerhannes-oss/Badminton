@@ -32,11 +32,25 @@ assert.deepEqual(selectUnstoredScoreless(scorelessCards,new Set(["old-dash"])).m
 assert.deepEqual(selectUnstoredScoreless(scorelessCards,new Set(["old-dash","new-dash","new-dash-2"])),[],
  "Repeated on-demand import must produce no redundant scoreless upserts");
 assert.throws(()=>selectUnstoredScoreless(scorelessCards,null),/invalid/);
+// A 120-card batch must never write 120 regular cards PLUS unbounded scoreless.
+const large=[...Array.from({length:125},(_,i)=>({source_key:`normal-${i}`})),
+ ...Array.from({length:8},(_,i)=>({source_key:`dash-${i}`,outcome_evidence:"badhub-bold-dash"}))];
+const priority=reconcileMatchBatch(large,[],120);
+assert.equal(priority.selected.length,120,"Quota applies to all evidence combined");
+assert.deepEqual(priority.selected.slice(0,8).map(x=>x.source_key),
+ Array.from({length:8},(_,i)=>`dash-${i}`),"New scoreless cards take priority");
+assert.equal(priority.remaining_eligible,13,"Remaining reflects actual unpersisted keys");
+assert.equal(priority.progress,120);
+assert.equal(priority.finished,false);
+const after=reconcileMatchBatch(large,priority.selected.map(x=>x.source_key),120);
+assert.equal(after.selected.length,13);
+assert.equal(after.remaining_eligible,0);
+assert.equal(after.finished,true);
 const edge=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 assert.match(edge,/if\(!\(await isInvitedMember\(req\)\)\)/,"Membership gate remains mandatory");
 assert.match(edge,/const storedKeys=await readStoredSourceKeys\(id\)/);
 assert.match(edge,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/);
-assert.match(edge,/const scoreless=selectUnstoredScoreless\(all,storedKeys\)/);
+assert.match(edge,/const scoreless=written\.filter\(row=>row\.outcome_evidence===\"badhub-bold-dash\"\)/);
 assert.doesNotMatch(edge,/all\.slice\(start,start\+120\)/,"Old cursor must not skip reordered source matches");
 assert.match(edge,/on_conflict=dbv_id,source_key/,"Upserts remain idempotent");
 console.log("Synthetic source-key reconciliation, reorder backfill, pagination guard and auth gate verified.");
