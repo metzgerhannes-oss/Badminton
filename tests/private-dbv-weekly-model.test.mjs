@@ -3,7 +3,7 @@ import {webcrypto} from "node:crypto";
 import {readFileSync} from "node:fs";
 import {tokenMatches} from "../supabase/functions/private-dbv-weekly/auth.mjs";
 import assert from "node:assert/strict";
-import {officialPublication,buildWeeklyPayload,importDecision} from "../scripts/private-dbv-weekly-model.mjs";
+import {officialPublication,buildWeeklyPayload,importDecision,officialXlsxCandidates} from "../scripts/private-dbv-weekly-model.mjs";
 import {parseOfficialXlsxXml} from "../supabase/functions/private-dbv-weekly/xlsx.mjs";
 const stamp={year:2026,week:43,publishedAt:"2026-10-21T09:30:00.000Z"};
 function rows(n=5001) {
@@ -21,6 +21,20 @@ test("official Berlin publication stamp is authoritative and DST-safe",()=>{
   assert.throws(()=>officialPublication("Rangliste KW 43",Date.UTC(2026,9,27)),/stamp_missing/);
   assert.throws(()=>officialPublication(page,Date.UTC(2026,9,19)),/out_of_range/);
 });
+test("only existing same-host official XLSX URLs are candidates for verified current week",()=>{
+ const candidates=officialXlsxCandidates(stamp);
+ assert.deepEqual(candidates,[
+  "https://turniere.badminton.de/uploads/ranking/Ranking_2026_KW43.xlsx",
+  "https://turniere.badminton.de/ranking/download"
+ ]);
+ assert.throws(()=>officialXlsxCandidates({year:2026,week:0}),/publication_invalid/);
+ assert.throws(()=>officialXlsxCandidates({year:2026,week:54}),/publication_invalid/);
+ const edge=readFileSync(new URL("../supabase/functions/private-dbv-weekly/index.ts",import.meta.url),"utf8");
+ assert.match(edge,/fetchCurrentOfficialRows\(publication\)/);
+ assert.match(edge,/error\.code==="source_forbidden"\|\|error\.code==="source_throttled"\)throw error/);
+ assert.doesNotMatch(edge,/fetch\(.*(?:bing|google|archive\.org)/i);
+});
+
 test("full synthetic ranking, deterministic identity and discipline totals",()=>{
   const payload=buildWeeklyPayload(rows(),stamp);
   assert.equal(payload.total,5001);
