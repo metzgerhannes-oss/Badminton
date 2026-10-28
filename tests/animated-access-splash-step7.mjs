@@ -35,7 +35,7 @@ const flightPoints=[...flightFrames.matchAll(/translate3d\((-?\d+)px,(-?\d+)px,0
  .map(([,x,y])=>({x:Number(x),y:Number(y)}));
 assert.ok(flightPoints.length>=5,"Flight needs segmented trajectory");
 assert.ok(flightPoints[0].x>140&&flightPoints[0].y< -150,"Enter from upper right, not beside the badge");
-assert.ok(flightPoints.some(({x,y})=>x>110&&y>=-30&&y<=60),"Travel past emblem's right edge");
+assert.ok(flightPoints.some(({x,y})=>x>=80&&x<=100&&y>=-30&&y<=60),"Travel past emblem's right edge");
 assert.ok(flightPoints.at(-1).x<50&&flightPoints.at(-1).y>140,"Exit below emblem");
 
 assert.match(css,/2\.5s linear infinite both/);
