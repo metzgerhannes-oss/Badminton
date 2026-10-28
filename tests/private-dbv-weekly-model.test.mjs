@@ -85,12 +85,17 @@ test("private cron token uses bounded constant-time digest, not public credentia
   assert.equal(await tokenMatches("short","short",webcrypto),false);
   assert.equal(await tokenMatches(secret,"",webcrypto),false);
 });
-test("scheduler remains disabled without source rights and never restores GitHub publish",()=>{
+test("private scheduler still requires Vault and database authorization and never restores GitHub publish",()=>{
   const workflow=readFileSync(new URL("../.github/workflows/private-dbv-directory.yml",import.meta.url),"utf8");
   const edge=readFileSync(new URL("../supabase/functions/private-dbv-weekly/index.ts",import.meta.url),"utf8");
   const sql=readFileSync(new URL("../supabase/migrations/20261027141000_private_dbv_weekly_scheduler_guard.sql",import.meta.url),"utf8");
   assert.doesNotMatch(workflow,/id-token:\s*write|\bpublish:\s*\n|secrets\./);
-  assert.match(edge,/DBV_SOURCE_RIGHTS_APPROVED/);
+  assert.match(edge,/authorized\(req\)/,"Authorization gate is before any scheduler claim");
+  assert.match(edge,/authorize_private_dbv_weekly/,"The token is checked by a server-only DB RPC");
+  assert.match(edge,/claim_private_dbv_weekly/,"Database backoff is checked before source download");
+  assert.match(edge,/source_forbidden/);
+  assert.match(edge,/source_throttled/);
+  assert.match(edge,/fetchCurrentOfficialRows/);
   assert.match(edge,/claim_private_dbv_weekly/);
   assert.match(sql,/enabled boolean NOT NULL DEFAULT false/);
   assert.doesNotMatch(sql,/cron\.schedule\s*\(/);
