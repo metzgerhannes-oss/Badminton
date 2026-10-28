@@ -23,6 +23,7 @@ assert.match(html,/html:not\(\[data-app-access="checking"\]\) #app-access-splash
 assert.match(css,/html\[data-app-access="checking"\] #app-access-splash\s*\{/,"Checking state must style visible splash");
 assert.doesNotMatch(css,/html:not\(\[data-app-access="checking"\]\)\s*#app-access-splash\s*\{/,"Splash must not style only hidden state");
 assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
+assert.match(css,/@media \(max-width:350px\)\s*\{[\s\S]*?\.app-access-splash-emblem \{width:70%\}[\s\S]*?\.app-access-shuttle \{width:52px\}/, "320px shuttle and badge must both fit without overlap");
 assert.match(css,/mix-blend-mode:multiply/);
 assert.match(css,/@keyframes app-access-shuttle-flight/);
 
