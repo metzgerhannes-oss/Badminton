@@ -1,5 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,importStatusForBatch,missingSourceStatus,reconcileMatchBatch} from "./source-availability.mjs";
+import {assessSourceAvailability,importStatusForBatch,missingSourceStatus,reconcileMatchBatch,selectUnstoredScoreless} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
@@ -175,7 +175,7 @@ Deno.serve(async req=>{
   // A newly recognized scoreless result may sort BEFORE the old cursor.
   // Explicitly backfill just those independently evidenced outcomes, with
   // source-key deduplication. Never reset a large player's ordinary cursor.
-  const scoreless=all.filter(m=>m.outcome_evidence==="badhub-bold-dash");
+  const scoreless=selectUnstoredScoreless(all,storedKeys);
   if(scoreless.length>120)throw Error("Unexpected scoreless source cardinality");
   const toStore=new Map(selected.concat(scoreless).map(row=>[row.source_key,row]));
   const written=[...toStore.values()];
