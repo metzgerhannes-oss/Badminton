@@ -205,6 +205,7 @@ jobs:
           node tests/storage-budget-guard.mjs
           node tests/external-match-consistency.mjs
           node tests/import-status-preserve-evidence.mjs
+          node tests/history-source-key-reconcile.mjs
           node tests/match-availability.mjs
           node tests/design-v2.mjs
            node tests/app-shell.mjs
