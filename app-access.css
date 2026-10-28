@@ -84,6 +84,14 @@ html[data-app-access="checking"] #app-access-splash {
  .app-access-splash-emblem {width:70%}
  .app-access-shuttle {width:52px}
 }
+/* Keep the moving feather clear of the club crest at intermediate iPhone sizes.
+   A desktop-sized, rotated shuttle cannot share the narrow space beside the emblem. */
+@media (min-width:351px) and (max-width:430px) {
+ .app-access-shuttle {width:46px;left:calc(50% + 28px)}
+}
+@media (min-width:431px) {
+ .app-access-shuttle {left:calc(50% + 29px)}
+}
 .app-access-visually-hidden {
  position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;
  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
