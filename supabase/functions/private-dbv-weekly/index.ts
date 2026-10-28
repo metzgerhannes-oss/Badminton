@@ -23,8 +23,7 @@ const codes=new Set(["source_forbidden","source_throttled","source_unavailable",
   "publication_invalid","xlsx_invalid","coverage_invalid","database_error","internal_error"]);
 class ImportError extends Error {
   code:string;
-  diagnostic?:string;
-  constructor(code:string,diagnostic?:string){super(code);this.code=code;this.diagnostic=diagnostic;}
+  constructor(code:string){super(code);this.code=code;}
 }
 const response=(status:number,body:Record<string,unknown>)=>Response.json(body,{
   status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}
@@ -94,8 +93,9 @@ async function source(url:string,accept:string,max:number,timeout:number):Promis
   return readLimited(r,max);
 }
 function parseXlsx(bytes:Uint8Array):any[] {
+  if(bytes.length===0)throw new ImportError("source_unavailable");
   if(bytes.length<100||bytes[0]!==0x50||bytes[1]!==0x4b)
-    throw new ImportError("xlsx_invalid","not_zip_or_short:"+bytes.length+":"+Array.from(bytes.slice(0,4)).map(x=>x.toString(16).padStart(2,"0")).join(""));
+    throw new ImportError("xlsx_invalid");
   let files:Record<string,Uint8Array>;
   try {
     // Reject ZIP bombs from central-directory metadata BEFORE inflation.
@@ -113,18 +113,7 @@ function parseXlsx(bytes:Uint8Array):any[] {
     if(Object.values(files).reduce((n,b)=>n+b.byteLength,0)>MAX_UNZIPPED)
       throw Error("xlsx_inflated_limit");
     return parseOfficialXlsxXml(files);
-  }catch(error){
-    // Aggregate-only format diagnostics. No player rows, names, file content,
-    // headers, token or match metadata is ever logged.
-    console.error("private_dbv_xlsx_validation",{
-      size:bytes.byteLength,
-      zip_signature:bytes[0]===0x50&&bytes[1]===0x4b,
-      reason:error instanceof Error?error.message.slice(0,72):"unknown"
-    });
-    throw new ImportError("xlsx_invalid",
-      "zip="+bytes.length+":sig="+String(bytes[0])+","+String(bytes[1])+":reason="+
-      (error instanceof Error?error.message.slice(0,72):"unknown"));
-  }
+  }catch{throw new ImportError("xlsx_invalid");}
 }
 Deno.serve(async (req:Request)=>{
   if(req.method!=="POST")return response(405,{ok:false,code:"method_not_allowed"});
@@ -174,7 +163,6 @@ Deno.serve(async (req:Request)=>{
       try{await dbRpc("finish_private_dbv_weekly",{
         p_attempt_id:claim.attemptId,p_code:code});}catch{/* preserve original failure */}
     }
-    return response(503,{ok:false,code,
-      diagnostic: (code==="xlsx_invalid"||code==="publication_invalid") && error instanceof ImportError?error.diagnostic:undefined});
+    return response(503,{ok:false,code});
   }
 });
