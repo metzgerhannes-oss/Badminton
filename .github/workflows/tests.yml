@@ -71,6 +71,8 @@ jobs:
           node --check tests/import-health-signal-v224.mjs
           node --check tests/storage-budget-guard.mjs
           node --check supabase/functions/history-match-import/source-availability.mjs
+          node --check scripts/private-dbv-weekly-model.mjs
+          node --check supabase/functions/private-dbv-weekly/transport.mjs
           node --check tests/import-status-preserve-evidence.mjs
           node --check scripts/match-availability.mjs
           node --check friend-search.js
@@ -208,6 +210,7 @@ jobs:
           node tests/external-match-consistency.mjs
           node tests/import-status-preserve-evidence.mjs
           node tests/history-source-key-reconcile.mjs
+          node --test tests/private-dbv-weekly-model.test.mjs tests/private-dbv-weekly-transport.test.mjs
           node tests/match-availability.mjs
           node tests/design-v2.mjs
            node tests/app-shell.mjs
