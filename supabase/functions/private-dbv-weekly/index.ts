@@ -15,7 +15,8 @@ const codes=new Set(["source_forbidden","source_throttled","source_unavailable",
   "publication_invalid","xlsx_invalid","coverage_invalid","database_error","internal_error"]);
 class ImportError extends Error {
   code:string;
-  constructor(code:string){super(code);this.code=code;}
+  diagnostic?:string;
+  constructor(code:string,diagnostic?:string){super(code);this.code=code;this.diagnostic=diagnostic;}
 }
 const response=(status:number,body:Record<string,unknown>)=>Response.json(body,{
   status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}
@@ -86,7 +87,7 @@ async function source(url:string,accept:string,max:number,timeout:number):Promis
 }
 function parseXlsx(bytes:Uint8Array):any[] {
   if(bytes.length<100||bytes[0]!==0x50||bytes[1]!==0x4b)
-    throw new ImportError("xlsx_invalid");
+    throw new ImportError("xlsx_invalid","not_zip_or_short:"+bytes.length+":"+Array.from(bytes.slice(0,4)).map(x=>x.toString(16).padStart(2,"0")).join(""));
   let files:Record<string,Uint8Array>;
   try {
     // Reject ZIP bombs from central-directory metadata BEFORE inflation.
@@ -112,7 +113,9 @@ function parseXlsx(bytes:Uint8Array):any[] {
       zip_signature:bytes[0]===0x50&&bytes[1]===0x4b,
       reason:error instanceof Error?error.message.slice(0,72):"unknown"
     });
-    throw new ImportError("xlsx_invalid");
+    throw new ImportError("xlsx_invalid",
+      "zip="+bytes.length+":sig="+String(bytes[0])+","+String(bytes[1])+":reason="+
+      (error instanceof Error?error.message.slice(0,72):"unknown"));
   }
 }
 Deno.serve(async (req:Request)=>{
@@ -162,6 +165,7 @@ Deno.serve(async (req:Request)=>{
       try{await dbRpc("finish_private_dbv_weekly",{
         p_attempt_id:claim.attemptId,p_code:code});}catch{/* preserve original failure */}
     }
-    return response(503,{ok:false,code});
+    return response(503,{ok:false,code,
+      diagnostic: code==="xlsx_invalid" && error instanceof ImportError?error.diagnostic:undefined});
   }
 });
