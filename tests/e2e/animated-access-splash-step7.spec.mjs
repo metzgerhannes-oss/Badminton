@@ -152,6 +152,11 @@ for(const width of [351,390,430]){
    await page.setViewportSize({width,height:780});
    await page.goto("/",{waitUntil:"commit"});
    await expect(page.locator("#app-access-splash")).toBeVisible();
+   // waitUntil:commit can race the stylesheet download on cold WebKit.
+   // Do not weaken the position assertions; measure only after CSS is loaded.
+   await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
+   await expect.poll(()=>page.locator(".app-access-shuttle").evaluate(img=>
+    img.getAnimations().some(a=>a.effect?.getKeyframes)),{timeout:10000}).toBe(true);
    const frame=await page.locator(".app-access-shuttle").evaluate(img=>{
     const a=img.getAnimations().find(a=>a.effect?.getKeyframes);
     if(!a)return null;
