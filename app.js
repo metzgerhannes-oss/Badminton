@@ -568,7 +568,10 @@ function prefillVerifiedTournamentForm(form){
    field.value=value;corrected++;
   }
  }
- note.textContent=corrected?"Offizielle DBV-Turnierdaten übernommen.":"DBV-Turnierdaten stimmen überein.";
+ const fields=SchmetterlingeBookmarks.describeOfficialChanges(draft,result.updated);
+ note.textContent=corrected
+  ?"DBV-Quelle bestätigt: "+fields.join(", ")+" korrigiert. Spieltag und Meldeschluss sind getrennte Daten."
+  :"DBV-Turnierdaten stimmen überein.";
  note.hidden=false;
 }
 function openTournamentForm(item=null){

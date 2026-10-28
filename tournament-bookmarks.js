@@ -101,6 +101,14 @@ var SchmetterlingeBookmarks=(function(){
   return {status:"matched",sourceCorrected:Object.keys(patch).length>0,
    updated:Object.keys(patch).length?{...bookmark,...patch}:bookmark};
  }
+ // Explain only fields changed by a uniquely verified official DBV identity.
+ // This is presentation metadata; never log player names or private links.
+ function describeOfficialChanges(before,after){
+  const labels={name:"Titel/Kategorie",startDate:"Spieltag",endDate:"Turnierende",
+   place:"Austragungsort",deadline:"Meldeschluss"};
+  return Object.keys(labels).filter(key=>String(after?.[key]||"")&&
+   String(before?.[key]||"")!==String(after[key])).map(key=>labels[key]);
+ }
  function localDay(date=new Date()){
   const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
   const values=Object.fromEntries(parts.filter(p=>["year","month","day"].includes(p.type)).map(p=>[p.type,p.value]));
@@ -134,5 +142,5 @@ var SchmetterlingeBookmarks=(function(){
     a.name.localeCompare(b.name,"de");
   });
  }
- return Object.freeze({parseDbvTournamentLink,normalizeBookmark,reconcileOfficialMetadata,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
+ return Object.freeze({parseDbvTournamentLink,normalizeBookmark,reconcileOfficialMetadata,describeOfficialChanges,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
 })();
