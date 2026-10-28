@@ -26,7 +26,12 @@ const original=await readFile("scripts/badhub-history-parser.mjs","utf8");
 assert.equal(parser,original,"Deployed parser must match the audited source parser");
 assert.match(fn,/Promise\.allSettled\(/);
 assert.match(fn,/parsePublicHistory\(html,profiles\[0\],category\)/);
-assert.match(fn,/const start=sources\.missing\.length\?0/);
+assert.match(fn,/const storedKeys=await readStoredSourceKeys\(id\)/,
+ "Partial upstream failure must still reconcile persisted source keys");
+assert.match(fn,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/,
+ "A stale numeric cursor cannot suppress valid new evidence");
+assert.doesNotMatch(fn,/const start=sources\.missing\.length\?0/,
+ "Old cursor-reset workaround must stay removed");
 assert.match(fn,/status:importStatusForBatch\(finished,excluded,sources\.missing\)/);
 assert.match(fn,/status:missingSourceStatus\(saved\)/,
  "Missing upstream source must preserve existing saved match evidence");
@@ -46,4 +51,4 @@ const deployedIntegrity=await readFile("supabase/functions/history-match-import/
 assert.equal(deployedIntegrity,await readFile("scripts/match-source-integrity.mjs","utf8"),
  "The deployed guard must be the tested guard");
 assert.match(fn,/excludeContradictoryRounds\(\[\.\.\.matches\.values\(\)\]\)/);
-console.log("Match importer: partial source failover, no false completion, safe cursor reset and parser parity.");
+console.log("Match importer: partial source failover, no false completion, source-key reconciliation and parser parity.");
