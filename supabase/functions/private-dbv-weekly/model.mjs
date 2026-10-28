@@ -149,3 +149,20 @@ export function importDecision(latest,publication) {
   }
   return "new";
 }
+
+/**
+ * Two existing endpoints on the same official DBV host. Only a date-stamped,
+ * independently confirmed newer week may reach either endpoint.
+ * Never guess another week, third-party mirror, redirect or player-data API.
+ */
+export function officialXlsxCandidates(publication){
+ const year=publication?.year,week=publication?.week;
+ if(!Number.isInteger(year)||year<2026||year>2100||
+    !Number.isInteger(week)||week<1||week>53)
+   throw Error("publication_invalid");
+ const file="Ranking_"+year+"_KW"+String(week).padStart(2,"0")+".xlsx";
+ return [
+  "https://turniere.badminton.de/uploads/ranking/"+file,
+  "https://turniere.badminton.de/ranking/download"
+ ];
+}
