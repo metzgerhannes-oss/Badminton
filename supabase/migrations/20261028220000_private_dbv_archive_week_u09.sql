@@ -166,7 +166,7 @@ BEGIN
     'clubs_inserted',inserted_clubs,'rankings_imported',rank_count
   );
 END
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.ingest_private_dbv_weekly(p_attempt_id uuid, p_year integer, p_week integer, p_total integer, p_players jsonb, p_source_published_at timestamp with time zone)
@@ -271,7 +271,7 @@ BEGIN
     updated_at=now() WHERE id=1;
   RETURN v_result || pg_catalog.jsonb_build_object('publishedAt',p_source_published_at,'idempotent',false);
 END
-$function$
+$function$;
 
 
 -- Privileges must stay service_role only (idempotent defense in depth).
