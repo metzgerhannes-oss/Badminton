@@ -153,19 +153,28 @@ test("v221 fast successful cold launch shows intro for 0.8s; warm navigation nev
  await expect(page.locator("#app-access-splash")).toBeHidden();
 });
 
-test("a failed status check shows the actionable error and does not trap the user in animation",async({page})=>{
+test("a failed status check offers a working retry instead of trapping the user in animation",async({page})=>{
  await withExistingSession(page);
+ let recovered=false;
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>
   route.request().method()==="OPTIONS"
    ?route.fulfill({status:204,headers,body:""})
-   :route.fulfill({status:503,headers,body:'{"message":"offline"}'}));
+   :recovered
+    ?route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'})
+    :route.fulfill({status:503,headers,body:'{"message":"offline"}'}));
  await page.goto("/",{waitUntil:"domcontentloaded"});
  await expect(page.locator("html")).toHaveAttribute("data-app-access","denied");
  await expect(page.locator("#app-access-splash")).toBeHidden();
  await expect(page.locator(".app-access-panel")).toBeVisible();
  await expect(page.locator("#app-access-status")).toContainText("Zugangsdienst nicht erreichbar");
  await expect(page.locator("#app-access-code")).toBeVisible();
+ await expect(page.locator("#app-access-retry")).toBeVisible();
  await expect(page.locator("body > .app")).toBeHidden();
+ recovered=true;
+ await page.locator("#app-access-retry").click();
+ await expect(page.locator("#app-access-retry")).toBeHidden();
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("body > .app")).toBeVisible();
 });
 test("reduced motion keeps the shuttle static while a session is being checked",async({page})=>{
  await page.emulateMedia({reducedMotion:"reduce"});
