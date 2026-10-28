@@ -71,14 +71,18 @@ html[data-app-access="checking"] #app-access-splash {
 @keyframes app-access-shuttle-flight {
  0%,6% {opacity:0;transform:translate3d(178px,-205px,0) rotate(29deg) scale(.86)}
  16% {opacity:.96;transform:translate3d(130px,-93px,0) rotate(32deg) scale(.91);animation-timing-function:cubic-bezier(.2,.4,.57,.9)}
- 32% {opacity:1;transform:translate3d(66px,-6px,0) rotate(28deg) scale(.96);animation-timing-function:cubic-bezier(.22,.45,.65,.95)}
+ 32% {opacity:1;transform:translate3d(83px,-6px,0) rotate(28deg) scale(.96);animation-timing-function:cubic-bezier(.22,.45,.65,.95)}
  48% {opacity:1;transform:translate3d(92px,57px,0) rotate(31deg) scale(1);animation-timing-function:cubic-bezier(.26,.46,.71,.96)}
  67% {opacity:.98;transform:translate3d(72px,112px,0) rotate(26deg) scale(.99);animation-timing-function:cubic-bezier(.3,.52,.76,.98)}
  82% {opacity:.66;transform:translate3d(58px,144px,0) rotate(21deg) scale(.94)}
  93%,100% {opacity:0;transform:translate3d(22px,172px,0) rotate(18deg) scale(.9)}
 }
 @media (max-width:350px) {
- .app-access-shuttle {width:68px}
+ /* A large rotated shuttle cannot fit beside the 84% badge on a 320px screen.
+    Keep the original logo centered, but make room for the shuttle to fly fully
+    inside the viewport without crossing the emblem. */
+ .app-access-splash-emblem {width:70%}
+ .app-access-shuttle {width:52px}
 }
 .app-access-visually-hidden {
  position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;
