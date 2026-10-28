@@ -12,6 +12,9 @@ assert.match(html,/id="app-access-splash"[\s\S]*?assets\/spvgg-schmetterlinge-sp
 assert.match(html,/class="app-access-shuttle"[^>]+src="\.\/assets\/shuttlecock-splash\.svg"/);
 assert.match(html,/class="brand"[\s\S]*?src="\.\/assets\/spvgg-schmetterlinge\.svg"/);
 assert.match(html,/<p id="app-access-status" role="status" aria-live="polite"><\/p>/);
+assert.match(html,/id="app-access-retry"[^>]+hidden>Zugang erneut prüfen<\/button>/);
+assert.match(css,/#app-access-retry\[hidden\] \{ display:none!important; \}/);
+assert.match(js,/retry\?\.addEventListener\("click"/);
 assert.match(css,/html\[data-app-access="checking"\] \.app-access-panel \{display:none!important\}/);
 assert.match(html,/html:not\(\[data-app-access="checking"\]\) #app-access-splash\{display:none!important\}/,
  "Critical inline CSS prevents the splash persisting after access resolves");
