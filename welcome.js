@@ -212,11 +212,19 @@ async function verifyWelcomeFamilyMember(signal){
  });
  if(!response.ok)return false;
  const result=await response.json().catch(()=>null);
+ // A successful reply belongs only to the session that made the request.
+ // Logging out or switching accounts while the RPC is pending must not grant
+ // the new session access based on the previous session's membership.
+ const currentSession=await getPrivateSession(false);
  if(signal?.aborted||checkId!==verifyWelcomeFamilyMember.latestCheckId||
-    result?.allowed!==true)return false;
+    result?.allowed!==true||currentSession?.access_token!==session.access_token)return false;
+ const verifiedToken=session.access_token;
  window.badmintonAppAccess=Object.freeze({
   allowed:true,
-  async getAccessToken(){return (await getPrivateSession(false))?.access_token||null;}
+  async getAccessToken(){
+   const latest=await getPrivateSession(false);
+   return latest?.access_token===verifiedToken?verifiedToken:null;
+  }
  });
  return true;
 }
