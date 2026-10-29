@@ -79,4 +79,28 @@ assert.equal(window.badmintonAppAccess.allowed,false);
  finishCanceled({allowed:true});
  assert.equal(await canceled,false);
  assert.equal(window.badmintonAppAccess.allowed,false);
-console.log("Welcome membership recheck: stale capability removed on revoked, 403, network or logout.");
+
+ // An in-flight positive response from an old login cannot grant a new login.
+ session={access_token:"synthetic-family-token"};
+ let finishSwitched, switchedReady;
+ const switchedStarted=new Promise(resolve=>{switchedReady=resolve});
+ context.fetch=async()=>({ok:true,json:async()=>{
+  switchedReady();
+  return new Promise(resolve=>{finishSwitched=resolve});
+ }});
+ const switchedCheck=context.verify();
+ await switchedStarted;
+ session={access_token:"synthetic-switched-session"};
+ finishSwitched({allowed:true});
+ assert.equal(await switchedCheck,false,"Old membership must not authorize a switched session");
+ assert.equal(window.badmintonAppAccess.allowed,false);
+
+ // A previously verified capability must not hand out a later account's token.
+ session={access_token:"synthetic-family-token"};
+ context.fetch=async()=>({ok:true,json:async()=>({allowed:true})});
+ assert.equal(await context.verify(),true);
+ session={access_token:"synthetic-switched-session"};
+ assert.equal(await window.badmintonAppAccess.getAccessToken(),null);
+ session=null;
+ assert.equal(await window.badmintonAppAccess.getAccessToken(),null);
+console.log("Welcome membership recheck: revoked, switched, aborted or stale sessions fail closed.");
