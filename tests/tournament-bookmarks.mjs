@@ -187,7 +187,7 @@ for(const key of ["id","url","source","name","playerId","startDate","endDate","d
 assert.equal(bookmarks.updateLocalCalendarVenue(typed,"").place,"",
  "User may clear an incorrect manually entered venue");
 assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"X".repeat(121)),null);
-assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"Broken\\nLocation"),null);
+assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"Broken\nLocation"),null);
 assert.equal(bookmarks.updateLocalCalendarVenue(bookmarks.normalizeBookmark({
  url,playerId:"99-000001",name:"Direct UUID"}),"Wrong venue"),null,
  "A verified turnier.de link must use its existing full editor");
