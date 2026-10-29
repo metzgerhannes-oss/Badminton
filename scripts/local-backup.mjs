@@ -62,7 +62,8 @@ function bookmark(row,owns){
  if(!record(row))fail("Ungültiger Turnierfavorit");
  const raw=text(row.url,1200,"Turnierlink",true);
  const playerId=text(row.playerId||"all",80,"Turnierspieler");
- if(playerId!=="all"&&!owns.has(playerId))fail("Turnier verweist auf unbekannten Spieler");
+ if((playerId==="all"&&!owns.size)||(playerId!=="all"&&!owns.has(playerId)))
+  fail("Turnier verweist auf unbekannten Spieler");
  const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
  if(startDate&&endDate&&endDate<startDate)fail("Turnierende vor Turnierbeginn");
  const place=text(row.place,120,"Austragungsort");
