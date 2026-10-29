@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {readPublicRows,PublicReadError,SUPABASE_ROOT} from "../scripts/supabase-read.mjs";
+import {readPublicRows,readMatchImportProgress,PublicReadError,SUPABASE_ROOT} from "../scripts/supabase-read.mjs";
 const query="players?select=dbv_id,name&limit=40&offset=0";
 const oldWindow=globalThis.window;
 let deniedCalls=0;
@@ -157,6 +157,61 @@ try{
 }finally{
  if(previousWindow===undefined)delete globalThis.window;
  else globalThis.window=previousWindow;
+}
+
+// P0 #417: coverage RPC responses are also session-scoped, not only REST GETs.
+const originalFetch=globalThis.fetch;
+try{
+ const syntheticId="99-999999";
+ let calls=0;
+ globalThis.window={badmintonAppAccess:{allowed:false,getAccessToken:async()=>null}};
+ globalThis.fetch=async()=>{calls++;throw Error("denied coverage must not fetch")};
+ assert.equal(await readMatchImportProgress(syntheticId),null);
+ assert.equal(calls,0,"Denied coverage makes no request");
+
+ let token="synthetic-coverage-member";
+ const member={allowed:true,getAccessToken:async()=>token};
+ globalThis.window={badmintonAppAccess:member};
+ let release,started;
+ const bodyStarted=new Promise(resolve=>{started=resolve});
+ globalThis.fetch=async(url,options)=>{
+  calls++;
+  assert.equal(url,SUPABASE_ROOT+"rpc/app_access_player_coverage");
+  assert.equal(options.headers.Authorization,"Bearer synthetic-coverage-member");
+  return {ok:true,json:()=>new Promise(resolve=>{release=resolve;started()})};
+ };
+ const stale=readMatchImportProgress(syntheticId);
+ await bodyStarted;
+ token="synthetic-switched-member";
+ release({dbv_id:syntheticId,import_status:"complete",match_cards:3,birth_year:2000});
+ assert.equal(await stale,null,"Old-session coverage is not disclosed after token switch");
+
+ const verified={allowed:true,getAccessToken:async()=> "synthetic-coverage-member"};
+ globalThis.window={badmintonAppAccess:verified};
+ globalThis.fetch=async()=>({ok:true,json:async()=>({
+  dbv_id:syntheticId,import_status:"partial",match_cards:7,birth_year:2000
+ })});
+ assert.deepEqual(await readMatchImportProgress(syntheticId),{
+  status:"partial",verified_count:7,last_finished_at:null,birth_year:2000
+ },"Verified member can read matching coverage");
+
+ globalThis.fetch=async()=>({ok:true,json:async()=>{
+  globalThis.window.badmintonAppAccess={allowed:false,getAccessToken:async()=>null};
+  return {dbv_id:syntheticId,import_status:"complete",match_cards:8};
+ }});
+ assert.equal(await readMatchImportProgress(syntheticId),null,
+  "Replacing capability while parsing the RPC response suppresses coverage");
+
+ globalThis.window={badmintonAppAccess:verified};
+ const coverageAbort=new AbortController();
+ globalThis.fetch=async()=>({ok:true,json:async()=>{
+  coverageAbort.abort();
+  return {dbv_id:syntheticId,import_status:"complete",match_cards:9};
+ }});
+ assert.equal(await readMatchImportProgress(syntheticId,{signal:coverageAbort.signal}),null,
+  "Aborted coverage never reaches the UI");
+}finally{
+ globalThis.fetch=originalFetch;
 }
 
 if(oldWindow===undefined)delete globalThis.window;
