@@ -74,7 +74,7 @@ export function assessMatchCardCoverage(parsed){
   throw Error("invalid_source_coverage_input");
  const knownUnplayed=["confirmed_bye_rast","marked_walkover",
   "marked_retirement","marked_disqualification"];
- let sourceCards=0,parsedCards=0,documentedUnplayed=0;
+ let sourceCards=0,parsedCards=0,documentedUnplayed=0,sourceCoverageOk=true;
  const identities=new Set();
  for(const result of parsed){
   if(!Number.isSafeInteger(result?.cards_seen)||result.cards_seen<0||
@@ -90,21 +90,32 @@ export function assessMatchCardCoverage(parsed){
     throw Error("invalid_source_coverage_identity");
    identities.add(row.source_key);
   }
+  let sourceUnplayed=0;
   for(const kind of knownUnplayed){
-   const n=result.rejection_reasons[kind]||0;
+   const n=result.rejection_reasons[kind]??0;
    if(!Number.isSafeInteger(n)||n<0)throw Error("invalid_source_coverage_reason");
-   documentedUnplayed+=n;
-   if(!Number.isSafeInteger(documentedUnplayed))
+   sourceUnplayed+=n;
+   if(!Number.isSafeInteger(sourceUnplayed))
     throw Error("invalid_source_coverage_reason");
   }
+  // Never allow exclusions from one source to mask parser drift in another.
+  if(result.items.length>result.cards_seen||
+     sourceUnplayed>result.cards_seen-result.items.length)
+   throw Error("invalid_source_coverage_count");
+  const sourceIdentities=new Set(result.items.map(row=>row.source_key));
+  const sourcePotential=result.cards_seen-sourceUnplayed;
+  if(sourceIdentities.size<Math.floor(sourcePotential*0.55))
+   sourceCoverageOk=false;
+  documentedUnplayed+=sourceUnplayed;
+  if(!Number.isSafeInteger(documentedUnplayed))
+   throw Error("invalid_source_coverage_reason");
  }
  if(parsedCards>sourceCards)throw Error("invalid_source_coverage_count");
- // Never subtract documented exclusions beyond the actually unparsed cards.
- const nonplayed=Math.min(documentedUnplayed,sourceCards-parsedCards);
+ const nonplayed=documentedUnplayed;
  const potentialPlayed=sourceCards-nonplayed;
- // The old 55% anti-layout-drift floor applies to potentially played
- // cards. Entire-event quarantine is separate and remains in force.
+ // The old 55% floor applies independently to each available source;
+ // an intact league parser cannot conceal a broken tournament parser.
  const required=Math.floor(potentialPlayed*0.55);
- return {acceptable:identities.size>=required,sourceCards,
+ return {acceptable:sourceCoverageOk&&identities.size>=required,sourceCards,
   parsedCards:identities.size,nonplayed,potentialPlayed,required};
 }
