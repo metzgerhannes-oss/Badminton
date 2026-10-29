@@ -33,4 +33,17 @@ assert.equal(raw-eligible,excluded);
 assert.equal(Math.max(0,eligible-cursor),2);
 assert.notEqual(raw-cursor,Math.max(0,eligible-cursor));
 
+// #199/#417: the Edge runtime may disable platform JWT verification only
+// because it validates a current member JWT itself. Enforce the order in the
+// actual request handler: deny first, then service-role lease, then sources.
+// Static offline regression: never calls Supabase or any external provider.
+const requestHandler=edge.slice(edge.indexOf("Deno.serve("));
+const membershipGate=requestHandler.indexOf("if(!(await isInvitedMember(req)))");
+const importClaim=requestHandler.indexOf("rpc/claim_external_match_import");
+const upstreamFetch=requestHandler.indexOf('source(id,"turnier"');
+assert.ok(membershipGate>=0&&importClaim>membershipGate&&upstreamFetch>importClaim,
+ "Auth must precede service-role import claims and all upstream requests");
+assert.match(requestHandler,/if\(!claim\?\.accepted\)return respond\(200,/,
+ "A rejected lease must return before external source requests");
+
 console.log("P0: verified persisted matches survive an empty personal source profile.");
