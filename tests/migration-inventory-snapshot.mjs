@@ -3,6 +3,12 @@ import {readFile,readdir} from "node:fs/promises";
 import {auditMigrationInventory,auditLegacySqlCandidates,auditRegisteredSourceCoverage} from "../scripts/audit-migration-inventory.mjs";
 
 const snapshot=JSON.parse(await readFile(new URL("../docs/supabase-migrations-registered-20261029.json",import.meta.url),"utf8"));
+// Snapshot contains SQL fingerprints only; never fetches production data in CI.
+assert.ok(snapshot.registered.every(x=>/^[a-f0-9]{64}$/.test(x.statement_sha256) &&
+ Number.isSafeInteger(x.statement_bytes) && x.statement_bytes>0 &&
+ x.statement_count===1),"Every registered migration has a stable stored-SQL fingerprint");
+assert.equal(new Set(snapshot.registered.map(x=>x.version)).size,78,
+ "Fingerprint manifest must have unique registered versions");
 const files=(await readdir(new URL("../supabase/migrations/",import.meta.url)))
  .filter(name=>name.endsWith(".sql"));
 assert.equal(snapshot.registered.length,78,
