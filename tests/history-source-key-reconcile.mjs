@@ -111,6 +111,16 @@ assert.equal(assessMatchCardCoverage(coverage(100,30,
  {confirmed_bye_rast:70,unclassified_card:30})).nonplayed,70);
 assert.equal(assessMatchCardCoverage(coverage(20,20)).acceptable,true,
  "The parser gate must evaluate original parsed cards, not later KO-quarantined matches");
+const independentSources=[coverage(100,20)[0],coverage(200,200)[0]];
+assert.equal(assessMatchCardCoverage(independentSources).acceptable,false,
+ "A healthy league source must not conceal tournament parser layout drift");
+assert.throws(()=>assessMatchCardCoverage(coverage(100,30,
+ {confirmed_bye_rast:71})),/invalid_source_coverage_count/,
+ "Nonplayed reasons may never exceed the cards actually excluded");
+assert.equal(assessMatchCardCoverage([
+ coverage(100,30,{confirmed_bye_rast:45})[0],
+ coverage(200,150,{marked_walkover:20})[0]
+]).acceptable,true,"Two independently healthy source categories remain accepted");
 assert.throws(()=>assessMatchCardCoverage(coverage(10,11)),/invalid_source_coverage_count/);
 assert.throws(()=>assessMatchCardCoverage(coverage(10,3,
  {confirmed_bye_rast:-1})),/invalid_source_coverage_reason/);
