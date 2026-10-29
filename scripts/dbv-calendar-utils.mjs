@@ -40,7 +40,7 @@ function safeTournamentEventUrl(value){
   const url=new URL(String(value||""));
   if(url.protocol!=="https:"||url.hostname!=="dbv.turnier.de"||
      url.username||url.password||url.search||url.hash)return "";
-  return /^\\/tournament\\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\/?$/i.test(url.pathname)
+  return new RegExp("^/tournament/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/?$","i").test(url.pathname)
    ?url.href:"";
  }catch{return ""}
 }
