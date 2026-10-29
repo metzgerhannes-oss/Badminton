@@ -32,7 +32,7 @@ const classified=auditMigrationInventory(synthetic,[
  "20261010160000_unknown.sql"
 ]);
 assert.deepEqual([classified.exactVersionAndName,classified.registeredTimestampOnly,
- classified.sourceNameOnly,classified.unmapped],[1,1,1,1]);
+ classified.sourceNameOnly,classified.unmapped.length],[1,1,1,1]);
 assert.equal(classified.registeredVersionsWithoutExactTimestamp,1);
 assert.throws(()=>auditMigrationInventory([synthetic[0],synthetic[0]],[]),
  /invalid_or_duplicate_registered_migration/);
