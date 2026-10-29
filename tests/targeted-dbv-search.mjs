@@ -88,3 +88,6 @@ assert.equal(throttledRequests,1,"Rate limit never triggers public backup file G
 if(oldWindow===undefined)delete globalThis.window;
 else globalThis.window=oldWindow;
 console.log("P0 #417 scoped DBV lookup: guest denied before network, verified family JWT, 12-hit cap and 429 cooldown");
+
+// Run the same isolated revoked/logout welcome membership test in the pre-existing CI suite.
+await import("./welcome-member-recheck.mjs");
