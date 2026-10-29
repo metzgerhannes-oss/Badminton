@@ -93,9 +93,14 @@ function bookmark(row,owns){
 }
 export function normalizeLocalData(data){
  if(!record(data))fail("Kein gültiger Schmetterlinge-Datensatz");
- if(!Array.isArray(data.players)||data.players.length<1||data.players.length>12)
-  fail("Die Sicherung benötigt 1 bis 12 eigene Spieler");
+ if(!Array.isArray(data.players)||data.players.length>12)
+  fail("Maximal 12 eigene Spieler");
  if(!Array.isArray(data.friends)||data.friends.length>30)fail("Maximal 30 gefolgte Spieler");
+ // An invited family member may FOLLOW an accepted player without owning
+ // any profile. Their local follows must be portable between Safari and PWA.
+ // Refuse a completely blank device instead of producing a misleading backup.
+ if(!data.players.length&&!data.friends.length)
+  fail("Keine lokalen Spielerprofile oder gefolgten Spieler zum Sichern");
  if(!Array.isArray(data.officialLinks)||data.officialLinks.length>40)fail("Maximal 40 Turnierfavoriten");
  const players=data.players.map(x=>profile(x,"eigenes"));
  const friends=data.friends.map(x=>profile(x,"Freundes"));
@@ -116,10 +121,16 @@ export function normalizeLocalData(data){
   if(seen.has(key))fail("Doppelter Turnierfavorit");
   seen.add(key);
  }
- const original=text(data.activeProfileId||data.chosen,80,"Aktives Profil",true);
- // Backup ownership is authoritative. Never map a device-local alias to a DBV ID.
- const activeProfileId=original;
- if(!owns.has(activeProfileId))fail("Das aktive Profil ist kein eigenes Spielerprofil");
+ // A followed player is NEVER an owned profile: a follower-only backup
+ // carries an empty Home selection. Its follow list remains intact and does
+ // not implicitly confer any server permission after import.
+ let activeProfileId="";
+ if(players.length){
+  activeProfileId=text(data.activeProfileId||data.chosen,80,"Aktives Profil",true);
+  if(!owns.has(activeProfileId))fail("Das aktive Profil ist kein eigenes Spielerprofil");
+ }else if(data.activeProfileId!==undefined&&data.activeProfileId!==""){
+  fail("Ein gefolgter Spieler darf nicht als eigenes Profil gesichert werden");
+ }
  return {players,friends,officialLinks:links,activeProfileId,
   chosen:activeProfileId,historyProfilesInitialized:true};
 }
@@ -189,6 +200,6 @@ export function inspectLocalBackup(content){
   data,calendarEvents,createdAt:archive.createdAt,
   summary:{players:data.players.length,friends:data.friends.length,
    tournaments:data.officialLinks.length,calendarEvents:calendarEvents?.length??null,
-   activePlayer:data.players.find(x=>x.id===data.activeProfileId)?.name}
+   activePlayer:data.players.find(x=>x.id===data.activeProfileId)?.name||"Kein eigenes Profil"}
  };
 }
