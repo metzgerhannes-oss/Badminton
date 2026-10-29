@@ -37,8 +37,8 @@ assert.match(importMessage({status:"partial",match_cards:235}).detail,/235 gespe
 assert.match(importMessage({status:"error",match_cards:18}).detail,/18 gespeicherte Einzelmatchkarten/);
 assert.doesNotMatch(importMessage({status:"error",match_cards:-1}).detail,/-1 gespeicherte Einzelmatchkarten/);
 assert.doesNotMatch(importMessage({status:"awaiting_source",match_cards:"unknown"}).detail,/unknown/);
-assert.match(importMessage({status:"awaiting_source"}).detail,/historischen Matches/);
-assert.match(importMessage({status:"awaiting_source"}).detail,/Historie bei Bedarf erneut/);
+assert.match(importMessage({status:"awaiting_source"}).detail,/keine neuen eindeutigen Einzelmatches/);
+assert.match(importMessage({status:"awaiting_source"}).detail,/Vorhandene Ranglisten und Turnierergebnisse bleiben sichtbar/);
 assert.doesNotMatch(importMessage({status:"awaiting_source"}).detail,/weiterhin regelmäßig geprüft/);
 assert.equal(retryAfterHours({status:"partial"}),168);
 assert.equal(retryAfterHours({status:"error"}),1);
