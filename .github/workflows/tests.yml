@@ -210,6 +210,7 @@ jobs:
           node tests/external-match-consistency.mjs
           node tests/import-status-preserve-evidence.mjs
           node tests/history-source-key-reconcile.mjs
+          node tests/migration-inventory-snapshot.mjs
           node --test tests/private-dbv-weekly-model.test.mjs tests/private-dbv-weekly-transport.test.mjs
           node tests/match-availability.mjs
           node tests/design-v2.mjs
