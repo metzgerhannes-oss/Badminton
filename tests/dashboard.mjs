@@ -2,10 +2,22 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 const page=await readFile("index.html","utf8");
 const js=await readFile("dashboard.js","utf8");
+const homeCss=await readFile("home-v137.css","utf8");
 const app=await readFile("app.js","utf8");
 const sw=await readFile("sw.js","utf8");
 const snapshot=JSON.parse(await readFile("data/ranking.json","utf8"));
 assert.ok(page.includes('id="view-start"'));
+// P1 iPhone SE: all three short Home links retain accessible touch targets.
+for(const selector of [
+  "#view-start .upcoming-tournaments-header a",
+  "#view-start .home-stats-link",
+  "#view-start .home-trophy-heading a"
+]){
+  const start=homeCss.indexOf(selector+"{");
+  assert.ok(start>=0,selector+" must have a touch-target rule");
+  const rule=homeCss.slice(start,homeCss.indexOf("}",start));
+  assert.ok(rule.includes("min-height:44px"),selector+" must retain 44px");
+}
 assert.ok(page.includes('id="dashboard-rankings"'));
 assert.ok(page.includes('id="dashboard-kpis"'));
 assert.ok(page.includes('id="dashboard-next"'));
