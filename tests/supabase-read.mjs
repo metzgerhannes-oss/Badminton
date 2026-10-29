@@ -24,6 +24,59 @@ assert.equal(last.options.cache,"no-store");
 assert.equal(last.options.headers.Prefer,"count=exact");
 assert.equal(last.options.signal.aborted,false);
 
+
+// P0 #417: a successful HTTP response must not publish old-session rows
+// after a member logs out, switches accounts or loses the current capability.
+function delayedRows(){
+ let release,ready;
+ const started=new Promise(resolve=>{ready=resolve});
+ return {
+  started,release:rows=>release(rows),
+  fetchImpl:async()=>({ok:true,status:200,headers:{get:()=>null},
+   json:()=>new Promise(resolve=>{release=resolve;ready()})})
+ };
+}
+{
+ let token="synthetic-original-member";
+ const capability={allowed:true,getAccessToken:async()=>token};
+ globalThis.window={badmintonAppAccess:capability};
+ const delayed=delayedRows();
+ const pending=readPublicRows(query,{fetchImpl:delayed.fetchImpl,retries:0});
+ await delayed.started;
+ token="synthetic-other-member";
+ delayed.release([result]);
+ await assert.rejects(pending,error=>error instanceof PublicReadError&&
+  error.kind==="restricted"&&error.status===403,
+  "A rotated/account-switched token cannot accept an old HTTP 200 payload");
+}
+{
+ const capability={allowed:true,getAccessToken:async()=>"synthetic-original-member"};
+ globalThis.window={badmintonAppAccess:capability};
+ const delayed=delayedRows();
+ const pending=readPublicRows(query,{fetchImpl:delayed.fetchImpl,retries:0});
+ await delayed.started;
+ globalThis.window.badmintonAppAccess={
+  allowed:false,getAccessToken:async()=>null
+ };
+ delayed.release([result]);
+ await assert.rejects(pending,error=>error instanceof PublicReadError&&
+  error.kind==="restricted"&&error.status===403,
+  "A revoked/replaced member capability cannot accept an old HTTP 200 payload");
+}
+{
+ const capability={allowed:true,getAccessToken:async()=>"synthetic-original-member"};
+ globalThis.window={badmintonAppAccess:capability};
+ const delayed=delayedRows(),controller=new AbortController();
+ const pending=readPublicRows(query,{fetchImpl:delayed.fetchImpl,retries:0,signal:controller.signal});
+ await delayed.started;
+ controller.abort();
+ delayed.release([result]);
+ await assert.rejects(pending,error=>error instanceof PublicReadError&&
+  error.kind==="aborted","Cancellation after HTTP 200 must suppress stale rows");
+}
+globalThis.window={badmintonAppAccess:{allowed:true,
+ getAccessToken:async()=>"synthetic-family-jwt"}};
+
 for(const invalid of ["", "../players?select=*", "https://evil.example/players?select=*",
  "players#fragment","/rest/v1/players?select=*", "players?select=*&x#bad"]){
  await assert.rejects(()=>readPublicRows(invalid,{fetchImpl:success}),error=>
