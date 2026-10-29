@@ -82,7 +82,7 @@ const appSource=await readFile("app.js","utf8");
 const navigationStart=appSource.indexOf("function navigatePrimary(");
 const navigationEnd=appSource.indexOf("\nfunction navigateHome()",navigationStart);
 const nativeStart=appSource.indexOf(' window.addEventListener("hashchange",()=>{');
-const nativeEnd=appSource.indexOf("\n  const playerDialog=",nativeStart);
+const nativeEnd=appSource.indexOf("\n const playerDialog=",nativeStart);
 assert.ok(navigationStart>0&&navigationEnd>navigationStart&&
  nativeStart>navigationEnd&&nativeEnd>nativeStart,"Navigation and native hash handler must be present");
 const callbacks={};const routeCounters={render:0,focus:0,route:0,own:0};
