@@ -28,7 +28,15 @@ assert.match(importStatusPath("05-061350"),/^player_history_imports\?/);
 assert.match(overviewPath("05-061350"),/^player_history_overviews\?/);
 assert.match(importMessage({status:"queued"}).title,/vorgemerkt/);
 assert.match(importMessage({status:"checking"}).title,/geprüft/);
-assert.match(importMessage({status:"partial"}).detail,/Einzelne offizielle DBV-Matches sind noch nicht importiert/);
+assert.match(importMessage({status:"partial"}).detail,/Bereits belegte Spiele bleiben sichtbar/);
+assert.equal(importMessage({status:"complete"}).kind,"complete");
+assert.match(importMessage({status:"complete",match_cards:62}).detail,/62 gespeicherte Einzelmatchkarten/);
+assert.match(importMessage({status:"complete",match_cards:62}).detail,/nicht die Vollständigkeit/);
+assert.doesNotMatch(importMessage({status:"complete",match_cards:0}).detail,/0 gespeicherte Einzelmatchkarten/);
+assert.match(importMessage({status:"partial",match_cards:235}).detail,/235 gespeicherte Einzelmatchkarten/);
+assert.match(importMessage({status:"error",match_cards:18}).detail,/18 gespeicherte Einzelmatchkarten/);
+assert.doesNotMatch(importMessage({status:"error",match_cards:-1}).detail,/-1 gespeicherte Einzelmatchkarten/);
+assert.doesNotMatch(importMessage({status:"awaiting_source",match_cards:"unknown"}).detail,/unknown/);
 assert.match(importMessage({status:"awaiting_source"}).detail,/historischen Matches/);
 assert.match(importMessage({status:"awaiting_source"}).detail,/Historie bei Bedarf erneut/);
 assert.doesNotMatch(importMessage({status:"awaiting_source"}).detail,/weiterhin regelmäßig geprüft/);
@@ -66,6 +74,11 @@ assert.doesNotMatch(bridge,/addEventListener\("badminton:own-profile-added"/);
 assert.match(bridge,/readPublicRows\(importStatusPath\(id\),\{signal,count:false\}\)/);
 assert.doesNotMatch(bridge,/fetch\(importStatusUrl/);
 assert.match(bridge,/requestDemand\(id,signal\)/);
+assert.match(bridge,/app_access_player_coverage/,
+ "A permission-checked coverage RPC, not an open public SELECT, reports match-card counts");
+assert.match(bridge,/match_cards:Number\.isSafeInteger\(verifiedCount\)/,
+ "Only a verified nonnegative server card count can reach the source status view");
+
 assert.doesNotMatch(bridge,/requestNew\(/);
 assert.doesNotMatch(welcome,/importPost|history-match-import|player_history_imports/);
 assert.match(welcome,/Profile creation and invitation remain entirely local/);
