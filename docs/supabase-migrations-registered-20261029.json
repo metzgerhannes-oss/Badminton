@@ -1,319 +1,553 @@
 {
-  "note": "Read-only historical metadata snapshot, NOT executable migration SQL or recovery guarantee.",
+  "note": "Read-only historical metadata and SHA-256 fingerprints of registered SQL statements; NO executable SQL, identities, tokens or recovery guarantee. Hashes represent exact stored statement text, not necessarily local file formatting.",
   "scope": "Supabase Badminton (private account, no identities or secrets)",
   "captured_on": "2026-10-29",
   "registered": [
     {
       "version": "20261010062648",
-      "name": "badminton_app_foundation_v1"
+      "name": "badminton_app_foundation_v1",
+      "statement_sha256": "34c680b6a7ad61c1b593cb1d7677cba17ef945e7d0d4f9d7689d19cc6794af61",
+      "statement_bytes": 10630,
+      "statement_count": 1
     },
     {
       "version": "20261010062828",
-      "name": "badminton_curated_results_security_v2"
+      "name": "badminton_curated_results_security_v2",
+      "statement_sha256": "e051e7e43a74e74d26a5d2d5374cb007f87318c4f5d1fd34f9af6b11e884f134",
+      "statement_bytes": 1490,
+      "statement_count": 1
     },
     {
       "version": "20261010063258",
-      "name": "badminton_fk_indexes_v3"
+      "name": "badminton_fk_indexes_v3",
+      "statement_sha256": "d65e1fb4b982775ec35f759bc89ff708be80f356b2da3b6a48822ad7f456571d",
+      "statement_bytes": 227,
+      "statement_count": 1
     },
     {
       "version": "20261010063808",
-      "name": "badminton_clubs_report_sources_mentions_v4"
+      "name": "badminton_clubs_report_sources_mentions_v4",
+      "statement_sha256": "c17991e5d33a1633230a7e867f15fe6a74302ac29cbeed1e099ad06e59b01912",
+      "statement_bytes": 3573,
+      "statement_count": 1
     },
     {
       "version": "20261010063847",
-      "name": "badminton_article_club_links_v5"
+      "name": "badminton_article_club_links_v5",
+      "statement_sha256": "da3cfde78b6e5098036746834b6662851861ad645d78b32996b954fe03a04d3d",
+      "statement_bytes": 162,
+      "statement_count": 1
     },
     {
       "version": "20261010081352",
-      "name": "dbv_shared_library_age_club_schema"
+      "name": "dbv_shared_library_age_club_schema",
+      "statement_sha256": "3c8fdfc94fe3b8135fb889925aa6b0152dbaec4c660a3b205187a7fe6b21c968",
+      "statement_bytes": 786,
+      "statement_count": 1
     },
     {
       "version": "20261010081515",
-      "name": "dbv_directory_secure_scheduled_import_function"
+      "name": "dbv_directory_secure_scheduled_import_function",
+      "statement_sha256": "6fd52de4df2b7e3d677050015a180f7aebd63dd9958866c4284447c55c68fd51",
+      "statement_bytes": 5793,
+      "statement_count": 1
     },
     {
       "version": "20261010081731",
-      "name": "allow_missing_official_club_dbv_ranking_v2"
+      "name": "allow_missing_official_club_dbv_ranking_v2",
+      "statement_sha256": "8bf584c19e0ffeae888207fc4cf327d7a3c00166aaed1ae568ae289a9551df1b",
+      "statement_bytes": 5845,
+      "statement_count": 1
     },
     {
       "version": "20261010104248",
-      "name": "history_on_demand_queue_and_source_worker"
+      "name": "history_on_demand_queue_and_source_worker",
+      "statement_sha256": "e8c0bd85c454e1657012dc6891336f3e0d2651b421d0245c25414d0792222402",
+      "statement_bytes": 10534,
+      "statement_count": 1
     },
     {
       "version": "20261010115738",
-      "name": "live_radar_on_demand_public_player_cache"
+      "name": "live_radar_on_demand_public_player_cache",
+      "statement_sha256": "60ae0706f23e9106c8cb748366b81c0b2e298dc6cc943341086f6244e86cb062",
+      "statement_bytes": 7827,
+      "statement_count": 1
     },
     {
       "version": "20261010200831",
-      "name": "harden_public_truncate_v49_20261010"
+      "name": "harden_public_truncate_v49_20261010",
+      "statement_sha256": "9d0c0cec24abddc05881c55976eac05d973f91f417725fecc1ee0ffc12e51faf",
+      "statement_bytes": 80,
+      "statement_count": 1
     },
     {
       "version": "20261010201019",
-      "name": "harden_postgres_default_truncate_v49_20261010"
+      "name": "harden_postgres_default_truncate_v49_20261010",
+      "statement_sha256": "9d37d945c5e014e8e524546c48fd534c56111f6f06189b662282685e7ce39da3",
+      "statement_bytes": 111,
+      "statement_count": 1
     },
     {
       "version": "20261010203147",
-      "name": "history_worker_skip_idle_source_fetch_v51"
+      "name": "history_worker_skip_idle_source_fetch_v51",
+      "statement_sha256": "6722ce7b4791a0ca4e13ec39817d4b79d5ffc3f39dbdcadd6e6ed694ef6a03a1",
+      "statement_bytes": 6352,
+      "statement_count": 1
     },
     {
       "version": "20261010204558",
-      "name": "bound_history_and_external_matches_to_recent_demand_v52"
+      "name": "bound_history_and_external_matches_to_recent_demand_v52",
+      "statement_sha256": "f6d26590dd4203fbb11a3ce4989be18d4a15e11033d5eea813445aa7c3e337ea",
+      "statement_bytes": 14125,
+      "statement_count": 1
     },
     {
       "version": "20261010204745",
-      "name": "private_demand_rpc_invoker_v52"
+      "name": "private_demand_rpc_invoker_v52",
+      "statement_sha256": "65eb848ad4147ee8abb7118bfe3386d25c6aa274a0a3e41e11b32ecf69adcc29",
+      "statement_bytes": 2389,
+      "statement_count": 1
     },
     {
       "version": "20261010211307",
-      "name": "harden_auxiliary_table_privileges_v54"
+      "name": "harden_auxiliary_table_privileges_v54",
+      "statement_sha256": "03cc5db52f2b61d383671a9c3d6d68dd5ff57b40ed927f003293023169137b96",
+      "statement_bytes": 666,
+      "statement_count": 1
     },
     {
       "version": "20261011083816",
-      "name": "v67_queue_retry_for_external_match_import"
+      "name": "v67_queue_retry_for_external_match_import",
+      "statement_sha256": "7b8523fd6dbd3dd836bc6b26ae5da7a19c2e5507244aacbf9d2b567b2f789b51",
+      "statement_bytes": 1943,
+      "statement_count": 1
     },
     {
       "version": "20261011194527",
-      "name": "shared_tournament_links_v87"
+      "name": "shared_tournament_links_v87",
+      "statement_sha256": "87c0858852406d2f81f8ed8f30b9120a2e8bbb74a7df2f7cb89041943b09e324",
+      "statement_bytes": 4496,
+      "statement_count": 1
     },
     {
       "version": "20261011200147",
-      "name": "shared_tournament_projection_v88"
+      "name": "shared_tournament_projection_v88",
+      "statement_sha256": "bc26771e767697eeaacc55ab1e5d8122a588ddd5048d0661a0bb1db4b65b6cb2",
+      "statement_bytes": 5026,
+      "statement_count": 1
     },
     {
       "version": "20261012043351",
-      "name": "verified_player_publication_v90"
+      "name": "verified_player_publication_v90",
+      "statement_sha256": "c837113776a55f5212ace4e84c04d7bdf61331e697c9f2c936527dc9009a6410",
+      "statement_bytes": 6914,
+      "statement_count": 1
     },
     {
       "version": "20261012085609",
-      "name": "badhub_outcome_evidence_v92"
+      "name": "badhub_outcome_evidence_v92",
+      "statement_sha256": "97f25c2633b2b7522aae88e8bd4548c1333d725be79575a1db8d61831a6bec77",
+      "statement_bytes": 837,
+      "statement_count": 1
     },
     {
       "version": "20261012110048",
-      "name": "team_league_public_directory_v95"
+      "name": "team_league_public_directory_v95",
+      "statement_sha256": "d62e934a8419c28bbf0f9ac98fbca568d196711514f0d903f68c2b7e14d95390",
+      "statement_bytes": 6927,
+      "statement_count": 1
     },
     {
       "version": "20261012115549",
-      "name": "nuliga_bwbv_league_scraper_v96"
+      "name": "nuliga_bwbv_league_scraper_v96",
+      "statement_sha256": "20c4688520602fbe0d2b99cb52afb901bef3607b29a341e943bfa567a5f43563",
+      "statement_bytes": 10400,
+      "statement_count": 1
     },
     {
       "version": "20261012115911",
-      "name": "nuliga_bwbv_verified_team_aliases_v96"
+      "name": "nuliga_bwbv_verified_team_aliases_v96",
+      "statement_sha256": "dcea071559833eae3e44c5ed1acd052a69ddc491818f20d918ceaa339633d98f",
+      "statement_bytes": 10510,
+      "statement_count": 1
     },
     {
       "version": "20261012120050",
-      "name": "nuliga_daily_refresh_jobs_v96"
+      "name": "nuliga_daily_refresh_jobs_v96",
+      "statement_sha256": "f932809bad2d859213909a421e95d242e6e861d38de79655847173945d118428",
+      "statement_bytes": 512,
+      "statement_count": 1
     },
     {
       "version": "20261012120221",
-      "name": "nuliga_official_display_names_v96"
+      "name": "nuliga_official_display_names_v96",
+      "statement_sha256": "af665711575ca2694255d21ccccdc69970f0a60d9249d6c77d3f818517ed7684",
+      "statement_bytes": 493,
+      "statement_count": 1
     },
     {
       "version": "20261012123152",
-      "name": "nuliga_bwbv_club_directory_v97"
+      "name": "nuliga_bwbv_club_directory_v97",
+      "statement_sha256": "837b83d29c648da0fb7e9bd72f3590c5f102a9bd20817b09e5ea10ce397c4de1",
+      "statement_bytes": 2919,
+      "statement_count": 1
     },
     {
       "version": "20261012123626",
-      "name": "nuliga_club_teams_auto_discovery_v97"
+      "name": "nuliga_club_teams_auto_discovery_v97",
+      "statement_sha256": "99ae0a14c39295bafd057a67d8ac6b73e3ae40fd8aff5e61fd5ed89568df8b99",
+      "statement_bytes": 12294,
+      "statement_count": 1
     },
     {
       "version": "20261012123935",
-      "name": "nuliga_discovery_refresh_batches_v97"
+      "name": "nuliga_discovery_refresh_batches_v97",
+      "statement_sha256": "2e510baad00b685719e2f7f6b0556543e9ad86800868ae95def1267aac1821e4",
+      "statement_bytes": 2818,
+      "statement_count": 1
     },
     {
       "version": "20261012124029",
-      "name": "nuliga_2025_26_archive_mapping_v97"
+      "name": "nuliga_2025_26_archive_mapping_v97",
+      "statement_sha256": "0bb84034b51dd55e5c7da2a87ed00b8a419840a757a7bc85adbe121a9847b1bd",
+      "statement_bytes": 1393,
+      "statement_count": 1
     },
     {
       "version": "20261012124110",
-      "name": "nuliga_2025_26_archive_importer_v97"
+      "name": "nuliga_2025_26_archive_importer_v97",
+      "statement_sha256": "7ded2f0565524f4c5c5ef099c2e7118bb1ba5cfc93ab18ee67721818df974fd2",
+      "statement_bytes": 7899,
+      "statement_count": 1
     },
     {
       "version": "20261012124809",
-      "name": "nuliga_directory_weekly_refresh_v97"
+      "name": "nuliga_directory_weekly_refresh_v97",
+      "statement_sha256": "5408d99f22e4fc7e4e2bb4d16ca92a377983907b7422c14568354e4e1ac946ef",
+      "statement_bytes": 206,
+      "statement_count": 1
     },
     {
       "version": "20261012173803",
-      "name": "dbv_calendar_verified_cluster_v101"
+      "name": "dbv_calendar_verified_cluster_v101",
+      "statement_sha256": "df23d51bb6b43b4cd1d901bacf9be1ed5bf1ba23727029b380f8d77e43f25f54",
+      "statement_bytes": 2253,
+      "statement_count": 1
     },
     {
       "version": "20261012182158",
-      "name": "grant_service_role_dbv_calendar_writer_20261012"
+      "name": "grant_service_role_dbv_calendar_writer_20261012",
+      "statement_sha256": "23ba9089740a10a49797e4c10d1385e9d45e91c657763b7a7ec0fbd154f17193",
+      "statement_bytes": 82,
+      "statement_count": 1
     },
     {
       "version": "20261012201943",
-      "name": "private_tournament_invites_v108"
+      "name": "private_tournament_invites_v108",
+      "statement_sha256": "8f3b204af55cb4c59a3465a1b11626fa36fedef60e8123d9f197aa9eafa081a1",
+      "statement_bytes": 5806,
+      "statement_count": 1
     },
     {
       "version": "20261012202148",
-      "name": "private_tournament_invites_rpc_hardening_v108"
+      "name": "private_tournament_invites_rpc_hardening_v108",
+      "statement_sha256": "c32cc1fed87c847d49f73adc5ffa5aeb0d77f92decf1f39470d1043a4bf6dfda",
+      "statement_bytes": 3370,
+      "statement_count": 1
     },
     {
       "version": "20261013053938",
-      "name": "harden_postgres_global_function_execute_v112"
+      "name": "harden_postgres_global_function_execute_v112",
+      "statement_sha256": "85004289cae2a60339903bf61ec135be05d4408d0ae01d0bf90c786bc0502755",
+      "statement_bytes": 83,
+      "statement_count": 1
     },
     {
       "version": "20261013111040",
-      "name": "private_source_snapshot_v113"
+      "name": "private_source_snapshot_v113",
+      "statement_sha256": "1eb7512a6fcf74cce72692f1692e13fbf8e7fb82e63815e41444fec7a026ee99",
+      "statement_bytes": 749,
+      "statement_count": 1
     },
     {
       "version": "20261013112903",
-      "name": "private_player_read_cutover_v114"
+      "name": "private_player_read_cutover_v114",
+      "statement_sha256": "b16a766cd14c397ea48edc0bed37ed037842a3a327e58af3e6e04a6d99a294b5",
+      "statement_bytes": 4144,
+      "statement_count": 1
     },
     {
       "version": "20261013115631",
-      "name": "private_player_capability_v115"
+      "name": "private_player_capability_v115",
+      "statement_sha256": "a2213d64cbc64ce9252edf670258cfbdd9f155c110924af5dd0ef6c4a082c2d7",
+      "statement_bytes": 7446,
+      "statement_count": 1
     },
     {
       "version": "20261013130215",
-      "name": "private_player_accept_once_v116"
+      "name": "private_player_accept_once_v116",
+      "statement_sha256": "393c14958cfc7be517fdf3141e1fe5d3f720c9c3f886dd038c03838463a49459",
+      "statement_bytes": 7177,
+      "statement_count": 1
     },
     {
       "version": "20261013142758",
-      "name": "owner_first_bootstrap_v117"
+      "name": "owner_first_bootstrap_v117",
+      "statement_sha256": "e3d8133c66cf96bc35bd2a7537610805c5c10000d5ee05f7b05f5855ff05d140",
+      "statement_bytes": 7768,
+      "statement_count": 1
     },
     {
       "version": "20261013163634",
-      "name": "fix_verified_tournament_publishing_v118"
+      "name": "fix_verified_tournament_publishing_v118",
+      "statement_sha256": "60e6126ac2c8b8314bd7384074e4c600da5093880e4e284be21b6bfad6eea54b",
+      "statement_bytes": 2693,
+      "statement_count": 1
     },
     {
       "version": "20261013163651",
-      "name": "minimize_private_player_payload_v118"
+      "name": "minimize_private_player_payload_v118",
+      "statement_sha256": "b7d57931f02bb9533a9f6000f8d81ef0ba59b722885448c4570f41e96a5792ea",
+      "statement_bytes": 1633,
+      "statement_count": 1
     },
     {
       "version": "20261013171210",
-      "name": "fix_private_player_invite_create_v119"
+      "name": "fix_private_player_invite_create_v119",
+      "statement_sha256": "799b0966d64b38b13e476845ad98ea21f2a31a3cba836940189e56311a0a566b",
+      "statement_bytes": 2112,
+      "statement_count": 1
     },
     {
       "version": "20261013200450",
-      "name": "private_invite_player_metadata_v125"
+      "name": "private_invite_player_metadata_v125",
+      "statement_sha256": "8576c31bc6a6d5be442b13900f804c8b900fe3828d8e7871af46c76c3b73d3f9",
+      "statement_bytes": 1616,
+      "statement_count": 1
     },
     {
       "version": "20261013202757",
-      "name": "spvgg_private_evidence_archive_v126"
+      "name": "spvgg_private_evidence_archive_v126",
+      "statement_sha256": "cfbb10a703c4605d11b94735858ce9c9312f6ceab9f025bf7c9b599470ee183e",
+      "statement_bytes": 6033,
+      "statement_count": 1
     },
     {
       "version": "20261013204614",
-      "name": "automatic_player_evidence_v127"
+      "name": "automatic_player_evidence_v127",
+      "statement_sha256": "2bf0682622d8b9c98583799469f486e3fe2f383b5d47ffc4732574cc1775202a",
+      "statement_bytes": 7985,
+      "statement_count": 1
     },
     {
       "version": "20261014043111",
-      "name": "verified_player_access_trophies_v127"
+      "name": "verified_player_access_trophies_v127",
+      "statement_sha256": "4eadcb111c08ea2b5afaa1f4b5c7654f075f4f506dcaf41b2756b80f99d746c4",
+      "statement_bytes": 21472,
+      "statement_count": 1
     },
     {
       "version": "20261014043435",
-      "name": "private_rpc_invoker_hardening_v127_1"
+      "name": "private_rpc_invoker_hardening_v127_1",
+      "statement_sha256": "52a8d21ebe8ddf585606db2072a36e097bc7e06b9f749b81bbefa15ea6d1ac30",
+      "statement_bytes": 3693,
+      "statement_count": 1
     },
     {
       "version": "20261014094957",
-      "name": "auto_archived_player_evidence_v128"
+      "name": "auto_archived_player_evidence_v128",
+      "statement_sha256": "d35e3754fe7abfc546c2fbadcf01c6bf1719c35835ed349432b9d4f7aebadef2",
+      "statement_bytes": 8257,
+      "statement_count": 1
     },
     {
       "version": "20261014133715",
-      "name": "targeted_dbv_identity_search_v133"
+      "name": "targeted_dbv_identity_search_v133",
+      "statement_sha256": "1f5ca9550c22e39f52c1dc6e5408039cc4110dc212434d2637e7a0fb84f327b6",
+      "statement_bytes": 2482,
+      "statement_count": 1
     },
     {
       "version": "20261014143546",
-      "name": "trusted_guardian_archive_grant_v134"
+      "name": "trusted_guardian_archive_grant_v134",
+      "statement_sha256": "3f23fc15b7bcb0fa062a9398c5cd90415fbd5737188d3074bce1eed60353aaf2",
+      "statement_bytes": 2514,
+      "statement_count": 1
     },
     {
       "version": "20261014160408",
-      "name": "app_access_invitation_v136_sourced_results"
+      "name": "app_access_invitation_v136_sourced_results",
+      "statement_sha256": "1add30e85f965f54ed8ec9719dd5984efb4f290317bafc8014201f5246c03a82",
+      "statement_bytes": 9851,
+      "statement_count": 1
     },
     {
       "version": "20261014192131",
-      "name": "app_access_owner_invitation_overview_v138"
+      "name": "app_access_owner_invitation_overview_v138",
+      "statement_sha256": "4afc0697c258ec9823f83eef4b5a81230ea68b08f142465b11821cff3510eeb0",
+      "statement_bytes": 1450,
+      "statement_count": 1
     },
     {
       "version": "20261015081455",
-      "name": "ranking_youth_overall_position_v144"
+      "name": "ranking_youth_overall_position_v144",
+      "statement_sha256": "df583ba56a4b0ee9817330d05ae79718568543bb4d614b1f98a19d09a7e663a2",
+      "statement_bytes": 2235,
+      "statement_count": 1
     },
     {
       "version": "20261015183610",
-      "name": "p0_spvgg_fresh_match_stage_20261015"
+      "name": "p0_spvgg_fresh_match_stage_20261015",
+      "statement_sha256": "be5ff953a0a7dcb28fb76c8d2beabfe8f5e565b013a84de988cb81e39201fbef",
+      "statement_bytes": 739,
+      "statement_count": 1
     },
     {
       "version": "20261015184832",
-      "name": "p0_spvgg_match_rebuild_from_20261015_sources"
+      "name": "p0_spvgg_match_rebuild_from_20261015_sources",
+      "statement_sha256": "4017557a5b8c2cea43953e24b210f1211feeac7e678b18360c26a0ef7bf9fd9a",
+      "statement_bytes": 4317,
+      "statement_count": 1
     },
     {
       "version": "20261015185514",
-      "name": "p0_age_class_birth_year_in_invited_player_coverage"
+      "name": "p0_age_class_birth_year_in_invited_player_coverage",
+      "statement_sha256": "e34883b9921d8eb510d911e7a2a3bed2ff7761441e92f7f113e39aebbd783ffc",
+      "statement_bytes": 1573,
+      "statement_count": 1
     },
     {
       "version": "20261015192808",
-      "name": "p0_continuous_spvgg_match_reconciliation_v153"
+      "name": "p0_continuous_spvgg_match_reconciliation_v153",
+      "statement_sha256": "b67ed77093685a040959792621fe4b86f3e1e153ab35329eaf66c0aee5ffbb2c",
+      "statement_bytes": 4616,
+      "statement_count": 1
     },
     {
       "version": "20261016044423",
-      "name": "app_access_reports_read_v157"
+      "name": "app_access_reports_read_v157",
+      "statement_sha256": "182fe878235fe97eb0ef1133675f8c1a29ca167b91fe62242110432df5ebd08e",
+      "statement_bytes": 3146,
+      "statement_count": 1
     },
     {
       "version": "20261016061417",
-      "name": "follow_team_import_v158"
+      "name": "follow_team_import_v158",
+      "statement_sha256": "5317e96ffe04fbde1467cffc71189121ff512c76da6f59638b22d7fe75bd5111",
+      "statement_bytes": 4245,
+      "statement_count": 1
     },
     {
       "version": "20261016182000",
-      "name": "private_dbv_directory_import_20261016"
+      "name": "private_dbv_directory_import_20261016",
+      "statement_sha256": "47a737c84677cbd8efb69eebfdbf7be4de127c21eab9c26307c5bdb2016bc425",
+      "statement_bytes": 4624,
+      "statement_count": 1
     },
     {
       "version": "20261016182359",
-      "name": "cron_run_retention_7d_20261016"
+      "name": "cron_run_retention_7d_20261016",
+      "statement_sha256": "c4ffee5b0fb0c0d6219b4e2fbdc781c066a4eba3589a52f3a07080f1bfc772cc",
+      "statement_bytes": 359,
+      "statement_count": 1
     },
     {
       "version": "20261017065348",
-      "name": "private_weekly_rankings_20261017"
+      "name": "private_weekly_rankings_20261017",
+      "statement_sha256": "e9a3060417d8a96883f2ceb2d627db266fb13f19b16d5ef7d68b4c6f0849bc01",
+      "statement_bytes": 11356,
+      "statement_count": 1
     },
     {
       "version": "20261017144758",
-      "name": "private_import_health_weekly_20261017"
+      "name": "private_import_health_weekly_20261017",
+      "statement_sha256": "682679abbc2dc0532274d00443527b0ea22300c74b1fa76b5ee0ba5fec4e2653",
+      "statement_bytes": 5167,
+      "statement_count": 1
     },
     {
       "version": "20261017155111",
-      "name": "private_storage_budget_guard_20261017"
+      "name": "private_storage_budget_guard_20261017",
+      "statement_sha256": "e050871c5b84dedac2d42bafa5bc531cc6691fe9413951f077a7630fb8516f5b",
+      "statement_bytes": 6741,
+      "statement_count": 1
     },
     {
       "version": "20261019192218",
-      "name": "member_scoped_live_read_watch"
+      "name": "member_scoped_live_read_watch",
+      "statement_sha256": "bbb73bea915bb0f22d83b890cb488f0853874b5c9c63cf18e48d6d3b2e198ec7",
+      "statement_bytes": 2674,
+      "statement_count": 1
     },
     {
       "version": "20261021043024",
-      "name": "data_api_opt_in_private_rls_20261021"
+      "name": "data_api_opt_in_private_rls_20261021",
+      "statement_sha256": "0cb87b7c9a42d77459baa2b520a8f7f7afa7a72c42db8cd0424afabc7d3f051f",
+      "statement_bytes": 1045,
+      "statement_count": 1
     },
     {
       "version": "20261023210539",
-      "name": "f03_dbv_identity_search_global_quota"
+      "name": "f03_dbv_identity_search_global_quota",
+      "statement_sha256": "960eea8837532e6fe8f31518fb474529b9efabef61eecd77ceada73d55b124d9",
+      "statement_bytes": 5564,
+      "statement_count": 1
     },
     {
       "version": "20261026195708",
-      "name": "private_import_health_signal_20261026"
+      "name": "private_import_health_signal_20261026",
+      "statement_sha256": "937419fd3d1d733c943b321bc6144e550437c6cb2a9c51fcbbcd08ce369373bb",
+      "statement_bytes": 7367,
+      "statement_count": 1
     },
     {
       "version": "20261027194254",
-      "name": "p0_417_additive_owner_device_transfer_20261027"
+      "name": "p0_417_additive_owner_device_transfer_20261027",
+      "statement_sha256": "bb819c325c4749cf90060a00507789d0ebdf8a4af78ace59ba5f3f660820160b",
+      "statement_bytes": 3928,
+      "statement_count": 1
     },
     {
       "version": "20261028053242",
-      "name": "p0_417_verified_family_sport_data_cutover_20261028"
+      "name": "p0_417_verified_family_sport_data_cutover_20261028",
+      "statement_sha256": "fe9207ee4e67ce83dd5a5f2a2fe1f589d9d2de3847e7b9b7ea1209892e2f7614",
+      "statement_bytes": 10803,
+      "statement_count": 1
     },
     {
       "version": "20261028174751",
-      "name": "private_dbv_weekly_scheduler_guard"
+      "name": "private_dbv_weekly_scheduler_guard",
+      "statement_sha256": "43719f376bc5dc2f1e9641bbcb34ce3a6898de4d5c28062fda12655923a89397",
+      "statement_bytes": 15358,
+      "statement_count": 1
     },
     {
       "version": "20261028174941",
-      "name": "private_dbv_weekly_vault_dispatch"
+      "name": "private_dbv_weekly_vault_dispatch",
+      "statement_sha256": "a234f164ada7e8fae5da06d3430f1d9f8d93b70827e817efdc52488425cf5103",
+      "statement_bytes": 2439,
+      "statement_count": 1
     },
     {
       "version": "20261028183809",
-      "name": "private_dbv_backoff_schedule_20261028"
+      "name": "private_dbv_backoff_schedule_20261028",
+      "statement_sha256": "13799bf8ed941feabba4b4a5dd5668c7a2bf1ecdf34098da741c58066e85066d",
+      "statement_bytes": 460,
+      "statement_count": 1
     },
     {
       "version": "20261028194137",
-      "name": "private_dbv_archive_week_u09_20261028"
+      "name": "private_dbv_archive_week_u09_20261028",
+      "statement_sha256": "96dd144e753bd2963f22216c1c8653b5963a3456db21cd85b3c9792a840fdbce",
+      "statement_bytes": 14024,
+      "statement_count": 1
     },
     {
       "version": "20261029050420",
-      "name": "import_health_stage_diagnostic_only_20261029"
+      "name": "import_health_stage_diagnostic_only_20261029",
+      "statement_sha256": "a5bd613f457e100a7655a3fc67ad69af39b1e0897c1d2a003d8afc1d11567157",
+      "statement_bytes": 6947,
+      "statement_count": 1
     }
   ]
 }
