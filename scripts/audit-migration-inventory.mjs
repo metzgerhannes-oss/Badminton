@@ -51,14 +51,14 @@ export function auditLegacySqlCandidates(registered,legacyFiles){
  const byName=new Map();
  for(const entry of registered){
   if(!entry||typeof entry.name!=="string"||typeof entry.version!=="string"||
-   !/^\\d{14}$/.test(entry.version)||!/^[A-Za-z0-9_]+$/.test(entry.name))
+   !/^\d{14}$/.test(entry.version)||!/^[A-Za-z0-9_]+$/.test(entry.name))
    throw Error("invalid_registered_legacy_candidate");
   const key=entry.name.toLowerCase().replace(/-/g,"_");
   byName.set(key,[...(byName.get(key)||[]),entry]);
  }
  const seen=new Set(), candidates=[],ambiguous=[],unmapped=[];
  for(const filename of legacyFiles){
-  if(typeof filename!=="string"||!/^[A-Za-z0-9_-]+\\.sql$/.test(filename)||
+  if(typeof filename!=="string"||!/^[A-Za-z0-9_-]+\.sql$/.test(filename)||
    seen.has(filename))throw Error("invalid_or_duplicate_legacy_file");
   seen.add(filename);
   const key=filename.slice(0,-4).toLowerCase().replace(/-/g,"_");
