@@ -131,12 +131,9 @@ function renderTournaments(){
   const name=String(t.name||"").trim();
   const heading=venue&&!name.toLocaleLowerCase("de").includes(venue.toLocaleLowerCase("de"))?name+" · "+venue:name;
   const missingVenue=venue?"":'<p class="saved-tournament-venue">Austragungsort nicht erfasst</p>';
-  // Calendar keys and turnier.de UUIDs are different identities. Only an
-  // exact official calendar key with a source-backed event URL gets a direct link.
-  const sourceLinks=t.source==="dbv-calendar"?verifiedCalendarRows.filter(row=>
-   row.key===t.id&&row.hasDirectLink===true&&typeof row.url==="string"&&
-   /^https:\/\/(?:turniere\.badminton\.de|dbv\.turnier\.de)\//.test(row.url)):[];
-  const directSource=sourceLinks.length===1?sourceLinks[0].url:"";
+  // Exact DBV event UUID only. A generic calendar URL must never be
+  // presented as the direct tournament page, even if flagged by the feed.
+  const directSource=SchmetterlingeBookmarks.verifiedCalendarEventUrl(t,verifiedCalendarRows);
   const destination=directSource||t.url;
   const sourceLabel=planning?"Terminquelle ↗":directSource||!calendar?"Offizielle Turnierseite ↗":"DBV-Kalender öffnen ↗";
   const sourceStatus=calendar?'<p class="saved-tournament-id">'+(planning?"Rahmentermin · Anmeldung nicht bestätigt":"Vorgemerkt · Anmeldung nicht bestätigt")+"</p>":"";
