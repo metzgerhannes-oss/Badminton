@@ -1,6 +1,6 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
 import {assessSourceAvailability,importStatusForBatch,missingSourceStatus,reconcileMatchBatch} from "./source-availability.mjs";
-import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
+import {readBoundedJson,PayloadTooLargeError,readBoundedText} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
@@ -88,11 +88,7 @@ async function source(id:string,category:string,signal:AbortSignal){
  });
  if(!res.ok||!(res.headers.get("content-type")||"").includes("text/html"))
   throw Error("Source unavailable");
- const size=Number(res.headers.get("content-length")||0);
- if(size>5500000)throw Error("Source too large");
- const text=await res.text();
- if(text.length>5500000)throw Error("Source too large");
- return text;
+ return readBoundedText(res,5500000);
 }
 Deno.serve(async req=>{
  const origin=req.headers.get("origin");

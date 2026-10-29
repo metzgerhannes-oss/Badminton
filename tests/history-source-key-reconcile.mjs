@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {readBoundedText,PayloadTooLargeError} from "../supabase/functions/history-match-import/bounded-request.mjs";
 import {readFile} from "node:fs/promises";
 import {reconcileMatchBatch,selectUnstoredScoreless} from "../supabase/functions/history-match-import/source-availability.mjs";
 const cards=["new","old-1","old-2","old-3"].map(source_key=>({source_key}));
@@ -46,8 +47,25 @@ const after=reconcileMatchBatch(large,priority.selected.map(x=>x.source_key),120
 assert.equal(after.selected.length,13);
 assert.equal(after.remaining_eligible,0);
 assert.equal(after.finished,true);
+// Third-party HTML can omit or lie about Content-Length: bound actual bytes.
+const unicode=new TextEncoder().encode("äöü");
+const chunks=new ReadableStream({start(controller){
+ controller.enqueue(unicode.slice(0,1));controller.enqueue(unicode.slice(1));controller.close();
+}});
+assert.equal(await readBoundedText(new Response(chunks),unicode.byteLength),"äöü");
+assert.equal(await readBoundedText(new Response("12345"),5),"12345");
+let cancelled=false;
+const endless=new ReadableStream({pull(controller){controller.enqueue(new Uint8Array(3));},
+ cancel(){cancelled=true;}});
+await assert.rejects(readBoundedText(new Response(endless),5),PayloadTooLargeError);
+assert.equal(cancelled,true,"Oversized response stream must be cancelled");
+await assert.rejects(readBoundedText(new Response("ok",{headers:{"content-length":"99"}}),5),PayloadTooLargeError);
+await assert.rejects(readBoundedText(new Response("ok",{headers:{"content-length":"oops"}}),5),/invalid_content_length/);
+await assert.rejects(readBoundedText(new Response(null),5),/invalid_source_body/);
 const edge=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 assert.match(edge,/if\(!\(await isInvitedMember\(req\)\)\)/,"Membership gate remains mandatory");
+assert.match(edge,/return readBoundedText\(res,5500000\)/,"External HTML must use a bounded stream");
+assert.doesNotMatch(edge,/await res\.text\(\)/,"Do not buffer unbounded external HTML");
 assert.match(edge,/const storedKeys=await readStoredSourceKeys\(id\)/);
 assert.match(edge,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/);
 assert.match(edge,/const scoreless=written\.filter\(row=>row\.outcome_evidence===\"badhub-bold-dash\"\)/);
