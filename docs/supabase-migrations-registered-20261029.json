@@ -1,0 +1,319 @@
+{
+  "note": "Read-only historical metadata snapshot, NOT executable migration SQL or recovery guarantee.",
+  "scope": "Supabase Badminton (private account, no identities or secrets)",
+  "captured_on": "2026-10-29",
+  "registered": [
+    {
+      "version": "20261010062648",
+      "name": "badminton_app_foundation_v1"
+    },
+    {
+      "version": "20261010062828",
+      "name": "badminton_curated_results_security_v2"
+    },
+    {
+      "version": "20261010063258",
+      "name": "badminton_fk_indexes_v3"
+    },
+    {
+      "version": "20261010063808",
+      "name": "badminton_clubs_report_sources_mentions_v4"
+    },
+    {
+      "version": "20261010063847",
+      "name": "badminton_article_club_links_v5"
+    },
+    {
+      "version": "20261010081352",
+      "name": "dbv_shared_library_age_club_schema"
+    },
+    {
+      "version": "20261010081515",
+      "name": "dbv_directory_secure_scheduled_import_function"
+    },
+    {
+      "version": "20261010081731",
+      "name": "allow_missing_official_club_dbv_ranking_v2"
+    },
+    {
+      "version": "20261010104248",
+      "name": "history_on_demand_queue_and_source_worker"
+    },
+    {
+      "version": "20261010115738",
+      "name": "live_radar_on_demand_public_player_cache"
+    },
+    {
+      "version": "20261010200831",
+      "name": "harden_public_truncate_v49_20261010"
+    },
+    {
+      "version": "20261010201019",
+      "name": "harden_postgres_default_truncate_v49_20261010"
+    },
+    {
+      "version": "20261010203147",
+      "name": "history_worker_skip_idle_source_fetch_v51"
+    },
+    {
+      "version": "20261010204558",
+      "name": "bound_history_and_external_matches_to_recent_demand_v52"
+    },
+    {
+      "version": "20261010204745",
+      "name": "private_demand_rpc_invoker_v52"
+    },
+    {
+      "version": "20261010211307",
+      "name": "harden_auxiliary_table_privileges_v54"
+    },
+    {
+      "version": "20261011083816",
+      "name": "v67_queue_retry_for_external_match_import"
+    },
+    {
+      "version": "20261011194527",
+      "name": "shared_tournament_links_v87"
+    },
+    {
+      "version": "20261011200147",
+      "name": "shared_tournament_projection_v88"
+    },
+    {
+      "version": "20261012043351",
+      "name": "verified_player_publication_v90"
+    },
+    {
+      "version": "20261012085609",
+      "name": "badhub_outcome_evidence_v92"
+    },
+    {
+      "version": "20261012110048",
+      "name": "team_league_public_directory_v95"
+    },
+    {
+      "version": "20261012115549",
+      "name": "nuliga_bwbv_league_scraper_v96"
+    },
+    {
+      "version": "20261012115911",
+      "name": "nuliga_bwbv_verified_team_aliases_v96"
+    },
+    {
+      "version": "20261012120050",
+      "name": "nuliga_daily_refresh_jobs_v96"
+    },
+    {
+      "version": "20261012120221",
+      "name": "nuliga_official_display_names_v96"
+    },
+    {
+      "version": "20261012123152",
+      "name": "nuliga_bwbv_club_directory_v97"
+    },
+    {
+      "version": "20261012123626",
+      "name": "nuliga_club_teams_auto_discovery_v97"
+    },
+    {
+      "version": "20261012123935",
+      "name": "nuliga_discovery_refresh_batches_v97"
+    },
+    {
+      "version": "20261012124029",
+      "name": "nuliga_2025_26_archive_mapping_v97"
+    },
+    {
+      "version": "20261012124110",
+      "name": "nuliga_2025_26_archive_importer_v97"
+    },
+    {
+      "version": "20261012124809",
+      "name": "nuliga_directory_weekly_refresh_v97"
+    },
+    {
+      "version": "20261012173803",
+      "name": "dbv_calendar_verified_cluster_v101"
+    },
+    {
+      "version": "20261012182158",
+      "name": "grant_service_role_dbv_calendar_writer_20261012"
+    },
+    {
+      "version": "20261012201943",
+      "name": "private_tournament_invites_v108"
+    },
+    {
+      "version": "20261012202148",
+      "name": "private_tournament_invites_rpc_hardening_v108"
+    },
+    {
+      "version": "20261013053938",
+      "name": "harden_postgres_global_function_execute_v112"
+    },
+    {
+      "version": "20261013111040",
+      "name": "private_source_snapshot_v113"
+    },
+    {
+      "version": "20261013112903",
+      "name": "private_player_read_cutover_v114"
+    },
+    {
+      "version": "20261013115631",
+      "name": "private_player_capability_v115"
+    },
+    {
+      "version": "20261013130215",
+      "name": "private_player_accept_once_v116"
+    },
+    {
+      "version": "20261013142758",
+      "name": "owner_first_bootstrap_v117"
+    },
+    {
+      "version": "20261013163634",
+      "name": "fix_verified_tournament_publishing_v118"
+    },
+    {
+      "version": "20261013163651",
+      "name": "minimize_private_player_payload_v118"
+    },
+    {
+      "version": "20261013171210",
+      "name": "fix_private_player_invite_create_v119"
+    },
+    {
+      "version": "20261013200450",
+      "name": "private_invite_player_metadata_v125"
+    },
+    {
+      "version": "20261013202757",
+      "name": "spvgg_private_evidence_archive_v126"
+    },
+    {
+      "version": "20261013204614",
+      "name": "automatic_player_evidence_v127"
+    },
+    {
+      "version": "20261014043111",
+      "name": "verified_player_access_trophies_v127"
+    },
+    {
+      "version": "20261014043435",
+      "name": "private_rpc_invoker_hardening_v127_1"
+    },
+    {
+      "version": "20261014094957",
+      "name": "auto_archived_player_evidence_v128"
+    },
+    {
+      "version": "20261014133715",
+      "name": "targeted_dbv_identity_search_v133"
+    },
+    {
+      "version": "20261014143546",
+      "name": "trusted_guardian_archive_grant_v134"
+    },
+    {
+      "version": "20261014160408",
+      "name": "app_access_invitation_v136_sourced_results"
+    },
+    {
+      "version": "20261014192131",
+      "name": "app_access_owner_invitation_overview_v138"
+    },
+    {
+      "version": "20261015081455",
+      "name": "ranking_youth_overall_position_v144"
+    },
+    {
+      "version": "20261015183610",
+      "name": "p0_spvgg_fresh_match_stage_20261015"
+    },
+    {
+      "version": "20261015184832",
+      "name": "p0_spvgg_match_rebuild_from_20261015_sources"
+    },
+    {
+      "version": "20261015185514",
+      "name": "p0_age_class_birth_year_in_invited_player_coverage"
+    },
+    {
+      "version": "20261015192808",
+      "name": "p0_continuous_spvgg_match_reconciliation_v153"
+    },
+    {
+      "version": "20261016044423",
+      "name": "app_access_reports_read_v157"
+    },
+    {
+      "version": "20261016061417",
+      "name": "follow_team_import_v158"
+    },
+    {
+      "version": "20261016182000",
+      "name": "private_dbv_directory_import_20261016"
+    },
+    {
+      "version": "20261016182359",
+      "name": "cron_run_retention_7d_20261016"
+    },
+    {
+      "version": "20261017065348",
+      "name": "private_weekly_rankings_20261017"
+    },
+    {
+      "version": "20261017144758",
+      "name": "private_import_health_weekly_20261017"
+    },
+    {
+      "version": "20261017155111",
+      "name": "private_storage_budget_guard_20261017"
+    },
+    {
+      "version": "20261019192218",
+      "name": "member_scoped_live_read_watch"
+    },
+    {
+      "version": "20261021043024",
+      "name": "data_api_opt_in_private_rls_20261021"
+    },
+    {
+      "version": "20261023210539",
+      "name": "f03_dbv_identity_search_global_quota"
+    },
+    {
+      "version": "20261026195708",
+      "name": "private_import_health_signal_20261026"
+    },
+    {
+      "version": "20261027194254",
+      "name": "p0_417_additive_owner_device_transfer_20261027"
+    },
+    {
+      "version": "20261028053242",
+      "name": "p0_417_verified_family_sport_data_cutover_20261028"
+    },
+    {
+      "version": "20261028174751",
+      "name": "private_dbv_weekly_scheduler_guard"
+    },
+    {
+      "version": "20261028174941",
+      "name": "private_dbv_weekly_vault_dispatch"
+    },
+    {
+      "version": "20261028183809",
+      "name": "private_dbv_backoff_schedule_20261028"
+    },
+    {
+      "version": "20261028194137",
+      "name": "private_dbv_archive_week_u09_20261028"
+    },
+    {
+      "version": "20261029050420",
+      "name": "import_health_stage_diagnostic_only_20261029"
+    }
+  ]
+}
