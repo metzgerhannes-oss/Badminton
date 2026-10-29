@@ -54,6 +54,14 @@ assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,key:"d
 assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[officialRow,officialRow]),"",
  "Duplicate source identities must not be treated as verified");
 assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,hasDirectLink:false}]),"");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,start:"2026-11-31"}]),"",
+ "A malformed official game date cannot authorize a direct tournament link");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,end:"2026-11-21"}]),"",
+ "An official end date before game day cannot authorize a direct link");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,start:"2026-11-15",end:"2026-11-14"}]),"",
+ "Registration deadline must not be misrepresented as a tournament day");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,deadline:"2026-11-31"}]),url,
+ "A malformed optional deadline must not erase an otherwise verified tournament identity");
 assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
  url:"https://turniere.badminton.de/",hasDirectLink:true}]),"",
  "Mislabelled DBV overview must not become a direct tournament link");
