@@ -41,7 +41,7 @@ function setActiveProfile(id){
 // A native hashchange follows our already synchronously rendered tab clicks.
  // Keep one route paint; genuine Back/Forward and deep-link hash changes still
  // render because their destination differs from lastRenderedHash.
-let lastRenderedHash=location.hash||"#start";
+let lastRenderedHash=typeof location==="undefined"?"#start":location.hash||"#start";
 // Existing UI callers keep the same route and focus methods.
 function routeTo(page){
  // Choosing a followed player's statistics is not a Home/Logo action.
