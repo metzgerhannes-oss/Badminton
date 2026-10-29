@@ -79,6 +79,18 @@ var SchmetterlingeBookmarks=(function(){
   return next&&next.id===bookmark.id&&next.playerId===bookmark.playerId&&
    next.source===bookmark.source?next:null;
  }
+ /** Only describe a calendar link as a DIRECT tournament page when the
+  * exact calendar key has one verified DBV tournament UUID in the local
+  * official feed. Generic overview URLs (even with hasDirectLink=true),
+  * untrusted hosts and ambiguous duplicate keys must remain overview links.
+  * Never join a saved calendar reminder by title or town.
+  */
+ function verifiedCalendarEventUrl(bookmark,rows){
+  if(bookmark?.source!=="dbv-calendar"||!Array.isArray(rows))return "";
+  const matching=rows.filter(row=>row?.key===bookmark.id);
+  if(matching.length!==1||matching[0].hasDirectLink!==true)return "";
+  return parseDbvTournamentLink(matching[0].url)?.url||"";
+ }
  // Use only an already loaded official-calendar row with an exact source key or UUID.
  // A similar venue/name is NEVER sufficient to join two distinct tournaments.
  function reconcileOfficialMetadata(bookmark,rows){
@@ -154,5 +166,5 @@ var SchmetterlingeBookmarks=(function(){
     a.name.localeCompare(b.name,"de");
   });
  }
- return Object.freeze({parseDbvTournamentLink,normalizeBookmark,updateLocalCalendarVenue,reconcileOfficialMetadata,describeOfficialChanges,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
+ return Object.freeze({parseDbvTournamentLink,normalizeBookmark,verifiedCalendarEventUrl,updateLocalCalendarVenue,reconcileOfficialMetadata,describeOfficialChanges,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
 })();
