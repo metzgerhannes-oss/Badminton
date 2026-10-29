@@ -27,6 +27,17 @@ assert.equal(liveView(idle,"05-070879",now).status,"unavailable");
 assert.equal(liveView({...idle,checked_at:"2026-10-10T11:55:00Z"},id,now).status,"stale");
 assert.equal(freshness(idle,now).ageMs,60000);
 assert.equal(freshness({...idle,checked_at:"invalid"},now).fresh,false);
+// Provider/device clock skew must not turn a future timestamp into
+// permanently fresh LIVE evidence (pure synthetic snapshots; no network).
+const nearFuture={...idle,checked_at:new Date(now+30000).toISOString()};
+const farFuture={...idle,checked_at:new Date(now+5*60000).toISOString()};
+assert.equal(freshness(nearFuture,now).fresh,true,"Small clock skew remains tolerated");
+assert.equal(freshness(farFuture,now).fresh,false,"Future-dated provider evidence is not LIVE");
+assert.equal(freshness(farFuture,now).ageMs,Infinity);
+assert.equal(freshness({...idle,checked_at:new Date(now+30001).toISOString()},now).fresh,false);
+assert.equal(liveView(farFuture,id,now).status,"stale");
+assert.equal(radarSituation(farFuture,id,now).kind,"pending",
+ "Future-dated empty result must not assert current no-tournament status");
 assert.equal(radarSituation(idle,id,now).kind,"idle","Fresh empty source means no reported tournament");
 const cold={...idle,checked_at:"2026-10-10T11:55:00Z"};
 assert.equal(radarSituation(cold,id,now).kind,"idle","A 5-minute-old no-tournament response must not be an alarm");
@@ -47,6 +58,11 @@ assert.equal(radarSituation(playing,id,now).kind,"current");
 const oldMatch={...playing,checked_at:"2026-10-10T11:55:00Z"};
 assert.equal(radarSituation(oldMatch,id,now).kind,"updating","Old match MUST NOT masquerade as live");
 assert.equal(radarSituation(oldMatch,id,now).showScore,false);
+const futureMatch={...playing,checked_at:new Date(now+5*60000).toISOString()};
+assert.equal(liveView(futureMatch,id,now).status,"stale");
+assert.equal(radarSituation(futureMatch,id,now).kind,"updating");
+assert.equal(radarSituation(futureMatch,id,now).showScore,false,
+ "Future-dated active match must never display unverified LIVE scores");
 assert.match(radarSituation(oldMatch,id,now).title,/Spielstand wird geprüft/);
 assert.equal(radarSituation({...playing,source_url:"https://evil.test/live"},id,now).kind,"pending");
 
