@@ -67,6 +67,18 @@ var SchmetterlingeBookmarks=(function(){
    startDate:validDate(value.startDate),endDate:validDate(value.endDate),
    place:String(value.place||"").trim().slice(0,120),deadline:validDate(value.deadline)};
  }
+ /** Edits ONLY a private locally saved calendar/framework venue.
+  * Never infer a DBV tournament UUID, rewrite dates or claim official proof.
+  * A later exact-key official reconciliation remains authoritative.
+  */
+ function updateLocalCalendarVenue(bookmark,value){
+  if(!bookmark||!["dbv-calendar","bwbv-framework"].includes(bookmark.source)||
+     typeof value!=="string"||value.length>120||
+     /[\\u0000-\\u001f\\u007f]/.test(value))return null;
+  const next=normalizeBookmark({...bookmark,place:value.trim()});
+  return next&&next.id===bookmark.id&&next.playerId===bookmark.playerId&&
+   next.source===bookmark.source?next:null;
+ }
  // Use only an already loaded official-calendar row with an exact source key or UUID.
  // A similar venue/name is NEVER sufficient to join two distinct tournaments.
  function reconcileOfficialMetadata(bookmark,rows){
@@ -142,5 +154,5 @@ var SchmetterlingeBookmarks=(function(){
     a.name.localeCompare(b.name,"de");
   });
  }
- return Object.freeze({parseDbvTournamentLink,normalizeBookmark,reconcileOfficialMetadata,describeOfficialChanges,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
+ return Object.freeze({parseDbvTournamentLink,normalizeBookmark,updateLocalCalendarVenue,reconcileOfficialMetadata,describeOfficialChanges,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
 })();
