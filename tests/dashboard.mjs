@@ -7,6 +7,21 @@ const app=await readFile("app.js","utf8");
 const sw=await readFile("sw.js","utf8");
 const snapshot=JSON.parse(await readFile("data/ranking.json","utf8"));
 assert.ok(page.includes('id="view-start"'));
+// IA #13: exactly four stable mobile destinations; the club is desktop-only,
+// while live/today and settings remain contextual, not shifting bottom tabs.
+const primaryNav=page.match(/<nav class="bottom-nav"[^>]*>[\s\S]*?<\/nav>/)?.[0];
+assert.ok(primaryNav,"The canonical mobile navigation must exist");
+const primaryDestinations=[...primaryNav.matchAll(/<a\b[^>]*data-page="([^"]+)"/g)].map(m=>m[1]);
+assert.deepEqual(primaryDestinations,["start","spieler","turniere","verein","mannschaft"],
+ "The four mobile destinations and desktop club shortcut must remain stable");
+assert.ok(primaryNav.includes('data-page="verein" class="desktop-club-nav"'),
+ "The club shortcut must remain desktop-only");
+assert.ok(!primaryNav.includes('data-page="live"')&&!primaryNav.includes('data-page="berichte"'),
+ "Today/live and reports must not create shifting mobile tabs");
+assert.ok(page.includes('class="today-context-bar"')&&page.includes('id="live-nav-tab"'),
+ "Live remains a contextual shortcut");
+assert.ok(page.includes('class="topbar-settings" href="#einstellungen"'),
+ "Settings must remain available outside the bottom navigation");
 // P1 iPhone SE: all three short Home links retain accessible touch targets.
 for(const selector of [
   "#view-start .upcoming-tournaments-header a",
