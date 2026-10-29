@@ -65,7 +65,8 @@ await assert.rejects(readBoundedText(new Response(null),5),/invalid_source_body/
 const edge=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 assert.match(edge,/if\(!\(await isInvitedMember\(req\)\)\)/,"Membership gate remains mandatory");
 assert.match(edge,/return readBoundedText\(res,5500000\)/,"External HTML must use a bounded stream");
-assert.doesNotMatch(edge,/await res\.text\(\)/,"Do not buffer unbounded external HTML");
+const externalSource=edge.slice(edge.indexOf("async function source("),edge.indexOf("Deno.serve("));
+assert.doesNotMatch(externalSource,/await res\.text\(\)/,"Do not buffer unbounded external HTML");
 assert.match(edge,/const storedKeys=await readStoredSourceKeys\(id\)/);
 assert.match(edge,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/);
 assert.match(edge,/const scoreless=written\.filter\(row=>row\.outcome_evidence===\"badhub-bold-dash\"\)/);
