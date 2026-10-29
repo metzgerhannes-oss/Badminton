@@ -19,6 +19,8 @@ const none=assessSourceAvailability([bad,bad]);
 assert.equal(none.available.length,0);
 assert.deepEqual(none.missing,["Turnier","Liga"]);
 assert.equal(importStatusForBatch(true,4,[]),"partial");
+assert.equal(importStatusForBatch(true,0,["Liga"]),"partial");
+assert.equal(importStatusForBatch(false,0,[]),"partial");
 assert.throws(()=>assessSourceAvailability([bad]),/Expected/);
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 const parser=await readFile("supabase/functions/history-match-import/badhub-history-parser.mjs","utf8");
@@ -32,7 +34,12 @@ assert.match(fn,/const batch=reconcileMatchBatch\(all,storedKeys,120\)/,
  "A stale numeric cursor cannot suppress valid new evidence");
 assert.doesNotMatch(fn,/const start=sources\.missing\.length\?0/,
  "Old cursor-reset workaround must stay removed");
-assert.match(fn,/status:importStatusForBatch\(finished,excluded,sources\.missing\)/);
+assert.match(fn,/const status=importStatusForBatch\(finished,excluded,sources\.missing\)/,
+ "Persisted status must be computed once from actual coverage");
+assert.match(fn,/completed:status==="complete"/,
+ "Response completion must agree with persisted status when cards are excluded");
+assert.doesNotMatch(fn,/completed:finished&&!sources\.missing\.length/,
+ "Finished batch with rejected cards must never report complete");
 assert.match(fn,/status:missingSourceStatus\(saved\)/,
  "Missing upstream source must preserve existing saved match evidence");
 assert.match(fn,/unavailable_categories:sources\.missing/);
