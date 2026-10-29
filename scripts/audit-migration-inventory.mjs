@@ -3,6 +3,7 @@
  * A filename match is NOT proof of identical SQL or successful replay.
  */
 import {readFile,readdir} from "node:fs/promises";
+import {createHash} from "node:crypto";
 import {fileURLToPath} from "node:url";
 import {resolve} from "node:path";
 
@@ -113,6 +114,36 @@ export function auditRegisteredSourceCoverage(registered,localFiles,legacyFiles)
   unbacked,conflicting,sqlHashesVerified:false,recoveryReplayed:false};
 }
 
+/** Exact stored-statement SHA-256 vs local file bytes, offline only.
+ * Mismatch is not proof of different SQL semantics (formatting may differ).
+ * Neither SQL nor identities are emitted in the report.
+ */
+export function auditStoredSqlFingerprints(registered,localSqlByPath){
+ if(!Array.isArray(registered)||!localSqlByPath||
+    typeof localSqlByPath!=="object"||Array.isArray(localSqlByPath))
+  throw Error("invalid_sql_fingerprint_inventory");
+ const byHash=new Map();
+ for(const row of registered){
+  if(!row||!/^[a-f0-9]{64}$/.test(row.statement_sha256)||
+     !/^\\d{14}$/.test(row.version))throw Error("invalid_registered_sql_fingerprint");
+  byHash.set(row.statement_sha256,[...(byHash.get(row.statement_sha256)||[]),row.version]);
+ }
+ const matched=[],unmatched=[];
+ for(const [path,sql] of Object.entries(localSqlByPath)){
+  if(typeof sql!=="string"||typeof path!=="string"||
+     !/^(supabase\\/migrations|database)\\/[A-Za-z0-9_-]+\\.sql$/.test(path))
+   throw Error("invalid_local_sql_fingerprint");
+  const hash=createHash("sha256").update(sql,"utf8").digest("hex");
+  const versions=byHash.get(hash)||[];
+  if(versions.length===1)matched.push({path,version:versions[0]});
+  else unmatched.push(path);
+ }
+ return {filesChecked:matched.length+unmatched.length,exactByteMatches:matched.length,
+  exactVersionMatches:new Set(matched.map(x=>x.version)).size,
+  nonidenticalOrUnmatched:unmatched.length,matched,unmatched,
+  recoveryReplayed:false};
+}
+
 async function report(){
  const snapshot=JSON.parse(await readFile(new URL("../docs/supabase-migrations-registered-20261029.json",import.meta.url),"utf8"));
  const directory=fileURLToPath(new URL("../supabase/migrations/",import.meta.url));
@@ -122,7 +153,13 @@ async function report(){
  const legacyFiles=(await readdir(legacyDir)).filter(n=>n.endsWith(".sql")).sort();
  const legacy=auditLegacySqlCandidates(snapshot.registered,legacyFiles);
  const sourceCoverage=auditRegisteredSourceCoverage(snapshot.registered,files,legacyFiles);
- process.stdout.write(JSON.stringify({captured_on:snapshot.captured_on,...result,legacy,sourceCoverage},null,2)+"\n");
+ const localSqlByPath={};
+ for(const name of files)localSqlByPath["supabase/migrations/"+name]=
+  await readFile(new URL("../supabase/migrations/"+name,import.meta.url),"utf8");
+ for(const name of legacyFiles)localSqlByPath["database/"+name]=
+  await readFile(new URL("../database/"+name,import.meta.url),"utf8");
+ const sqlFingerprintAudit=auditStoredSqlFingerprints(snapshot.registered,localSqlByPath);
+ process.stdout.write(JSON.stringify({captured_on:snapshot.captured_on,...result,legacy,sourceCoverage,sqlFingerprintAudit},null,2)+"\n");
  if(!result.registered||!result.localFiles)process.exitCode=1;
 }
 // Direct CLI use only. Test import never reads other files or opens sockets.
