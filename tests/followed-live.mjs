@@ -39,6 +39,11 @@ const stale=followedCard(mine,{...row,checked_at:new Date(now-180000).toISOStrin
 assert.notEqual(stale.kind,"current");
 assert.equal(stale.score,"");
 assert.equal(stale.result,"");
+const future=followedCard(mine,{...row,checked_at:new Date(now+300000).toISOString()},now);
+assert.notEqual(future.kind,"current",
+ "Future-dated provider snapshots must not appear as a live followed-player card");
+assert.equal(future.score,"");
+assert.equal(future.result,"");
 const spoof=followedCard(mine,{...row,source_url:"https://evil.test"},now);
 assert.notEqual(spoof.kind,"current");
 assert.equal(spoof.score,"");
