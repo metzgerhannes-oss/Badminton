@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readBoundedText,PayloadTooLargeError} from "../supabase/functions/history-match-import/bounded-request.mjs";
 import {readFile} from "node:fs/promises";
-import {reconcileMatchBatch,selectUnstoredScoreless} from "../supabase/functions/history-match-import/source-availability.mjs";
+import {reconcileMatchBatch,selectUnstoredScoreless,assessMatchCardCoverage} from "../supabase/functions/history-match-import/source-availability.mjs";
 const cards=["new","old-1","old-2","old-3"].map(source_key=>({source_key}));
 const before=["old-1","old-2","old-3"];
 const first=reconcileMatchBatch(cards,before,2);
@@ -83,3 +83,45 @@ assert.match(edge,/const scoreless=written\.filter\(row=>row\.outcome_evidence==
 assert.doesNotMatch(edge,/all\.slice\(start,start\+120\)/,"Old cursor must not skip reordered source matches");
 assert.match(edge,/on_conflict=dbv_id,source_key/,"Upserts remain idempotent");
 console.log("Synthetic source-key reconciliation, reorder backfill, pagination guard and auth gate verified.");
+
+
+// #199: Historical provider pages may include many explicit BYEs/WO/retirements.
+// Do not classify these as played matches or as parser-layout failures.
+const coverageRows=n=>Array.from({length:n},(_,i)=>({source_key:"synthetic-match-"+i}));
+const coverage=(raw,valid,reasons={})=>[{cards_seen:raw,
+ items:coverageRows(valid),rejection_reasons:reasons}];
+const legitimate=assessMatchCardCoverage(coverage(100,30,
+ {confirmed_bye_rast:25,marked_walkover:20}));
+assert.deepEqual({acceptable:legitimate.acceptable,potential:legitimate.potentialPlayed,
+ nonplayed:legitimate.nonplayed,required:legitimate.required},
+ {acceptable:true,potential:55,nonplayed:45,required:30},
+ "Documented nonplayed cards cannot make a successful parse look broken");
+assert.equal(assessMatchCardCoverage(coverage(100,30,
+ {unclassified_card:45})).acceptable,false,
+ "Unclassified layout drift must remain a hard error");
+assert.equal(assessMatchCardCoverage(coverage(100,30,
+ {conflicting_bye_with_scores:45,conflicting_walkover_with_scores:10})).acceptable,false,
+ "Conflicting scores cannot be treated as a safe unplayed status");
+assert.equal(assessMatchCardCoverage(coverage(100,30,
+ {marked_retirement:20,marked_disqualification:25})).acceptable,true,
+ "Explicit retirements and disqualifications are not played matches");
+assert.equal(assessMatchCardCoverage(coverage(5,0,{confirmed_bye_rast:5})).acceptable,true,
+ "A source page containing only verified BYEs does not have a broken layout");
+assert.equal(assessMatchCardCoverage(coverage(100,30,
+ {confirmed_bye_rast:70,unclassified_card:30})).nonplayed,70);
+assert.equal(assessMatchCardCoverage(coverage(20,20)).acceptable,true,
+ "The parser gate must evaluate original parsed cards, not later KO-quarantined matches");
+assert.throws(()=>assessMatchCardCoverage(coverage(10,11)),/invalid_source_coverage_count/);
+assert.throws(()=>assessMatchCardCoverage(coverage(10,3,
+ {confirmed_bye_rast:-1})),/invalid_source_coverage_reason/);
+assert.throws(()=>assessMatchCardCoverage(coverage(10,3,
+ {marked_walkover:"5"})),/invalid_source_coverage_reason/);
+// Index must apply source quality before storage/reconciliation, preserving all guards.
+const sourceCode=await readFile("supabase/functions/history-match-import/index.ts","utf8");
+assert.match(sourceCode,/const coverage=assessMatchCardCoverage\(parsed\)/);
+assert.match(sourceCode,/if\(!coverage\.acceptable\)/);
+assert.match(sourceCode,/const guarded=excludeContradictoryRounds/);
+assert.match(sourceCode,/const storedKeys=await readStoredSourceKeys\(id\)/);
+assert.ok(sourceCode.indexOf("assessMatchCardCoverage(parsed)")<
+ sourceCode.indexOf("readStoredSourceKeys(id);"),
+ "Never read/write persisted keys before the source quality gate");
