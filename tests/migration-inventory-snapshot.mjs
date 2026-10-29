@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile,readdir} from "node:fs/promises";
-import {auditMigrationInventory,auditLegacySqlCandidates} from "../scripts/audit-migration-inventory.mjs";
+import {auditMigrationInventory,auditLegacySqlCandidates,auditRegisteredSourceCoverage} from "../scripts/audit-migration-inventory.mjs";
 
 const snapshot=JSON.parse(await readFile(new URL("../docs/supabase-migrations-registered-20261029.json",import.meta.url),"utf8"));
 const files=(await readdir(new URL("../supabase/migrations/",import.meta.url)))
@@ -66,3 +66,39 @@ assert.throws(()=>auditLegacySqlCandidates(snapshot.registered,
 assert.throws(()=>auditLegacySqlCandidates(snapshot.registered,
  ["../escape.sql"]),/invalid_or_duplicate_legacy_file/);
 console.log("Legacy SQL filenames: candidates only; no SQL hash equivalence or recovery proven.");
+
+
+// S-01 #326: registered versions without even a candidate SQL file are
+// explicitly visible. Filename matches alone are NOT proof of SQL identity.
+const coverage=auditRegisteredSourceCoverage(snapshot.registered,files,legacyFiles);
+assert.equal(coverage.registered,78);
+assert.equal(coverage.candidateVersions,36);
+assert.equal(coverage.unbackedVersions,42,
+ "42 registered migrations have no uniquely matching local SQL candidate");
+assert.equal(coverage.conflictingVersions,0);
+assert.equal(coverage.sqlHashesVerified,false);
+assert.equal(coverage.recoveryReplayed,false);
+assert.ok(coverage.unbacked.every(x=>/^\d{14}$/.test(x.version)&&x.name),
+ "Only migration names/versions, never user data, enter the offline report");
+// A wrong name with the correct timestamp must NOT be counted as covered.
+const cross=auditRegisteredSourceCoverage(synthetic,[
+ "20261010120000_exact.sql",
+ "20261010130000_other.sql",
+ "20261010150000_source_name.sql"
+],["exact.sql","different.sql"]);
+assert.equal(cross.candidateVersions,3);
+assert.equal(cross.unbackedVersions,0);
+assert.equal(cross.conflictingVersions,1,
+ "Two candidate files for one migration are flagged, not silently accepted");
+assert.equal(cross.conflicting[0].version,"20261010120000");
+const onlyWrongTimestamp=auditRegisteredSourceCoverage(synthetic,
+ ["20261010130000_other.sql"],[]);
+assert.equal(onlyWrongTimestamp.candidateVersions,0);
+assert.equal(onlyWrongTimestamp.unbackedVersions,3);
+const ambiguousNames=auditRegisteredSourceCoverage([
+ {version:"20261010120000",name:"same_name"},
+ {version:"20261010130000",name:"SAME_NAME"}
+],[],["same-name.sql"]);
+assert.equal(ambiguousNames.candidateVersions,0);
+assert.equal(ambiguousNames.unbackedVersions,2);
+console.log("S-01 #326: 36 source candidates / 42 unbacked versions; no SQL hash or replay claims.");
