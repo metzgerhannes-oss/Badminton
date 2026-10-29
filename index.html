@@ -811,6 +811,16 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <button class="primary-button" id="tournament-save" type="submit">Turnier speichern</button>
  </form>
 </dialog>
+<dialog id="tournament-venue-dialog" aria-labelledby="tournament-venue-heading">
+ <form id="tournament-venue-form" class="modal">
+  <div class="section-heading"><h2 id="tournament-venue-heading">Austragungsort bearbeiten</h2><button id="tournament-venue-close" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <label for="tournament-venue-place">Austragungsort / Halle
+   <input id="tournament-venue-place" name="place" type="text" maxlength="120" autocomplete="off" placeholder="z. B. Sporthalle, Straße und Ort">
+  </label>
+  <p class="small muted">Nur für diese private Vormerkung. Eine spätere eindeutig zugeordnete DBV-Quelle hat Vorrang; Datum und Turnier bleiben unverändert.</p>
+  <button id="tournament-venue-save" class="primary-button" type="submit">Ort speichern</button>
+ </form>
+</dialog>
 <dialog id="spond-source-dialog" aria-labelledby="spond-source-heading">
  <div class="modal spond-source">
   <div class="spond-source-top"><h2 id="spond-source-heading">Spond-Termine übernehmen</h2><button type="button" id="spond-source-close" class="icon-button" aria-label="Schließen">×</button></div>
