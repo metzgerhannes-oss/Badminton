@@ -73,6 +73,46 @@ export function auditLegacySqlCandidates(registered,legacyFiles){
   candidates,ambiguous,unmapped,sqlHashesVerified:false,recoveryReplayed:false};
 }
 
+
+/** Cross-inventory source coverage: a candidate is not a replay or SQL match.
+ * Version-only conflicts are intentionally excluded; a wrong migration name
+ * must not be counted as a valid source for that registered version.
+ */
+export function auditRegisteredSourceCoverage(registered,localFiles,legacyFiles){
+ auditMigrationInventory(registered,localFiles);
+ const legacy=auditLegacySqlCandidates(registered,legacyFiles);
+ const byVersion=new Map(registered.map(entry=>[entry.version,entry]));
+ const byName=new Map();
+ for(const entry of registered){
+  const key=entry.name.toLowerCase();
+  byName.set(key,[...(byName.get(key)||[]),entry.version]);
+ }
+ const candidates=new Map(registered.map(entry=>[entry.version,[]]));
+ for(const filename of localFiles){
+  const match=/^(\d{14})_([A-Za-z0-9_]+)\.sql$/.exec(filename);
+  const [version,name]=[match[1],match[2].toLowerCase()];
+  const exact=byVersion.get(version)?.name.toLowerCase()===name;
+  const nameVersions=byName.get(name)||[];
+  const mapped=exact?version:nameVersions.length===1?nameVersions[0]:null;
+  if(mapped)candidates.get(mapped).push("supabase/migrations/"+filename);
+ }
+ for(const candidate of legacy.candidates)
+  candidates.get(candidate.registeredVersion).push("database/"+candidate.filename);
+ const unbacked=[],conflicting=[];
+ let candidateVersions=0;
+ for(const entry of registered){
+  const paths=candidates.get(entry.version);
+  if(paths.length===0)unbacked.push({version:entry.version,name:entry.name});
+  else{
+   candidateVersions++;
+   if(paths.length>1)conflicting.push({version:entry.version,name:entry.name,paths});
+  }
+ }
+ return {registered:registered.length,candidateVersions,
+  unbackedVersions:unbacked.length,conflictingVersions:conflicting.length,
+  unbacked,conflicting,sqlHashesVerified:false,recoveryReplayed:false};
+}
+
 async function report(){
  const snapshot=JSON.parse(await readFile(new URL("../docs/supabase-migrations-registered-20261029.json",import.meta.url),"utf8"));
  const directory=fileURLToPath(new URL("../supabase/migrations/",import.meta.url));
@@ -81,7 +121,8 @@ async function report(){
  const legacyDir=fileURLToPath(new URL("../database/",import.meta.url));
  const legacyFiles=(await readdir(legacyDir)).filter(n=>n.endsWith(".sql")).sort();
  const legacy=auditLegacySqlCandidates(snapshot.registered,legacyFiles);
- process.stdout.write(JSON.stringify({captured_on:snapshot.captured_on,...result,legacy},null,2)+"\n");
+ const sourceCoverage=auditRegisteredSourceCoverage(snapshot.registered,files,legacyFiles);
+ process.stdout.write(JSON.stringify({captured_on:snapshot.captured_on,...result,legacy,sourceCoverage},null,2)+"\n");
  if(!result.registered||!result.localFiles)process.exitCode=1;
 }
 // Direct CLI use only. Test import never reads other files or opens sockets.
