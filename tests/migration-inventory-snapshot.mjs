@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
+import {createHash} from "node:crypto";
 import {readFile,readdir} from "node:fs/promises";
-import {auditMigrationInventory,auditLegacySqlCandidates,auditRegisteredSourceCoverage} from "../scripts/audit-migration-inventory.mjs";
+import {auditMigrationInventory,auditLegacySqlCandidates,auditRegisteredSourceCoverage,auditStoredSqlFingerprints} from "../scripts/audit-migration-inventory.mjs";
 
 const snapshot=JSON.parse(await readFile(new URL("../docs/supabase-migrations-registered-20261029.json",import.meta.url),"utf8"));
 // Snapshot contains SQL fingerprints only; never fetches production data in CI.
@@ -108,3 +109,18 @@ const ambiguousNames=auditRegisteredSourceCoverage([
 assert.equal(ambiguousNames.candidateVersions,0);
 assert.equal(ambiguousNames.unbackedVersions,2);
 console.log("S-01 #326: 36 source candidates / 42 unbacked versions; no SQL hash or replay claims.");
+
+// Exact-byte comparison is pure offline; never reads production Supabase.
+const syntheticSql="CREATE TABLE synthetic_test (id integer);";
+const syntheticFingerprint=createHash("sha256").update(syntheticSql,"utf8").digest("hex");
+const fingerprints=auditStoredSqlFingerprints([
+ {version:"20261010120000",name:"synthetic",statement_sha256:syntheticFingerprint}
+],{"database/synthetic.sql":syntheticSql,
+    "database/modified.sql":syntheticSql+"\n"});
+assert.equal(fingerprints.filesChecked,2);
+assert.equal(fingerprints.exactByteMatches,1);
+assert.equal(fingerprints.exactVersionMatches,1);
+assert.equal(fingerprints.nonidenticalOrUnmatched,1);
+assert.equal(fingerprints.recoveryReplayed,false);
+assert.throws(()=>auditStoredSqlFingerprints([],{"bad/path.sql":"SQL"}),
+ /invalid_local_sql_fingerprint/);
