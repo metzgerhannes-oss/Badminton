@@ -65,7 +65,14 @@ test("remote revocation hides stale cached share and copy controls without issui
  let remotelyRevoked=false,overviewReads=0,inviteIssues=0;
  const secret="f".repeat(64);
  await page.addInitScript(({secret,id})=>{
-  seedSession();
+  localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[{id:"99-000001",name:"Synthetisches Testprofil"}],friends:[],
+   activeProfileId:"99-000001",chosen:"99-000001",officialLinks:[]
+  }));
+  localStorage.setItem("schmetterlinge.communitySession.v1",JSON.stringify({
+   access_token:"synthetic-owner-jwt",refresh_token:"synthetic-refresh",
+   expires_at:Date.now()+3600000,user_id:"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
+  }));
   localStorage.setItem("schmetterlinge.appIssuedInvite.v136",JSON.stringify({
    id,secret,expires:"2026-12-01T00:00:00Z",revoked:false
   }));
