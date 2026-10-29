@@ -42,8 +42,11 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
    if(member?.allowed!==true)
     throw new PublicReadError("restricted","Verified family membership required",403);
    const sessionToken=await member.getAccessToken?.();
-   if(typeof sessionToken!=="string"||!sessionToken)
+   if(typeof sessionToken!=="string"||!sessionToken||
+      typeof window==="undefined"||window.badmintonAppAccess!==member||
+      member.allowed!==true)
     throw new PublicReadError("restricted","Verified family session unavailable",403);
+   if(signal?.aborted)throw new PublicReadError("aborted","Request cancelled");
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
     headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),
@@ -58,6 +61,15 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
    try{rows=await response.json()}
    catch{throw new PublicReadError("invalid","Invalid JSON response")}
    if(!Array.isArray(rows))throw new PublicReadError("invalid","Expected row array");
+   // An in-flight response belongs to the member session that requested it.
+   // Logout, account switch, revocation or cancellation must not release
+   // old-session rows into the newly active UI (even after HTTP 200).
+   if(signal?.aborted)throw new PublicReadError("aborted","Request cancelled");
+   const currentToken=await member.getAccessToken?.();
+   if(typeof window==="undefined"||window.badmintonAppAccess!==member||
+      member.allowed!==true||currentToken!==sessionToken)
+    throw new PublicReadError("restricted","Family session changed during read",403);
+   if(signal?.aborted)throw new PublicReadError("aborted","Request cancelled");
    return {rows,range:response.headers?.get("content-range")||""};
   }catch(error){
    const normalized=error instanceof PublicReadError?error:
