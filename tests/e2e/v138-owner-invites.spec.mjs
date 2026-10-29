@@ -59,3 +59,47 @@ test("uninvited session cannot see invitation overview",async({page})=>{
  await expect(page.locator("#app-access-gate")).toBeVisible();
  await expect(page.locator("#settings-room-einladungen .invitation-card")).toBeHidden();
 });
+
+
+test("remote revocation hides stale cached share and copy controls without issuing a new grant",async({page})=>{
+ let remotelyRevoked=false,overviewReads=0,inviteIssues=0;
+ const secret="f".repeat(64);
+ await page.addInitScript(({secret,id})=>{
+  seedSession();
+  localStorage.setItem("schmetterlinge.appIssuedInvite.v136",JSON.stringify({
+   id,secret,expires:"2026-12-01T00:00:00Z",revoked:false
+  }));
+ },{secret,id});
+ await page.route(API+"/**",route=>{
+  const request=route.request(),path=new URL(request.url()).pathname;
+  if(request.method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
+  if(path.endsWith("/rpc/app_access_status"))
+   return route.fulfill({status:200,headers,body:'{"allowed":true,"owner":true}'});
+  if(path.endsWith("/rpc/app_access_invites_overview")){
+   overviewReads++;
+   return route.fulfill({status:200,headers,body:JSON.stringify([{
+    id,created_at:"2026-10-14T11:00:00Z",redeem_until:"2026-11-13T11:00:00Z",
+    revoked_at:remotelyRevoked?"2026-10-29T19:00:00Z":null,accepted_count:1
+   }])});
+  }
+  if(path.endsWith("/rpc/app_access_invite_issue"))inviteIssues++;
+  return route.fulfill({status:401,headers,body:'{"message":"Synthetic QA: denied"}'});
+ });
+ await page.goto("/#einstellungen/einladungen",{waitUntil:"domcontentloaded"});
+ const room=page.locator("#settings-room-einladungen");
+ await expect(room.locator(".invitation-overview")).toContainText("1 angenommene Zugänge");
+ await expect(room.locator("#invite-copy")).toBeVisible();
+ await expect(room.locator("#invite-link-preview")).toHaveAttribute("href",/#appinvite=/);
+ remotelyRevoked=true;
+ await room.getByRole("button",{name:"Liste aktualisieren"}).click();
+ await expect(room.locator(".invitation-overview")).toContainText("Widerrufen");
+ await expect(room.locator("#invite-copy")).toBeHidden();
+ await expect(room.locator("#invite-revoke")).toBeHidden();
+ await expect(room.locator("#invite-link-preview")).toHaveAttribute("href","./welcome.html#installation");
+ await expect(room.locator("#invite-status")).toContainText("wurde widerrufen");
+ const local=await page.evaluate(()=>JSON.parse(localStorage.getItem("schmetterlinge.appIssuedInvite.v136")));
+ expect(local.revoked).toBe(true);
+ expect(local.id).toBe(id);
+ expect(inviteIssues).toBe(0);
+ expect(overviewReads).toBe(2,"Remote revoke should not cause a refresh loop");
+});
