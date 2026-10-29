@@ -45,6 +45,28 @@ assert.equal(bookmarks.normalizeBookmark({...calendar,deadline:"2026-10-31"}).de
 const officialRow={key:"dbv-calendar-44094",url,hasDirectLink:true,
  title:"3. D-RLT BAW SW U11-U19 Gomaringen",start:"2026-11-22",end:"2026-11-22",
  deadline:"2026-11-15",place:"Sport- und Kulturhalle, Haydnstraße 22, Gomaringen"};
+// An official page requires an exact saved-calendar key PLUS an actual
+// canonical DBV tournament UUID, never merely a provider hostname/overview.
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[officialRow]),url);
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[]),"");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,key:"dbv-calendar-00012"}]),"",
+ "A calendar link for another event is never this saved event");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[officialRow,officialRow]),"",
+ "Duplicate source identities must not be treated as verified");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,hasDirectLink:false}]),"");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
+ url:"https://turniere.badminton.de/",hasDirectLink:true}]),"",
+ "Mislabelled DBV overview must not become a direct tournament link");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
+ url:"https://turniere.badminton.de/embed",hasDirectLink:true}]),"",
+ "DBV calendar embed is not a tournament detail page");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
+ url:"https://evil.example/tournament/"+id,hasDirectLink:true}]),"",
+ "A third-party tournament-shaped URL must not be promoted");
+assert.equal(bookmarks.verifiedCalendarEventUrl(bookmarks.normalizeBookmark({
+ url,playerId:"99-000001"}),[officialRow]),"",
+ "Only actual calendar reminders can be resolved via calendar source-key");
+
 const correct=bookmarks.normalizeBookmark({url,name:"3. D-RLT Gomaringen",
  startDate:"2026-11-22",endDate:"2026-11-22",playerId:"05-070879"});
 const enriched=bookmarks.reconcileOfficialMetadata(correct,[officialRow]);
@@ -129,6 +151,9 @@ assert.deepEqual(owned.map(p=>p.id),["future","past","today","unknown","other"],
 assert.doesNotMatch(source,/\bfetch\s*\(|XMLHttpRequest|localStorage|service_role|supabaseUrl/i);
 
 const appSource=await readFile("app.js","utf8");
+assert.match(appSource,/SchmetterlingeBookmarks\\.verifiedCalendarEventUrl\\(t,verifiedCalendarRows\\)/,
+ "Saved tournament cards must use validated direct source URLs, not a hostname-only regex");
+
 const prefillStart=appSource.indexOf("function prefillVerifiedTournamentForm(form){");
 const prefillEnd=appSource.indexOf("\nfunction openTournamentForm(",prefillStart);
 assert.ok(prefillStart>=0&&prefillEnd>prefillStart,"Verified tournament form helper must exist");
