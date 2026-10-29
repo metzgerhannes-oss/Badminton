@@ -108,7 +108,7 @@ const ambiguousNames=auditRegisteredSourceCoverage([
 ],[],["same-name.sql"]);
 assert.equal(ambiguousNames.candidateVersions,0);
 assert.equal(ambiguousNames.unbackedVersions,2);
-console.log("S-01 #326: 36 source candidates / 42 unbacked versions; no SQL hash or replay claims.");
+console.log("S-01 #326: 36 filename candidates / 42 without local candidates; stored-SQL fingerprints available, recovery replay not proven.");
 
 // Exact-byte comparison is pure offline; never reads production Supabase.
 const syntheticSql="CREATE TABLE synthetic_test (id integer);";
