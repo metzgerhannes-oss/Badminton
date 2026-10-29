@@ -38,6 +38,10 @@ function setActiveProfile(id){
  return true;
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
+// A native hashchange follows our already synchronously rendered tab clicks.
+ // Keep one route paint; genuine Back/Forward and deep-link hash changes still
+ // render because their destination differs from lastRenderedHash.
+let lastRenderedHash=location.hash||"#start";
 // Existing UI callers keep the same route and focus methods.
 function routeTo(page){
  // Choosing a followed player's statistics is not a Home/Logo action.
@@ -80,6 +84,7 @@ function navigatePrimary(page,{returnToOwn=true}={}){
  }
  state.page=page;
  if(location.hash!=="#"+page)location.hash="#"+page;
+ lastRenderedHash=location.hash||"#start";
  // Render the destination first. An unrelated dashboard/live rendering failure
  // must not trap navigation on the previous view.
  SchmetterlingeRouter.renderPage(state);
@@ -698,7 +703,12 @@ function setup(){
   navigatePrimary(dest);
  });
  window.addEventListener("hashchange",()=>{
-  state.page=(location.hash||"#start").slice(1).split("/")[0];
+  const destination=location.hash||"#start";
+  // navigatePrimary already painted this exact route and restored focus.
+  // Do not do the expensive second render/focus/scroll on its native event.
+  if(destination===lastRenderedHash)return;
+  lastRenderedHash=destination;
+  state.page=destination.slice(1).split("/")[0];
   // Never let an unrelated data renderer hold the old section on-screen.
   SchmetterlingeRouter.renderPage(state);
   try{render()}finally{
