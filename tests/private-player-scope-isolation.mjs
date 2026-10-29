@@ -148,6 +148,22 @@ function matchFixture({fetchImpl=async()=>matchOk(player),getSession=async()=>({
  assert.equal(api.matchArchiveSnapshot(player).rows.length,0);
 }
 
+// S-01 #199/#227: a valid page envelope must not hide an invalid match row.
+// Reject the whole page as unavailable, never present a falsely empty archive.
+for(const badRow of [
+ {...matchRow(other),source_key:"synthetic-foreign-row"},
+ {...matchRow(player),source_url:"http://example.invalid/unsafe-match"},
+ {...matchRow(player),winning_side:null}
+]){
+ const {api}=matchFixture({fetchImpl:async()=>({
+  ok:true,status:200,json:async()=>({...matchPage(player),entries:[badRow]})
+ })});
+ await api.requestPrivateMatches(player);
+ assert.equal(api.matchArchiveSnapshot(player).state,"unavailable",
+  "Invalid row inside an otherwise valid response must not become ready");
+ assert.equal(api.matchArchiveSnapshot(player).rows.length,0);
+}
+
 // Revocation and session switch: a late old-session success cannot override 403.
 {
  let resolveOld,call=0,session="old-synthetic";
