@@ -89,9 +89,13 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
  * suppress backed, server-authorized match-card reads. */
 export async function readMatchImportProgress(id,{signal}={}){
  if(typeof id!=="string"||!/^[0-9]{2}-[0-9]{6}$/.test(id))return null;
- if(typeof window!=="undefined"&&window.badmintonAppAccess?.allowed){
-  const jwt=await window.badmintonAppAccess.getAccessToken();
-  if(!jwt)return null;
+ const member=typeof window!=="undefined"?window.badmintonAppAccess:null;
+ if(member?.allowed===true){
+  // Coverage is advisory but still member-only. A delayed RPC response must
+  // not disclose old-session profile metadata after logout or account switch.
+  const jwt=await member.getAccessToken?.();
+  if(typeof jwt!=="string"||!jwt||signal?.aborted||
+     window.badmintonAppAccess!==member||member.allowed!==true)return null;
   const response=await fetch(SUPABASE_ROOT+"rpc/app_access_player_coverage",{
    method:"POST",cache:"no-store",signal,
    headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+jwt,"Content-Type":"application/json"},
@@ -99,6 +103,10 @@ export async function readMatchImportProgress(id,{signal}={}){
   });
   if(!response.ok)return null;
   const d=await response.json();
+  if(signal?.aborted||window.badmintonAppAccess!==member||member.allowed!==true)return null;
+  const currentJwt=await member.getAccessToken?.();
+  if(signal?.aborted||window.badmintonAppAccess!==member||
+     member.allowed!==true||currentJwt!==jwt)return null;
   if(d?.dbv_id!==id)return null;
   return {status:d.import_status||null,verified_count:Number(d.match_cards||0),
    last_finished_at:d.last_import||null,
