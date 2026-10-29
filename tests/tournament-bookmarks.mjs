@@ -206,8 +206,8 @@ assert.match(venueMarkup,/id="tournament-venue-dialog"/);
 assert.match(venueMarkup,/id="tournament-venue-form"/);
 assert.match(venueMarkup,/id="tournament-venue-place"[^>]*name="place"/);
 assert.match(appVenueSource,/data-edit-venue-id=/);
-assert.match(appVenueSource,/updateLocalCalendarVenue\\(current,raw\\)/);
-assert.doesNotMatch(appVenueSource,/updateLocalCalendarVenue\\([^)]*url/i,
+assert.match(appVenueSource,/updateLocalCalendarVenue\(current,raw\)/);
+assert.doesNotMatch(appVenueSource,/updateLocalCalendarVenue\([^)]*url/i,
  "A venue-only edit must never infer new official UUIDs");
 
 console.log("Tournament bookmarks v61: official URL, strict calendar dates, Berlin day, own/friend boundaries and stable sort verified.");
