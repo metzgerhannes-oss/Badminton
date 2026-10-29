@@ -40,7 +40,12 @@ export async function readBoundedText(response,maxBytes=5500000){
  const declared=response.headers.get("content-length");
  if(declared!==null){
   if(!/^\d+$/.test(declared))throw new SyntaxError("invalid_content_length");
-  if(Number(declared)>maxBytes)throw new PayloadTooLargeError();
+  if(Number(declared)>maxBytes){
+   // A rejected upstream response must not leave its streaming body open.
+   // Cancel before parsing or allocating any of the oversized payload.
+   try{await response.body?.cancel();}catch{}
+   throw new PayloadTooLargeError();
+  }
  }
  const reader=response.body?.getReader();
  if(!reader)throw new SyntaxError("invalid_source_body");
