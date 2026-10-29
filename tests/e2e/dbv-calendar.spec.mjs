@@ -428,7 +428,12 @@ test("F06: 2027 C planning + persists locally with honest unknown venue",async({
  expect(saved.filter(t=>t.source==="bwbv-framework")).toHaveLength(1);
  await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","true");
+ // WebKit may paint the restored '+'/'✓' state before the app's click
+ // callback is registered after reload. Wait for the actual command, not
+ // only for a static DOM attribute that looks interactive.
+ await page.waitForFunction(()=>typeof window.badmintonFrameworkToggle==="function");
  await page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]").click();
+ await expect(page.locator(".dbv-calendar-external-plan").first().locator("[data-framework-toggle]")).toHaveAttribute("aria-pressed","false");
  await expect(page.locator("#official-tournament-list")).not.toContainText("Rahmentermin · Anmeldung nicht bestätigt");
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(2);
 });
