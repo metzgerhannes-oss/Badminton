@@ -199,7 +199,7 @@ console.log("Offline backup contract: roundtrip, canonical home profile, old app
 // storage. Two writes are not transactional; a calendar quota failure must
 // restore the prior family and calendar rather than leave a mixed backup.
 const backupRuntime=(await readFile("backup.js","utf8"))
- .replace(/^import\s*\{[\s\S]*?\}\s*from\s*["'][^"']+["'];?\s*/,"");
+ .replace(/\bimport\s*\{[\s\S]*?\}\s*from\s*["'][^"']+["'];?/,"");
 assert.doesNotMatch(backupRuntime,/^\s*import\s/m,"Restore harness must evaluate the real module body");
 function restoreHarness({archive=created,approve=true,failCalendarOnce=false}={}){
  const beforeFamily=JSON.stringify(parsed.data);
