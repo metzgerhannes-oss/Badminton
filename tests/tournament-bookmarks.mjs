@@ -151,7 +151,7 @@ assert.deepEqual(owned.map(p=>p.id),["future","past","today","unknown","other"],
 assert.doesNotMatch(source,/\bfetch\s*\(|XMLHttpRequest|localStorage|service_role|supabaseUrl/i);
 
 const appSource=await readFile("app.js","utf8");
-assert.match(appSource,/SchmetterlingeBookmarks\\.verifiedCalendarEventUrl\\(t,verifiedCalendarRows\\)/,
+assert.ok(appSource.includes("SchmetterlingeBookmarks.verifiedCalendarEventUrl(t,verifiedCalendarRows)"),
  "Saved tournament cards must use validated direct source URLs, not a hostname-only regex");
 
 const prefillStart=appSource.indexOf("function prefillVerifiedTournamentForm(form){");
