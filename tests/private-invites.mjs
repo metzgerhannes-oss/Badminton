@@ -1,7 +1,21 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {freshToken,tokenFromFragment,invitationLink,safeEvent,storedInvites,inviteKey} from "../scripts/private-invite-utils.mjs";
+import {reconcileIssuedInvite} from "../scripts/owner-invites-overview.mjs";
 const valid="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+const issued={id:"11111111-2222-4333-8444-555555555555",
+ secret:"synthetic-no-real-link",expires:"2026-11-20T00:00:00Z",revoked:false};
+const revokedRow={id:issued.id,revoked_at:"2026-10-29T19:00:00Z"};
+assert.deepEqual(reconcileIssuedInvite(issued,[revokedRow]),{...issued,revoked:true},
+ "Only an exact server-confirmed revocation can invalidate the local copy/share link");
+assert.equal(reconcileIssuedInvite(issued,[{...revokedRow,id:valid}]),null,
+ "Revoking another owner's link must never alter the local link");
+assert.equal(reconcileIssuedInvite(issued,[]),null,
+ "An invite missing from a bounded overview is NOT proof of revocation");
+assert.equal(reconcileIssuedInvite(issued,[{...revokedRow,revoked_at:null}]),null);
+assert.equal(reconcileIssuedInvite({...issued,revoked:true},[revokedRow]),null);
+assert.equal(reconcileIssuedInvite({...issued,id:"not-an-id"},[revokedRow]),null);
+
 const b={id:valid,url:"https://dbv.turnier.de/tournament/"+valid,
  name:"Jugendturnier",playerId:"05-070879",startDate:"2026-12-03",endDate:"2026-12-04"};
 const tok=freshToken({getRandomValues:a=>{for(let i=0;i<a.length;i++)a[i]=i}});
