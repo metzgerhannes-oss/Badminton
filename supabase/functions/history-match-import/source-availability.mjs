@@ -61,3 +61,50 @@ export function selectUnstoredScoreless(rows,storedKeys){
  const known=new Set(storedKeys);
  return rows.filter(row=>row?.outcome_evidence==="badhub-bold-dash"&&!known.has(row.source_key));
 }
+
+
+/** Validate source-parser yield without treating explicitly NON-PLAYED cards
+ * or later quarantine decisions as evidence that HTML parsing failed.
+ * Only documented, unambiguously unplayed source statuses reduce the
+ * denominator. Ambiguous or unclassified source cards NEVER get a discount.
+ * This is a pure, offline-testable guard: it neither fetches nor persists.
+ */
+export function assessMatchCardCoverage(parsed){
+ if(!Array.isArray(parsed)||parsed.length<1||parsed.length>2)
+  throw Error("invalid_source_coverage_input");
+ const knownUnplayed=["confirmed_bye_rast","marked_walkover",
+  "marked_retirement","marked_disqualification"];
+ let sourceCards=0,parsedCards=0,documentedUnplayed=0;
+ const identities=new Set();
+ for(const result of parsed){
+  if(!Number.isSafeInteger(result?.cards_seen)||result.cards_seen<0||
+     !Array.isArray(result?.items)||!result.rejection_reasons||
+     typeof result.rejection_reasons!=="object")
+   throw Error("invalid_source_coverage_input");
+  sourceCards+=result.cards_seen;
+  parsedCards+=result.items.length;
+  if(!Number.isSafeInteger(sourceCards)||!Number.isSafeInteger(parsedCards))
+   throw Error("invalid_source_coverage_input");
+  for(const row of result.items){
+   if(typeof row?.source_key!=="string"||!row.source_key)
+    throw Error("invalid_source_coverage_identity");
+   identities.add(row.source_key);
+  }
+  for(const kind of knownUnplayed){
+   const n=result.rejection_reasons[kind]||0;
+   if(!Number.isSafeInteger(n)||n<0)throw Error("invalid_source_coverage_reason");
+   documentedUnplayed+=n;
+   if(!Number.isSafeInteger(documentedUnplayed))
+    throw Error("invalid_source_coverage_reason");
+  }
+ }
+ if(parsedCards>sourceCards)throw Error("invalid_source_coverage_count");
+ // Never subtract documented exclusions beyond the actually unparsed cards.
+ const nonplayed=Math.min(documentedUnplayed,sourceCards-parsedCards);
+ const potentialPlayed=sourceCards-nonplayed;
+ // The old 55% anti-layout-drift floor applies to potentially played
+ // cards. Entire-event quarantine is separate and remains in force.
+ const required=Math.floor(potentialPlayed*0.55);
+ return {acceptable:identities.size>=required,sourceCards,
+  parsedCards:identities.size,nonplayed,potentialPlayed,required};
+}
