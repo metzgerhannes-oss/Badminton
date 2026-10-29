@@ -1,5 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,importStatusForBatch,missingSourceStatus,reconcileMatchBatch} from "./source-availability.mjs";
+import {assessSourceAvailability,assessMatchCardCoverage,importStatusForBatch,missingSourceStatus,reconcileMatchBatch} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError,readBoundedText} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
@@ -160,8 +160,14 @@ Deno.serve(async req=>{
    return respond(200,{queued:true,stored:0,eligible:0,existing_proof:saved,
     reason:sources.missing.length?"partial_source_no_matches":"no_source_matches"},origin);
   }
-  if(all.length<Math.floor(cardCount*0.55))
+  const coverage=assessMatchCardCoverage(parsed);
+  if(!coverage.acceptable){
+   // Private aggregate metrics only. Never log player identities/source URLs.
+   console.error("Source card coverage gate",{cards:coverage.sourceCards,
+    potential:coverage.potentialPlayed,valid:coverage.parsedCards,
+    documented_nonplayed:coverage.nonplayed,required:coverage.required});
    throw Error("Match parser rejected unexpected amount of source cards");
+  }
   // Reconcile every fresh, verified source_key against actual persisted proof.
   // This also finds older missing cards after source reordering; old numeric
   // cursor_offset and stale source_count are never used to infer completeness.
