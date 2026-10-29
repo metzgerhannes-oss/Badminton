@@ -3,29 +3,33 @@ import {readFile} from "node:fs/promises";
 import {addAcceptedPlayerToLocalStore,invitationFollowCandidate} from "../scripts/invited-player-local.mjs";
 import {searchInvitationPlayers} from "../scripts/invitation-search.mjs";
 
-const person={dbv_id:"05-070879",name:"Philipp Metzger",club:"SpVgg Mössingen",birth_year:2016,age_class:"U13"};
+// All identities in this public regression are synthetic and deliberately use
+// the non-production 99- prefix. Never add real family names or DBV IDs here.
+const person={dbv_id:"99-100101",name:"Testperson A",club:"Musterverein",birth_year:2016,age_class:"U13"};
+assert.match(person.dbv_id,/^99-/);
+assert.match(person.name,/^Testperson /);
 const added=addAcceptedPlayerToLocalStore(null,person);
 assert.deepEqual(added.players,undefined,"Accepted invitation must NOT create a self-owned player");
 assert.equal(added.friends.length,1);
-assert.deepEqual(added.friends[0],{id:"05-070879",name:"Philipp Metzger",club:"SpVgg Mössingen",birthYear:2016,url:""});
+assert.deepEqual(added.friends[0],{id:"99-100101",name:"Testperson A",club:"Musterverein",birthYear:2016,url:""});
 assert.equal(added.activeProfileId,undefined,"No owner/active profile assigned");
 assert.equal(invitationFollowCandidate({dbv_id:"x",name:"Wrong"}),null);
-assert.equal(addAcceptedPlayerToLocalStore(null,{dbv_id:"05-070879",name:""}),null);
+assert.equal(addAcceptedPlayerToLocalStore(null,{dbv_id:"99-100101",name:""}),null);
 
-const existing={players:[{id:"05-071969",name:"Charlotte"}],
- friends:[{id:"05-070879",name:"Old display",birthYear:2016,url:""}],
- activeProfileId:"05-071969",officialLinks:[{id:"T1",name:"Existing tournament"}],
+const existing={players:[{id:"99-100102",name:"Testperson B"}],
+ friends:[{id:"99-100101",name:"Old display",birthYear:2016,url:""}],
+ activeProfileId:"99-100102",officialLinks:[{id:"T1",name:"Existing tournament"}],
  customSetting:"still stored"};
 const merged=addAcceptedPlayerToLocalStore(existing,person);
 assert.equal(merged.players.length,1,"Do not replace own profiles");
-assert.equal(merged.players[0].name,"Charlotte");
+assert.equal(merged.players[0].name,"Testperson B");
 assert.equal(merged.friends.length,1,"No duplicate followed players");
-assert.equal(merged.friends[0].name,"Philipp Metzger");
+assert.equal(merged.friends[0].name,"Testperson A");
 assert.equal(merged.activeProfileId,existing.activeProfileId);
 assert.deepEqual(merged.officialLinks,existing.officialLinks);
 assert.equal(merged.customSetting,"still stored");
 assert.equal(existing.friends[0].name,"Old display","Do not mutate prior state");
-const ownsSame=addAcceptedPlayerToLocalStore({players:[{id:person.dbv_id,name:"Philipp"}],friends:[]},person);
+const ownsSame=addAcceptedPlayerToLocalStore({players:[{id:person.dbv_id,name:"Testperson"}],friends:[]},person);
 assert.equal(ownsSame.friends.length,0,"Existing owned profile must not duplicate into following");
 
 // Offline fixture: family-member session required for the remote identity RPC.
@@ -34,7 +38,7 @@ const previousWindow=globalThis.window;
 globalThis.window={badmintonAppAccess:{allowed:true,
  getAccessToken:async()=>"synthetic-accepted-family-member"}};
 let scopedLookups=0;
-const local=await searchInvitationPlayers("Philipp",{savedCandidates:added.friends,fetchImpl:async url=>{
+const local=await searchInvitationPlayers("Testperson",{savedCandidates:added.friends,fetchImpl:async url=>{
  scopedLookups++;
  if(String(url).includes("rpc/search_dbv_player_identity"))throw Error("Synthetic lookup offline");
  throw Error("Synthetic backup unavailable");
@@ -42,14 +46,14 @@ const local=await searchInvitationPlayers("Philipp",{savedCandidates:added.frien
 assert.equal(local.source,"unavailable-device");
 assert.equal(local.players[0].id,person.dbv_id);
 assert.ok(scopedLookups>=1,"A local hit must not skip the official identity lookup");
-const combined=await searchInvitationPlayers("Philipp",{savedCandidates:added.friends,fetchImpl:async url=>{
+const combined=await searchInvitationPlayers("Testperson",{savedCandidates:added.friends,fetchImpl:async url=>{
  assert.ok(String(url).includes("rpc/search_dbv_player_identity"));
  return {ok:true,json:async()=>[
-  {...person}, {dbv_id:"05-071970",name:"Philipp Beispiel",club:"Anderer Verein"}
+  {...person}, {dbv_id:"99-100103",name:"Testperson C",club:"Anderer Musterverein"}
  ]};
 }});
 assert.equal(combined.source,"mixed");
-assert.deepEqual(combined.players.map(p=>p.id),["05-070879","05-071970"],
+assert.deepEqual(combined.players.map(p=>p.id),["99-100101","99-100103"],
  "Local and official search results combine without duplicate DBV IDs");
 const forbidden=await searchInvitationPlayers("Anderer Spieler",{fetchImpl:async(url)=>{
  if(String(url).includes("/rpc/search_dbv_player_identity"))return {ok:false,status:403};
