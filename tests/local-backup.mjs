@@ -64,22 +64,22 @@ assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(parsed.data
 // A device-local ID is an independent identity, even when another official
 // profile has the same display name. Neither favorites nor Home choice move.
 const sameNameLocal={...original,
- players:[{id:"local-charlotte",name:"Testperson B"},{id:"99-100002",name:"Testperson B"}],
+ players:[{id:"local-fixture-player",name:"Testperson B"},{id:"99-100002",name:"Testperson B"}],
  friends:[],
- officialLinks:[{...original.officialLinks[0],playerId:"local-charlotte"},
+ officialLinks:[{...original.officialLinks[0],playerId:"local-fixture-player"},
   {...original.officialLinks[0],playerId:"99-100002"}],
- activeProfileId:"local-charlotte",chosen:"99-100002"};
+ activeProfileId:"local-fixture-player",chosen:"99-100002"};
 const sameNameRestored=inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameLocal)));
-assert.deepEqual(sameNameRestored.data.players.map(p=>p.id),["local-charlotte","99-100002"]);
-assert.deepEqual(sameNameRestored.data.officialLinks.map(t=>t.playerId),["local-charlotte","99-100002"]);
-assert.equal(sameNameRestored.data.activeProfileId,"local-charlotte");
-assert.equal(sameNameRestored.data.chosen,"local-charlotte");
-assert.equal(inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameRestored.data))).data.activeProfileId,"local-charlotte");
+assert.deepEqual(sameNameRestored.data.players.map(p=>p.id),["local-fixture-player","99-100002"]);
+assert.deepEqual(sameNameRestored.data.officialLinks.map(t=>t.playerId),["local-fixture-player","99-100002"]);
+assert.equal(sameNameRestored.data.activeProfileId,"local-fixture-player");
+assert.equal(sameNameRestored.data.chosen,"local-fixture-player");
+assert.equal(inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameRestored.data))).data.activeProfileId,"local-fixture-player");
 assert.throws(()=>createLocalBackup(JSON.stringify({...sameNameLocal,
  players:[{id:"99-100002",name:"Testperson B"}]})),
  /unbekannten Spieler/,"A removed local owner must not silently transfer a tournament");
 assert.throws(()=>inspectLocalBackup(JSON.stringify({...JSON.parse(created),
- data:{...original,activeProfileId:"local-charlotte"}})),
+ data:{...original,activeProfileId:"local-fixture-player"}})),
  /kein eigenes Spielerprofil/,"A stale active alias must not select an unrelated official profile");
 
 // A person can be an own profile and independently followed with the same
