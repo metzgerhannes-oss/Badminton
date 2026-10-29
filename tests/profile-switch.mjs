@@ -7,8 +7,8 @@ const storageScript=await readFile("state-storage.js","utf8");
 const bookmarksScript=await readFile("tournament-bookmarks.js","utf8");
 const styles=await readFile("styles.css","utf8");
 const store=new Map([["shuttleboard-v1",JSON.stringify({
- players:[{id:"05-070879",name:"Philipp Metzger"},{id:"05-071969",name:"Charlotte Metzger"}],
- friends:[],officialLinks:[],activeProfileId:"05-070879",historyProfilesInitialized:true
+ players:[{id:"99-100001",name:"Testperson A"},{id:"99-100002",name:"Testperson B"}],
+ friends:[],officialLinks:[],activeProfileId:"99-100001",historyProfilesInitialized:true
 })]]);
 const header={innerHTML:"",querySelectorAll:()=>[]};
 const context=vm.createContext({
@@ -24,24 +24,24 @@ run("restore()"); // Existing local profiles survive neutral default onboarding.
 
 run("renderFocusHeader()");
 assert.match(header.innerHTML,/class="focus-switcher"/,"Two own profiles should show a top switcher");
-assert.match(header.innerHTML,/data-switch-profile="05-070879"/);
-assert.match(header.innerHTML,/data-switch-profile="05-071969"/);
+assert.match(header.innerHTML,/data-switch-profile="99-100001"/);
+assert.match(header.innerHTML,/data-switch-profile="99-100002"/);
 assert.match(header.innerHTML,/aria-current="true"/,"Selected player identified accessibly");
 assert.ok(!header.innerHTML.includes('href="#einstellungen">Wechseln'),"Should not redirect to settings to change players");
 
-assert.equal(run('setActiveProfile("05-071969")'),true);
-assert.equal(run("state.activeProfileId"),"05-071969");
-assert.equal(run("state.chosen"),"05-071969");
-assert.equal(JSON.parse(store.get("shuttleboard-v1")).activeProfileId,"05-071969");
+assert.equal(run('setActiveProfile("99-100002")'),true);
+assert.equal(run("state.activeProfileId"),"99-100002");
+assert.equal(run("state.chosen"),"99-100002");
+assert.equal(JSON.parse(store.get("shuttleboard-v1")).activeProfileId,"99-100002");
 run("renderFocusHeader()");
-assert.match(header.innerHTML,/Charlotte Metzger/);
+assert.match(header.innerHTML,/Testperson B/);
 assert.match(header.innerHTML,/class="focus-switcher"/);
 
-run('state.viewingFriendId="05-123456"');
+run('state.viewingFriendId="99-100003"');
 run("renderFocusHeader()"); // Friend not saved: safe missing-profile fallback.
 assert.doesNotMatch(header.innerHTML,/class="focus-switcher"/);
 run('state.viewingFriendId=null');
-run('state.players=state.players.filter(p=>p.id==="05-071969")');
+run('state.players=state.players.filter(p=>p.id==="99-100002")');
 run("renderFocusHeader()");
 assert.doesNotMatch(header.innerHTML,/class="focus-switcher"/,"One own profile must have no switcher");
 assert.doesNotMatch(header.innerHTML,/>Wechseln</,"One profile must not show a switch button");
