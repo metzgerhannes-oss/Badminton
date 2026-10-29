@@ -61,7 +61,9 @@ function safeRows(rows,player){
  if(!Array.isArray(rows))throw Error("invalid private match rows");
  const valid=rows.filter(row=>row&&row.dbv_id===player&&typeof row.source_key==="string"&&
   typeof row.source_url==="string"&&row.source_url.startsWith("https://")&&
-  /^\d{4}-\d\d-\d\d$/.test(row.match_date||"")&&
+  (row.match_date===null
+   ?Number.isInteger(row.match_year)&&row.match_year>=1900&&row.match_year<=2100
+   :/^\d{4}-\d\d-\d\d$/.test(row.match_date||""))&&
   [1,2].includes(row.player_side)&&[1,2].includes(row.winning_side)&&
   Array.isArray(row.games)&&Array.isArray(row.opponent_names));
  if(valid.length!==rows.length)throw Error("invalid private match row");
