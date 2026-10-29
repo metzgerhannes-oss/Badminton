@@ -125,13 +125,13 @@ export function auditStoredSqlFingerprints(registered,localSqlByPath){
  const byHash=new Map();
  for(const row of registered){
   if(!row||!/^[a-f0-9]{64}$/.test(row.statement_sha256)||
-     !/^\\d{14}$/.test(row.version))throw Error("invalid_registered_sql_fingerprint");
+     !/^\d{14}$/.test(row.version))throw Error("invalid_registered_sql_fingerprint");
   byHash.set(row.statement_sha256,[...(byHash.get(row.statement_sha256)||[]),row.version]);
  }
  const matched=[],unmatched=[];
  for(const [path,sql] of Object.entries(localSqlByPath)){
   if(typeof sql!=="string"||typeof path!=="string"||
-     !/^(supabase\\/migrations|database)\\/[A-Za-z0-9_-]+\\.sql$/.test(path))
+     !/^(supabase\/migrations|database)\/[A-Za-z0-9_-]+\.sql$/.test(path))
    throw Error("invalid_local_sql_fingerprint");
   const hash=createHash("sha256").update(sql,"utf8").digest("hex");
   const versions=byHash.get(hash)||[];
