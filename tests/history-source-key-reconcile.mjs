@@ -60,6 +60,16 @@ const endless=new ReadableStream({pull(controller){controller.enqueue(new Uint8A
 await assert.rejects(readBoundedText(new Response(endless),5),PayloadTooLargeError);
 assert.equal(cancelled,true,"Oversized response stream must be cancelled");
 await assert.rejects(readBoundedText(new Response("ok",{headers:{"content-length":"99"}}),5),PayloadTooLargeError);
+let rejectedHeaderStreamCancelled=false;
+const rejectedHeaderStream=new ReadableStream({
+ start(controller){controller.enqueue(new Uint8Array([65,66]));},
+ cancel(){rejectedHeaderStreamCancelled=true;}
+});
+await assert.rejects(readBoundedText(new Response(rejectedHeaderStream,{
+ headers:{"content-length":"999"}
+}),5),PayloadTooLargeError);
+assert.equal(rejectedHeaderStreamCancelled,true,
+ "Oversized Content-Length must cancel upstream HTML before body consumption");
 await assert.rejects(readBoundedText(new Response("ok",{headers:{"content-length":"oops"}}),5),/invalid_content_length/);
 await assert.rejects(readBoundedText(new Response(null),5),/invalid_source_body/);
 const edge=await readFile("supabase/functions/history-match-import/index.ts","utf8");
