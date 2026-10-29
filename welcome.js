@@ -191,6 +191,10 @@ function showSearchResults(players,source){
 // family session against the server before enabling the same member-only RPCs.
 // A player-scoped invitation is NOT a global family membership.
 async function verifyWelcomeFamilyMember(signal){
+ // Network responses can resolve out of order. The newest check alone is
+ // permitted to restore a client-side capability, including after cancellation.
+ const checkId=(verifyWelcomeFamilyMember.latestCheckId||0)+1;
+ verifyWelcomeFamilyMember.latestCheckId=checkId;
  // A prior successful search never authorizes a later query. Invalidate the
  // local capability before every fresh server membership decision, including
  // logout, revoked membership, an expired session or a transient 403.
@@ -199,7 +203,8 @@ async function verifyWelcomeFamilyMember(signal){
   async getAccessToken(){return null;}
  });
  const session=await getPrivateSession(false);
- if(!session?.access_token)return false;
+ if(signal?.aborted||checkId!==verifyWelcomeFamilyMember.latestCheckId||
+    !session?.access_token)return false;
  const response=await fetch(SUPABASE_ROOT+"rpc/app_access_status",{
   method:"POST",cache:"no-store",signal,
   headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,
@@ -207,7 +212,8 @@ async function verifyWelcomeFamilyMember(signal){
  });
  if(!response.ok)return false;
  const result=await response.json().catch(()=>null);
- if(result?.allowed!==true)return false;
+ if(signal?.aborted||checkId!==verifyWelcomeFamilyMember.latestCheckId||
+    result?.allowed!==true)return false;
  window.badmintonAppAccess=Object.freeze({
   allowed:true,
   async getAccessToken(){return (await getPrivateSession(false))?.access_token||null;}
