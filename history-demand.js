@@ -42,9 +42,13 @@ async function memberRpc(name,body,signal){
 async function callStatus(id,signal){
  if(window.badmintonAppAccess?.allowed){
   const coverage=await memberRpc("app_access_player_coverage",{p_player_dbv_id:id},signal);
+  // Match-card counts come from the server's permission-checked RPC.
+  // Missing/invalid counts must remain unknown, not be presented as zero.
+  const raw=coverage?.match_cards;
+  const verifiedCount=raw===null||raw===undefined?null:Number(raw);
   return {dbv_id:id,status:coverage?.import_status||"awaiting_source",
    last_checked_at:coverage?.last_import||null,
-   detail:"Nachgewiesene Einzelbelege: "+Number(coverage?.match_cards||0)};
+   match_cards:Number.isSafeInteger(verifiedCount)&&verifiedCount>=0?verifiedCount:null};
  }
  const {rows}=await readPublicRows(importStatusPath(id),{signal,count:false});
  return rows[0]||null;
