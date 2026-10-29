@@ -1,4 +1,4 @@
-import {demandPost,importStatusPath,importMessage,validHistoryId} from "./scripts/history-demand.mjs";
+import {demandPost,importStatusPath,importMessage,validHistoryId,historyImportOutcome} from "./scripts/history-demand.mjs";
 import {SUPABASE_ROOT,PUBLIC_KEY,readPublicRows} from "./scripts/supabase-read.mjs";
 
 let shown="",requestSeq=0,timeout,controller;
@@ -100,17 +100,30 @@ async function requestIndividualMatches(id){
  try{
   const jwt=await window.badmintonAppAccess.getAccessToken();
   if(!jwt)return;
-  sourceCheckAt.set(id,Date.now());
-  const response=await fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
-   method:"POST",headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+jwt,
-    "Content-Type":"application/json"},
-   body:JSON.stringify({dbv_id:id})
-  });
-  if(response.ok){
-   window.dispatchEvent(new CustomEvent("badminton:external-matches-updated",
-    {detail:{playerId:id}}));
+  const requestedAt=Date.now();
+  // Prevent duplicate simultaneous requests; release the local throttle on
+  // network/HTTP/parser failure so an explicit revisit can retry immediately.
+  sourceCheckAt.set(id,requestedAt);
+  try{
+   const response=await fetch("https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/history-match-import",{
+    method:"POST",headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+jwt,
+     "Content-Type":"application/json"},
+    body:JSON.stringify({dbv_id:id})
+   });
+   if(!response.ok)throw Error("history_import_http_failure");
+   const outcome=historyImportOutcome(await response.json());
+   if(!outcome)throw Error("history_import_invalid_response");
+   // A successful but skipped/cached source check does not change local facts.
+   if(outcome.changed){
+    window.dispatchEvent(new CustomEvent("badminton:external-matches-updated",
+     {detail:{playerId:id}}));
+   }
+  }catch{
+   if(sourceCheckAt.get(id)===requestedAt)sourceCheckAt.delete(id);
+   // No player identities or upstream errors in browser logs.
+   console.warn("Source-backed match import temporarily unavailable");
   }
- }catch(error){console.warn("Source-backed match import temporarily unavailable",error?.message)}
+ }catch{console.warn("History import membership check unavailable")}
 }
 // Following, backup restoration and Home must not upload any DBV-ID.
 const historyOpen=()=>location.hash==="#historie";
