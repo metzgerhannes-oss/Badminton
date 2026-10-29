@@ -172,6 +172,42 @@ for(const width of [351,390,430]){
   await expect(page.locator("#app-access-gate")).toBeHidden();
  });
 }
+// P1 #370: a 2.5s shuttle loop is visual only. A late but valid membership
+// response must dismiss the splash mid-cycle, not wait for another iteration.
+// The isolated fixture intercepts all productive Supabase traffic.
+test("slow verified access never waits for the shuttle loop to finish",async({page})=>{
+ await withExistingSession(page);
+ let finishCheck;
+ const checking=new Promise(resolve=>{finishCheck=resolve});
+ let started;
+ const requestStarted=new Promise(resolve=>{started=resolve});
+ await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
+  started();
+  await checking;
+  await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+ });
+ try{
+  await page.goto("/",{waitUntil:"commit"});
+  await requestStarted;
+  await expect(page.locator("#app-access-splash")).toBeVisible();
+  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
+  // Synchronize to an early point in any 2.5s cycle. A wait-for-animation-end
+  // regression would now delay access by ~2s; a correct grant is immediate.
+  await page.waitForFunction(()=>{
+   const img=document.querySelector(".app-access-shuttle");
+   const animation=img?.getAnimations().find(a=>a.effect?.getKeyframes);
+   const t=Number(animation?.currentTime);
+   return Number.isFinite(t)&&t%2500>=180&&t%2500<=480;
+  },null,{timeout:10000,polling:50});
+  const releasedAt=Date.now();
+  finishCheck();
+  await expect(page.locator("#app-access-gate")).toBeHidden({timeout:5000});
+  expect(Date.now()-releasedAt,"Successful authorization must not wait for the 2.5s visual cycle").toBeLessThan(1250);
+  await expect(page.locator("body > .app")).toBeVisible();
+ }finally{finishCheck();}
+});
+
 test("v221 fast successful cold launch shows intro for 0.8s; warm navigation never restarts splash",async({page})=>{
  await withExistingSession(page);
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>
