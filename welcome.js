@@ -267,8 +267,8 @@ window.addEventListener("schmetterlinge:language-change", event => {
  else if(lastSearchStatus?.kind==="results")setResultsStatus(lastSearchStatus.count,lastSearchStatus.source);
  else if(lastSearchStatus?.kind==="message")setSearchStatus(lastSearchStatus.message);
  if(!$("onboard-install").hidden&&$("open-app").hidden){
-  const saved=readSaved()?.players;
-  showInstallFirst(Array.isArray(saved)&&saved.length>0);
+  const saved=readSaved();
+  showInstallFirst(Boolean(saved?.players?.length||saved?.friends?.length));
  }
  if(selectedCandidate){
   const detail=[selectedCandidate.club||t("Verein unbekannt"),
@@ -304,8 +304,10 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("install-android").addEventListener("click",()=>showPlatform("android"));
  $("install-back").addEventListener("click",showProfileForm);
  $("install-backup-export").addEventListener("click",exportExistingSafariProfiles);
- const known=readSaved()?.players;
- const hasProfiles=Array.isArray(known)&&known.length>0;
+ const saved=readSaved();
+ // A family member with only accepted/followed players still has local data
+ // to back up before Safari -> installed-PWA storage isolation.
+ const hasProfiles=Boolean(saved?.players?.length||saved?.friends?.length);
  $("welcome-existing").hidden=!hasProfiles;
  // A user coming from the app has already chosen to use its current
  // browser/PWA context; do not send them back through installation advice.
