@@ -191,6 +191,13 @@ function showSearchResults(players,source){
 // family session against the server before enabling the same member-only RPCs.
 // A player-scoped invitation is NOT a global family membership.
 async function verifyWelcomeFamilyMember(signal){
+ // A prior successful search never authorizes a later query. Invalidate the
+ // local capability before every fresh server membership decision, including
+ // logout, revoked membership, an expired session or a transient 403.
+ window.badmintonAppAccess=Object.freeze({
+  allowed:false,
+  async getAccessToken(){return null;}
+ });
  const session=await getPrivateSession(false);
  if(!session?.access_token)return false;
  const response=await fetch(SUPABASE_ROOT+"rpc/app_access_status",{
