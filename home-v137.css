@@ -32,7 +32,7 @@
 #view-start .upcoming-tournaments-section{margin:3px 0 9px;padding:11px 12px 4px;border-radius:16px}
 #view-start .upcoming-tournaments-header{align-items:center;margin-bottom:3px;gap:8px}
 #view-start .upcoming-tournaments-header h2{font-size:16px;line-height:1.25}
-#view-start .upcoming-tournaments-header a{font-size:11px;min-height:38px;display:flex;align-items:center}
+#view-start .upcoming-tournaments-header a{font-size:11px;min-height:44px;display:flex;align-items:center}
 #view-start .upcoming-tournament-row{display:flex;align-items:center;gap:9px;min-height:54px;
  padding:6px 2px;color:#f2f9ff;text-decoration:none}
 #view-start .upcoming-tournament-row:focus-visible{outline-offset:-2px}
@@ -54,7 +54,7 @@
 #view-start .match-stats-heading{margin:0 0 9px;align-items:center;gap:8px}
 #view-start .match-stats-heading h2{font-size:17px;line-height:1.25}
 #view-start .home-stats-link{font-size:11px;font-weight:800;white-space:nowrap;
- min-height:36px;display:inline-flex;align-items:center}
+ min-height:44px;display:inline-flex;align-items:center}
 #view-start .match-stats-values{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 #view-start .match-stat{min-height:63px;gap:5px;padding:8px 3px;border-radius:10px;
  text-align:center;align-content:center;justify-items:center}
@@ -76,7 +76,7 @@
 #view-start .home-trophy{padding:11px 12px 9px;border-radius:16px}
 #view-start .home-trophy-heading{margin:0 0 7px;align-items:center}
 #view-start .home-trophy-heading h2{font-size:17px;line-height:1.3}
-#view-start .home-trophy-heading a{font-size:11px;min-height:36px;display:flex;align-items:center}
+#view-start .home-trophy-heading a{font-size:11px;min-height:44px;display:flex;align-items:center}
 #view-start .home-trophy-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 #view-start .home-trophy-slot{grid-template-rows:25px 18px auto;gap:2px;padding:3px 2px}
 #view-start .home-trophy-symbol{font-size:22px}
