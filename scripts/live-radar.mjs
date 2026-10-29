@@ -28,7 +28,11 @@ export function validSource(url,id){
 }
 export function freshness(row,now=Date.now()){
  const checked=Date.parse(row?.checked_at||"");
- if(!Number.isFinite(checked))return {ageMs:Infinity,fresh:false,stale:true};
+ // A source timestamp far in the future is not proof of a current match.
+ // Allow only minor provider/device clock skew; never clamp arbitrary future
+ // dates to age zero, which would display stale scores as LIVE for hours.
+ if(!Number.isFinite(checked)||!Number.isFinite(now)||checked>now+30000)
+  return {ageMs:Infinity,fresh:false,stale:true};
  const age=Math.max(0,now-checked);
  return {ageMs:age,fresh:age<=120000,stale:age>120000};
 }
