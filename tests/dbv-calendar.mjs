@@ -64,6 +64,30 @@ assert.deepEqual(filterCalendar(rows,{region:"Baden-Württemberg",age:"U11",leve
  .every(t=>t.bundesland==="Baden-Württemberg"&&t.ages.includes("U11")&&t.level==="C"),true);
 assert.equal(calendarEntry({...sample.entries[0],source_key:"from-unknown-site"}),null);
 assert.equal(calendarEntry({...sample.entries[0],event_url:"https://evil.example/"}).hasDirectLink,false);
+// Impossible calendar days are never treated as official game/deadline data.
+assert.equal(calendarEntry({...sample.entries[0],start_date:"2026-02-30"}),null,
+ "Impossible calendar days must not be published as DBV event dates");
+assert.equal(calendarEntry({...sample.entries[0],end_date:"2026-02-30"}),null);
+assert.equal(calendarEntry({...sample.entries[0],start_date:"2026-13-01"}),null);
+assert.equal(calendarEntry({...sample.entries[0],start_date:"2026-12-31",end_date:"2026-12-30"}),null);
+assert.equal(calendarEntry({...sample.entries[0],registration_deadline:"2026-11-31"}).deadline,"",
+ "An impossible registration deadline must never replace a real event start");
+const eventUuid="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+const realEventUrl="https://dbv.turnier.de/tournament/"+eventUuid;
+const confirmedEvent=calendarEntry({...sample.entries[0],event_url:realEventUrl});
+assert.equal(confirmedEvent.hasDirectLink,true);
+assert.equal(confirmedEvent.url,realEventUrl);
+for(const generic of ["https://turniere.badminton.de/","https://turniere.badminton.de/embed",
+ "https://dbv.turnier.de/","https://dbv.turnier.de/tournament",
+ "https://dbv.turnier.de/tournament/"+eventUuid+"?view=all",
+ "https://dbv.turnier.de.evil.example/tournament/"+eventUuid]){
+ const row=calendarEntry({...sample.entries[0],event_url:generic});
+ assert.equal(row.hasDirectLink,false,
+  "Generic/ambiguous source links must not masquerade as event-detail links: "+generic);
+ assert.equal(row.url,"https://turniere.badminton.de/",
+  "Unverified source URLs must remain at the official calendar overview");
+}
+
 // Synthetic overlap must never roll back corrections from a current official feed.
 const currentOfficial={...rows[0],key:"dbv-calendar-999998",title:"Aktuelles D-RLT",
  start:"2026-12-01",end:"2026-12-01",place:"Neue Halle"};
