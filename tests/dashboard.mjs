@@ -69,8 +69,8 @@ assert.ok(app.includes("heading=venue")&&app.includes("name+\" · \"+venue"),
 assert.ok(app.includes('class="saved-tournament-player"')&&
  app.indexOf('class="saved-tournament-player"')>app.indexOf('class="local-shortcut-actions"'),
  "The player attribution belongs below the tournament actions");
-assert.ok(app.includes('row.key===t.id&&row.hasDirectLink===true'),
- "A source-linked direct event URL is available only for an identical official calendar key");
+assert.ok(app.includes("SchmetterlingeBookmarks.verifiedCalendarEventUrl(t,verifiedCalendarRows)"),
+ "The saved tournament card must require an exact official UUID link rather than a hostname match");
 
 assert.ok(page.includes('src="./dashboard.js"'));
 assert.ok(page.includes('href="#start" data-page="start"'));
