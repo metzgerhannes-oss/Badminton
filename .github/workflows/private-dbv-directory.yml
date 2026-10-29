@@ -19,6 +19,8 @@ on:
       - 'tests/private-dbv-weekly-transport.test.mjs'
       - 'supabase/migrations/20261027141000_private_dbv_weekly_scheduler_guard.sql'
       - 'supabase/migrations/20261028220000_private_dbv_archive_week_u09.sql'
+      - 'supabase/migrations/20261029061000_import_health_stage_diagnostic_only.sql'
+      - 'tests/import-health-stage-diagnostic.test.mjs'
       - 'supabase/migrations/20261016190000_private_dbv_directory_import.sql'
   push:
     branches: [main]
@@ -34,6 +36,8 @@ on:
       - 'tests/private-dbv-weekly-transport.test.mjs'
       - 'supabase/migrations/20261027141000_private_dbv_weekly_scheduler_guard.sql'
       - 'supabase/migrations/20261028220000_private_dbv_archive_week_u09.sql'
+      - 'supabase/migrations/20261029061000_import_health_stage_diagnostic_only.sql'
+      - 'tests/import-health-stage-diagnostic.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -54,7 +58,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/private-dbv-weekly-model.test.mjs tests/private-dbv-weekly-transport.test.mjs
+      - run: node --test tests/private-dbv-weekly-model.test.mjs tests/private-dbv-weekly-transport.test.mjs tests/import-health-stage-diagnostic.test.mjs
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
