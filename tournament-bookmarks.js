@@ -74,7 +74,7 @@ var SchmetterlingeBookmarks=(function(){
  function updateLocalCalendarVenue(bookmark,value){
   if(!bookmark||!["dbv-calendar","bwbv-framework"].includes(bookmark.source)||
      typeof value!=="string"||value.length>120||
-     /[\\u0000-\\u001f\\u007f]/.test(value))return null;
+     /[\x00-\x1f\x7f]/.test(value))return null;
   const next=normalizeBookmark({...bookmark,place:value.trim()});
   return next&&next.id===bookmark.id&&next.playerId===bookmark.playerId&&
    next.source===bookmark.source?next:null;
