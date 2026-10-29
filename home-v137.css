@@ -190,7 +190,7 @@
  color:#365e77;position:relative;z-index:2
 }
 #view-turniere .saved-tournament-technical summary{
- cursor:pointer;display:list-item;padding:6px 0;min-height:38px;
+ cursor:pointer;display:list-item;padding:9px 0;min-height:44px;
  color:inherit;font-weight:650;outline-offset:2px
 }
 #view-turniere .saved-tournament-technical code{

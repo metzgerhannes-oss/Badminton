@@ -33,6 +33,12 @@ for(const selector of [
   const rule=homeCss.slice(start,homeCss.indexOf("}",start));
   assert.ok(rule.includes("min-height:44px"),selector+" must retain 44px");
 }
+// P1 iPhone: the collapsed technical identifier is a real interactive details control.
+// Its summary must be tappable without forcing users to zoom at 320px width.
+const technicalSummaryStart=homeCss.indexOf("#view-turniere .saved-tournament-technical summary{");
+assert.ok(technicalSummaryStart>=0,"Saved tournament technical details must have a summary rule");
+const technicalSummaryRule=homeCss.slice(technicalSummaryStart,homeCss.indexOf("}",technicalSummaryStart));
+assert.match(technicalSummaryRule,/min-height:44px/,"Technical details disclosure must keep a 44px touch target");
 assert.ok(page.includes('id="dashboard-rankings"'));
 assert.ok(page.includes('id="dashboard-kpis"'));
 assert.ok(page.includes('id="dashboard-next"'));
