@@ -168,4 +168,46 @@ assert.equal(matchedPrefill.fields.startDate.value,"2026-11-22","Only verified U
 assert.equal(matchedPrefill.fields.deadline.value,"2026-11-15","Registration deadline stays separate");
 assert.equal(testPrefill([officialRow],"https://invalid.example/").note.hidden,true);
 
+
+// #386: A calendar reminder without a turnier.de UUID must have a local,
+// optional venue editor while preserving the actual official key and game day.
+const venueCalendar=bookmarks.normalizeBookmark({
+ source:"dbv-calendar",id:"dbv-calendar-44094",
+ url:"https://turniere.badminton.de/",name:"Synthetischer Kalendertermin",
+ playerId:"99-000001",startDate:"2026-11-22",endDate:"2026-11-22",
+ deadline:"2026-11-15",place:""
+});
+const typed=bookmarks.updateLocalCalendarVenue(venueCalendar,"  Sporthalle Musterort  ");
+assert.ok(typed,"Manual venue correction should accept safe local text");
+assert.equal(typed.place,"Sporthalle Musterort");
+assert.equal(venueCalendar.place,"","Manual correction must not mutate original record");
+for(const key of ["id","url","source","name","playerId","startDate","endDate","deadline"])
+ assert.equal(typed[key],venueCalendar[key],"Manually entered venue must preserve local calendar identity: "+key);
+
+assert.equal(bookmarks.updateLocalCalendarVenue(typed,"").place,"",
+ "User may clear an incorrect manually entered venue");
+assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"X".repeat(121)),null);
+assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"Broken\\nLocation"),null);
+assert.equal(bookmarks.updateLocalCalendarVenue(bookmarks.normalizeBookmark({
+ url,playerId:"99-000001",name:"Direct UUID"}),"Wrong venue"),null,
+ "A verified turnier.de link must use its existing full editor");
+const officialCalendarVenue=bookmarks.reconcileOfficialMetadata(typed,[{
+ key:venueCalendar.id,url:"https://turniere.badminton.de/",hasDirectLink:false,
+ title:venueCalendar.name,start:venueCalendar.startDate,end:venueCalendar.endDate,
+ deadline:venueCalendar.deadline,place:"DBV offiziell bestätigte Halle"
+}]);
+assert.equal(officialCalendarVenue.status,"matched");
+assert.equal(officialCalendarVenue.updated.place,"DBV offiziell bestätigte Halle",
+ "Later exact calendar key confirmation must supersede a manually entered venue");
+const [venueMarkup,appVenueSource]=await Promise.all([
+ readFile("index.html","utf8"),readFile("app.js","utf8")
+]);
+assert.match(venueMarkup,/id="tournament-venue-dialog"/);
+assert.match(venueMarkup,/id="tournament-venue-form"/);
+assert.match(venueMarkup,/id="tournament-venue-place"[^>]*name="place"/);
+assert.match(appVenueSource,/data-edit-venue-id=/);
+assert.match(appVenueSource,/updateLocalCalendarVenue\\(current,raw\\)/);
+assert.doesNotMatch(appVenueSource,/updateLocalCalendarVenue\\([^)]*url/i,
+ "A venue-only edit must never infer new official UUIDs");
+
 console.log("Tournament bookmarks v61: official URL, strict calendar dates, Berlin day, own/friend boundaries and stable sort verified.");
