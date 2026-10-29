@@ -54,3 +54,14 @@ export function retryAfterHours(row){
  return row.status==="partial"||row.status==="awaiting_source"?7*24:
   row.status==="error"?1:0;
 }
+
+// A 200 response may mean the source job was SKIPPED or saw no fresh
+// evidence. Only a server-confirmed positive write warrants a match refresh.
+// Reject malformed counters: never claim new matches from an HTTP status alone.
+export function historyImportOutcome(body){
+ if(!body||typeof body!=="object"||Array.isArray(body))return null;
+ if(body.queued===false)return {acknowledged:true,changed:false};
+ if(body.queued!==true||!Number.isSafeInteger(body.stored)||
+  body.stored<0||body.stored>120)return null;
+ return {acknowledged:true,changed:body.stored>0};
+}
