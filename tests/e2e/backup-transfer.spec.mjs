@@ -104,3 +104,37 @@ test("legacy backups preserve the target's newer private calendar and invalid fi
  await expect(page.locator("#backup-restore")).toBeDisabled();
  expect((await stored(page)).family.players[0].id).toBe(PLAYER);
 });
+
+
+test("P1: restored follower-only backup preserves Follow without inventing own-player rights",async({page})=>{
+ const follower={id:"99-100005",name:"Testperson Follow",club:"Musterverein"};
+ await setup(page.context(),makeFamily(OTHER,"Vorheriges Eigenprofil"),[]);
+ await page.goto("/#einstellungen/daten",{waitUntil:"load"});
+ await expect(page.locator("#settings-room-daten")).toBeVisible();
+ const archive={kind:"schmetterlinge-local-backup",schemaVersion:2,
+  createdAt:"2026-10-29T12:00:00.000Z",
+  data:{players:[],friends:[follower],officialLinks:[],activeProfileId:"",chosen:follower.id},
+  calendarEvents:[]};
+ await page.locator("#backup-file").setInputFiles({name:"follower-only.json",
+  mimeType:"application/json",buffer:Buffer.from(JSON.stringify(archive))});
+ await expect(page.locator("#backup-feedback")).toContainText("Eigene Profile: 0");
+ await expect(page.locator("#backup-feedback")).toContainText("Gefolgte Spieler: 1");
+ await expect(page.locator("#backup-feedback")).toContainText("Kein eigenes Profil");
+ page.once("dialog",dialog=>dialog.accept());
+ const loaded=page.waitForEvent("load");
+ await page.locator("#backup-restore").click();
+ await loaded;
+ const data=(await stored(page)).family;
+ expect(data.players).toEqual([]);
+ expect(data.friends.map(x=>x.id)).toEqual([follower.id]);
+ expect(data.activeProfileId).toBe("");
+ expect(data.chosen).toBe("");
+ await page.goto("/#spieler",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#friend-list [data-follow-row='"+follower.id+"']")).toBeVisible();
+ await expect(page.locator("#profile-list .own-profile")).toHaveCount(0);
+ await page.reload({waitUntil:"domcontentloaded"});
+ const after=(await stored(page)).family;
+ expect(after.players).toEqual([]);
+ expect(after.friends[0].id).toBe(follower.id);
+ expect(after.activeProfileId).toBe("");
+});
