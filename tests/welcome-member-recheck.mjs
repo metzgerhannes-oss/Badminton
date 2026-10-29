@@ -47,4 +47,36 @@ assert.equal(window.badmintonAppAccess.allowed,false,"Network failure also inval
 session=null;mode="success";
 assert.equal(await context.verify(),false,"Logout must never keep search capability");
 assert.equal(window.badmintonAppAccess.allowed,false);
+
+ // Out-of-order replies cannot restore a stale member capability.
+ session={access_token:"synthetic-family-token"};
+ let finishOld, oldReady;
+ const oldStarted=new Promise(resolve=>{oldReady=resolve});
+ context.fetch=async()=>({ok:true,json:async()=>{
+  oldReady();
+  return new Promise(resolve=>{finishOld=resolve});
+ }});
+ const oldCheck=context.verify();
+ await oldStarted;
+ assert.equal(window.badmintonAppAccess.allowed,false);
+ context.fetch=async()=>({ok:true,json:async()=>({allowed:false})});
+ assert.equal(await context.verify(),false);
+ finishOld({allowed:true});
+ assert.equal(await oldCheck,false);
+ assert.equal(window.badmintonAppAccess.allowed,false);
+
+ // Aborting after HTTP headers but before the body resolves must fail closed.
+ let finishCanceled, cancelReady;
+ const cancelStarted=new Promise(resolve=>{cancelReady=resolve});
+ context.fetch=async()=>({ok:true,json:async()=>{
+  cancelReady();
+  return new Promise(resolve=>{finishCanceled=resolve});
+ }});
+ const controller=new AbortController();
+ const canceled=context.verify(controller.signal);
+ await cancelStarted;
+ controller.abort();
+ finishCanceled({allowed:true});
+ assert.equal(await canceled,false);
+ assert.equal(window.badmintonAppAccess.allowed,false);
 console.log("Welcome membership recheck: stale capability removed on revoked, 403, network or logout.");
