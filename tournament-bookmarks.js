@@ -89,7 +89,13 @@ var SchmetterlingeBookmarks=(function(){
   if(bookmark?.source!=="dbv-calendar"||!Array.isArray(rows))return "";
   const matching=rows.filter(row=>row?.key===bookmark.id);
   if(matching.length!==1||matching[0].hasDirectLink!==true)return "";
-  return parseDbvTournamentLink(matching[0].url)?.url||"";
+  // A direct event link is only promoted from a coherent official event
+  // record. A malformed source date must not be silently combined with a
+  // stale local reminder (in particular, registration deadline != game day).
+  const row=matching[0];
+  const start=validDate(row.start),end=validDate(row.end);
+  if(!start||!end||end<start)return "";
+  return parseDbvTournamentLink(row.url)?.url||"";
  }
  // Use only an already loaded official-calendar row with an exact source key or UUID.
  // A similar venue/name is NEVER sufficient to join two distinct tournaments.
