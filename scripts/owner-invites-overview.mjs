@@ -1,5 +1,13 @@
 /** Minimal owner-only metadata for issued app links; no recipient identifiers. */
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** A server-verified revocation outranks the locally cached copy-link state.
+ * Only reconcile an exact invite UUID present in the owner-only response.
+ * Absence from the bounded overview never proves revocation. */
+export function reconcileIssuedInvite(local,serverRows){
+ if(!UUID.test(local?.id||"")||!Array.isArray(serverRows)||local?.revoked===true)return null;
+ const matching=serverRows.find(row=>row?.id===local.id&&UUID.test(row?.id||""));
+ return matching?.revoked_at?{...local,revoked:true}:null;
+}
 export function mountOwnerInviteOverview({card,rpc,read,write,draw,status}){
  const section=document.createElement("section");
  section.className="invitation-overview";
@@ -21,6 +29,14 @@ export function mountOwnerInviteOverview({card,rpc,read,write,draw,status}){
    const data=await rpc("app_access_invites_overview");
    if(!Array.isArray(data))throw Error("invalid overview");
    if(ticket!==version)return;
+   // A different device can revoke an invitation. Remove only the local
+   // copy/share affordance for that exact server-confirmed revoked link.
+   const revokedLocally=reconcileIssuedInvite(read(),data);
+   if(revokedLocally){
+    write(revokedLocally,{broadcast:false});
+    draw();
+    status("Dieser Einladungslink wurde widerrufen. Du kannst einen neuen erstellen.");
+   }
    list.replaceChildren();
    for(const record of data.slice(0,50)){
     if(!UUID.test(record?.id||""))continue;
