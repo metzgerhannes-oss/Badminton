@@ -196,8 +196,9 @@ Deno.serve(async req=>{
    ?String(all.length)+" einzelne Badhub-Matches aus erreichbaren Quellen verarbeitet; "+String(excluded)+" unklare Karten ausgeschlossen"
    :String(progress)+" von "+String(all.length)+" geprüften Quellenspielen verarbeitet")+incomplete+
    (reasonSummary?" · Prüfung: "+reasonSummary:"");
+  const status=importStatusForBatch(finished,excluded,sources.missing);
   await update(id,{
-   status:importStatusForBatch(finished,excluded,sources.missing),
+   status,
    cursor_offset:progress,source_count:cardCount,
    verified_count:all.length,rejected_count:excluded,
    lease_until:null,last_finished_at:new Date().toISOString(),detail
@@ -205,7 +206,7 @@ Deno.serve(async req=>{
   return respond(200,{
    queued:true,stored:written.length,scoreless_evidence_count:scoreless.length,progress,eligible:all.length,
    source_cards:cardCount,excluded,remaining_eligible:batch.remaining_eligible,
-   completed:finished&&!sources.missing.length,
+   completed:status==="complete",
    unavailable_categories:sources.missing,
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
