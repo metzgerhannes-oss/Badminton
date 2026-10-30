@@ -114,8 +114,8 @@ test("remote revocation hides stale cached share and copy controls without issui
 test("cached owner link is rechecked at copy time; remote revoke cannot be shared",async({page})=>{
  let remoteRevoked=false,overviewReads=0,newGrants=0;
  const secret="e".repeat(64);
+ await page.addInitScript(seedSession);
  await page.addInitScript(({id,secret})=>{
-  seedSession();
   localStorage.setItem("schmetterlinge.appIssuedInvite.v136",JSON.stringify({
    id,secret,expires:"2026-12-01T00:00:00Z",revoked:false
   }));
