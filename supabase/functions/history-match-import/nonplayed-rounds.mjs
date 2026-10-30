@@ -14,9 +14,10 @@ export function classifyNonPlayedCard(card){
  const center=body.slice(result,away);
  const other=body.slice(away,awayEnd>=0?awayEnd+6:undefined);
  // Match scores can occur outside the printed result column.
+ // Match exact semantic class tokens regardless of optional CSS modifiers/order.
  // Check only this match card, then let the full score validator decide.
- const scores=[...card.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
-  .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)])
+ const scores=[...card.matchAll(/class="(?:[^"]*\s)?sp-set-score(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/div>/g)]
+  .map(m=>[...m[1].matchAll(/class="(?:[^"]*\s)?sp-s(?:\s[^"]*)?"[^>]*>(\d{1,2})<\/span>/g)])
   .filter(items=>items.length===2).length;
  const bye="BYE|RAST|RUST|FREILOS|SPIELFREI";
  const walkover="W[.]?O[.]?|WALKOVER|KAMPFLOS";
@@ -33,6 +34,6 @@ export function classifyNonPlayedCard(card){
  if(isolated(center,walkover)||(!scores&&isolated(other,walkover)))
   return scores?"conflicting_walkover_with_scores":"marked_walkover";
  if(scores)return null;
- const opponent=/class="sp-name-full"/.test(other);
+ const opponent=/class="(?:[^"]*\s)?sp-name-full(?:\s[^"]*)?"/.test(other);
  return opponent?"unscored_with_opponent":"unscored_without_opponent";
 }
