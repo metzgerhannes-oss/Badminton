@@ -104,7 +104,9 @@ const COVERAGE_REASONS=[
 ];
 const COVERAGE_LAYOUT=["sections","meetings","recognized_meeting_cards",
  "unrecognized_header_cards","missing_link_cards","missing_date_cards",
- "outside_recognized_meetings"];
+ "outside_recognized_meetings","header_missing_title_cards",
+ "header_noncanonical_href_cards","header_other_region_cards",
+ "header_unverified_link_cards","header_no_link_cards"];
 const finiteCount=value=>Number.isSafeInteger(value)&&value>=0?value:0;
 export function safeMatchCoverageDiagnostics(parsed){
  if(!Array.isArray(parsed)||parsed.length>2)return [];
