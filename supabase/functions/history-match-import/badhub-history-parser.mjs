@@ -96,8 +96,14 @@ function discipline(event){
 }
 const keyPart=s=>plain(s).normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
  .toLocaleLowerCase("de").replace(/[^\p{L}\p{N}]+/gu,"-").replace(/(^-|-$)/g,"").slice(0,110);
+// Match semantic CSS class tokens, not their order or optional modifiers.
+// The same selector counts source cards and splits parsed cards: divergence
+// here can falsely trigger the 55% coverage guard on legitimate HTML.
+const MATCH_ITEM_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-match-item(?:\s[^"]*)?"[^>]*>/g;
+const TOURNAMENT_CARD_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-tournament-card(?:\s[^"]*)?"[^>]*>/g;
+const MEETING_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-meeting(?:\s[^"]*)?"[^>]*>/g;
 function matchSections(segment){
- const parts=segment.split(/<div class="sp-match-item\b[^>]*>/);
+ const parts=segment.split(MATCH_ITEM_OPEN);
  return {prefix:parts.shift()||"",chunks:parts};
 }
 function piece(source,segment,context,counts){
@@ -150,7 +156,7 @@ function tournamentFacts(html,playerName,counts){
  // Badhub's crossfed DBV cards have additional CSS classes.
  // The formerly exact split joined entire DBV tournaments to the preceding
  // BWBV event and therefore assigned wrong year, competition and source.
- const cards=html.split(/<div class="card sp-tournament-card(?: [^"]*)?">/).slice(1),all=[];
+ const cards=html.split(TOURNAMENT_CARD_OPEN).slice(1),all=[];
  for(const card of cards){
   const head=card.match(/class="sp-tournament-name"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
   if(!head){noteReject(counts,"unknown_tournament_header");continue;}
@@ -158,7 +164,7 @@ function tournamentFacts(html,playerName,counts){
   const year=date?Number(date.slice(0,4)):(Number((card.slice(0,600).match(/\b20\d{2}\b/)||[])[0])||null);
   const c={source_id:head[2],source_namespace:head[1],title:plain(head[3]),date,year,
    link:"https://badhub.de/"+head[1]+"/turnier.php?id="+head[2],playerName};
-  for(const meeting of card.split(/<div class="sp-meeting">/).slice(1)){
+  for(const meeting of card.split(MEETING_OPEN).slice(1)){
    const event=plain((meeting.match(/class="sp-t-event-badge"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    all.push(...piece("tournament",meeting,{...c,event},counts));
   }
@@ -167,7 +173,7 @@ function tournamentFacts(html,playerName,counts){
 }
 function leagueFacts(html,playerName,counts){
  const all=[];
- const sections=html.split(/<div class="sp-meeting">/).slice(1);
+ const sections=html.split(MEETING_OPEN).slice(1);
  for(const meeting of sections){
   const head=meeting.match(/\/bwbv\/begegnung\.php\?id=(\d+)/);
   if(!head)continue;
@@ -199,7 +205,7 @@ export function parsePublicHistory(html,player,category){
   }
   unique.set(row.source_key,{...row,dbv_id:player.dbv_id});
  }
- const cards_seen=(html.match(/class="[^"]*\bsp-match-item\b/g)||[]).length;
+ const cards_seen=(html.match(MATCH_ITEM_OPEN)||[]).length;
  const rejected=Math.max(0,cards_seen-unique.size);
  const identified=Object.values(rejection_reasons).reduce((a,b)=>a+b,0);
  if(identified<rejected)rejection_reasons.unclassified_card=rejected-identified;

@@ -135,3 +135,39 @@ assert.match(sourceCode,/const storedKeys=await readStoredSourceKeys\(id\)/);
 assert.ok(sourceCode.indexOf("assessMatchCardCoverage(parsed)")<
  sourceCode.indexOf("readStoredSourceKeys(id);"),
  "Never read/write persisted keys before the source quality gate");
+
+// #199/#131: Offline synthetic provider HTML with reordered CSS class tokens.
+// The source-card count and parser must recognize the SAME cards; modifiers
+// alone must not create a phantom match. No real names, IDs or network access.
+const {parsePublicHistory:parseEdgeHistory}=await import("../supabase/functions/history-match-import/badhub-history-parser.mjs");
+const syntheticPlayer={dbv_id:"99-000001",name:"Alex Beispiel"};
+const syntheticScores='<div class="sp-result-col">'+
+ '<div class="sp-set-score"><span class="sp-s">21</span><span class="sp-s">18</span></div>'+
+ '<div class="sp-set-score"><span class="sp-s">21</span><span class="sp-s">13</span></div></div>';
+const syntheticMatch='<div class="sp-match-item--won sp-match-item">'+
+ '<div class="sp-match-body"><div class="sp-side sp-side--winner">'+
+ '<span class="sp-player-name--self"><span class="sp-name-full">Alex Beispiel</span></span></div>'+
+ syntheticScores+'<div class="sp-side sp-side--away">'+
+ '<span class="sp-name-full">Jamie Beispiel</span></div></div></div>';
+const syntheticHtml='<title>Alex Beispiel – Spielerprofil</title>'+
+ '<div class="sp-tournament-card card"><strong class="sp-tournament-name">'+
+ '<a href="/bwbv/turnier.php?id=777">Synthetisches Turnier</a></strong>'+
+ '<span class="sp-tournament-meta">3.–4. Oct 2026</span>'+
+ '<div class="compact sp-meeting"><span class="sp-t-event-badge">ME U17</span>'+
+ '<div class="sp-t-phase-header">Finale</div>'+syntheticMatch+'</div></div>';
+const reordered=parseEdgeHistory(syntheticHtml,syntheticPlayer,"tournament");
+assert.equal(reordered.cards_seen,1,"Reordered CSS class tokens must count exactly one match card");
+assert.equal(reordered.items.length,1,"Reordered CSS class tokens must preserve sourced result");
+assert.equal(assessMatchCardCoverage([reordered]).acceptable,true);
+const conventionalHtml=syntheticHtml
+ .replace('sp-tournament-card card','card sp-tournament-card')
+ .replace('compact sp-meeting','sp-meeting')
+ .replace('sp-match-item--won sp-match-item','sp-match-item sp-match-item--won');
+const conventional=parseEdgeHistory(conventionalHtml,syntheticPlayer,"tournament");
+assert.equal(conventional.cards_seen,1);
+assert.deepEqual(reordered.items,conventional.items,
+ "Changing only class-token order must never change persisted source identity");
+const modifierOnly=parseEdgeHistory(syntheticHtml.replace(
+ 'sp-match-item--won sp-match-item','sp-match-item--won'),syntheticPlayer,"tournament");
+assert.equal(modifierOnly.cards_seen,0,"CSS modifier alone is not a source card");
+assert.equal(modifierOnly.items.length,0,"CSS modifier alone cannot fabricate a result");
