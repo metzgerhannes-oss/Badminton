@@ -106,7 +106,20 @@ const MEETING_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-meeting(?:\s[^"]*)?"[^>]*
 // Aggregate structure only. No HTML, names, links, IDs or score values in telemetry.
 const countCards=s=>(s.match(MATCH_ITEM_OPEN)||[]).length;
 const emptyLayout=()=>({sections:0,meetings:0,recognized_meeting_cards:0,
- unrecognized_header_cards:0,missing_link_cards:0,missing_date_cards:0});
+ unrecognized_header_cards:0,missing_link_cards:0,missing_date_cards:0,
+ header_missing_title_cards:0,header_noncanonical_href_cards:0,
+ header_other_region_cards:0,header_unverified_link_cards:0,header_no_link_cards:0});
+function tournamentHeaderFailure(header){
+ if(!/class="(?:[^"]*\s)?sp-tournament-name(?:\s[^"]*)?"/i.test(header))
+  return "header_missing_title_cards";
+ if(/(?:https:\/\/badhub\.de)?\/(?:bwbv|dbv)\/turnier\.php\?id=\d+/i.test(header))
+  return "header_noncanonical_href_cards";
+ if(/\/[a-z0-9-]+\/turnier\.php\?id=\d+/i.test(header))
+  return "header_other_region_cards";
+ if(/<a\b[^>]*\shref\s*=/i.test(header))
+  return "header_unverified_link_cards";
+ return "header_no_link_cards";
+}
 function matchSections(segment){
  const parts=segment.split(MATCH_ITEM_OPEN);
  return {prefix:parts.shift()||"",chunks:parts};
@@ -164,16 +177,23 @@ function tournamentFacts(html,playerName,counts,layout){
  const cards=html.split(TOURNAMENT_CARD_OPEN).slice(1),all=[];
  layout.sections=cards.length;
  for(const card of cards){
-  const head=card.match(/class="(?:[^"]*\s)?sp-tournament-name(?:\s[^"]*)?"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
+  const header=card.split(MEETING_OPEN,1)[0]||"";
+  // Accept only canonical Badhub links with a numerical tournament ID.
+  // Attribute order, relative/absolute Badhub path and trailing source query
+  // parameters never change the canonical identity or stored provenance.
+  const head=header.match(/class="(?:[^"]*\s)?sp-tournament-name(?:\s[^"]*)?"[^>]*>[\s\S]*?<a\b[^>]*\shref=(["'])(?:https:\/\/badhub\.de)?\/(bwbv|dbv)\/turnier\.php\?id=(\d+)(?:&(?:amp;)?[A-Za-z0-9_.=%&-]+)?\1[^>]*>([\s\S]*?)<\/a>/i);
   if(!head){
    noteReject(counts,"unknown_tournament_header");
-   layout.unrecognized_header_cards+=countCards(card);
+   const n=countCards(card);
+   layout.unrecognized_header_cards+=n;
+   const kind=tournamentHeaderFailure(header);
+   layout[kind]+=n;
    continue;
   }
   const date=tournamentStart(card.slice(0,650));
   const year=date?Number(date.slice(0,4)):(Number((card.slice(0,600).match(/\b20\d{2}\b/)||[])[0])||null);
-  const c={source_id:head[2],source_namespace:head[1],title:plain(head[3]),date,year,
-   link:"https://badhub.de/"+head[1]+"/turnier.php?id="+head[2],playerName};
+  const c={source_id:head[3],source_namespace:head[2],title:plain(head[4]),date,year,
+   link:"https://badhub.de/"+head[2]+"/turnier.php?id="+head[3],playerName};
   for(const meeting of card.split(MEETING_OPEN).slice(1)){
    layout.meetings++;
    layout.recognized_meeting_cards+=countCards(meeting);
