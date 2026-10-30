@@ -12,6 +12,25 @@ export function assessSourceAvailability(outcomes){
  });
  return {available,missing};
 }
+/** Classify private import failures without exposing IDs, names, URLs, tokens,
+ * upstream HTML, or database response bodies in logs/status rows. The original
+ * exception is deliberately never interpolated into a persisted diagnostic. */
+export function classifyImportFailure(error){
+ const message=typeof error?.message==="string"?error.message:"";
+ const name=typeof error?.name==="string"?error.name:"";
+ if(name==="AbortError"||/\b(?:aborted|timeout)\b/i.test(message))
+  return "source_timeout";
+ if(/Match parser rejected unexpected amount of source cards|invalid_source_coverage/i.test(message))
+  return "source_coverage";
+ if(/Player-name mismatch|Verified profile unavailable|Invalid player or source document/i.test(message))
+  return "source_identity";
+ if(/DB REST \d{3}\b|Service credentials missing|Unexpected source fact read/i.test(message))
+  return "storage_request";
+ if(/invalid_reconciliation_input|invalid_or_duplicate_source_key|Persisted source-key pagination limit|Invalid persisted source key|Invalid source-key page/i.test(message))
+  return "source_reconciliation";
+ return "unclassified";
+}
+
 export function importStatusForBatch(finished,excluded,missing){
  return finished&&excluded===0&&Array.isArray(missing)&&missing.length===0
   ?"complete":"partial";
