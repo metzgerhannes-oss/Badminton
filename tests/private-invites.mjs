@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {freshToken,tokenFromFragment,invitationLink,safeEvent,storedInvites,inviteKey} from "../scripts/private-invite-utils.mjs";
-import {reconcileIssuedInvite} from "../scripts/owner-invites-overview.mjs";
+import {reconcileIssuedInvite,checkIssuedInviteForSharing} from "../scripts/owner-invites-overview.mjs";
 const valid="E24DC6EE-152A-454D-B00C-E625B751D7D5";
 const issued={id:"11111111-2222-4333-8444-555555555555",
  secret:"synthetic-no-real-link",expires:"2026-11-20T00:00:00Z",revoked:false};
@@ -15,6 +15,22 @@ assert.equal(reconcileIssuedInvite(issued,[]),null,
 assert.equal(reconcileIssuedInvite(issued,[{...revokedRow,revoked_at:null}]),null);
 assert.equal(reconcileIssuedInvite({...issued,revoked:true},[revokedRow]),null);
 assert.equal(reconcileIssuedInvite({...issued,id:"not-an-id"},[revokedRow]),null);
+
+// #187/#227: only server-confirmed, non-revoked invitations may be shared.
+const serverActive={id:issued.id,revoked_at:null,redeem_until:"2026-11-10T00:00:00Z"};
+const now=Date.parse("2026-10-30T09:00:00Z");
+assert.deepEqual(checkIssuedInviteForSharing(issued,[serverActive],now),
+ {status:"active",expires:"2026-11-10T00:00:00.000Z"});
+assert.deepEqual(checkIssuedInviteForSharing(issued,[{...serverActive,revoked_at:"2026-10-29T00:00:00Z"}],now),
+ {status:"revoked"},"Remote revocation takes precedence over local cached expiry");
+assert.deepEqual(checkIssuedInviteForSharing(issued,[{...serverActive,redeem_until:"2026-10-01T00:00:00Z"}],now),
+ {status:"expired",expires:"2026-10-01T00:00:00.000Z"});
+assert.deepEqual(checkIssuedInviteForSharing(issued,[],now),{status:"unverified"},
+ "Missing row in a bounded list is not evidence that a cached token is safe");
+assert.deepEqual(checkIssuedInviteForSharing(issued,[{...serverActive,id:valid}],now),{status:"unverified"});
+assert.deepEqual(checkIssuedInviteForSharing(issued,[{...serverActive,redeem_until:"invalid"}],now),
+ {status:"unverified"},"Malformed server deadlines must not authorize sharing");
+assert.deepEqual(checkIssuedInviteForSharing(issued,null,now),{status:"unverified"});
 
 const b={id:valid,url:"https://dbv.turnier.de/tournament/"+valid,
  name:"Jugendturnier",playerId:"05-070879",startDate:"2026-12-03",endDate:"2026-12-04"};
