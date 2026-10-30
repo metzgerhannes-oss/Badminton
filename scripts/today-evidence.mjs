@@ -68,7 +68,7 @@ export function todayTeamEvents({today,teams=[],fixtures=[]}={}){
  if(!validDay(today))return [];
  const byId=new Map(teams.filter(t=>t&&officialTeamUrl(t.source_url))
   .map(t=>[exactId(t.id),t]));
- const events=new Map();
+ const events=new Map(),verifiedFixtureKeys=new Map();
  for(const row of Array.isArray(fixtures)?fixtures:[]){
   const t=byId.get(exactId(row?.team_id));
   if(!t||!row?.id||sourceMatchDay(row.match_date)!==today)continue;
@@ -76,6 +76,15 @@ export function todayTeamEvents({today,teams=[],fixtures=[]}={}){
   if(!source)continue;
   const id=short(String(row.id),100);
   if(events.has(id))continue;
+  // The same nuLiga match may be persisted once per followed team with
+  // DIFFERENT row IDs. Deduplicate only if the official source URL,
+  // home/away team strings and exact kickoff instant all coincide.
+  // Never join by club/town or fixture date alone.
+  const when=typeof row.match_date==="string"?Date.parse(row.match_date):NaN;
+  if(!Number.isFinite(when))continue;
+  const home=short(row.home_team,95),away=short(row.away_team,95);
+  if(!home||!away)continue;
+  const sourceKey=JSON.stringify([source,when,home,away]);
   const score=confirmedResult(row);
   let status="Heute angesetzt",kind="scheduled";
   if(row.status==="cancelled"){status="Abgesagt";kind="cancelled"}
@@ -84,13 +93,28 @@ export function todayTeamEvents({today,teams=[],fixtures=[]}={}){
    status=score?"Ergebnis veröffentlicht":"Ergebnis noch nicht belegt";
    kind=score?"result":"unverified-result";
   }else if(row.status!=="scheduled")continue;
-  events.set(id,{
+  const event={
    id:"team:"+id,entity:"team",kind,status,name:short(displayTeamName(t),100),
-   detail:short(row.home_team,95)+" – "+short(row.away_team,95),
+   detail:home+" – "+away,
    score:score||"",when:row.match_date,sourceUrl:source,
    checkedAt:short(row.source_checked_at,48)||null,
    teamId:t.id,followKey:t.follow_key,source:"nuLiga"
-  });
+  };
+  const previousId=verifiedFixtureKeys.get(sourceKey);
+  if(previousId){
+   const previous=events.get(previousId);
+   // Prefer a newer provider verification, not a local render timestamp.
+   // Equal/missing timestamps keep the first verified card stable.
+   const fresh=Date.parse(event.checkedAt),old=Date.parse(previous?.checkedAt);
+   if(Number.isFinite(fresh)&&(!Number.isFinite(old)||fresh>old)){
+    events.delete(previousId);
+    events.set(id,event);
+    verifiedFixtureKeys.set(sourceKey,id);
+   }
+   continue;
+  }
+  events.set(id,event);
+  verifiedFixtureKeys.set(sourceKey,id);
  }
  return [...events.values()].sort((a,b)=>
   String(a.when).localeCompare(String(b.when))||a.name.localeCompare(b.name,"de"));
