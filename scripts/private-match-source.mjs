@@ -56,11 +56,18 @@ function validPage(data,player,offset){
   Array.isArray(data.entries)&&data.entries.length<=PAGE_SIZE;
 }
 function safeRows(rows,player){
- return rows.filter(row=>row&&row.dbv_id===player&&typeof row.source_key==="string"&&
+ // Fail closed on malformed or cross-player cards. Silently filtering them
+ // would display a truncated archive as successfully loaded (even as zero).
+ if(!Array.isArray(rows))throw Error("invalid private match rows");
+ const valid=rows.filter(row=>row&&row.dbv_id===player&&typeof row.source_key==="string"&&
   typeof row.source_url==="string"&&row.source_url.startsWith("https://")&&
-  /^\d{4}-\d\d-\d\d$/.test(row.match_date||"")&&
+  (row.match_date===null
+   ?Number.isInteger(row.match_year)&&row.match_year>=1900&&row.match_year<=2100
+   :/^\d{4}-\d\d-\d\d$/.test(row.match_date||""))&&
   [1,2].includes(row.player_side)&&[1,2].includes(row.winning_side)&&
   Array.isArray(row.games)&&Array.isArray(row.opponent_names));
+ if(valid.length!==rows.length)throw Error("invalid private match row");
+ return valid;
 }
 async function readMemberMatches(player,isCurrent=()=>true){
  const output=[];

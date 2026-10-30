@@ -111,6 +111,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <button id="app-access-paste" type="button" hidden>Einladung aus Zwischenablage übernehmen</button>
   <p id="app-access-status" role="status" aria-live="polite"></p>
   <button id="app-access-retry" class="outline-button" type="button" hidden>Zugang erneut prüfen</button>
+  <p><a href="./owner-device-transfer.html" style="color:#1e587b;text-decoration:underline;font-weight:700">Bestehenden Eigentümerzugang auf dieses Gerät übernehmen</a></p>
   <small>Die Anmeldung per E-Mail-Code erfolgt über Cloudflare. Ein zusätzliches App-Passwort ist nicht nötig.</small>
  </section>
 </div>
@@ -642,9 +643,13 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <ul id="owner-admin-grants"></ul>
    </section>
    <details class="settings-card" id="owner-activation-setup">
-    <summary>Eigentümeraktivierung (nur Betreiber)</summary>
-    <p class="settings-hint">Der erste App-Eigentümer kann sich mit einem einmaligen Aktivierungscode auf diesem Gerät legitimieren. Besucher benötigen keine Anmeldung.</p>
-    <p><a href="./owner-activate.html">Einmaligen Eigentümercode auf diesem Gerät eingeben ↗</a></p>
+    <summary>Betreiberzugang auf diesem Gerät einrichten</summary>
+    <p class="settings-hint">Beim Wechsel auf die private App wird die bisherige Betreiberberechtigung nicht automatisch übertragen. Die Übernahme ist einmalig und wird in Supabase geprüft; bestehende Spielerprofile müssen nicht übernommen werden.</p>
+    <p><a class="settings-grant-action" href="./owner-device-transfer.html">Betreiberzugang einmalig übernehmen ↗</a></p>
+    <details>
+     <summary>Nur bei der allerersten Betreiberaktivierung</summary>
+     <p><a href="./owner-activate.html">Ursprüngliche Eigentümeraktivierung öffnen ↗</a></p>
+    </details>
    </details>
    <section class="settings-card language-settings" aria-labelledby="language-title">
     <h3 id="language-title">Sprache</h3>
@@ -694,6 +699,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      <button class="outline-button" id="invite-copy" type="button">Einladungslink kopieren</button>
      <button class="outline-button" id="invite-revoke" type="button" hidden>Aktuellen Zugang widerrufen</button>
     </div>
+    <p class="invitation-status" id="invite-status" role="status" aria-live="polite" aria-atomic="true"></p>
     <a class="invitation-link" id="invite-link-preview" href="./welcome.html#installation">App-Installation ↗</a>
     <a class="invitation-guide" href="./welcome.html#installation">Anleitung: App auf iPhone oder Android hinzufügen ↗</a>
     <details class="invitation-short-guide">
@@ -710,7 +716,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      </ol>
      <p class="small">Bei bestehender App-Installation musst du die App nicht erneut installieren. Nach erfolgreicher Freischaltung ist kein zweiter Code nötig.</p>
     </details>
-    <p class="invitation-status" id="invite-status" aria-live="polite"></p>
+
     <p class="small muted">Links sind bis zu 30 Tage einlösbar. Der Zugang bleibt danach bis zum Widerruf aktiv. Weitergeleitete Links können von weiteren Personen genutzt werden. Neue Geräte benötigen eine erneute Annahme.</p>
    </section>
    <div class="settings-card"><h3>Datenquellen & Nachweise</h3>

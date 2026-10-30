@@ -8,6 +8,13 @@ for(const x of ["","  ","ab","a"," -- ","%","*","?"]){
 }
 assert.equal(validDbvLookup("  Mössingen  "),"Mössingen");
 assert.equal(validDbvLookup("99-000001"),"99-000001");
+const oldWindow=globalThis.window;
+globalThis.window={badmintonAppAccess:{allowed:false,getAccessToken:async()=>null}};
+let deniedCalls=0;
+await assert.rejects(()=>searchDbvIdentities("Probe",{fetchImpl:async()=>{deniedCalls++;throw Error("guest network")}}),
+ error=>error.status===403);
+assert.equal(deniedCalls,0,"Guest cannot call identity RPC");
+globalThis.window={badmintonAppAccess:{allowed:true,getAccessToken:async()=>"synthetic-family-jwt"}};
 let calls=0;
 const records=Array.from({length:24},(_,i)=>({
  dbv_id:"99-"+String(i).padStart(6,"0"),name:"Probe "+i,
@@ -21,6 +28,7 @@ const result=await searchDbvIdentities("  Probe  ",{
   assert.equal(request.method,"POST");
   assert.equal(request.cache,"no-store");
   assert.equal(request.headers.Accept,"application/json");
+  assert.equal(request.headers.Authorization,"Bearer synthetic-family-jwt");
   const body=JSON.parse(request.body);
   assert.deepEqual(body,{
    p_query:"Probe",p_age_class:"U13",p_club:"SpVgg Mössingen",
@@ -77,4 +85,9 @@ assert.equal(unknown.source,"rate-limited");
 assert.equal(unknown.players.length,0);
 assert.equal(throttledRequests,1,"Rate limit never triggers public backup file GETs");
 
-console.log("Scoped official DBV identity lookup: explicit query, 12-hit cap, no birth year, no anonymous table read");
+if(oldWindow===undefined)delete globalThis.window;
+else globalThis.window=oldWindow;
+console.log("P0 #417 scoped DBV lookup: guest denied before network, verified family JWT, 12-hit cap and 429 cooldown");
+
+// Run the same isolated revoked/logout welcome membership test in the pre-existing CI suite.
+await import("./welcome-member-recheck.mjs");

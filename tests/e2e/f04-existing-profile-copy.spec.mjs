@@ -1,4 +1,4 @@
-import {test,expect} from "./supabase-isolated.fixture.mjs";
+import {test,expect} from "./invited-member.fixture.mjs";
 
 // F04 #198: entirely synthetic identities, no production Supabase traffic.
 // Stop at the redirect so the next page cannot consume the pending-copy key

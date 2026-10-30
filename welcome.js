@@ -2,6 +2,8 @@ import {STORE,parseDbvReference,normalizeProfile,addProfileToStore} from "./scri
 import {normalizeFriendSearch} from "./scripts/friend-search.mjs";
 import {searchInvitationPlayers} from "./scripts/invitation-search.mjs";
 import {shouldOfferInstallationFirst} from "./scripts/welcome-flow.mjs";
+import {getPrivateSession} from "./private-invites.js";
+import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 import {LOCAL_STORE_KEY,SPOND_STORE_KEY,createLocalBackup} from "./scripts/local-backup.mjs";
 import {WIZARD_KEY,isFirstProfile} from "./scripts/onboarding-wizard-state.mjs";
 const $=id=>document.getElementById(id);
@@ -185,6 +187,47 @@ function showSearchResults(players,source){
   else setSearchStatus("Kein passender Spieler auf diesem Gerät gefunden. Weitere Profile kannst du mit DBV-ID manuell ergänzen.");
  }else setResultsStatus(players.length,source);
 }
+// The separate welcome.html page has no app-access.js. Validate the stored
+// family session against the server before enabling the same member-only RPCs.
+// A player-scoped invitation is NOT a global family membership.
+async function verifyWelcomeFamilyMember(signal){
+ // Network responses can resolve out of order. The newest check alone is
+ // permitted to restore a client-side capability, including after cancellation.
+ const checkId=(verifyWelcomeFamilyMember.latestCheckId||0)+1;
+ verifyWelcomeFamilyMember.latestCheckId=checkId;
+ // A prior successful search never authorizes a later query. Invalidate the
+ // local capability before every fresh server membership decision, including
+ // logout, revoked membership, an expired session or a transient 403.
+ window.badmintonAppAccess=Object.freeze({
+  allowed:false,
+  async getAccessToken(){return null;}
+ });
+ const session=await getPrivateSession(false);
+ if(signal?.aborted||checkId!==verifyWelcomeFamilyMember.latestCheckId||
+    !session?.access_token)return false;
+ const response=await fetch(SUPABASE_ROOT+"rpc/app_access_status",{
+  method:"POST",cache:"no-store",signal,
+  headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,
+   "Content-Type":"application/json"},body:"{}"
+ });
+ if(!response.ok)return false;
+ const result=await response.json().catch(()=>null);
+ // A successful reply belongs only to the session that made the request.
+ // Logging out or switching accounts while the RPC is pending must not grant
+ // the new session access based on the previous session's membership.
+ const currentSession=await getPrivateSession(false);
+ if(signal?.aborted||checkId!==verifyWelcomeFamilyMember.latestCheckId||
+    result?.allowed!==true||currentSession?.access_token!==session.access_token)return false;
+ const verifiedToken=session.access_token;
+ window.badmintonAppAccess=Object.freeze({
+  allowed:true,
+  async getAccessToken(){
+   const latest=await getPrivateSession(false);
+   return latest?.access_token===verifiedToken?verifiedToken:null;
+  }
+ });
+ return true;
+}
 async function searchPlayers(value){
  const current=++searchTicket;
  searchController?.abort();
@@ -198,11 +241,19 @@ async function searchPlayers(value){
   return;
  }
  clearError();
- setSearchStatus("Spieler werden im öffentlichen DBV-Verzeichnis gesucht …");
+ setSearchStatus("Berechtigte DBV-Spielersuche wird geprüft …");
  try{
   const saved=readSaved();
   const known=[...(Array.isArray(saved?.players)?saved.players:[]),
    ...(Array.isArray(saved?.friends)?saved.friends:[])];
+  // Cached browser state alone never grants access to the full DBV directory.
+  // Re-check the server before search. Local manual entry remains available.
+  const granted=await verifyWelcomeFamilyMember(searchController.signal);
+  if(current!==searchTicket)return;
+  if(!granted){
+   showSearchResults([], "restricted");
+   return;
+  }
   const {players,source}=await searchInvitationPlayers(term,{signal:searchController.signal,savedCandidates:known});
   if(current!==searchTicket)return;
   showSearchResults(players,source);

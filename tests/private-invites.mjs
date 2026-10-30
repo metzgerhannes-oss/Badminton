@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {freshToken,tokenFromFragment,invitationLink,safeEvent,storedInvites,inviteKey} from "../scripts/private-invite-utils.mjs";
 import {reconcileIssuedInvite,checkIssuedInviteForSharing} from "../scripts/owner-invites-overview.mjs";
-const valid="E24DC6EE-152A-454D-B00C-E625B751D7D5";
+const valid="11111111-2222-4333-8444-555555555556";
 const issued={id:"11111111-2222-4333-8444-555555555555",
  secret:"synthetic-no-real-link",expires:"2026-11-20T00:00:00Z",revoked:false};
 const revokedRow={id:issued.id,revoked_at:"2026-10-29T19:00:00Z"};
@@ -45,7 +45,10 @@ assert.deepEqual(checkIssuedInviteForSharing({...issued,expires:"2026-11-01T00:0
 
 
 const b={id:valid,url:"https://dbv.turnier.de/tournament/"+valid,
- name:"Jugendturnier",playerId:"05-070879",startDate:"2026-12-03",endDate:"2026-12-04"};
+ name:"Jugendturnier",playerId:"99-100104",startDate:"2026-12-03",endDate:"2026-12-04"};
+// Public fixtures must never contain actual tournament UUIDs or player identities.
+assert.equal(valid,"11111111-2222-4333-8444-555555555556");
+assert.match(b.playerId,/^99-/);
 const tok=freshToken({getRandomValues:a=>{for(let i=0;i<a.length;i++)a[i]=i}});
 assert.equal(tok.length,64);
 assert.equal(tok,"000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
@@ -54,13 +57,13 @@ assert.equal(tokenFromFragment("#invite="+tok+"%0a"),null);
 assert.equal(tokenFromFragment("#profile="+tok),null);
 assert.equal(invitationLink(tok,"https://example.com/app/index.html"),"https://example.com/app/private-invite.html#invite="+tok);
 assert.deepEqual(safeEvent(b),{title:"Jugendturnier",start_date:"2026-12-03",end_date:"2026-12-04",source_url:b.url});
-assert.ok(!JSON.stringify(safeEvent(b)).includes("05-070879"),"No player identity may enter shared payload");
+assert.ok(!JSON.stringify(safeEvent(b)).includes("99-100104"),"No player identity may enter shared payload");
 assert.throws(()=>safeEvent({...b,url:"https://evil.example/"}),/DBV/);
 assert.throws(()=>safeEvent({...b,startDate:"",endDate:""}),/Beginn/);
 assert.throws(()=>safeEvent({...b,endDate:"2026-11-01"}),/Turnierzeitraum|Beginn/);
 assert.deepEqual(storedInvites({"a|b":{id:valid,token:tok,expires:"2026-12-10T00:00:00Z"},"bad":{id:valid,token:"bad",expires:"2026-12-10T00:00:00Z"}}),
  {"a|b":{id:valid,token:tok,expires:"2026-12-10T00:00:00Z"}});
-assert.equal(inviteKey(b),valid+"|05-070879");
+assert.equal(inviteKey(b),valid+"|99-100104");
 const [html,reader,creator,app,sw,root,doc]=await Promise.all([
 "private-invite.html","private-invite-reader.js","private-invites.js","app.js","sw.js",
 "index.html","docs/ZUGRIFFSMODELL_V105.md"

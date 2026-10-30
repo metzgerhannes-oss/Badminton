@@ -1,6 +1,6 @@
 import {test,expect} from "./supabase-isolated.fixture.mjs";
 
-const PLAYER="05-070879",FRIEND="05-071969";
+const PLAYER="99-900001",FRIEND="99-900002";
 const TOURNAMENT="E24DC6EE-152A-454D-B00C-E625B751D7D5";
 const AUTH_USER="2980046b-abd4-4056-b275-090a7364c4ac";
 const headers={"Access-Control-Allow-Origin":"*","Content-Type":"application/json",
@@ -12,11 +12,11 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
  const publisher=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});
  const follower=await browser.newContext({baseURL:"http://127.0.0.1:4173",serviceWorkers:"block"});
  const owner=await publisher.newPage(),reader=await follower.newPage();
- const storeA={players:[{id:PLAYER,name:"Philipp Metzger",birthYear:2016}],
+ const storeA={players:[{id:PLAYER,name:"Testkind A",birthYear:2016}],
   activeProfileId:PLAYER,chosen:PLAYER,officialLinks:[],friends:[]};
- const storeB={players:[{id:FRIEND,name:"Charlotte Metzger",birthYear:2014}],
+ const storeB={players:[{id:FRIEND,name:"Testkind B",birthYear:2014}],
   activeProfileId:FRIEND,chosen:FRIEND,officialLinks:[],
-  friends:[{id:PLAYER,name:"Philipp Metzger",birthYear:2016}]};
+  friends:[{id:PLAYER,name:"Testkind A",birthYear:2016}]};
  await publisher.addInitScript(s=>{
   localStorage.setItem("shuttleboard-v1",JSON.stringify(s));
   // This existing authenticated identity is independently approved for PLAYER.

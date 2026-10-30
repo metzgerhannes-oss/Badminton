@@ -77,8 +77,18 @@ async function runSearch(text){
  }
  showMessage("Suche im offiziellen DBV-Spielerverzeichnis …");
  found=[];render();
+ // Legacy picker is not mounted in the current shell, but must never
+ // reintroduce anonymous REST probes if reused.
+ if(window.badmintonAppAccess?.allowed!==true){
+  showMessage("DBV-Suche nur mit bestätigtem Familienzugang verfügbar.");return;
+ }
+ const token=await window.badmintonAppAccess.getAccessToken?.();
+ if(typeof token!=="string"||!token){
+  showMessage("Familienzugang nicht verfügbar. Bitte erneut anmelden.");return;
+ }
  try{
-  const response=await fetch(query,{signal:controller.signal,cache:"no-store",headers:{apikey:APIKEY,accept:"application/json"}});
+  const response=await fetch(query,{signal:controller.signal,cache:"no-store",
+   headers:{apikey:APIKEY,Authorization:"Bearer "+token,accept:"application/json"}});
   if(!response.ok)throw Error("Supabase HTTP "+response.status);
   const rows=await response.json();
   if(!Array.isArray(rows))throw Error("Ungültige Suchantwort");

@@ -127,6 +127,7 @@ jobs:
           node tests/browser-qa-supabase-isolation.mjs
           node tests/private-publication-gate.mjs
           node tests/security-gate.mjs
+          node tests/p0-417-staged-privacy.mjs
           node tests/p0-ci-prod-isolation.mjs
           node tests/operations-audit.mjs
           node tests/calendar-health-watch.mjs
@@ -248,6 +249,10 @@ jobs:
           node tests/welcome-i18n.mjs
           node tests/onboarding-wizard-v202.mjs
           node scripts/validate-i18n.mjs
+          node tests/invite-feedback.mjs
+          node tests/auth-singleflight.mjs
+          node tests/owner-device-transfer.mjs
+          node tests/private-pages-build.mjs
           node tests/supabase-read.mjs
           node tests/report-read-client.mjs
           node tests/supabase-library.mjs

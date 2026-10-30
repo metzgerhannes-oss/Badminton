@@ -8,18 +8,18 @@ const fake=async(_url,options)=>{
  attempts++;header=options.headers.Authorization||"";
  return {ok:true,status:200,headers:{get:()=>null},json:async()=>[]};
 };
-globalThis.window={badmintonAppAccess:{async getAccessToken(){return null}}};
+globalThis.window={badmintonAppAccess:{allowed:false,async getAccessToken(){return null}}};
 await assert.rejects(readPublicRows(path,{fetchImpl:fake,retries:0}),e=>
  e instanceof PublicReadError&&e.kind==="restricted"&&e.status===403);
 assert.equal(attempts,0,"No anonymous live-cache request may be emitted");
-globalThis.window={badmintonAppAccess:{async getAccessToken(){return "synthetic-member-jwt"}}};
+globalThis.window={badmintonAppAccess:{allowed:true,async getAccessToken(){return "synthetic-member-jwt"}}};
 const rows=await readPublicRows(path,{fetchImpl:fake,retries:0,count:false});
 assert.deepEqual(rows.rows,[]);
 assert.equal(attempts,1);
 assert.equal(header,"Bearer synthetic-member-jwt");
 header="";
 await readPublicRows("league_fixtures?limit=1",{fetchImpl:fake,retries:0,count:false});
-assert.equal(header,"","Public nuLiga fixtures must not acquire an invitation token");
+assert.equal(header,"Bearer synthetic-member-jwt","P0 #417: league fixtures must also require a verified family JWT");
 delete globalThis.window;
 const migration=await readFile("supabase/migrations/20261019210000_member_scoped_live_read_watch.sql","utf8");
 assert.match(migration,/grant select\s*\(dbv_id,\s*provider,\s*source_url,\s*checked_at,\s*payload,\s*last_error_at\)/i);
@@ -45,4 +45,4 @@ assert.match(followed,/getAccessToken/);
 assert.match(followed,/badminton:app-access-granted/);
 assert.match(followed,/if\(!window\.badmintonAppAccess\?\.allowed\)/,
  "Followed LIVE must await membership before scheduling watches");
-console.log("App membership required for Badhub watch+live cache; fixture public read unchanged; no extra cron.");
+console.log("P0 #417: verified family JWT required for live cache and league fixtures; no anonymous reads or extra cron.");

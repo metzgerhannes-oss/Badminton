@@ -1,4 +1,4 @@
-/** Read-only, bounded public Supabase client. No family data is written remotely. */
+/** P0 #417: bounded, read-only Supabase REST client for verified family members. */
 export const SUPABASE_ROOT="https://yadexibmjmnjfmfabrug.supabase.co/rest/v1/";
 export const PUBLIC_KEY="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
 
@@ -35,14 +35,18 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
   if(signal)signal.addEventListener("abort",onAbort,{once:true});
   const timer=setTimeout(()=>{timedOut=true;controller.abort()},timeoutMs);
   try{
-   const protectedRoute=/^(?:player_external_match_facts|tournament_placements|player_live_snapshots)[?]/.test(path);
-   const sessionToken=protectedRoute&&typeof window!=="undefined"
-    ?await window.badmintonAppAccess?.getAccessToken?.():null;
-   // All member-only row sources require an actual app membership token.
-   // An accepted, player-scoped invitation is NOT a global member grant.
-   // Reject locally before fetching: do not create direct REST probes as a guest.
-   if(protectedRoute&&!sessionToken)
-    throw new PublicReadError("restricted","Member-only data require app membership",403);
+   // P0 #417: every PostgREST table read requires a verified family member.
+   // Supabase Anonymous Auth also uses the "authenticated" DB role; an
+   // accepted player-scoped link must NEVER be treated as global membership.
+   const member=typeof window!=="undefined"?window.badmintonAppAccess:null;
+   if(member?.allowed!==true)
+    throw new PublicReadError("restricted","Verified family membership required",403);
+   const sessionToken=await member.getAccessToken?.();
+   if(typeof sessionToken!=="string"||!sessionToken||
+      typeof window==="undefined"||window.badmintonAppAccess!==member||
+      member.allowed!==true)
+    throw new PublicReadError("restricted","Verified family session unavailable",403);
+   if(signal?.aborted)throw new PublicReadError("aborted","Request cancelled");
    const response=await fetchImpl(url,{
     method:"GET",signal:controller.signal,cache:"no-store",
     headers:{apikey:PUBLIC_KEY,Accept:"application/json",...(count?{Prefer:"count=exact"}:{}),
@@ -57,6 +61,15 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
    try{rows=await response.json()}
    catch{throw new PublicReadError("invalid","Invalid JSON response")}
    if(!Array.isArray(rows))throw new PublicReadError("invalid","Expected row array");
+   // An in-flight response belongs to the member session that requested it.
+   // Logout, account switch, revocation or cancellation must not release
+   // old-session rows into the newly active UI (even after HTTP 200).
+   if(signal?.aborted)throw new PublicReadError("aborted","Request cancelled");
+   const currentToken=await member.getAccessToken?.();
+   if(typeof window==="undefined"||window.badmintonAppAccess!==member||
+      member.allowed!==true||currentToken!==sessionToken)
+    throw new PublicReadError("restricted","Family session changed during read",403);
+   if(signal?.aborted)throw new PublicReadError("aborted","Request cancelled");
    return {rows,range:response.headers?.get("content-range")||""};
   }catch(error){
    const normalized=error instanceof PublicReadError?error:
@@ -76,9 +89,13 @@ export async function readPublicRows(path,{fetchImpl=fetch,signal,timeoutMs=6500
  * suppress backed, server-authorized match-card reads. */
 export async function readMatchImportProgress(id,{signal}={}){
  if(typeof id!=="string"||!/^[0-9]{2}-[0-9]{6}$/.test(id))return null;
- if(typeof window!=="undefined"&&window.badmintonAppAccess?.allowed){
-  const jwt=await window.badmintonAppAccess.getAccessToken();
-  if(!jwt)return null;
+ const member=typeof window!=="undefined"?window.badmintonAppAccess:null;
+ if(member?.allowed===true){
+  // Coverage is advisory but still member-only. A delayed RPC response must
+  // not disclose old-session profile metadata after logout or account switch.
+  const jwt=await member.getAccessToken?.();
+  if(typeof jwt!=="string"||!jwt||signal?.aborted||
+     window.badmintonAppAccess!==member||member.allowed!==true)return null;
   const response=await fetch(SUPABASE_ROOT+"rpc/app_access_player_coverage",{
    method:"POST",cache:"no-store",signal,
    headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+jwt,"Content-Type":"application/json"},
@@ -86,15 +103,15 @@ export async function readMatchImportProgress(id,{signal}={}){
   });
   if(!response.ok)return null;
   const d=await response.json();
+  if(signal?.aborted||window.badmintonAppAccess!==member||member.allowed!==true)return null;
+  const currentJwt=await member.getAccessToken?.();
+  if(signal?.aborted||window.badmintonAppAccess!==member||
+     member.allowed!==true||currentJwt!==jwt)return null;
   if(d?.dbv_id!==id)return null;
   return {status:d.import_status||null,verified_count:Number(d.match_cards||0),
    last_finished_at:d.last_import||null,
    birth_year:Number.isInteger(d.birth_year)?d.birth_year:null};
  }
- const path="player_external_match_imports?"+new URLSearchParams({
-  select:"status,verified_count,source_count,rejected_count,last_finished_at",
-  dbv_id:"eq."+id,limit:"1"
- });
- const data=await readPublicRows(path,{signal,count:false});
- return data.rows[0]||null;
+ // No anonymous status fallback: member-only coverage RPC is authoritative.
+ return null;
 }

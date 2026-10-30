@@ -105,22 +105,22 @@ assert.throws(()=>createLocalBackup(JSON.stringify({...followerOnly,
 // A device-local ID is an independent identity, even when another official
 // profile has the same display name. Neither favorites nor Home choice move.
 const sameNameLocal={...original,
- players:[{id:"local-charlotte",name:"Testperson B"},{id:"99-100002",name:"Testperson B"}],
+ players:[{id:"local-fixture-player",name:"Testperson B"},{id:"99-100002",name:"Testperson B"}],
  friends:[],
- officialLinks:[{...original.officialLinks[0],playerId:"local-charlotte"},
+ officialLinks:[{...original.officialLinks[0],playerId:"local-fixture-player"},
   {...original.officialLinks[0],playerId:"99-100002"}],
- activeProfileId:"local-charlotte",chosen:"99-100002"};
+ activeProfileId:"local-fixture-player",chosen:"99-100002"};
 const sameNameRestored=inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameLocal)));
-assert.deepEqual(sameNameRestored.data.players.map(p=>p.id),["local-charlotte","99-100002"]);
-assert.deepEqual(sameNameRestored.data.officialLinks.map(t=>t.playerId),["local-charlotte","99-100002"]);
-assert.equal(sameNameRestored.data.activeProfileId,"local-charlotte");
-assert.equal(sameNameRestored.data.chosen,"local-charlotte");
-assert.equal(inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameRestored.data))).data.activeProfileId,"local-charlotte");
+assert.deepEqual(sameNameRestored.data.players.map(p=>p.id),["local-fixture-player","99-100002"]);
+assert.deepEqual(sameNameRestored.data.officialLinks.map(t=>t.playerId),["local-fixture-player","99-100002"]);
+assert.equal(sameNameRestored.data.activeProfileId,"local-fixture-player");
+assert.equal(sameNameRestored.data.chosen,"local-fixture-player");
+assert.equal(inspectLocalBackup(createLocalBackup(JSON.stringify(sameNameRestored.data))).data.activeProfileId,"local-fixture-player");
 assert.throws(()=>createLocalBackup(JSON.stringify({...sameNameLocal,
  players:[{id:"99-100002",name:"Testperson B"}]})),
  /unbekannten Spieler/,"A removed local owner must not silently transfer a tournament");
 assert.throws(()=>inspectLocalBackup(JSON.stringify({...JSON.parse(created),
- data:{...original,activeProfileId:"local-charlotte"}})),
+ data:{...original,activeProfileId:"local-fixture-player"}})),
  /kein eigenes Spielerprofil/,"A stale active alias must not select an unrelated official profile");
 
 // A person can be an own profile and independently followed with the same
@@ -234,3 +234,70 @@ assert.match(sw,/scripts\/local-backup\.mjs/);
 assert.match(sw,/backup\.js/);
 assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
 console.log("Offline backup contract: roundtrip, canonical home profile, old app restore, unsafe/duplicate files rejected.");
+
+
+// S-01 / #153: exercise the real offline restore UI with isolated browser
+// storage. Two writes are not transactional; a calendar quota failure must
+// restore the prior family and calendar rather than leave a mixed backup.
+const backupRuntime=(await readFile("backup.js","utf8"))
+ .replace(/\bimport\s*\{[\s\S]*?\}\s*from\s*["'][^"']+["'];?/,"");
+assert.doesNotMatch(backupRuntime,/^\s*import\s/m,"Restore harness must evaluate the real module body");
+function restoreHarness({archive=created,approve=true,failCalendarOnce=false}={}){
+ const beforeFamily=JSON.stringify(parsed.data);
+ const beforeCalendar=JSON.stringify(privateCalendar);
+ const storage=new Map([[LOCAL_STORE_KEY,beforeFamily],[SPOND_STORE_KEY,beforeCalendar]]);
+ const status={textContent:"",dataset:{}};
+ const restoreButton={disabled:false};
+ let reloads=0,confirmations=0,calendarFailurePending=failCalendarOnce;
+ const context=vm.createContext({
+  LOCAL_STORE_KEY,SPOND_STORE_KEY,MAX_BACKUP_BYTES,createLocalBackup,inspectLocalBackup,
+  document:{getElementById:id=>({
+   "backup-feedback":status,"backup-restore":restoreButton
+  })[id]||null,addEventListener:()=>{}},
+  localStorage:{
+   getItem:key=>storage.get(key)??null,
+   setItem:(key,value)=>{
+    if(key===SPOND_STORE_KEY&&calendarFailurePending){
+     calendarFailurePending=false;
+     throw new Error("synthetic storage quota");
+    }
+    storage.set(key,String(value));
+   },
+   removeItem:key=>storage.delete(key)
+  },
+  window:{confirm:()=>{confirmations++;return approve;},
+   location:{hash:"#spieler",reload:()=>{reloads++;}}},
+  Date,Intl,JSON,URL,Blob,setTimeout,__testArchive:archive
+ });
+ vm.runInContext(backupRuntime,context,{filename:"backup.js"});
+ vm.runInContext("pending=inspectLocalBackup(__testArchive); restore();",context);
+ return {storage,status,restoreButton,reloads,confirmations,beforeFamily,beforeCalendar,
+  hash:context.window.location.hash};
+}
+const declinedRestore=restoreHarness({approve:false});
+assert.equal(declinedRestore.confirmations,1);
+assert.equal(declinedRestore.reloads,0);
+assert.equal(declinedRestore.storage.get(LOCAL_STORE_KEY),declinedRestore.beforeFamily);
+assert.equal(declinedRestore.storage.get(SPOND_STORE_KEY),declinedRestore.beforeCalendar);
+assert.match(declinedRestore.status.textContent,/abgebrochen/i);
+
+const successfulRestore=restoreHarness();
+assert.equal(successfulRestore.confirmations,1);
+assert.equal(successfulRestore.reloads,1);
+assert.equal(successfulRestore.hash,"#start");
+assert.deepEqual(JSON.parse(successfulRestore.storage.get(LOCAL_STORE_KEY)),parsed.data);
+assert.deepEqual(JSON.parse(successfulRestore.storage.get(SPOND_STORE_KEY)),parsed.calendarEvents);
+
+const failedRestore=restoreHarness({failCalendarOnce:true});
+assert.equal(failedRestore.reloads,0,"A partial write must not reload the app");
+assert.equal(failedRestore.storage.get(LOCAL_STORE_KEY),failedRestore.beforeFamily,
+ "Restore failure must roll back the original own/followed profiles");
+assert.equal(failedRestore.storage.get(SPOND_STORE_KEY),failedRestore.beforeCalendar,
+ "Restore failure must preserve private calendar data");
+assert.equal(failedRestore.status.dataset.error,"true");
+
+const legacyRestore=restoreHarness({archive:JSON.stringify(legacyArchive)});
+assert.equal(legacyRestore.reloads,1);
+assert.equal(legacyRestore.storage.get(SPOND_STORE_KEY),legacyRestore.beforeCalendar,
+ "A v1 archive must not erase newer private Spond events");
+console.log("S-01 #153: cancel, successful offline restore, storage-quota rollback and v1 calendar preservation passed.");

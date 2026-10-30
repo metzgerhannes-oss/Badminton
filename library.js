@@ -309,7 +309,11 @@ document.addEventListener("DOMContentLoaded",()=>{
  if(!$("library-results"))return;
  showIdle();
  // Small club metadata fetch may populate the Landesverband filter, never the 9,246-player list.
- dbAssociations().catch(e=>console.warn("Landesverbände derzeit nicht abrufbar:",e?.message));
+ // Do not send member-only Supabase requests before app access is verified.
+ if(window.badmintonAppAccess?.allowed)void dbAssociations().catch(()=>{});
+ window.addEventListener("badminton:app-access-granted",()=>{
+  void dbAssociations().catch(()=>{});
+ });
  $("library-age").addEventListener("change",()=>{load()});
  
  

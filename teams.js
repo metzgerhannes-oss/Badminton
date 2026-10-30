@@ -435,7 +435,12 @@ function init(){
   }else showStatus("Standardreihenfolge wiederhergestellt.");
   renderFollowed();$("team-order-reset")?.focus({preventScroll:true});
  });
- window.addEventListener("badminton:app-access-granted",queueExistingTeams);
+ window.addEventListener("badminton:app-access-granted",()=>{
+  queueExistingTeams();
+  // First guest load may have failed before the member JWT existed.
+  const refresh=()=>{if(loading){setTimeout(refresh,100);return;}void load();};
+  refresh();
+ });
  $("team-detail").querySelectorAll("[data-team-tab]").forEach(btn=>btn.addEventListener("click",()=>{
   activeTab=btn.dataset.teamTab;renderDetail();
  }));
