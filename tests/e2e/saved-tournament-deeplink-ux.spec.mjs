@@ -111,6 +111,17 @@ test("verified DBV correction explains changed game day, deadline, category and 
  await expect(notice).toContainText("Austragungsort");
  await expect(notice).toContainText("korrigiert");
  await expect(notice).not.toContainText("Angaben prüfen");
+ // A replayed exact-key feed or an unrelated partial feed must not erase
+ // the already verified source correction (WebKit/background-feed race).
+ await page.evaluate(({id,url})=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[{key:id,hasDirectLink:true,url,title:"3. D-RLT BAW SW U11-U19 · bestätigt",
+   start:"2028-11-23",end:"2028-11-23",place:"Sporthalle Teststadt",deadline:"2028-11-16"}]}
+ })),{id:CALENDAR,url:EVENT_URL});
+ await expect(notice).toContainText("Offizielle DBV-Angaben übernommen");
+ await page.evaluate(()=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[{key:"dbv-calendar-123456",start:"2028-11-23",end:"2028-11-23"}]}
+ })));
+ await expect(notice).toContainText("Offizielle DBV-Angaben übernommen");
  await expect(card.locator(".saved-tournament-player")).toHaveText("Spieler: Synthetisches Familienprofil");
  await expect(card.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
  const saved=await page.evaluate(id=>{
