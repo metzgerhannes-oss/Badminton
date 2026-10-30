@@ -32,6 +32,18 @@ assert.deepEqual(checkIssuedInviteForSharing(issued,[{...serverActive,redeem_unt
  {status:"unverified"},"Malformed server deadlines must not authorize sharing");
 assert.deepEqual(checkIssuedInviteForSharing(issued,null,now),{status:"unverified"});
 
+assert.deepEqual(checkIssuedInviteForSharing({...issued,revoked:true},[serverActive],now),
+ {status:"revoked"},"A previously revoked local bearer link cannot be revived by stale server metadata");
+assert.deepEqual(checkIssuedInviteForSharing({...issued,expires:"2026-10-29T00:00:00Z"},[serverActive],now),
+ {status:"expired",expires:"2026-10-29T00:00:00.000Z"},
+ "Server metadata must not silently extend the locally expired bearer link");
+assert.deepEqual(checkIssuedInviteForSharing({...issued,expires:"invalid"},[serverActive],now),
+ {status:"unverified"},"A missing or malformed local expiry cannot authorize sharing");
+assert.deepEqual(checkIssuedInviteForSharing({...issued,expires:"2026-11-01T00:00:00Z"},[serverActive],now),
+ {status:"active",expires:"2026-11-01T00:00:00.000Z"},
+ "The earlier of local and server expiry always bounds the shareable link");
+
+
 const b={id:valid,url:"https://dbv.turnier.de/tournament/"+valid,
  name:"Jugendturnier",playerId:"05-070879",startDate:"2026-12-03",endDate:"2026-12-04"};
 const tok=freshToken({getRandomValues:a=>{for(let i=0;i<a.length;i++)a[i]=i}});
