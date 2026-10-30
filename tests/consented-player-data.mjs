@@ -30,6 +30,35 @@ assert.equal(serializePlayerDataExport(other,storage),null,"No export without ma
 assert.ok(!storage.getItem(KEY).includes("should-not-copy"),"Only sanctioned fields in local snapshot");
 assert.ok(!storage.getItem(KEY).includes("invitation"),"No private access tokens/IDs in copy");
 
+// #198/#188: an offline snapshot is only evidence when every locally stored
+// row still satisfies the same verification contract as the consented writer.
+// Corrupted or forged storage must not display a Top-4 or a match as verified.
+const pristine=storage.getItem(KEY);
+for(const damage of [
+ item=>{item.trophies[0].verified=false;},
+ item=>{item.trophies[0].place=5;},
+ item=>{item.trophies[0].source.url="javascript:alert(1)";},
+ item=>{item.trophies[0].playerId=other;},
+ item=>{item.matches[0].winning_side=3;},
+ item=>{item.matches[0].source_url="http://unsafe.invalid";},
+]){
+ const corrupted=JSON.parse(pristine);
+ damage(corrupted[player]);
+ storage.setItem(KEY,JSON.stringify(corrupted));
+ assert.equal(loadPlayerCopy(player,storage),null,
+  "Invalid offline records must not be displayed as verified private results");
+}
+storage.setItem(KEY,pristine);
+const withUnknownFields=JSON.parse(pristine);
+withUnknownFields[player].access_token="NEVER-RETURN-LOCAL-SECRET";
+withUnknownFields[player].trophies[0].private_token="NEVER-RETURN-LOCAL-SECRET";
+storage.setItem(KEY,JSON.stringify(withUnknownFields));
+const sanitized=loadPlayerCopy(player,storage);
+assert.ok(sanitized&&sanitized.trophies.length===1&&sanitized.matches.length===115);
+assert.ok(!JSON.stringify(sanitized).includes("NEVER-RETURN-LOCAL-SECRET"),
+ "Offline reader must return allowlisted fields only");
+storage.setItem(KEY,pristine);
+
 // Reproduce a real, independently source-verified Badhub card. The local
 // round-trip must preserve every field required by the W/L evaluator.
 const sourceMatch={
