@@ -88,7 +88,7 @@ function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
   outcomeEvidence:declaredWinner?"badhub-bold-dash":null};
 }
 function discipline(event){
- const c=event.split(/\s/)[0].toUpperCase();
+ const c=String(event||"").trim().replace(/^[0-9]{1,2}[.]\s*/,"").split(/\s/)[0].toUpperCase();
  if(["ME","DE","HE","JE","MS","WS","SE","UE"].includes(c))return "Einzel";
  if(["DD","HD","JD","MD","WD","D","BD"].includes(c))return "Doppel";
  if(["MX","MIX","GD","XD","MXD"].includes(c))return "Mixed";
