@@ -1,24 +1,33 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {followedRoster,followedSnapshotPath,followedCard,followedCards,FOLLOW_LIMIT} from "../scripts/followed-live.mjs";
-const id="05-070879",friend="05-061350";
+import {followedRoster,followedSnapshotPath,followedCard,followedCards,FOLLOW_LIMIT,shouldReplaceFollowedRequest} from "../scripts/followed-live.mjs";
+const id="99-000001",friend="99-000002";
 const roster=followedRoster({
- own:[{id,name:"Philipp"},{id,name:"Doppelt"},{id:"bad",name:"Falsch"}],
- friends:[{id:friend,name:"Sarah"},{id:"05-040000",name:"Zweiter Freund"}],selected:friend
+ own:[{id,name:"Testperson A"},{id,name:"Doppelt"},{id:"bad",name:"Falsch"}],
+ friends:[{id:friend,name:"Testperson B"},{id:"99-000003",name:"Testperson C"}],selected:friend
 });
 assert.equal(FOLLOW_LIMIT,6);
-assert.deepEqual(roster.players.map(x=>x.id),[friend,id,"05-040000"]);
+assert.equal(shouldReplaceFollowedRequest(false,"99-000001","99-000001"),true,
+ "A new idle refresh is permitted");
+assert.equal(shouldReplaceFollowedRequest(true,"99-000001","99-000001"),false,
+ "Repeated events for the same roster must not restart a pending fetch");
+assert.equal(shouldReplaceFollowedRequest(true,"99-000001","99-000002"),true,
+ "A changed player selection must supersede a pending response");
+assert.equal(shouldReplaceFollowedRequest(true,"99-000001,99-000002","99-000002,99-000001"),true,
+ "Changing roster priority must supersede an older response");
+
+assert.deepEqual(roster.players.map(x=>x.id),[friend,id,"99-000003"]);
 assert.equal(roster.remaining,0);
 assert.equal(followedRoster({friends:Array.from({length:9},(_,i)=>({
- id:"05-"+String(i).padStart(6,"0"),name:"Person "+i
+ id:"99-"+String(i).padStart(6,"0"),name:"Person "+i
  }))}).players.length,6);
 assert.equal(followedRoster({friends:Array.from({length:9},(_,i)=>({
- id:"05-"+String(i).padStart(6,"0"),name:"Person "+i
+ id:"99-"+String(i).padStart(6,"0"),name:"Person "+i
  }))}).remaining,3);
 assert.equal(followedSnapshotPath([]),null);
 assert.equal(followedSnapshotPath([{id:"invalid"}]),null);
 assert.match(followedSnapshotPath(roster.players),/^player_live_snapshots\?/);
-assert.match(decodeURIComponent(followedSnapshotPath(roster.players)),/dbv_id=in\.\(05-061350,05-070879,05-040000\)/);
+assert.match(decodeURIComponent(followedSnapshotPath(roster.players)),/dbv_id=in\.\(99-000002,99-000001,99-000003\)/);
 const now=Date.parse("2026-10-11T12:00:00Z");
 const row={
  dbv_id:id,provider:"Badhub",source_url:"https://badhub.de/spieler/"+id+"/live",
@@ -27,7 +36,7 @@ const row={
  running:{class:"JE U11",opponent:"Gegner",sets:[[15,10],[5,7]],is_team1:true,court:"Feld 1"},
  next:{queue_position:0},upcoming:[],past:[],entries:[]}
 };
-const mine={id,name:"Philipp",role:"own"};
+const mine={id,name:"Testperson A",role:"own"};
 const card=followedCard(mine,row,now);
 assert.equal(card.kind,"current");
 assert.equal(card.title,"Spielt gerade");
@@ -63,7 +72,15 @@ assert.match(ui,/readPublicRows\(followedSnapshotPath\(players\)/);
 assert.match(ui,/watchRequest\(p\.id\)/);
 assert.match(ui,/Promise\.allSettled/);
 assert.doesNotMatch(ui,/badhub\.de\/api|spieler_live\.php|service_role/);
-assert.match(ui,/document\.hidden/);
+assert.match(ui,/document\\.hidden/);
+assert.match(ui,/shouldReplaceFollowedRequest\\(busy,rosterKey\\(lastRoster\\),ids\\)/);
+assert.match(ui,/const request=\\+\\+seq;[\\s\\S]*controller\\?\\.abort\\(\\)/,
+ "A new roster invalidates and aborts the old request before fetching");
+assert.match(ui,/lastRowsRosterIds=ids;checked=Date\\.now\\(\\)/);
+assert.match(ui,/ids===lastRowsRosterIds\\?lastRows:\\[\\]/,
+ "Fallback cache must belong to the last successfully fetched roster");
+assert.doesNotMatch(ui,/ids===lastRoster\\.map/,
+ "The active roster is not proof that a previous cache belongs to it");
 assert.match(ui,/window\.badmintonMatchdayMode==="all"/);
 assert.match(css,/followed-live-grid/);
 assert.match(sw,/followed-live\.js/);
