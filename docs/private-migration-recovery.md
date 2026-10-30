@@ -20,7 +20,7 @@ node scripts/replay-private-migration-bundle.mjs /private/path/history.json \
   --execute --database=schmetterlinge_recovery_s01 --port=5432
 ```
 
-The first `node` invocation is **validation only**, with no database connection. The second validates again, checks the local address, database name and marker, and streams the verified SQL directly to `psql -X --single-transaction -f -`. It does **not** write SQL to files or echo it into logs. Any `psql` failure is treated as failure, not partial success. The runner does not automatically create or drop databases.
+The first `node` invocation is **validation only**, with no database connection. The second validates again, checks the local address, database name and marker **and refuses any non-empty recovery target**: the marker must be an ordinary empty table, and no other user tables, partitioned tables, views, materialized views, foreign tables or sequences may exist (installed extension-owned relations are exempt). A marker alone is not proof of an empty database. Only after these checks does it stream the verified SQL directly to `psql -X --single-transaction -f -`. It does **not** write SQL to files or echo it into logs. Any `psql` failure is treated as failure, not partial success. The runner does not automatically create or drop databases.
 
 ## Completion boundary
 
