@@ -75,6 +75,8 @@ jobs:
           node --check supabase/functions/private-dbv-weekly/transport.mjs
           node --check tests/import-status-preserve-evidence.mjs
           node --check scripts/verify-private-migration-bundle.mjs
+          node --check scripts/replay-private-migration-bundle.mjs
+          node --check tests/private-migration-replay.mjs
           node --check scripts/match-availability.mjs
           node --check friend-search.js
           node --check career-history.js
@@ -213,6 +215,7 @@ jobs:
           node tests/history-source-key-reconcile.mjs
           node tests/migration-inventory-snapshot.mjs
           node tests/private-migration-bundle.mjs
+          node tests/private-migration-replay.mjs
           node --test tests/private-dbv-weekly-model.test.mjs tests/private-dbv-weekly-transport.test.mjs
           node tests/match-availability.mjs
           node tests/design-v2.mjs
