@@ -186,7 +186,8 @@ export function createLocalBackup(stored,now=new Date(),calendarStored="[]"){
  return archive;
 }
 export function inspectLocalBackup(content){
- if(typeof content!=="string"||content.length>MAX_BACKUP_BYTES)fail("Sicherungsdatei zu groß");
+ if(typeof content!=="string"||new TextEncoder().encode(content).byteLength>MAX_BACKUP_BYTES)
+  fail("Sicherungsdatei zu groß");
  let archive;
  try{archive=JSON.parse(content)}catch{fail("Die Datei enthält kein gültiges JSON")}
  if(!record(archive)||archive.kind!==BACKUP_KIND||
