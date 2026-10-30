@@ -128,7 +128,7 @@ test("320/390/430px tournament and calendar form controls avoid iOS auto-zoom",a
   }),selectors);
   expect(metrics.fonts.length).toBeGreaterThanOrEqual(8);
   for(const item of metrics.fonts)expect(item.font,selectorMessage(item.selector,width)).toBeGreaterThanOrEqual(16);
-  expect(metrics.viewport).not.toMatch(/user-scalable\\s*=\\s*no|maximum-scale\\s*=\\s*1/);
+  expect(metrics.viewport).not.toMatch(/user-scalable\s*=\s*no|maximum-scale\s*=\s*1/);
   expect(metrics.overflow).toBeLessThanOrEqual(2);
  }
 });
