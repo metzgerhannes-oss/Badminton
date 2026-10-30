@@ -2,7 +2,7 @@
  * Bounded to 6 public DBV IDs. No Badhub browser scraping or tournament-wide claims. */
 import {watchRequest} from "./scripts/live-radar.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
-import {followedRoster,followedSnapshotPath,followedCards} from "./scripts/followed-live.mjs";
+import {followedRoster,followedSnapshotPath,followedCards,shouldReplaceFollowedRequest} from "./scripts/followed-live.mjs";
 const $=id=>document.getElementById(id);
 let seq=0,controller,busy=false,checked=0,watchTimes=new Map(),lastRows=[],lastRoster=[],lastRowsRosterIds="";
 const rosterKey=players=>players.map(p=>p.id).join(",");
@@ -75,7 +75,7 @@ async function refresh(){
  const ids=rosterKey(players);
  // A profile/follow change must supersede an in-flight request, not wait for
  // its previous roster to render. Repeated events for the same roster coalesce.
- if(busy&&ids===rosterKey(lastRoster))return;
+ if(!shouldReplaceFollowedRequest(busy,rosterKey(lastRoster),ids))return;
  const request=++seq;
  controller?.abort();controller=new AbortController();busy=true;
  lastRoster=players;
