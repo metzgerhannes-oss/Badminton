@@ -95,7 +95,12 @@ async function execute(action){
    status("Der Link wurde angezeigt. Bitte manuell kopieren; automatisches Kopieren ist nicht verfügbar.");
   }
  }catch(e){
-  status("Kopieren nicht möglich. Bitte die Zwischenablage freigeben oder „Aktuellen Einladungslink öffnen“ nutzen.", "error");
+  // Keep verified invite revocation/expiry visible; a generic clipboard error
+  // would hide the server-confirmed denial and mislead the owner.
+  const reason=String(e?.message||"");
+  const verifiedDenial=/^(Einladung wurde widerrufen\.|Annahmefrist abgelaufen\.|Einladungsstatus derzeit nicht bestätigbar\.)/.test(reason);
+  status(verifiedDenial?reason:
+   "Kopieren nicht möglich. Bitte die Zwischenablage freigeben oder „Aktuellen Einladungslink öffnen“ nutzen.", "error");
  }finally{
   busy=false;el("invite-share").disabled=false;copyButton.disabled=false;
   if(action!=="copy"||copyButton.textContent==="Wird kopiert …")
