@@ -8,6 +8,19 @@ export function reconcileIssuedInvite(local,serverRows){
  const matching=serverRows.find(row=>row?.id===local.id&&UUID.test(row?.id||""));
  return matching?.revoked_at?{...local,revoked:true}:null;
 }
+/** Check the *current* server-side invite status immediately before copying/sharing.
+ * A bounded overview can omit older links; omission is not proof of revocation
+ * and must never silently authorize sharing or issue a replacement grant. */
+export function checkIssuedInviteForSharing(local,serverRows,now=Date.now()){
+ if(!UUID.test(local?.id||"")||!Array.isArray(serverRows))return {status:"unverified"};
+ const row=serverRows.find(item=>item?.id===local.id&&UUID.test(item?.id||""));
+ if(!row)return {status:"unverified"};
+ if(row.revoked_at)return {status:"revoked"};
+ const until=Date.parse(row.redeem_until);
+ if(!Number.isFinite(until))return {status:"unverified"};
+ const expires=new Date(until).toISOString();
+ return until<=now?{status:"expired",expires}:{status:"active",expires};
+}
 export function mountOwnerInviteOverview({card,rpc,read,write,draw,status}){
  const section=document.createElement("section");
  section.className="invitation-overview";
