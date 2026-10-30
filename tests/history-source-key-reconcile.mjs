@@ -171,3 +171,29 @@ const modifierOnly=parseEdgeHistory(syntheticHtml.replace(
  'sp-match-item--won sp-match-item','sp-match-item--won'),syntheticPlayer,"tournament");
 assert.equal(modifierOnly.cards_seen,0,"CSS modifier alone is not a source card");
 assert.equal(modifierOnly.items.length,0,"CSS modifier alone cannot fabricate a result");
+
+// #199/#131: Provider may reorder/add CSS tokens inside a correctly
+// recognized match card. The count, parsed result and source key must agree.
+// No live provider request, actual player identity or synthetic extra match.
+const reorderedInnerDetails=syntheticHtml
+ .replace('class="sp-tournament-name"','class="featured sp-tournament-name"')
+ .replace('class="sp-tournament-meta"','class="subtle sp-tournament-meta"')
+ .replace('class="sp-t-event-badge"','class="badge sp-t-event-badge"')
+ .replace('class="sp-t-phase-header"','class="heading sp-t-phase-header"')
+ .replaceAll('class="sp-name-full"','class="name sp-name-full"')
+ .replaceAll('class="sp-set-score"','class="result sp-set-score"')
+ .replaceAll('class="sp-s"','class="point sp-s"');
+const reorderedDetails=parseEdgeHistory(reorderedInnerDetails,syntheticPlayer,"tournament");
+assert.equal(reorderedDetails.cards_seen,1);
+assert.equal(reorderedDetails.items.length,1,
+ "Additional/reordered inner CSS tokens must not silently drop a played match");
+assert.deepEqual(reorderedDetails.items,reordered.items,
+ "CSS token order must not alter a sourced match identity or its result");
+assert.equal(assessMatchCardCoverage([reorderedDetails]).acceptable,true);
+const misleadingModifier=parseEdgeHistory(syntheticHtml.replace(
+ 'class="sp-name-full"','class="sp-name-full--alias"'),syntheticPlayer,"tournament");
+assert.equal(misleadingModifier.cards_seen,1);
+assert.equal(misleadingModifier.items.length,0,
+ "A similarly prefixed modifier must not masquerade as the exact player-name class");
+assert.equal(assessMatchCardCoverage([misleadingModifier]).acceptable,false,
+ "An unparsed played card must remain quarantined, not reported as complete");
