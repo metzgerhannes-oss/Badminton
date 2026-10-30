@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {excludeContradictoryRounds} from "../scripts/match-source-integrity.mjs";
-import {assessSourceAvailability,importStatusForBatch} from "../supabase/functions/history-match-import/source-availability.mjs";
+import {assessSourceAvailability,importStatusForBatch,classifyImportFailure} from "../supabase/functions/history-match-import/source-availability.mjs";
 const ok=s=>({status:"fulfilled",value:s});
 const bad={status:"rejected",reason:new Error("HTTP 404")};
 const all=assessSourceAvailability([ok("tournament HTML"),ok("league HTML")]);
@@ -22,11 +22,28 @@ assert.equal(importStatusForBatch(true,4,[]),"partial");
 assert.equal(importStatusForBatch(true,0,["Liga"]),"partial");
 assert.equal(importStatusForBatch(false,0,[]),"partial");
 assert.throws(()=>assessSourceAvailability([bad]),/Expected/);
+// Private failure telemetry must be actionable without leaking raw source
+// errors, personal identifiers, URLs or DB responses.
+assert.equal(classifyImportFailure(new Error("Match parser rejected unexpected amount of source cards")),"source_coverage");
+assert.equal(classifyImportFailure(new Error("Player-name mismatch on source page")),"source_identity");
+assert.equal(classifyImportFailure(new Error("DB REST 409 private profile 99-123456 token=secret")),"storage_request");
+assert.equal(classifyImportFailure(new Error("invalid_or_duplicate_source_key")),"source_reconciliation");
+assert.equal(classifyImportFailure(Object.assign(new Error("operation aborted"),{name:"AbortError"})),"source_timeout");
+assert.equal(classifyImportFailure(new Error("private player 99-123456 https://example.invalid?token=secret")),"unclassified");
+for(const input of [new Error("DB REST 409 99-123456 token=secret"),new Error("unknown 99-123456 token=secret")]){
+ const kind=classifyImportFailure(input);
+ assert.match(kind,/^(?:source_timeout|source_coverage|source_identity|storage_request|source_reconciliation|unclassified)$/);
+ assert.doesNotMatch(kind,/99-123456|token|secret|https?:/);
+}
 const fn=await readFile("supabase/functions/history-match-import/index.ts","utf8");
 const parser=await readFile("supabase/functions/history-match-import/badhub-history-parser.mjs","utf8");
 const original=await readFile("scripts/badhub-history-parser.mjs","utf8");
 assert.equal(parser,original,"Deployed parser must match the audited source parser");
 assert.match(fn,/Promise\.allSettled\(/);
+assert.match(fn,/const failureCategory=classifyImportFailure\(error\)/);
+assert.match(fn,/category:failureCategory/);
+assert.doesNotMatch(fn,/console\.error\([^\n]*error\b/,
+ "Never log the raw private source exception");
 assert.match(fn,/parsePublicHistory\(html,profiles\[0\],category\)/);
 assert.match(fn,/const storedKeys=await readStoredSourceKeys\(id\)/,
  "Partial upstream failure must still reconcile persisted source keys");
