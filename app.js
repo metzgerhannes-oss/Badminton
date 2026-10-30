@@ -145,8 +145,10 @@ function renderTournaments(){
   const technicalId=calendar?"":'<details class="saved-tournament-technical"><summary>Turnier-ID</summary><code>'+esc(t.id)+"</code></details>";
   const deadline=t.deadline?'<p class="saved-tournament-deadline">Meldeschluss: '+esc(niceDay(t.deadline))+'</p>':"";
   const discrepancy=tournamentSourceConflicts.get(t.id+"|"+t.playerId);
-  const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+'. DBV-Spieltag: '+esc(niceDay(discrepancy.officialDate))+(
-   discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+'. Angaben prüfen.</p>':"";
+  const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+
+   (discrepancy.resolved?' · Spieltag: ':'. DBV-Spieltag: ')+esc(niceDay(discrepancy.officialDate))+(
+   discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+
+   (discrepancy.resolved?' · korrigiert.</p>':'. Angaben prüfen.</p>'):"";
   return '<article class="tournament-card card-open-surface" data-saved-tournament-id="'+esc(t.id)+'" data-saved-tournament-player="'+esc(t.playerId)+'"><div class="saved-tournament-top"><h3>'+esc(heading)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p class="saved-tournament-dates">'+esc(dates)+'</p>'+missingVenue+deadline+sourceNote+sourceStatus+'<div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(destination)+'" rel="noopener noreferrer" target="_blank">'+sourceLabel+'</a>'+(calendar?'<button class="remove-button" data-edit-venue-id="'+esc(t.id)+'" data-edit-venue-player="'+esc(t.playerId)+'" type="button" aria-label="Austragungsort dieser privaten Vormerkung bearbeiten">Ort bearbeiten</button>':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div>'+technicalId+'<p class="saved-tournament-player">Spieler: '+esc(profile)+'</p></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
@@ -917,7 +919,16 @@ function setup(){
   const reconciled=state.officialLinks.map(bookmark=>{
    const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(bookmark,entries);
    if(result.status==="conflict")tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,result);
-   if(result.status==="matched"&&result.updated!==bookmark){changed=true;return result.updated}
+   if(result.status==="matched"&&result.updated!==bookmark){
+    // Source-backed corrections must be visible, not silently change a local
+    // game day into a registration deadline. No private identity is logged.
+    const fields=SchmetterlingeBookmarks.describeOfficialChanges(bookmark,result.updated);
+    tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,{
+     reason:"Offizielle DBV-Angaben übernommen: "+fields.join(", "),
+     officialDate:result.updated.startDate,officialDeadline:result.updated.deadline,resolved:true
+    });
+    changed=true;return result.updated;
+   }
    return bookmark;
   });
   const warningsChanged=JSON.stringify([...tournamentSourceConflicts.entries()])!==previousWarnings;
