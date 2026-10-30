@@ -72,14 +72,14 @@ assert.match(ui,/readPublicRows\(followedSnapshotPath\(players\)/);
 assert.match(ui,/watchRequest\(p\.id\)/);
 assert.match(ui,/Promise\.allSettled/);
 assert.doesNotMatch(ui,/badhub\.de\/api|spieler_live\.php|service_role/);
-assert.match(ui,/document\\.hidden/);
-assert.match(ui,/shouldReplaceFollowedRequest\\(busy,rosterKey\\(lastRoster\\),ids\\)/);
-assert.match(ui,/const request=\\+\\+seq;[\\s\\S]*controller\\?\\.abort\\(\\)/,
+assert.match(ui,/document\.hidden/);
+assert.match(ui,/shouldReplaceFollowedRequest\(busy,rosterKey\(lastRoster\),ids\)/);
+assert.match(ui,/const request=\+\+seq;[\s\S]*controller\?\.abort\(\)/,
  "A new roster invalidates and aborts the old request before fetching");
-assert.match(ui,/lastRowsRosterIds=ids;checked=Date\\.now\\(\\)/);
-assert.match(ui,/ids===lastRowsRosterIds\\?lastRows:\\[\\]/,
+assert.match(ui,/lastRowsRosterIds=ids;checked=Date\.now\(\)/);
+assert.match(ui,/ids===lastRowsRosterIds\?lastRows:\[\]/,
  "Fallback cache must belong to the last successfully fetched roster");
-assert.doesNotMatch(ui,/ids===lastRoster\\.map/,
+assert.doesNotMatch(ui,/ids===lastRoster\.map/,
  "The active roster is not proof that a previous cache belongs to it");
 assert.match(ui,/window\.badmintonMatchdayMode==="all"/);
 assert.match(css,/followed-live-grid/);
