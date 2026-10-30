@@ -88,6 +88,38 @@ assert.equal(result[0].score,"");
 assert.equal(todayTeamEvents({today,teams:[a],fixtures:[fixture({source_url:"https://example.org/evil"})]}).length,0);
 assert.equal(todayTeamEvents({today,teams:[a],fixtures:[fixture({team_id:"999"})]}).length,0);
 assert.equal(todayTeamEvents({today,teams:[a,b],fixtures:[fixture(),fixture()]}).length,1);
+
+const opposingTeam={...b,id:"nuliga:10892:2026-27:1",follow_key:"nuliga:10892:1",
+ club_name:"Gäste",team_label:"1",source_url:teamUrl};
+// Source-key deduplication must not depend on a unique database row ID.
+// nuLiga may produce a row for BOTH followed sides of the same exact match.
+const firstSide=fixture({id:"home-side",team_id:a.id,
+ source_checked_at:"2026-10-19T10:00:00Z"});
+const secondSide=fixture({id:"away-side",team_id:opposingTeam.id,
+ source_checked_at:"2026-10-19T10:05:00Z"});
+let mirrored=todayTeamEvents({today,teams:[a,opposingTeam],
+ fixtures:[firstSide,secondSide]});
+assert.equal(mirrored.length,1,"One official match, not one tile per followed team");
+assert.equal(mirrored[0].id,"team:away-side",
+ "Choose latest provider-checked source row for the same official fixture");
+mirrored=todayTeamEvents({today,teams:[a,opposingTeam],
+ fixtures:[{...firstSide,source_checked_at:"2026-10-19T10:06:00Z"},{
+  ...secondSide,source_checked_at:"2026-10-19T10:05:00Z",status:"finished",
+  home_score:5,away_score:3}]});
+assert.equal(mirrored.length,1);
+assert.equal(mirrored[0].kind,"scheduled",
+ "Do not prefer an older finished claim over a newer provider check");
+assert.equal(mirrored[0].score,"");
+for(const variant of [
+ {...secondSide,match_date:"2026-10-19T13:00:00+02:00"},
+ {...secondSide,away_team:"Andere Gäste 1"},
+ {...secondSide,source_url:"https://bwbv-badminton.liga.nu/cgi-bin/WebObjects/nuLigaBADDE.woa/wa/groupPage?championship=other"}
+]){
+ assert.equal(todayTeamEvents({today,teams:[a,opposingTeam],
+  fixtures:[firstSide,variant]}).length,2,
+ "Never collapse distinct source URL, kickoff or opponent just by town/club");
+}
+
 let player=todayPlayerEvents({today,groups:{own:[own],friends:[friend]},rows:[freshPlayer()],now});
 assert.equal(player.events.length,1);
 assert.equal(player.events[0].kind,"playing");
