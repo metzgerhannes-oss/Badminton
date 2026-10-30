@@ -1,5 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,assessMatchCardCoverage,importStatusForBatch,missingSourceStatus,reconcileMatchBatch} from "./source-availability.mjs";
+import {assessSourceAvailability,assessMatchCardCoverage,importStatusForBatch,missingSourceStatus,reconcileMatchBatch,classifyImportFailure} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError,readBoundedText} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
@@ -213,6 +213,7 @@ Deno.serve(async req=>{
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
  }catch(error){
+  const failureCategory=classifyImportFailure(error);
   if(claimed)try{
    if(String(error).includes("Source unavailable")){
     await updateNoNewSource(id,
@@ -220,11 +221,11 @@ Deno.serve(async req=>{
    }else{
     await update(id,{status:"error",lease_until:null,
      last_finished_at:new Date().toISOString(),
-     detail:"Quellenabgleich fehlgeschlagen; vorhandene belegte Matches bleiben gespeichert"});
+     detail:"Quellenabgleich fehlgeschlagen ("+failureCategory+"); vorhandene belegte Matches bleiben gespeichert"});
    }
   }catch{}
   // Never log player IDs, source URLs or raw provider/database errors.
-  console.error("External source import failed (private source/validation path)");
+  console.error("External source import failed",{category:failureCategory});
   return respond(502,{error:"source_import_unavailable"},origin);
  }
 });
