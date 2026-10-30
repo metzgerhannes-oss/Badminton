@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-const [html,css,js,sw,release,welcome,club,transparentClub,shuttle]=await Promise.all([
+const [html,css,js,sw,release,welcome,club,transparentClub,shuttle,shellCss]=await Promise.all([
  "index.html","app-access.css","app-access.js","sw.js","app-release.js","welcome.html",
- "assets/spvgg-schmetterlinge.svg","assets/spvgg-schmetterlinge-splash.svg","assets/shuttlecock-splash.svg"
+ "assets/spvgg-schmetterlinge.svg","assets/spvgg-schmetterlinge-splash.svg","assets/shuttlecock-splash.svg","app-shell.css"
 ].map(file=>readFile(file,"utf8")));
 assert.match(html,/<html lang="de" data-app-access="checking">/);
+assert.match(html,/<link rel="stylesheet" href="\.\/app-access\.css">\s*<link rel="stylesheet" href="\.\/app-shell\.css">/,
+ "Splash CSS must load directly before the app shell, not via delayed nested @import on iOS WebKit");
+assert.doesNotMatch(shellCss,/@import\s+url\(["\']?\.\/app-access\.css/,
+ "App shell must not duplicate or delay critical access CSS via @import");
 assert.match(html,/<style>[\s\S]*?html\[data-app-access="checking"\] \.app-access-panel\{display:none!important\}/,"Invitation panel must be hidden on first paint without external CSS");
 assert.match(html,/id="app-access-splash"[^>]+role="status"/);
 assert.match(html,/class="app-access-visually-hidden">Zugang wird geprüft\.<\/span>/);
@@ -12,14 +16,33 @@ assert.match(html,/id="app-access-splash"[\s\S]*?assets\/spvgg-schmetterlinge-sp
 assert.match(html,/class="app-access-shuttle"[^>]+src="\.\/assets\/shuttlecock-splash\.svg"/);
 assert.match(html,/class="brand"[\s\S]*?src="\.\/assets\/spvgg-schmetterlinge\.svg"/);
 assert.match(html,/<p id="app-access-status" role="status" aria-live="polite"><\/p>/);
+assert.match(html,/id="app-access-retry"[^>]+hidden>Zugang erneut prüfen<\/button>/);
+assert.match(html,/Die Anmeldung per E-Mail-Code erfolgt über Cloudflare/);
+assert.doesNotMatch(html,/Keine E-Mail-Adresse und kein Passwort erforderlich/);
+assert.match(css,/#app-access-retry\[hidden\] \{ display:none!important; \}/);
+assert.match(js,/retry\?\.addEventListener\("click"/);
 assert.match(css,/html\[data-app-access="checking"\] \.app-access-panel \{display:none!important\}/);
 assert.match(html,/html:not\(\[data-app-access="checking"\]\) #app-access-splash\{display:none!important\}/,
  "Critical inline CSS prevents the splash persisting after access resolves");
 assert.match(css,/html\[data-app-access="checking"\] #app-access-splash\s*\{/,"Checking state must style visible splash");
 assert.doesNotMatch(css,/html:not\(\[data-app-access="checking"\]\)\s*#app-access-splash\s*\{/,"Splash must not style only hidden state");
 assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
+assert.match(css,/@media \(max-width:350px\)\s*\{[\s\S]*?\.app-access-splash-emblem \{width:70%\}[\s\S]*?\.app-access-shuttle \{width:52px\}/, "320px shuttle and badge must both fit without overlap");
 assert.match(css,/mix-blend-mode:multiply/);
 assert.match(css,/@keyframes app-access-shuttle-flight/);
+
+/* Regression: the iPhone shuttle must not stay anchored beside the badge. */
+const flightPlacement=css.match(/\.app-access-shuttle\s*\{([^}]+)\}/)?.[1]||"";
+assert.match(flightPlacement,/left:50%;top:50%/,"Flight must use the stage centre");
+assert.doesNotMatch(flightPlacement,/(?:^|;)\s*(?:right|bottom):/,"No static bottom-right anchor");
+const flightFrames=css.match(/@keyframes app-access-shuttle-flight\s*\{([\s\S]*?)\n\}/)?.[1]||"";
+const flightPoints=[...flightFrames.matchAll(/translate3d\((-?\d+)px,(-?\d+)px,0\)/g)]
+ .map(([,x,y])=>({x:Number(x),y:Number(y)}));
+assert.ok(flightPoints.length>=5,"Flight needs segmented trajectory");
+assert.ok(flightPoints[0].x>140&&flightPoints[0].y< -150,"Enter from upper right, not beside the badge");
+assert.ok(flightPoints.some(({x,y})=>x>=80&&x<=100&&y>=-30&&y<=60),"Travel past emblem's right edge");
+assert.ok(flightPoints.at(-1).x<50&&flightPoints.at(-1).y>140,"Exit below emblem");
+
 assert.match(css,/2\.5s linear infinite both/);
 assert.match(css,/env\(safe-area-inset-top\)/);
 assert.match(js,/root\.dataset\.appAccess="denied"/);

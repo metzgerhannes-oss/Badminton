@@ -60,3 +60,34 @@ test("invalid legacy Safari data is never downloaded or silently overwritten",as
  const existing=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(existing.activeProfileId).toBe("99-999999");
 });
+
+
+test("follower-only Safari user can export their local follow before installing PWA",async({page})=>{
+ const friend={id:"99-100005",name:"Testperson Follow",club:"Testverein"};
+ await page.addInitScript(friend=>{
+  localStorage.setItem("shuttleboard-v1",JSON.stringify({
+   players:[],friends:[friend],officialLinks:[],activeProfileId:"",
+   chosen:friend.id,historyProfilesInitialized:true,
+   access_token:"SYNTHETIC-SHOULD-NOT-BE-SAVED"
+  }));
+ },friend);
+ await page.setViewportSize({width:320,height:700});
+ await page.goto("/welcome.html#installation",{waitUntil:"domcontentloaded"});
+ const exportSection=page.locator("#install-existing-backup");
+ await expect(exportSection).toBeVisible();
+ await expect(page.locator("#install-backup-export")).toBeVisible();
+ const [download]=await Promise.all([
+  page.waitForEvent("download"),page.locator("#install-backup-export").click()
+ ]);
+ const stream=await download.createReadStream();
+ let body="";
+ for await(const chunk of stream)body+=chunk.toString("utf8");
+ const archive=JSON.parse(body);
+ expect(archive.schemaVersion).toBe(2);
+ expect(archive.data.players).toEqual([]);
+ expect(archive.data.friends[0].id).toBe(friend.id);
+ expect(archive.data.activeProfileId).toBe("");
+ expect(archive.data.chosen).toBe("");
+ expect(body).not.toContain("SYNTHETIC-SHOULD-NOT-BE-SAVED");
+ await expect(page.locator("#install-backup-feedback")).toContainText("Sicherung erstellt");
+});

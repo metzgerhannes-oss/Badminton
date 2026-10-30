@@ -12,6 +12,7 @@ const gate=document.getElementById("app-access-gate");
 const code=document.getElementById("app-access-code");
 const submit=document.getElementById("app-access-submit");
 const paste=document.getElementById("app-access-paste");
+const retry=document.getElementById("app-access-retry");
 const status=document.getElementById("app-access-status");
 window.badmintonAppAccess=Object.freeze({
  get accessToken(){return allowed?session?.access_token||null:null;},
@@ -41,6 +42,7 @@ async function rpc(name,body,token){
 function grant({member=true}={}){
  allowed=member;
  root.dataset.appAccess="granted";
+ if(retry)retry.hidden=true;
  gate.hidden=true;
  const params=new URLSearchParams(location.hash.slice(1));
  if(params.has("appinvite")){
@@ -99,6 +101,7 @@ async function accept(raw){
  if(!TOKEN.test(token)){inform("Bitte den vollständigen Einladungslink öffnen oder den Code einfügen.");return}
  if(busy)return;
  busy=true;submit.disabled=true;
+ if(retry)retry.hidden=true;
  root.dataset.appAccess="checking";
  inform("");
  try{
@@ -116,6 +119,7 @@ async function accept(raw){
  }finally{busy=false;submit.disabled=false}
 }
 submit?.addEventListener("click",()=>accept(code.value));
+retry?.addEventListener("click",()=>{if(!busy)void initialize();});
 code?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();accept(code.value)}});
 // After iOS installation Safari and the PWA have separate storage. A deliberate
 // user gesture can transfer the original link from the shared OS clipboard
@@ -132,6 +136,8 @@ paste?.addEventListener("click",async()=>{
  }
 });
 async function initialize(){
+ if(retry)retry.hidden=true;
+ inform("");
  root.dataset.appAccess="checking";
  const hashParams=new URLSearchParams(location.hash.slice(1));
  const incoming=hashParams.get("appinvite");
@@ -174,6 +180,7 @@ async function initialize(){
   // An unavailable server never turns a private session into authorization.
   root.dataset.appAccess="denied";
   inform(error?.message||"Zugang konnte nicht geprüft werden. Bitte später erneut versuchen.");
+  if(retry)retry.hidden=false;
   return;
  }
  root.dataset.appAccess="denied";

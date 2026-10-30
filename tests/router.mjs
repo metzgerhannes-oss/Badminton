@@ -74,3 +74,51 @@ assert.match(html,/<script defer src="\.\/router\.js"><\/script>/);
 assert.match(sw,/\.\/router\.js/);
 assert.match(sw,/schmetterlinge-shell-v[1-9][0-9]*/);
 console.log("Router v41: four tabs, history alias, settings, focus/scroll, same-hash Home, deep-link fallback.");
+
+// Duplicate-route painting regression: direct tab taps must render synchronously
+// exactly once, while native Back/Forward and bookmarked tournament deep links
+// must still render and focus the genuinely changed URL.
+const appSource=await readFile("app.js","utf8");
+const navigationStart=appSource.indexOf("function navigatePrimary(");
+const navigationEnd=appSource.indexOf("\nfunction navigateHome()",navigationStart);
+const nativeStart=appSource.indexOf(' window.addEventListener("hashchange",()=>{');
+const nativeEnd=appSource.indexOf("\n const playerDialog=",nativeStart);
+assert.ok(navigationStart>0&&navigationEnd>navigationStart&&
+ nativeStart>navigationEnd&&nativeEnd>nativeStart,"Navigation and native hash handler must be present");
+const callbacks={};const routeCounters={render:0,focus:0,route:0,own:0};
+const navLocation={hash:"#start"};
+const navState={page:"start",players:[{id:"99-000001"}],friends:[],viewingFriendId:null};
+const navigationScope=vm.createContext({
+ location:navLocation,state:navState,
+ window:{addEventListener(name,callback){callbacks[name]=callback}},
+ SchmetterlingeRouter:{renderPage(){routeCounters.route++}},
+ SchmetterlingeStorage:{showOwn(){routeCounters.own++}},
+ render(){routeCounters.render++},
+ focusCurrentView(){routeCounters.focus++},
+ el:()=>null,pendingFollowSearchFocus:false
+});
+vm.runInContext('let lastRenderedHash=location.hash||"#start";\n'+
+ appSource.slice(navigationStart,navigationEnd)+"\n"+
+ appSource.slice(nativeStart,nativeEnd),navigationScope,{filename:"navigation-hash-regression.js"});
+const navigate=page=>vm.runInContext('navigatePrimary("'+page+'")',navigationScope);
+navigate("spieler");
+assert.equal(navLocation.hash,"#spieler");
+assert.equal(routeCounters.render,1,"Tab click must render immediately");
+callbacks.hashchange();
+assert.equal(routeCounters.render,1,"Following native hashchange must not paint the same tab twice");
+assert.equal(routeCounters.focus,1,"Following native hashchange must not steal iPhone keyboard focus");
+navLocation.hash="#turniere/dbv-calendar-999987/99-000001";
+callbacks.hashchange();
+assert.equal(navState.page,"turniere");
+assert.equal(routeCounters.render,2,"Exact Home-to-tournament hash deep link must still render");
+navLocation.hash="#start";
+callbacks.hashchange();
+assert.equal(navState.page,"start");
+assert.equal(routeCounters.render,3,"Browser Back must render and restore the prior view");
+navigate("start");
+assert.equal(routeCounters.own,1,"Repeat Home tap must still restore the own profile");
+assert.equal(routeCounters.render,4,"Same-tab Home tap must paint when no hashchange fires");
+navigate("turniere");
+callbacks.hashchange();
+assert.equal(routeCounters.render,5,"Normal route navigation must paint once per click");
+console.log("P1 navigation: one synchronous paint per tab, deep-link and browser Back preserved.");

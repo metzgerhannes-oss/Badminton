@@ -38,6 +38,10 @@ function setActiveProfile(id){
  return true;
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
+// A native hashchange follows our already synchronously rendered tab clicks.
+ // Keep one route paint; genuine Back/Forward and deep-link hash changes still
+ // render because their destination differs from lastRenderedHash.
+let lastRenderedHash=typeof location==="undefined"?"#start":location.hash||"#start";
 // Existing UI callers keep the same route and focus methods.
 function routeTo(page){
  // Choosing a followed player's statistics is not a Home/Logo action.
@@ -45,7 +49,25 @@ function routeTo(page){
  if(!navigatePrimary(page,{returnToOwn:false}))
   SchmetterlingeRouter.routeTo(state,page,render);
 }
-function focusCurrentView(){SchmetterlingeRouter.focusCurrentView(state)}
+function focusSavedTournamentFromHash(){
+ const match=location.hash.match(/^#turniere\/([^/]+)\/([^/]+)$/);
+ if(!match||state.page!=="turniere")return;
+ let id,player;
+ try{id=decodeURIComponent(match[1]);player=decodeURIComponent(match[2])}catch{return}
+ const card=[...document.querySelectorAll("#official-tournament-list [data-saved-tournament-id]")]
+  .find(node=>node.dataset.savedTournamentId===id&&node.dataset.savedTournamentPlayer===player);
+ if(!card)return;
+ card.setAttribute("tabindex","-1");
+ card.focus({preventScroll:true});
+ card.scrollIntoView({behavior:"auto",block:"start"});
+}
+function focusCurrentView(){
+ SchmetterlingeRouter.focusCurrentView(state);
+ // The router restores scroll on its next frame. Focus the exact bookmarked
+ // card afterwards, including when a Home deep link is reopened on iOS PWA.
+ if(location.hash.startsWith("#turniere/"))
+  requestAnimationFrame(()=>requestAnimationFrame(focusSavedTournamentFromHash));
+}
 /** Native-feeling primary navigation: source of truth is the tapped destination,
  * not a deferred hashchange from installed WebKit. The four stable mobile tabs and the desktop club link use
  * the same route. This does not touch stored players, friends or invitations.
@@ -62,6 +84,7 @@ function navigatePrimary(page,{returnToOwn=true}={}){
  }
  state.page=page;
  if(location.hash!=="#"+page)location.hash="#"+page;
+ lastRenderedHash=location.hash||"#start";
  // Render the destination first. An unrelated dashboard/live rendering failure
  // must not trap navigation on the previous view.
  SchmetterlingeRouter.renderPage(state);
@@ -109,16 +132,37 @@ function renderTournaments(){
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
   const planning=t.source==="bwbv-framework";
   const calendar=t.source==="dbv-calendar"||planning;
-  const venue=t.place?"Austragungsort: "+t.place:"Austragungsort nicht erfasst";
+  const venue=String(t.place||"").trim();
+  const name=String(t.name||"").trim();
+  const heading=venue&&!name.toLocaleLowerCase("de").includes(venue.toLocaleLowerCase("de"))?name+" · "+venue:name;
+  const missingVenue=venue?"":'<p class="saved-tournament-venue">Austragungsort nicht erfasst</p>';
+  // Exact DBV event UUID only. A generic calendar URL must never be
+  // presented as the direct tournament page, even if flagged by the feed.
+  const directSource=SchmetterlingeBookmarks.verifiedCalendarEventUrl(t,verifiedCalendarRows);
+  const destination=directSource||t.url;
+  const sourceLabel=planning?"Terminquelle ↗":directSource||!calendar?"Offizielle Turnierseite ↗":"DBV-Kalender öffnen ↗";
+  const sourceStatus=calendar?'<p class="saved-tournament-id">'+(planning?"Rahmentermin · Anmeldung nicht bestätigt":"Vorgemerkt · Anmeldung nicht bestätigt")+"</p>":"";
+  const technicalId=calendar?"":'<details class="saved-tournament-technical"><summary>Turnier-ID</summary><code>'+esc(t.id)+"</code></details>";
   const deadline=t.deadline?'<p class="saved-tournament-deadline">Meldeschluss: '+esc(niceDay(t.deadline))+'</p>':"";
   const discrepancy=tournamentSourceConflicts.get(t.id+"|"+t.playerId);
-  const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+'. DBV-Spieltag: '+esc(niceDay(discrepancy.officialDate))+(
-   discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+'. Angaben prüfen.</p>':"";
-  return '<article class="tournament-card card-open-surface"><div class="saved-tournament-top"><h3>'+esc(t.name)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p>'+esc(profile)+' · '+esc(dates)+'</p><p class="saved-tournament-venue">'+esc(venue)+'</p>'+deadline+sourceNote+'<p class="saved-tournament-id">'+(planning?'Rahmentermin · Anmeldung nicht bestätigt':calendar?'Vorgemerkt · Anmeldung nicht bestätigt':'Turnier-ID: '+esc(t.id))+'</p><div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(t.url)+'" rel="noopener noreferrer" target="_blank">'+(planning?'Terminquelle ↗':calendar?'DBV-Kalender öffnen ↗':'Offizielle Turnierseite ↗')+'</a>'+(calendar?'':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div></article>';
+  const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+
+   (discrepancy.resolved?' · Spieltag: ':'. DBV-Spieltag: ')+esc(niceDay(discrepancy.officialDate))+(
+   discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+
+   (discrepancy.resolved?' · korrigiert.</p>':'. Angaben prüfen.</p>'):"";
+  return '<article class="tournament-card card-open-surface" data-saved-tournament-id="'+esc(t.id)+'" data-saved-tournament-player="'+esc(t.playerId)+'"><div class="saved-tournament-top"><h3>'+esc(heading)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p class="saved-tournament-dates">'+esc(dates)+'</p>'+missingVenue+deadline+sourceNote+sourceStatus+'<div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(destination)+'" rel="noopener noreferrer" target="_blank">'+sourceLabel+'</a>'+(calendar?'<button class="remove-button" data-edit-venue-id="'+esc(t.id)+'" data-edit-venue-player="'+esc(t.playerId)+'" type="button" aria-label="Austragungsort dieser privaten Vormerkung bearbeiten">Ort bearbeiten</button>':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div>'+technicalId+'<p class="saved-tournament-player">Spieler: '+esc(profile)+'</p></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);
   if(item)openTournamentForm(item);
+ }));
+ section.querySelectorAll("[data-edit-venue-id]").forEach(button=>button.addEventListener("click",()=>{
+  const bookmark=state.officialLinks.find(t=>t.id===button.dataset.editVenueId&&t.playerId===button.dataset.editVenuePlayer);
+  if(!bookmark||!["dbv-calendar","bwbv-framework"].includes(bookmark.source))return;
+  editingVenue={id:bookmark.id,playerId:bookmark.playerId};
+  const form=el("tournament-venue-form");
+  form.reset();
+  form.elements.namedItem("place").value=bookmark.place||"";
+  SchmetterlingeRouter.openDialog(el("tournament-venue-dialog"));
  }));
  section.querySelectorAll("[data-private-invite-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.privateInviteId&&t.playerId===button.dataset.privateInvitePlayer);
@@ -546,7 +590,7 @@ function render(){
  updateLiveNavigation();
  SchmetterlingeRouter.renderPage(state);
 }
-let editing=null;
+let editing=null,editingVenue=null;
 const tournamentSourceConflicts=new Map();
 let verifiedCalendarRows=[];
 function prefillVerifiedTournamentForm(form){
@@ -555,12 +599,21 @@ function prefillVerifiedTournamentForm(form){
  note.hidden=true;note.textContent="";
  const data=new FormData(form);
  const parsed=parseDbvTournamentLink(data.get("url"));
- if(!parsed||!verifiedCalendarRows.length)return;
+ if(!parsed)return;
+ if(!verifiedCalendarRows.length){
+  note.textContent="DBV-Abgleich derzeit nicht verfügbar. Angaben bleiben lokal und ungeprüft.";
+  note.hidden=false;
+  return;
+ }
  const draft=normalizeBookmark({url:parsed.url,playerId:String(data.get("playerId")||"all"),
   name:data.get("name"),startDate:data.get("startDate"),endDate:data.get("endDate"),
   place:data.get("place"),deadline:data.get("deadline")});
  const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(draft,verifiedCalendarRows);
- if(result.status!=="matched")return;
+ if(result.status!=="matched"){
+  note.textContent="Turnier-ID in den geladenen DBV-Daten nicht eindeutig bestätigt. Angaben bleiben lokal und ungeprüft.";
+  note.hidden=false;
+  return;
+ }
  let corrected=0;
  for(const key of ["name","startDate","endDate","place","deadline"]){
   const field=form.elements.namedItem(key),value=result.updated?.[key];
@@ -568,7 +621,10 @@ function prefillVerifiedTournamentForm(form){
    field.value=value;corrected++;
   }
  }
- note.textContent=corrected?"Offizielle DBV-Turnierdaten übernommen.":"DBV-Turnierdaten stimmen überein.";
+ const fields=SchmetterlingeBookmarks.describeOfficialChanges(draft,result.updated);
+ note.textContent=corrected
+  ?"DBV-Quelle bestätigt: "+fields.join(", ")+" korrigiert. Spieltag und Meldeschluss sind getrennte Daten."
+  :"DBV-Turnierdaten stimmen überein.";
  note.hidden=false;
 }
 function openTournamentForm(item=null){
@@ -649,7 +705,12 @@ function setup(){
   navigatePrimary(dest);
  });
  window.addEventListener("hashchange",()=>{
-  state.page=(location.hash||"#start").slice(1).split("/")[0];
+  const destination=location.hash||"#start";
+  // navigatePrimary already painted this exact route and restored focus.
+  // Do not do the expensive second render/focus/scroll on its native event.
+  if(destination===lastRenderedHash)return;
+  lastRenderedHash=destination;
+  state.page=destination.slice(1).split("/")[0];
   // Never let an unrelated data renderer hold the old section on-screen.
   SchmetterlingeRouter.renderPage(state);
   try{render()}finally{
@@ -854,17 +915,50 @@ function setup(){
   if(el("tournament-dialog")?.open&&form)prefillVerifiedTournamentForm(form);
   let changed=false;
   const previousWarnings=JSON.stringify([...tournamentSourceConflicts.entries()]);
+  const confirmedWarnings=new Map(tournamentSourceConflicts);
   tournamentSourceConflicts.clear();
   const reconciled=state.officialLinks.map(bookmark=>{
+   const key=bookmark.id+"|"+bookmark.playerId;
    const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(bookmark,entries);
-   if(result.status==="conflict")tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,result);
-   if(result.status==="matched"&&result.updated!==bookmark){changed=true;return result.updated}
+   if(result.status==="conflict")tournamentSourceConflicts.set(key,result);
+   if(result.status==="matched"&&result.updated!==bookmark){
+    // Source-backed corrections must be visible, not silently change a local
+    // game day into a registration deadline. No private identity is logged.
+    const fields=SchmetterlingeBookmarks.describeOfficialChanges(bookmark,result.updated);
+    tournamentSourceConflicts.set(key,{
+     reason:"Offizielle DBV-Angaben übernommen: "+fields.join(", "),
+     officialDate:result.updated.startDate,officialDeadline:result.updated.deadline,resolved:true
+    });
+    changed=true;return result.updated;
+   }
+   // Repeated or partial DBV calendar events cannot erase a previously
+   // verified correction. A new exact-key correction replaces it above.
+   const confirmed=confirmedWarnings.get(key);
+   if(confirmed?.resolved===true&&confirmed.officialDate===bookmark.startDate&&
+      confirmed.officialDeadline===bookmark.deadline&&
+      (result.status==="matched"||result.status==="unverified")){
+    tournamentSourceConflicts.set(key,confirmed);
+   }
    return bookmark;
   });
   const warningsChanged=JSON.stringify([...tournamentSourceConflicts.entries()])!==previousWarnings;
   if(changed){state.officialLinks=reconciled;save()}
   // Background calendar reads must not reset the active profile or ranking view.
   if(changed||warningsChanged)render();
+ });
+ const venueDialog=el("tournament-venue-dialog");
+ el("tournament-venue-close").addEventListener("click",()=>{editingVenue=null;venueDialog.close()});
+ el("tournament-venue-form").addEventListener("submit",event=>{
+  event.preventDefault();
+  if(!editingVenue)return;
+  const current=state.officialLinks.find(t=>t.id===editingVenue.id&&t.playerId===editingVenue.playerId);
+  const raw=String(event.currentTarget.elements.namedItem("place")?.value||"");
+  const updated=SchmetterlingeBookmarks.updateLocalCalendarVenue(current,raw);
+  if(!updated){toast("Austragungsort konnte nicht gespeichert werden.");return;}
+  state.officialLinks=state.officialLinks.map(t=>t===current?updated:t);
+  editingVenue=null;
+  save();render();venueDialog.close();
+  toast("Austragungsort nur in dieser privaten Vormerkung gespeichert");
  });
  const tournamentDialog=el("tournament-dialog");
  el("add-tournament").addEventListener("click",()=>openTournamentForm());

@@ -25,6 +25,14 @@ const privateCalendar=[{name:"Beispiel-Ranglistenturnier",startDate:"2026-10-24"
 const created=createLocalBackup(stored,new Date("2026-10-10T11:00:00.000Z"),
  JSON.stringify(privateCalendar));
 const parsed=inspectLocalBackup(created);
+// #198: file.size is measured in UTF-8 bytes. The pure inspector must
+// enforce the same bound, even if called without the browser file picker.
+const unicodeOversize=JSON.stringify({...JSON.parse(created),ignored:"ä".repeat(105_000)});
+assert.ok(unicodeOversize.length<MAX_BACKUP_BYTES);
+assert.ok(new TextEncoder().encode(unicodeOversize).byteLength>MAX_BACKUP_BYTES);
+assert.throws(()=>inspectLocalBackup(unicodeOversize),/Sicherungsdatei zu groß/,
+ "UTF-8 oversized backups must fail before parsing or touching local profiles");
+
 assert.equal(LOCAL_STORE_KEY,"shuttleboard-v1");
 assert.equal(SPOND_STORE_KEY,"schmetterlinge.calendarEvents.v1");
 assert.equal(LEGACY_BACKUP_VERSION,1);
@@ -60,6 +68,39 @@ assert.equal(legacy.calendarEvents,null,"An older backup cannot erase newer priv
 assert.equal(legacy.summary.calendarEvents,null);
 assert.equal(parsed.data.historyProfilesInitialized,true);
 assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(parsed.data))).data,parsed.data);
+
+// #198: a member can follow a player through a valid private invitation
+// without owning ANY local player profile. This minimal data is portable;
+// never convert a followed identity into an own profile or export a session.
+const followerOnly={players:[],friends:[{id:"99-100003",name:"Testperson C",club:"Musterverein"}],
+ officialLinks:[],activeProfileId:"",chosen:"99-100003",historyProfilesInitialized:true,
+ access_token:"DO-NOT-EXPORT",serverGrant:"DO-NOT-EXPORT"};
+const followerArchive=createLocalBackup(JSON.stringify(followerOnly),
+ new Date("2026-10-29T12:00:00Z"),"[]");
+const restoredFollow=inspectLocalBackup(followerArchive);
+assert.equal(restoredFollow.summary.players,0);
+assert.equal(restoredFollow.summary.friends,1);
+assert.equal(restoredFollow.summary.activePlayer,"Kein eigenes Profil");
+assert.deepEqual(restoredFollow.data.players,[]);
+assert.equal(restoredFollow.data.activeProfileId,"");
+assert.equal(restoredFollow.data.chosen,"",
+ "A followed player cannot become the device's own Home profile");
+assert.equal(restoredFollow.data.friends[0].id,"99-100003");
+assert.equal(restoredFollow.calendarEvents.length,0);
+assert.equal(followerArchive.includes("DO-NOT-EXPORT"),false,
+ "No server grants or session secrets in the follower-only local backup");
+assert.deepEqual(inspectLocalBackup(createLocalBackup(JSON.stringify(restoredFollow.data))).data,
+ restoredFollow.data,"Follower-only data survives repeated Safari/PWA file transfers");
+assert.throws(()=>createLocalBackup(JSON.stringify({...followerOnly,
+ activeProfileId:"99-100003"})),/gefolgter Spieler/,
+ "A friend ID must never be treated as an owned player");
+assert.throws(()=>createLocalBackup(JSON.stringify({...followerOnly,
+ friends:[],chosen:""})),/Keine lokalen Spielerprofile/,
+ "An entirely blank device should not generate a misleading backup");
+assert.throws(()=>createLocalBackup(JSON.stringify({...followerOnly,
+ officialLinks:[{...original.officialLinks[0],playerId:"all"}]})),/unbekannten Spieler/,
+ "Follower-only backups must not fabricate own tournament ownership");
+
 
 // A device-local ID is an independent identity, even when another official
 // profile has the same display name. Neither favorites nor Home choice move.

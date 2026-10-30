@@ -17,7 +17,7 @@ async function withExistingSession(page){
   }));
  });
 }
-test("checking uses original club logo and animated shuttle without visible text or invitation controls",async({page})=>{
+test("checking uses original club logo and animated shuttle without visible text or invitation controls",async({page},testInfo)=>{
  await withExistingSession(page);
  // Keep the synthetic RPC in flight until all visual assertions have completed.
  // A fixed 3.5s delay raced with slow WebKit screenshot/layout evaluation.
@@ -53,6 +53,60 @@ test("checking uses original club logo and animated shuttle without visible text
  expect(actual.logoWidth).toBeGreaterThan(100);
  expect(actual.duration).toBe("2.5s");
 
+ // Validate visual choreography in the actual browser rather than only
+ // checking that some animation-name exists. This caught the 27.10 iPhone report.
+ const trajectory=await page.locator(".app-access-shuttle").evaluate(img=>{
+  const animation=img.getAnimations().find(a=>a.effect?.getKeyframes);
+  return (animation?.effect?.getKeyframes()||[]).filter(frame=>frame.transform)
+   .map(frame=>{const matrix=new DOMMatrix(frame.transform);return {x:matrix.m41,y:matrix.m42};});
+ });
+ expect(trajectory.length).toBeGreaterThanOrEqual(5);
+ expect(trajectory[0].x).toBeGreaterThan(140);
+ expect(trajectory[0].y).toBeLessThan(-150);
+ expect(trajectory.some(({x,y})=>x>=80&&x<=100&&y>=-30&&y<=60)).toBe(true);
+ expect(trajectory.at(-1).x).toBeLessThan(50);
+ expect(trajectory.at(-1).y).toBeGreaterThan(140);
+
+ // Short cold starts must show more than a one-pixel glimpse on a 320px phone.
+ // Freeze this synthetic frame after 0.8s: do not add a longer login delay.
+ const earlyFlight=await page.locator(".app-access-shuttle").evaluate(img=>{
+  const animation=img.getAnimations().find(a=>a.effect?.getKeyframes);
+  if(!animation)return null;
+  animation.pause();
+  animation.currentTime=800;
+  const stage=img.closest(".app-access-splash-art").getBoundingClientRect();
+  const badge=img.parentElement.querySelector(".app-access-splash-emblem").getBoundingClientRect();
+  const frame=img.getBoundingClientRect();
+  const info={visibleWidth:Math.max(0,Math.min(frame.right,innerWidth)-Math.max(frame.left,0)),
+   clearsBadge:frame.left>=badge.right-2, badgeRight:badge.right,
+   viewport:innerWidth,stageWidth:stage.width,visibleRight:frame.right};
+  animation.play();
+  return info;
+ });
+ expect(earlyFlight).not.toBeNull();
+ expect(earlyFlight.viewport).toBe(320);
+ expect(earlyFlight.visibleWidth).toBeGreaterThan(55);
+ expect(earlyFlight.visibleRight).toBeLessThanOrEqual(324);
+ expect(earlyFlight.clearsBadge).toBe(true);
+
+ // Preserve reproducible 320px Chromium AND iPhone-WebKit visual evidence.
+ // Synthetic session only; never screenshot a real player's private data.
+ // Freeze at exact times, rather than relying on nondeterministic screenshot timing.
+ const shuttle=page.locator(".app-access-shuttle");
+ for(const [ms,label] of [[800,"entry-800ms"],[1650,"descent-1650ms"],[2250,"exit-2250ms"]]){
+  await shuttle.evaluate((img,time)=>{
+   const animation=img.getAnimations().find(a=>a.effect?.getKeyframes);
+   if(!animation)throw Error("Missing shuttle animation for visual evidence");
+   animation.pause();
+   animation.currentTime=time;
+  },ms);
+  await testInfo.attach("splash-"+label+"-"+testInfo.project.name,{
+   body:await page.screenshot({fullPage:false,animations:"allow"}),
+   contentType:"image/png"
+  });
+ }
+ await shuttle.evaluate(img=>img.getAnimations().forEach(animation=>animation.play()));
+
  const screenReaderOnly=await page.locator(".app-access-visually-hidden").evaluate(el=>({
   width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height,
   clip:getComputedStyle(el).clip
@@ -81,6 +135,82 @@ test("checking uses original club logo and animated shuttle without visible text
  const stored=await page.evaluate(()=>localStorage.getItem("schmetterlinge.communitySession.v1"));
  expect(stored).toContain("synthetic-access-token");
 });
+
+// Responsive visual contract: the shuttle is visible AND does not cross the logo.
+// The full 320px screenshot test above also checks the invitation/access lifecycle.
+for(const width of [351,390,430]){
+ test("responsive shuttle keeps clear of badge at "+width+"px",async({page})=>{
+  await withExistingSession(page);
+  let release;
+  const pending=new Promise(resolve=>{release=resolve});
+  await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
+   if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
+   await pending;
+   await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+  });
+  try{
+   await page.setViewportSize({width,height:780});
+   await page.goto("/",{waitUntil:"commit"});
+   await expect(page.locator("#app-access-splash")).toBeVisible();
+   // waitUntil:commit can race the stylesheet download on cold WebKit.
+   // Do not weaken the position assertions; measure only after CSS is loaded.
+   await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
+   await expect.poll(()=>page.locator(".app-access-shuttle").evaluate(img=>
+    img.getAnimations().some(a=>a.effect?.getKeyframes)),{timeout:10000}).toBe(true);
+   const frame=await page.locator(".app-access-shuttle").evaluate(img=>{
+    const a=img.getAnimations().find(a=>a.effect?.getKeyframes);
+    if(!a)return null;
+    a.pause();a.currentTime=800;
+    const bird=img.getBoundingClientRect();
+    const badge=img.parentElement.querySelector(".app-access-splash-emblem").getBoundingClientRect();
+    return {left:bird.left,right:bird.right,badgeRight:badge.right,viewport:innerWidth};
+   });
+   expect(frame).not.toBeNull();
+   expect(frame.left).toBeGreaterThanOrEqual(frame.badgeRight-2);
+   expect(frame.right).toBeLessThanOrEqual(frame.viewport+2);
+  }finally{release();}
+  // This test measures splash geometry only. On a loaded WebKit runner the
+  // deliberately held RPC may outlast the real 12s auth deadline; the app
+  // must fail closed rather than fake a successful authorization.
+  // Grant and retry behavior are asserted by separate lifecycle tests.
+ });
+}
+// P1 #370: a 2.5s shuttle loop is visual only. A late but valid membership
+// response must dismiss the splash mid-cycle, not wait for another iteration.
+// The isolated fixture intercepts all productive Supabase traffic.
+test("slow verified access never waits for the shuttle loop to finish",async({page})=>{
+ await withExistingSession(page);
+ let finishCheck;
+ const checking=new Promise(resolve=>{finishCheck=resolve});
+ let started;
+ const requestStarted=new Promise(resolve=>{started=resolve});
+ await page.route(API+"/rest/v1/rpc/app_access_status",async route=>{
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers,body:""});
+  started();
+  await checking;
+  await route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'});
+ });
+ try{
+  await page.goto("/",{waitUntil:"commit"});
+  await requestStarted;
+  await expect(page.locator("#app-access-splash")).toBeVisible();
+  await expect(page.locator(".app-access-shuttle")).toHaveCSS("animation-name","app-access-shuttle-flight");
+  // Synchronize to an early point in any 2.5s cycle. A wait-for-animation-end
+  // regression would now delay access by ~2s; a correct grant is immediate.
+  await page.waitForFunction(()=>{
+   const img=document.querySelector(".app-access-shuttle");
+   const animation=img?.getAnimations().find(a=>a.effect?.getKeyframes);
+   const t=Number(animation?.currentTime);
+   return Number.isFinite(t)&&t%2500>=180&&t%2500<=480;
+  },null,{timeout:10000,polling:50});
+  const releasedAt=Date.now();
+  finishCheck();
+  await expect(page.locator("#app-access-gate")).toBeHidden({timeout:5000});
+  expect(Date.now()-releasedAt,"Successful authorization must not wait for the 2.5s visual cycle").toBeLessThan(1250);
+  await expect(page.locator("body > .app")).toBeVisible();
+ }finally{finishCheck();}
+});
+
 test("v221 fast successful cold launch shows intro for 0.8s; warm navigation never restarts splash",async({page})=>{
  await withExistingSession(page);
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>
@@ -100,19 +230,28 @@ test("v221 fast successful cold launch shows intro for 0.8s; warm navigation nev
  await expect(page.locator("#app-access-splash")).toBeHidden();
 });
 
-test("a failed status check shows the actionable error and does not trap the user in animation",async({page})=>{
+test("a failed status check offers a working retry instead of trapping the user in animation",async({page})=>{
  await withExistingSession(page);
+ let recovered=false;
  await page.route(API+"/rest/v1/rpc/app_access_status",route=>
   route.request().method()==="OPTIONS"
    ?route.fulfill({status:204,headers,body:""})
-   :route.fulfill({status:503,headers,body:'{"message":"offline"}'}));
+   :recovered
+    ?route.fulfill({status:200,headers,body:'{"allowed":true,"owner":false}'})
+    :route.fulfill({status:503,headers,body:'{"message":"offline"}'}));
  await page.goto("/",{waitUntil:"domcontentloaded"});
  await expect(page.locator("html")).toHaveAttribute("data-app-access","denied");
  await expect(page.locator("#app-access-splash")).toBeHidden();
  await expect(page.locator(".app-access-panel")).toBeVisible();
  await expect(page.locator("#app-access-status")).toContainText("Zugangsdienst nicht erreichbar");
  await expect(page.locator("#app-access-code")).toBeVisible();
+ await expect(page.locator("#app-access-retry")).toBeVisible();
  await expect(page.locator("body > .app")).toBeHidden();
+ recovered=true;
+ await page.locator("#app-access-retry").click();
+ await expect(page.locator("#app-access-retry")).toBeHidden();
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ await expect(page.locator("body > .app")).toBeVisible();
 });
 test("reduced motion keeps the shuttle static while a session is being checked",async({page})=>{
  await page.emulateMedia({reducedMotion:"reduce"});

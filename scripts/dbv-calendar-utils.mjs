@@ -5,9 +5,16 @@ export const ALLOWED_ASSOCIATIONS=new Set(["Baden-Württemberg","Bayern","Berlin
 "Mecklenburg-Vorpommern","Niedersachsen","Nordrhein-Westfalen","Rheinhessen-Pfalz","Rheinland",
 "Saarland","Sachsen","Sachsen-Anhalt","Schleswig-Holstein","Thüringen"]);
 const DATE=/^\d{4}-\d{2}-\d{2}$/;
+function actualCalendarDay(value){
+ if(typeof value!=="string"||!DATE.test(value))return false;
+ const [year,month,day]=value.split("-").map(Number);
+ if(year<2000||year>2100||month<1||month>12||day<1||day>31)return false;
+ const date=new Date(Date.UTC(year,month-1,day));
+ return date.getUTCFullYear()===year&&date.getUTCMonth()+1===month&&date.getUTCDate()===day;
+}
 export function calendarEntry(raw){
  if(!raw||!/^dbv-calendar-\d{2,12}$/.test(String(raw.source_key||""))||
-  !DATE.test(String(raw.start_date||""))||!DATE.test(String(raw.end_date||""))||
+  !actualCalendarDay(raw.start_date)||!actualCalendarDay(raw.end_date)||
   raw.end_date<raw.start_date||!String(raw.title||"").trim())return null;
  const ages=Array.isArray(raw.age_groups)?raw.age_groups.filter(a=>AGE_OPTIONS.includes(a)):[];
  const level=LEVEL_OPTIONS.includes(raw.level_group)?raw.level_group:"Sonstige";
@@ -20,16 +27,21 @@ export function calendarEntry(raw){
   category:String(raw.category||"").slice(0,100),level,
   ages:[...new Set(ages)],
   disciplines:Array.isArray(raw.disciplines)?raw.disciplines.filter(x=>["Einzel","Doppel","Mixed"].includes(x)):[],
-  deadline:DATE.test(String(raw.registration_deadline||""))?raw.registration_deadline:"",
-  url:safeUrl(raw.event_url)||"https://turniere.badminton.de/",
-  hasDirectLink:Boolean(safeUrl(raw.event_url)),
+  deadline:actualCalendarDay(raw.registration_deadline)?raw.registration_deadline:"",
+  url:safeTournamentEventUrl(raw.event_url)||"https://turniere.badminton.de/",
+  hasDirectLink:Boolean(safeTournamentEventUrl(raw.event_url)),
   checked:String(raw.last_seen_at||"")
  };
 }
-function safeUrl(value){
+// Only a source-provided URL with a full DBV tournament UUID is a
+// verified direct detail link. A general calendar or embed is not.
+function safeTournamentEventUrl(value){
  try{
   const url=new URL(String(value||""));
-  return url.protocol==="https:"&&["turniere.badminton.de","dbv.turnier.de"].includes(url.hostname)?url.href:"";
+  if(url.protocol!=="https:"||url.hostname!=="dbv.turnier.de"||
+     url.username||url.password||url.search||url.hash)return "";
+  return new RegExp("^/tournament/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/?$","i").test(url.pathname)
+   ?url.href:"";
  }catch{return ""}
 }
 export function regionLabel(t){return t.bundesland||t.organizer||"Überregional"}

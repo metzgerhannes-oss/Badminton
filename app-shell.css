@@ -1,4 +1,3 @@
-@import url("./app-access.css");
 /* v63 – application chrome. Loaded last to keep the current, five-route
    header and bottom navigation separate from the historical design cascade.
    Logo artwork and local-profile behaviour are unchanged. */
@@ -389,3 +388,14 @@
  .tournament-shortcuts button:active{background:#e3f2fc}
 }
 @media(prefers-reduced-motion:reduce){.tournament-shortcuts button{transition:none}}
+
+/* P1 #280: native iOS input focus must not auto-zoom compact tournament,
+   event and calendar forms. Keep labels/cards compact and pinch zoom enabled. */
+@media(max-width:1079px){
+ .tournament-live-toolbar select,.tournament-court-label select,
+ .badhub-event-form input,.badhub-event-controls select,
+ .dbv-calendar-filters :is(input,select),
+ .spond-import-details :is(input,textarea),.spond-preview select{
+  font-size:16px;
+ }
+}

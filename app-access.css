@@ -22,6 +22,9 @@ html:not([data-app-access="granted"]) dialog { display:none !important; }
 #app-access-paste[hidden]{display:none!important}
 #app-access-paste:focus-visible{outline:3px solid #086ca7;outline-offset:2px}
 #app-access-status { min-height:2.6em; }
+#app-access-retry { display:block; width:100%; min-height:44px; margin-top:8px; padding:11px 14px; color:#174b75; background:#eef7ff; border:1px solid #8bb4cd; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer; }
+#app-access-retry[hidden] { display:none!important; }
+#app-access-retry:focus-visible { outline:3px solid #086ca7; outline-offset:2px; }
 
 
 /* U7 / #286: only the actual access check has a graphic splash.
@@ -53,29 +56,46 @@ html[data-app-access="checking"] #app-access-splash {
     the white photographic matte multiplies into the pale round badge, never a square. */
  mix-blend-mode:multiply;
 }
+/* VIS-LOAD-01: the shuttle flies in screen space beside the badge,
+   instead of orbiting around a bottom-right anchor. Positions are relative
+   to the centre of the 224–260px stage; no keyframe intersects the emblem. */
 .app-access-shuttle {
  position:absolute;width:76px;height:auto;aspect-ratio:96/118;
- right:-15%;bottom:-15%;pointer-events:none;user-select:none;
+ left:50%;top:50%;pointer-events:none;user-select:none;
  filter:drop-shadow(0 8px 6px #061d3880);transform-origin:49% 81%;
  will-change:transform,opacity;animation:app-access-shuttle-flight 2.5s linear infinite both;
 }
-/* Fixed 2.5s flight; the 0.8s cold-start beat is separate from the CSS loop. */
-/* Segmented, air-drag easing; no permanent rotation or forced load duration. */
+/* A visible entry within the 0.8s cold-start minimum, drag-limited descent, exit below logo.
+   The cork points into the downward-left flight vector; no endless spin.
+   Looping never holds access open: the access controller owns dismissal. */
 @keyframes app-access-shuttle-flight {
- 0% {opacity:0;transform:translate3d(98px,-70px,0) rotate(-34deg) scale(.87);animation-timing-function:cubic-bezier(.2,.1,.45,.72)}
- 12% {opacity:1;transform:translate3d(63px,-57px,0) rotate(-24deg) scale(.91);animation-timing-function:cubic-bezier(.26,.2,.45,1)}
- 34% {opacity:1;transform:translate3d(10px,-17px,0) rotate(-5deg) scale(1);animation-timing-function:cubic-bezier(.25,.64,.72,1)}
- 55% {opacity:1;transform:translate3d(-14px,9px,0) rotate(4deg) scale(1.015);animation-timing-function:cubic-bezier(.34,.18,.72,.8)}
- 72% {opacity:.9;transform:translate3d(-47px,49px,0) rotate(14deg) scale(.95)}
- 82%,100% {opacity:0;transform:translate3d(-77px,82px,0) rotate(18deg) scale(.89)}
+ 0%,6% {opacity:0;transform:translate3d(178px,-205px,0) rotate(29deg) scale(.86)}
+ 16% {opacity:.96;transform:translate3d(130px,-93px,0) rotate(32deg) scale(.91);animation-timing-function:cubic-bezier(.2,.4,.57,.9)}
+ 32% {opacity:1;transform:translate3d(83px,-6px,0) rotate(28deg) scale(.96);animation-timing-function:cubic-bezier(.22,.45,.65,.95)}
+ 48% {opacity:1;transform:translate3d(92px,57px,0) rotate(31deg) scale(1);animation-timing-function:cubic-bezier(.26,.46,.71,.96)}
+ 67% {opacity:.98;transform:translate3d(72px,112px,0) rotate(26deg) scale(.99);animation-timing-function:cubic-bezier(.3,.52,.76,.98)}
+ 82% {opacity:.66;transform:translate3d(58px,144px,0) rotate(21deg) scale(.94)}
+ 93%,100% {opacity:0;transform:translate3d(22px,172px,0) rotate(18deg) scale(.9)}
 }
 @media (max-width:350px) {
- .app-access-shuttle {width:68px;right:-13%;bottom:-12%}
+ /* A large rotated shuttle cannot fit beside the 84% badge on a 320px screen.
+    Keep the original logo centered, but make room for the shuttle to fly fully
+    inside the viewport without crossing the emblem. */
+ .app-access-splash-emblem {width:70%}
+ .app-access-shuttle {width:52px}
+}
+/* Keep the moving feather clear of the club crest at intermediate iPhone sizes.
+   A desktop-sized, rotated shuttle cannot share the narrow space beside the emblem. */
+@media (min-width:351px) and (max-width:430px) {
+ .app-access-shuttle {width:46px;left:calc(50% + 28px)}
+}
+@media (min-width:431px) {
+ .app-access-shuttle {left:calc(50% + 29px)}
 }
 .app-access-visually-hidden {
  position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;
  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
 }
 @media (prefers-reduced-motion:reduce) {
- .app-access-shuttle {animation:none;opacity:1;transform:translate3d(0,0,0) rotate(-9deg) scale(.95);will-change:auto}
+ .app-access-shuttle {animation:none;opacity:1;transform:translate3d(88px,118px,0) rotate(18deg) scale(.95);will-change:auto}
 }

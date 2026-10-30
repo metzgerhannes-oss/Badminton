@@ -40,12 +40,21 @@ export function overviewUrl(id){
 }
 export function importMessage(row){
  if(!row)return {kind:"none",title:"Noch kein Importauftrag",detail:"Eine bestätigte DBV-Spieler-ID startet die Quellenprüfung."};
+ // The verified per-player coverage RPC returns a count of stored source
+ // cards, not a career total. Never infer unimported matches from the count.
+ const count=Number.isSafeInteger(row.match_cards)&&row.match_cards>0
+  ?" "+row.match_cards+" gespeicherte Einzelmatchkarten (Teilbestand, keine Gesamtkarriere).":"";
  switch(row.status){
   case "queued":return {kind:"queued",title:"Historie vorgemerkt",detail:"Der erste Quellenabgleich startet automatisch. Die Quelle wird anschließend gemeinsam für alle Nutzer genutzt."};
   case "checking":return {kind:"checking",title:"Historische Quellen werden geprüft",detail:"Der Quellenabgleich läuft auf dem Server."};
-  case "partial":return {kind:"partial",title:"Historische Übersicht verfügbar",detail:"Externe Karriereübersicht in Supabase übernommen. Einzelne offizielle DBV-Matches sind noch nicht importiert."};
-  case "awaiting_source":return {kind:"waiting",title:"Einzelmatches noch nicht importiert",detail:"Noch keine einzeln belegten historischen Matches aus der geprüften Quelle verfügbar. Weitere Prüfungen erfolgen nur bei aktueller Nachfrage; öffne die Historie bei Bedarf erneut. Vorhandene Ranglisten und Turnierergebnisse bleiben sichtbar."};
-  case "error":return {kind:"error",title:"Quellenprüfung vorübergehend fehlgeschlagen",detail:"Bei aktueller Nachfrage wird die Quellenprüfung erneut versucht. Die Historie kann später erneut geöffnet werden."};
+  case "complete":return {kind:"complete",title:"Verfügbare Quellen verarbeitet",
+   detail:"Der letzte geprüfte Quellenlauf ist abgeschlossen. Dies bestätigt nicht die Vollständigkeit aller Karriere- und DBV-Spiele."+count};
+  case "partial":return {kind:"partial",title:"Historische Einzelspiele teilweise verfügbar",
+   detail:"Der geprüfte Quellenbestand ist unvollständig oder enthält ausgeschlossene Karten. Bereits belegte Spiele bleiben sichtbar."+count};
+  case "awaiting_source":return {kind:"waiting",title:"Weitere Matchquelle noch nicht verfügbar",
+   detail:"Die geprüfte Quelle liefert derzeit keine neuen eindeutigen Einzelmatches. Vorhandene Ranglisten und Turnierergebnisse bleiben sichtbar."+count};
+  case "error":return {kind:"error",title:"Quellenprüfung vorübergehend fehlgeschlagen",
+   detail:"Ein neuer Quellenabgleich ist derzeit nicht abgeschlossen; vorhandene Einzelmatchbelege bleiben gespeichert."+count};
   default:return {kind:"none",title:"Importstatus nicht bekannt",detail:"Bitte später erneut versuchen."};
  }
 }
@@ -53,4 +62,15 @@ export function retryAfterHours(row){
  if(!row)return 0;
  return row.status==="partial"||row.status==="awaiting_source"?7*24:
   row.status==="error"?1:0;
+}
+
+// A 200 response may mean the source job was SKIPPED or saw no fresh
+// evidence. Only a server-confirmed positive write warrants a match refresh.
+// Reject malformed counters: never claim new matches from an HTTP status alone.
+export function historyImportOutcome(body){
+ if(!body||typeof body!=="object"||Array.isArray(body))return null;
+ if(body.queued===false)return {acknowledged:true,changed:false};
+ if(body.queued!==true||!Number.isSafeInteger(body.stored)||
+  body.stored<0||body.stored>120)return null;
+ return {acknowledged:true,changed:body.stored>0};
 }

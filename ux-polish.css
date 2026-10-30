@@ -88,6 +88,17 @@
   transform:translateY(1px) scale(.985);
  }
 }
+/* P1 iPhone touch feedback: even with Reduced Motion enabled, a tap
+   must visibly register. Static inset outline changes no layout, zoom or
+   animation. Disabled actions never masquerade as operable controls. */
+@media(max-width:1079px){
+ .app .bottom-nav a:active,
+ .app .topbar-settings:active,
+ .app .page :is(.primary-button,.subtle-button,.outline-button,.dashboard-add-friend):not(:disabled):not([aria-disabled="true"]):active{
+  outline:2px solid #0074ab;
+  outline-offset:-2px;
+ }
+}
 @media (prefers-reduced-motion:reduce) {
  .app .bottom-nav a,
  .app .bottom-nav a > span,

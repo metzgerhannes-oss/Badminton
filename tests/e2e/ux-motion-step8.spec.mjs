@@ -73,3 +73,63 @@ test("nav changes do not affect local profile/friends storage or desktop Navy",a
  const after=await page.evaluate(()=>localStorage.getItem("shuttleboard-v1"));
  expect(after).toBe(before);
 });
+
+
+test("P1 iPhone: pressed navigation and action controls give feedback even with reduced motion",async({page})=>{
+ await page.emulateMedia({reducedMotion:"reduce"});
+ await page.setViewportSize({width:320,height:720});
+ await page.goto("/#start",{waitUntil:"domcontentloaded"});
+ const nav=page.locator('.bottom-nav a[data-page="spieler"]');
+ const bounds=await nav.boundingBox();
+ expect(bounds).not.toBeNull();
+ await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height/2);
+ await page.mouse.down();
+ await expect(nav).toHaveCSS("outline-style","solid");
+ await expect(nav).toHaveCSS("outline-width","2px");
+ await page.mouse.up();
+ await expect(page.locator("#view-spieler")).toBeVisible();
+ const profileState=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
+ expect(profileState.activeProfileId).toBe("05-070879");
+ // The action is a real control on the reports screen; keyboard focus and
+ // reduced-motion settings must not suppress static tactile feedback.
+ await page.locator('#view-spieler a.context-reports-link[href="#berichte"]').click();
+ const button=page.locator("#report-refresh");
+ await expect(button).toBeVisible();
+ const b=await button.boundingBox();
+ expect(b).not.toBeNull();
+ await page.mouse.move(b.x+b.width/2,b.y+b.height/2);
+ await page.mouse.down();
+ await expect(button).toHaveCSS("outline-style","solid");
+ await expect(button).toHaveCSS("outline-width","2px");
+ await page.mouse.up();
+});
+
+// P1 #13/#280: real WebKit/Chromium computed font sizes, not CSS string checks.
+// 16px prevents the iOS focus auto-zoom while preserving deliberate pinch zoom.
+test("320/390/430px tournament and calendar form controls avoid iOS auto-zoom",async({page})=>{
+ for(const width of [320,390,430]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#view-turniere")).toBeVisible();
+  await page.locator("#dbv-calendar-advanced").evaluate(el=>{el.open=true});
+  const selectors=[
+   "#dbv-calendar-q","#dbv-calendar-year","#dbv-calendar-region",
+   "#dbv-calendar-age","#dbv-calendar-level","#dbv-calendar-period",
+   "#spond-paste-data","#spond-import-player",
+   "#badhub-event-form input",".badhub-event-controls select",
+   ".tournament-live-toolbar select"
+  ];
+  const metrics=await page.evaluate(selectors=>({
+   fonts:selectors.flatMap(selector=>[...document.querySelectorAll(selector)].map(el=>({
+    selector,font:parseFloat(getComputedStyle(el).fontSize)
+   }))),
+   viewport:document.querySelector('meta[name="viewport"]').content,
+   overflow:document.documentElement.scrollWidth-innerWidth
+  }),selectors);
+  expect(metrics.fonts.length).toBeGreaterThanOrEqual(8);
+  for(const item of metrics.fonts)expect(item.font,selectorMessage(item.selector,width)).toBeGreaterThanOrEqual(16);
+  expect(metrics.viewport).not.toMatch(/user-scalable\s*=\s*no|maximum-scale\s*=\s*1/);
+  expect(metrics.overflow).toBeLessThanOrEqual(2);
+ }
+});
+function selectorMessage(selector,width){return selector+" at "+width+"px must be >=16px to avoid iOS auto-zoom";}

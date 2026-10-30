@@ -62,7 +62,8 @@ function bookmark(row,owns){
  if(!record(row))fail("Ungültiger Turnierfavorit");
  const raw=text(row.url,1200,"Turnierlink",true);
  const playerId=text(row.playerId||"all",80,"Turnierspieler");
- if(playerId!=="all"&&!owns.has(playerId))fail("Turnier verweist auf unbekannten Spieler");
+ if((playerId==="all"&&!owns.size)||(playerId!=="all"&&!owns.has(playerId)))
+  fail("Turnier verweist auf unbekannten Spieler");
  const startDate=isDate(row.startDate),endDate=isDate(row.endDate);
  if(startDate&&endDate&&endDate<startDate)fail("Turnierende vor Turnierbeginn");
  const place=text(row.place,120,"Austragungsort");
@@ -93,9 +94,14 @@ function bookmark(row,owns){
 }
 export function normalizeLocalData(data){
  if(!record(data))fail("Kein gültiger Schmetterlinge-Datensatz");
- if(!Array.isArray(data.players)||data.players.length<1||data.players.length>12)
-  fail("Die Sicherung benötigt 1 bis 12 eigene Spieler");
+ if(!Array.isArray(data.players)||data.players.length>12)
+  fail("Maximal 12 eigene Spieler");
  if(!Array.isArray(data.friends)||data.friends.length>30)fail("Maximal 30 gefolgte Spieler");
+ // An invited family member may FOLLOW an accepted player without owning
+ // any profile. Their local follows must be portable between Safari and PWA.
+ // Refuse a completely blank device instead of producing a misleading backup.
+ if(!data.players.length&&!data.friends.length)
+  fail("Keine lokalen Spielerprofile oder gefolgten Spieler zum Sichern");
  if(!Array.isArray(data.officialLinks)||data.officialLinks.length>40)fail("Maximal 40 Turnierfavoriten");
  const players=data.players.map(x=>profile(x,"eigenes"));
  const friends=data.friends.map(x=>profile(x,"Freundes"));
@@ -116,10 +122,16 @@ export function normalizeLocalData(data){
   if(seen.has(key))fail("Doppelter Turnierfavorit");
   seen.add(key);
  }
- const original=text(data.activeProfileId||data.chosen,80,"Aktives Profil",true);
- // Backup ownership is authoritative. Never map a device-local alias to a DBV ID.
- const activeProfileId=original;
- if(!owns.has(activeProfileId))fail("Das aktive Profil ist kein eigenes Spielerprofil");
+ // A followed player is NEVER an owned profile: a follower-only backup
+ // carries an empty Home selection. Its follow list remains intact and does
+ // not implicitly confer any server permission after import.
+ let activeProfileId="";
+ if(players.length){
+  activeProfileId=text(data.activeProfileId||data.chosen,80,"Aktives Profil",true);
+  if(!owns.has(activeProfileId))fail("Das aktive Profil ist kein eigenes Spielerprofil");
+ }else if(data.activeProfileId!==undefined&&data.activeProfileId!==""){
+  fail("Ein gefolgter Spieler darf nicht als eigenes Profil gesichert werden");
+ }
  return {players,friends,officialLinks:links,activeProfileId,
   chosen:activeProfileId,historyProfilesInitialized:true};
 }
@@ -174,7 +186,9 @@ export function createLocalBackup(stored,now=new Date(),calendarStored="[]"){
  return archive;
 }
 export function inspectLocalBackup(content){
- if(typeof content!=="string"||content.length>MAX_BACKUP_BYTES)fail("Sicherungsdatei zu groß");
+ if(typeof content!=="string"||content.length>MAX_BACKUP_BYTES||
+    new TextEncoder().encode(content).byteLength>MAX_BACKUP_BYTES)
+  fail("Sicherungsdatei zu groß");
  let archive;
  try{archive=JSON.parse(content)}catch{fail("Die Datei enthält kein gültiges JSON")}
  if(!record(archive)||archive.kind!==BACKUP_KIND||
@@ -189,6 +203,6 @@ export function inspectLocalBackup(content){
   data,calendarEvents,createdAt:archive.createdAt,
   summary:{players:data.players.length,friends:data.friends.length,
    tournaments:data.officialLinks.length,calendarEvents:calendarEvents?.length??null,
-   activePlayer:data.players.find(x=>x.id===data.activeProfileId)?.name}
+   activePlayer:data.players.find(x=>x.id===data.activeProfileId)?.name||"Kein eigenes Profil"}
  };
 }

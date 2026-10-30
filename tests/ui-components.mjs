@@ -4,7 +4,7 @@ const [html,components,design,legacy,cache]=await Promise.all([
  "index.html","ui-components.css","design-v2.css","styles.css","sw.js"
 ].map(path=>readFile(path,"utf8")));
 const order=[...html.matchAll(/<link rel="stylesheet" href="\.\/([^"]+)"/g)].map(x=>x[1]);
-assert.deepEqual(order.slice(0,14),["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-shell.css","teams.css","club-roster.css","private-sharing.css","settings-rooms.css","onboarding-wizard.css","spiele.css","home-v137.css","desktop-dashboard.css"]);
+assert.deepEqual(order.slice(0,15),["styles.css","ui-components.css","design-v2.css","language.css","club-branding.css","app-access.css","app-shell.css","teams.css","club-roster.css","private-sharing.css","settings-rooms.css","onboarding-wizard.css","spiele.css","home-v137.css","desktop-dashboard.css"]);
 assert.equal(new Set(order).size,order.length,"No duplicate stylesheet layers");
 assert.ok(order.indexOf("canonical-follows-v183.css")>order.indexOf("desktop-dashboard.css"),"Later focused-navigation CSS must override the old dashboard");
 assert.match(components,/\.focused-profile\{margin:5px 0 23px/);

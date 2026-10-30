@@ -2,17 +2,51 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 const page=await readFile("index.html","utf8");
 const js=await readFile("dashboard.js","utf8");
+const homeCss=await readFile("home-v137.css","utf8");
 const app=await readFile("app.js","utf8");
 const sw=await readFile("sw.js","utf8");
 const snapshot=JSON.parse(await readFile("data/ranking.json","utf8"));
 assert.ok(page.includes('id="view-start"'));
+// IA #13: exactly four stable mobile destinations; the club is desktop-only,
+// while live/today and settings remain contextual, not shifting bottom tabs.
+const primaryNav=page.match(/<nav class="bottom-nav"[^>]*>[\s\S]*?<\/nav>/)?.[0];
+assert.ok(primaryNav,"The canonical mobile navigation must exist");
+const primaryDestinations=[...primaryNav.matchAll(/<a\b[^>]*data-page="([^"]+)"/g)].map(m=>m[1]);
+assert.deepEqual(primaryDestinations,["start","spieler","turniere","verein","mannschaft"],
+ "The four mobile destinations and desktop club shortcut must remain stable");
+assert.ok(primaryNav.includes('data-page="verein" class="desktop-club-nav"'),
+ "The club shortcut must remain desktop-only");
+assert.ok(!primaryNav.includes('data-page="live"')&&!primaryNav.includes('data-page="berichte"'),
+ "Today/live and reports must not create shifting mobile tabs");
+assert.ok(page.includes('class="today-context-bar"')&&page.includes('id="live-nav-tab"'),
+ "Live remains a contextual shortcut");
+assert.ok(page.includes('class="topbar-settings" href="#einstellungen"'),
+ "Settings must remain available outside the bottom navigation");
+// P1 iPhone SE: all three short Home links retain accessible touch targets.
+for(const selector of [
+  "#view-start .upcoming-tournaments-header a",
+  "#view-start .home-stats-link",
+  "#view-start .home-trophy-heading a"
+]){
+  const start=homeCss.indexOf(selector+"{");
+  assert.ok(start>=0,selector+" must have a touch-target rule");
+  const rule=homeCss.slice(start,homeCss.indexOf("}",start));
+  assert.ok(rule.includes("min-height:44px"),selector+" must retain 44px");
+}
+// P1 iPhone: the collapsed technical identifier is a real interactive details control.
+// Its summary must be tappable without forcing users to zoom at 320px width.
+const technicalSummaryStart=homeCss.indexOf("#view-turniere .saved-tournament-technical summary{");
+assert.ok(technicalSummaryStart>=0,"Saved tournament technical details must have a summary rule");
+const technicalSummaryRule=homeCss.slice(technicalSummaryStart,homeCss.indexOf("}",technicalSummaryStart));
+assert.match(technicalSummaryRule,/min-height:44px/,"Technical details disclosure must keep a 44px touch target");
 assert.ok(page.includes('id="dashboard-rankings"'));
 assert.ok(page.includes('id="dashboard-kpis"'));
 assert.ok(page.includes('id="dashboard-next"'));
 assert.ok(js.includes('upcomingTournaments(bookmarks,selection,today)'),"Dashboard must select three upcoming tournaments for active player");
 assert.ok(js.includes('Nächste Turniere'),"Upcoming panel title");
-assert.ok(js.includes('location?"Austragungsort: "+location:"Austragungsort nicht erfasst"'),
- "A missing local bookmark venue must not claim that DBV has not published it");
+assert.ok(js.includes('location?"":\'<small class="upcoming-tournament-venue">Austragungsort nicht erfasst</small>\'')||
+ js.includes('Austragungsort nicht erfasst'),
+ "A missing locally stored venue must remain visibly not recorded");
 assert.ok(!js.includes("Austragungsort noch nicht veröffentlicht"),
  "Home must distinguish missing local data from missing official publication");
 assert.ok(js.includes('profiles.slice().reverse().find(x=>x.id===selection)'),
@@ -23,6 +57,21 @@ assert.ok(page.indexOf('id="dashboard-kpis"') < page.indexOf('home-ranking-secti
 assert.ok(!page.includes('Für eingeladene Nutzer: Belegte Badminton-Ergebnisse'),"Technical Home introduction removed");
 assert.ok(page.includes('href="./home-v137.css"'),"Compact Home stylesheet linked");
 assert.ok(js.includes('upcoming-tournament-row')&&js.includes('upcoming-tournament-date'),"Each row has date and DBV link");
+assert.ok(js.includes('const target="#turniere/"+encodeURIComponent(String(t.id))+"/"+encodeURIComponent(String(t.playerId))'),
+ "Home tournament row must deep-link directly to the exact stored tournament, not generic #turniere");
+assert.ok(app.includes('function focusSavedTournamentFromHash()')&&
+ app.includes('card.scrollIntoView({behavior:"auto",block:"start"})'),
+ "Deep-linked tournament must be focused and scrolled into view after native iPhone navigation");
+assert.ok(app.includes('data-saved-tournament-id=')&&app.includes('data-saved-tournament-player='),
+ "Tournament identity is selected by both bookmark ID and attached player");
+assert.ok(app.includes("heading=venue")&&app.includes("name+\" · \"+venue"),
+ "Saved event shows verified or manually recorded venue in its heading");
+assert.ok(app.includes('class="saved-tournament-player"')&&
+ app.indexOf('class="saved-tournament-player"')>app.indexOf('class="local-shortcut-actions"'),
+ "The player attribution belongs below the tournament actions");
+assert.ok(app.includes("SchmetterlingeBookmarks.verifiedCalendarEventUrl(t,verifiedCalendarRows)"),
+ "The saved tournament card must require an exact official UUID link rather than a hostname match");
+
 assert.ok(page.includes('src="./dashboard.js"'));
 assert.ok(page.includes('href="#start" data-page="start"'));
 assert.ok(!page.includes('class="hero"'),"No verbose hero on landing page");

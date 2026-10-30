@@ -1,5 +1,32 @@
 /** Minimal owner-only metadata for issued app links; no recipient identifiers. */
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** A server-verified revocation outranks the locally cached copy-link state.
+ * Only reconcile an exact invite UUID present in the owner-only response.
+ * Absence from the bounded overview never proves revocation. */
+export function reconcileIssuedInvite(local,serverRows){
+ if(!UUID.test(local?.id||"")||!Array.isArray(serverRows)||local?.revoked===true)return null;
+ const matching=serverRows.find(row=>row?.id===local.id&&UUID.test(row?.id||""));
+ return matching?.revoked_at?{...local,revoked:true}:null;
+}
+/** Check the *current* server-side invite status immediately before copying/sharing.
+ * A bounded overview can omit older links; omission is not proof of revocation
+ * and must never silently authorize sharing or issue a replacement grant. */
+export function checkIssuedInviteForSharing(local,serverRows,now=Date.now()){
+ if(!UUID.test(local?.id||"")||!Array.isArray(serverRows))return {status:"unverified"};
+ // A stale server snapshot must never revive a locally revoked invitation.
+ if(local.revoked===true)return {status:"revoked"};
+ const localUntil=Date.parse(local.expires);
+ if(!Number.isFinite(localUntil))return {status:"unverified"};
+ const row=serverRows.find(item=>item?.id===local.id&&UUID.test(item?.id||""));
+ if(!row)return {status:"unverified"};
+ if(row.revoked_at)return {status:"revoked"};
+ const serverUntil=Date.parse(row.redeem_until);
+ if(!Number.isFinite(serverUntil))return {status:"unverified"};
+ // Never extend a cached bearer link beyond either confirmed deadline.
+ const until=Math.min(localUntil,serverUntil);
+ const expires=new Date(until).toISOString();
+ return until<=now?{status:"expired",expires}:{status:"active",expires};
+}
 export function mountOwnerInviteOverview({card,rpc,read,write,draw,status}){
  const section=document.createElement("section");
  section.className="invitation-overview";
@@ -21,6 +48,14 @@ export function mountOwnerInviteOverview({card,rpc,read,write,draw,status}){
    const data=await rpc("app_access_invites_overview");
    if(!Array.isArray(data))throw Error("invalid overview");
    if(ticket!==version)return;
+   // A different device can revoke an invitation. Remove only the local
+   // copy/share affordance for that exact server-confirmed revoked link.
+   const revokedLocally=reconcileIssuedInvite(read(),data);
+   if(revokedLocally){
+    write(revokedLocally,{broadcast:false});
+    draw();
+    status("Dieser Einladungslink wurde widerrufen. Du kannst einen neuen erstellen.");
+   }
    list.replaceChildren();
    for(const record of data.slice(0,50)){
     if(!UUID.test(record?.id||""))continue;

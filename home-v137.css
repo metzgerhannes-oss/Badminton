@@ -32,7 +32,7 @@
 #view-start .upcoming-tournaments-section{margin:3px 0 9px;padding:11px 12px 4px;border-radius:16px}
 #view-start .upcoming-tournaments-header{align-items:center;margin-bottom:3px;gap:8px}
 #view-start .upcoming-tournaments-header h2{font-size:16px;line-height:1.25}
-#view-start .upcoming-tournaments-header a{font-size:11px;min-height:38px;display:flex;align-items:center}
+#view-start .upcoming-tournaments-header a{font-size:11px;min-height:44px;display:flex;align-items:center}
 #view-start .upcoming-tournament-row{display:flex;align-items:center;gap:9px;min-height:54px;
  padding:6px 2px;color:#f2f9ff;text-decoration:none}
 #view-start .upcoming-tournament-row:focus-visible{outline-offset:-2px}
@@ -54,7 +54,7 @@
 #view-start .match-stats-heading{margin:0 0 9px;align-items:center;gap:8px}
 #view-start .match-stats-heading h2{font-size:17px;line-height:1.25}
 #view-start .home-stats-link{font-size:11px;font-weight:800;white-space:nowrap;
- min-height:36px;display:inline-flex;align-items:center}
+ min-height:44px;display:inline-flex;align-items:center}
 #view-start .match-stats-values{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 #view-start .match-stat{min-height:63px;gap:5px;padding:8px 3px;border-radius:10px;
  text-align:center;align-content:center;justify-items:center}
@@ -76,7 +76,7 @@
 #view-start .home-trophy{padding:11px 12px 9px;border-radius:16px}
 #view-start .home-trophy-heading{margin:0 0 7px;align-items:center}
 #view-start .home-trophy-heading h2{font-size:17px;line-height:1.3}
-#view-start .home-trophy-heading a{font-size:11px;min-height:36px;display:flex;align-items:center}
+#view-start .home-trophy-heading a{font-size:11px;min-height:44px;display:flex;align-items:center}
 #view-start .home-trophy-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 #view-start .home-trophy-slot{grid-template-rows:25px 18px auto;gap:2px;padding:3px 2px}
 #view-start .home-trophy-symbol{font-size:22px}
@@ -146,3 +146,61 @@
 #view-historie .history-proof-feedback{background:#153352;color:#edf8ff;border:1px solid #72b9e8;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5}
 #view-historie .history-result.is-proof-target{outline:3px solid #75c9ff;outline-offset:4px;border-radius:10px;scroll-margin-top:100px}
 #view-historie .history-detail-note{font-weight:700;font-size:13px;color:#d9edff;line-height:1.45}
+
+/* P1 F08 / UX: saved tournament card hierarchy and direct Home deep link. */
+#view-turniere .saved-tournament-top h3{
+ overflow-wrap:anywhere;line-height:1.28
+}
+#view-turniere .saved-tournament-dates{
+ margin-top:8px!important
+}
+#view-turniere .saved-tournament-player{
+ margin-top:12px!important;padding-top:10px;
+ border-top:1px solid #bcd9e8;
+ color:#365e77!important;font-size:13px!important;font-weight:650
+}
+#view-turniere .tournament-card[data-saved-tournament-id]{
+ scroll-margin-top:calc(env(safe-area-inset-top,0px) + 16px)
+}
+#view-turniere .tournament-card[data-saved-tournament-id]:focus{
+ outline:3px solid #147bac;outline-offset:3px
+}
+#view-turniere .tournament-card .local-shortcut-actions{
+ gap:8px 13px;align-items:center
+}
+#view-turniere .tournament-card .card-open-primary{
+ color:#17688f!important;text-decoration:underline;text-underline-offset:3px;
+ min-height:44px;display:inline-flex;align-items:center;font-size:14px
+}
+
+/* Compact actions: one clear source link, a short secondary-control row. */
+#view-turniere .tournament-card .local-shortcut-actions{
+ display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;
+ column-gap:12px;row-gap:0;margin-top:8px
+}
+#view-turniere .tournament-card .local-shortcut-actions>.card-open-primary{
+ flex:1 0 100%;width:100%;min-height:44px
+}
+#view-turniere .tournament-card .local-shortcut-actions>button{
+ min-height:44px;margin:0!important;padding:8px 6px;
+ font-size:13px;font-weight:650;line-height:1.3
+}
+#view-turniere .saved-tournament-technical{
+ margin-top:3px;font-size:12px;line-height:1.45;max-width:100%;
+ color:#365e77;position:relative;z-index:2
+}
+#view-turniere .saved-tournament-technical summary{
+ cursor:pointer;display:list-item;padding:9px 0;min-height:44px;
+ color:inherit;font-weight:650;outline-offset:2px
+}
+#view-turniere .saved-tournament-technical code{
+ display:block;overflow-wrap:anywhere;white-space:normal;
+ font-family:ui-monospace,Menlo,monospace;font-size:11px
+}
+#view-turniere .saved-tournament-player{
+ margin-top:6px!important;padding-top:8px
+}
+@media (min-width:900px){
+ #view-turniere .saved-tournament-technical,
+ #view-turniere .saved-tournament-player{color:#d3e9fa!important;border-color:#557892}
+}

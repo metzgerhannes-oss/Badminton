@@ -67,6 +67,36 @@ var SchmetterlingeBookmarks=(function(){
    startDate:validDate(value.startDate),endDate:validDate(value.endDate),
    place:String(value.place||"").trim().slice(0,120),deadline:validDate(value.deadline)};
  }
+ /** Edits ONLY a private locally saved calendar/framework venue.
+  * Never infer a DBV tournament UUID, rewrite dates or claim official proof.
+  * A later exact-key official reconciliation remains authoritative.
+  */
+ function updateLocalCalendarVenue(bookmark,value){
+  if(!bookmark||!["dbv-calendar","bwbv-framework"].includes(bookmark.source)||
+     typeof value!=="string"||value.length>120||
+     /[\x00-\x1f\x7f]/.test(value))return null;
+  const next=normalizeBookmark({...bookmark,place:value.trim()});
+  return next&&next.id===bookmark.id&&next.playerId===bookmark.playerId&&
+   next.source===bookmark.source?next:null;
+ }
+ /** Only describe a calendar link as a DIRECT tournament page when the
+  * exact calendar key has one verified DBV tournament UUID in the local
+  * official feed. Generic overview URLs (even with hasDirectLink=true),
+  * untrusted hosts and ambiguous duplicate keys must remain overview links.
+  * Never join a saved calendar reminder by title or town.
+  */
+ function verifiedCalendarEventUrl(bookmark,rows){
+  if(bookmark?.source!=="dbv-calendar"||!Array.isArray(rows))return "";
+  const matching=rows.filter(row=>row?.key===bookmark.id);
+  if(matching.length!==1||matching[0].hasDirectLink!==true)return "";
+  // A direct event link is only promoted from a coherent official event
+  // record. A malformed source date must not be silently combined with a
+  // stale local reminder (in particular, registration deadline != game day).
+  const row=matching[0];
+  const start=validDate(row.start),end=validDate(row.end);
+  if(!start||!end||end<start)return "";
+  return parseDbvTournamentLink(row.url)?.url||"";
+ }
  // Use only an already loaded official-calendar row with an exact source key or UUID.
  // A similar venue/name is NEVER sufficient to join two distinct tournaments.
  function reconcileOfficialMetadata(bookmark,rows){
@@ -101,6 +131,14 @@ var SchmetterlingeBookmarks=(function(){
   return {status:"matched",sourceCorrected:Object.keys(patch).length>0,
    updated:Object.keys(patch).length?{...bookmark,...patch}:bookmark};
  }
+ // Explain only fields changed by a uniquely verified official DBV identity.
+ // This is presentation metadata; never log player names or private links.
+ function describeOfficialChanges(before,after){
+  const labels={name:"Titel/Kategorie",startDate:"Spieltag",endDate:"Turnierende",
+   place:"Austragungsort",deadline:"Meldeschluss"};
+  return Object.keys(labels).filter(key=>String(after?.[key]||"")&&
+   String(before?.[key]||"")!==String(after[key])).map(key=>labels[key]);
+ }
  function localDay(date=new Date()){
   const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
   const values=Object.fromEntries(parts.filter(p=>["year","month","day"].includes(p.type)).map(p=>[p.type,p.value]));
@@ -134,5 +172,5 @@ var SchmetterlingeBookmarks=(function(){
     a.name.localeCompare(b.name,"de");
   });
  }
- return Object.freeze({parseDbvTournamentLink,normalizeBookmark,reconcileOfficialMetadata,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
+ return Object.freeze({parseDbvTournamentLink,normalizeBookmark,verifiedCalendarEventUrl,updateLocalCalendarVenue,reconcileOfficialMetadata,describeOfficialChanges,validDate,localDay,niceDay,visible,phase,hasTournamentToday,sorted});
 })();

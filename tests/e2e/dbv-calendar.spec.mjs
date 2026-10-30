@@ -453,13 +453,13 @@ test("F06: verified 2026 Reutlingen C tournament + preserves exact source and pl
  await expect(first.locator('a[href*="dbv.turnier.de/tournament/"]')).toBeVisible();
  await first.locator("[data-official-toggle]").click();
  await expect(first.locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
- await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort: Reutlingen");
+ await expect(page.locator("#official-tournament-list .saved-tournament-top h3")).toContainText("Reutlingen");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")).officialLinks);
  expect(saved.filter(t=>t.id==="52B3B803-279B-48CF-8143-F5078F5236DB")).toHaveLength(1);
  await page.reload({waitUntil:"domcontentloaded"});
  await expect(page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
  await page.locator(".dbv-calendar-external-result").first().locator("[data-official-toggle]").click();
- await expect(page.locator("#official-tournament-list")).not.toContainText("Austragungsort: Reutlingen");
+ await expect(page.locator("#official-tournament-list")).not.toContainText("Reutlingen");
 });
 
 
@@ -478,11 +478,12 @@ test("F06: Home tournament cards route internally on phone and desktop; external
   await page.goto("/#start",{waitUntil:"domcontentloaded"});
   await page.reload({waitUntil:"domcontentloaded"});
   const row=page.locator(".upcoming-tournament-row").first();
-  await expect(row).toHaveAttribute("href","#turniere");
-  await expect(row).toContainText("Austragungsort: Testhalle");
+  await expect(row).toHaveAttribute("href",/^#turniere\/11111111-2222-4333-8444-555555555555\/05-070879$/);
+  await expect(row.locator(".upcoming-tournament-info strong")).toContainText("· Testhalle");
   await row.click();
-  await expect(page).toHaveURL(/#turniere$/);
-  await expect(page.locator("#official-tournament-list")).toContainText("Synthetisches Zukunftsturnier");
+  await expect(page).toHaveURL(/#turniere\/11111111-2222-4333-8444-555555555555\/05-070879$/);
+  await expect(page.locator("#official-tournament-list [data-saved-tournament-id=\"11111111-2222-4333-8444-555555555555\"]")).toBeFocused();
+   await expect(page.locator("#official-tournament-list")).toContainText("Synthetisches Zukunftsturnier");
   await expect(page.locator('#official-tournament-list a[href*="dbv.turnier.de/tournament/"]')).toBeVisible();
   await expect(page.locator(".live-hub-official-link")).toHaveAttribute("href","https://turniere.badminton.de/");
  }
@@ -550,7 +551,7 @@ test("v219: Reutlingen quick search shows the verified past C result without hid
  await expect(save).toHaveText("+");
  await save.click();
  await expect(result.locator("[data-official-toggle]")).toHaveAttribute("aria-pressed","true");
- await expect(page.locator("#official-tournament-list")).toContainText("Austragungsort: Reutlingen");
+ await expect(page.locator("#official-tournament-list .saved-tournament-top h3")).toContainText("Reutlingen");
  const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(stored.officialLinks.filter(x=>x.id==="52B3B803-279B-48CF-8143-F5078F5236DB"&&x.playerId==="05-070879")).toHaveLength(1);
  await page.reload({waitUntil:"domcontentloaded"});

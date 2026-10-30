@@ -25,6 +25,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
 <link rel="stylesheet" href="./design-v2.css">
 <link rel="stylesheet" href="./language.css">
 <link rel="stylesheet" href="./club-branding.css">
+<link rel="stylesheet" href="./app-access.css">
 <link rel="stylesheet" href="./app-shell.css">
 <link rel="stylesheet" href="./teams.css">
 <link rel="stylesheet" href="./club-roster.css">
@@ -103,14 +104,15 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
  </div>
  <section class="app-access-panel">
   <h1>Schmetterlinge · Einladung</h1>
-  <p>Die App ist für eingeladene Badminton-Familien zugänglich. Mit einem gültigen Link siehst du belegte Matchkarten, Turnierergebnisse und Trophäen.</p>
+  <p>Schmetterlinge ist privat. Für den ersten Start benötigst du einen persönlichen Einladungslink.</p>
   <label for="app-access-code">Einladungslink oder Code</label>
   <input id="app-access-code" type="password" autocomplete="off" spellcheck="false" placeholder="Einladungslink hier einfügen">
   <button id="app-access-submit" type="button">Zugang freischalten</button>
   <button id="app-access-paste" type="button" hidden>Einladung aus Zwischenablage übernehmen</button>
   <p id="app-access-status" role="status" aria-live="polite"></p>
+  <button id="app-access-retry" class="outline-button" type="button" hidden>Zugang erneut prüfen</button>
   <p><a href="./owner-device-transfer.html" style="color:#1e587b;text-decoration:underline;font-weight:700">Bestehenden Eigentümerzugang auf dieses Gerät übernehmen</a></p>
-  <small>Keine E-Mail-Adresse und kein Passwort erforderlich. Auf dem iPhone wird die Einladung beim Installieren übernommen; falls nötig genügt ein Tipp auf „Einladung aus Zwischenablage übernehmen“.</small>
+  <small>Die Anmeldung per E-Mail-Code erfolgt über Cloudflare. Ein zusätzliches App-Passwort ist nicht nötig.</small>
  </section>
 </div>
 <a class="skip-link" href="#hauptinhalt">Zum Inhalt springen</a>
@@ -119,7 +121,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v234" title="Version v234">v234</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v235" title="Version v235">v235</span>
   </div>
  </header>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
@@ -610,7 +612,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
    <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v234 · Release-Informationen werden geladen</p>
+   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v235 · Release-Informationen werden geladen</p>
    <section class="player-management" aria-label="Meine eigenen Spielerprofile">
     <div class="player-management-head"><h3>Profile und Familie</h3><p>Verwalte hier nur deine eigenen Spielerprofile. Andere Spieler findest du unter Spieler → Gefolgte Spieler.</p></div>
     <div class="settings-section">
@@ -813,6 +815,16 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <p id="community-save-status" class="community-save-status" role="status" aria-live="polite" hidden></p>
   <p class="small muted">Keine automatische Ergebnisübertragung: Spiele erscheinen erst mit belegten DBV-/Badhub-Daten.</p>
   <button class="primary-button" id="tournament-save" type="submit">Turnier speichern</button>
+ </form>
+</dialog>
+<dialog id="tournament-venue-dialog" aria-labelledby="tournament-venue-heading">
+ <form id="tournament-venue-form" class="modal">
+  <div class="section-heading"><h2 id="tournament-venue-heading">Austragungsort bearbeiten</h2><button id="tournament-venue-close" type="button" class="icon-button" aria-label="Schließen">×</button></div>
+  <label for="tournament-venue-place">Austragungsort / Halle
+   <input id="tournament-venue-place" name="place" type="text" maxlength="120" autocomplete="off" placeholder="z. B. Sporthalle, Straße und Ort">
+  </label>
+  <p class="small muted">Nur für diese private Vormerkung. Eine spätere eindeutig zugeordnete DBV-Quelle hat Vorrang; Datum und Turnier bleiben unverändert.</p>
+  <button id="tournament-venue-save" class="primary-button" type="submit">Ort speichern</button>
  </form>
 </dialog>
 <dialog id="spond-source-dialog" aria-labelledby="spond-source-heading">

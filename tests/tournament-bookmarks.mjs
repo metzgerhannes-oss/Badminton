@@ -45,6 +45,36 @@ assert.equal(bookmarks.normalizeBookmark({...calendar,deadline:"2026-10-31"}).de
 const officialRow={key:"dbv-calendar-44094",url,hasDirectLink:true,
  title:"3. D-RLT BAW SW U11-U19 Gomaringen",start:"2026-11-22",end:"2026-11-22",
  deadline:"2026-11-15",place:"Sport- und Kulturhalle, Haydnstraße 22, Gomaringen"};
+// An official page requires an exact saved-calendar key PLUS an actual
+// canonical DBV tournament UUID, never merely a provider hostname/overview.
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[officialRow]),url);
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[]),"");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,key:"dbv-calendar-00012"}]),"",
+ "A calendar link for another event is never this saved event");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[officialRow,officialRow]),"",
+ "Duplicate source identities must not be treated as verified");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,hasDirectLink:false}]),"");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,start:"2026-11-31"}]),"",
+ "A malformed official game date cannot authorize a direct tournament link");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,end:"2026-11-21"}]),"",
+ "An official end date before game day cannot authorize a direct link");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,start:"2026-11-15",end:"2026-11-14"}]),"",
+ "Registration deadline must not be misrepresented as a tournament day");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,deadline:"2026-11-31"}]),url,
+ "A malformed optional deadline must not erase an otherwise verified tournament identity");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
+ url:"https://turniere.badminton.de/",hasDirectLink:true}]),"",
+ "Mislabelled DBV overview must not become a direct tournament link");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
+ url:"https://turniere.badminton.de/embed",hasDirectLink:true}]),"",
+ "DBV calendar embed is not a tournament detail page");
+assert.equal(bookmarks.verifiedCalendarEventUrl(calendar,[{...officialRow,
+ url:"https://evil.example/tournament/"+id,hasDirectLink:true}]),"",
+ "A third-party tournament-shaped URL must not be promoted");
+assert.equal(bookmarks.verifiedCalendarEventUrl(bookmarks.normalizeBookmark({
+ url,playerId:"99-000001"}),[officialRow]),"",
+ "Only actual calendar reminders can be resolved via calendar source-key");
+
 const correct=bookmarks.normalizeBookmark({url,name:"3. D-RLT Gomaringen",
  startDate:"2026-11-22",endDate:"2026-11-22",playerId:"05-070879"});
 const enriched=bookmarks.reconcileOfficialMetadata(correct,[officialRow]);
@@ -59,6 +89,11 @@ assert.equal(wrongDate.status,"matched","Official DBV date overrides legacy loca
 assert.equal(wrongDate.updated.startDate,"2026-11-22");
 assert.equal(wrongDate.updated.deadline,"2026-11-15");
 assert.equal(wrongDate.sourceCorrected,true);
+assert.deepEqual(Array.from(bookmarks.describeOfficialChanges({...correct,startDate:"2026-11-15"},wrongDate.updated)),
+ ["Titel/Kategorie","Spieltag","Austragungsort","Meldeschluss"],
+ "The UI must explicitly name corrected game date, venue and separate registration deadline");
+assert.deepEqual(Array.from(bookmarks.describeOfficialChanges(correct,correct)),[],
+ "No invented corrections when verified DBV metadata already matches");
 const wrongCategory=bookmarks.reconcileOfficialMetadata({...correct,name:"3. E-RLT Gomaringen"},
  [officialRow]);
 assert.equal(wrongCategory.status,"matched","An independently verified SAME UUID identifies the event");
@@ -122,4 +157,90 @@ assert.equal(bookmarks.hasTournamentToday({...state,players:[{id:"05-070879"}],o
 assert.deepEqual(owned.map(p=>p.id),["future","past","today","unknown","other"],
  "Sorting must not mutate saved local bookmark order");
 assert.doesNotMatch(source,/\bfetch\s*\(|XMLHttpRequest|localStorage|service_role|supabaseUrl/i);
+
+const appSource=await readFile("app.js","utf8");
+assert.ok(appSource.includes("SchmetterlingeBookmarks.verifiedCalendarEventUrl(t,verifiedCalendarRows)"),
+ "Saved tournament cards must use validated direct source URLs, not a hostname-only regex");
+
+const prefillStart=appSource.indexOf("function prefillVerifiedTournamentForm(form){");
+const prefillEnd=appSource.indexOf("\nfunction openTournamentForm(",prefillStart);
+assert.ok(prefillStart>=0&&prefillEnd>prefillStart,"Verified tournament form helper must exist");
+function testPrefill(rows,link){
+ const note={hidden:true,textContent:""};
+ const values={url:link,playerId:"05-070879",name:"3. E-RLT Gomaringen",
+  startDate:"2026-11-15",endDate:"2026-11-15",place:"",deadline:""};
+ const fields=Object.fromEntries(Object.entries(values).map(([key,value])=>[key,{value}]));
+ const form={values,elements:{namedItem:key=>fields[key]||null}};
+ class MockFormData{constructor(source){this.source=source}get(key){return this.source.values[key]||""}}
+ const scope=vm.createContext({el:key=>key==="tournament-official-source"?note:null,
+  FormData:MockFormData,parseDbvTournamentLink:bookmarks.parseDbvTournamentLink,
+  normalizeBookmark:bookmarks.normalizeBookmark,SchmetterlingeBookmarks:bookmarks,
+  verifiedCalendarRows:rows});
+ vm.runInContext(appSource.slice(prefillStart,prefillEnd),scope);
+ scope.prefillVerifiedTournamentForm(form);
+ return {note,fields};
+}
+const noCalendarPrefill=testPrefill([],url);
+assert.equal(noCalendarPrefill.note.hidden,false,"Unavailable official data must not silently look verified");
+assert.match(noCalendarPrefill.note.textContent,/nicht verfügbar.*ungeprüft/);
+assert.equal(noCalendarPrefill.fields.startDate.value,"2026-11-15","Unverified form must not change the date");
+const otherUuid="CCCCCCCC-1111-4222-8333-444444444444";
+const wrongIdentityPrefill=testPrefill([{...officialRow,url:"https://dbv.turnier.de/tournament/"+otherUuid}],url);
+assert.equal(wrongIdentityPrefill.note.hidden,false,"Unmatched UUID needs explicit feedback");
+assert.match(wrongIdentityPrefill.note.textContent,/nicht eindeutig bestätigt.*ungeprüft/);
+assert.equal(wrongIdentityPrefill.fields.place.value,"","Wrong UUID must never inject a venue");
+const genericCalendarPrefill=testPrefill([{...officialRow,url:"https://turniere.badminton.de/",hasDirectLink:false}],url);
+assert.match(genericCalendarPrefill.note.textContent,/nicht eindeutig bestätigt.*ungeprüft/,
+ "A generic DBV calendar landing page is not proof of a tournament UUID");
+assert.equal(genericCalendarPrefill.fields.startDate.value,"2026-11-15",
+ "Unverified calendar landing pages must not silently overwrite the event date");
+const matchedPrefill=testPrefill([officialRow],url);
+assert.equal(matchedPrefill.note.hidden,false);
+assert.match(matchedPrefill.note.textContent,/Spieltag.*Meldeschluss/);
+assert.equal(matchedPrefill.fields.startDate.value,"2026-11-22","Only verified UUID corrects the game date");
+assert.equal(matchedPrefill.fields.deadline.value,"2026-11-15","Registration deadline stays separate");
+assert.equal(testPrefill([officialRow],"https://invalid.example/").note.hidden,true);
+
+
+// #386: A calendar reminder without a turnier.de UUID must have a local,
+// optional venue editor while preserving the actual official key and game day.
+const venueCalendar=bookmarks.normalizeBookmark({
+ source:"dbv-calendar",id:"dbv-calendar-44094",
+ url:"https://turniere.badminton.de/",name:"Synthetischer Kalendertermin",
+ playerId:"99-000001",startDate:"2026-11-22",endDate:"2026-11-22",
+ deadline:"2026-11-15",place:""
+});
+const typed=bookmarks.updateLocalCalendarVenue(venueCalendar,"  Sporthalle Musterort  ");
+assert.ok(typed,"Manual venue correction should accept safe local text");
+assert.equal(typed.place,"Sporthalle Musterort");
+assert.equal(venueCalendar.place,"","Manual correction must not mutate original record");
+for(const key of ["id","url","source","name","playerId","startDate","endDate","deadline"])
+ assert.equal(typed[key],venueCalendar[key],"Manually entered venue must preserve local calendar identity: "+key);
+
+assert.equal(bookmarks.updateLocalCalendarVenue(typed,"").place,"",
+ "User may clear an incorrect manually entered venue");
+assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"X".repeat(121)),null);
+assert.equal(bookmarks.updateLocalCalendarVenue(venueCalendar,"Broken\nLocation"),null);
+assert.equal(bookmarks.updateLocalCalendarVenue(bookmarks.normalizeBookmark({
+ url,playerId:"99-000001",name:"Direct UUID"}),"Wrong venue"),null,
+ "A verified turnier.de link must use its existing full editor");
+const officialCalendarVenue=bookmarks.reconcileOfficialMetadata(typed,[{
+ key:venueCalendar.id,url:"https://turniere.badminton.de/",hasDirectLink:false,
+ title:venueCalendar.name,start:venueCalendar.startDate,end:venueCalendar.endDate,
+ deadline:venueCalendar.deadline,place:"DBV offiziell bestätigte Halle"
+}]);
+assert.equal(officialCalendarVenue.status,"matched");
+assert.equal(officialCalendarVenue.updated.place,"DBV offiziell bestätigte Halle",
+ "Later exact calendar key confirmation must supersede a manually entered venue");
+const [venueMarkup,appVenueSource]=await Promise.all([
+ readFile("index.html","utf8"),readFile("app.js","utf8")
+]);
+assert.match(venueMarkup,/id="tournament-venue-dialog"/);
+assert.match(venueMarkup,/id="tournament-venue-form"/);
+assert.match(venueMarkup,/id="tournament-venue-place"[^>]*name="place"/);
+assert.match(appVenueSource,/data-edit-venue-id=/);
+assert.match(appVenueSource,/updateLocalCalendarVenue\(current,raw\)/);
+assert.doesNotMatch(appVenueSource,/updateLocalCalendarVenue\([^)]*url/i,
+ "A venue-only edit must never infer new official UUIDs");
+
 console.log("Tournament bookmarks v61: official URL, strict calendar dates, Berlin day, own/friend boundaries and stable sort verified.");

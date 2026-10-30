@@ -1,13 +1,13 @@
 /** v136: only a verified site owner issues revocable, shareable app invitations. */
 import {getPrivateSession} from "./private-invites.js";
 import {PUBLIC_KEY,SUPABASE_ROOT} from "./scripts/supabase-read.mjs";
-import {mountOwnerInviteOverview} from "./scripts/owner-invites-overview.mjs";
+import {mountOwnerInviteOverview,checkIssuedInviteForSharing} from "./scripts/owner-invites-overview.mjs";
 const STORAGE="schmetterlinge.appIssuedInvite.v136";
 const el=id=>document.getElementById(id);
 const hex=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,"0")).join("");
 const read=()=>{try{return JSON.parse(localStorage.getItem(STORAGE)||"null")}catch{return null}};
-const write=value=>{localStorage.setItem(STORAGE,JSON.stringify(value));
- window.dispatchEvent(new Event("badminton:issued-invites-changed"));};
+const write=(value,{broadcast=true}={})=>{localStorage.setItem(STORAGE,JSON.stringify(value));
+ if(broadcast)window.dispatchEvent(new Event("badminton:issued-invites-changed"));};
 const link=token=>{const url=new URL("./index.html",location.href);url.hash="appinvite="+token;return url.href};
 const active=record=>record&&/^[0-9a-f]{64}$/.test(record.secret)&&Date.parse(record.expires)>Date.now()&&!record.revoked;
 let session=null,owner=false,busy=false;
@@ -37,7 +37,25 @@ function draw(){
 async function ensureInvite(){
  if(!owner)throw Error("Nur der Betreiber darf Einladungen erstellen.");
  const current=read();
- if(active(current))return current;
+ if(active(current)){
+  // A revoked or expired invitation may remain cached on another device.
+  // Never copy a stale bearer link or silently create a new grant on this click.
+  const verified=checkIssuedInviteForSharing(current,await rpc("app_access_invites_overview"));
+  if(verified.status!=="active"){
+   if(verified.status==="revoked")write({...current,revoked:true});
+   if(verified.status==="expired")write({...current,expires:verified.expires});
+   draw();
+   throw Error(verified.status==="revoked"?"Einladung wurde widerrufen. Für einen neuen Link erneut auf Teilen klicken.":
+    verified.status==="expired"?"Annahmefrist abgelaufen. Für einen neuen Link erneut auf Teilen klicken.":
+    "Einladungsstatus derzeit nicht bestätigbar. Bitte Liste aktualisieren und erneut versuchen.");
+  }
+  // The server's deadline can shorten, but never silently extend, local validity.
+  if(Date.parse(verified.expires)<Date.parse(current.expires)){
+   const synced={...current,expires:verified.expires};
+   write(synced,{broadcast:false});draw();return synced;
+  }
+  return current;
+ }
  const secret=hex();
  const id=await rpc("app_access_invite_issue",{p_secret:secret});
  if(typeof id!=="string"||!/^[a-f0-9-]{36}$/i.test(id))throw Error("Einladung nicht bestätigt");
@@ -77,7 +95,12 @@ async function execute(action){
    status("Der Link wurde angezeigt. Bitte manuell kopieren; automatisches Kopieren ist nicht verfügbar.");
   }
  }catch(e){
-  status("Kopieren nicht möglich. Bitte die Zwischenablage freigeben oder „Aktuellen Einladungslink öffnen“ nutzen.", "error");
+  // Keep verified invite revocation/expiry visible; a generic clipboard error
+  // would hide the server-confirmed denial and mislead the owner.
+  const reason=String(e?.message||"");
+  const verifiedDenial=/^(Einladung wurde widerrufen\.|Annahmefrist abgelaufen\.|Einladungsstatus derzeit nicht bestätigbar\.)/.test(reason);
+  status(verifiedDenial?reason:
+   "Kopieren nicht möglich. Bitte die Zwischenablage freigeben oder „Aktuellen Einladungslink öffnen“ nutzen.", "error");
  }finally{
   busy=false;el("invite-share").disabled=false;copyButton.disabled=false;
   if(action!=="copy"||copyButton.textContent==="Wird kopiert …")
