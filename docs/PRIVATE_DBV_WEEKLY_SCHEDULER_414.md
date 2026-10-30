@@ -1,3 +1,12 @@
+# Status verifiziert am 30.10.2026 – Datenbank und produktiver Edge-Lauf
+
+- **Produktiv und nachgewiesen:** Edge `private-dbv-weekly` v14 ist ACTIVE und bytegenau mit den vier Quelldateien aus `ops/private-dbv-import-20261028` identisch; 28.10.2026 19:43:12 UTC: Ranglisten-KW 43/2026 mit **9.575 Spielern und 18.232 Einträgen** importiert. `source_published_at` bleibt korrekt leer, da der Archivstand KW43 und der Webseitenzeitstempel nicht gleichgesetzt werden dürfen.
+- **Privater Scheduler:** `cron.job` ID 16, `15 0,6,12,18 * * *` UTC, `active=true`, ausschließlich `SELECT private_content.dispatch_private_dbv_weekly();`; Backoff-Sperre `next_allowed_at=2026-10-30T19:43:12Z`. Erster planmäßiger erlaubter Lauf frühestens am 31.10. 00:15 UTC. Dessen Ergebnis ist **noch nicht** nachgewiesen; nicht manuell auslösen.
+- **Dieser PR:** Übernimmt ausschließlich den bereits produktiv verwendeten Backend-Code und seine synthetischen Tests/Migrationen in den privaten Git-Entwicklungszweig. **Keine** Edge-Neuveröffentlichung, SQL-Ausführung oder Änderung an laufenden Cron-Jobs; GitHub-Workflow bleibt reines Verify und verarbeitet keine produktiven Daten.
+- Die nachfolgenden älteren Plan-/Fehlerabschnitte dokumentieren den damaligen Entwicklungsverlauf, nicht den aktuellen Produktivzustand.
+
+---
+
 # #414 – Privater DBV-Wochenimport: Freigabe- und Betriebsplan
 
 Stand 27.10.2026. Diese Implementierung ist zunächst ausschließlich Quellcode und synthetische Offline-Prüfung. Es gibt keinen produktiv aktiven neuen Scheduler. Der bestehende GitHub-Workflow bleibt ein reiner Offline-Verify-Job. Ein grüner Test ist kein amtlicher Wochenimport.
@@ -48,3 +57,15 @@ Diese Befehle sind ausschließlich ein Betriebsrunbook. Keine GitHub-Action darf
 5. Erst nach einer tatsächlich neu veröffentlichten offiziellen KW in der privaten DB über die service-role-only Health-RPC und einen aggregierten SELECT die neue KW, amtlichen Zeitstempel, Tausende Ranking-Einträge, max. acht Wochen, 13er Vereinsstichprobe und Erfolgscode belegen. Kein Statuswechsel allein wegen erfolgreichem Cron-Dispatch.
 
 **Not-Aus:** Zuerst enabled=false, anschließend beide Cron-Jobs per cron.unschedule mit ihren Jobnamen deaktivieren, dann Vault-Token und Edge-Secret rotieren. Kein Re-Enable der alten GitHub-OIDC-Publish-Strecke.
+
+## Stand 28.10.2026 – privater Betrieb nach Aktivierung
+
+Die oben dokumentierte ursprüngliche Aktivierungssperre beschreibt den Planstand vom 27.10. und ist **nicht mehr der aktuelle Ist-Stand**. Nach vom Betreiber bestätigter familiärer Freigabe einschließlich Gesamt-XLSX ist der private Scheduler im ausschließlich richtigen Badminton-Projekt aktiv: Edge `private-dbv-weekly`, private Vault-Authentifizierung, `pg_cron`/ `pg_net`, service-only DB-Zugriff, weiterhin kein öffentlicher App-Release.
+
+**Reale Quellprobleme:** Offizielle DBV-KW43/2026 ist im Archiv genannt. Aus dem Supabase-Edge-Netz kamen dagegen bei offiziellen XLSX-URLs bislang HTTP-200-Antworten ohne Nutzdaten bzw. `source_unavailable`. Ein Produktiv-Snapshot für KW43 ist **nicht** vorhanden; letzter belegter Snapshot bleibt KW42/2026 (17.790 Einträge). Kein Quellenwiderstand durch alte Woche kaschieren, keine Dubletten/erfundene KW.
+
+**Backoff-Scheduler-Fix 28.10.:** Migration `20261028193000_private_dbv_backoff_schedule.sql` ist produktiv wirksam: derselbe private Cron-Job ID 16, vorher `15 12 * * *`, nun `15 0,6,12,18 * * *` UTC. Der Datenbank-Claim bleibt eine zwingende Schranke: Aufrufe vor `next_allowed_at` lösen **keinen externen Download** aus. Maximal vier kurze private Dispatches pro Tag, bei 24h-Backoff höchstens ein tatsächlicher Quellenversuch pro Zeitraum. Backoff wurde **nicht** zurückgesetzt. Beim Stand 28.10. 17:55 UTC: `next_allowed_at=2026-10-29T17:55:15Z`; der nächste zulässige Slot ist 29.10. 18:15 UTC.
+
+**Source-Reliability-Code im privaten Backend-Branch (kein öffentlicher PR/Release):** Nach unabhängig überprüfter Berliner Quellenveröffentlichung und aktuellem Jahr/KW wird erst der direkte offizielle XLSX-Archivpfad und bei transienten Lieferfehlern maximal einmal der bestehende offizielle `/ranking/download`-Weg versucht. Keine Fremdhosts/Umleitungen, keine alten Wochen. 401/403/429 bleiben harte Stoppgrenzen; beide XLSX-Versionen müssen sämtliche ZIP/XML-/Identitäts-/Mengenkontrollen bestehen. Offline-Regressionen im Modelltest dokumentiert.
+
+**Abnahme bleibt offen:** Erst nach einem echten `imported`-Status, einer neuen Woche in `public.ranking_weeks` mit amtlichem `source_published_at`, plausibler Zahl in `public.ranking_entries`, unveränderten privaten Zugriffen und einem zweiten unveränderten Lauf darf #414 geschlossen werden. Bis dahin bloß `source_unavailable` dokumentieren. Aktive App-Publikationssperre bleibt bestehen.

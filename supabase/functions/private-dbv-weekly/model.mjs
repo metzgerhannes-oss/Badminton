@@ -4,7 +4,7 @@ export const SOURCE = "https://turniere.badminton.de/ranking";
 export const MAX_PAYLOAD_BYTES = 4_800_000;
 export const BW_ASSOCIATION = "BAW-Baden-Württemberg";
 export const DISCIPLINES = ["HE","HD","HM","DE","DD","DM"];
-export const AGES = ["U11","U13","U15","U17","U19","U22"];
+export const AGES = ["U09","U11","U13","U15","U17","U19","U22"];
 const ID = /^[0-9]{2}-[0-9]{6}$/;
 const CLUB_ID = /^[0-9]{2}-[0-9]{3,8}$/;
 const isoDateParts = new Intl.DateTimeFormat("en-GB",{
@@ -84,7 +84,7 @@ export function buildWeeklyPayload(rows,publication) {
   const {year,week,publishedAt}=publication||{};
   if(!Number.isInteger(year)||year<2026||year>2100||
      !Number.isInteger(week)||week<1||week>53||
-     typeof publishedAt!=="string"||!Number.isFinite(Date.parse(publishedAt)))
+     !(publishedAt===null||(typeof publishedAt==="string"&&Number.isFinite(Date.parse(publishedAt)))))
     throw Error("invalid_publication");
   const tag=String(year)+"-KW"+String(week).padStart(2,"0");
   const byId=new Map(),conflicts=new Set(),valid=[];
@@ -144,8 +144,69 @@ export function importDecision(latest,publication) {
   const previous=latest.year*100+latest.week;
   if(current<previous)throw Error("publication_older_than_database");
   if(current===previous) {
+    if(publication.publishedAt===null)return "unchanged";
     if(latest.sourcePublishedAt&&Date.parse(latest.sourcePublishedAt)===Date.parse(publication.publishedAt))return "unchanged";
     throw Error("publication_same_week_unverified");
   }
   return "new";
+}
+
+/**
+ * The archive's *actual published HTML href*, not an inferred filename,
+ * is the only permitted weekly download. /ranking may already carry next
+ * week's timestamp while that XLSX has not been released into /history.
+ * Return [] until a matching, visibly labelled official archive row exists.
+ */
+export function officialXlsxCandidates(publication,historyHtml){
+ const year=publication?.year,week=publication?.week;
+ if(!Number.isInteger(year)||year<2026||year>2100||
+    !Number.isInteger(week)||week<1||week>53)
+   throw Error("publication_invalid");
+ if(typeof historyHtml!=="string"||historyHtml.length>5_000_000)
+   throw Error("archive_page_invalid");
+ const file="Ranking_"+year+"_KW"+String(week).padStart(2,"0")+".xlsx";
+ const rows=historyHtml.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi)||[];
+ const matching=new Set();
+ for(const row of rows){
+  // The filename must be VISIBLE within the same table row as its link.
+  const label=row.replace(/<[^>]*>/g," ").replace(/&nbsp;/gi," ");
+  if(!label.includes(file))continue;
+  const links=row.matchAll(/<a\b[^>]*\bhref\s*=\s*(["'])(.*?)\1[^>]*>/gi);
+  for(const link of links){
+   let url;
+   try{url=new URL(link[2].replace(/&amp;/gi,"&"),"https://turniere.badminton.de/ranking/history");}
+   catch{continue;}
+   if(url.protocol!=="https:"||url.hostname!=="turniere.badminton.de"||
+      url.port||url.username||url.password||url.search||url.hash)continue;
+   if(url.pathname==="/uploads/ranking/"+file)matching.add(url.href);
+  }
+ }
+ // Duplicate or ambiguous matching rows are not silently accepted.
+ return matching.size===1?[...matching]:[];
+}
+
+/** The /ranking timestamp bounds the week, not the release date of older XLSX. */
+export function selectOfficialArchive(historyHtml,pagePublication) {
+ if(!pagePublication||!Number.isInteger(pagePublication.year)||
+    !Number.isInteger(pagePublication.week))throw Error("publication_invalid");
+ if(typeof historyHtml!=="string"||historyHtml.length>5_000_000)
+    throw Error("archive_page_invalid");
+ const rows=historyHtml.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi)||[];
+ const found=new Map();
+ for(const row of rows) {
+   const filenames=row.match(/Ranking_(20\d{2})_KW(\d{2})\.xlsx/g)||[];
+   for(const filename of filenames) {
+     const m=/^Ranking_(20\d{2})_KW(\d{2})\.xlsx$/.exec(filename);
+     if(!m)continue;
+     const year=Number(m[1]),week=Number(m[2]);
+     if(year<2026||year>2100||week<1||week>53||year>pagePublication.year||
+       (year===pagePublication.year&&week>pagePublication.week))continue;
+     const urls=officialXlsxCandidates({year,week},row);
+     if(urls.length===1)found.set(String(year)+"-"+String(week).padStart(2,"0"),urls[0]);
+   }
+ }
+ if(found.size===0)return null;
+ const key=[...found.keys()].sort().at(-1);
+ const [year,week]=key.split("-").map(Number);
+ return {year,week,publishedAt:null,downloadUrl:found.get(key),publicationKind:"official-archive"};
 }
