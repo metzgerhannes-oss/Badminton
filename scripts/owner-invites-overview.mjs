@@ -13,11 +13,17 @@ export function reconcileIssuedInvite(local,serverRows){
  * and must never silently authorize sharing or issue a replacement grant. */
 export function checkIssuedInviteForSharing(local,serverRows,now=Date.now()){
  if(!UUID.test(local?.id||"")||!Array.isArray(serverRows))return {status:"unverified"};
+ // A stale server snapshot must never revive a locally revoked invitation.
+ if(local.revoked===true)return {status:"revoked"};
+ const localUntil=Date.parse(local.expires);
+ if(!Number.isFinite(localUntil))return {status:"unverified"};
  const row=serverRows.find(item=>item?.id===local.id&&UUID.test(item?.id||""));
  if(!row)return {status:"unverified"};
  if(row.revoked_at)return {status:"revoked"};
- const until=Date.parse(row.redeem_until);
- if(!Number.isFinite(until))return {status:"unverified"};
+ const serverUntil=Date.parse(row.redeem_until);
+ if(!Number.isFinite(serverUntil))return {status:"unverified"};
+ // Never extend a cached bearer link beyond either confirmed deadline.
+ const until=Math.min(localUntil,serverUntil);
  const expires=new Date(until).toISOString();
  return until<=now?{status:"expired",expires}:{status:"active",expires};
 }
