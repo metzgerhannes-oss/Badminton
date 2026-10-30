@@ -41,11 +41,18 @@ export function parseLocalPreflight(stdout,target){
 }
 function psql(args,input){
  return new Promise((resolveResult,reject)=>{
-  const child=spawn("psql",args,{stdio:["pipe","pipe","pipe"],env:process.env});
-  let stdout="",stderrSize=0;
+  const env={...process.env};
+// libpq PGHOSTADDR/PGSERVICE can redirect even when -h is specified.
+// Keep only credentials needed for the explicitly local connection.
+for(const key of Object.keys(env))
+ if(key.startsWith("PG")&&!["PGUSER","PGPASSWORD","PGPASSFILE"].includes(key))
+  delete env[key];
+env.PGHOSTADDR="127.0.0.1";
+const child=spawn("psql",args,{stdio:["pipe","pipe","pipe"],env});
+  let stdout="";
   child.stdout.on("data",data=>{if(stdout.length<4096)stdout+=data.toString().slice(0,4096-stdout.length);});
   // SQL and connection diagnostics are intentionally NEVER exposed.
-  child.stderr.on("data",data=>{stderrSize+=data.length;});
+  child.stderr.on("data",()=>{});
   child.on("error",()=>reject(Error("replay_psql_unavailable")));
   child.on("close",code=>code===0?resolveResult(stdout):
    reject(Error("replay_psql_failed")));
@@ -89,7 +96,7 @@ async function main(){
   "SELECT current_database(),inet_server_addr()::text,to_regclass('public."+marker+"')::text"],"");
  parseLocalPreflight(preflight,target);
  // One transaction; failure must abort rather than skip migrations.
- await psql([...common,"--single-transaction"],composeVerifiedReplaySql(bundle));
+ await psql([...common,"--single-transaction","-f","-"],composeVerifiedReplaySql(bundle));
  process.stdout.write(JSON.stringify({...verified,localReplaySucceeded:true,
   schemaAndAccessVerified:false})+"\n");
 }
