@@ -104,7 +104,7 @@ export function assessMatchCardCoverage(parsed){
    throw Error("invalid_source_coverage_count");
   const sourceIdentities=new Set(result.items.map(row=>row.source_key));
   const sourcePotential=result.cards_seen-sourceUnplayed;
-  if(sourceIdentities.size<Math.floor(sourcePotential*0.55))
+  if(sourceIdentities.size<Math.ceil(sourcePotential*0.55))
    sourceCoverageOk=false;
   documentedUnplayed+=sourceUnplayed;
   if(!Number.isSafeInteger(documentedUnplayed))
@@ -115,7 +115,8 @@ export function assessMatchCardCoverage(parsed){
  const potentialPlayed=sourceCards-nonplayed;
  // The old 55% floor applies independently to each available source;
  // an intact league parser cannot conceal a broken tournament parser.
- const required=Math.floor(potentialPlayed*0.55);
+ // Round UP: even a single unclassified played card must not pass a zero-card parse.
+ const required=Math.ceil(potentialPlayed*0.55);
  return {acceptable:sourceCoverageOk&&identities.size>=required,sourceCards,
   parsedCards:identities.size,nonplayed,potentialPlayed,required};
 }
