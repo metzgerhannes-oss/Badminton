@@ -38,11 +38,20 @@ export function loadPlayerCopy(player,storage=globalThis.localStorage){
  if(!DBV.test(player))return null;
  const item=get(storage,KEY,{})?.[player];
  if(!item||item.version!==1||item.playerId!==player||!Number.isFinite(Date.parse(item.fetchedAt)))return null;
+ // Local storage is not proof of source verification. A damaged or stale
+ // device copy must never turn unverified placements into offline trophies.
+ // Fail closed for the entire category instead of silently dropping rows and
+ // displaying an apparently complete zero/partial result.
  if(item.matches!==null&&(!Array.isArray(item.matches)||item.matches.length>10000||
-  item.matches.some(row=>row.dbv_id!==player)))return null;
+  item.matches.some(row=>!cleanMatch(row,player))))return null;
  if(item.trophies!==null&&(!Array.isArray(item.trophies)||item.trophies.length>200||
-  item.trophies.some(row=>row.playerId!==player)))return null;
- return item;
+  item.trophies.some(row=>!cleanTrophy(row,player))))return null;
+ // Return only the same allowlisted fields that the consented writer stores.
+ // This is display data, never a server grant or an authorization token.
+ return {version:1,playerId:player,fetchedAt:item.fetchedAt,
+  coverage:"quellenabhaengiges_teilarchiv",
+  matches:item.matches===null?null:item.matches.map(row=>cleanMatch(row,player)),
+  trophies:item.trophies===null?null:item.trophies.map(row=>cleanTrophy(row,player))};
 }
 export function savePlayerCopy(player,{matches=null,trophies=null},storage=globalThis.localStorage,now=new Date().toISOString()){
  if(!DBV.test(player)||(!Array.isArray(matches)&&!Array.isArray(trophies))||!Number.isFinite(Date.parse(now)))return null;
