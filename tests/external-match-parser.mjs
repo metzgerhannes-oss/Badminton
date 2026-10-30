@@ -67,6 +67,26 @@ assert.equal(l.items[0].match_date,"2026-10-09");
 assert.equal(l.items[0].event,"DE");
 assert.equal(l.items[0].competition_id,"290071");
 
+// #199: Badhub numbered team-lineup slots must be interpreted as badminton
+// disciplines while preserving each original match event (and source identity).
+for(const [slot,discipline] of [
+ ["1.HD","Doppel"],["2.HD","Doppel"],["1.HE","Einzel"],
+ ["2.HE","Einzel"],["3.HE","Einzel"],["1.DE","Einzel"],
+ ["1.DD","Doppel"],["1.GD","Mixed"]
+]){
+ const rendered=league.replace(">DE</span>",">"+slot+"</span>");
+ const parsed=parsePublicHistory(rendered,player,"league");
+ assert.equal(parsed.cards_seen,1,"count one source card for "+slot);
+ assert.equal(parsed.items.length,1,"import scored league match for "+slot);
+ assert.equal(parsed.items[0].event,slot,"retain the source event label");
+ assert.equal(parsed.items[0].discipline,discipline);
+ assert.equal(parsed.items[0].competition_id,"290071");
+}
+const invalidSlot=parsePublicHistory(league.replace(">DE</span>",">1.FOO</span>"),player,"league");
+assert.equal(invalidSlot.items.length,0,"unknown numbered discipline remains rejected");
+assert.equal(invalidSlot.rejection_reasons.missing_event_or_source,1);
+
+
 const variantCard=card
  .replace('class="sp-side sp-side--winner"','class="sp-side sp-side--home sp-side--winner"')
  .replace('class="sp-match-body"','class="sp-match-body sp-match-body--compact"')
