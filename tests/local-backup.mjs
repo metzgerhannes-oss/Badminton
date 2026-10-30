@@ -25,6 +25,14 @@ const privateCalendar=[{name:"Beispiel-Ranglistenturnier",startDate:"2026-10-24"
 const created=createLocalBackup(stored,new Date("2026-10-10T11:00:00.000Z"),
  JSON.stringify(privateCalendar));
 const parsed=inspectLocalBackup(created);
+// #198: file.size is measured in UTF-8 bytes. The pure inspector must
+// enforce the same bound, even if called without the browser file picker.
+const unicodeOversize=JSON.stringify({...JSON.parse(created),ignored:"ä".repeat(105_000)});
+assert.ok(unicodeOversize.length<MAX_BACKUP_BYTES);
+assert.ok(new TextEncoder().encode(unicodeOversize).byteLength>MAX_BACKUP_BYTES);
+assert.throws(()=>inspectLocalBackup(unicodeOversize),/Sicherungsdatei zu groß/,
+ "UTF-8 oversized backups must fail before parsing or touching local profiles");
+
 assert.equal(LOCAL_STORE_KEY,"shuttleboard-v1");
 assert.equal(SPOND_STORE_KEY,"schmetterlinge.calendarEvents.v1");
 assert.equal(LEGACY_BACKUP_VERSION,1);
