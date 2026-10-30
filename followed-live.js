@@ -4,7 +4,8 @@ import {watchRequest} from "./scripts/live-radar.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {followedRoster,followedSnapshotPath,followedCards} from "./scripts/followed-live.mjs";
 const $=id=>document.getElementById(id);
-let seq=0,controller,busy=false,checked=0,watchTimes=new Map(),lastRows=[],lastRoster=[];
+let seq=0,controller,busy=false,checked=0,watchTimes=new Map(),lastRows=[],lastRoster=[],lastRowsRosterIds="";
+const rosterKey=players=>players.map(p=>p.id).join(",");
 const visible=()=>location.hash==="#live"&&window.badmintonMatchdayMode==="all"&&!document.hidden;
 const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;
  if(text!==undefined)e.textContent=String(text);return e};
@@ -68,24 +69,31 @@ async function registerWatches(roster,signal){
  }));
 }
 async function refresh(){
- if(!visible()||busy)return;
+ if(!visible())return;
  const options=window.badmintonLiveViewerOptions?.()||{};
  const {players,remaining}=followedRoster(options);
- const ids=players.map(p=>p.id).join(",");
+ const ids=rosterKey(players);
+ // A profile/follow change must supersede an in-flight request, not wait for
+ // its previous roster to render. Repeated events for the same roster coalesce.
+ if(busy&&ids===rosterKey(lastRoster))return;
+ const request=++seq;
+ controller?.abort();controller=new AbortController();busy=true;
  lastRoster=players;
- if(!players.length){render([],[],0);return}
- const request=++seq;busy=true;controller?.abort();controller=new AbortController();
+ if(!players.length){
+  lastRows=[];lastRowsRosterIds="";checked=0;busy=false;
+  render([],[],0);return;
+ }
  const signal=controller.signal;
  try{
   await registerWatches(players,signal);
   if(request!==seq||signal.aborted||!visible())return;
   const {rows}=await readPublicRows(followedSnapshotPath(players),{signal,count:false,timeoutMs:9000});
   if(request!==seq||signal.aborted||!visible())return;
-  lastRows=rows;checked=Date.now();
+  lastRows=rows;lastRowsRosterIds=ids;checked=Date.now();
   render(players,rows,remaining);
  }catch(error){
   if(signal.aborted||request!==seq)return;
-  render(players,ids===lastRoster.map(p=>p.id).join(",")?lastRows:[],remaining,
+  render(players,ids===lastRowsRosterIds?lastRows:[],remaining,
    "Quellenaktualisierung fehlgeschlagen");
  }finally{if(request===seq)busy=false}
 }
@@ -95,11 +103,13 @@ function sync(){
  // The invitation/session check may finish after DOMContentLoaded on iOS.
  // Never mark a watch as requested before the member token exists.
  if(!window.badmintonAppAccess?.allowed){
-  checked=0;render(p.players,[],p.remaining);
+  seq++;controller?.abort();busy=false;checked=0;
+  lastRows=[];lastRowsRosterIds="";lastRoster=[];
+  render(p.players,[],p.remaining);
   return;
  }
- const ids=p.players.map(x=>x.id).join(",");
- if(ids!==lastRoster.map(x=>x.id).join(",")||!checked||Date.now()-checked>30000)refresh();
+ const ids=rosterKey(p.players);
+ if(ids!==rosterKey(lastRoster)||!checked||Date.now()-checked>30000)refresh();
  else render(p.players,lastRows,p.remaining);
 }
 document.addEventListener("DOMContentLoaded",()=>{
