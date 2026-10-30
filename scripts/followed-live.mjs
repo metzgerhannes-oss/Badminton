@@ -2,6 +2,11 @@
  * This is intentionally NOT a full-tournament feed and does not write match records. */
 import {DBV_ID,radarSituation,matchdayOverview,setText,opponents,matchLabel,playerOutcome} from "./live-radar.mjs";
 export const FOLLOW_LIMIT=6;
+/** A different followed roster supersedes pending requests; identical events coalesce. */
+export function shouldReplaceFollowedRequest(busy,activeRosterKey,nextRosterKey){
+ return !busy||activeRosterKey!==nextRosterKey;
+}
+
 const txt=(v,n=110)=>typeof v==="string"?v.trim().slice(0,n):"";
 export function followedRoster(groups={},limit=FOLLOW_LIMIT){
  const safeLimit=Number.isInteger(limit)&&limit>0?Math.min(6,limit):FOLLOW_LIMIT;
