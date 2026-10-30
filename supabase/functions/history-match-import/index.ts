@@ -1,11 +1,12 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,importStatusForBatch,missingSourceStatus} from "./source-availability.mjs";
-import {readBoundedJson,PayloadTooLargeError} from "./bounded-request.mjs";
+import {assessSourceAvailability,assessMatchCardCoverage,importStatusForBatch,missingSourceStatus,reconcileMatchBatch,classifyImportFailure} from "./source-availability.mjs";
+import {readBoundedJson,PayloadTooLargeError,readBoundedText} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
 const ADMIN=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const PUBLIC="sb_publishable_WdNC1AoOLe4rqDomSVnxWw_wq64M5kE";
-const ORIGIN="https://metzgerhannes-oss.github.io";
+const ALLOWED_ORIGINS=new Set(["https://schmetterlinge-familie.pages.dev",
+  "https://metzgerhannes-oss.github.io"]);
 // v136: PostgREST verifies the user JWT and the server-side invite membership.
 // Origin and publishable key are never accepted as a substitute for this.
 async function isInvitedMember(req:Request):Promise<boolean>{
@@ -24,7 +25,7 @@ async function isInvitedMember(req:Request):Promise<boolean>{
 }
 const headers=(origin:string|null)=>({
  "Content-Type":"application/json","Cache-Control":"no-store","Vary":"Origin",
- "Access-Control-Allow-Origin":origin===ORIGIN?ORIGIN:"null",
+ "Access-Control-Allow-Origin":origin&&ALLOWED_ORIGINS.has(origin)?origin:"null",
  "Access-Control-Allow-Methods":"POST,OPTIONS",
  "Access-Control-Allow-Headers":"content-type,apikey,authorization"
 });
@@ -54,6 +55,22 @@ async function hasStoredMatchFact(id:string):Promise<boolean>{
  if(!Array.isArray(facts))throw Error("Unexpected source fact read");
  return facts.length>0;
 }
+// A numeric cursor is not proof of completeness when the external feed reorders.
+// Read only this already-authorized profile's persisted source keys, in bounded pages.
+async function readStoredSourceKeys(id:string):Promise<Set<string>>{
+ const result=new Set<string>(),pageSize=500,maxRows=10000;
+ for(let offset=0;offset<maxRows;offset+=pageSize){
+  const rows=await api("player_external_match_facts?select=source_key&dbv_id=eq."+
+   encodeURIComponent(id)+"&order=source_key.asc&limit="+pageSize+"&offset="+offset);
+  if(!Array.isArray(rows)||rows.length>pageSize)throw Error("Invalid source-key page");
+  for(const row of rows){
+   if(typeof row?.source_key!=="string"||!row.source_key)throw Error("Invalid persisted source key");
+   result.add(row.source_key);
+  }
+  if(rows.length<pageSize)return result;
+ }
+ throw Error("Persisted source-key pagination limit");
+}
 async function updateNoNewSource(id:string,detail:string){
  const saved=await hasStoredMatchFact(id);
  await update(id,{status:missingSourceStatus(saved),lease_until:null,
@@ -71,17 +88,13 @@ async function source(id:string,category:string,signal:AbortSignal){
  });
  if(!res.ok||!(res.headers.get("content-type")||"").includes("text/html"))
   throw Error("Source unavailable");
- const size=Number(res.headers.get("content-length")||0);
- if(size>5500000)throw Error("Source too large");
- const text=await res.text();
- if(text.length>5500000)throw Error("Source too large");
- return text;
+ return readBoundedText(res,5500000);
 }
 Deno.serve(async req=>{
  const origin=req.headers.get("origin");
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:headers(origin)});
  if(req.method!=="POST")return respond(405,{error:"post_required"},origin);
- if(origin&&origin!==ORIGIN)return respond(403,{error:"disallowed_origin"},origin);
+ if(origin&&!ALLOWED_ORIGINS.has(origin))return respond(403,{error:"disallowed_origin"},origin);
  // The publishable key is not authentication: reject oversized input
  // BEFORE allocating an unbounded JSON body or touching the database.
  let data:any;
@@ -147,27 +160,31 @@ Deno.serve(async req=>{
    return respond(200,{queued:true,stored:0,eligible:0,existing_proof:saved,
     reason:sources.missing.length?"partial_source_no_matches":"no_source_matches"},origin);
   }
-  if(all.length<Math.floor(cardCount*0.55))
+  const coverage=assessMatchCardCoverage(parsed);
+  if(!coverage.acceptable){
+   // Private aggregate metrics only. Never log player identities/source URLs.
+   console.error("Source card coverage gate",{cards:coverage.sourceCards,
+    potential:coverage.potentialPlayed,valid:coverage.parsedCards,
+    documented_nonplayed:coverage.nonplayed,required:coverage.required});
    throw Error("Match parser rejected unexpected amount of source cards");
-  // A partial source can reorder/shorten the feed: never resume at an old
-  // offset and silently skip verified matches from the accessible category.
-  const start=sources.missing.length?0:Math.min(Number(claim.cursor)||0,all.length);
-  const selected=all.slice(start,start+120);
-  // A newly recognized scoreless result may sort BEFORE the old cursor.
-  // Explicitly backfill just those independently evidenced outcomes, with
-  // source-key deduplication. Never reset a large player's ordinary cursor.
-  const scoreless=all.filter(m=>m.outcome_evidence==="badhub-bold-dash");
-  if(scoreless.length>120)throw Error("Unexpected scoreless source cardinality");
-  const toStore=new Map(selected.concat(scoreless).map(row=>[row.source_key,row]));
-  const written=[...toStore.values()];
+  }
+  // Reconcile every fresh, verified source_key against actual persisted proof.
+  // This also finds older missing cards after source reordering; old numeric
+  // cursor_offset and stale source_count are never used to infer completeness.
+  const storedKeys=await readStoredSourceKeys(id);
+  const batch=reconcileMatchBatch(all,storedKeys,120);
+  // Reconciliation prioritizes newly evidenced scoreless cards within the
+  // same 120-row quota; progress and remaining_eligible now match writes.
+  const written=batch.selected;
+  const scoreless=written.filter(row=>row.outcome_evidence==="badhub-bold-dash");
   for(let i=0;i<written.length;i+=25){
    await api("player_external_match_facts?on_conflict=dbv_id,source_key",{
     method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},
     body:JSON.stringify(written.slice(i,i+25))
    });
   }
-  const progress=start+selected.length;
-  const finished=progress>=all.length;
+  const progress=batch.progress;
+  const finished=batch.finished;
   const excluded=Math.max(0,cardCount-all.length);
   const incomplete=sources.missing.length
    ?" · "+sources.missing.join(" und ")+"-Quelle derzeit nicht abrufbar; Gesamtbestand unvollständig":"";
@@ -181,19 +198,22 @@ Deno.serve(async req=>{
    ?String(all.length)+" einzelne Badhub-Matches aus erreichbaren Quellen verarbeitet; "+String(excluded)+" unklare Karten ausgeschlossen"
    :String(progress)+" von "+String(all.length)+" geprüften Quellenspielen verarbeitet")+incomplete+
    (reasonSummary?" · Prüfung: "+reasonSummary:"");
+  const status=importStatusForBatch(finished,excluded,sources.missing);
   await update(id,{
-   status:importStatusForBatch(finished,excluded,sources.missing),
+   status,
    cursor_offset:progress,source_count:cardCount,
    verified_count:all.length,rejected_count:excluded,
    lease_until:null,last_finished_at:new Date().toISOString(),detail
   });
   return respond(200,{
    queued:true,stored:written.length,scoreless_evidence_count:scoreless.length,progress,eligible:all.length,
-   source_cards:cardCount,excluded,completed:finished&&!sources.missing.length,
+   source_cards:cardCount,excluded,remaining_eligible:batch.remaining_eligible,
+   completed:status==="complete",
    unavailable_categories:sources.missing,
    provenance:"Badhub – public match cards, not official DBV match IDs"
   },origin);
  }catch(error){
+  const failureCategory=classifyImportFailure(error);
   if(claimed)try{
    if(String(error).includes("Source unavailable")){
     await updateNoNewSource(id,
@@ -201,10 +221,11 @@ Deno.serve(async req=>{
    }else{
     await update(id,{status:"error",lease_until:null,
      last_finished_at:new Date().toISOString(),
-     detail:"Quellenabgleich fehlgeschlagen; vorhandene belegte Matches bleiben gespeichert"});
+     detail:"Quellenabgleich fehlgeschlagen ("+failureCategory+"); vorhandene belegte Matches bleiben gespeichert"});
    }
   }catch{}
-  console.error("External source import failed",id,String(error).slice(0,250));
+  // Never log player IDs, source URLs or raw provider/database errors.
+  console.error("External source import failed",{category:failureCategory});
   return respond(502,{error:"source_import_unavailable"},origin);
  }
 });

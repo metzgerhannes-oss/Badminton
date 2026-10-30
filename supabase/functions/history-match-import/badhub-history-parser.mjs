@@ -19,7 +19,7 @@ function iso(y,m,d){
   ?String(y).padStart(4,"0")+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0"):null;
 }
 export function tournamentStart(markup){
- const info=markup.match(/class="sp-tournament-meta"[^>]*>([\s\S]*?)<\/span>/i);
+ const info=markup.match(/class="(?:[^"]*\s)?sp-tournament-meta(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/span>/i);
  if(!info)return null;
  const text=plain(info[1]);
  // The first day is verifiably the tournament's start, NOT the day of this match.
@@ -27,12 +27,12 @@ export function tournamentStart(markup){
  return m?iso(Number(m[3]),MAP[m[2]]||0,Number(m[1])):null;
 }
 export function leagueStart(markup){
- const d=markup.match(/class="sp-date-dm"[^>]*>(\d{2})\.(\d{2})\./);
- const y=markup.match(/class="sp-date-y"[^>]*>(20\d{2})/);
+ const d=markup.match(/class="(?:[^"]*\s)?sp-date-dm(?:\s[^"]*)?"[^>]*>(\d{2})\.(\d{2})\./);
+ const y=markup.match(/class="(?:[^"]*\s)?sp-date-y(?:\s[^"]*)?"[^>]*>(20\d{2})/);
  return d&&y?iso(Number(y[1]),Number(d[2]),Number(d[1])):null;
 }
 function players(markup){
- return [...markup.matchAll(/class="sp-name-full"[^>]*>([\s\S]*?)<\/span>/g)]
+ return [...markup.matchAll(/class="(?:[^"]*\s)?sp-name-full(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/span>/g)]
   .map(m=>plain(m[1])).filter(Boolean).slice(0,4);
 }
 function noteReject(counts,reason){counts[reason]=(counts[reason]||0)+1;}
@@ -54,8 +54,8 @@ function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
  if(winA===winB){noteReject(counts,"missing_or_ambiguous_winner");return null}
  // Badhub uses two layouts: standard result columns and youth match cards
  // with set scores elsewhere in the SAME sp-match-item.
- const readScores=markup=>[...markup.matchAll(/class="sp-set-score"[^>]*>([\s\S]*?)<\/div>/g)]
-  .map(m=>[...m[1].matchAll(/class="sp-s(?: [^"]*)?"[^>]*>(\d{1,2})<\/span>/g)].map(x=>Number(x[1])))
+ const readScores=markup=>[...markup.matchAll(/class="(?:[^"]*\s)?sp-set-score(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/div>/g)]
+  .map(m=>[...m[1].matchAll(/class="(?:[^"]*\s)?sp-s(?:\s[^"]*)?"[^>]*>(\d{1,2})<\/span>/g)].map(x=>Number(x[1])))
   .filter(s=>s.length===2&&s.every(x=>x>=0&&x<=40));
  let scores=readScores(post.slice(0,rightStart));
  if(scores.length===0){
@@ -96,15 +96,22 @@ function discipline(event){
 }
 const keyPart=s=>plain(s).normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
  .toLocaleLowerCase("de").replace(/[^\p{L}\p{N}]+/gu,"-").replace(/(^-|-$)/g,"").slice(0,110);
+// Match semantic CSS class tokens, not their order or optional modifiers.
+// Inner player/score/date/header tokens use the same exact-token discipline.
+// The same selector counts source cards and splits parsed cards: divergence
+// here can falsely trigger the 55% coverage guard on legitimate HTML.
+const MATCH_ITEM_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-match-item(?:\s[^"]*)?"[^>]*>/g;
+const TOURNAMENT_CARD_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-tournament-card(?:\s[^"]*)?"[^>]*>/g;
+const MEETING_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-meeting(?:\s[^"]*)?"[^>]*>/g;
 function matchSections(segment){
- const parts=segment.split(/<div class="sp-match-item\b[^>]*>/);
+ const parts=segment.split(MATCH_ITEM_OPEN);
  return {prefix:parts.shift()||"",chunks:parts};
 }
 function piece(source,segment,context,counts){
  const {prefix,chunks}=matchSections(segment);
- const matches=[];let phase=plain((prefix.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1]);
+ const matches=[];let phase=plain((prefix.match(/class="(?:[^"]*\s)?sp-t-phase-header(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/div>/)||[])[1]);
  for(const chunk of chunks){
-  const nextPhase=(chunk.match(/class="sp-t-phase-header"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
+  const nextPhase=(chunk.match(/class="(?:[^"]*\s)?sp-t-phase-header(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/div>/)||[])[1];
   const nonplayed=classifyNonPlayedCard(chunk);
   // The source winner marker plus an explicit dash is valid outcome evidence,
   // although no individual sets were supplied. Other unplayed statuses remain excluded.
@@ -150,16 +157,16 @@ function tournamentFacts(html,playerName,counts){
  // Badhub's crossfed DBV cards have additional CSS classes.
  // The formerly exact split joined entire DBV tournaments to the preceding
  // BWBV event and therefore assigned wrong year, competition and source.
- const cards=html.split(/<div class="card sp-tournament-card(?: [^"]*)?">/).slice(1),all=[];
+ const cards=html.split(TOURNAMENT_CARD_OPEN).slice(1),all=[];
  for(const card of cards){
-  const head=card.match(/class="sp-tournament-name"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
+  const head=card.match(/class="(?:[^"]*\s)?sp-tournament-name(?:\s[^"]*)?"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
   if(!head){noteReject(counts,"unknown_tournament_header");continue;}
   const date=tournamentStart(card.slice(0,650));
   const year=date?Number(date.slice(0,4)):(Number((card.slice(0,600).match(/\b20\d{2}\b/)||[])[0])||null);
   const c={source_id:head[2],source_namespace:head[1],title:plain(head[3]),date,year,
    link:"https://badhub.de/"+head[1]+"/turnier.php?id="+head[2],playerName};
-  for(const meeting of card.split(/<div class="sp-meeting">/).slice(1)){
-   const event=plain((meeting.match(/class="sp-t-event-badge"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
+  for(const meeting of card.split(MEETING_OPEN).slice(1)){
+   const event=plain((meeting.match(/class="(?:[^"]*\s)?sp-t-event-badge(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    all.push(...piece("tournament",meeting,{...c,event},counts));
   }
  }
@@ -167,7 +174,7 @@ function tournamentFacts(html,playerName,counts){
 }
 function leagueFacts(html,playerName,counts){
  const all=[];
- const sections=html.split(/<div class="sp-meeting">/).slice(1);
+ const sections=html.split(MEETING_OPEN).slice(1);
  for(const meeting of sections){
   const head=meeting.match(/\/bwbv\/begegnung\.php\?id=(\d+)/);
   if(!head)continue;
@@ -199,7 +206,7 @@ export function parsePublicHistory(html,player,category){
   }
   unique.set(row.source_key,{...row,dbv_id:player.dbv_id});
  }
- const cards_seen=(html.match(/class="[^"]*\bsp-match-item\b/g)||[]).length;
+ const cards_seen=(html.match(MATCH_ITEM_OPEN)||[]).length;
  const rejected=Math.max(0,cards_seen-unique.size);
  const identified=Object.values(rejection_reasons).reduce((a,b)=>a+b,0);
  if(identified<rejected)rejection_reasons.unclassified_card=rejected-identified;
