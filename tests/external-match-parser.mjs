@@ -37,6 +37,34 @@ assert.match(dbv.source_key,/^tournament:dbv-950:/);
 assert.match(bwbv.source_key,/^tournament:4986:/);
 assert.notEqual(dbv.source_key,bwbv.source_key);
 
+// #199: A Badhub tournament link must remain identified by its canonical,
+// numeric tournament ID despite safe markup variants. Unknown providers,
+// regions, missing title class and external links must remain quarantined.
+const absHeader=tour.replace('href="/bwbv/turnier.php?id=4986"',
+ 'data-source="profile" href="https://badhub.de/bwbv/turnier.php?id=4986&amp;src=profile"');
+const absParsed=parsePublicHistory(absHeader,player,"tournament");
+assert.deepEqual(absParsed.items,result.items,"Canonical absolute link does not change match identity");
+const singleHeader=tour.replace('href="/bwbv/turnier.php?id=4986"',
+ "data-source=\"profile\" href='/bwbv/turnier.php?id=4986'");
+const singleParsed=parsePublicHistory(singleHeader,player,"tournament");
+assert.deepEqual(singleParsed.items,result.items,"Single-quoted link with other attributes is safe");
+const unknownRegion=parsePublicHistory(tour.replace(
+ "/bwbv/turnier.php?id=4986","/hbv/turnier.php?id=4986"),player,"tournament");
+assert.equal(unknownRegion.cards_seen,1);
+assert.equal(unknownRegion.items.length,0,"Do not invent unsupported association provenance");
+assert.equal(unknownRegion.layout_stats.header_other_region_cards,1);
+const foreignSite=parsePublicHistory(tour.replace(
+ "/bwbv/turnier.php?id=4986","https://example.invalid/bwbv/turnier.php?id=4986"),player,"tournament");
+assert.equal(foreignSite.items.length,0,"No untrusted external tournament host");
+const titleMissing=parsePublicHistory(tour.replace(
+ 'class="sp-tournament-name"','class="unknown-title"'),player,"tournament");
+assert.equal(titleMissing.items.length,0);
+assert.equal(titleMissing.layout_stats.header_missing_title_cards,1);
+const sourceCode=await readFile("supabase/functions/history-match-import/badhub-history-parser.mjs","utf8");
+assert.equal(sourceCode,await readFile("scripts/badhub-history-parser.mjs","utf8"),
+ "Reviewed source parser must match private Edge source byte-for-byte");
+
+
 assert.equal(m.discipline,"Einzel");
 assert.equal(m.event,"ME U17");
 assert.equal(m.round_label,"Finale");
