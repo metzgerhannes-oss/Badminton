@@ -88,3 +88,37 @@ test("direct DBV URL is used only when the matching source calendar key confirms
  await expect(calendar.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
  await expect(calendar.locator(".card-open-primary")).toHaveText("Offizielle Turnierseite ↗");
 });
+
+test("verified DBV correction explains changed game day, deadline, category and venue without changing player",async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ const card=page.locator('#official-tournament-list [data-saved-tournament-id="'+CALENDAR+'"]');
+ await expect(card.locator(".saved-tournament-source-warning")).toHaveCount(0);
+ await page.evaluate(({id,url})=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[{key:id,hasDirectLink:true,url,title:"3. D-RLT BAW SW U11-U19 · bestätigt",
+   start:"2028-11-23",end:"2028-11-23",place:"Sporthalle Teststadt",
+   deadline:"2028-11-16"}]}
+ })),{id:CALENDAR,url:EVENT_URL});
+ await expect(card.locator("h3")).toContainText("Sporthalle Teststadt");
+ await expect(card.locator(".saved-tournament-dates")).toContainText("23.");
+ await expect(card.locator(".saved-tournament-deadline")).toContainText("16.");
+ const notice=card.locator(".saved-tournament-source-warning");
+ await expect(notice).toContainText("Offizielle DBV-Angaben übernommen");
+ await expect(notice).toContainText("Spieltag");
+ await expect(notice).toContainText("Meldeschluss");
+ await expect(notice).toContainText("Titel/Kategorie");
+ await expect(notice).toContainText("Austragungsort");
+ await expect(notice).toContainText("korrigiert");
+ await expect(notice).not.toContainText("Angaben prüfen");
+ await expect(card.locator(".saved-tournament-player")).toHaveText("Spieler: Synthetisches Familienprofil");
+ await expect(card.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
+ const saved=await page.evaluate(id=>{
+  const state=JSON.parse(localStorage.getItem("shuttleboard-v1"));
+  return state.officialLinks.find(t=>t.id===id);
+ },CALENDAR);
+ expect(saved.playerId).toBe(OWNER);
+ expect(saved.startDate).toBe("2028-11-23");
+ expect(saved.deadline).toBe("2028-11-16");
+ expect(saved.place).toBe("Sporthalle Teststadt");
+});
