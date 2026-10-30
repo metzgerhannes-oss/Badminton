@@ -77,6 +77,8 @@ assert.match(ui,/shouldReplaceFollowedRequest\(busy,rosterKey\(lastRoster\),ids\
 assert.match(ui,/const request=\+\+seq;[\s\S]*controller\?\.abort\(\)/,
  "A new roster invalidates and aborts the old request before fetching");
 assert.match(ui,/lastRowsRosterIds=ids;checked=Date\.now\(\)/);
+assert.match(ui,/ids!==rosterKey\(lastRoster\)\|\|ids!==lastRowsRosterIds/,
+ "A changed roster never renders the previous roster cache while refreshing");
 assert.match(ui,/ids===lastRowsRosterIds\?lastRows:\[\]/,
  "Fallback cache must belong to the last successfully fetched roster");
 assert.doesNotMatch(ui,/ids===lastRoster\.map/,
