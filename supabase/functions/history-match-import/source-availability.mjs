@@ -88,6 +88,44 @@ export function selectUnstoredScoreless(rows,storedKeys){
  * denominator. Ambiguous or unclassified source cards NEVER get a discount.
  * This is a pure, offline-testable guard: it neither fetches nor persists.
  */
+// Only enumerated reason keys and bounded aggregate counts may reach logs.
+// Never include upstream reason strings, profile IDs, names, opponent data,
+// tournament titles, source URLs, request metadata or raw HTML.
+const COVERAGE_REASONS=[
+ "unclassified_card","unknown_tournament_header","missing_match_layout",
+ "missing_second_side","missing_or_ambiguous_player",
+ "missing_or_ambiguous_winner","winner_score_conflict",
+ "incomplete_or_invalid_score","missing_event_or_source",
+ "duplicate_source_key","invalid_match_identity","wrong_self_identity",
+ "invalid_import_row","unscored_with_opponent","unscored_without_opponent",
+ "confirmed_bye_rast","marked_walkover","marked_retirement",
+ "marked_disqualification","conflicting_bye_with_scores",
+ "conflicting_walkover_with_scores"
+];
+const COVERAGE_LAYOUT=["sections","meetings","recognized_meeting_cards",
+ "unrecognized_header_cards","missing_link_cards","missing_date_cards",
+ "outside_recognized_meetings"];
+const finiteCount=value=>Number.isSafeInteger(value)&&value>=0?value:0;
+export function safeMatchCoverageDiagnostics(parsed){
+ if(!Array.isArray(parsed)||parsed.length>2)return [];
+ return parsed.map(p=>{
+  const source=p?.category==="tournament"?"tournament":p?.category==="league"?"league":"unknown";
+  const cards=finiteCount(p?.cards_seen),valid=Array.isArray(p?.items)?p.items.length:0;
+  const nonplayed=["confirmed_bye_rast","marked_walkover","marked_retirement",
+   "marked_disqualification"].reduce((n,key)=>n+finiteCount(p?.rejection_reasons?.[key]),0);
+  const potential=Math.max(0,cards-nonplayed);
+  const reasons={},layout={};
+  for(const key of COVERAGE_REASONS){
+   const value=finiteCount(p?.rejection_reasons?.[key]);
+   if(value>0)reasons[key]=value;
+  }
+  for(const key of COVERAGE_LAYOUT)layout[key]=finiteCount(p?.layout_stats?.[key]);
+  return {source,cards,valid,excluded:Math.max(0,cards-valid),
+   potential,required:Math.ceil(potential*0.55),
+   passes:valid>=Math.ceil(potential*0.55),reasons,layout};
+ });
+}
+
 export function assessMatchCardCoverage(parsed){
  if(!Array.isArray(parsed)||parsed.length<1||parsed.length>2)
   throw Error("invalid_source_coverage_input");

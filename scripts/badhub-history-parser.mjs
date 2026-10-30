@@ -103,6 +103,10 @@ const keyPart=s=>plain(s).normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
 const MATCH_ITEM_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-match-item(?:\s[^"]*)?"[^>]*>/g;
 const TOURNAMENT_CARD_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-tournament-card(?:\s[^"]*)?"[^>]*>/g;
 const MEETING_OPEN=/<div\b[^>]*\sclass="(?:[^"]*\s)?sp-meeting(?:\s[^"]*)?"[^>]*>/g;
+// Aggregate structure only. No HTML, names, links, IDs or score values in telemetry.
+const countCards=s=>(s.match(MATCH_ITEM_OPEN)||[]).length;
+const emptyLayout=()=>({sections:0,meetings:0,recognized_meeting_cards:0,
+ unrecognized_header_cards:0,missing_link_cards:0,missing_date_cards:0});
 function matchSections(segment){
  const parts=segment.split(MATCH_ITEM_OPEN);
  return {prefix:parts.shift()||"",chunks:parts};
@@ -153,33 +157,43 @@ function piece(source,segment,context,counts){
  }
  return matches;
 }
-function tournamentFacts(html,playerName,counts){
+function tournamentFacts(html,playerName,counts,layout){
  // Badhub's crossfed DBV cards have additional CSS classes.
  // The formerly exact split joined entire DBV tournaments to the preceding
  // BWBV event and therefore assigned wrong year, competition and source.
  const cards=html.split(TOURNAMENT_CARD_OPEN).slice(1),all=[];
+ layout.sections=cards.length;
  for(const card of cards){
   const head=card.match(/class="(?:[^"]*\s)?sp-tournament-name(?:\s[^"]*)?"[^>]*>[\s\S]*?<a href="\/(bwbv|dbv)\/turnier\.php\?id=(\d+)"[^>]*>([\s\S]*?)<\/a>/);
-  if(!head){noteReject(counts,"unknown_tournament_header");continue;}
+  if(!head){
+   noteReject(counts,"unknown_tournament_header");
+   layout.unrecognized_header_cards+=countCards(card);
+   continue;
+  }
   const date=tournamentStart(card.slice(0,650));
   const year=date?Number(date.slice(0,4)):(Number((card.slice(0,600).match(/\b20\d{2}\b/)||[])[0])||null);
   const c={source_id:head[2],source_namespace:head[1],title:plain(head[3]),date,year,
    link:"https://badhub.de/"+head[1]+"/turnier.php?id="+head[2],playerName};
   for(const meeting of card.split(MEETING_OPEN).slice(1)){
+   layout.meetings++;
+   layout.recognized_meeting_cards+=countCards(meeting);
    const event=plain((meeting.match(/class="(?:[^"]*\s)?sp-t-event-badge(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/span>/)||[])[1]);
    all.push(...piece("tournament",meeting,{...c,event},counts));
   }
  }
  return all;
 }
-function leagueFacts(html,playerName,counts){
+function leagueFacts(html,playerName,counts,layout){
  const all=[];
  const sections=html.split(MEETING_OPEN).slice(1);
+ layout.sections=sections.length;
  for(const meeting of sections){
+  layout.meetings++;
   const head=meeting.match(/\/bwbv\/begegnung\.php\?id=(\d+)/);
-  if(!head)continue;
+  if(!head){layout.missing_link_cards+=countCards(meeting);continue;}
   const date=leagueStart(meeting.slice(0,2100));
-  if(!date)continue;
+  if(!date){layout.missing_date_cards+=countCards(meeting);continue;}
+  layout.recognized_meeting_cards+=countCards(meeting);
   const title=plain((meeting.match(/class="sp-group-opponent sp-gopp-line"[^>]*>([\s\S]*?)<\/span>/)||[])[1])||"Ligabegegnung";
   const ctx={source_id:head[1],title,date,year:Number(date.slice(0,4)),
    link:"https://badhub.de/bwbv/begegnung.php?id="+head[1],playerName};
@@ -193,8 +207,10 @@ export function parsePublicHistory(html,player,category){
  if(!["league","tournament"].includes(category))throw new Error("Unknown source category");
  const title=(html.match(/<title>([\s\S]*?)<\/title>/)||[])[1]||"";
  if(!keyPart(plain(title)).includes(keyPart(player.name)))throw new Error("Player-name mismatch on source page");
- const rejection_reasons={};
- const rows=category==="tournament"?tournamentFacts(html,player.name,rejection_reasons):leagueFacts(html,player.name,rejection_reasons);
+ const rejection_reasons={},layout_stats=emptyLayout();
+ const rows=category==="tournament"
+  ?tournamentFacts(html,player.name,rejection_reasons,layout_stats)
+  :leagueFacts(html,player.name,rejection_reasons,layout_stats);
  const unique=new Map();
  let invalid=0;
  for(const row of rows){
@@ -206,11 +222,14 @@ export function parsePublicHistory(html,player,category){
   }
   unique.set(row.source_key,{...row,dbv_id:player.dbv_id});
  }
- const cards_seen=(html.match(MATCH_ITEM_OPEN)||[]).length;
+ const cards_seen=countCards(html);
+ // Sources outside recognized meeting sections are not silently exempted
+ // from the strict coverage threshold; they are measured separately.
+ layout_stats.outside_recognized_meetings=Math.max(0,cards_seen-layout_stats.recognized_meeting_cards);
  const rejected=Math.max(0,cards_seen-unique.size);
  const identified=Object.values(rejection_reasons).reduce((a,b)=>a+b,0);
  if(identified<rejected)rejection_reasons.unclassified_card=rejected-identified;
  // Diagnostics are aggregated by reason and never include scraped names, scores or HTML.
  return {items:[...unique.values()],duplicates_or_invalid:invalid,cards_seen,category,
-  rejection_reasons};
+  rejection_reasons,layout_stats};
 }

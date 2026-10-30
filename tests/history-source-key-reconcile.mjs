@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readBoundedText,PayloadTooLargeError} from "../supabase/functions/history-match-import/bounded-request.mjs";
 import {readFile} from "node:fs/promises";
-import {reconcileMatchBatch,selectUnstoredScoreless,assessMatchCardCoverage} from "../supabase/functions/history-match-import/source-availability.mjs";
+import {reconcileMatchBatch,selectUnstoredScoreless,assessMatchCardCoverage,safeMatchCoverageDiagnostics} from "../supabase/functions/history-match-import/source-availability.mjs";
 const cards=["new","old-1","old-2","old-3"].map(source_key=>({source_key}));
 const before=["old-1","old-2","old-3"];
 const first=reconcileMatchBatch(cards,before,2);
@@ -206,3 +206,36 @@ assert.equal(assessMatchCardCoverage(coverage(3,2,{unclassified_card:1})).accept
  "Two of three parsed played cards meet the strict threshold");
 assert.equal(assessMatchCardCoverage(coverage(100,30,{confirmed_bye_rast:45})).acceptable,false,
  "30/55 is below 55 percent; rounding down must not waive the source gate");
+
+// #199: real member source failures need a private aggregate-only explanation.
+// No HTML, user identity or untrusted rejection reason can enter telemetry.
+const diagnosticOne={category:"tournament",cards_seen:695,
+ items:Array.from({length:348},(_,i)=>({source_key:"private-player-99-abcdef"+i})),
+ rejection_reasons:{unclassified_card:320,unknown_tournament_header:18,
+  "secret=player-99&token=abc":40},
+ layout_stats:{sections:240,meetings:210,recognized_meeting_cards:350,
+  unrecognized_header_cards:90,outside_recognized_meetings:345,
+  "name":"Private Person","source_url":"https://private.test/?token=abc"}};
+const diag=safeMatchCoverageDiagnostics([diagnosticOne]);
+assert.equal(diag.length,1);
+assert.deepEqual({source:diag[0].source,cards:diag[0].cards,
+ valid:diag[0].valid,required:diag[0].required,passes:diag[0].passes},
+ {source:"tournament",cards:695,valid:348,required:383,passes:false});
+assert.equal(diag[0].reasons.unclassified_card,320);
+assert.equal(diag[0].layout.unrecognized_header_cards,90);
+assert.doesNotMatch(JSON.stringify(diag),/private-player|Private Person|token=abc|source_url|secret=|https?:/);
+const categorySplit=safeMatchCoverageDiagnostics([
+ {...diagnosticOne,category:"tournament",cards_seen:100,items:coverageRows(20),
+  rejection_reasons:{unclassified_card:80}},
+ {category:"league",cards_seen:100,items:coverageRows(100),rejection_reasons:{},
+  layout_stats:{meetings:12,recognized_meeting_cards:100}}
+]);
+assert.equal(categorySplit[0].passes,false);
+assert.equal(categorySplit[1].passes,true);
+assert.equal(assessMatchCardCoverage([
+ {cards_seen:100,items:coverageRows(20),rejection_reasons:{unclassified_card:80}},
+ {cards_seen:100,items:coverageRows(100),rejection_reasons:{}}
+]).acceptable,false,"A passing league may not conceal a failing tournament parse");
+const annotated=await readFile("supabase/functions/history-match-import/index.ts","utf8");
+assert.match(annotated,/safeMatchCoverageDiagnostics\(parsed\)/);
+assert.ok(annotated.indexOf("safeMatchCoverageDiagnostics(parsed)")<annotated.indexOf("readStoredSourceKeys(id);"));

@@ -1,5 +1,5 @@
 import {parsePublicHistory} from "./badhub-history-parser.mjs";
-import {assessSourceAvailability,assessMatchCardCoverage,importStatusForBatch,missingSourceStatus,reconcileMatchBatch,classifyImportFailure} from "./source-availability.mjs";
+import {assessSourceAvailability,assessMatchCardCoverage,importStatusForBatch,missingSourceStatus,reconcileMatchBatch,classifyImportFailure,safeMatchCoverageDiagnostics} from "./source-availability.mjs";
 import {readBoundedJson,PayloadTooLargeError,readBoundedText} from "./bounded-request.mjs";
 import {excludeContradictoryRounds} from "./match-source-integrity.mjs";
 const API=Deno.env.get("SUPABASE_URL")||"";
@@ -166,6 +166,8 @@ Deno.serve(async req=>{
    console.error("Source card coverage gate",{cards:coverage.sourceCards,
     potential:coverage.potentialPlayed,valid:coverage.parsedCards,
     documented_nonplayed:coverage.nonplayed,required:coverage.required});
+   // Bounded, allowlisted counts per source only; no identity/HTML persisted.
+   console.info("Source card coverage diagnostics",safeMatchCoverageDiagnostics(parsed));
    throw Error("Match parser rejected unexpected amount of source cards");
   }
   // Reconcile every fresh, verified source_key against actual persisted proof.
