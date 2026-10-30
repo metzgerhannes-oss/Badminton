@@ -5,6 +5,12 @@ const REDIRECTS=new Set([301,302,303,307,308]);
 export class DbvTransportError extends Error {
  constructor(code,reason){super(reason);this.name="DbvTransportError";this.code=code;this.reason=reason;}
 }
+/**
+ * @param {string} url Official URL on the allowlisted DBV host
+ * @param {{accept:string,maxBytes:number,timeoutMs:number,fetchImpl?:typeof fetch,
+ *   report?:(detail:{reason:string,status?:number,hops?:number,bytes?:number,
+ *     declaredBytes?:number,contentType?:string})=>void}} options
+ */
 export async function fetchOfficialBytes(url,{accept,maxBytes,timeoutMs,fetchImpl=fetch,report=()=>{}}){
  let current;
  try{current=new URL(url);}catch{throw new DbvTransportError("source_unavailable","bad_url");}
