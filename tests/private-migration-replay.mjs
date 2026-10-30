@@ -8,12 +8,21 @@ for(const database of ["postgres","Badminton","schmetterlinge_recovery_","schmet
  assert.throws(()=>validateReplayTarget(database,5432),/replay_target/);
 for(const port of [0,65536,NaN,5432.5,"5432"])
  assert.throws(()=>validateReplayTarget("schmetterlinge_recovery_ci",port),/replay_invalid_local_port/);
-assert.equal(parseLocalPreflight("schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker\n",target),true);
-for(const value of ["prod|127.0.0.1|schmetterlinge_recovery_marker",
- "schmetterlinge_recovery_ci|10.1.2.3|schmetterlinge_recovery_marker",
- "schmetterlinge_recovery_ci|127.0.0.1|",
- "schmetterlinge_recovery_ci|127.0.0.1|wrong"])
+const safePreflight="schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker|f|f|r";
+assert.equal(parseLocalPreflight(safePreflight+"\n",target),true);
+for(const value of ["prod|127.0.0.1|schmetterlinge_recovery_marker|f|f|r",
+ "schmetterlinge_recovery_ci|10.1.2.3|schmetterlinge_recovery_marker|f|f|r",
+ "schmetterlinge_recovery_ci|127.0.0.1||f|f|r",
+ "schmetterlinge_recovery_ci|127.0.0.1|wrong|f|f|r",
+ "schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker|f|f|v",
+ "schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker"])
  assert.throws(()=>parseLocalPreflight(value,target),/replay_target_marker_or_host_mismatch/);
+for(const value of [
+ "schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker|t|f|r",
+ "schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker|f|t|r",
+ "schmetterlinge_recovery_ci|127.0.0.1|schmetterlinge_recovery_marker|t|t|r"])
+ assert.throws(()=>parseLocalPreflight(value,target),/replay_target_not_empty/,
+  "Existing user objects or marker rows must stop replay before any SQL write");
 const sql=composeVerifiedReplaySql({migrations:[
  {sql:"CREATE TABLE synthetic_one (id int);"},
  {sql:"INSERT INTO synthetic_one VALUES (1)"}]});
