@@ -31,14 +31,34 @@ export function composeVerifiedReplaySql(bundle){
   return row.sql+"\n;\n";
  }).join("\n");
 }
+/** Refuse replay on an already populated local database, even if someone
+ * accidentally left the marker behind. Extension-owned relations are allowed
+ * because local Supabase compatibility may require installed extensions.
+ * No user tables, views, sequences or rows in the marker are allowed.
+ */
 export function parseLocalPreflight(stdout,target){
  const fields=String(stdout).trim().split("|");
- if(fields.length!==3||fields[0]!==target.database||
+ if(fields.length!==6||fields[0]!==target.database||
     !["127.0.0.1","::1"].includes(fields[1])||
-    fields[2]!==marker)
+    fields[2]!==marker||fields[5]!=="r")
   throw Error("replay_target_marker_or_host_mismatch");
+ if(fields[3]!=="f"||fields[4]!=="f")
+  throw Error("replay_target_not_empty");
  return true;
 }
+const localPreflightSql=[
+ "SELECT current_database(),inet_server_addr()::text,",
+ "to_regclass('public.schmetterlinge_recovery_marker')::text,",
+ "EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace",
+ "WHERE n.nspname NOT IN ('pg_catalog','information_schema')",
+ "AND n.nspname NOT LIKE 'pg_toast%' AND n.nspname NOT LIKE 'pg_temp_%'",
+ "AND c.relkind IN ('r','p','v','m','f','S')",
+ "AND NOT (n.nspname='public' AND c.relname='schmetterlinge_recovery_marker')",
+ "AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_class'::regclass",
+ "AND d.objid=c.oid AND d.deptype='e')),",
+ "EXISTS (SELECT 1 FROM public.schmetterlinge_recovery_marker),",
+ "(SELECT relkind FROM pg_class WHERE oid='public.schmetterlinge_recovery_marker'::regclass)"
+].join(" ");
 function psql(args,input){
  return new Promise((resolveResult,reject)=>{
   const env={...process.env};
@@ -92,8 +112,7 @@ async function main(){
  const target=validateReplayTarget(dbArg.slice(11),Number(portArg.slice(7)));
  const common=["-X","-q","-v","ON_ERROR_STOP=1","-h",target.host,
   "-p",String(target.port),"-d",target.database];
- const preflight=await psql([...common,"-t","-A","-c",
-  "SELECT current_database(),inet_server_addr()::text,to_regclass('public."+marker+"')::text"],"");
+ const preflight=await psql([...common,"-t","-A","-c",localPreflightSql],"");
  parseLocalPreflight(preflight,target);
  // One transaction; failure must abort rather than skip migrations.
  await psql([...common,"--single-transaction","-f","-"],composeVerifiedReplaySql(bundle));
