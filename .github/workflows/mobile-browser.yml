@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, fix/p0-417-private-member-reads-20261027]
   workflow_dispatch:
   schedule:
     # A full offline Chromium/WebKit regression on main every night.
