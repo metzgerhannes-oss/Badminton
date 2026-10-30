@@ -103,3 +103,33 @@ test("P1 iPhone: pressed navigation and action controls give feedback even with 
  await expect(button).toHaveCSS("outline-width","2px");
  await page.mouse.up();
 });
+
+// P1 #13/#280: real WebKit/Chromium computed font sizes, not CSS string checks.
+// 16px prevents the iOS focus auto-zoom while preserving deliberate pinch zoom.
+test("320/390/430px tournament and calendar form controls avoid iOS auto-zoom",async({page})=>{
+ for(const width of [320,390,430]){
+  await page.setViewportSize({width,height:844});
+  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#view-turniere")).toBeVisible();
+  await page.locator("#dbv-calendar-advanced").evaluate(el=>{el.open=true});
+  const selectors=[
+   "#dbv-calendar-q","#dbv-calendar-year","#dbv-calendar-region",
+   "#dbv-calendar-age","#dbv-calendar-level","#dbv-calendar-period",
+   "#spond-paste-data","#spond-import-player",
+   "#badhub-event-form input",".badhub-event-controls select",
+   ".tournament-live-toolbar select"
+  ];
+  const metrics=await page.evaluate(selectors=>({
+   fonts:selectors.flatMap(selector=>[...document.querySelectorAll(selector)].map(el=>({
+    selector,font:parseFloat(getComputedStyle(el).fontSize)
+   }))),
+   viewport:document.querySelector('meta[name="viewport"]').content,
+   overflow:document.documentElement.scrollWidth-innerWidth
+  }),selectors);
+  expect(metrics.fonts.length).toBeGreaterThanOrEqual(8);
+  for(const item of metrics.fonts)expect(item.font,selectorMessage(item.selector,width)).toBeGreaterThanOrEqual(16);
+  expect(metrics.viewport).not.toMatch(/user-scalable\\s*=\\s*no|maximum-scale\\s*=\\s*1/);
+  expect(metrics.overflow).toBeLessThanOrEqual(2);
+ }
+});
+function selectorMessage(selector,width){return selector+" at "+width+"px must be >=16px to avoid iOS auto-zoom";}
