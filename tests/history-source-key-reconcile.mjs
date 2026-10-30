@@ -90,11 +90,11 @@ console.log("Synthetic source-key reconciliation, reorder backfill, pagination g
 const coverageRows=n=>Array.from({length:n},(_,i)=>({source_key:"synthetic-match-"+i}));
 const coverage=(raw,valid,reasons={})=>[{cards_seen:raw,
  items:coverageRows(valid),rejection_reasons:reasons}];
-const legitimate=assessMatchCardCoverage(coverage(100,30,
+const legitimate=assessMatchCardCoverage(coverage(100,31,
  {confirmed_bye_rast:25,marked_walkover:20}));
 assert.deepEqual({acceptable:legitimate.acceptable,potential:legitimate.potentialPlayed,
  nonplayed:legitimate.nonplayed,required:legitimate.required},
- {acceptable:true,potential:55,nonplayed:45,required:30},
+ {acceptable:true,potential:55,nonplayed:45,required:31},
  "Documented nonplayed cards cannot make a successful parse look broken");
 assert.equal(assessMatchCardCoverage(coverage(100,30,
  {unclassified_card:45})).acceptable,false,
@@ -102,7 +102,7 @@ assert.equal(assessMatchCardCoverage(coverage(100,30,
 assert.equal(assessMatchCardCoverage(coverage(100,30,
  {conflicting_bye_with_scores:45,conflicting_walkover_with_scores:10})).acceptable,false,
  "Conflicting scores cannot be treated as a safe unplayed status");
-assert.equal(assessMatchCardCoverage(coverage(100,30,
+assert.equal(assessMatchCardCoverage(coverage(100,31,
  {marked_retirement:20,marked_disqualification:25})).acceptable,true,
  "Explicit retirements and disqualifications are not played matches");
 assert.equal(assessMatchCardCoverage(coverage(5,0,{confirmed_bye_rast:5})).acceptable,true,
@@ -118,7 +118,7 @@ assert.throws(()=>assessMatchCardCoverage(coverage(100,30,
  {confirmed_bye_rast:71})),/invalid_source_coverage_count/,
  "Nonplayed reasons may never exceed the cards actually excluded");
 assert.equal(assessMatchCardCoverage([
- coverage(100,30,{confirmed_bye_rast:45})[0],
+ coverage(100,31,{confirmed_bye_rast:45})[0],
  coverage(200,150,{marked_walkover:20})[0]
 ]).acceptable,true,"Two independently healthy source categories remain accepted");
 assert.throws(()=>assessMatchCardCoverage(coverage(10,11)),/invalid_source_coverage_count/);
@@ -197,3 +197,12 @@ assert.equal(misleadingModifier.items.length,0,
  "A similarly prefixed modifier must not masquerade as the exact player-name class");
 assert.equal(assessMatchCardCoverage([misleadingModifier]).acceptable,false,
  "An unparsed played card must remain quarantined, not reported as complete");
+
+assert.equal(assessMatchCardCoverage(coverage(1,0,{unclassified_card:1})).acceptable,false,
+ "One unclassified source card may never pass a zero-result parse");
+assert.equal(assessMatchCardCoverage(coverage(2,1,{unclassified_card:1})).acceptable,false,
+ "One of two played cards is below the strict 55 percent threshold");
+assert.equal(assessMatchCardCoverage(coverage(3,2,{unclassified_card:1})).acceptable,true,
+ "Two of three parsed played cards meet the strict threshold");
+assert.equal(assessMatchCardCoverage(coverage(100,30,{confirmed_bye_rast:45})).acceptable,false,
+ "30/55 is below 55 percent; rounding down must not waive the source gate");
