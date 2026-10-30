@@ -109,7 +109,7 @@ function sync(){
   return;
  }
  const ids=rosterKey(p.players);
- if(ids!==rosterKey(lastRoster)||!checked||Date.now()-checked>30000)refresh();
+ if(ids!==rosterKey(lastRoster)||ids!==lastRowsRosterIds||!checked||Date.now()-checked>30000)refresh();
  else render(p.players,lastRows,p.remaining);
 }
 document.addEventListener("DOMContentLoaded",()=>{
