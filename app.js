@@ -915,19 +915,29 @@ function setup(){
   if(el("tournament-dialog")?.open&&form)prefillVerifiedTournamentForm(form);
   let changed=false;
   const previousWarnings=JSON.stringify([...tournamentSourceConflicts.entries()]);
+  const confirmedWarnings=new Map(tournamentSourceConflicts);
   tournamentSourceConflicts.clear();
   const reconciled=state.officialLinks.map(bookmark=>{
+   const key=bookmark.id+"|"+bookmark.playerId;
    const result=SchmetterlingeBookmarks.reconcileOfficialMetadata(bookmark,entries);
-   if(result.status==="conflict")tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,result);
+   if(result.status==="conflict")tournamentSourceConflicts.set(key,result);
    if(result.status==="matched"&&result.updated!==bookmark){
     // Source-backed corrections must be visible, not silently change a local
     // game day into a registration deadline. No private identity is logged.
     const fields=SchmetterlingeBookmarks.describeOfficialChanges(bookmark,result.updated);
-    tournamentSourceConflicts.set(bookmark.id+"|"+bookmark.playerId,{
+    tournamentSourceConflicts.set(key,{
      reason:"Offizielle DBV-Angaben übernommen: "+fields.join(", "),
      officialDate:result.updated.startDate,officialDeadline:result.updated.deadline,resolved:true
     });
     changed=true;return result.updated;
+   }
+   // Repeated or partial DBV calendar events cannot erase a previously
+   // verified correction. A new exact-key correction replaces it above.
+   const confirmed=confirmedWarnings.get(key);
+   if(confirmed?.resolved===true&&confirmed.officialDate===bookmark.startDate&&
+      confirmed.officialDeadline===bookmark.deadline&&
+      (result.status==="matched"||result.status==="unverified")){
+    tournamentSourceConflicts.set(key,confirmed);
    }
    return bookmark;
   });
