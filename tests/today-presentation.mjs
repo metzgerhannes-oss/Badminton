@@ -62,6 +62,11 @@ assert.equal(combined[0].kickoff,"","Badhub player view never invents start time
 assert.equal(combined[0].score,"","Unverified sets must not become a live score");
 assert.equal(combined[1].kickoff,"20:00 Uhr");
 assert.equal(combined[1].pairing,scheduled.detail);
+assert.equal(combined[1].name,"SpVgg. Mössingen IV",
+ "Team badge must name the followed, officially identified squad instead of generic Mannschaft");
+const todayClient=await readFile("today-in-action.js","utf8");
+assert.match(todayClient,/isPlayer\?event\.label:event\.name\|\|event\.label/,
+ "Today card must render the sourced squad identity with fallback");
 assert.equal(combined[1].url,url);
 assert.equal(combined[1].score,"");
 assert.equal(todayDisplayRows([player,player],{now}).length,1,"One sourced event, one card");

@@ -101,7 +101,7 @@ export function todayDisplayRows(events,{now=Date.now(),limit=102}={}){
    const url=["scheduled","result"].includes(event.kind)?directMeetingReport(source):"";
    seen.add(id);
    rows.push({id,entity:"team",kind:event.kind,label:"Mannschaft",
-    status:TEAM_STATUS[event.kind],name:"",detail:"",kickoff,pairing,score,
+    status:TEAM_STATUS[event.kind],name:safeText(event.name,100),detail:"",kickoff,pairing,score,
     url,priority:ORDER[event.kind],order:rows.length});
   }
  }

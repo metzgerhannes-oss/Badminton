@@ -70,6 +70,8 @@ const scheduled=todayTeamEvents({today,teams:[a],fixtures:[fixture(),fixture({id
 assert.equal(scheduled.length,1);
 assert.equal(scheduled[0].status,"Heute angesetzt");
 assert.equal(scheduled[0].kind,"scheduled");
+assert.equal(scheduled[0].name,"SpVgg Test 1",
+ "The sourced team label remains available to the presentation");
 assert.equal(scheduled[0].score,"");
 assert.equal(scheduled[0].checkedAt,"2026-10-19T10:50:00Z","Use fixture last-check, not unrelated team-directory last-check");
 for(const [status,expected] of [["cancelled","Abgesagt"],["postponed","Verlegt"]]){
