@@ -15,6 +15,8 @@ assert.match(failure,/requestPrivateTrophies\(lastPlayer,\{force:true\}\)/);
 assert.match(failure,/timeline\.innerHTML=""/);
 assert.doesNotMatch(failure,/Geschützte Turnierhistorie/,"Avoid duplicate warning inside an unreadable card");
 assert.match(history,/showChronicle\(true\)/,"A ready source must restore filters and chronicle");
+assert.match(history,/source\.classList\.remove\("history-private-notice"\)/);
+assert.match(css,/#view-historie \.history-private-notice\[hidden\]\{display:none!important\}/);
 assert.match(css,/#view-historie \.history-filters label\{color:#24465c!important\}/);
 assert.match(css,/#view-historie \.empty h3\{color:#f3f9ff!important\}/);
 assert.match(css,/#view-historie #history-filters\[hidden\]/);
