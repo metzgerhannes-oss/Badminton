@@ -108,7 +108,7 @@ function render(){
    if(chronicle)chronicle.hidden=!visible;
    if(rankingNote)rankingNote.hidden=!visible;
   };
-  if(error){showChronicle(false);source.hidden=false;source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
+  if(error){source.hidden=false;showChronicle(false);source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
   // The history opens directly with the trophies. Show a notice only if loading fails.
   source.hidden=true;
   source.textContent="";
