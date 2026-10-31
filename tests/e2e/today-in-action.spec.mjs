@@ -40,7 +40,7 @@ test("Today separates a scheduled team match from live scores and rejects schedu
  await expect(card).toHaveAttribute("aria-label",/Noch kein offizieller Spielbericht veröffentlicht/);
  await expect(home.locator("a.today-match-row")).toHaveCount(0);
  await expect(card).toHaveAttribute("data-entity","team");
- await expect(card.locator(".today-match-entity")).toHaveText("Mannschaft");
+ await expect(card.locator(".today-match-entity")).toHaveText("Synthetischer Verein 1");
  await expect(card.locator(".today-match-status")).toHaveText("Heute angesetzt");
  await expect(card.locator(".today-match-row-score")).toHaveCount(0);
  // An appointment is never represented as a currently running match.

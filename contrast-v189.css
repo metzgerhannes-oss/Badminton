@@ -412,3 +412,25 @@
  outline:3px solid #0096db!important;
  outline-offset:3px;
 }
+
+/* v236: History unavailable/loading: single high-contrast notice and no inert filters. */
+#view-historie #history-filters[hidden],
+#view-historie .history-chronicle-title[hidden],
+#view-historie .history-ranking-note[hidden]{display:none!important}
+#view-historie .history-filters label{color:#24465c!important}
+#view-historie .history-private-notice{
+ display:grid;gap:12px;justify-items:start;
+ background:#f7fcff!important;color:#193c58!important;
+ border:1px solid #8baec6!important;font-size:15px!important;
+ line-height:1.55;margin:12px 0 18px;
+}
+#view-historie .history-private-notice[hidden]{display:none!important}
+#view-historie .history-private-retry{
+ min-height:44px;padding:10px 16px;background:#e1f2fd!important;
+ color:#144365!important;border:1px solid #8baec6!important;
+ font-size:14px;font-weight:800;
+}
+#view-historie .history-private-retry:disabled{opacity:.7;cursor:progress}
+#view-historie .empty{color:#f3f9ff}
+#view-historie .empty h3{color:#f3f9ff!important}
+#view-historie .empty p{color:#d6e9f8!important}
