@@ -17,7 +17,9 @@ function acceptedIdsFor(player){
  return ids.filter(id=>UUID.test(id)&&bindings?.[id]===player).slice(-20);
 }
 async function rpc(name,args,session){
- const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),6500);
+ // Cellular Safari can receive a valid HTTP 200 after the old 6.5 s deadline.
+  // Keep a bounded timeout without misclassifying slow successful reads as missing results.
+  const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),11000);
  try{
   const r=await fetch(SUPABASE_ROOT+"rpc/"+name,{
    method:"POST",cache:"no-store",signal:abort.signal,
