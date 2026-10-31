@@ -100,11 +100,19 @@ function render(){
   const source=$("history-source"),coverage=$("history-source-coverage"),summary=$("history-summary"),timeline=$("history-timeline"),yearSelect=$("history-year");
   if(!source||!summary||!timeline||!yearSelect)return;
   if(coverage){coverage.hidden=true;coverage.textContent=""}
-  if(error){source.hidden=false;source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
+  const filters=$("history-filters");
+  const chronicle=document.querySelector("#view-historie .history-chronicle-title");
+  const rankingNote=document.querySelector("#view-historie .history-ranking-note");
+  const showChronicle=visible=>{
+   if(filters)filters.hidden=!visible;
+   if(chronicle)chronicle.hidden=!visible;
+   if(rankingNote)rankingNote.hidden=!visible;
+  };
+  if(error){showChronicle(false);source.hidden=false;source.textContent="Die Historie konnte nicht geladen werden. "+error;summary.innerHTML="";timeline.innerHTML="";$("history-pending").innerHTML="";$("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";return;}
   // The history opens directly with the trophies. Show a notice only if loading fails.
   source.hidden=true;
   source.textContent="";
-  if(!loaded)return;
+  if(!loaded){showChronicle(false);return;}
   const state=trophySnapshot(lastPlayer);
   const trophySection=$("trophy-shelf")?.closest(".trophy-section");
   if(state.state!=="ready"){
@@ -114,8 +122,21 @@ function render(){
     ?"Diese Auszeichnungen sind privat geschützt. Ein gültiger neuer Berechtigungslink oder ein unabhängig bestätigter Verwalternachweis ist erforderlich."
     :"Die private Ergebnisquelle ist vorübergehend nicht abrufbar; das bedeutet nicht 0 Trophäen.";
    if(trophySection)trophySection.hidden=true;
+   showChronicle(false);
+   source.classList.add("history-private-notice");
    source.hidden=false;source.textContent=notice;
-   summary.innerHTML="";timeline.innerHTML='<div class="empty" role="status"><h3>Geschützte Turnierhistorie</h3><p>'+escape(notice)+'</p></div>';
+   if(state.state==="unavailable"){
+    const retry=document.createElement("button");
+    retry.type="button";retry.className="outline-button history-private-retry";
+    retry.textContent="Erneut laden";
+    retry.addEventListener("click",()=>{
+     retry.disabled=true;retry.textContent="Ergebnisse werden geprüft …";
+     void requestPrivateTrophies(lastPlayer,{force:true});
+    });
+    source.append(retry);
+   }
+   // One accessible notice, not the same error again in a dark empty card.
+   summary.innerHTML="";timeline.innerHTML="";
    $("history-trends").innerHTML="";$("history-pending").innerHTML="";
    $("trophy-shelf").innerHTML="";$("trophy-awards").innerHTML="";
    $("trophy-awards-heading").textContent="Auszeichnungen";
@@ -124,6 +145,7 @@ function render(){
   // All sourced placements are displayed in the chronology. Only verified
   // top-four finishes produce trophies. Coverage may be incomplete.
   source.hidden=true;source.textContent="";
+  showChronicle(true);
   // Partial-coverage notes are accessible behind the existing source disclosure.
   // Authentication, loading and failure notices stay visibly on the page.
   if(coverage){
