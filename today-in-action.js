@@ -37,7 +37,7 @@ function buildCard(event){
  const hasLink=Boolean(event.url),isPlayer=event.entity==="player";
  const row=n(hasLink?"a":"div","today-match-row"+(hasLink?"":" today-match-pending"));
  row.dataset.entity=event.entity;row.dataset.kind=event.kind;
- const context=event.label+": "+event.status+"; "+
+ const context=(isPlayer?event.label:event.name||event.label)+": "+event.status+"; "+
   (isPlayer?event.name+(event.detail?"; "+event.detail:""):
    "Anpfiff "+event.kickoff+"; "+event.pairing);
  if(hasLink){
@@ -47,7 +47,7 @@ function buildCard(event){
   row.setAttribute("aria-label",context+(event.kind==="scheduled"?
    ". Noch kein offizieller Spielbericht veröffentlicht.":""));
  }
- row.append(n("span","today-match-entity",event.label));
+ row.append(n("span","today-match-entity",isPlayer?event.label:event.name||event.label));
  row.append(n("span","today-match-status",event.status));
  if(!isPlayer)row.append(n("span","today-match-kickoff","Anpfiff "+event.kickoff));
  row.append(n("strong","today-match-pairing",isPlayer?event.name:event.pairing));
