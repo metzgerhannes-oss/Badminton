@@ -135,6 +135,7 @@ jobs:
           node tests/validate.mjs
           node tests/history.mjs
           node tests/history-layout-v216.mjs
+          node tests/history-private-source-v236.mjs
           node tests/trophies.mjs
           node tests/bookmarks.mjs
           node tests/tournament-bookmarks.mjs
