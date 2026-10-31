@@ -112,6 +112,7 @@ function render(){
   // The history opens directly with the trophies. Show a notice only if loading fails.
   source.hidden=true;
   source.textContent="";
+  source.classList.remove("history-private-notice");
   if(!loaded){showChronicle(false);return;}
   const state=trophySnapshot(lastPlayer);
   const trophySection=$("trophy-shelf")?.closest(".trophy-section");
