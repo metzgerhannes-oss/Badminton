@@ -20,6 +20,7 @@
  padding:.16rem .55rem;border-radius:7px;font-size:.82rem;line-height:1.4;
  font-weight:700;background:#284e71;color:#f5faff;border:1px solid #83a9c7;
 }
+.today-match-entity{overflow-wrap:anywhere}
 .today-match-row[data-kind="playing"] .today-match-status{
  background:#a34b14;color:#fff;border-color:#f8c18b;
 }
