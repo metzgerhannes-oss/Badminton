@@ -7,7 +7,7 @@ import {requireOfflineSourceScan} from "../scripts/p0-fresh-source-scan.mjs";
 import {stageFreshResults} from "../scripts/p0-stage-results-oidc.mjs";
 
 const root=".github/workflows/";
-for(const name of ["p0-fresh-scan.yml","private-dbv-directory.yml","dbv-calendar-source.yml"]){
+for(const name of ["p0-fresh-scan.yml","private-dbv-directory.yml"]){
  const workflow=await readFile(root+name,"utf8");
  assert.match(workflow,/permissions:\s*\n\s*contents: read/);
  assert.doesNotMatch(workflow,/id-token:\s*write|contents:\s*write/,
@@ -45,7 +45,6 @@ const fiveSourceWorkflows=[
  "bw-youth-archive.yml",
  "bwbv-youth-calendar.yml",
  "team-report-import.yml",
- "dbv-calendar-source.yml",
  "badhub-source-audit.yml"
 ];
 function assertOfflineSourceWorkflow(name,source){
@@ -81,6 +80,35 @@ for(const name of fiveSourceWorkflows){
    {name:"AssertionError"},name+": injected production path must fail");
  }
 }
+
+// Exception only for the PUBLIC, player-free official DBV calendar. The OIDC
+// writer checks GitHub repository IDs, main ref, workflow_ref and audience
+// cryptographically, and only writes dbv_calendar_entries. All other source
+// workflows remain offline and write-disabled by the checks above.
+const calendarFlow=await readFile(root+"dbv-calendar-source.yml","utf8");
+assert.match(calendarFlow,/^\s+pull_request:\s*$/m);
+assert.match(calendarFlow,/^\s+push:\s*$/m);
+assert.match(calendarFlow,/^\s+schedule:\s*$/m);
+assert.match(calendarFlow,/^permissions:\s*\n\s*contents:\s*read\s*$/m);
+assert.match(calendarFlow,/^  publish:\s*$/m);
+assert.match(calendarFlow,/if:\s*github\.ref == 'refs\/heads\/main' && github\.event_name != 'pull_request'/);
+assert.match(calendarFlow,/needs: verify/);
+assert.match(calendarFlow,/id-token:\s*write/);
+assert.match(calendarFlow,/contents:\s*write/);
+assert.match(calendarFlow,/python3 scripts\/import-dbv-calendar\.py --year 2026 --write-json --export-payload/);
+assert.match(calendarFlow,/python3 scripts\/publish-dbv-calendar-oidc\.py --payload/);
+assert.doesNotMatch(calendarFlow,/SUPABASE_SERVICE_ROLE_KEY|secrets\./);
+assert.doesNotMatch(calendarFlow,/https?:\/\/|--stage|--source-fallback/);
+const calendarWriter=await readFile("supabase/functions/dbv-calendar-publish/index.ts","utf8");
+for(const restricted of [
+ "payload.repository_id","payload.repository_owner_id","payload.workflow_ref===WORKFLOW",
+ 'payload.ref==="refs/heads/main"',"jwtVerify(","maxTokenAge:",
+ "/rest/v1/dbv_calendar_entries"
+])assert.ok(calendarWriter.includes(restricted),"DBV OIDC writer must remain scoped: "+restricted);
+assert.ok(!calendarWriter.includes("user_tournament_links"));
+assert.ok(!calendarWriter.includes("private_content."));
+console.log("P0: only public DBV calendar OIDC sync is narrowly scoped; private source workflows remain offline.");
+
 const auditSource=await readFile("scripts/badhub-source-audit.mjs","utf8");
 assert.doesNotMatch(auditSource,/\b\d{2}-\d{6}\b|\bdbv_id\b|fetch\s*\(|https?:\/\//,
  "Badhub live-audit entry must not contain real identities or fetch calls");
