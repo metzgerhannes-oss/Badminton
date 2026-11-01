@@ -9,7 +9,7 @@ import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode,urljoin,urlsplit
 from urllib.request import Request, urlopen
 
 ORIGIN="https://turniere.badminton.de/"
@@ -28,17 +28,47 @@ def calendar_url(year=None):
  if year is not None:qs.append(("year",str(year)))
  return ORIGIN+"?"+urlencode(qs)
 
+# Direct tournament UUIDs are obtained ONLY from the exact official calendar
+# row / expanded detail panel; no title, date or city matching is allowed.
+TOURNAMENT_PATH=re.compile(r"^/tournament/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/?$",re.I)
+CALENDAR_PANEL=re.compile(r"collapse(\d{2,12})$")
+DIRECT_HOSTS={"dbv.turnier.de","turnier.de","www.turnier.de"}
+
+def canonical_event_url(link):
+ try:
+  absolute=urlsplit(urljoin(ORIGIN,str(link).strip()))
+  if absolute.scheme!="https" or absolute.hostname not in DIRECT_HOSTS or \
+     absolute.username or absolute.password or absolute.port not in (None,443):
+   return None
+  found=TOURNAMENT_PATH.fullmatch(absolute.path)
+  if not found:return None
+  return "https://dbv.turnier.de/tournament/"+found.group(1).upper()
+ except (ValueError,TypeError):return None
+
 class TableRows(HTMLParser):
  def __init__(self):
   super().__init__(convert_charrefs=True)
   self.rows=[];self.row=None;self.cell=None
+  self.panels={};self.panel_id=None;self.panel_tag=None;self.panel_depth=0
  def handle_starttag(self,tag,attrs):
   attrs=dict(attrs)
+  if self.panel_id is not None and tag==self.panel_tag:self.panel_depth+=1
+  if self.panel_id is None and tag in ("div","tr","section","article"):
+   marker=CALENDAR_PANEL.fullmatch(attrs.get("id",""))
+   number=marker.group(1) if marker else attrs.get("data-tournament","")
+   if re.fullmatch(r"\d{2,12}",str(number)):
+    self.panel_id=str(number);self.panel_tag=tag;self.panel_depth=1
+    self.panels.setdefault(self.panel_id,[])
   if tag=="tr":
    target=attrs.get("data-target","")
-   if re.fullmatch(r"#collapse\d{2,12}",target):self.row={"id":target[9:],"columns":[]}
+   if re.fullmatch(r"#collapse\d{2,12}",target):
+    self.row={"id":target[9:],"columns":[],"links":[]}
   elif tag=="td" and self.row is not None:self.cell=[]
   elif tag=="br" and self.cell is not None:self.cell.append(" ")
+  elif tag=="a":
+   href=attrs.get("href","")
+   if self.row is not None:self.row["links"].append(href)
+   if self.panel_id is not None:self.panels[self.panel_id].append(href)
  def handle_data(self,data):
   if self.cell is not None:self.cell.append(data)
  def handle_endtag(self,tag):
@@ -46,6 +76,15 @@ class TableRows(HTMLParser):
    self.row["columns"].append(" ".join("".join(self.cell).split()));self.cell=None
   if tag=="tr" and self.row is not None:
    self.rows.append(self.row);self.row=None;self.cell=None
+  if self.panel_id is not None and tag==self.panel_tag:
+   self.panel_depth-=1
+   if not self.panel_depth:self.panel_id=None;self.panel_tag=None
+
+def verified_detail_link(entry):
+ links={link for link in (canonical_event_url(value) for value in entry.get("links",[])) if link}
+ # Two distinct tournament UUIDs in the same calendar detail are ambiguous:
+ # never silently pick the first.
+ return next(iter(links)) if len(links)==1 else None
 
 def read_page(url):
  req=Request(url,headers={"User-Agent":"Schmetterlinge-PublicDBVCalendar/1.0 (+https://github.com/metzgerhannes-oss/Badminton)","Accept":"text/html"})
@@ -96,7 +135,7 @@ def normalize(entry,year):
   "end_date":end,"location_text":place[:180],"organizer":organizer[:100],"bundesland":region,
   "region_scope":scope,"category":category[:100],"level_group":group,
   "age_groups":ages,"disciplines":disciplines,"registration_deadline":deadline_iso,
-  "event_url":None,"source_url":ORIGIN}
+  "event_url":verified_detail_link(entry),"source_url":ORIGIN}
 
 def parse_page(html,year):
  if "tournamenttable" not in html or "Turniere gefunden" not in html:raise ValueError("Calendar table missing")
@@ -105,6 +144,8 @@ def parse_page(html,year):
  expected=int(match.group(1))
  rows=TableRows();rows.feed(html)
  if len(rows.rows)!=expected:raise ValueError(f"Source mismatch: calendar announces {expected}, parser read {len(rows.rows)}")
+ for row in rows.rows:
+  row["links"].extend(rows.panels.get(row["id"],[]))
  clean=[normalize(row,year) for row in rows.rows]
  if len({r["source_key"] for r in clean})!=len(clean):raise ValueError("Duplicated official calendar IDs")
  return clean
