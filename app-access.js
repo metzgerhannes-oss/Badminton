@@ -175,6 +175,33 @@ async function initialize(){
    return await hasAcceptedPlayerLink(session.access_token)?"player":null;
   })());
   if(permission==="member"){await grantAfterIntro();return;}
+  // A Cloudflare-authenticated, independently approved family user should not
+  // need to redeem a second invitation on every browser/device. The private
+  // Pages endpoint forwards the signed Access identity only server-to-server;
+  // Supabase validates it and enrolls this actual Auth session with a 24h
+  // member lease. No access is granted by the browser or the Access cookie.
+  try{
+   session=await withCheckDeadline(getPrivateSession(true));
+   if(session?.access_token){
+    const response=await withCheckDeadline(fetch("./api/access-bootstrap",{
+     method:"POST",cache:"no-store",credentials:"same-origin",
+     headers:{Authorization:"Bearer "+session.access_token}
+    }));
+    if(response.ok&&(await response.json())?.allowed===true){
+     const confirmed=await withCheckDeadline(rpc("app_access_status",{},session.access_token));
+     if(confirmed?.allowed===true){await grantAfterIntro();return;}
+    }
+   }
+  }catch(error){
+   if(permission!=="player"){
+    root.dataset.appAccess="denied";
+    inform(navigator.onLine===false
+     ?"Du bist offline. Bitte erneut mit dem Internet verbinden. Deine lokalen Profile bleiben erhalten."
+     :"Cloudflare-Anmeldung erfolgreich, aber die sichere App-Freigabe konnte nicht bestätigt werden. Bitte Zugang erneut prüfen.");
+    if(retry)retry.hidden=false;
+    return;
+   }
+  }
   if(permission==="player"){await grantAfterIntro({member:false});return;}
  }catch(error){
   // An unavailable server never turns a private session into authorization.
