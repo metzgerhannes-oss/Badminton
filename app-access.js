@@ -180,7 +180,7 @@ async function initialize(){
   // Pages endpoint forwards the signed Access identity only server-to-server;
   // Supabase validates it and enrolls this actual Auth session with a 24h
   // member lease. No access is granted by the browser or the Access cookie.
-  try{
+  if(location.hostname==="schmetterlinge-familie.pages.dev")try{
    session=await withCheckDeadline(getPrivateSession(true));
    if(session?.access_token){
     const response=await withCheckDeadline(fetch("./api/access-bootstrap",{
