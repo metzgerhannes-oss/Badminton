@@ -202,6 +202,12 @@ async function initialize(){
     return;
    }
   }
+  if(location.hostname==="schmetterlinge-familie.pages.dev"&&permission!=="player"){
+   root.dataset.appAccess="denied";
+   inform("Cloudflare-Anmeldung erfolgreich. Deine Familienfreigabe konnte noch nicht bestätigt werden. Bitte Zugang erneut prüfen oder die Betreiberfreigabe kontrollieren.");
+   if(retry)retry.hidden=false;
+   return;
+  }
   if(permission==="player"){await grantAfterIntro({member:false});return;}
  }catch(error){
   // An unavailable server never turns a private session into authorization.
