@@ -41,6 +41,32 @@ jobs:
           python3 -m unittest discover -s tests -p test_dbv_calendar.py -v
           python3 -m unittest discover -s tests -p test_dbv_calendar_oidc.py -v
           python3 -m py_compile scripts/import-dbv-calendar.py scripts/publish-dbv-calendar-oidc.py
+      - name: Inspect live official DBV event panels (read-only, public fields)
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          spec=importlib.util.spec_from_file_location("dbv_parser","scripts/import-dbv-calendar.py")
+          lib=importlib.util.module_from_spec(spec);spec.loader.exec_module(lib)
+          try:
+           html=lib.read_page(lib.calendar_url(2026))
+           parser=lib.TableRows();parser.feed(html)
+           print("DBV source rows",len(parser.rows),"event panels",len(parser.panels))
+           for key in ("44749","43826"):
+            row=next((r for r in parser.rows if r["id"]==key),None)
+            links=(row["links"] if row else [])+parser.panels.get(key,[])
+            print("Event",key,"calendar row",bool(row),
+                  "inline links",len(row["links"]) if row else 0,
+                  "panel links",len(parser.panels.get(key,[])),
+                  "verified direct",bool(lib.verified_detail_link({"links":links})))
+            if not lib.verified_detail_link({"links":links}):
+             at=html.find("#collapse"+key)
+             if at<0:at=html.find("collapse"+key)
+             print("event markup hint",key,
+                  " ".join(html[max(0,at-90):at+520].split())[:540] if at>=0 else "source marker missing")
+          except Exception as error:
+           print("DBV source diagnostic unavailable:",type(error).__name__,str(error)[:180])
+          PY
 
   publish:
     # No privileged writes from untrusted pull requests or preview branches.
