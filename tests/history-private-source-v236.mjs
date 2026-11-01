@@ -22,7 +22,10 @@ assert.match(css,/#view-historie \.empty h3\{color:#f3f9ff!important\}/);
 assert.match(css,/#view-historie #history-filters\[hidden\]/);
 assert.match(source,/setTimeout\(\(\)=>abort\.abort\(\),11000\)/);
 assert.match(source,/getPrivateSession\(false\)/,"No identity creation on ordinary reads");
-assert.match(worker,/schmetterlinge-shell-v236/);
+const release=await readFile("app-release.js","utf8");
+const currentVersion=release.match(/version:"(v[0-9]+)"/)?.[1];
+assert.ok(currentVersion,"Release version required");
+assert.ok(worker.includes("schmetterlinge-shell-"+currentVersion),"PWA cache must match current release");
 assert.doesNotMatch(history,/service_role|localStorage\.setItem/);
 
 function luminance(hex){
