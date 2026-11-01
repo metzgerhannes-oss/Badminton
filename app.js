@@ -132,16 +132,24 @@ function renderTournaments(){
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
   const planning=t.source==="bwbv-framework";
   const calendar=t.source==="dbv-calendar"||planning;
-  // Exact calendar source key and event dates, never title or city matching.
-  // Saved private venue edits always win; missing locations fall back to DBV.
-  const officialRows=t.source==="dbv-calendar"?verifiedCalendarRows.filter(row=>
-   row.key===t.id&&row.start===t.startDate&&row.end===t.endDate):[];
+  // For calendar saves use the exact official source key; for manually
+  // saved turnier.de links use ONLY the verified DBV tournament UUID.
+  // Never match on title, region or town. Keep user-edited venues intact.
+  const savedUrl=!calendar?SchmetterlingeBookmarks.parseDbvTournamentLink(t.url)?.url:"";
+  const officialRows=verifiedCalendarRows.filter(row=>{
+   if(t.source==="dbv-calendar")return row.key===t.id&&
+    row.start===t.startDate&&row.end===t.endDate;
+   if(!savedUrl||!row.hasDirectLink)return false;
+   const officialUrl=SchmetterlingeBookmarks.parseDbvTournamentLink(row.url)?.url;
+   return officialUrl===savedUrl&&(!t.startDate||row.start===t.startDate)&&
+    (!t.endDate||row.end===t.endDate);
+  });
   const officialRow=officialRows.length===1?officialRows[0]:null;
   const venue=String(t.place||officialRow?.place||"").trim();
   const name=String(t.name||"").trim();
   const heading=venue&&!name.toLocaleLowerCase("de").includes(venue.toLocaleLowerCase("de"))?name+" · "+venue:name;
-  const mastersVenue=officialRow&&t.id==="dbv-calendar-43826"&&
-   t.startDate==="2026-12-05"&&t.endDate==="2026-12-06"&&
+  const mastersVenue=officialRow?.key==="dbv-calendar-43826"&&
+   officialRow.start==="2026-12-05"&&officialRow.end==="2026-12-06"&&
    officialRow.place==="Hofheim";
   // Separately evidenced by the BWBV event calendar, not inferred from
   // the shorter DBV place field. Do not change locally stored user notes.
@@ -959,6 +967,7 @@ function setup(){
   if(changed){state.officialLinks=reconciled;save()}
   // Background calendar reads must not reset the active profile or ranking view.
   if(changed||warningsChanged)render();
+  else renderTournaments(); // Fresh official URLs and venues must appear immediately.
  });
  const venueDialog=el("tournament-venue-dialog");
  el("tournament-venue-close").addEventListener("click",()=>{editingVenue=null;venueDialog.close()});
