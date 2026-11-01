@@ -99,8 +99,8 @@ assert.match(calendarFlow,/python3 scripts\/import-dbv-calendar\.py --year 2026 
 assert.match(calendarFlow,/python3 scripts\/publish-dbv-calendar-oidc\.py --payload/);
 assert.doesNotMatch(calendarFlow,/SUPABASE_SERVICE_ROLE_KEY|secrets\./);
 assert.doesNotMatch(calendarFlow,/--stage|--source-fallback/);
-const mentionedUrls=[...calendarFlow.matchAll(/https?:\\/\\/[^\s"'\\`]+/g)].map(m=>m[0]);
-assert.ok(mentionedUrls.every(u=>u.startsWith("https://turniere.badminton.de/")),
+const explicitUrlLines=calendarFlow.split("\n").filter(line=>line.includes("https://"));
+assert.ok(explicitUrlLines.every(line=>line.includes("https://turniere.badminton.de/")),
  "Only the public official calendar URL may appear in the diagnostic workflow");
 const calendarWriter=await readFile("supabase/functions/dbv-calendar-publish/index.ts","utf8");
 for(const restricted of [
