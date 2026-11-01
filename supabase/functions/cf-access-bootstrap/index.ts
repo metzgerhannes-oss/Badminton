@@ -48,13 +48,20 @@ async function verifyCloudflareJwt(token:string){
  if(!ok)throw Error("invalid_access_signature");
  return email;
 }
+function defaultKey(dictionaryName:string,legacyName:string){
+ try{
+  const value=JSON.parse(Deno.env.get(dictionaryName)||"{}")?.default;
+  if(typeof value==="string"&&value)return value;
+ }catch{/** Fall back to the legacy key during migration. */}
+ return Deno.env.get(legacyName);
+}
 Deno.serve(async request=>{
  if(request.method!=="POST")return json({allowed:false},405);
  const userJwt=(request.headers.get("Authorization")||"").match(/^Bearer\s+([A-Za-z0-9._-]+)$/i)?.[1];
  const accessJwt=request.headers.get("X-Cloudflare-Access-Assertion");
  if(!userJwt||!accessJwt)return json({allowed:false},401);
- const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
- const anon=Deno.env.get("SUPABASE_ANON_KEY");
+ const service=defaultKey("SUPABASE_SECRET_KEYS","SUPABASE_SERVICE_ROLE_KEY");
+ const anon=defaultKey("SUPABASE_PUBLISHABLE_KEYS","SUPABASE_ANON_KEY");
  if(!service||!anon||Deno.env.get("SUPABASE_URL")!==SUPABASE_URL)
   return json({allowed:false,error:"server_configuration"},503);
  try{
@@ -73,7 +80,8 @@ Deno.serve(async request=>{
   // approved email allowlist and links only this verified Supabase user.
   const response=await fetch(SUPABASE_URL+"/rest/v1/rpc/cf_access_enroll_member",{
    method:"POST",signal:AbortSignal.timeout(7000),cache:"no-store",
-   headers:{"Content-Type":"application/json",apikey:service,Authorization:"Bearer "+service},
+   headers:{"Content-Type":"application/json",apikey:service,
+    ...(service.startsWith("sb_secret_")?{}:{Authorization:"Bearer "+service})},
    body:JSON.stringify({p_user_id:user.id,p_verified_email:email})
   });
   if(!response.ok)return json({allowed:false,error:"enrollment_unavailable"},503);
