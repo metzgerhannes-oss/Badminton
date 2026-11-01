@@ -9,8 +9,9 @@ import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode,urljoin,urlsplit
 from urllib.request import Request, urlopen
+from concurrent.futures import ThreadPoolExecutor
 
 ORIGIN="https://turniere.badminton.de/"
 AGE=("U9","U11","U13","U15","U17","U19","U22","O19","O35ff.")
@@ -28,17 +29,47 @@ def calendar_url(year=None):
  if year is not None:qs.append(("year",str(year)))
  return ORIGIN+"?"+urlencode(qs)
 
+# Direct tournament UUIDs are obtained ONLY from the exact official calendar
+# row / expanded detail panel; no title, date or city matching is allowed.
+TOURNAMENT_PATH=re.compile(r"^/tournament/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/?$",re.I)
+CALENDAR_PANEL=re.compile(r"collapse(\d{2,12})$")
+DIRECT_HOSTS={"dbv.turnier.de","turnier.de","www.turnier.de"}
+
+def canonical_event_url(link):
+ try:
+  absolute=urlsplit(urljoin(ORIGIN,str(link).strip()))
+  if absolute.scheme!="https" or absolute.hostname not in DIRECT_HOSTS or \
+     absolute.username or absolute.password or absolute.port not in (None,443):
+   return None
+  found=TOURNAMENT_PATH.fullmatch(absolute.path)
+  if not found:return None
+  return "https://dbv.turnier.de/tournament/"+found.group(1).upper()
+ except (ValueError,TypeError):return None
+
 class TableRows(HTMLParser):
  def __init__(self):
   super().__init__(convert_charrefs=True)
   self.rows=[];self.row=None;self.cell=None
+  self.panels={};self.panel_id=None;self.panel_tag=None;self.panel_depth=0
  def handle_starttag(self,tag,attrs):
   attrs=dict(attrs)
+  if self.panel_id is not None and tag==self.panel_tag:self.panel_depth+=1
+  if self.panel_id is None and tag in ("div","tr","section","article"):
+   marker=CALENDAR_PANEL.fullmatch(attrs.get("id",""))
+   number=marker.group(1) if marker else attrs.get("data-tournament","")
+   if re.fullmatch(r"\d{2,12}",str(number)):
+    self.panel_id=str(number);self.panel_tag=tag;self.panel_depth=1
+    self.panels.setdefault(self.panel_id,[])
   if tag=="tr":
    target=attrs.get("data-target","")
-   if re.fullmatch(r"#collapse\d{2,12}",target):self.row={"id":target[9:],"columns":[]}
+   if re.fullmatch(r"#collapse\d{2,12}",target):
+    self.row={"id":target[9:],"columns":[],"links":[]}
   elif tag=="td" and self.row is not None:self.cell=[]
   elif tag=="br" and self.cell is not None:self.cell.append(" ")
+  elif tag=="a":
+   href=attrs.get("href","")
+   if self.row is not None:self.row["links"].append(href)
+   if self.panel_id is not None:self.panels[self.panel_id].append(href)
  def handle_data(self,data):
   if self.cell is not None:self.cell.append(data)
  def handle_endtag(self,tag):
@@ -46,6 +77,44 @@ class TableRows(HTMLParser):
    self.row["columns"].append(" ".join("".join(self.cell).split()));self.cell=None
   if tag=="tr" and self.row is not None:
    self.rows.append(self.row);self.row=None;self.cell=None
+  if self.panel_id is not None and tag==self.panel_tag:
+   self.panel_depth-=1
+   if not self.panel_depth:self.panel_id=None;self.panel_tag=None
+
+def verified_detail_link(entry):
+ links={link for link in (canonical_event_url(value) for value in entry.get("links",[])) if link}
+ # Two distinct tournament UUIDs in the same calendar detail are ambiguous:
+ # never silently pick the first.
+ return next(iter(links)) if len(links)==1 else None
+
+class DetailLinks(HTMLParser):
+ def __init__(self):
+  super().__init__(convert_charrefs=True)
+  self.links=[]
+ def handle_starttag(self,tag,attrs):
+  if tag=="a":
+   self.links.append(dict(attrs).get("href",""))
+
+def read_event_details(calendar_id):
+ """Exact DBV calendar AJAX request used by its accordion (public source only)."""
+ if not re.fullmatch(r"\d{2,12}",str(calendar_id)):
+  raise ValueError("Invalid DBV calendar identifier")
+ url=ORIGIN+"ajax/tournament/"+str(calendar_id)
+ request=Request(url,data=b"jwsfilter=0",method="POST",headers={
+  "User-Agent":"Schmetterlinge-PublicDBVCalendar/1.0 (+https://github.com/metzgerhannes-oss/Badminton)",
+  "Accept":"text/html","X-Requested-With":"XMLHttpRequest",
+  "Content-Type":"application/x-www-form-urlencoded","Referer":ORIGIN})
+ with urlopen(request,timeout=20) as response:
+  if response.status!=200 or urlsplit(response.url).hostname!="turniere.badminton.de":
+   raise RuntimeError("DBV detail request not verified: "+str(calendar_id))
+  body=response.read(120001)
+  if len(body)>120000:raise RuntimeError("DBV event detail too large: "+str(calendar_id))
+  text=body.decode("utf-8","replace")
+ if not text.strip():raise RuntimeError("DBV event detail empty: "+str(calendar_id))
+ links=DetailLinks();links.feed(text)
+ direct={url for url in (canonical_event_url(x) for x in links.links) if url}
+ if len(direct)>1:raise ValueError("Ambiguous direct tournament URLs for official calendar ID "+str(calendar_id))
+ return next(iter(direct)) if direct else None
 
 def read_page(url):
  req=Request(url,headers={"User-Agent":"Schmetterlinge-PublicDBVCalendar/1.0 (+https://github.com/metzgerhannes-oss/Badminton)","Accept":"text/html"})
@@ -96,15 +165,24 @@ def normalize(entry,year):
   "end_date":end,"location_text":place[:180],"organizer":organizer[:100],"bundesland":region,
   "region_scope":scope,"category":category[:100],"level_group":group,
   "age_groups":ages,"disciplines":disciplines,"registration_deadline":deadline_iso,
-  "event_url":None,"source_url":ORIGIN}
+  "event_url":verified_detail_link(entry),"source_url":ORIGIN}
 
-def parse_page(html,year):
+def parse_page(html,year,detail_fetcher=None):
  if "tournamenttable" not in html or "Turniere gefunden" not in html:raise ValueError("Calendar table missing")
  match=re.search(r"(\d+)\s+Turniere gefunden",html)
  if not match:raise ValueError("Official result counter missing")
  expected=int(match.group(1))
  rows=TableRows();rows.feed(html)
  if len(rows.rows)!=expected:raise ValueError(f"Source mismatch: calendar announces {expected}, parser read {len(rows.rows)}")
+ for row in rows.rows:
+  row["links"].extend(rows.panels.get(row["id"],[]))
+ if detail_fetcher:
+  # Bounded parallelism: official endpoint is public, no personal accounts.
+  # On any source/network error fail the whole update rather than erasing links.
+  with ThreadPoolExecutor(max_workers=2) as pool:
+   detail_urls=list(pool.map(detail_fetcher,(row["id"] for row in rows.rows)))
+  for row,link in zip(rows.rows,detail_urls):
+   if link:row["links"].append(link)
  clean=[normalize(row,year) for row in rows.rows]
  if len({r["source_key"] for r in clean})!=len(clean):raise ValueError("Duplicated official calendar IDs")
  return clean
@@ -136,7 +214,7 @@ def main():
  if args.year<2025 or args.year>2100:raise ValueError("Year out of bounds")
  url=calendar_url(args.year)
  text=args.fixture.read_text(encoding="utf-8") if args.fixture else read_page(url)
- rows=parse_page(text,args.year)
+ rows=parse_page(text,args.year,read_event_details if args.fixture is None else None)
  if not rows:raise RuntimeError("Empty calendar is not a valid replacement")
  if args.fixture is None:
   # The DBV lists 2027 already. A malformed year must fail rather than be
@@ -146,13 +224,18 @@ def main():
   if re.search(r"\\b0\\s+Turniere gefunden\\b",future) and "tournamenttable" not in future:
    print(f"DBV {next_year}: no official calendar entries published yet",flush=True)
   else:
-   next_rows=parse_page(future,next_year)
+   next_rows=parse_page(future,next_year,read_event_details)
    if not next_rows:raise RuntimeError(f"DBV {next_year} returned an unexpectedly empty calendar")
    rows.extend(next_rows)
    print(f"DBV {next_year}: {len(next_rows)} source-verified entries",flush=True)
   if len({x["source_key"] for x in rows})!=len(rows):
    raise ValueError("Duplicate event ID across DBV year windows")
- print(f"DBV calendar: {len(rows)} verified entries, first {rows[0]['start_date']}",flush=True)
+ print(f"DBV calendar: {len(rows)} verified entries, {sum(bool(x['event_url']) for x in rows)} direct event URLs, first {rows[0]['start_date']}",flush=True)
+ if args.fixture is None:
+  # Source extraction must keep the already-verified two live November/December 2026 event links.
+  verified={"dbv-calendar-44749","dbv-calendar-43826"}
+  missing=[x["source_key"] for x in rows if x["source_key"] in verified and not x["event_url"]]
+  if missing:raise RuntimeError("DBV event details missing verified direct links for "+",".join(missing))
  if args.emit_lines:
   for x in rows:print("DBV_CALENDAR_ENTRY "+json.dumps(x,ensure_ascii=False,separators=(",",":")))
  if args.write_json:write_snapshot(rows,Path("data/dbv-calendar.json"))
