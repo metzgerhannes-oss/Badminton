@@ -36,6 +36,44 @@ class CalendarTests(unittest.TestCase):
   self.assertEqual(b["bundesland"],"Saarland")
   self.assertEqual(b["registration_deadline"],"2026-10-11")
   self.assertIsNone(a["event_url"],"A PDF link must not be mislabelled an official match page")
+ def test_direct_tournament_links_from_exact_details_only(self):
+  # Both source records carry their direct links in the collapsed detail,
+  # not in the eight visible columns.
+  uuid1="E24DC6EE-152A-454D-B00C-E625B751D7D5"
+  uuid2="9A0F8A11-6CB3-4586-900A-97CD0CB8B19C"
+  example='''<!doctype html><body>2 Turniere gefunden
+<table class="tournamenttable">
+<tr data-target="#collapse44749"><td>22.11. - 22.11.</td><td>3. D-RLT BAW SW U11-U19</td>
+<td>Gomaringen</td><td>Baden-Württemberg</td><td>D1-Level</td>
+<td>U11: E/D<br>U13: E/D</td><td>15.11.2026</td><td></td></tr>
+<tr class="hiddenrow"><td colspan="8"><div id="collapse44749">
+<a href="https://dbv.turnier.de/tournament/E24DC6EE-152A-454D-B00C-E625B751D7D5">Turnierseite</a>
+<a href="https://evil.example/tournament/AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA">Unsicher</a>
+</div></td></tr>
+<tr data-target="#collapse43826"><td>05.12. - 06.12.</td><td>German Masters U11</td>
+<td>Hofheim</td><td>DBV</td><td>A-Level</td><td>U11: E/D</td>
+<td>10.11.2026</td><td></td></tr>
+<tr class="hiddenrow"><td colspan="8"><div data-tournament="43826">
+<a href="https://turnier.de/tournament/9a0f8a11-6cb3-4586-900a-97cd0cb8b19c">Offizielle Turnierseite</a>
+<a href="https://turniere.badminton.de/">Kalenderübersicht</a>
+</div></td></tr>
+</table></body>'''
+  rows=module.parse_page(example,2026)
+  self.assertEqual(rows[0]["source_key"],"dbv-calendar-44749")
+  self.assertEqual(rows[0]["event_url"],"https://dbv.turnier.de/tournament/"+uuid1)
+  self.assertEqual(rows[1]["source_key"],"dbv-calendar-43826")
+  self.assertEqual(rows[1]["event_url"],"https://dbv.turnier.de/tournament/"+uuid2)
+  self.assertEqual(rows[1]["location_text"],"Hofheim")
+  self.assertEqual(rows[1]["registration_deadline"],"2026-11-10")
+ def test_no_cross_assignment_of_expanded_details(self):
+  uuid="E24DC6EE-152A-454D-B00C-E625B751D7D5"
+  source=HTML.replace("<div data-tournament=\"44094\"></div>",
+    '<div id="collapse44094"><a href="https://dbv.turnier.de/tournament/'+uuid+'">Detail</a></div>')
+  rows=module.parse_page(source,2026)
+  self.assertEqual(rows[0]["event_url"],"https://dbv.turnier.de/tournament/"+uuid)
+  self.assertIsNone(rows[1]["event_url"])
+  duplicate=source.replace("</div>",'<a href="https://dbv.turnier.de/tournament/AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA">Fremdturnier</a></div>',1)
+  self.assertIsNone(module.parse_page(duplicate,2026)[0]["event_url"])
  def test_source_count_guard(self):
   with self.assertRaisesRegex(ValueError,"Source mismatch"):
    module.parse_page(HTML.replace("2 Turniere gefunden","3 Turniere gefunden"),2026)
