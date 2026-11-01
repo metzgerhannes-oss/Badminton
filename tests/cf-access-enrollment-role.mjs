@@ -4,7 +4,7 @@ const sql=readFileSync("database/p1-429-cloudflare-enrollment-role-fix.sql","utf
 assert.match(sql,/SECURITY DEFINER SET search_path = ''/);
 assert.match(sql,/REVOKE ALL ON FUNCTION public\.cf_access_enroll_member\(uuid,text\)\s+FROM PUBLIC,anon,authenticated/);
 assert.match(sql,/GRANT EXECUTE ON FUNCTION public\.cf_access_enroll_member\(uuid,text\)\s+TO service_role/);
-assert.doesNotMatch(sql,/current_setting\\s*\\(/);
+assert.ok(!sql.includes("current_setting("));
 assert.match(sql,/cf_access_allowed_emails a/);
 assert.match(sql,/a\.enabled/);
 assert.match(sql,/valid_until/);
