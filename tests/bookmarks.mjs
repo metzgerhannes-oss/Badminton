@@ -55,11 +55,13 @@ assert.match(content,/Noch kein Direktlink zum Turnier hinterlegt/);
 assert.match(content,/const destination=directSource\|\|t\.url/);
 assert.match(content,/verifiedCalendarEventUrl\(t,verifiedCalendarRows\)/);
 
-assert.match(content,/row\.key===t\.id&&row\.start===t\.startDate&&row\.end===t\.endDate/,
+assert.match(content,/row\.key===t\.id&&\s*row\.start===t\.startDate&&row\.end===t\.endDate/,
  "Only matching official DBV identity and days may fill an absent local venue");
 assert.match(content,/t\.place\|\|officialRow\?\.place/,
  "Owner-edited local venues take precedence over official DBV fallback");
-assert.match(content,/t\.id==="dbv-calendar-43826"/);
+assert.match(content,/officialRow\?\.key==="dbv-calendar-43826"/);
+assert.match(content,/officialUrl===savedUrl/,"Manually saved DBV URL must resolve by exact UUID only");
+assert.match(content,/else renderTournaments\(\)/,"Official data arriving later must refresh saved cards");
 assert.match(content,/Brühlwiesenhalle, Rudolf-Mohr-Str\. 4, 65719 Hofheim am Taunus/);
 assert.match(content,/BWBV-Quelle/,"Clearly attribute the complete U11 Masters hall details");
 
