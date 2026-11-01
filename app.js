@@ -132,9 +132,21 @@ function renderTournaments(){
   const dates=t.startDate?niceDay(t.startDate)+(t.endDate&&t.endDate!==t.startDate?" – "+niceDay(t.endDate):""):"Termin nicht hinterlegt";
   const planning=t.source==="bwbv-framework";
   const calendar=t.source==="dbv-calendar"||planning;
-  const venue=String(t.place||"").trim();
+  // Exact calendar source key and event dates, never title or city matching.
+  // Saved private venue edits always win; missing locations fall back to DBV.
+  const officialRows=t.source==="dbv-calendar"?verifiedCalendarRows.filter(row=>
+   row.key===t.id&&row.start===t.startDate&&row.end===t.endDate):[];
+  const officialRow=officialRows.length===1?officialRows[0]:null;
+  const venue=String(t.place||officialRow?.place||"").trim();
   const name=String(t.name||"").trim();
   const heading=venue&&!name.toLocaleLowerCase("de").includes(venue.toLocaleLowerCase("de"))?name+" · "+venue:name;
+  const mastersVenue=officialRow&&t.id==="dbv-calendar-43826"&&
+   t.startDate==="2026-12-05"&&t.endDate==="2026-12-06"&&
+   officialRow.place==="Hofheim";
+  // Separately evidenced by the BWBV event calendar, not inferred from
+  // the shorter DBV place field. Do not change locally stored user notes.
+  const venueDetail=mastersVenue?
+   '<p class="saved-tournament-venue">Brühlwiesenhalle, Rudolf-Mohr-Str. 4, 65719 Hofheim am Taunus · <a href="https://bwbv.de/veranstaltungen/" target="_blank" rel="noopener noreferrer">BWBV-Quelle ↗</a></p>':"";
   const missingVenue=venue?"":'<p class="saved-tournament-venue">Austragungsort nicht erfasst</p>';
   // Exact DBV event UUID only. A generic calendar URL must never be
   // presented as the direct tournament page, even if flagged by the feed.
@@ -151,7 +163,7 @@ function renderTournaments(){
    (discrepancy.resolved?' · Spieltag: ':'. DBV-Spieltag: ')+esc(niceDay(discrepancy.officialDate))+(
    discrepancy.officialDeadline?', Meldeschluss: '+esc(niceDay(discrepancy.officialDeadline)):"")+
    (discrepancy.resolved?' · korrigiert.</p>':'. Angaben prüfen.</p>'):"";
-  return '<article class="tournament-card card-open-surface" data-saved-tournament-id="'+esc(t.id)+'" data-saved-tournament-player="'+esc(t.playerId)+'"><div class="saved-tournament-top"><h3>'+esc(heading)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p class="saved-tournament-dates">'+esc(dates)+'</p>'+missingVenue+deadline+sourceNote+sourceStatus+linkStatus+'<div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(destination)+'" rel="noopener noreferrer" target="_blank">'+sourceLabel+'</a>'+(calendar?'<button class="remove-button" data-edit-venue-id="'+esc(t.id)+'" data-edit-venue-player="'+esc(t.playerId)+'" type="button" aria-label="Austragungsort dieser privaten Vormerkung bearbeiten">Ort bearbeiten</button>':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div>'+technicalId+'<p class="saved-tournament-player">Spieler: '+esc(profile)+'</p></article>';
+  return '<article class="tournament-card card-open-surface" data-saved-tournament-id="'+esc(t.id)+'" data-saved-tournament-player="'+esc(t.playerId)+'"><div class="saved-tournament-top"><h3>'+esc(heading)+'</h3><span class="saved-tournament-phase phase-'+tone+'">'+esc(phase)+'</span></div><p class="saved-tournament-dates">'+esc(dates)+'</p>'+missingVenue+venueDetail+deadline+sourceNote+sourceStatus+linkStatus+'<div class="local-shortcut-actions"><a class="card-open-primary" href="'+esc(destination)+'" rel="noopener noreferrer" target="_blank">'+sourceLabel+'</a>'+(calendar?'<button class="remove-button" data-edit-venue-id="'+esc(t.id)+'" data-edit-venue-player="'+esc(t.playerId)+'" type="button" aria-label="Austragungsort dieser privaten Vormerkung bearbeiten">Ort bearbeiten</button>':'<button class="remove-button" data-edit-id="'+esc(t.id)+'" data-edit-player="'+esc(t.playerId)+'" type="button">Bearbeiten</button>')+(planning?'':'<button class="remove-button" data-private-invite-id="'+esc(t.id)+'" data-private-invite-player="'+esc(t.playerId)+'" type="button">Privat teilen</button>')+'<button class="remove-button" data-remove-id="'+esc(t.id)+'" data-remove-player="'+esc(t.playerId)+'" type="button">Entfernen</button></div>'+technicalId+'<p class="saved-tournament-player">Spieler: '+esc(profile)+'</p></article>';
  }).join("");
  section.querySelectorAll("[data-edit-id]").forEach(button=>button.addEventListener("click",()=>{
   const item=state.officialLinks.find(t=>t.id===button.dataset.editId&&t.playerId===button.dataset.editPlayer);

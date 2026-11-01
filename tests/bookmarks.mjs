@@ -55,4 +55,12 @@ assert.match(content,/Noch kein Direktlink zum Turnier hinterlegt/);
 assert.match(content,/const destination=directSource\|\|t\.url/);
 assert.match(content,/verifiedCalendarEventUrl\(t,verifiedCalendarRows\)/);
 
+assert.match(content,/row\.key===t\.id&&row\.start===t\.startDate&&row\.end===t\.endDate/,
+ "Only matching official DBV identity and days may fill an absent local venue");
+assert.match(content,/t\.place\|\|officialRow\?\.place/,
+ "Owner-edited local venues take precedence over official DBV fallback");
+assert.match(content,/t\.id==="dbv-calendar-43826"/);
+assert.match(content,/Brühlwiesenhalle, Rudolf-Mohr-Str\. 4, 65719 Hofheim am Taunus/);
+assert.match(content,/BWBV-Quelle/,"Clearly attribute the complete U11 Masters hall details");
+
 console.log("DBV bookmark tests passed: IDs, URL safety, URL-only entry, optional metadata, editing, persistence.");
