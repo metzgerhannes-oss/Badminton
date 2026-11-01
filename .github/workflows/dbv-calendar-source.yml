@@ -52,6 +52,14 @@ jobs:
            html=lib.read_page(lib.calendar_url(2026))
            parser=lib.TableRows();parser.feed(html)
            print("DBV source rows",len(parser.rows),"event panels",len(parser.panels))
+           import re
+           print("DBV script assets",re.findall(r'<script[^>]+src=["\\\']([^"\\\']+)',html,re.I)[-15:])
+           for word in ("collapsecontent","show.bs.collapse","/ajax/","/detail/","load("):
+            found=list(re.finditer(re.escape(word),html,re.I))
+            print("DBV JS marker",word,"count",len(found))
+            for match in found[-2:]:
+             print("DBV JS context"," ".join(html[max(0,match.start()-450):match.start()+750].split())[:1200])
+
            for key in ("44749","43826"):
             row=next((r for r in parser.rows if r["id"]==key),None)
             links=(row["links"] if row else [])+parser.panels.get(key,[])
