@@ -15,6 +15,18 @@ for(const path of files)for(const x of forbiddenPrefixes)
  assert.ok(!path.startsWith(x),"Protected source file in private bundle: "+path);
 for(const exact of ["README.md","AGENTS.md","package.json","data/history.json","data/ranking.json"])
  assert.ok(!files.includes(exact),"Protected document/backup in private bundle: "+exact);
+// User-retired language packs and versioned translation caches must never ship.
+assert.ok(!files.some(x=>x==="i18n.js"||x==="language.css"||x.startsWith("locales/")),
+ "Retired language assets must not enter the private runtime bundle");
+for(const page of ["index.html","welcome.html"]){
+ const html=await readFile(join(root,page),"utf8");
+ assert.ok(!/data-language-select|\.\/i18n\.js|\.\/language\.css/.test(html),
+  "Old language selector still included in "+page);
+}
+const worker=await readFile(join(root,"sw.js"),"utf8");
+assert.ok(!worker.includes("./locales/"),"No retired locale should be precached");
+assert.match(worker,/caches\.delete\("schmetterlinge-i18n-v2"\)/,
+ "Remove only obsolete first-party translation cache");
 const welcome=await readFile(join(root,"welcome.js"),"utf8");
 assert.match(welcome,/verifyWelcomeFamilyMember/);
 const client=await readFile(join(root,"scripts/supabase-read.mjs"),"utf8");
