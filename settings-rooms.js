@@ -6,7 +6,7 @@
  if(!view)return;
  const definitions=[
   {id:"profile",title:"Profile & Familie",desc:"Eigene Spielerprofile anlegen, auswählen und verwalten",icon:"♙"},
-  {id:"darstellung",title:"App & Darstellung",desc:"Sprache, Vereinsname, Logo und Erscheinungsbild",icon:"◐"},
+  {id:"darstellung",title:"App & Darstellung",desc:"Vereinsname, Logo und Erscheinungsbild",icon:"◐"},
   {id:"einladungen",title:"Zugänge & Freigaben",desc:"Einladungen, Spielerberechtigungen und Eigentümerzugang",icon:"↗"},
   {id:"daten",title:"Daten & Datenschutz",desc:"Datensicherung, Wiederherstellung und Privatsphäre",icon:"▣"},
   {id:"hilfe",title:"Hilfe & Informationen",desc:"Regeln, App-Anleitung und Datenquellen",icon:"?"}
@@ -53,7 +53,6 @@
  }
  // IA-2: follower management lives in subject pages, never a second settings room.
  appendTo("profile",".player-management");
- appendTo("darstellung",".language-settings");
  appendTo("darstellung",".club-branding-card");
  // A v136 app invitation grants entry to the sourced sport archive.
  // Owner grants and activation live beside app invitations, never in family
