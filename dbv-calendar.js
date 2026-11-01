@@ -248,7 +248,7 @@ function render(){
     (t.organizer?'<p>Veranstalter: '+esc(t.organizer)+'</p>':"")+
     '<div class="dbv-calendar-badges"><span>'+esc(t.category)+'</span>'+t.ages.map(a=>'<span>'+esc(a)+'</span>').join("")+(isNationalU11Masters(t)?'<span>DBV · bundesweit</span>':'')+'</div>'+
     (!t.historicalArchive&&t.deadline?'<p class="dbv-calendar-deadline">Meldeschluss: '+esc(formatDate(t.deadline))+(closed?' · abgelaufen':'')+'</p>':"")+
-    '<a class="card-open-primary" href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Turnier beim Anbieter öffnen ↗":"DBV-Kalender öffnen ↗")+'</a></div></article>';
+    '<a class="card-open-primary" href="'+esc(t.url)+'" target="_blank" rel="noopener noreferrer">'+(t.hasDirectLink?"Offizielle Turnierseite ↗":"DBV-Turnierkalender (Übersicht) ↗")+'</a></div></article>';
   }).join("");
   html+='</section>';
  }
