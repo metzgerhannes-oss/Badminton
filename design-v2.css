@@ -4,7 +4,7 @@
 :root{
   color-scheme:light;
   --sky:#e5f4ff;--sky-deep:#cce8fb;--panel:#ffffffea;
-  --ink:#0b2a52;--ink-soft:#456588;--link:#087dc3;
+  --ink:#0b2a52;--ink-soft:#456588;--link:#08699e;
   --hairline:#b8dcef;--shadow:0 7px 26px #5488ab19;
   /* UX2 B1: CD-matched readable ink for translucent pale navigation and light report cards. */
   --ux2-nav-ink:#355f80;--ux2-nav-active:#075a91;--ux2-report-link:#066b9f;
@@ -309,7 +309,7 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .live-hub-bookmarks .section-heading{margin:0 0 6px;align-items:center}
 .live-hub-bookmarks .section-heading h3{font-size:18px;color:#0c345a;margin:0}
 .live-hub-bookmarks .section-heading button{min-height:44px;
- background:#0d83c4!important;color:#fff!important;border-radius:11px;padding:7px 13px;
+ background:#086da6!important;color:#fff!important;border-radius:11px;padding:7px 13px;
  border:1px solid #0877b3}
 .live-hub-bookmarks .settings-hint{font-size:11px;color:#55748d;line-height:1.5;margin:0 0 10px}
 .live-hub-bookmarks .tournament-list{display:grid;gap:10px}
@@ -472,7 +472,7 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .player-management{margin:22px 0 15px;padding:17px;border-radius:19px;
   border:1px solid #c4dfef;background:#fffefeff;box-shadow:var(--shadow)}
 .player-management-head h3{font-size:19px;color:#0d3559;margin:0 0 6px}
-.player-management-head p{font-size:12px;color:#587b95;line-height:1.5;margin:0 0 12px}
+.player-management-head p{font-size:14px;color:#365570;line-height:1.5;margin:0 0 12px}
 .player-management .settings-section{margin:12px 0 18px;padding-top:13px;border-top:1px solid #d5eaf6}
 .player-management .section-heading h3{font-size:17px}
 .player-management .current-account-label{display:block;font-size:11px;color:#4c7391;margin-top:14px}

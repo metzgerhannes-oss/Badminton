@@ -35,8 +35,8 @@ assert.match(invites,/appinvite=/);
 
 const settingsGuide=gate.match(/<details class="invitation-short-guide">([\s\S]*?)<\/details>/)?.[1];
 assert.ok(settingsGuide,"Owner invitation settings must separate sending and receiving");
-assert.match(settingsGuide,/<h4>Einladung teilen<\/h4>/);
-assert.match(settingsGuide,/<h4>Einladung erhalten<\/h4>/);
+assert.match(settingsGuide,/<h4\b[^>]*>Einladung teilen<\/h4>/);
+assert.match(settingsGuide,/<h4\b[^>]*>Einladung erhalten<\/h4>/);
 assert.match(settingsGuide,/Einladung erstellen &amp; teilen/);
 assert.match(install,/id="existing-installation"/);
 assert.match(install,/id="new-installation"/);

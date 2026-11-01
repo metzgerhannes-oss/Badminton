@@ -157,6 +157,35 @@
  }
 }
 
+/* Surface contracts: the profile manager stays pale even inside the navy desktop.
+   Active own cards stay navy on mobile as well; never mix their two text palettes. */
+#view-einstellungen .player-management :is(.player-management-head h3,.section-heading h3){color:#123960!important}
+#view-einstellungen .player-management :is(.player-management-head p,.settings-section>.settings-hint,#current-account-label){color:#365570!important;font-size:14px}
+#view-einstellungen .player-management .profile-card:not(.profile-active){background:#f8fcff!important}
+#view-einstellungen .player-management .profile-card:not(.profile-active) :is(h3,p,.profile-club){color:#193c58!important}
+#view-einstellungen .player-management .profile-card.profile-active :is(h3,p,.profile-club){color:#f2f9ff!important}
+#view-einstellungen .player-management .profile-card.profile-active .active-profile-chip{color:#fff!important;background:#285978}
+#view-einstellungen .player-management .profile-main :is(p,.profile-club){font-size:14px;line-height:1.45}
+#view-einstellungen .player-management .profile-active .remove-button{color:#e4f2ff!important}
+#view-einstellungen .player-management .profile-card:not(.profile-active) .remove-button{color:#075a91!important}
+#view-einstellungen .player-management>.settings-section>.settings-hint a{color:#075a91!important;text-decoration:underline}
+#view-turniere .tournament-card a.card-open-primary{color:#075a91}
+#view-turniere .dbv-calendar-panel a{color:#075a91}
+#view-historie .empty h3,#view-historie .history-ranking-note h3{color:#e4f2ff}
+#view-historie .history-inline-link{color:#075a91!important}
+#view-turniere .dbv-calendar-cluster>h4>small{color:#365570}
+#view-turniere .live-radar-hint,#view-turniere .live-radar-disclaimer{color:#365570;font-size:14px;line-height:1.5}
+#view-turniere #add-tournament{background:#086da6;color:#fff;min-width:44px;min-height:44px}
+#view-spieler .family-entry a{color:#075a91}
+#view-turniere :is(.live-hub-bookmarks,.dbv-calendar-panel,.spond-panel,.live-dbv) :is(h3,h4,h5,p,label,.settings-hint){color:#193c58!important}
+.dbv-calendar-source a,.small.muted a{text-decoration:underline;text-underline-offset:3px}
+#view-start .friend-ranking-official{color:#075a91!important;display:inline-flex;align-items:center;min-height:44px}
+@media(min-width:1080px){
+ #view-turniere .tournament-card a.card-open-primary{color:#075a91}
+ #view-spieler #followed-player-count{color:#d6ebfb}
+ #focused-profile .focus-profile-copy :is(.focus-profile-meta,.focus-profile-id){color:#365570!important}
+}
+
 /* #396 / v223 P0 regression: Home colors MUST match the actual card surface.
    The earlier v222 repair used navy-only ink at every viewport. On iPhone the
    cards are pale (#fff -> #edf8ff), making titles and profile metadata white
@@ -196,7 +225,7 @@
  }
  #focused-profile .focus-profile-copy .focus-profile-meta,
  #focused-profile .focus-profile-copy .focus-profile-id{
-  color:#d3e7fa!important;
+  color:#365570!important;
  }
 }
 @media(min-width:1080px){

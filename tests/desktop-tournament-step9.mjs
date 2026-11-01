@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 const paths=["index.html","app.js","desktop-context-v173.js","desktop-tournament-v173.css","desktop-shell-v172.css","app-release.js","sw.js","tests/e2e/supabase-isolated.fixture.mjs","app-shell.css"];
 const [html,app,script,css,shell,release,sw,fixture,appShell]=await Promise.all(paths.map(p=>readFile(p,"utf8")));
-assert.match(html,/id="desktop-tournament-context" aria-labelledby=/);
+assert.match(html,/id="desktop-tournament-context" aria-label="Zusätzliche Turnieraktionen und Termine"/);
 assert.match(html,/id="desktop-context-events"/);
 assert.match(html,/data-desktop-action="follow"/);
 assert.match(html,/data-desktop-action="calendar"/);

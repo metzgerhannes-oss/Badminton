@@ -2,6 +2,7 @@
 <html lang="de" data-app-access="checking">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="base-uri 'self'; object-src 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>
 /* Critical first paint: prevent invitation text and app content flashing before CSS loads. */
@@ -108,6 +109,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <input id="app-access-code" type="password" autocomplete="off" spellcheck="false" placeholder="Einladungslink hier einfügen">
   <button id="app-access-submit" type="button">Zugang freischalten</button>
   <button id="app-access-paste" type="button" hidden>Einladung aus Zwischenablage übernehmen</button>
+  <button id="app-access-retry" type="button" hidden>Zugang erneut prüfen</button>
   <p id="app-access-status" role="status" aria-live="polite"></p>
   <small>Keine E-Mail-Adresse und kein Passwort erforderlich. Auf dem iPhone wird die Einladung beim Installieren übernommen; falls nötig genügt ein Tipp auf „Einladung aus Zwischenablage übernehmen“.</small>
  </section>
@@ -118,9 +120,10 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <a class="brand" href="#start" aria-label="Schmetterlinge Home"><img class="brand-logo" src="./assets/spvgg-schmetterlinge.svg" alt="Schmetterlingslogo der SpVgg Mössingen"><span>Schmetterlinge<small id="club-brand-subtitle">SPVGG MÖSSINGEN · BADMINTON JUGEND</small></span></a>
   <div class="topbar-actions">
    <a class="topbar-settings" href="#einstellungen" aria-label="Einstellungen öffnen" title="Einstellungen"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5 21 16l-2 3-2-1a8 8 0 0 1-2.5 1.5L14 22h-4l-.5-2.5A8 8 0 0 1 7 18l-2 1-2-3 1.6-1.5a8 8 0 0 1 0-3L3 10l2-3 2 1a8 8 0 0 1 2.5-1.5L10 4h4l.5 2.5A8 8 0 0 1 17 8l2-1 2 3-1.6 1.5a8 8 0 0 1 0 3Z"/></svg></a>
-   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v234" title="Version v234">v234</span>
+   <span class="app-version-badge" id="app-version-badge" data-app-version aria-label="App-Version v235" title="Version v235">v235</span>
   </div>
  </header>
+ <div id="local-save-status" class="local-save-feedback" role="alert" data-local-save-feedback hidden></div>
  <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden>
    <strong>Keine Verbindung gemeldet</strong>
    <span>Du kannst vorhandene Ansichten weiter nutzen. Neue Ergebnisse werden bei Verbindung wieder geladen.</span>
@@ -188,11 +191,11 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <a class="wiki-home-link" href="./wiki.html" aria-label="Badminton-Regeln im Wiki suchen"><span class="wiki-home-icon" aria-hidden="true">▧</span><span class="wiki-home-copy"><strong>Regeln & Wissen</strong><small>61 Grafikkarten · Suche · offline</small></span><span class="wiki-home-arrow" aria-hidden="true">↗</span></a>
   </section>
   <section class="page" id="view-historie" aria-labelledby="heading-historie">
-   <div class="section-heading"><h2 id="heading-historie">Turnierhistorie</h2><a class="history-inline-link" href="#start">Zurück zur Übersicht</a></div>
+   <div class="section-heading"><h2 id="heading-historie" role="heading" aria-level="1">Turnierhistorie</h2><a class="history-inline-link" href="#start">Zurück zur Übersicht</a></div>
    <section class="trophy-section" aria-labelledby="trophy-heading">
-    <div class="section-heading"><h3 id="trophy-heading">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
+    <div class="section-heading"><h3 id="trophy-heading" role="heading" aria-level="2">Trophäenschrank</h3><span class="trophy-curated-label">Bisher erfasst</span></div>
     <div id="trophy-shelf" class="trophy-shelf" role="group" aria-label="Auszeichnungen nach Platzierung"></div>
-    <div class="trophy-awards-heading"><h3 id="trophy-awards-heading">Auszeichnungen</h3><button id="trophy-show-all" class="subtle-button" type="button">Alle anzeigen</button></div>
+    <div class="trophy-awards-heading"><h3 id="trophy-awards-heading" role="heading" aria-level="2">Auszeichnungen</h3><button id="trophy-show-all" class="subtle-button" type="button">Alle anzeigen</button></div>
     <div id="trophy-awards" class="trophy-awards" aria-live="polite"></div>
    </section>
    
@@ -212,12 +215,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <label>Jahr<select id="history-year"><option value="all">Alle Jahre</option></select></label>
     <label>Disziplin<select id="history-discipline"><option value="all">Alle Disziplinen</option><option value="Einzel">Einzel</option><option value="Doppel">Doppel</option><option value="Mixed">Mixed</option></select></label>
    </div>
-   <div class="section-heading history-chronicle-title"><h3>Turnierchronik</h3><span class="muted">Alle Platzierungen</span></div>
+   <div class="section-heading history-chronicle-title"><h3 role="heading" aria-level="2">Turnierchronik</h3><span class="muted">Alle Platzierungen</span></div>
    <div id="history-trends" class="history-trends"></div>
    <div id="history-timeline" class="history-timeline"></div>
-   <div class="history-ranking-note"><h3>Ranglistenentwicklung</h3><p>Eine belastbare Verlaufsgrafik benötigt mehrere datierte Ranglistenstände. Platzierungen unterschiedlicher Altersklassen werden nicht miteinander vermischt.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Offizielle DBV-Rangliste öffnen ↗</a></div>
+   <div class="history-ranking-note"><h3 role="heading" aria-level="2">Ranglistenentwicklung</h3><p>Eine belastbare Verlaufsgrafik benötigt mehrere datierte Ranglistenstände. Platzierungen unterschiedlicher Altersklassen werden nicht miteinander vermischt.</p><a href="https://turniere.badminton.de/ranking" target="_blank" rel="noopener noreferrer">Offizielle DBV-Rangliste öffnen ↗</a></div>
    <section id="career-history" class="career-history" aria-labelledby="career-heading" hidden>
-     <div class="section-heading"><h3 id="career-heading">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
+     <div class="section-heading"><h3 id="career-heading" role="heading" aria-level="2">Historische Spielerkarriere</h3><span class="career-source-label">Externe Quelle</span></div>
      <div id="career-summary" class="career-summary"></div>
      <div class="career-history-filters">
        <label>Jahr<select id="career-year"><option value="all">Alle Jahre</option></select></label>
@@ -228,7 +231,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      <p id="career-citation" class="career-citation"></p>
    </section>
    <section id="external-match-history" class="external-match-history" aria-labelledby="external-match-title" hidden>
-    <div class="section-heading"><h3 id="external-match-title">Historische Einzelspiele</h3><span class="career-source-label">Badhub · Quellennachweise</span></div>
+    <div class="section-heading"><h3 id="external-match-title" role="heading" aria-level="2">Historische Einzelspiele</h3><span class="career-source-label">Badhub · Quellennachweise</span></div>
     <p class="external-match-intro">Einzelne Begegnungen aus der öffentlichen Spielerhistorie, mit Gegner und Satzständen. Keine offiziellen DBV-Match-IDs.</p>
     <p id="external-match-brief" class="external-match-brief" role="status" aria-live="polite" hidden></p>
     <details id="external-match-source-details" class="external-match-source-details">
@@ -247,12 +250,13 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </section>
   </section>
   <section class="page" id="view-turniere" aria-labelledby="heading-turniere">
-   <div class="section-heading"><h2 id="heading-turniere">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
+   <div class="section-heading"><h2 id="heading-turniere" role="heading" aria-level="1">Turniertag</h2><span class="live-hub-kicker">Spielplan &amp; Ergebnisse</span></div>
    <p class="live-hub-lead">Dein Spieltag auf einen Blick.</p>
    <div class="tournament-shortcuts" id="tournament-shortcuts" role="group" aria-label="Turniere schnell öffnen">
     <button type="button" data-tournament-shortcut="saved">Meine Turniere</button>
     <button type="button" data-tournament-shortcut="find">Turnier finden</button>
    </div>
+   <a class="tournament-results-shortcut history-inline-link" href="#live">Spielplan &amp; Ergebnisse öffnen ↗</a>
    <section class="today-evidence" id="today-tournament" aria-label="Heute im Einsatz · Spieler und Mannschaften" hidden>
  <div data-today-cards aria-label="Heutige Spieler- und Mannschaftsereignisse"></div>
 </section>
@@ -263,12 +267,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <a class="history-inline-link" href="#historie">Turnierhistorie und Auszeichnungen ansehen ↗</a>
      <a class="history-inline-link live-tournaments-return" href="#turniere"><span aria-hidden="true">←</span> <span>Turniere</span></a>
    <section class="live-hub-bookmarks" aria-labelledby="my-tournaments-title">
-    <div class="section-heading"><h3 id="my-tournaments-title">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
+    <div class="section-heading"><h3 id="my-tournaments-title" role="heading" aria-level="2">Meine gespeicherten Turniere</h3><button class="subtle-button" id="add-tournament" type="button">+ Turnier</button></div>
     <p class="settings-hint">Deine eigenen Turnierlinks, unabhängig vom aktuellen Live-Stand.</p>
     <div id="official-tournament-list" class="tournament-list"></div>
     <section class="spond-panel" aria-labelledby="spond-title">
       <div class="spond-simple-head">
-        <div><h3 id="spond-title">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
+        <div><h3 id="spond-title" role="heading" aria-level="2">Spond-Turniere</h3><p class="settings-hint">Termine aus deinem Kalender übernehmen.</p></div>
         <button id="spond-quick-import" class="primary-button" type="button">Termine übernehmen</button>
       </div>
       <div id="spond-events" class="spond-events" aria-live="polite"></div>
@@ -277,7 +281,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <a class="live-hub-official-link" href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offiziellen DBV-Turnierkalender öffnen ↗</a>
    </section>
    <section class="dbv-calendar-panel" aria-labelledby="dbv-calendar-heading">
-     <div class="section-heading"><h3 id="dbv-calendar-heading">DBV-Turnierkalender</h3><button id="dbv-calendar-refresh" class="subtle-button" type="button">Aktualisieren</button></div>
+     <div class="section-heading"><h3 id="dbv-calendar-heading" role="heading" aria-level="2">DBV-Turnierkalender</h3><button id="dbv-calendar-refresh" class="subtle-button" type="button">Aktualisieren</button></div>
      <p class="settings-hint">Offizielle Turniere filtern und mit + für dein aktives Spielerprofil vormerken. Eine Vormerkung ist keine bestätigte Anmeldung.</p>
      <label class="dbv-calendar-quick-search" for="dbv-calendar-q">Turnier oder Ort suchen
       <input id="dbv-calendar-q" type="search" placeholder="Name oder Ort" autocomplete="off">
@@ -295,7 +299,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      </details>
      <p id="dbv-calendar-status" class="settings-hint" role="status" aria-live="polite">DBV-Turniere werden geladen …</p>
      <div id="dbv-calendar-results" class="dbv-calendar-results" aria-live="polite"></div>
-     <button id="dbv-calendar-more" class="subtle-button" type="button" hidden>Weitere Turniere anzeigen</button>
+     <button id="dbv-calendar-more" class="subtle-button" type="button" hidden>Weitere 12 Turniere anzeigen</button>
      <p class="settings-hint dbv-calendar-source">Quelle: <a href="https://turniere.badminton.de/" target="_blank" rel="noopener noreferrer">Offizieller DBV-Turnierkalender ↗</a>. Ausrichtender Landesverband und geografischer Spielort sind nicht immer identisch. Aktuelle Meldungen und persönliche Teilnahmen werden hier nicht behauptet.</p>
    </section>
    <section class="live-dbv" aria-labelledby="dbv-live-title">
@@ -308,7 +312,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     </div>
     <div class="live-radar-panel" aria-labelledby="dbv-live-title">
      <div class="live-radar-heading">
-      <div class="live-hub-title"><h3 id="dbv-live-title">Meine Spiele</h3><span class="live-radar-hint">Automatischer Abgleich</span></div>
+      <div class="live-hub-title"><h3 id="dbv-live-title" role="heading" aria-level="2">Meine Spiele</h3><span class="live-radar-hint">Automatischer Abgleich</span></div>
       <button class="subtle-button" id="live-radar-refresh" type="button" aria-label="Aktuelle Spielergebnisse aktualisieren">Aktualisieren</button>
      </div>
      <div id="live-radar-content" class="live-radar-content" role="status" aria-live="polite">
@@ -334,16 +338,16 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     </details>
    </section>
    <section class="live-tournament-follow" id="live-tournament-follow" aria-labelledby="live-tournament-follow-title">
-    <h3 id="live-tournament-follow-title">Turnier &amp; verfolgte Spieler</h3>
+    <h3 id="live-tournament-follow-title" role="heading" aria-level="2">Turnier &amp; verfolgte Spieler</h3>
     <section class="followed-live" id="followed-live" aria-labelledby="followed-live-heading">
      <div class="followed-live-heading">
-      <h4 id="followed-live-heading">Unsere Spieler</h4>
+      <h4 id="followed-live-heading" role="heading" aria-level="3">Unsere Spieler</h4>
       <span id="followed-live-status" class="muted"></span>
      </div>
      <div id="followed-live-cards" class="followed-live-grid" role="region" aria-live="polite" aria-label="Aktueller Stand verfolgter Spieler"></div>
      <p class="followed-live-note">Öffentliche Badhub-Livedaten unserer Spieler. Nicht sämtliche Spiele des Turniers. Neue Daten erscheinen nach der nächsten Quellenprüfung.</p>
     </section>
-    <h4 class="tournament-matches-heading">Offizieller Turnier-Spielplan</h4>
+    <h4 class="tournament-matches-heading" role="heading" aria-level="3">Offizieller Turnier-Spielplan</h4>
     <div class="tournament-live-toolbar">
      <label for="tournament-live-select">Turnier auswählen</label>
      <select id="tournament-live-select" aria-label="Gespeichertes Turnier auswählen"><option value="">Turniere werden geladen</option></select>
@@ -395,14 +399,14 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     </details>
 
    </section>
-   <aside class="desktop-tournament-context" id="desktop-tournament-context" aria-labelledby="desktop-tournament-context-heading">
+   <section class="desktop-tournament-context" id="desktop-tournament-context" aria-label="Zusätzliche Turnieraktionen und Termine">
     <section class="desktop-context-group" aria-labelledby="desktop-tournament-context-heading">
-     <h3 id="desktop-tournament-context-heading">Nächste gespeicherte Termine</h3>
+     <h3 id="desktop-tournament-context-heading" role="heading" aria-level="2">Nächste gespeicherte Termine</h3>
      <p>Nur deine lokalen Vormerkungen und Kalenderimporte, keine bestätigten Anmeldungen.</p>
      <div class="desktop-context-events" id="desktop-context-events" aria-live="polite"><p>Gespeicherte Termine werden geprüft …</p></div>
     </section>
     <section class="desktop-context-group" aria-labelledby="desktop-context-actions-heading">
-     <h3 id="desktop-context-actions-heading">Schnellaktionen</h3>
+     <h3 id="desktop-context-actions-heading" role="heading" aria-level="2">Schnellaktionen</h3>
      <div class="desktop-context-actions">
       <button type="button" data-desktop-action="schedule">Offiziellen Spielplan auswählen</button>
       <button type="button" data-desktop-action="calendar">DBV-Turnierkalender durchsuchen</button>
@@ -412,10 +416,10 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
      </div>
     </section>
     <div class="desktop-context-motif" aria-hidden="true"><img src="./assets/spvgg-schmetterlinge.svg" alt=""><small>SpVgg Mössingen Badminton · Schmetterlinge</small></div>
-   </aside>
+   </section>
   </section>
   <section class="page" id="view-spiele" aria-labelledby="heading-spiele">
-   <div class="section-heading"><h2 id="heading-spiele">Spielecke · Zeit bis zum nächsten Spiel?</h2><a class="outline-button" href="#turniere">← Turniertag</a></div>
+   <div class="section-heading"><h2 id="heading-spiele" role="heading" aria-level="1">Spielecke · Zeit bis zum nächsten Spiel?</h2><a class="outline-button" href="#turniere">← Turniertag</a></div>
    <div class="arcade-game-choice"><label for="arcade-game">Spiel auswählen
     <select id="arcade-game" aria-label="Spiel auswählen"><option value="snake">Snake · 120 Sekunden</option><option value="2048">2048 · 180 Sekunden</option><option value="pong">Pong Solo · 90 Sekunden</option></select>
    </label></div>
@@ -503,7 +507,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </div>
   </section>
   <section class="page" id="view-berichte" aria-labelledby="heading-berichte">
-   <div class="section-heading"><h2 id="heading-berichte">Berichte &amp; Erwähnungen</h2><button id="report-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
+   <div class="section-heading"><h2 id="heading-berichte" role="heading" aria-level="1">Berichte &amp; Erwähnungen</h2><button id="report-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
    <p class="supporting">Personenbezogene Spielererwähnungen werden im Privatmodus nicht öffentlich ausgeliefert. Allgemeine Quelleninformationen bleiben verfügbar; private Freigaben sind noch nicht aktiviert.</p>
    <div class="report-filters">
     <label>Ansicht<select id="report-scope"><option value="mentions">Spielererwähnungen</option><option value="club">Berichte zum Verein</option></select></label>
@@ -519,7 +523,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </details>
   </section>
   <section class="page club-overview-page" id="view-verein" aria-labelledby="heading-verein">
-   <div class="section-heading"><h2 id="heading-verein">Vereinsübersicht</h2></div>
+   <div class="section-heading"><h2 id="heading-verein" role="heading" aria-level="1">Vereinsübersicht</h2></div>
    <section class="club-overview-panel">
     <p class="club-overview-intro">Alle in den verfügbaren Vereinsquellen und auf diesem Gerät erfassten Spieler auf einen Blick. Unbelegte Ergebnisse werden nicht als Nullwerte ausgegeben.</p>
     <div class="club-overview-controls">
@@ -536,19 +540,29 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </section>
   </section>
   <section class="page" id="view-spieler" aria-labelledby="heading-spieler">
-   <div class="section-heading follow-hub-header"><h2 id="heading-spieler">Spieler</h2></div>
+   <div class="section-heading follow-hub-header"><h2 id="heading-spieler" role="heading" aria-level="1">Spieler</h2></div>
+   <section class="family-entry" aria-labelledby="family-entry-heading">
+    <div class="section-heading"><h3 id="family-entry-heading" role="heading" aria-level="2">Meine Familie</h3><a href="#einstellungen/profile">Profile verwalten ↗</a></div>
+    <p>Eigene Profile auf diesem Gerät. Folgen und private Freigaben bleiben getrennt.</p>
+    <div id="family-profile-links" class="family-profile-links"></div>
+    <a href="#einstellungen/profile" class="family-manage-link">Eigenes Spielerprofil hinzufügen oder bearbeiten</a>
+   </section>
    <a class="context-reports-link" href="#berichte">Berichte zu Spielern ansehen ↗</a>
    <section class="follow-hub" aria-label="Meine Spieler">
-    <h3 hidden>Mein Startprofil</h3>
+    <h3 hidden role="heading" aria-level="2">Mein Startprofil</h3>
     <div id="player-own-preview" class="follow-stack" aria-live="polite" hidden></div>
-    <div class="follow-hub-subheading"><h3>Gefolgte Spieler <span id="followed-player-count"></span></h3><button id="followed-show-all" type="button" class="subtle-button" hidden>Alle anzeigen</button></div>
+    <div class="follow-hub-subheading"><h3 role="heading" aria-level="2">Gefolgte Spieler <span id="followed-player-count"></span></h3><button id="followed-show-all" type="button" class="subtle-button" hidden>Alle anzeigen</button></div>
      <label class="followed-search-label">Spieler suchen oder hinzufügen<input id="followed-player-search" type="search" placeholder="Name, Verein oder DBV-ID" autocomplete="off" aria-controls="friend-list library-results"></label>
     <div id="friend-list" class="friends-list follow-stack" aria-live="polite"></div>
+    <p id="follow-order-status" class="settings-hint" role="status" aria-live="polite"></p>
+    <div id="follow-order-actions" class="follow-order-actions" role="group" aria-label="Ausgewählten Spieler verschieben" hidden>
+     <button type="button" data-follow-order="up">Nach oben</button><button type="button" data-follow-order="down">Nach unten</button><button type="button" data-follow-order="done">Fertig</button>
+    </div>
 
    </section>
    <section id="player-discover" class="follow-discovery" aria-labelledby="player-discover-heading" hidden>
-    <div class="follow-hub-subheading"><h3 id="player-discover-heading">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>
-   <div class="section-heading library-section-heading"><h3>Spieler suchen</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
+    <div class="follow-hub-subheading"><h3 id="player-discover-heading" role="heading" aria-level="2">Spieler finden</h3><button type="button" id="player-discover-close" class="subtle-button">Schließen</button></div>
+   <div class="section-heading library-section-heading"><h3 role="heading" aria-level="2">Spieler suchen</h3><button type="button" class="subtle-button" id="library-reload">Aktualisieren</button></div>
    <p class="supporting">Name (mindestens 3 Zeichen) oder DBV-ID eingeben und auf „+ Folgen“ tippen.</p>
    <div class="library-source" id="library-source" aria-live="polite">Offizielle DBV-Rangliste wird geladen.</div>
    <div class="library-filters">
@@ -570,15 +584,15 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </section>
   </section>
   <section class="page" id="view-mannschaft" aria-labelledby="heading-mannschaft">
-   <div class="section-heading follow-hub-header"><h2 id="heading-mannschaft">Mannschaften</h2><button id="team-add-open" class="subtle-button follow-add" type="button" aria-expanded="false" aria-controls="team-discover">+ Hinzufügen</button></div>
+   <div class="section-heading follow-hub-header"><h2 id="heading-mannschaft" role="heading" aria-level="1">Mannschaften</h2><button id="team-add-open" class="subtle-button follow-add" type="button" aria-expanded="false" aria-controls="team-discover">+ Hinzufügen</button></div>
    <a class="context-reports-link" href="#berichte">Berichte zu Teams ansehen ↗</a>
    <div class="follow-season"><label for="team-season">Saison</label><select id="team-season"><option value="2026/27">2026/27</option></select><button id="team-refresh" type="button" class="subtle-button">Aktualisieren</button></div>
    <section class="team-section" aria-labelledby="team-followed-heading">
-    <div class="follow-hub-subheading"><h3 id="team-followed-heading">Meine Mannschaften</h3><button id="team-order-reset" type="button" class="subtle-button follow-order-reset" disabled>Reihenfolge zurücksetzen</button></div>
+    <div class="follow-hub-subheading"><h3 id="team-followed-heading" role="heading" aria-level="2">Meine Mannschaften</h3><button id="team-order-reset" type="button" class="subtle-button follow-order-reset" disabled>Reihenfolge zurücksetzen</button></div>
     <div id="team-followed" class="team-stack" aria-live="polite"></div>
    </section>
    <section id="team-detail" class="team-detail" aria-labelledby="team-detail-title" hidden>
-    <h3 id="team-detail-title"></h3>
+    <h3 id="team-detail-title" role="heading" aria-level="2"></h3>
     <p id="team-detail-meta" class="team-detail-meta"></p>
     <p id="team-detail-summary" class="team-detail-summary"></p><p id="team-official-alias" class="team-source-note" hidden></p>
     <div class="team-tabs" role="tablist" aria-label="Mannschafts-Saisondaten">
@@ -595,11 +609,11 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </section>
 
    <section id="team-discover" class="follow-discovery team-discovery" aria-labelledby="team-find-heading" hidden>
-    <div class="follow-hub-subheading"><h3 id="team-find-heading">Mannschaften finden</h3><button type="button" id="team-discover-close" class="subtle-button">Schließen</button></div>
+    <div class="follow-hub-subheading"><h3 id="team-find-heading" role="heading" aria-level="2">Mannschaften finden</h3><button type="button" id="team-discover-close" class="subtle-button">Schließen</button></div>
     <div class="team-controls team-controls-single"><label>Mannschaft oder Verein suchen<input id="team-search" type="search" placeholder="Verein oder Liga" autocomplete="off"></label></div>
     <p id="team-count" class="team-result-count" aria-live="polite"></p>
     <div id="team-results" class="team-stack" aria-live="polite"></div>
-    <div class="team-club-directory" aria-labelledby="team-clubs-title"><h3 id="team-clubs-title">Weitere Vereine im BWBV</h3>
+    <div class="team-club-directory" aria-labelledby="team-clubs-title"><h3 id="team-clubs-title" role="heading" aria-level="2">Weitere Vereine im BWBV</h3>
      <p class="team-source-note">Nicht importierte Vereine können über den offiziellen nuLiga-Link geöffnet werden.</p>
      <div id="team-clubs-results" class="team-clubs-results" aria-live="polite"></div>
     </div>
@@ -608,12 +622,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    <p class="team-source-note">Spielpläne und Tabellen basieren auf datierten nuLiga-Quellen. Gefolgte Mannschaften bleiben auf diesem Gerät gespeichert.</p>
   </section>
   <section class="page" id="view-einstellungen" aria-labelledby="heading-einstellungen">
-   <div class="section-heading"><h2 id="heading-einstellungen">Einstellungen</h2></div>
-   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v234 · Release-Informationen werden geladen</p>
+   <div class="section-heading"><h2 id="heading-einstellungen" role="heading" aria-level="1">Einstellungen</h2></div>
+   <p class="app-build-info" id="app-build-info" aria-label="Technischer App-Stand">Version v235 · Release-Informationen werden geladen</p>
    <section class="player-management" aria-label="Meine eigenen Spielerprofile">
-    <div class="player-management-head"><h3>Profile und Familie</h3><p>Verwalte hier nur deine eigenen Spielerprofile. Andere Spieler findest du unter Spieler → Gefolgte Spieler.</p></div>
+    <div class="player-management-head"><h3 role="heading" aria-level="2">Profile und Familie</h3><p>Verwalte hier nur deine eigenen Spielerprofile. Andere Spieler findest du unter Spieler → Gefolgte Spieler.</p></div>
     <div class="settings-section">
-    <div class="section-heading"><h3>Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
+    <div class="section-heading"><h3 role="heading" aria-level="2">Meine Spielerprofile</h3><button id="add-player" class="subtle-button" type="button">+ Spielerprofil</button></div>
     <p class="settings-hint">Wähle das Standardprofil für deine Startseite. Zusätzliche eigene Profile lassen sich hier verwalten.</p>
     <div id="profile-list" class="profiles"></div>
     <p class="settings-hint"><a href="./private-player.html">Angenommene private Spielerfreigaben ansehen ↗</a></p>
@@ -622,7 +636,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
    </section>
 
    <section class="settings-card" id="owner-admin-panel" aria-labelledby="owner-admin-title" hidden>
-    <h3 id="owner-admin-title">Eigentümerverwaltung – private Spieler</h3>
+    <h3 id="owner-admin-title" role="heading" aria-level="2">Eigentümerverwaltung – private Spieler</h3>
     <p class="settings-hint">Du verwaltest die Freigabe deiner eigenen Spieler. Die Berechtigung wird auf dem Server geprüft – lokale Profile allein geben keinen Zugriff.</p>
     <label for="owner-admin-search">Meine Spieler nach Namen oder DBV-ID finden</label>
     <input id="owner-admin-search" type="search" placeholder="Name oder DBV-ID" autocomplete="off" aria-controls="owner-admin-candidates">
@@ -636,7 +650,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
       <button class="primary-button" type="submit">Berechtigung bestätigen</button>
     </form></details>
     <p id="owner-admin-status" class="settings-hint" role="status" aria-live="polite"></p>
-    <h4>Meine bestätigten Spieler</h4>
+    <h4 role="heading" aria-level="3">Meine bestätigten Spieler</h4>
     <ul id="owner-admin-grants"></ul>
    </section>
    <details class="settings-card" id="owner-activation-setup">
@@ -645,13 +659,13 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <p><a href="./owner-activate.html">Einmaligen Eigentümercode auf diesem Gerät eingeben ↗</a></p>
    </details>
    <section class="settings-card language-settings" aria-labelledby="language-title">
-    <h3 id="language-title">Sprache</h3>
+    <h3 id="language-title" role="heading" aria-level="2">Sprache</h3>
     <label for="app-language">App-Sprache</label>
     <select id="app-language" data-language-select aria-label="App-Sprache"><option value="auto">Automatisch</option><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="uk">Українська</option><option value="ru">Русский</option><option value="zh-Hans">简体中文</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="it">Italiano</option><option value="es">Español</option><option value="pl">Polski</option></select>
     <p class="settings-hint">Die Auswahl gilt auf diesem Gerät. Sprachpakete sind nach dem ersten Laden auch offline verfügbar. Nicht übersetzte Texte erscheinen auf Deutsch.</p>
    </section>
    <section class="settings-card club-branding-card" aria-labelledby="club-branding-title">
-    <h3 id="club-branding-title">Erscheinungsbild &amp; Verein</h3>
+    <h3 id="club-branding-title" role="heading" aria-level="2">Erscheinungsbild &amp; Verein</h3>
     <p class="settings-hint">Gestalte Schmetterlinge mit deinem Vereinsnamen, Logo und Vereinsfarben. Diese Einstellung ändert weder die offiziellen DBV-Vereinsdaten noch die Anzeige anderer Nutzer.</p>
     <form id="club-branding-form">
      <label class="club-field" for="club-name">Vereinsname
@@ -685,7 +699,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     </form>
    </section>
    <section class="settings-card invitation-card" aria-labelledby="invitation-title" hidden>
-    <h3 id="invitation-title">App-Zugänge einladen</h3>
+    <h3 id="invitation-title" role="heading" aria-level="2">App-Zugänge einladen</h3>
     <p>Ein Link berechtigt zum Lesen aller belegten Spielergebnisse und Trophäen. Er erlaubt keine Verwaltung fremder Spieler.</p>
     <div class="invitation-actions">
      <button class="primary-button" id="invite-share" type="button">Einladung erstellen & teilen</button>
@@ -696,12 +710,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <a class="invitation-guide" href="./welcome.html#installation">Anleitung: App auf iPhone oder Android hinzufügen ↗</a>
     <details class="invitation-short-guide">
      <summary>Einladung teilen oder erhalten – Kurzanleitung</summary>
-     <h4>Einladung teilen</h4>
+     <h4 role="heading" aria-level="3">Einladung teilen</h4>
      <ol>
       <li>Wähle „Einladung erstellen &amp; teilen“.</li>
       <li>Teile den Link über die angezeigte Auswahl.</li>
      </ol>
-     <h4>Einladung erhalten</h4>
+     <h4 role="heading" aria-level="3">Einladung erhalten</h4>
      <ol>
       <li>Öffne den erhaltenen Einladungslink.</li>
       <li>Folge den Anweisungen auf dem Bildschirm.</li>
@@ -711,12 +725,12 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <p class="invitation-status" id="invite-status" aria-live="polite"></p>
     <p class="small muted">Links sind bis zu 30 Tage einlösbar. Der Zugang bleibt danach bis zum Widerruf aktiv. Weitergeleitete Links können von weiteren Personen genutzt werden. Neue Geräte benötigen eine erneute Annahme.</p>
    </section>
-   <div class="settings-card"><h3>Datenquellen & Nachweise</h3>
+   <div class="settings-card"><h3 role="heading" aria-level="2">Datenquellen & Nachweise</h3>
     <p>Wir bewerten die Datenquellen nach Verlässlichkeit: offizieller DBV, Verband, Vereinsbericht und Drittanbieter. Die aktuelle DBV-Excel-Rangliste enthält nur Gesamtpunkte; die fünf Turnier-Einzelwertungen werden separat geprüft.</p>
     <a class="sources-reference-link" href="https://github.com/metzgerhannes-oss/Badminton/blob/main/docs/DATENQUELLEN_PRIORITAET.md" target="_blank" rel="noopener noreferrer">Quellenliste mit Qualitätsstufen ansehen ↗</a>
    </div>
    <section class="settings-card backup-card" aria-labelledby="backup-title">
-    <h3 id="backup-title">Meine Daten sichern</h3>
+    <h3 id="backup-title" role="heading" aria-level="2">Meine Daten sichern</h3>
     <p>Eigene Spieler, gefolgte Freunde, DBV-Turnierfavoriten und privat importierte Spond-Kalendertermine liegen auf diesem Gerät. Mit einer Sicherungsdatei kannst du sie auf ein anderes Gerät übertragen.</p>
     <div class="backup-actions">
      <button id="backup-export" class="primary-button" type="button">Sicherungsdatei erstellen</button>
@@ -729,7 +743,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
     <p id="backup-feedback" class="backup-feedback" role="status" aria-live="polite"></p>
     <p class="small muted">Die Sicherung enthält Spielernamen, Favoriten und gegebenenfalls private Spond-Termine. Sie wird nicht an uns übertragen. Auf dem Zielgerät ersetzt sie erst nach Bestätigung die betroffenen lokalen Daten. Ältere Sicherungen ohne Spond-Termine bleiben nutzbar.</p>
    </section>
-   <div class="settings-card"><h3>Daten & Datenschutz</h3>
+   <div class="settings-card"><h3 role="heading" aria-level="2">Daten & Datenschutz</h3>
     <p>Deine eigenen Profile, gefolgten Spieler und Turnierfavoriten bleiben auf diesem Gerät im Browser gespeichert. Es findet keine automatische Cloud-Synchronisierung der Familie statt. Eine lokale Sicherungsdatei wird nicht an uns hochgeladen.</p>
      <p>Schmetterlinge trennt frei lesbare Turnier- und Vereinsinformationen von geschützten Sportdaten. Eine gezielte DBV-Identitätssuche ist möglich; persönliche Match- und Platzierungsdaten werden erst nach gültiger App- oder passender Spielerfreigabe abgerufen. Frühere Git-Versionen und fremde Kopien können nicht nachträglich gelöscht werden.</p>
      <p>Eigene Spielerprofile, Freundeslisten und private Termine bleiben lokal auf dem Gerät. Mit gültiger App-Einladung können bereits gespeicherte, belegte Sportergebnisse gelesen werden. Für gesonderte private Spielerinformationen gelten weiterhin die jeweiligen Spielerfreigaben. Datenlücken und Quellenfehler werden unabhängig davon geprüft.</p>
@@ -763,6 +777,7 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
 </dialog>
 <dialog id="player-dialog" aria-label="Eigenes Spielerprofil hinzufügen oder bearbeiten">
  <form id="player-form" class="modal">
+  <p class="local-save-feedback" role="alert" data-local-save-feedback hidden></p>
   <div class="section-heading"><h2>Eigenes Spielerprofil hinzufügen</h2><button id="cancel-dialog" type="button" class="icon-button" aria-label="Schließen">×</button></div>
   <details id="own-player-manual-fallback" class="own-player-manual-fallback">
    <summary>Spieler nicht gefunden? Manuell anlegen</summary>
@@ -778,8 +793,9 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   </details>
  </form>
 </dialog>
-<dialog id="friend-dialog">
+<dialog id="friend-dialog" aria-label="Gefolgten Spieler hinzufügen oder bearbeiten">
  <form id="friend-form" class="modal">
+  <p class="local-save-feedback" role="alert" data-local-save-feedback hidden></p>
   <div class="section-heading"><h2>Freund hinzufügen</h2><button id="cancel-friend" type="button" class="icon-button" aria-label="Schließen">×</button></div>
   <label>Name / Spitzname<input name="name" required maxlength="80" placeholder="z. B. Max Mustermann"></label>
   <label>DBV-Spieler-ID<input name="id" required maxlength="9" placeholder="05-123456" pattern="[0-9]{2}-[0-9]{6}" title="Format 05-123456"></label>
@@ -790,8 +806,9 @@ html[data-app-access="checking"] .app-access-visually-hidden{position:absolute!i
   <button class="primary-button" type="submit">Freund speichern</button>
  </form>
 </dialog>
-<dialog id="tournament-dialog">
+<dialog id="tournament-dialog" aria-labelledby="tournament-dialog-heading">
  <form id="tournament-form" class="modal">
+  <p class="local-save-feedback" role="alert" data-local-save-feedback hidden></p>
   <div class="section-heading"><h2 id="tournament-dialog-heading">Turnier anlegen</h2><button id="cancel-tournament" type="button" class="icon-button" aria-label="Schließen">×</button></div>
   <label>Spieler<select name="playerId" id="tournament-player" required></select></label>
   <label>DBV-Turnierlink (Pflicht)<input name="url" type="url" required placeholder="https://dbv.turnier.de/tournament/…"></label>

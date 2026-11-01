@@ -51,10 +51,10 @@ function bwFrameworkHTML(filters,today){
  const bookmarks=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
  const saved=new Set(bookmarks.savedKeys||[]);
  return '<section class="dbv-calendar-cluster dbv-calendar-sourced-plan" aria-label="Offizielle Termine 2027">'+
-  '<h4>Turniere 2027 <small>'+planned.length+'</small></h4>'+
+  '<h4 role="heading" aria-level="3">Turniere 2027 <small>'+planned.length+'</small></h4>'+
   planned.map(t=>'<article class="dbv-calendar-entry dbv-calendar-external-plan card-open-surface">'+
     '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong><small>bis '+esc(formatDate(t.end))+'</small></div>'+
-    '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
+    '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5 role="heading" aria-level="4">'+esc(t.title)+'</h5>'+
     '<button type="button" class="dbv-calendar-save'+(saved.has(t.key)?' is-saved':'')+'" data-framework-toggle="'+esc(t.key)+'"'+
     ' aria-pressed="'+(saved.has(t.key)?'true':'false')+'"'+
     ' aria-label="'+esc(bookmarks.playerId?(saved.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarks.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
@@ -118,7 +118,7 @@ function bwArchiveHTML(filters){
  const found=bwArchiveDates(filters);
  if(!found.length)return "";
  return '<section class="dbv-calendar-cluster dbv-calendar-sourced-results" aria-label="Verifizierte Turniere 2026">'+
-  '<h4>'+(String(filters.q||"").trim().length>=3&&filters.period==="upcoming"?'Vergangene Turniere 2026 · Ergebnisse':'Turniere 2026')+' <small>'+found.length+'</small></h4>'+
+  '<h4 role="heading" aria-level="3">'+(String(filters.q||"").trim().length>=3&&filters.period==="upcoming"?'Vergangene Turniere 2026 · Ergebnisse':'Turniere 2026')+' <small>'+found.length+'</small></h4>'+
   found.map(t=>{
   const direct=t.sourceKind==="results"?window.SchmetterlingeBookmarks?.parseDbvTournamentLink?.(t.source):null;
   const own=window.badmintonCalendarBookmarkState?.()||{playerId:"",playerName:"",savedKeys:[]};
@@ -126,7 +126,7 @@ function bwArchiveHTML(filters){
   return '<article class="dbv-calendar-entry dbv-calendar-external-result card-open-surface">'+
    '<div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+
      '<small>bis '+esc(formatDate(t.end))+'</small></div>'+
-   '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
+   '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5 role="heading" aria-level="4">'+esc(t.title)+'</h5>'+
    (direct?'<button type="button" class="dbv-calendar-save'+(saved?' is-saved':'')+'" data-official-toggle="'+esc(direct.id)+'" aria-pressed="'+(saved?'true':'false')+'" aria-label="'+
     esc(own.playerId?(saved?'Gespeichertes Turnier entfernen: ':'Für '+own.playerName+' speichern: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
     (own.playerId?'':' disabled title="Eigenes Spielerprofil auswählen"')+'>'+(saved?'✓':'+')+'</button>':'')+'</div>'+
@@ -141,7 +141,7 @@ const defaults={year:"all",region:"all",age:"all",level:"all",q:"",period:"upcom
 function readPreference(){
  try{const x=JSON.parse(localStorage.getItem(STORAGE)||"{}");return {...defaults,...Object.fromEntries(Object.entries(x).filter(([k,v])=>k in defaults&&typeof v==="string"))}}catch{return {...defaults}}
 }
-let settings=readPreference(),entries=[],source="supabase",loading=false,loaded=false,problem="",batchLimit=36;
+let settings=readPreference(),entries=[],source="supabase",loading=false,loaded=false,problem="",batchLimit=12;
 function message(s,state="ready"){
  const n=$("dbv-calendar-status");if(!n)return;
  n.textContent=s;n.dataset.state=state;
@@ -217,7 +217,7 @@ function render(){
   const switchPeriod=settings.period==="upcoming"&&settings.year==="2026"&&
      settings.region==="Baden-Württemberg"&&BW_YOUTH_AGES.includes(settings.age)
     ?'<button type="button" class="subtle-button" data-calendar-show-history>Ergebnisse 2026 ansehen ↗</button>':"";
-  host.innerHTML=nextYearHint+'<div class="dbv-calendar-no-results"><h4>'+(unavailable?"Kalenderquelle nicht erreichbar":"Keine passenden Turniere")+'</h4>'+
+  host.innerHTML=nextYearHint+'<div class="dbv-calendar-no-results"><h4 role="heading" aria-level="3">'+(unavailable?"Kalenderquelle nicht erreichbar":"Keine passenden Turniere")+'</h4>'+
     '<p>'+(unavailable?"Aktuelle Turnierdaten konnten nicht geprüft werden. Das ist kein Nachweis für fehlende Turniere.":"In dieser Auswahl sind keine bestätigten Einträge verfügbar.")+'</p>'+
     switchPeriod+
     (alternatives.length?'<div class="dbv-calendar-alternatives">'+
@@ -235,11 +235,11 @@ function render(){
   const visible=cluster.items.slice(0,remaining);
   remaining-=visible.length;
   if(!visible.length)continue;
-  html+='<section class="dbv-calendar-cluster"><h4>'+esc(cluster.label)+' <small>'+cluster.items.length+'</small></h4>';
+  html+='<section class="dbv-calendar-cluster"><h4 role="heading" aria-level="3">'+esc(cluster.label)+' <small>'+cluster.items.length+'</small></h4>';
   html+=visible.map(t=>{
    const closed=t.deadline&&t.deadline<localToday();
    return '<article class="dbv-calendar-entry card-open-surface'+(t.historicalArchive?' dbv-calendar-entry--history':'')+'"><div class="dbv-calendar-date"><strong>'+esc(formatDate(t.start))+'</strong>'+(t.end!==t.start?'<small>bis '+esc(formatDate(t.end))+'</small>':"")+'</div>'+
-    '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5>'+esc(t.title)+'</h5>'+
+    '<div class="dbv-calendar-detail"><div class="dbv-calendar-card-head"><h5 role="heading" aria-level="4">'+esc(t.title)+'</h5>'+
     (t.historicalArchive?'':'<button type="button" class="dbv-calendar-save'+(savedKeys.has(t.key)?' is-saved':'')+'" data-calendar-toggle="'+esc(t.key)+'"'+
     ' aria-pressed="'+(savedKeys.has(t.key)?'true':'false')+'"'+
     ' aria-label="'+esc(bookmarkState.playerId?(savedKeys.has(t.key)?'Vormerkung entfernen: ':'Für '+bookmarkState.playerName+' vormerken: ')+t.title:'Bitte zuerst ein eigenes Spielerprofil auswählen')+'"'+
@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   node?.addEventListener(key==="q"?"input":"change",()=>{
    settings[key]=node.value;
    try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
-   batchLimit=36;render();
+   batchLimit=12;render();
   });
  }
  $("dbv-calendar-results")?.addEventListener("click",event=>{
@@ -397,21 +397,21 @@ document.addEventListener("DOMContentLoaded",()=>{
    settings.period="all";
    $("dbv-calendar-period").value="all";
    try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
-   batchLimit=36;render();return;
+   batchLimit=12;render();return;
   }
   const future=event.target.closest("button[data-calendar-show-2027]");
   if(future){
    settings.year="2027";
    $("dbv-calendar-year").value="2027";
    try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
-   batchLimit=36;render();return;
+   batchLimit=12;render();return;
   }
   const alternative=event.target.closest("button[data-calendar-alternative-level]");
   if(alternative&&LEVEL_OPTIONS.includes(alternative.dataset.calendarAlternativeLevel)){
    settings.level=alternative.dataset.calendarAlternativeLevel;
    $("dbv-calendar-level").value=settings.level;
    try{localStorage.setItem(STORAGE,JSON.stringify(settings))}catch{}
-   batchLimit=36;render();return;
+   batchLimit=12;render();return;
   }
   const official=event.target.closest("button[data-official-toggle]");
    if(official){
@@ -437,7 +437,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(!result?.ok)message(result?.message||"Turnier konnte nicht vorgemerkt werden.");
  });
  window.addEventListener("badminton:tournament-bookmarks",()=>{if(loaded)render()});
- $("dbv-calendar-more")?.addEventListener("click",()=>{batchLimit+=36;render()});
- $("dbv-calendar-refresh")?.addEventListener("click",()=>{loaded=false;batchLimit=36;void load()});
+ $("dbv-calendar-more")?.addEventListener("click",()=>{batchLimit+=12;render()});
+ $("dbv-calendar-refresh")?.addEventListener("click",()=>{loaded=false;batchLimit=12;void load()});
  void load();
 });

@@ -1,5 +1,25 @@
 # Schmetterlinge – Badminton-App
 
+## Entwicklung und aktueller Stand
+
+Statische HTML/CSS/JavaScript-PWA mit Supabase als zugangsgeschützter Datenquelle. Neue Geräte erhalten keine voreingestellten Familienprofile. Ältere Versionsabschnitte weiter unten sind Entwicklungshistorie und beschreiben nicht automatisch den heutigen Funktionsumfang.
+
+Node 22 (siehe `.nvmrc`), Python 3 und die im Lockfile festgelegten Testabhängigkeiten verwenden:
+
+```bash
+npm ci
+python3 -m http.server 4173 --bind 127.0.0.1
+# In einem zweiten Terminal:
+npx playwright install --with-deps chromium webkit
+npm run test:mobile
+```
+
+Die Browsertests verwenden synthetische Daten und sperren produktive Supabase-APIs. Schneller lokaler Daten-/Backup-Vertragstest: `node tests/state-storage.mjs && node tests/local-backup.mjs && node tests/invitation.mjs`. Die vollständigen Unit-/Sicherheitsbefehle stehen in `.github/workflows/tests.yml`. Pages wird über `.github/workflows/ranking.yml` bereitgestellt; lokale Testartefakte gehören nicht in die Veröffentlichung.
+
+Bei der Neuanlage gelten Grenzen von zwölf eigenen Profilen, 30 gefolgten Spielern und 40 Turnierlinks. Ältere gültige Überbestände bleiben erhalten; Backups sichern sie innerhalb separater, größenbegrenzter Wiederherstellungsgrenzen. Lokale Profile erteilen keine privaten Serverrechte.
+
+Den [Auditbericht](docs/VERBESSERUNGSBERICHT_2026-11-01.md) bei weiteren UI-/Storage-Änderungen berücksichtigen. Lokale Tests ersetzen weder die reale iPhone-/VoiceOver-Abnahme noch einen aktuellen Produktionsrechte-Audit.
+
 **Produktvision:** „Öffnen. Erkennen. Tippen. Fertig.“ Eine intuitive, kostenlose, datensparsame PWA für Familien, Badminton-Spieler, Mannschaften, Turniere und belegte Ergebnisse. Das bisher freigegebene **Corporate Design (CD) bleibt verbindlich**; Navigation, Layout, Texte, Suchwege, Desktop-/iPhone-Struktur und Komponenten dürfen vollständig neu gestaltet werden.
 
 ## Verbindliche Projektbeschreibung: UX-Redesign 2.0 (25.10.2026)

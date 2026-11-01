@@ -56,6 +56,8 @@ test("v217: pointer drag reorders the main list and persists after reload",async
  await page.mouse.move(a.x+a.width/2,a.y+a.height/2);
  await page.mouse.down();
  await page.mouse.move(b.x+b.width/2,b.y+b.height/2,{steps:8});
+ await expect(page.locator('[data-follow-row="98-800003"]')).toHaveClass(/is-dragging/);
+ await expect(first).toHaveClass(/is-drop-target/);
  await page.mouse.up();
  expect(await ids(page)).toEqual(["98-800003","98-800001","98-800002"]);
  await page.reload({waitUntil:"domcontentloaded"});

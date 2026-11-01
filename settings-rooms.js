@@ -36,6 +36,7 @@
   const header=document.createElement("div");header.className="settings-room-header";
   const back=document.createElement("a");back.href="#einstellungen";back.className="settings-room-back";back.textContent="‹ Alle Einstellungen";
   const title=document.createElement("h3");title.textContent=d.title;title.tabIndex=-1;
+  title.setAttribute("role","heading");title.setAttribute("aria-level","2");
   const intro=document.createElement("p");intro.textContent=d.desc;
   header.append(back,title,intro);room.append(header);
   view.append(room);rooms.set(d.id,{room,title});

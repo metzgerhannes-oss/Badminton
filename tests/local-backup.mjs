@@ -25,6 +25,13 @@ const privateCalendar=[{name:"Beispiel-Ranglistenturnier",startDate:"2026-10-24"
 const created=createLocalBackup(stored,new Date("2026-10-10T11:00:00.000Z"),
  JSON.stringify(privateCalendar));
 const parsed=inspectLocalBackup(created);
+// Legacy overflow can be backed up and restored without enlarging creation limits.
+const overflowData={...original,players:Array.from({length:13},(_,i)=>({id:"99-"+String(910000+i),name:"Recovery "+i})),
+ officialLinks:[],activeProfileId:"99-910012",chosen:"99-910012"};
+const overflowBackup=inspectLocalBackup(createLocalBackup(JSON.stringify(overflowData)));
+assert.equal(overflowBackup.data.players.length,13);
+assert.equal(overflowBackup.data.activeProfileId,"99-910012");
+assert.throws(()=>normalizeLocalData({...overflowData,players:Array(101).fill(overflowData.players[0])}),"Recovery is bounded");
 assert.equal(LOCAL_STORE_KEY,"shuttleboard-v1");
 assert.equal(SPOND_STORE_KEY,"schmetterlinge.calendarEvents.v1");
 assert.equal(LEGACY_BACKUP_VERSION,1);

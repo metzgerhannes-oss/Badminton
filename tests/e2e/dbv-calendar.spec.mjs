@@ -167,6 +167,10 @@ test("v148: BW U13 historic A/B/C results distinguish Hexen-Cup A from C",async(
  await expect(page.locator(".dbv-calendar-external-result")).toHaveCount(6);
  const visible=Number((await page.locator("#dbv-calendar-status").textContent()).match(/(\d+) passende Turniere/)?.[1]);
  expect(visible).toBeGreaterThan(17);
+ // A compact first page must still make every matching event reachable.
+ const more=page.locator("#dbv-calendar-more");
+ for(let batch=0;batch<10&&await more.isVisible();batch++)await more.click();
+ await expect(more).toBeHidden();
  await expect(page.locator("#dbv-calendar-results .dbv-calendar-entry")).toHaveCount(visible);
 });
 
