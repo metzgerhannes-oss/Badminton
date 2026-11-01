@@ -15,9 +15,7 @@
  <link rel="stylesheet" href="./welcome.css">
 <link rel="stylesheet" href="./contrast-v189.css">
 <link rel="stylesheet" href="./pwa-update.css">
- <link rel="stylesheet" href="./language.css">
- <script defer src="./i18n.js"></script>
- <script defer src="./app-release.js"></script>
+   <script defer src="./app-release.js"></script>
 <script defer src="./pwa-update.js"></script>
  <script type="module" src="./welcome.js"></script>
 </head>
@@ -29,12 +27,7 @@
    <a href="./#start" id="existing-app-link">Zur App ↗</a>
   </header>
   <main>
-  <div class="welcome-language-picker" role="group" aria-label="Sprache für die Einrichtung wählen">
-      <label for="welcome-language">Sprache</label>
-      <select id="welcome-language" data-language-select aria-label="App-Sprache"><option value="auto">Automatisch</option><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="uk">Українська</option><option value="ru">Русский</option><option value="zh-Hans">简体中文</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="it">Italiano</option><option value="es">Español</option><option value="pl">Polski</option></select>
-     </div>
-   <p id="welcome-language-status" class="welcome-language-status" role="status" aria-live="polite"></p>
-   <div class="welcome-steps" aria-label="Einrichtungsschritte">
+  <div class="welcome-steps" aria-label="Einrichtungsschritte">
     <span id="progress-install" class="welcome-step">1. Schritt App hinzufügen</span>
     <span id="progress-profile" class="welcome-step current">2. Schritt Profil anlegen</span>
    </div>

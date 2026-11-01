@@ -3,10 +3,9 @@ import {readFile} from "node:fs/promises";
 import vm from "node:vm";
 
 const files = await Promise.all([
-  "index.html", "welcome.html", "club-branding.js", "club-branding.css",
-  "language.css", "i18n.js", "sw.js"
+  "index.html", "welcome.html", "club-branding.js", "club-branding.css", "sw.js"
 ].map(path => readFile(path, "utf8")));
-const [index, welcome, script, css, languageCss, i18n, serviceWorker] = files;
+const [index, welcome, script, css, serviceWorker] = files;
 
 for (const id of ["club-branding-form", "club-name", "club-logo", "club-accent",
   "club-logo-remove", "club-branding-cancel", "club-branding-reset",
@@ -15,24 +14,11 @@ for (const id of ["club-branding-form", "club-name", "club-logo", "club-accent",
 }
 assert.match(index, /<script defer src="\.\/club-branding\.js"><\/script>/);
 assert.match(index, /<link rel="stylesheet" href="\.\/club-branding\.css">/);
-assert.match(welcome, /id="welcome-language" data-language-select/);
-assert.ok(welcome.indexOf('id="welcome-language"') < welcome.indexOf('id="progress-profile"'),
-  "Language selection must precede onboarding");
-assert.match(welcome, /id="welcome-language-status"/);
-assert.match(languageCss, /min-height:46px/);
-assert.match(i18n, /schmetterlinge\.uiLanguage/);
+assert.doesNotMatch(welcome, /data-language-select|welcome-language/,
+ "Retired language controls must not return to onboarding");
 assert.match(serviceWorker, /schmetterlinge-shell-v[1-9][0-9]*/);
 assert.match(serviceWorker, /club-branding\.js/);
 assert.match(serviceWorker, /club-branding\.css/);
-for (const code of ["en", "fr", "uk", "ru", "zh-Hans", "tr", "ar", "it", "es", "pl"]) {
-  const pack = JSON.parse(await readFile("locales/" + code + ".json", "utf8"));
-  assert.equal(pack.meta.locale, code);
-  for (const key of ["Für wen möchtest du ein Profil anlegen?",
-    "Erscheinungsbild & Verein", "Vereinsname", "Vereinsdesign speichern"]) {
-    assert.ok(typeof pack.messages[key] === "string" && pack.messages[key].length > 0,
-      "Missing locale string: " + code + " " + key);
-  }
-}
 assert.match(css, /\.club-themed \.bottom-nav a\[aria-current="page"\]/);
 assert.doesNotMatch(css, /(?:win|loss|victor|defeat|warning|error)-/i,
   "Branding CSS must not modify scores or warning semantics");

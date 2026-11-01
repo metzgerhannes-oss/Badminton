@@ -56,8 +56,6 @@ jobs:
           node --check invite.js
           node --check scripts/owner-invites-overview.mjs
           node --check club-branding.js
-          node --check i18n.js
-          node --check scripts/validate-i18n.mjs
           node --check club-overview.js
           node --check scripts/club-overview-model.mjs
           node --check library.js
@@ -252,9 +250,7 @@ jobs:
           node tests/desktop-tournament-step9.mjs
           node tests/desktop-workspace-step9.mjs
           node tests/ux-motion-step8.mjs
-          node tests/welcome-i18n.mjs
           node tests/onboarding-wizard-v202.mjs
-          node scripts/validate-i18n.mjs
           node tests/invite-feedback.mjs
           node tests/auth-singleflight.mjs
           node tests/owner-device-transfer.mjs

@@ -7,7 +7,7 @@ const root=process.cwd();
 const dest=resolve(root,".cloudflare-private-dist");
 if(dest===root)throw Error("Invalid destination");
 const runtimeRootExt=new Set([".html",".js",".css",".webmanifest",".png",".svg",".ico"]);
-const assetDirs=new Set(["assets","games","locales"]);
+const assetDirs=new Set(["assets","games"]);
 const runtimeModuleExt=new Set([".js",".mjs",".json",".css",".svg",".png",".webp"]);
 const calendarFixtures=new Set([
  "bw-youth-calendar-archive.json",
