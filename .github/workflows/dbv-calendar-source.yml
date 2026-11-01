@@ -1,7 +1,9 @@
-name: DBV-Kalender Import (offline)
-# No official source download or productive OIDC publication from Actions.
+name: DBV-Kalender Import und Quellenabgleich
+# Fetch only official public DBV events. GitHub OIDC scopes the backend writer to main.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '37 3 * * *'
   pull_request:
     branches: [main]
     paths:
@@ -39,3 +41,46 @@ jobs:
           python3 -m unittest discover -s tests -p test_dbv_calendar.py -v
           python3 -m unittest discover -s tests -p test_dbv_calendar_oidc.py -v
           python3 -m py_compile scripts/import-dbv-calendar.py scripts/publish-dbv-calendar-oidc.py
+
+  publish:
+    # No privileged writes from untrusted pull requests or preview branches.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Parse current official DBV calendar and retain exact tournament links
+        run: |
+          set -euo pipefail
+          python3 scripts/import-dbv-calendar.py --year 2026 --write-json --export-payload /tmp/dbv-calendar-payload.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows=json.loads(Path('/tmp/dbv-calendar-payload.json').read_text(encoding='utf-8'))['entries']
+          direct=[row for row in rows if row.get('event_url')]
+          print('DBV: %d verified rows, %d source-linked tournament detail pages'%(len(rows),len(direct)))
+          for key in ('dbv-calendar-44749','dbv-calendar-43826'):
+           hit=next((r for r in rows if r['source_key']==key),None)
+           print('DBV official',key,'present='+str(bool(hit)),'direct='+str(bool(hit and hit.get('event_url'))))
+          if len(rows)<50:raise RuntimeError('Source unexpectedly small; refusing partial sync')
+          PY
+      - name: Publish verified public DBV fields to Badminton Supabase only
+        run: |
+          set -euo pipefail
+          python3 scripts/publish-dbv-calendar-oidc.py --payload /tmp/dbv-calendar-payload.json
+      - name: Retain reproducible official snapshot on main
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/dbv-calendar.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data(DBV): refresh verified calendar and source-provided event URLs"
+            git push origin HEAD:main
+          fi
