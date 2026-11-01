@@ -39,7 +39,7 @@ for(const width of [320,390]){
   await expect(card.locator("h3")).toContainText("· Gomaringen");
   await expect(card.locator(".saved-tournament-dates")).toContainText("22.");
   await expect(card.locator(".saved-tournament-player")).toHaveText("Spieler: Synthetisches Familienprofil");
-  await expect(card.locator('.card-open-primary')).toContainText("DBV-Kalender öffnen");
+  await expect(card.locator('.card-open-primary')).toContainText("DBV-Turnierkalender (Übersicht)");
   await expect(card.locator('.card-open-primary')).toHaveAttribute("href","https://turniere.badminton.de/");
   const box=await card.evaluate(node=>{
    const footer=node.querySelector(".saved-tournament-player").getBoundingClientRect();
@@ -59,7 +59,7 @@ test("direct DBV URL is used only when the matching source calendar key confirms
  await expect(page.locator("#app-access-gate")).toBeHidden();
  const calendar=page.locator('#official-tournament-list [data-saved-tournament-id="'+CALENDAR+'"]');
  const masters=page.locator('#official-tournament-list [data-saved-tournament-id="'+UUID+'"]');
- await expect(calendar.locator(".card-open-primary")).toHaveText("DBV-Kalender öffnen ↗");
+ await expect(calendar.locator(".card-open-primary")).toHaveText("DBV-Turnierkalender (Übersicht) ↗");
  await expect(masters.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
  await expect(masters.locator("h3")).toHaveText("German Masters U11");
  const technical=masters.locator(".saved-tournament-technical");
