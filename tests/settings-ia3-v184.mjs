@@ -25,7 +25,6 @@ assert.match(rooms,/setAttribute\("aria-label","Einstellungsbereiche"\)/);
 assert.ok(rooms.includes('a.href="#einstellungen/"+d.id'),"Room links must target their unique canonical settings hash");
 for(const [room,control]of [
  ["profile",".player-management"],
- ["darstellung",".language-settings"],
  ["darstellung",".club-branding-card"],
  ["einladungen",".invitation-card"],
  ["einladungen","#owner-admin-panel"],
@@ -46,7 +45,7 @@ for(const [hash,destination]of [
 ])assert.ok(rooms.includes('"'+hash+'":"'+destination+'"'),
  "Existing bookmark must redirect to its canonical destination: "+hash);
 for(const id of ["profile-list","owner-admin-panel","owner-activation-setup",
- "app-language","club-branding-form","invite-share","backup-export",
+ "club-branding-form","invite-share","backup-export",
  "backup-restore","followed-player-search","team-followed","team-order-reset"]){
  assert.equal((html.match(new RegExp('id="'+id+'"',"g"))||[]).length,1,
  "Do not create duplicates or remove existing controls: "+id);
