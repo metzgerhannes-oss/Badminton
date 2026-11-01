@@ -32,4 +32,3 @@ export async function onRequestPost({request,fetcher=fetch}){
   });
  }catch{return deny(503)}
 }
-export const onRequest=onRequestPost;
