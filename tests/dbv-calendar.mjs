@@ -125,6 +125,9 @@ assert.ok(main.includes("window.badmintonCalendarToggle="),"App must implement q
 assert.ok(main.includes('source:"dbv-calendar"'),"Source type prevents false official tournament detail IDs");
 assert.ok(main.includes('state.officialLinks.unshift(entry)'),"Private bookmark must appear in saved tournament list");
 assert.ok(main.includes('source!=="dbv-calendar"'),"Unverified calendar events must not be used for official live match options");
+assert.match(app,/DBV-Turnierkalender \(Übersicht\) ↗/,"Calendar-only items must identify the destination as overview");
+assert.match(app,/t\.hasDirectLink\?"Offizielle Turnierseite ↗"/,"Only source-verified direct links may advertise event details");
+
 console.log("DBV calendar: source IDs, 3-dimensional facets, BW, age/level, no fake tournament links and offline integration passed.");
 
 assert.ok(app.includes("BW_YOUTH_ARCHIVE_2026")&&app.includes("t.ages.includes(filters.age)"),"Real verified historical BW youth results must be correctly age-filtered");
