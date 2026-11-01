@@ -39,9 +39,9 @@ assert.match(await readFile(root+"dbv-calendar-source.yml","utf8"),
 console.log("P0: three CI source workflows are synthetic and write-disabled.");
 
 
-// Five additional source workflows: no live fetch, publish, schedule or write
+// Remaining four source workflows: no live fetch, publish, schedule or write
 // path may be reintroduced as part of test CI. These checks run on every PR.
-const fiveSourceWorkflows=[
+const offlineSourceWorkflows=[
  "bw-youth-archive.yml",
  "bwbv-youth-calendar.yml",
  "team-report-import.yml",
@@ -65,7 +65,7 @@ function assertOfflineSourceWorkflow(name,source){
  assert.doesNotMatch(source,/\b(?:node|python3)\s+scripts\/(?:import-|badhub-source-audit)/,
   name+": no direct live importer or source audit");
 }
-for(const name of fiveSourceWorkflows){
+for(const name of offlineSourceWorkflows){
  const workflow=await readFile(root+name,"utf8");
  assertOfflineSourceWorkflow(name,workflow);
  // Mutation probes ensure the guard actually fails on the forbidden changes.
@@ -121,4 +121,4 @@ const disabled=spawnSync(process.execPath,["scripts/badhub-source-audit.mjs"],
 assert.equal(disabled.error,undefined);
 assert.notEqual(disabled.status,0,"Badhub CLI must fail closed, not return false green");
 assert.match(disabled.stderr,/disabled/);
-console.log("P0: five additional source workflows and live Badhub probe are offline-only.");
+console.log("P0: four private source workflows and live Badhub probe are offline-only.");
