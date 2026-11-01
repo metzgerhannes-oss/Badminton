@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const sql=readFileSync("database/p1-429-cloudflare-enrollment-role-fix.sql","utf8");
+assert.match(sql,/SECURITY DEFINER SET search_path = ''/);
+assert.match(sql,/REVOKE ALL ON FUNCTION public\.cf_access_enroll_member\(uuid,text\)\s+FROM PUBLIC,anon,authenticated/);
+assert.match(sql,/GRANT EXECUTE ON FUNCTION public\.cf_access_enroll_member\(uuid,text\)\s+TO service_role/);
+assert.doesNotMatch(sql,/request\.jwt\.claim\.role/);
+assert.match(sql,/cf_access_allowed_emails a/);
+assert.match(sql,/a\.enabled/);
+assert.match(sql,/valid_until/);
+assert.match(sql,/auth\.users u/);
+assert.doesNotMatch(sql,/GRANT.*EXECUTE.*TO authenticated/);
+console.log("#429: enrollment RPC only callable by service_role; independent email allowlist still required");
