@@ -59,6 +59,11 @@ jobs:
                   "inline links",len(row["links"]) if row else 0,
                   "panel links",len(parser.panels.get(key,[])),
                   "verified direct",bool(lib.verified_detail_link({"links":links})))
+            print("public row hrefs",key,[value[:210] for value in (row["links"] if row else [])])
+            hit=html.find('id="collapse'+key+'"')
+            if hit<0:hit=html.find("id='collapse"+key+"'")
+            if hit>=0:print("expanded DBV markup",key," ".join(html[hit:hit+1700].split())[:1700])
+
             if not lib.verified_detail_link({"links":links}):
              at=html.find("#collapse"+key)
              if at<0:at=html.find("collapse"+key)
