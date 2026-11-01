@@ -32,6 +32,14 @@ Diese Datei beschreibt die geprüfte Zielumgebung. Sie gilt für **alle Arbeiten
 
 Diese Kennzahlen sind eine Momentaufnahme und keine garantierten aktuellen Daten. Vor neuen Aussagen erneut direkt abfragen.
 
+## Veröffentlichungsziel ab 01.11.2026 – ausschließlich private Familien-App
+
+- **Einziger App-Produktionsweg:** Cloudflare Pages `schmetterlinge-familie` (https://schmetterlinge-familie.pages.dev/) mit aktivem Cloudflare Access und privaten Supabase-RLS-Mitgliedsrechten.
+- **Produktionsbranch:** `fix/p0-417-private-member-reads-20261027`. App-PRs gegen diesen Branch prüfen und nach erfolgreichen relevanten Tests ausschließlich dort mergen; Cloudflare-Produktivdeployment anhand der tatsächlichen Commit-SHA bestätigen.
+- **Öffentliche GitHub Pages nicht mehr für App-Releases einsetzen.** GitHub `main` bleibt Quell-/Backend- bzw. OIDC-Kalenderimport-Branch, nicht das Veröffentlichungsziel der App. Keine App-Änderungen nur zum öffentlichen GitHub Pages deployen.
+- Vorhandene historische öffentliche Website ist **nicht** die Familien-App. Keine personalisierten Daten oder privaten Tokens darüber ausliefern. Keine Cloudflare-Access- oder RLS-Sperren lockern.
+- Versionen, PWA-Cache und Installationshinweise nur mit dem privaten Cloudflare-Release synchronisieren. Getestete lokale Profile, Freigaben und Eigentümerrechte erhalten.
+
 ## Weitere Abgrenzung
 
 Ein `HTTP 401` an der separaten nuLiga-/DBV-API ist **kein** Hinweis auf fehlende Berechtigungen für Supabase. Quellzugriff und Datenbankzugriff sind unabhängig zu prüfen.
@@ -46,5 +54,5 @@ Bei Fehlern über Projektverfügbarkeit immer zuerst die obige Projekt-ID prüfe
 - **UX-Soll:** vier stabile mobile Ziele **Start · Spieler · Turniere · Teams**; LIVE als nachweisbasiertes kontextuelles Highlight, nicht als zusätzlicher verrutschender Haupttab. Berichte, Ranglisten, Statistik und Verein kontextbezogen.
 - **Ein Pflegeweg pro Aufgabe:** eigene Familienprofile klar getrennt von gefolgten Personen, aber gut erreichbar im Spielerbereich; direkte Such-/Folge-/Sortieraktionen, konkrete Turnierorte als eigene Zeile, `+ Merken` ohne Umweg, Ergebnis → korrekter Einzelbeleg.
 - **Technische Regeln unverändert:** alte Routen/Storage/Freigaben erhalten, kostenlose Freeplan-konforme Lösung, kein produktives Supabase in gewöhnlichen Unit/CI/Playwright-Tests, keine erfundenen Live-/Matchdaten, keine ungeprüften externen Quellennutzungen.
-- **Lieferung:** vorhandene PRs/Gates und Issues (insb. #13, #306, #333, #305, #17, #56) zuerst abgleichen; Feature-Pakete sequenziell und mit technischen Prüfungen bis Main/Pages abschließen. **Keine manuellen Zwischenabnahmen**, eine physische iPhone-/Desktop-Schlussabnahme nach Gesamtabarbeitung.
+- **Lieferung:** vorhandene PRs/Gates und Issues (insb. #13, #306, #333, #305, #17, #56) zuerst abgleichen; Feature-Pakete sequenziell und mit technischen Prüfungen bis zum geschützten Cloudflare-Produktionsbranch/Pages-Deployment abschließen. **Keine manuellen Zwischenabnahmen**, eine physische iPhone-/Desktop-Schlussabnahme nach Gesamtabarbeitung.
 - **Konzeptstatus:** Beschreibung, nicht implementiert oder freigegeben. Niemals aufgrund dieser Dokumentation „live“ oder „fertig“ behaupten.
