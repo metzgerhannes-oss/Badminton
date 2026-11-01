@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {onRequestPost} from "../functions/api/access-bootstrap.js";
 
-const URL="https://schmetterlinge-familie.pages.dev/api/access-bootstrap";
-const authorized=()=>new Request(URL,{method:"POST",headers:{
+const TEST_URL="https://schmetterlinge-familie.pages.dev/api/access-bootstrap";
+const authorized=()=>new Request(TEST_URL,{method:"POST",headers:{
  Origin:"https://schmetterlinge-familie.pages.dev",
  Authorization:"Bearer valid.supabase.session",
  "Cf-Access-Jwt-Assertion":"signed.cloudflare.assertion"
@@ -16,9 +16,9 @@ const denied=async(request)=>{
  assert.deepEqual(await response.json(),{allowed:false});
  assert.equal(response.headers.get("cache-control"),"no-store");
 };
-await denied(new Request(URL,{method:"POST",headers:{Authorization:"Bearer fake.jwt"}}));
-await denied(new Request(URL,{method:"POST",headers:{"Cf-Access-Jwt-Assertion":"fake"}}));
-await denied(new Request(URL,{method:"POST",headers:{
+await denied(new Request(TEST_URL,{method:"POST",headers:{Authorization:"Bearer fake.jwt"}}));
+await denied(new Request(TEST_URL,{method:"POST",headers:{"Cf-Access-Jwt-Assertion":"fake"}}));
+await denied(new Request(TEST_URL,{method:"POST",headers:{
  Origin:"https://attacker.example",Authorization:"Bearer fake.jwt",
  "Cf-Access-Jwt-Assertion":"forged"
 }}));
