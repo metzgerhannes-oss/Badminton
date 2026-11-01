@@ -1,6 +1,7 @@
 """Offline regression tests for the official DBV calendar data contract."""
 import importlib.util
 from pathlib import Path
+from unittest.mock import patch
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -65,6 +66,34 @@ class CalendarTests(unittest.TestCase):
   self.assertEqual(rows[1]["event_url"],"https://dbv.turnier.de/tournament/"+uuid2)
   self.assertEqual(rows[1]["location_text"],"Hofheim")
   self.assertEqual(rows[1]["registration_deadline"],"2026-11-10")
+ def test_real_calendar_ajax_protocol_and_verified_url(self):
+  uuid="F849360D-AF7A-41E7-A20A-D438074A52CE"
+  class Response:
+   status=200
+   url="https://turniere.badminton.de/ajax/tournament/43826"
+   def __enter__(self):return self
+   def __exit__(self,*a):return False
+   def read(self,n):
+    return ('<a href="https://cloud.badminton.de/index.php/s/example">Ausschreibung</a>'+
+     '<a href="https://dbv.turnier.de/tournament/'+uuid+'">Turnier</a>'+
+     '<a href="https://turniere.badminton.de/downloadIcs/43826">Kalender</a>').encode()
+  with patch.object(module,"urlopen",return_value=Response()) as mocked:
+   self.assertEqual(module.read_event_details("43826"),"https://dbv.turnier.de/tournament/"+uuid)
+   request=mocked.call_args.args[0]
+   self.assertEqual(request.get_method(),"POST")
+   self.assertEqual(request.data,b"jwsfilter=0")
+   self.assertEqual(request.full_url,"https://turniere.badminton.de/ajax/tournament/43826")
+  with self.assertRaises(ValueError):module.read_event_details("../etc/passwd")
+ def test_ajax_enrichment_keeps_calendar_source_key_and_date(self):
+  uuid="31F12648-7085-429B-9A91-EC70D526343B"
+  details=lambda identifier:"https://dbv.turnier.de/tournament/"+uuid if identifier=="44094" else None
+  rows=module.parse_page(HTML,2026,detail_fetcher=details)
+  self.assertEqual(rows[0]["event_url"],"https://dbv.turnier.de/tournament/"+uuid)
+  self.assertEqual(rows[0]["start_date"],"2026-11-06")
+  self.assertIsNone(rows[1]["event_url"])
+ def test_ajax_network_failure_does_not_publish_partial_calendar(self):
+  def failed(_):raise OSError("source unavailable")
+  with self.assertRaises(OSError):module.parse_page(HTML,2026,detail_fetcher=failed)
  def test_no_cross_assignment_of_expanded_details(self):
   uuid="E24DC6EE-152A-454D-B00C-E625B751D7D5"
   source=HTML.replace("<div data-tournament=\"44094\"></div>",
