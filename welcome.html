@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
  <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="base-uri 'self'; object-src 'none'">
  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
  <meta name="apple-mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-title" content="Schmetterlinge">
@@ -39,12 +40,12 @@
     <span id="progress-profile" class="welcome-step current">2. Schritt Profil anlegen</span>
    </div>
    <section id="onboard-profile" class="welcome-panel" aria-labelledby="setup-title">
-    <h2 id="setup-title">Für wen möchtest du ein Profil anlegen?</h2>
+    <h2 id="setup-title" role="heading" aria-level="1">Für wen möchtest du ein Profil anlegen?</h2>
     <p>Angenommene Spielereinladungen werden automatisch übernommen. Weitere Spieler kannst du auf diesem Gerät auswählen oder mit Name und DBV-ID ergänzen.</p>
     <details id="welcome-manual-panel" class="welcome-manual-panel" open>
      <summary>Weiteren Spieler mit Name oder DBV-ID hinzufügen</summary>
     <section class="welcome-search" aria-labelledby="welcome-search-heading">
-      <h3 id="welcome-search-heading">Spieler suchen</h3>
+      <h3 id="welcome-search-heading" role="heading" aria-level="2">Spieler suchen</h3>
       <label for="welcome-player-search">Name oder DBV-Spieler-ID</label>
       <input id="welcome-player-search" type="search" disabled autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Vorname, Nachname oder 05-123456">
       <p id="welcome-search-status" class="welcome-search-status" role="status" aria-live="polite">Mindestens drei Zeichen eingeben, um Spieler zu finden.</p>
@@ -86,7 +87,7 @@
    </section>
    <section id="onboard-install" class="welcome-panel" aria-labelledby="install-title" hidden>
      <span id="welcome-success" class="welcome-success">✓ Profil auf diesem Gerät gespeichert</span>
-     <h2 id="install-title">Schmetterlinge wie eine App öffnen</h2>
+     <h2 id="install-title" role="heading" aria-level="1">Schmetterlinge wie eine App öffnen</h2>
      <p id="install-intro">Füge Schmetterlinge zum Home-Bildschirm hinzu. Öffne es danach über das Symbol und lege dein Profil dort an.</p>
      <div class="platform-switch" role="group" aria-label="Gerät auswählen">
       <button type="button" id="install-ios" aria-pressed="false">iPhone / iPad</button>
@@ -116,7 +117,7 @@
      <p class="welcome-small">Profile und Favoriten bleiben auf diesem Gerät. Einladungslinks erstellen kein Online-Konto und synchronisieren keine Daten.</p>
    </section>
   </main>
-  <footer class="welcome-footer">Schmetterlinge · Badminton Jugend <span>Eine kostenlose Web-App für Badminton-Familien</span><span class="welcome-app-version" data-app-version aria-label="App-Version v234">v234</span></footer>
+  <footer class="welcome-footer">Schmetterlinge · Badminton Jugend <span>Eine kostenlose Web-App für Badminton-Familien</span><span class="welcome-app-version" data-app-version aria-label="App-Version v235">v235</span></footer>
  </div>
 </body>
 </html>

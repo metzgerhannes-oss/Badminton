@@ -47,6 +47,7 @@ export function addProfileToStore(previous,profile,{confirmed=false}={}){
  if(confirmed&&!DBV_ID.test(profile?.id))
   throw Error("Der ausgewählte Spieler hat keine bestätigte DBV-ID. Bitte erneut suchen.");
  const existing=players.find(p=>p.id===profile.id);
+ if(!existing&&players.length>=12)throw Error("Auf diesem Gerät sind bereits 12 eigene Profile gespeichert. Vorhandene Profile bleiben erhalten. Bitte in der App verwalten.");
  if(existing&&!confirmed)
   throw Error("Diese DBV-Spieler-ID ist bereits als eigenes Profil angelegt. Öffne die App und bearbeite sie dort.");
  // Deduplicate only an EXISTING exact DBV-ID. Name-only matches remain

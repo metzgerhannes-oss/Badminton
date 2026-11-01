@@ -7,16 +7,17 @@
 var SchmetterlingeStorage=(function(){
  const STORE="shuttleboard-v1";
  const SCHEMA_VERSION=1;
+ const LIMITS=Object.freeze({players:12,friends:30,officialLinks:40});
 // Device-owned profiles retain their identities. Never infer a DBV link from
 // first names, stale labels or missing birth year/club information.
 function restore(state,normalizeBookmark){
  try{
   const saved=JSON.parse(localStorage.getItem(STORE)||"null");
   if(saved&&typeof saved==="object"){
-   if(Array.isArray(saved.players))state.players=saved.players.filter(p=>p&&typeof p.name==="string"&&typeof p.id==="string").slice(0,12);
+   if(Array.isArray(saved.players))state.players=saved.players.filter(p=>p&&typeof p.name==="string"&&typeof p.id==="string");
    // Retain all existing local profile IDs and bookmark ownership unchanged.
-   if(Array.isArray(saved.officialLinks))state.officialLinks=saved.officialLinks.map(normalizeBookmark).filter(Boolean).slice(0,40);
-   if(Array.isArray(saved.friends))state.friends=saved.friends.filter(p=>p&&/^\d{2}-\d{6}$/.test(p.id)&&typeof p.name==="string"&&p.name.trim()).slice(0,30);
+   if(Array.isArray(saved.officialLinks))state.officialLinks=saved.officialLinks.map(normalizeBookmark).filter(Boolean);
+   if(Array.isArray(saved.friends))state.friends=saved.friends.filter(p=>p&&/^\d{2}-\d{6}$/.test(p.id)&&typeof p.name==="string"&&p.name.trim());
    const preferred=typeof saved.activeProfileId==="string"?saved.activeProfileId:(typeof saved.chosen==="string"?saved.chosen:"");
    if(preferred!=="all"&&state.players.some(p=>p.id===preferred))state.activeProfileId=preferred;
 
@@ -29,7 +30,12 @@ function restore(state,normalizeBookmark){
  state.chosen=state.activeProfileId;
 }
 function save(state){
- try{localStorage.setItem(STORE,JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,activeProfileId:state.activeProfileId,chosen:state.activeProfileId,historyProfilesInitialized:true}))}catch{}
+ try{
+  localStorage.setItem(STORE,JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,activeProfileId:state.activeProfileId,chosen:state.activeProfileId,historyProfilesInitialized:true}));
+  return {ok:true};
+ }catch{
+  return {ok:false,message:"Nicht gespeichert. Der Gerätespeicher ist voll oder nicht verfügbar. Deine bisherigen Daten bleiben erhalten. Bitte erneut versuchen oder eine lokale Sicherung erstellen."};
+ }
 }
 // Pure local profile-navigation transitions: no cloud writes, new storage
 // schema or implicit changes to the user's chosen own starting profile.
@@ -56,5 +62,5 @@ function unfollow(state,id){
  if(state.viewingFriendId===id)showOwn(state);
  return true;
 }
- return Object.freeze({STORE,SCHEMA_VERSION,restore,save,selectOwn,selectFriend,showOwn,unfollow});
+ return Object.freeze({STORE,SCHEMA_VERSION,LIMITS,restore,save,selectOwn,selectFriend,showOwn,unfollow});
 })();

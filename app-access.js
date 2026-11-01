@@ -12,7 +12,10 @@ const gate=document.getElementById("app-access-gate");
 const code=document.getElementById("app-access-code");
 const submit=document.getElementById("app-access-submit");
 const paste=document.getElementById("app-access-paste");
+const retry=document.getElementById("app-access-retry");
 const status=document.getElementById("app-access-status");
+const localAppReady=document.readyState==="complete"?Promise.resolve():new Promise(resolve=>
+ document.addEventListener("DOMContentLoaded",resolve,{once:true}));
 window.badmintonAppAccess=Object.freeze({
  get accessToken(){return allowed?session?.access_token||null:null;},
  get allowed(){return allowed},
@@ -42,6 +45,7 @@ function grant({member=true}={}){
  allowed=member;
  root.dataset.appAccess="granted";
  gate.hidden=true;
+ if(retry)retry.hidden=true;
  const params=new URLSearchParams(location.hash.slice(1));
  if(params.has("appinvite")){
   history.replaceState(null,"",location.pathname+location.search+"#start");
@@ -50,6 +54,11 @@ function grant({member=true}={}){
  window.dispatchEvent(new CustomEvent(member?"badminton:app-access-granted":"badminton:player-shell-granted"));
 }
 async function grantAfterIntro(options){
+ // The classic app setup and deferred modules render on DOMContentLoaded.
+ // Reveal the verified shell only after those local initialisers have run,
+ // so users never see empty dashboard slots jump into place. This does not
+ // wait for remote sports data or replace any server-side access check.
+ await withCheckDeadline(localAppReady);
  // Only hold an already VERIFIED grant, never a failed/revoked invitation.
  // In background tabs or reduced-motion mode, avoid an artificial wait.
  if(document.visibilityState==="visible"&&
@@ -60,6 +69,19 @@ async function grantAfterIntro(options){
  grant(options);
 }
 function inform(message){status.textContent=message;}
+function explainAccessError(error){
+ if(navigator.onLine===false)return "Du bist offline. Verbinde dich mit dem Internet und prüfe den Zugang erneut. Deine gespeicherten Profile bleiben erhalten.";
+ if(error?.name==="AbortError"||/timeout|dauert zu lange/i.test(error?.message||""))
+  return "Die Zugangsprüfung dauert zu lange. Bitte erneut versuchen. Deine gespeicherten Profile bleiben erhalten.";
+ if(error instanceof TypeError||/failed to fetch|load failed|networkerror/i.test(error?.message||""))
+  return "Der Zugangsdienst ist gerade nicht erreichbar. Prüfe deine Verbindung und versuche es erneut. Deine gespeicherten Profile bleiben erhalten.";
+ return error?.message||"Zugang konnte nicht geprüft werden. Bitte erneut versuchen.";
+}
+function deny(error){
+ allowed=false;root.dataset.appAccess="denied";
+ if(retry)retry.hidden=false;
+ inform(explainAccessError(error));
+}
 // Bound the visual check: a stalled Auth/connection request must never leave
 // users staring at an endless animation. Late replies cannot grant access.
 async function withCheckDeadline(work){
@@ -111,8 +133,7 @@ async function accept(raw){
   })());
   await grantAfterIntro();
  }catch(error){
-  root.dataset.appAccess="denied";
-  inform(error?.message||"Einladung konnte nicht geprüft werden.");
+  deny(error);
  }finally{busy=false;submit.disabled=false}
 }
 submit?.addEventListener("click",()=>accept(code.value));
@@ -133,6 +154,7 @@ paste?.addEventListener("click",async()=>{
 });
 async function initialize(){
  root.dataset.appAccess="checking";
+ if(retry)retry.hidden=true;
  const hashParams=new URLSearchParams(location.hash.slice(1));
  const incoming=hashParams.get("appinvite");
  // Safari's accepted anonymous Auth session is NOT carried into the installed
@@ -172,11 +194,16 @@ async function initialize(){
   if(permission==="player"){await grantAfterIntro({member:false});return;}
  }catch(error){
   // An unavailable server never turns a private session into authorization.
-  root.dataset.appAccess="denied";
-  inform(error?.message||"Zugang konnte nicht geprüft werden. Bitte später erneut versuchen.");
+  deny(error);
   return;
  }
  root.dataset.appAccess="denied";
+ if(retry)retry.hidden=false;
  inform(incoming?"Einladung erkannt. Bitte Zugang bestätigen.":"Diese App ist nur mit Einladung zugänglich. Öffne deinen persönlichen Einladungslink oder füge den Code ein.");
 }
+retry?.addEventListener("click",async()=>{
+ if(busy||retry.disabled)return;
+ retry.disabled=true;
+ try{await initialize()}finally{retry.disabled=false}
+});
 initialize();

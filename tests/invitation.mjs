@@ -134,7 +134,8 @@ assert.doesNotMatch(welcome,/<section class="welcome-hero"/,"Invitation begins d
 assert.match(welcome,/id="progress-install"[^>]*>1\. Schritt App hinzufügen<\/span>/);
 assert.match(welcome,/id="progress-profile"[^>]*>2\. Schritt Profil anlegen<\/span>/);
 assert.match(welcomeJs,/shouldOfferInstallationFirst/);
-assert.match(welcome,/<h2 id="setup-title">Für wen möchtest du ein Profil anlegen\?<\/h2>/,"Invitation headline must use natural German");
+assert.match(welcome,/<h2 id="setup-title"[^>]*>Für wen möchtest du ein Profil anlegen\?<\/h2>/,"Invitation headline must use natural German");
+assert.match(welcome,/<h2 id="setup-title"[^>]*aria-level="1"/,"The active setup title is the logical main heading");
 assert.match(welcome,/id="welcome-form"/);
 assert.match(welcome,/id="onboard-install"/);
 assert.match(welcome,/Zu Home-Bildschirm hinzufügen/);

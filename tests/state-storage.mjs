@@ -132,4 +132,23 @@ vm.runInContext(bookmarksScript,blocked,{filename:"tournament-bookmarks.js"});
 vm.runInContext(appScript,blocked,{filename:"app.js"});
 assert.doesNotThrow(()=>vm.runInContext("restore();save()",blocked));
 assert.equal(vm.runInContext("state.players.length",blocked),0,"Blocked storage does not bootstrap private profiles");
-console.log("Local restore: legacy IDs, homonyms, bookmark ownership and blocked storage preserved.");
+// Recovery must never truncate a previously saved overflow or rewrite it on read.
+const overflow={...original,players:Array.from({length:13},(_,i)=>({id:"99-"+String(910000+i),name:"Test "+i})),
+ friends:Array.from({length:31},(_,i)=>({id:"98-"+String(910000+i),name:"Follow "+i})),
+ officialLinks:Array.from({length:41},(_,i)=>({url:tournament,playerId:"99-910000",name:"Termin "+i})),activeProfileId:"99-910012"};
+const overflowStore=new Map([[key,JSON.stringify(overflow)]]),recovery=makeVM(overflowStore);
+recovery.run("restore()");
+assert.equal(recovery.run("state.players.length"),13);
+assert.equal(recovery.run("state.friends.length"),31);
+assert.equal(recovery.run("state.officialLinks.length"),41);
+assert.equal(overflowStore.get(key),JSON.stringify(overflow),"Restore must not write");
+assert.equal(recovery.run("save()"),true);
+assert.equal(JSON.parse(overflowStore.get(key)).players.length,13);
+// A failed write rolls the in-memory data back, so the next action cannot save a phantom profile.
+const failedStore=new Map([[key,JSON.stringify(original)]]),failedWrite=makeVM(failedStore);
+failedWrite.run("restore()");
+failedWrite.context.localStorage.setItem=()=>{throw new Error("quota")};
+assert.equal(failedWrite.run('state.players.push({id:"99-999999",name:"Unsaved"});save()'),false);
+assert.equal(failedWrite.run("state.players.length"),2);
+assert.equal(JSON.parse(failedStore.get(key)).players.length,2);
+console.log("Local restore: legacy IDs, role isolation, overflow recovery and failed-write rollback preserved.");

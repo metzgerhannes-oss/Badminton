@@ -93,10 +93,10 @@ function bookmark(row,owns){
 }
 export function normalizeLocalData(data){
  if(!record(data))fail("Kein gültiger Schmetterlinge-Datensatz");
- if(!Array.isArray(data.players)||data.players.length<1||data.players.length>12)
-  fail("Die Sicherung benötigt 1 bis 12 eigene Spieler");
- if(!Array.isArray(data.friends)||data.friends.length>30)fail("Maximal 30 gefolgte Spieler");
- if(!Array.isArray(data.officialLinks)||data.officialLinks.length>40)fail("Maximal 40 Turnierfavoriten");
+ if(!Array.isArray(data.players)||data.players.length<1||data.players.length>100)
+  fail("Die Sicherung benötigt 1 bis 100 eigene Spieler zur Bestandswiederherstellung");
+ if(!Array.isArray(data.friends)||data.friends.length>300)fail("Maximal 300 gefolgte Spieler zur Bestandswiederherstellung");
+ if(!Array.isArray(data.officialLinks)||data.officialLinks.length>400)fail("Maximal 400 Turnierfavoriten zur Bestandswiederherstellung");
  const players=data.players.map(x=>profile(x,"eigenes"));
  const friends=data.friends.map(x=>profile(x,"Freundes"));
  // A DBV identity may be both an own profile and an independently followed

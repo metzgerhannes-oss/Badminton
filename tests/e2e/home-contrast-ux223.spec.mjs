@@ -89,7 +89,8 @@ for(const width of [320,375,390,420,768,1079,1080,1280,1440,1920]){
    expect(ratio(profile.color,"#ffffff"),"iPhone player metadata on white").toBeGreaterThanOrEqual(4.5);
    expect(profile.size,"mobile player details").toBeGreaterThanOrEqual(12);
   }else{
-   expect(ratio(profile.color,"#2b5c82"),"desktop player metadata on navy").toBeGreaterThanOrEqual(4.5);
+   expect(profile.bg,"desktop profile keeps its actual pale surface").toMatch(/rgb\(255, 255, 255\)|#fff/);
+   expect(ratio(profile.color,"#ffffff"),"desktop player metadata on its pale surface").toBeGreaterThanOrEqual(4.5);
   }
  });
 }

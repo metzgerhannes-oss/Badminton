@@ -180,7 +180,7 @@ button.focus-settings:focus-visible,.friend-open:focus-visible,.profile-actions 
 #view-einstellungen>.section-heading h2{font-size:23px}
 .account-notice{margin-bottom:20px}
 .account-notice p{margin:7px 0;line-height:1.6}
-.current-account-label{color:#acdfff!important;font-size:12px;font-weight:800}
+.current-account-label{color:#365570;font-size:14px;font-weight:800}
 .settings-section{margin:17px 0 25px}
 .settings-section .section-heading{margin-bottom:4px}
 .settings-section h3{font-size:17px;margin:0;letter-spacing:-.3px}
@@ -454,7 +454,7 @@ body{background:radial-gradient(ellipse 110% 58% at 12% -10%,#356994 0%,transpar
 
 /* Player club details and legacy navigation presentation */
 .focused-profile .focus-profile-copy .focus-club{display:block;margin-top:3px;color:#b7dcef;font-size:11px;line-height:1.35}
-.profile-card .profile-club{color:#bbd6ec;font-size:11px;margin-top:3px}
+.profile-card .profile-club{color:#365570;font-size:14px;margin-top:3px}
 .bottom-nav a{min-width:0;}
 
 .bottom-nav a small{white-space:nowrap}

@@ -12,16 +12,34 @@ function normalizeBookmark(value){return SchmetterlingeBookmarks.normalizeBookma
 const localDay=()=>SchmetterlingeBookmarks.localDay();
 const niceDay=value=>SchmetterlingeBookmarks.niceDay(value);
 // Keep the legacy function names for UI callers and existing integrations.
-function restore(){SchmetterlingeStorage.restore(state,normalizeBookmark)}
-function save(){SchmetterlingeStorage.save(state)}
+let persistedState=null;
+function storageSnapshot(){
+ return JSON.parse(JSON.stringify({players:state.players,friends:state.friends,officialLinks:state.officialLinks,
+  activeProfileId:state.activeProfileId,viewingFriendId:state.viewingFriendId,chosen:state.chosen}));
+}
+function restore(){SchmetterlingeStorage.restore(state,normalizeBookmark);persistedState=storageSnapshot()}
+function save(){
+ const result=SchmetterlingeStorage.save(state);
+ if(result.ok){persistedState=storageSnapshot();showSaveError("");return true;}
+ if(persistedState)Object.assign(state,JSON.parse(JSON.stringify(persistedState)));
+ showSaveError(result.message);
+ return false;
+}
+function showSaveError(message){
+ if(typeof document.querySelectorAll!=="function")return;
+ if(message)el("toast")?.classList.remove("visible");
+ for(const node of document.querySelectorAll("[data-local-save-feedback]")){
+  node.textContent=message;node.hidden=!message;
+ }
+}
 let toastTimer;
 function toast(message){const node=el("toast");node.textContent=message;node.classList.add("visible");clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove("visible"),2800)}
-function toastUndo(message,undo){
+function toastUndo(message,undo,label="Entfolgen rückgängig machen"){
  const node=el("toast");if(!node)return;
  clearTimeout(toastTimer);node.textContent=message+" · ";
  const button=document.createElement("button");
  button.type="button";button.className="toast-undo";button.textContent="Rückgängig";
- button.setAttribute("aria-label","Entfolgen rückgängig machen");
+ button.setAttribute("aria-label",label);
  button.addEventListener("click",()=>{clearTimeout(toastTimer);undo()});
  node.append(button);node.classList.add("visible");
  toastTimer=setTimeout(()=>node.classList.remove("visible"),6000);
@@ -34,7 +52,7 @@ function currentProfile(){
 function setActiveProfile(id){
  // Switching to one's own player is a local choice, not an online account login.
  if(!SchmetterlingeStorage.selectOwn(state,id))return false;
- save();
+ if(!save())return false;
  return true;
 }
 // The Home action always opens the locally selected own profile, even when already on #start.
@@ -133,7 +151,15 @@ function renderTournaments(){
    return;
   }
   state.officialLinks=state.officialLinks.filter(t=>!(t.id===id&&t.playerId===player));
-  save();render();toast(removed?.source==="dbv-calendar"||removed?.source==="bwbv-framework"?"Vormerkung entfernt":"Turnierlink entfernt");
+  if(!save())return;
+  render();
+  // Undo restores the local bookmark only; never republish or restore a revoked grant.
+  toastUndo(removed?.source==="dbv-calendar"||removed?.source==="bwbv-framework"?"Vormerkung entfernt":"Turnierlink entfernt",()=>{
+   if(!removed||state.officialLinks.some(t=>t.id===id&&t.playerId===player))return;
+   state.officialLinks.unshift(removed);
+   if(!save())return;
+   render();toast("Turnierlink wiederhergestellt · nur auf diesem Gerät");
+  },"Turnierlink lokal wiederherstellen");
   if(removed&&removed.source!=="dbv-calendar"&&removed.source!=="bwbv-framework")window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
    detail:{bookmark:removed,publicShare:false,removed:true}
   }));
@@ -162,12 +188,15 @@ function renderProfiles(){
  }));
  list.querySelectorAll("[data-remove-profile]").forEach(b=>b.addEventListener("click",()=>{
   const id=b.dataset.removeProfile;
-  if(!confirm("Dieses eigene Spielerprofil auf diesem Gerät entfernen?"))return;
+  const links=state.officialLinks.filter(t=>t.playerId===id).length;
+  if(!confirm("Dieses eigene Spielerprofil auf diesem Gerät entfernen?"+
+   (links?" Dabei werden auch "+links+" zugeordnete lokale Turnierlinks entfernt.":"")+" Andere Profile und serverseitige Berechtigungen bleiben unverändert."))return;
   state.players=state.players.filter(p=>p.id!==id);
   state.officialLinks=state.officialLinks.filter(t=>t.playerId!==id);
   if(state.activeProfileId===id)state.activeProfileId=state.players[0]?.id||"";
   if(!state.viewingFriendId)state.chosen=state.activeProfileId;
-  save();render();
+  if(!save())return;
+  render();
  }));
  const preview=el("player-own-preview");
  if(preview){
@@ -176,6 +205,13 @@ function renderProfiles(){
   preview.querySelector("#player-own-open")?.addEventListener("click",()=>window.badmintonSelectViewer(p.id));
  }
  el("current-account-label").textContent="Aktives Startprofil: "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"noch keines");
+ const family=el("family-profile-links");
+ if(family){
+  family.innerHTML=state.players.map(p=>'<button type="button" class="family-profile-choice" data-family-profile="'+esc(p.id)+'"'+
+   (p.id===state.activeProfileId?' aria-current="true"':'')+'><strong>'+esc(p.name)+'</strong><small>'+
+   (p.id===state.activeProfileId?'Startprofil':'Profil ansehen')+'</small></button>').join("");
+  family.querySelectorAll("[data-family-profile]").forEach(b=>b.addEventListener("click",()=>window.badmintonSelectViewer(b.dataset.familyProfile)));
+ }
 }
 function renderFriendQuick(){
  const root=el("dashboard-friends");if(!root)return;
@@ -223,14 +259,28 @@ function unfollowPlayer(id){
  if(index<0)return;
  const friend=state.friends[index];
  if(!SchmetterlingeStorage.unfollow(state,id))return;
- save();render();window.dispatchEvent(new Event("badminton:library-following"));
+ if(!save())return;
+ render();window.dispatchEvent(new Event("badminton:library-following"));
  toastUndo(friend.name+" entfolgt",()=>{
   // Restore only the device-local follow and its previous position, not a family profile.
   if(state.friends.some(p=>p.id===id))return;
   state.friends.splice(Math.min(index,state.friends.length),0,friend);
-  save();render();window.dispatchEvent(new Event("badminton:library-following"));
+  if(!save())return;
+  render();window.dispatchEvent(new Event("badminton:library-following"));
   toast(friend.name+" wieder gefolgt");
  });
+}
+let followOrderId="";
+function selectFollowOrder(id){
+ followOrderId=id;
+ const index=state.friends.findIndex(p=>p.id===id);
+ const controls=el("follow-order-actions");
+ if(!controls)return;
+ controls.hidden=index<0||state.friends.length<2||Boolean(el("followed-player-search")?.value.trim());
+ if(controls.hidden)return;
+ controls.querySelector('[data-follow-order="up"]').disabled=index===0;
+ controls.querySelector('[data-follow-order="down"]').disabled=index===state.friends.length-1;
+ el("follow-order-status").textContent=state.friends[index].name+": Position "+(index+1)+" von "+state.friends.length+". Mit den Tasten verschieben oder am Griff ziehen.";
 }
 function moveFollow(id, target, focus=true){
  const query=String(el("followed-player-search")?.value||"").trim();
@@ -239,7 +289,9 @@ function moveFollow(id, target, focus=true){
  if(from<0||target<0||target>=state.friends.length||from===target)return false;
  const [player]=state.friends.splice(from,1);
  state.friends.splice(target,0,player);
- save();renderFriends();
+ if(!save())return false;
+ renderFriends();
+ selectFollowOrder(id);
  if(focus){
   const handles=Array.from(el("friend-list")?.querySelectorAll("[data-friend-grip]")||[]);
   handles.find(x=>x.dataset.friendGrip===id)?.focus({preventScroll:true});
@@ -277,7 +329,8 @@ function renderFriends(){
   if(player)window.openFriendForm?.(player);
  }));
  root.querySelectorAll("[data-friend-grip]").forEach(b=>{
-  b.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation()});
+  let dragged=false;
+  b.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation();if(!dragged)selectFollowOrder(b.dataset.friendGrip);dragged=false;});
   b.addEventListener("keydown",ev=>{
    if(!["ArrowUp","ArrowDown"].includes(ev.key))return;
    ev.preventDefault();ev.stopPropagation();
@@ -285,28 +338,35 @@ function renderFriends(){
    moveFollow(b.dataset.friendGrip,i+(ev.key==="ArrowUp"?-1:1));
   });
   let start=null;
+  const clearDrag=()=>root.querySelectorAll(".is-dragging,.is-drop-target").forEach(row=>row.classList.remove("is-dragging","is-drop-target"));
+  const nearest=y=>Array.from(root.querySelectorAll("[data-follow-row]")).reduce((best,row)=>{
+   const r=row.getBoundingClientRect(),distance=Math.abs(y-(r.top+r.height/2));
+   return distance<best.distance?{distance,id:row.dataset.followRow,row}:best;
+  },{distance:Infinity,id:""});
   b.addEventListener("pointerdown",ev=>{
    if(b.disabled||ev.button!==0)return;
    start={id:b.dataset.friendGrip,x:ev.clientX,y:ev.clientY,pointer:ev.pointerId};
    b.setPointerCapture?.(ev.pointerId);
   });
-  b.addEventListener("pointercancel",()=>{start=null});
+  b.addEventListener("pointermove",ev=>{
+   if(!start||start.pointer!==ev.pointerId||Math.hypot(ev.clientX-start.x,ev.clientY-start.y)<10)return;
+   clearDrag();dragged=true;
+   b.closest("[data-follow-row]").classList.add("is-dragging");
+   const target=nearest(ev.clientY);target.row?.classList.add("is-drop-target");
+   if(target.id)el("follow-order-status").textContent="Verschieben: Position "+(state.friends.findIndex(p=>p.id===target.id)+1)+" von "+state.friends.length;
+  });
+  b.addEventListener("pointercancel",()=>{start=null;clearDrag()});
   b.addEventListener("pointerup",ev=>{
    if(!start||start.pointer!==ev.pointerId)return;
-   const move=start;start=null;
+   const move=start;start=null;clearDrag();
    if(Math.hypot(ev.clientX-move.x,ev.clientY-move.y)<10)return;
-   const rows=Array.from(root.querySelectorAll("[data-follow-row]"));
-   // Pointer capture keeps the handle active; use target row bounds to find the destination.
-   const target=rows.reduce((best,row)=>{
-    const r=row.getBoundingClientRect();
-    const distance=Math.abs(ev.clientY-(r.top+r.height/2));
-    return distance<best.distance?{distance,id:row.dataset.followRow}:best;
-   },{distance:Infinity,id:""});
+   const target=nearest(ev.clientY);
    if(!target.id)return;
    const i=state.friends.findIndex(p=>p.id===target.id);
    moveFollow(move.id,i);
   });
  });
+ selectFollowOrder(followOrderId);
 }
 
 function syncFollowSearch(){
@@ -364,13 +424,13 @@ window.badmintonLibraryToggleFollow=player=>{
  // Following does not grant ownership and must not erase an existing own role.
  const exists=state.friends.some(p=>p.id===id);
  if(exists)return {ok:false,message:"Du folgst diesem Spieler bereits. Entfolgen geht in deiner Freundeliste."};
- if(state.friends.length>=30)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
+ if(state.friends.length>=SchmetterlingeStorage.LIMITS.friends)return {ok:false,message:"Es können aktuell höchstens 30 Spieler gleichzeitig gefolgt werden."};
  state.friends.push({
   id,name:String(player.name).trim().slice(0,80),
   birthYear:Number.isInteger(player.birthYear)?player.birthYear:undefined,
   club:String(player.club||"").slice(0,120),url:""
  });
- save();render();window.dispatchEvent(new Event("badminton:library-following"));toast("Du folgst jetzt "+player.name);
+ if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();window.dispatchEvent(new Event("badminton:library-following"));toast("Du folgst jetzt "+player.name);
  window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  return {ok:true,message:"Spieler zu deiner Liste hinzugefügt."};
 };
@@ -378,11 +438,11 @@ window.badmintonLibraryToggleFollow=player=>{
 window.badmintonSelectViewer=(id,{stayOnPage=false,preferFriend=false}={})=>{
  // An explicit Follow click must keep its role even if the DBV ID is also owned.
  if(preferFriend&&SchmetterlingeStorage.selectFriend(state,id)){
-  save();
+  if(!save())return false;
  }else if(state.players.some(p=>p.id===id)){
-  setActiveProfile(id);
+  if(!setActiveProfile(id))return false;
  }else if(SchmetterlingeStorage.selectFriend(state,id)){
-  save();
+  if(!save())return false;
  }else return false;
  const destination=stayOnPage?(state.page==="live"?"live":"turniere"):"start";
   routeTo(destination);
@@ -405,15 +465,15 @@ window.badmintonCalendarToggle=item=>{
  const previous=state.officialLinks.find(t=>t.source==="dbv-calendar"&&t.id===key&&t.playerId===state.activeProfileId);
  if(previous){
   state.officialLinks=state.officialLinks.filter(t=>t!==previous);
-  save();render();toast("Vormerkung entfernt");
+  if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();toast("Vormerkung entfernt");
   return {ok:true,saved:false};
  }
- if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
+ if(state.officialLinks.length>=SchmetterlingeStorage.LIMITS.officialLinks)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
  const entry=normalizeBookmark({id:key,source:"dbv-calendar",url:"https://turniere.badminton.de/",
   playerId:state.activeProfileId,name:item?.title,startDate:item?.start,endDate:item?.end,place:item?.place,deadline:item?.deadline});
  if(!entry)return {ok:false,message:"Turnier konnte nicht eindeutig zugeordnet werden."};
  state.officialLinks.unshift(entry);
- save();render();toast("Turnier für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
+ if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();toast("Turnier für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
  return {ok:true,saved:true};
 };
 // The seven published BWBV/DBV 2027 planning dates have source URLs but
@@ -425,15 +485,15 @@ window.badmintonFrameworkToggle=item=>{
  const previous=state.officialLinks.find(t=>t.source==="bwbv-framework"&&t.id===id&&t.playerId===state.activeProfileId);
  if(previous){
   state.officialLinks=state.officialLinks.filter(t=>t!==previous);
-  save();render();toast("Vormerkung entfernt");
+  if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();toast("Vormerkung entfernt");
   return {ok:true,saved:false};
  }
- if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
+ if(state.officialLinks.length>=SchmetterlingeStorage.LIMITS.officialLinks)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
  const entry=normalizeBookmark({id,source:"bwbv-framework",url:item?.source,
   playerId:state.activeProfileId,name:item?.title,startDate:item?.start,endDate:item?.end,place:item?.place});
  if(!entry)return {ok:false,message:"Rahmentermin konnte nicht eindeutig zugeordnet werden."};
  state.officialLinks.unshift(entry);
- save();render();toast("Rahmentermin für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
+ if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();toast("Rahmentermin für "+(state.players.find(p=>p.id===state.activeProfileId)?.name||"dein Profil")+" vorgemerkt");
  return {ok:true,saved:true};
 };
 // A verified 2026 result is a local bookmark, not a registration or access grant.
@@ -449,13 +509,13 @@ window.badmintonOfficialTournamentToggle=item=>{
   if(window.badmintonPrivateInvite?.hasActive(existing))
    return {ok:false,message:"Zuerst den privaten Einladungslink widerrufen."};
   state.officialLinks=state.officialLinks.filter(t=>t!==existing);
-  save();render();toast("Turnier aus Meine Turniere entfernt");return {ok:true,saved:false};
+  if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();toast("Turnier aus Meine Turniere entfernt");return {ok:true,saved:false};
  }
- if(state.officialLinks.length>=40)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
+ if(state.officialLinks.length>=SchmetterlingeStorage.LIMITS.officialLinks)return {ok:false,message:"Die private Turnierliste enthält bereits 40 Einträge."};
  const entry=normalizeBookmark({url:parsed.url,playerId:state.activeProfileId,
   name:item.title,startDate:item.start,endDate:item.end,place:item.place});
  if(!entry)return {ok:false,message:"Turnier konnte nicht eindeutig zugeordnet werden."};
- state.officialLinks.unshift(entry);save();render();toast("Turnier zu Meine Turniere hinzugefügt");
+ state.officialLinks.unshift(entry);if(!save())return {ok:false,message:"Nicht gespeichert. Bitte den Gerätespeicher prüfen und erneut versuchen."};render();toast("Turnier zu Meine Turniere hinzugefügt");
  return {ok:true,saved:true};
 };
 // Read-only desktop context. Show only currently selected OWN profile's locally
@@ -599,7 +659,15 @@ function setup(){
   if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state);
  });
  window.addEventListener("badminton:community-feedback",event=>{
-  if(typeof event.detail?.message==="string")toast(event.detail.message);
+  const message=event.detail?.message;
+  if(typeof message!=="string")return;
+  const node=el("toast");
+  // An async revocation result must stay visible without erasing local Undo.
+  if(node?.classList.contains("visible")&&node.querySelector(".toast-undo")){
+   let note=node.querySelector(".toast-followup");
+   if(!note){note=document.createElement("span");note.className="toast-followup";node.append(note)}
+   note.textContent=" · "+message;
+  }else toast(message);
  });
  // Local date rollover check only: no additional provider polling.
  setInterval(()=>{if(updateLiveNavigation())SchmetterlingeRouter.renderPage(state)},60_000);
@@ -609,7 +677,7 @@ function setup(){
  // iOS Safari and an installed Home Screen PWA can have different local stores.
  // Do not manufacture an empty saved profile on a brand-new app installation.
  // Only persist an existing state here; a new profile is saved after consent.
- if(!freshDevice)save();
+ // Restore is read-only: never overwrite unrecognised or oversized stored data on startup.
  // One-time local navigation hint, never an ownership or private data grant.
  try{
   const invited=localStorage.getItem("schmetterlinge.invitedPlayerPendingView.v1");
@@ -777,6 +845,9 @@ function setup(){
   const club=String(data.get("club")||"").trim().slice(0,120);
   const record={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club,url:safeUrl(data.get("url")||"")};
   const isNewOwn=!editingPlayerId;
+  if(isNewOwn&&state.players.length>=SchmetterlingeStorage.LIMITS.players){
+   showSaveError("Auf diesem Gerät sind bereits 12 eigene Profile gespeichert. Vorhandene Profile bleiben erhalten und können bearbeitet werden.");return;
+  }
   if(editingPlayerId)state.players=state.players.map(p=>p.id===editingPlayerId?record:p);
   else{
    // An already followed DBV player can also become a separately owned profile.
@@ -785,8 +856,9 @@ function setup(){
    if(activatingNewProfile){SchmetterlingeStorage.showOwn(state);location.hash="#start";}
    activatingNewProfile=false;
   }
+  if(!save())return;
   editingPlayerId=null;
-  save();render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
+  render();playerDialog.close();playerForm.reset();toast("Spielerprofil gespeichert");
   if(isNewOwn)window.dispatchEvent(new CustomEvent("badminton:own-profile-added",{detail:{playerId:id}}));
  });
  const friendDialog=el("friend-dialog"),friendForm=el("friend-form");
@@ -813,7 +885,7 @@ function setup(){
   if(state.friends.length<2)return;
   const before=state.friends.slice();
   state.friends.sort((a,b)=>a.name.localeCompare(b.name,"de",{numeric:true,sensitivity:"base"})||a.id.localeCompare(b.id));
-  save();
+  if(!save())return;
   try{
    const saved=JSON.parse(localStorage.getItem(STORE)||"null");
    if(saved?.friends?.map(p=>p.id).join("|")!==state.friends.map(p=>p.id).join("|"))throw Error("not persisted");
@@ -822,6 +894,20 @@ function setup(){
   toast("Standardreihenfolge wiederhergestellt");
  });
  el("followed-player-search")?.addEventListener("input",syncFollowSearch);
+ el("follow-order-actions")?.addEventListener("click",event=>{
+  const action=event.target.closest("[data-follow-order]")?.dataset.followOrder;
+  if(!action)return;
+  if(action==="done"){
+   const id=followOrderId;followOrderId="";el("follow-order-actions").hidden=true;
+   el("follow-order-status").textContent="Reihenfolge gespeichert.";
+   Array.from(el("friend-list").querySelectorAll("[data-friend-grip]")).find(b=>b.dataset.friendGrip===id)?.focus();return;
+  }
+  const index=state.friends.findIndex(p=>p.id===followOrderId);
+  if(moveFollow(followOrderId,index+(action==="up"?-1:1),false)){
+   const button=el("follow-order-actions").querySelector('[data-follow-order="'+action+'"]');
+   (button.disabled?el("follow-order-actions").querySelector('[data-follow-order="done"]'):button).focus({preventScroll:true});
+  }
+ });
  el("followed-show-all")?.addEventListener("click",()=>{const field=el("followed-player-search");if(field){field.value="";syncFollowSearch();field.focus()}});
  // Search and add share #followed-player-search; no second + panel.
   el("player-discover-close")?.addEventListener("click",()=>showPlayerDiscover(false,false));
@@ -835,15 +921,16 @@ function setup(){
   const birth=Number(data.get("birthYear"));
   if(!name||!/^\d{2}-\d{6}$/.test(id)){toast("Name und gültige DBV-ID erforderlich");return}
   if(state.friends.some(p=>p.id===id&&p.id!==editingFriendId)){toast("Dieser Spieler wird bereits gefolgt");return}
-  if(!editingFriendId&&state.friends.length>=30){toast("Maximal 30 Freunde");return}
+  if(!editingFriendId&&state.friends.length>=SchmetterlingeStorage.LIMITS.friends){toast("Maximal 30 Freunde");return}
   const profileUrl=safeUrl(data.get("url")||"");
   const friend={id,name,birthYear:birth>=2000&&birth<=2035?birth:undefined,club:String(data.get("club")||"").trim().slice(0,120),url:profileUrl};
   const isNewFriend=!editingFriendId;
   if(editingFriendId)state.friends=state.friends.map(p=>p.id===editingFriendId?friend:p);
   else state.friends.push(friend);
+  if(!save())return;
   editingFriendId=null;
   if(isNewFriend)showPlayerDiscover(false,false);
-   save();render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
+  render();friendDialog.close();friendForm.reset();toast("Freund gespeichert");
   if(isNewFriend)window.dispatchEvent(new CustomEvent("badminton:friend-followed",{detail:{playerId:id}}));
  });
  window.addEventListener("badminton:dbv-calendar-loaded",event=>{
@@ -894,11 +981,14 @@ function setup(){
   if(officialCheck.status==="matched")bookmark=officialCheck.updated;
   const duplicate=state.officialLinks.some(t=>t.id===bookmark.id&&t.playerId===bookmark.playerId&&(!editing||t.id!==editing.id||t.playerId!==editing.playerId));
   if(duplicate){toast("Das Turnier ist für diesen Spieler bereits gespeichert");return}
+  if(!editing&&state.officialLinks.length>=SchmetterlingeStorage.LIMITS.officialLinks){
+   showSaveError("Die private Turnierliste enthält bereits 40 Einträge. Vorhandene Turniere bleiben erhalten und können bearbeitet werden.");return;
+  }
   const previous=editing?state.officialLinks.find(t=>t.id===editing.id&&t.playerId===editing.playerId):null;
   if(editing)state.officialLinks=state.officialLinks.filter(t=>!(t.id===editing.id&&t.playerId===editing.playerId));
   state.officialLinks.unshift(bookmark);
-  state.officialLinks=state.officialLinks.slice(0,40);
-  editing=null;save();render();tournamentDialog.close();event.currentTarget.reset();
+  if(!save())return;
+  editing=null;render();tournamentDialog.close();event.currentTarget.reset();
   toast(publicShare?"Turnier lokal gespeichert · Freigabe wird geprüft":"Turnier privat gespeichert");
   window.dispatchEvent(new CustomEvent("badminton:share-tournament",{
    detail:{bookmark,previous,publicShare}
