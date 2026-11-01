@@ -19,7 +19,7 @@ function ownProfileExists(){
 }
 function updateResume(){if(resume)resume.hidden=readStep()===null||dialog?.open===true}
 function progressText(){
- const template=window.SchmetterlingeI18n?.t("{step} von 4")||"{step} von 4";
+ const template="{step} von 4";
  return template.replace("{step}",String(step+1));
 }
 function render(){
@@ -126,9 +126,6 @@ function init(){
   (help.querySelector(".settings-grant-card")||help).append(button);
  }
  updateResume();
- window.addEventListener("schmetterlinge:language-change",()=>{
-  if(dialog?.open)$("onboarding-progress").textContent=progressText();
- });
  window.addEventListener("badminton:app-access-granted",()=>setTimeout(()=>open(true),300));
  setTimeout(()=>open(true),700);
 }
