@@ -131,6 +131,7 @@ jobs:
           node tests/security-gate.mjs
           node tests/p0-417-staged-privacy.mjs
           node tests/cf-access-bootstrap.mjs
+          node tests/cf-access-enrollment-role.mjs
           node tests/p0-ci-prod-isolation.mjs
           node tests/operations-audit.mjs
           node tests/calendar-health-watch.mjs
