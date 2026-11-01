@@ -133,3 +133,26 @@ test("verified DBV correction explains changed game day, deadline, category and 
  expect(saved.deadline).toBe("2028-11-16");
  expect(saved.place).toBe("Sporthalle Teststadt");
 });
+
+test("manual official DBV link receives venue and deadline only from exact matching event UUID",async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ await expect(page.locator("#app-access-gate")).toBeHidden();
+ const manual=page.locator('#official-tournament-list [data-saved-tournament-id="'+UUID+'"]');
+ await expect(manual.locator(".saved-tournament-deadline")).toHaveCount(0);
+ await page.evaluate(({id,url})=>window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{
+  detail:{entries:[{
+   key:"dbv-calendar-43826",hasDirectLink:true,url,
+   title:"German Masters U11",start:"2028-12-05",end:"2028-12-06",
+   place:"Hofheim",deadline:"2028-11-10"
+  }]}
+ })),{id:UUID,url:EVENT_URL});
+ await expect(manual.locator("h3")).toContainText("Hofheim");
+ await expect(manual.locator(".saved-tournament-deadline")).toContainText("10. Nov. 2028");
+ await expect(manual.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
+ // The incoming source may not mutate the private user-specific bookmark.
+ const saved=await page.evaluate(id=>JSON.parse(localStorage.getItem("shuttleboard-v1"))
+  .officialLinks.find(item=>item.id===id),UUID);
+ expect(saved.place).toBe("");
+ expect(saved.deadline).toBe("");
+});

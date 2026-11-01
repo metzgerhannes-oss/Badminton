@@ -165,7 +165,8 @@ function renderTournaments(){
   const linkStatus=t.source==="dbv-calendar"&&!directSource?
    '<p class="saved-tournament-id">Noch kein Direktlink zum Turnier hinterlegt.</p>':"";
   const technicalId=calendar?"":'<details class="saved-tournament-technical"><summary>Turnier-ID</summary><code>'+esc(t.id)+"</code></details>";
-  const deadline=t.deadline?'<p class="saved-tournament-deadline">Meldeschluss: '+esc(niceDay(t.deadline))+'</p>':"";
+  const visibleDeadline=t.deadline||officialRow?.deadline||"";
+  const deadline=visibleDeadline?'<p class="saved-tournament-deadline">Meldeschluss: '+esc(niceDay(visibleDeadline))+'</p>':"";
   const discrepancy=tournamentSourceConflicts.get(t.id+"|"+t.playerId);
   const sourceNote=discrepancy?'<p class="saved-tournament-source-warning" role="status">'+esc(discrepancy.reason)+
    (discrepancy.resolved?' · Spieltag: ':'. DBV-Spieltag: ')+esc(niceDay(discrepancy.officialDate))+(
