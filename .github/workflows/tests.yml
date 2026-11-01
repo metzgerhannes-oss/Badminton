@@ -30,6 +30,8 @@ jobs:
           node --check settings-rooms.js
           node --check app-release.js
           node --check app-access.js
+          node --check functions/api/access-bootstrap.js
+          node --check tests/cf-access-bootstrap.mjs
           node --check scripts/stamp-release.mjs
           node --check backup.js
           node --check scripts/local-backup.mjs
@@ -128,6 +130,7 @@ jobs:
           node tests/private-publication-gate.mjs
           node tests/security-gate.mjs
           node tests/p0-417-staged-privacy.mjs
+          node tests/cf-access-bootstrap.mjs
           node tests/p0-ci-prod-isolation.mjs
           node tests/operations-audit.mjs
           node tests/calendar-health-watch.mjs
