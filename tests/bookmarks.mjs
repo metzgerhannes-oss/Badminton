@@ -44,13 +44,14 @@ assert.ok(html.includes('name="deadline"'),"Meldeschluss is not a start date");
 assert.ok(content.includes('Austragungsort nicht erfasst'),"Unknown local venue is not called unpublished");
 assert.ok(content.includes('place:data.get("place"),deadline:data.get("deadline")'),"Editor must persist manual venue and deadline");
 
-// A DBV calendar ID without a source-provided tournament UUID must show an
-// honest overview link, never promise a direct event detail page.
+// An official DBV event link is only shown once verified in the
+// source-provided calendar snapshot. Unknown events still use the overview.
 const snapshot=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
 const gomaringen=snapshot.entries.find(t=>t.source_key==="dbv-calendar-44749");
 assert.equal(gomaringen?.start_date,"2026-11-22");
 assert.equal(gomaringen?.location_text,"Gomaringen");
-assert.equal(gomaringen?.event_url,null,"Do not invent a UUID for a calendar-only event");
+assert.equal(gomaringen?.event_url,"https://dbv.turnier.de/tournament/31F12648-7085-429B-9A91-EC70D526343B",
+ "Verified DBV snapshot contains a source-provided direct URL; never synthesize one from the calendar ID");
 assert.match(content,/DBV-Turnierkalender \(Übersicht\) ↗/);
 assert.match(content,/Noch kein Direktlink zum Turnier hinterlegt/);
 assert.match(content,/const destination=directSource\|\|t\.url/);
