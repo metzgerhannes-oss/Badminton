@@ -226,7 +226,7 @@ test("Verified player snapshots produce real multi-player LIVE cards without cla
  await expect(page.locator(".followed-live-card").first()).toContainText("Spielt gerade");
  await expect(page.locator(".followed-live-card").nth(1)).toContainText("Verfolgter Spieler");
  await expect(page.locator(".followed-live-card").nth(1)).toContainText("Noch ein Spiel davor");
- await expect(page.locator(".followed-live-note")).toContainText("Nicht sämtliche Spiele");
+ await expect(page.locator(".followed-live-note")).toContainText("Badhub");
  await assertNoHorizontalOverflow(page);
  await page.locator(".followed-live-card").nth(1).getByRole("button",{name:"Meine Spiele ansehen"}).click();
  await expect(page.locator('[data-matchday-view="mine"]')).toHaveAttribute("aria-pressed","true");
