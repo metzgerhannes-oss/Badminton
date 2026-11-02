@@ -176,7 +176,7 @@ function renderFollowed(){
   const name=team?displayTeamName(team):"Gespeicherte Mannschaft";
   return '<article class="team-card team-card-unavailable" data-team-follow="'+esc(key)+'">'+
    '<div class="team-card-main team-card-unavailable-content"><strong>'+esc(name)+'</strong>'+
-   '<small>'+'–'+
+   '<small>'+'Noch keine bestätigten Saisondaten'+
    '</small><small>Gemerkt: '+esc(key)+'</small></div>'+teamActions(key,name,i)+'</article>';
  }).join(""):'<p class="team-empty">'+(loading?'…':'–')+'</p>';
  const reset=$("team-order-reset");if(reset)reset.disabled=follows.length<2;
