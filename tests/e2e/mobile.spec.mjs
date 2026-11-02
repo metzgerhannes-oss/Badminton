@@ -483,7 +483,7 @@ test("v183: followed players use their canonical Spieler page and old bookmarks 
  await expect(page.locator("#team-manage-details")).toHaveCount(0);
  await expect(page.locator("#team-followed")).toBeVisible();
  await page.goto("/#einstellungen/darstellung",{waitUntil:"domcontentloaded"});
- await expect(page.locator("#app-language")).toBeVisible();
+ await expect(page.locator("#settings-room-darstellung #club-branding-form")).toBeVisible();
  await page.goto("/#einstellungen/daten",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#backup-export")).toBeVisible();
 });

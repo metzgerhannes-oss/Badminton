@@ -150,9 +150,10 @@ test("manual official DBV link receives venue and deadline only from exact match
  await expect(manual.locator("h3")).toContainText("Hofheim");
  await expect(manual.locator(".saved-tournament-deadline")).toContainText("10. Nov. 2028");
  await expect(manual.locator(".card-open-primary")).toHaveAttribute("href",EVENT_URL);
- // The incoming source may not mutate the private user-specific bookmark.
+ // Unique verified DBV identity updates official fields; private player association remains.
  const saved=await page.evaluate(id=>JSON.parse(localStorage.getItem("shuttleboard-v1"))
   .officialLinks.find(item=>item.id===id),UUID);
- expect(saved.place).toBe("");
- expect(saved.deadline).toBe("");
+ expect(saved.place).toBe("Hofheim");
+ expect(saved.deadline).toBe("2028-11-10");
+ expect(saved.playerId).toBe(OWNER);
 });

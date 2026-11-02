@@ -56,7 +56,7 @@ test("search and modal entry remain readable on narrow iPhone and keyboard focus
 test("iPhone welcome search, manual entry and selects do not autozoom",async({page})=>{
  await page.setViewportSize({width:375,height:700});
  await page.goto("/welcome.html",{waitUntil:"domcontentloaded"});
- for(const id of ["#welcome-player-search","#welcome-reference","#welcome-name","#welcome-language"]){
+ for(const id of ["#welcome-player-search","#welcome-reference","#welcome-name"]){
   const px=await page.locator(id).evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
   expect(px,id).toBeGreaterThanOrEqual(16);
  }

@@ -37,7 +37,7 @@ test("v184: five accessible canonical settings rooms, no duplicate functions",as
   await expect(page.locator("#settings-room-hub")).toBeVisible();
  }
  await expect(page.locator("#settings-room-profile #profile-list")).toHaveCount(1);
- await expect(page.locator("#settings-room-darstellung #app-language")).toHaveCount(1);
+ await expect(page.locator("#settings-room-darstellung #app-language")).toHaveCount(0);
  await expect(page.locator("#settings-room-darstellung #club-branding-form")).toHaveCount(1);
  await expect(page.locator("#settings-room-einladungen .invitation-card")).toHaveCount(1);
  await expect(page.locator("#settings-room-einladungen #owner-admin-panel")).toHaveCount(1);

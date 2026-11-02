@@ -933,7 +933,14 @@ function setup(){
  window.addEventListener("badminton:dbv-calendar-loaded",event=>{
   const entries=event.detail?.entries;
   if(!Array.isArray(entries)||!entries.length)return;
-  verifiedCalendarRows=entries;
+  // Full DBV refreshes replace old metadata. Partial/replayed event updates
+  // only replace their exact source keys; unrelated events must not erase a
+  // previously verified direct tournament URL from the current session.
+  // No UUID inference from title, venue or date.
+  const refreshedKeys=new Set(entries.map(row=>row?.key).filter(Boolean));
+  verifiedCalendarRows=event.detail?.complete===true
+   ?entries.slice()
+   :[...verifiedCalendarRows.filter(row=>!refreshedKeys.has(row?.key)),...entries].slice(-1000);
   const form=el("tournament-form");
   if(el("tournament-dialog")?.open&&form)prefillVerifiedTournamentForm(form);
   let changed=false;

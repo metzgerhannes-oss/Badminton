@@ -365,7 +365,7 @@ async function load(){
  loading=false;loaded=true;
  updateControls();render();
  // Only public, already loaded source metadata. No new provider call and no user data.
- window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{detail:{entries:entries.map(t=>({
+ window.dispatchEvent(new CustomEvent("badminton:dbv-calendar-loaded",{detail:{complete:true,entries:entries.map(t=>({
   key:t.key,url:t.url,hasDirectLink:t.hasDirectLink,title:t.title,start:t.start,end:t.end,
   place:t.place,deadline:t.deadline
  }))}}));
