@@ -138,7 +138,7 @@ test("v222 inline team sorting keeps missing entries, focus, profile and 320/128
   expect(await ids()).toEqual(["nuliga:10777:1","nuliga:10777:2","nuliga:999999:9"]);
   await expect(page.locator("#team-detail")).toBeHidden();
   const unknown=page.locator('#team-followed [data-team-follow="nuliga:999999:9"]');
-  await expect(unknown).toContainText("–");
+  await expect(unknown).toContainText("Noch keine bestätigten Saisondaten");
   await unknown.locator('[data-team-toggle="nuliga:999999:9"]').click();
   await expect(unknown).toHaveCount(0);
   expect(await ids()).toEqual(["nuliga:10777:1","nuliga:10777:2"]);
