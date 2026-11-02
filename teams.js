@@ -13,9 +13,9 @@ const displayDate=value=>{
   new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(dt);
 };
 const dateOnly=value=>{
- if(!value)return "unbekannt";
+ if(!value)return "–";
  const dt=new Date(value);
- return Number.isNaN(dt.getTime())?"unbekannt":
+ return Number.isNaN(dt.getTime())?"–":
  new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Europe/Berlin"}).format(dt);
 };
 let rows=[],clubs=[],loading=false,loadFailed=false,selectedId="",activeTab="games",detailsTicket=0,initialized=false;
@@ -74,7 +74,7 @@ function renderTeamReports(){
  if(reportState==="restricted"){box.textContent="Berichte sind nur mit einer gültigen App-Freigabe verfügbar.";return}
  if(reportState==="error"){box.textContent="Berichte aktuell nicht abrufbar. Vorhandene Spielpläne bleiben sichtbar.";return}
  if(!reportRows.length){
-  box.textContent="Für diesen Verein sind noch keine geprüften Berichte importiert.";return;
+  box.textContent="–";return;
  }
  box.innerHTML='<div class="team-fixtures">'+reportRows.map(a=>
   '<article class="team-fixture"><span>'+esc(dateOnly(a.published_on))+
