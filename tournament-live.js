@@ -67,8 +67,8 @@ function courtFilter(){
  input.parentElement.hidden=names.length===0;
 }
 function time(value){
- if(!value)return "Spielzeit offen";
- const date=new Date(value);if(!Number.isFinite(date.getTime()))return "Spielzeit offen";
+ if(!value)return "–";
+ const date=new Date(value);if(!Number.isFinite(date.getTime()))return "–";
  return new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(date)+" Uhr";
 }
 function render(){
@@ -91,11 +91,10 @@ function render(){
  }
  const shown=filterTournament(items,{status,court});
  if(!items.length){
-  note("Noch keine Begegnungen importiert",
-   "Der offizielle Spielplan ist über die Schaltfläche oben erreichbar. Hier erscheinen nur bestätigte, bereits importierte Spiele.");
+  note("–");
   return;
  }
- if(!shown.length){note("Keine Spiele in diesem Filter","Probiere eine andere Kategorie oder ein anderes Feld.");return}
+ if(!shown.length){note("–");return}
  for(const m of shown){
   const card=node("article","event-match-card event-status-"+m.category);
   const top=node("div","event-match-top");
@@ -131,7 +130,7 @@ async function refresh(){
  controller?.abort();controller=new AbortController();
  const signal=controller.signal;
  const btn=$("tournament-live-refresh");if(btn)btn.disabled=true;
- note("Turnier-Spielplan wird geprüft","Es werden ausschließlich bereits bestätigte Matchdaten gelesen.");
+ note("–");
  try{
   const {rows:events}=await readPublicRows(tournamentPath(id),{signal,count:false});
   if(signal.aborted||request!==serial)return;
@@ -144,13 +143,12 @@ async function refresh(){
  }catch(error){
   if(signal.aborted||request!==serial)return;
   items=[];loadedAt=Date.now();
-  note("Turnierdaten derzeit nicht verfügbar",
-   "Der geprüfte Datenbestand lässt sich gerade nicht abrufen. Der offizielle Turnierlink bleibt darunter erreichbar.");
+  note("–");
  }finally{if(request===serial&&btn)btn.disabled=false}
 }
 function sync(){
  const changed=choose();
- if(!selected){items=[];note("Turnier auswählen","Speichere einen offiziellen DBV-Turnierlink unter „Turniere“, um hier den geprüften Spielplan einzublenden.");return}
+ if(!selected){items=[];note("–");return}
  if(!visible())return;
  if(changed){items=[];status="all";court="all";loadedAt=0}
  if(changed||!loadedAt||Date.now()-loadedAt>60000)refresh();
@@ -175,6 +173,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  window.addEventListener("hashchange",()=>{if(visible())sync();else{++serial;controller?.abort()}});
  document.addEventListener("visibilitychange",()=>{if(visible())sync();else{++serial;controller?.abort()}});
- setInterval(()=>{if(visible()&&selected&&Date.now()-loadedAt>60000)refresh()},60000);
+ setInterval(()=>{if(visible()&&selected&&Date.now()-loadedAt>60000)refresh()},300000);
  sync();
 });
