@@ -66,9 +66,9 @@ function nextMatchPanel(day){
  if(next){
   const timing=nextMatchTiming(next);
   const title=timing.kind==="forecast"?"Prognose laut Spielplan":
-   timing.kind==="planned"?"Geplanter Beginn":"Startzeit noch nicht veröffentlicht";
+   timing.kind==="planned"?"Geplant":"–";
   section.appendChild(element("strong","matchday-next-time",timing.overdue
-   ?"Startzeit überschritten – neu prüfen":timing.time||"Uhrzeit offen"));
+   ?"Zeit prüfen":timing.time||"–"));
   section.appendChild(element("small","matchday-next-type",title));
   const opponent=opponents(next);
   section.appendChild(element("p","matchday-next-opponent",matchLabel(next)+
@@ -78,18 +78,15 @@ function nextMatchPanel(day){
   if(venue)section.appendChild(element("small","matchday-next-type",venue));
  }else{
   section.appendChild(element("strong","matchday-next-time",
-   day.running?"Weiteres Spiel noch nicht gemeldet":
-   day.queue===0?"Dein Spiel ist als Nächstes dran":"Startzeit noch offen"));
-  section.appendChild(element("small","matchday-next-type",
-   "Noch keine bestätigte Uhrzeit für die nächste Begegnung"));
+   "–"));
+  
  }
  if(!day.running&&day.queue!==null){
   const queue=day.queue===0?"Als Nächstes aufgerufen":
    day.queue===1?"Noch 1 Spiel vor dir":"Noch "+day.queue+" Spiele vor dir";
   section.appendChild(element("span","matchday-next-queue",queue));
  }
- section.appendChild(element("small","matchday-next-warning",
-  "Zeiten können sich am Turniertag verschieben. Es gilt der Aufruf der Turnierleitung."));
+ section.appendChild(element("small","matchday-next-warning","Zeit laut Quelle · Änderungen möglich"));
  return section;
 }
 
@@ -123,8 +120,7 @@ function render(row,id){
   top.appendChild(element("span","radar-source","Badhub · zuletzt geprüft "+printed+" Uhr"));
  }
  if(situation.kind!=="current"){
-  top.appendChild(element("strong","radar-empty",situation.title));
-  top.appendChild(element("p","",situation.detail));
+  top.appendChild(element("strong","radar-empty",situation.kind==="idle"||situation.kind==="pending"?"–":"Stand veraltet"));
   box.appendChild(top);
   const shortcut=sourceShortcut(row,id);
   if(situation.kind==="updating"&&situation.tournament)
@@ -133,7 +129,7 @@ function render(row,id){
   return;
  }
  const day=matchdayOverview(row,id);
- if(!day){message("Turnierstatus wird geprüft","Noch kein bestätigter Spieltagsplan verfügbar.","pending");return}
+ if(!day){message("–","","pending");return}
  top.appendChild(element("strong","radar-tournament",day.tournament||"Aktuelles Turnier"));
  box.appendChild(top);
  if(day.running){
@@ -149,8 +145,7 @@ function render(row,id){
  if(upcoming)box.appendChild(upcoming);
  const finished=matchList("Bereits gespielte Begegnungen",day.past,{past:true});
  if(finished)box.appendChild(finished);
- if(!day.hasPublishedGames)box.appendChild(line("Noch keine Einzelspiele gemeldet",
-  "Der Turniertag ist zugeordnet. Sobald Begegnungen veröffentlicht werden, erscheinen sie hier."));
+ 
  const shortcut=sourceShortcut(row,id);
  if(shortcut)box.appendChild(shortcut);
 }
@@ -186,7 +181,7 @@ async function refresh(){
  const signal=controller.signal;
  const btn=$("live-radar-refresh");if(btn)btn.disabled=true;
  try{
-  if(!lastWatchAt||Date.now()-lastWatchAt>60000)await watch(id,signal);
+  if(!lastWatchAt||Date.now()-lastWatchAt>300000)await watch(id,signal);
   if(seq!==generation||id!==currentId)return;
   const snapshot=await getSnapshot(id,signal);
   if(seq!==generation||id!==currentId)return;
@@ -197,8 +192,7 @@ async function refresh(){
   console.warn("Sourced live radar unavailable",error.message);
   if(lastKnownRow&&id===currentId)render(lastKnownRow,id);
   else{
-   message("Turnierdaten gerade nicht verfügbar",
-    "Die Quellenprüfung wird automatisch erneut versucht.","waiting");
+   message("–","","waiting");
    const shortcut=sourceShortcut(null,id);
    if(shortcut)root()?.appendChild(shortcut);
   }
@@ -209,10 +203,10 @@ async function refresh(){
 function switchPlayer(id){
  currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;lastKnownRow=null;
  if(!DBV_ID.test(currentId)){
-  message("Keine offizielle DBV-ID","Wähle ein bestätigtes Spielerprofil mit DBV-ID.");
+  message("–");
   return;
  }
- message("Live-Radar wird vorbereitet","Der gemeinsame Quellenabruf startet nur bei geöffneter Turnieransicht.");
+ message("–");
  if(displayed())refresh();
 }
 document.addEventListener("DOMContentLoaded",()=>{
@@ -234,5 +228,5 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("hashchange",()=>{if(displayed())refresh()});
  document.addEventListener("visibilitychange",()=>{if(displayed())refresh()});
  if(displayed())refresh();
- timer=setInterval(()=>{if(displayed())refresh()},30000);
+ timer=setInterval(()=>{if(displayed())refresh()},300000);
 });
