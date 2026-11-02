@@ -168,7 +168,7 @@ function render(){
  }
  if(status==="missing-id"){
   source.textContent="DBV-Spieler-ID benötigt";
-  values.innerHTML='<p class="match-stats-empty">Für Matchzahlen wird eine DBV-Spieler-ID benötigt.</p>';
+  values.innerHTML='<p class="match-stats-empty">–</p>';
   note.textContent="Bitte unter Spieler eine DBV-ID ergänzen.";
   sourceDetails.textContent="Nur mit einer eindeutigen Spieler-ID können fremde Matches sicher zugeordnet werden.";
   details.hidden=true;return;
@@ -270,6 +270,7 @@ function render(){
    :"")+(availability.detail?availability.detail+" ":"")+
    "Ranglistenpunkte und Platzierungen zählen nicht als einzelne Spiele. Falls Quellen nachgetragen werden, erscheinen geprüfte Ergebnisse hier automatisch.";
  }
+ if(missing){note.textContent="–";sourceDetails.textContent="";}
  if(stats.total)sourceDetails.textContent+=" Die gespielte Altersklasse stammt aus dem belegten Wettkampffeld. Eine höhere AK belegt nicht das Alter einzelner Gegner.";
  // Do not display a second, partial set of career counters under Badhub's
  // published total. Filtering switches back to individually evidenced figures.
