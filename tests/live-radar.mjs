@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {DBV_ID,watchRequest,snapshotPath,snapshotUrl,validSource,sourceSets,setText,opponents,matchLabel,
- freshness,validateSnapshot,liveView,radarSituation,playerOutcome,sourceTime} from "../scripts/live-radar.mjs";
+ freshness,validateSnapshot,liveView,radarSituation,playerOutcome,sourceTime,matchdayOverview,nextMatchTiming} from "../scripts/live-radar.mjs";
 const id="05-061350";
 assert.ok(DBV_ID.test(id));
 assert.equal(watchRequest("local-123"),null);
@@ -81,6 +81,32 @@ assert.equal(playerOutcome({team1_won:true,is_team1:0}),"loss");
 assert.equal(playerOutcome({team1_won:true,is_team1:false}),"loss");
 assert.equal(playerOutcome({team1_won:null,is_team1:true}),null);
 assert.equal(sourceTime("invalid"),"");
+
+const projected=nextMatchTiming({predicted_start_ts:now+15*60000,planned_ts:now+35*60000},now);
+assert.equal(projected.kind,"forecast","Live provider projection outranks original start schedule");
+assert.equal(projected.overdue,false);
+assert.match(projected.time,/Uhr$/);
+assert.equal(nextMatchTiming({planned_ts:now+35*60000},now).kind,"planned");
+assert.equal(nextMatchTiming({predicted_start_ts:now-3*60000},now).overdue,true,
+ "Elapsed provider projection must be explicitly flagged");
+assert.equal(nextMatchTiming({predicted_start_ts:"not a timestamp",planned_ts:now+60000},now).kind,"planned");
+assert.equal(nextMatchTiming({predicted_start_ts:"invalid",planned_ts:"invalid"},now).kind,"unknown");
+assert.equal(nextMatchTiming({predicted_start_ts:now+60*60000},now-24*60*60000).kind,"forecast");
+assert.match(nextMatchTiming({predicted_start_ts:now+24*60*60000},now).time,/\\d{2}\\.\\d{2}\\./,
+ "Next-day start includes calendar date");
+assert.equal(nextMatchTiming(null,now).time,"");
+const scheduled={...playing,payload:{...playing.payload,running:null,
+ next:{queue_position:1},upcoming:[
+ {match_id:"next-match",class:"ME U17",opponent:"Beispiel A",planned_ts:now+20*60000},
+ {match_id:"later-match",class:"GD U17",opponent:"Beispiel B",predicted_start_ts:now+90*60000}
+]}};
+const upcomingDay=matchdayOverview(scheduled,id,now);
+assert.equal(upcomingDay.queue,1);
+assert.equal(upcomingDay.upcoming.length,2);
+assert.equal(upcomingDay.upcoming[0].match_id,"next-match");
+assert.equal(matchdayOverview({...scheduled,checked_at:new Date(now-180000).toISOString()},id,now),null,
+ "Expired provider schedule must not be displayed as current");
+
 assert.ok(sourceTime(1791621600000).includes("Uhr"));
 assert.equal(liveView({...idle,payload:{...idle.payload,upcoming:{}}},id,now).status,"unavailable");
 
@@ -92,7 +118,12 @@ assert.match(html,/Originalquellen &amp; weitere Ergebnisse/);
 assert.match(js,/badminton:profile-change/);
 assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
-assert.match(js,/Wartestand/);
+assert.match(js,/nextMatchPanel\\(day\\)/,"The next fixture leads the turn-day panel");
+assert.match(js,/nextMatchTiming\\(next\\)/);
+assert.match(js,/Zeiten können sich am Turniertag verschieben/);
+assert.match(js,/sourceShortcut/);
+assert.doesNotMatch(js,/setInterval\\([^)]*()=>\\{[^}]*fetch\\(.*badhub/s,
+ "No direct provider polling in browser");
 assert.match(js,/situation\.kind==="idle"|situation\.kind!=="current"/);
 assert.match(js,/Bei Badhub prüfen/);
 assert.doesNotMatch(js,/Live-Abgleich veraltet/,"Technical cache age must not be the headline");
