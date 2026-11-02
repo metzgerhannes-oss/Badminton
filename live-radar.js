@@ -7,7 +7,7 @@ import {
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
-let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
+let currentId="",generation=0,controller,lastWatchAt=0,lastFetchedAt=0,lastKnownRow=null;
 let busy=false,timer;
 const displayed=()=>(location.hash==="#turniere"||(location.hash==="#live"&&window.badmintonMatchdayMode!=="all"))&&!document.hidden;
 function element(tag,cls,value){
@@ -164,14 +164,15 @@ async function watch(id,signal){
  if(!res.ok)throw Error("Watch request "+res.status);
  lastWatchAt=Date.now();
 }
-async function refresh(){
+async function refresh(force=false){
  const id=currentId;
  if(!displayed()||!DBV_ID.test(id||"")||busy)return;
+ if(!force&&lastFetchedAt&&Date.now()-lastFetchedAt<300000){render(lastKnownRow,id);return;}
  // On a freshly launched iPhone/PWA, app-access may still be resolving
  // the saved invitation when the live UI mounts. Wait for its grant event
  // instead of sending a doomed watch/snapshot request and showing an error.
  if(!window.badmintonAppAccess?.allowed){
-  message("Live-Radar wird vorbereitet","Die Mitgliederfreigabe wird geprüft.","pending");
+  message("–","","pending");
   return;
  }
  const seq=++generation;
@@ -186,6 +187,7 @@ async function refresh(){
   const snapshot=await getSnapshot(id,signal);
   if(seq!==generation||id!==currentId)return;
   lastKnownRow=snapshot;
+  lastFetchedAt=Date.now();
   render(snapshot,id);
  }catch(error){
   if(signal.aborted||seq!==generation)return;
@@ -201,7 +203,7 @@ async function refresh(){
  }
 }
 function switchPlayer(id){
- currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;lastKnownRow=null;
+ currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;lastFetchedAt=0;lastKnownRow=null;
  if(!DBV_ID.test(currentId)){
   message("–");
   return;
@@ -212,7 +214,7 @@ function switchPlayer(id){
 document.addEventListener("DOMContentLoaded",()=>{
  if(!root())return;
  currentId=String(window.badmintonActivePlayerId||"");
- $("live-radar-refresh")?.addEventListener("click",refresh);
+ $("live-radar-refresh")?.addEventListener("click",()=>refresh(true));
  window.addEventListener("badminton:app-access-granted",()=>{if(displayed())refresh()});
  window.addEventListener("badminton:profile-change",e=>{
   const id=String(e.detail?.playerId||"");
