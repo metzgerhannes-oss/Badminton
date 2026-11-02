@@ -59,22 +59,25 @@ test("F07 existing user is never forced into setup and can restart it in setting
  expect(await page.evaluate(()=>localStorage.getItem("schmetterlinge.setupWizard.v1"))).toBe("0");
 });
 
-test("F07 wizard translates progress and controls in English/Arabic without losing profiles",async({page})=>{
+test("F07 German-only wizard remains readable on small devices without changing saved profiles",async({page})=>{
  await page.setViewportSize({width:320,height:700});
  await page.addInitScript(data=>{
   localStorage.setItem("shuttleboard-v1",JSON.stringify(data));
   localStorage.setItem("schmetterlinge.setupWizard.v1","0");
-  localStorage.setItem("schmetterlinge.uiLanguage","en");
+  // Old language preferences may survive in existing PWA storage. They no
+  // longer affect the app and must not delete or alter the player records.
+  localStorage.setItem("schmetterlinge.uiLanguage","ar");
  },store);
  await page.goto("/#start");
  const dialog=page.locator("#onboarding-wizard");
  await expect(dialog).toBeVisible();
- await expect(page.locator("#onboarding-title")).toHaveText("Your profile");
- await expect(page.locator("#onboarding-progress")).toHaveText("1 of 4");
- await page.evaluate(()=>window.SchmetterlingeI18n.choose("ar"));
- await expect(page.locator("html")).toHaveAttribute("dir","rtl");
- await expect(page.locator("#onboarding-title")).toHaveText("ملفك الشخصي");
- await expect(page.locator("#onboarding-progress")).toHaveText("1 من 4");
+ await expect(page.locator("#onboarding-title")).toHaveText("Dein Profil");
+ await expect(page.locator("#onboarding-progress")).toHaveText("1 von 4");
+ await expect(page.locator("html")).toHaveAttribute("lang","de");
+ await expect(page.locator("html")).toHaveAttribute("dir","ltr").catch(async()=>{
+  const dir=await page.locator("html").getAttribute("dir");
+  expect(dir===null||dir==="ltr").toBe(true);
+ });
  const box=await dialog.boundingBox();
  expect(box).not.toBeNull();
  expect(box.x).toBeGreaterThanOrEqual(-1);
@@ -85,12 +88,10 @@ test("F07 wizard translates progress and controls in English/Arabic without losi
  expect(resume).not.toBeNull();
  expect(resume.x).toBeGreaterThanOrEqual(-1);
  expect(resume.x+resume.width).toBeLessThanOrEqual(321);
- await page.evaluate(()=>window.SchmetterlingeI18n.choose("en"));
  await page.locator("#onboarding-resume").click();
- await expect(page.locator("#onboarding-progress")).toHaveText("1 of 4");
  await page.locator("#onboarding-action").click();
- await expect(page.locator("#onboarding-title")).toHaveText("More players");
- await expect(page.locator("#onboarding-progress")).toHaveText("2 of 4");
+ await expect(page.locator("#onboarding-title")).toHaveText("Weitere Spieler");
+ await expect(page.locator("#onboarding-progress")).toHaveText("2 von 4");
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("shuttleboard-v1")));
  expect(saved.players).toEqual([player]);
 });
