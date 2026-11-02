@@ -2,7 +2,7 @@
  * It never fetches Badhub directly from browsers and never guesses live scores. */
 import {
  DBV_ID,watchRequest,snapshotPath,liveView,
- radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime,matchdayOverview,nextMatchTiming
+ radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime,matchdayOverview,nextMatchTiming,recentMatchdayPlan
 } from "./scripts/live-radar.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
@@ -120,11 +120,16 @@ function render(row,id){
   top.appendChild(element("span","radar-source","Badhub · zuletzt geprüft "+printed+" Uhr"));
  }
  if(situation.kind!=="current"){
-  top.appendChild(element("strong","radar-empty",situation.kind==="idle"||situation.kind==="pending"?"–":"Stand veraltet"));
-  box.appendChild(top);
+  const plan=recentMatchdayPlan(row,id);
+  if(plan){
+   top.appendChild(element("strong","radar-tournament",plan.tournament||"–"));
+   box.appendChild(top);
+   box.appendChild(nextMatchPanel(plan));
+  }else{
+   top.appendChild(element("strong","radar-empty","–"));
+   box.appendChild(top);
+  }
   const shortcut=sourceShortcut(row,id);
-  if(situation.kind==="updating"&&situation.tournament)
-   box.appendChild(line("Bekanntes Turnier",situation.tournament));
   if(shortcut)box.appendChild(shortcut);
   return;
  }
