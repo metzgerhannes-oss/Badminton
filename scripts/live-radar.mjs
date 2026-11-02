@@ -171,6 +171,19 @@ export function isExplicitNonplayedLiveMatch(match){
    .replace(/[\\s._-]/g,"");
  return new Set(["BYE","RAST","RUST","FREILOS","SPIELFREI","WALKOVER","WO","KAMPFLOS"]).has(flag);
 }
+/** A five-minute-old provider plan can still be shown as a *dated plan*.
+ * Never reclassify its running/queue state as LIVE after the 120s live gate. */
+export function recentMatchdayPlan(row,id,now=Date.now()){
+ if(!validateSnapshot(row,id))return null;
+ const age=freshness(row,now);
+ if(!Number.isFinite(age.ageMs)||age.ageMs>300000||age.fresh)return null;
+ const p=row.payload;
+ if(!object(p.tournament))return null;
+ const upcoming=p.upcoming.filter(m=>object(m)&&!isExplicitNonplayedLiveMatch(m)).slice(0,20);
+ if(!upcoming.length)return null;
+ return {tournament:str(p.tournament.name,120),running:null,queue:null,upcoming,past:[],
+  pendingCount:upcoming.length,shownResults:0,hasPublishedGames:true,datedPlan:true};
+}
 export function matchdayOverview(row,id,now=Date.now()){
  const view=liveView(row,id,now);
  if(!["playing","next","tournament"].includes(view.status))return null;
