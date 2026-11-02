@@ -74,10 +74,8 @@ test("F07 German-only wizard remains readable on small devices without changing 
  await expect(page.locator("#onboarding-title")).toHaveText("Dein Profil");
  await expect(page.locator("#onboarding-progress")).toHaveText("1 von 4");
  await expect(page.locator("html")).toHaveAttribute("lang","de");
- await expect(page.locator("html")).toHaveAttribute("dir","ltr").catch(async()=>{
-  const dir=await page.locator("html").getAttribute("dir");
-  expect(dir===null||dir==="ltr").toBe(true);
- });
+ const dir=await page.locator("html").getAttribute("dir");
+ expect(dir===null||dir==="ltr").toBe(true);
  const box=await dialog.boundingBox();
  expect(box).not.toBeNull();
  expect(box.x).toBeGreaterThanOrEqual(-1);
