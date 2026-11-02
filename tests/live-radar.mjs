@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {DBV_ID,watchRequest,snapshotPath,snapshotUrl,validSource,sourceSets,setText,opponents,matchLabel,
- freshness,validateSnapshot,liveView,radarSituation,playerOutcome,sourceTime,matchdayOverview,nextMatchTiming} from "../scripts/live-radar.mjs";
+ freshness,validateSnapshot,liveView,radarSituation,playerOutcome,sourceTime,matchdayOverview,nextMatchTiming,recentMatchdayPlan} from "../scripts/live-radar.mjs";
 const id="05-061350";
 assert.ok(DBV_ID.test(id));
 assert.equal(watchRequest("local-123"),null);
@@ -107,6 +107,20 @@ assert.equal(upcomingDay.upcoming[0].match_id,"next-match");
 assert.equal(matchdayOverview({...scheduled,checked_at:new Date(now-180000).toISOString()},id,now),null,
  "Expired provider schedule must not be displayed as current");
 
+const datedPlan={...scheduled,checked_at:new Date(now-180000).toISOString()};
+const oldPlan=recentMatchdayPlan(datedPlan,id,now);
+assert.equal(oldPlan?.upcoming[0]?.match_id,"next-match",
+ "After two minutes the planned time is still available as a dated plan");
+assert.equal(oldPlan.running,null);
+assert.equal(oldPlan.queue,null,"Old call position is never presented as live");
+assert.deepEqual(oldPlan.past,[],"Old scores and match outcomes are never represented as LIVE");
+assert.equal(recentMatchdayPlan({...datedPlan,checked_at:new Date(now-300001).toISOString()},id,now),null,
+ "After five minutes the old plan is no longer displayed");
+assert.equal(recentMatchdayPlan(playing,id,now),null,
+ "Live current source stays in the existing validated live view");
+assert.equal(recentMatchdayPlan({...datedPlan,source_url:"https://untrusted.invalid"},id,now),null);
+
+
 assert.ok(sourceTime(1791621600000).includes("Uhr"));
 assert.equal(liveView({...idle,payload:{...idle.payload,upcoming:{}}},id,now).status,"unavailable");
 
@@ -119,6 +133,7 @@ assert.match(js,/badminton:profile-change/);
 assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
 assert.match(js,/nextMatchPanel\(day\)/,"The next fixture leads the turn-day panel");
+assert.match(js,/recentMatchdayPlan\(row,id\)/,"Dated five-minute plan fallback in UI");
 assert.match(js,/Date\.now\(\)-lastFetchedAt<300000/,"No repeat read before five minutes");
 assert.match(js,/setInterval\([^\n]*300000\)/,"Turn-day auto refresh every five minutes");
 assert.match(js,/Date\.now\(\)-lastWatchAt>300000/,"No extra watch request before five minutes");
