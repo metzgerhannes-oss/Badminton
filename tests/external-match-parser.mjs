@@ -53,6 +53,17 @@ const unknownRegion=parsePublicHistory(tour.replace(
 assert.equal(unknownRegion.cards_seen,1);
 assert.equal(unknownRegion.items.length,0,"Do not invent unsupported association provenance");
 assert.equal(unknownRegion.layout_stats.header_other_region_cards,1);
+assert.equal(unknownRegion.rejection_reasons.unknown_tournament_header,1);
+// A single unsafe header with several cards must account for *each* excluded
+// card; no unverified result is silently classified as a mysterious match.
+const unknownMulti=parsePublicHistory(tour.replace(
+ "/bwbv/turnier.php?id=4986","/hbv/turnier.php?id=4986").replace(card,card+card),player,"tournament");
+assert.equal(unknownMulti.cards_seen,2);
+assert.equal(unknownMulti.items.length,0);
+assert.equal(unknownMulti.rejection_reasons.unknown_tournament_header,2);
+assert.equal(unknownMulti.layout_stats.header_other_region_cards,2);
+assert.equal(unknownMulti.rejection_reasons.unclassified_card||0,0);
+
 const foreignSite=parsePublicHistory(tour.replace(
  "/bwbv/turnier.php?id=4986","https://example.invalid/bwbv/turnier.php?id=4986"),player,"tournament");
 assert.equal(foreignSite.items.length,0,"No untrusted external tournament host");
@@ -89,6 +100,23 @@ const league=head+'<div class="sp-meeting"><div class="sp-group-header">'+
  '<div class="sp-meeting-discs"><div class="sp-match-item sp-match-item--link">'+
  '<span class="sp-match-disc sp-match-disc--win">DE</span>'+card.slice(card.indexOf('<div class="sp-match-body">'))+'</div></div></div>';
 const l=parsePublicHistory(league,player,"league");
+// A missing verified meeting link or date excludes every source card and
+// records a precise reason, without turning the entry into a played match.
+const leagueNoLink=parsePublicHistory(league.replace(
+ "/bwbv/begegnung.php?id=290071","/unknown/meeting"),player,"league");
+assert.equal(leagueNoLink.cards_seen,1);
+assert.equal(leagueNoLink.items.length,0);
+assert.equal(leagueNoLink.layout_stats.missing_link_cards,1);
+assert.equal(leagueNoLink.rejection_reasons.missing_event_or_source,1);
+assert.equal(leagueNoLink.rejection_reasons.unclassified_card||0,0);
+const leagueNoDate=parsePublicHistory(league.replace(
+ '<span class="sp-date-y">2026</span>',""),player,"league");
+assert.equal(leagueNoDate.cards_seen,1);
+assert.equal(leagueNoDate.items.length,0);
+assert.equal(leagueNoDate.layout_stats.missing_date_cards,1);
+assert.equal(leagueNoDate.rejection_reasons.missing_event_or_source,1);
+assert.equal(leagueNoDate.rejection_reasons.unclassified_card||0,0);
+
 assert.equal(l.items.length,1);
 assert.equal(l.items[0].category,"league");
 assert.equal(l.items[0].match_date,"2026-10-09");
