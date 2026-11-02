@@ -35,7 +35,7 @@ function players(markup){
  return [...markup.matchAll(/class="(?:[^"]*\s)?sp-name-full(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/span>/g)]
   .map(m=>plain(m[1])).filter(Boolean).slice(0,4);
 }
-function noteReject(counts,reason){counts[reason]=(counts[reason]||0)+1;}
+function noteReject(counts,reason,n=1){if(n>0)counts[reason]=(counts[reason]||0)+n;}
 function sides(chunk,counts,year,rule,allowDeclaredWinner=false){
  const start=chunk.search(/class="[^"]*\bsp-match-body\b[^"]*"/);
  const mid=start<0?-1:start+chunk.slice(start).search(/class="[^"]*\bsp-result-col\b[^"]*"/);
@@ -183,8 +183,10 @@ function tournamentFacts(html,playerName,counts,layout){
   // parameters never change the canonical identity or stored provenance.
   const head=header.match(/class="(?:[^"]*\s)?sp-tournament-name(?:\s[^"]*)?"[^>]*>[\s\S]*?<a\b[^>]*\shref=(["'])(?:https:\/\/badhub\.de)?\/(bwbv|dbv)\/turnier\.php\?id=(\d+)(?:&(?:amp;)?[A-Za-z0-9_.=%&-]+)?\1[^>]*>([\s\S]*?)<\/a>/i);
   if(!head){
-   noteReject(counts,"unknown_tournament_header");
    const n=countCards(card);
+   // One unverified event header may hide many match cards. Classify every
+   // excluded card, not just the surrounding header; do not import any of them.
+   noteReject(counts,"unknown_tournament_header",n);
    layout.unrecognized_header_cards+=n;
    const kind=tournamentHeaderFailure(header);
    layout[kind]+=n;
@@ -210,9 +212,19 @@ function leagueFacts(html,playerName,counts,layout){
  for(const meeting of sections){
   layout.meetings++;
   const head=meeting.match(/\/bwbv\/begegnung\.php\?id=(\d+)/);
-  if(!head){layout.missing_link_cards+=countCards(meeting);continue;}
+  if(!head){
+   const n=countCards(meeting);
+   layout.missing_link_cards+=n;
+   noteReject(counts,"missing_event_or_source",n);
+   continue;
+  }
   const date=leagueStart(meeting.slice(0,2100));
-  if(!date){layout.missing_date_cards+=countCards(meeting);continue;}
+  if(!date){
+   const n=countCards(meeting);
+   layout.missing_date_cards+=n;
+   noteReject(counts,"missing_event_or_source",n);
+   continue;
+  }
   layout.recognized_meeting_cards+=countCards(meeting);
   const title=plain((meeting.match(/class="sp-group-opponent sp-gopp-line"[^>]*>([\s\S]*?)<\/span>/)||[])[1])||"Ligabegegnung";
   const ctx={source_id:head[1],title,date,year:Number(date.slice(0,4)),
