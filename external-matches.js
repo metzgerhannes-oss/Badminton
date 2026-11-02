@@ -104,7 +104,7 @@ function render(){
  count.textContent=filtered.length
   ?fmt(result.total)+" einzeln belegte Spiele · "+fmt(result.wins)+" Siege · "+
    fmt(result.losses)+" Niederlagen (Badhub-Einzelnachweise)"
-  :"–";
+  :"Für diese Auswahl sind in der App noch keine zählbaren Einzelspiele belegt.";
  if(result.excluded&&(year!=="all"||discipline!=="all"||category!=="all"))
   count.textContent+=" "+fmt(result.excluded)+" unklare Quellkarten nicht berücksichtigt.";
  if(result.quarantined&&(year!=="all"||discipline!=="all"||category!=="all"))
