@@ -72,7 +72,7 @@ function renderHistory(){
  root.hidden=false;
  if(!data){
   root.classList.add("career-empty");
-  summary.innerHTML='<p>Für diesen Spieler liegt derzeit noch keine extern übernommene Jahresübersicht vor. In einer öffentlichen Ergebnisquelle kannst du ältere Turniere recherchieren.</p>'+
+  summary.innerHTML='<p>–</p>'+
    sourceLink(profileLink,"Bei Badhub nach dieser DBV-ID suchen");
   yearField.closest(".career-history-filters").hidden=true;
   years.innerHTML="";highlight.innerHTML="";
