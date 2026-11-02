@@ -92,7 +92,7 @@ assert.equal(nextMatchTiming({predicted_start_ts:now-3*60000},now).overdue,true,
 assert.equal(nextMatchTiming({predicted_start_ts:"not a timestamp",planned_ts:now+60000},now).kind,"planned");
 assert.equal(nextMatchTiming({predicted_start_ts:"invalid",planned_ts:"invalid"},now).kind,"unknown");
 assert.equal(nextMatchTiming({predicted_start_ts:now+60*60000},now-24*60*60000).kind,"forecast");
-assert.match(nextMatchTiming({predicted_start_ts:now+24*60*60000},now).time,/\\d{2}\\.\\d{2}\\./,
+assert.match(nextMatchTiming({predicted_start_ts:now+24*60*60000},now).time,/\d{2}\.\d{2}\./,
  "Next-day start includes calendar date");
 assert.equal(nextMatchTiming(null,now).time,"");
 const scheduled={...playing,payload:{...playing.payload,running:null,
@@ -118,11 +118,11 @@ assert.match(html,/Originalquellen &amp; weitere Ergebnisse/);
 assert.match(js,/badminton:profile-change/);
 assert.match(js,/document.hidden/);
 assert.match(js,/lastWatchAt/);
-assert.match(js,/nextMatchPanel\\(day\\)/,"The next fixture leads the turn-day panel");
-assert.match(js,/nextMatchTiming\\(next\\)/);
+assert.match(js,/nextMatchPanel\(day\)/,"The next fixture leads the turn-day panel");
+assert.match(js,/nextMatchTiming\(next\)/);
 assert.match(js,/Zeiten können sich am Turniertag verschieben/);
 assert.match(js,/sourceShortcut/);
-assert.doesNotMatch(js,/setInterval\\([^)]*()=>\\{[^}]*fetch\\(.*badhub/s,
+assert.doesNotMatch(js,/fetch\(["']https:\/\/badhub\.de/i,
  "No direct provider polling in browser");
 assert.match(js,/situation\.kind==="idle"|situation\.kind!=="current"/);
 assert.match(js,/Bei Badhub prüfen/);
