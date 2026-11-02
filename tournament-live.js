@@ -151,7 +151,7 @@ function sync(){
  if(!selected){items=[];note("–");return}
  if(!visible())return;
  if(changed){items=[];status="all";court="all";loadedAt=0}
- if(changed||!loadedAt||Date.now()-loadedAt>60000)refresh();
+ if(changed||!loadedAt||Date.now()-loadedAt>300000)refresh();
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!root())return;
@@ -173,6 +173,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
  window.addEventListener("hashchange",()=>{if(visible())sync();else{++serial;controller?.abort()}});
  document.addEventListener("visibilitychange",()=>{if(visible())sync();else{++serial;controller?.abort()}});
- setInterval(()=>{if(visible()&&selected&&Date.now()-loadedAt>60000)refresh()},300000);
+ setInterval(()=>{if(visible()&&selected&&Date.now()-loadedAt>300000)refresh()},300000);
  sync();
 });
