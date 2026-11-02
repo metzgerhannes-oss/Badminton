@@ -2,12 +2,12 @@
  * It never fetches Badhub directly from browsers and never guesses live scores. */
 import {
  DBV_ID,watchRequest,snapshotPath,liveView,
- radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime,matchdayOverview
+ radarSituation,validSource,setText,opponents,matchLabel,playerOutcome,sourceTime,matchdayOverview,nextMatchTiming,recentMatchdayPlan
 } from "./scripts/live-radar.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 const root=()=> $("live-radar-content");
-let currentId="",generation=0,controller,lastWatchAt=0,lastKnownRow=null;
+let currentId="",generation=0,controller,lastWatchAt=0,lastFetchedAt=0,lastKnownRow=null;
 let busy=false,timer;
 const displayed=()=>(location.hash==="#turniere"||(location.hash==="#live"&&window.badmintonMatchdayMode!=="all"))&&!document.hidden;
 function element(tag,cls,value){
@@ -57,6 +57,39 @@ function fixture(match,{running=false,past=false}={}){
  if(meta.length)card.appendChild(element("p","radar-match-detail",meta.join(" · ")));
  return card;
 }
+/** Source-order first upcoming item. Never turn queue length into a clock time. */
+function nextMatchPanel(day){
+ const section=element("section","matchday-next");
+ section.setAttribute("aria-label","Nächstes Spiel und Beginn");
+ section.appendChild(element("span","matchday-next-kicker",day.running?"Danach":"Nächstes Spiel"));
+ const next=day.upcoming[0]||null;
+ if(next){
+  const timing=nextMatchTiming(next);
+  const title=timing.kind==="forecast"?"Prognose laut Spielplan":
+   timing.kind==="planned"?"Geplant":"–";
+  section.appendChild(element("strong","matchday-next-time",timing.overdue
+   ?"Zeit prüfen":timing.time||"–"));
+  section.appendChild(element("small","matchday-next-type",title));
+  const opponent=opponents(next);
+  section.appendChild(element("p","matchday-next-opponent",matchLabel(next)+
+   (opponent?" · gegen "+opponent:"")));
+  const venue=[next.hall?"Halle "+String(next.hall).slice(0,30):"",
+   next.court?String(next.court).slice(0,40):""].filter(Boolean).join(" · ");
+  if(venue)section.appendChild(element("small","matchday-next-type",venue));
+ }else{
+  section.appendChild(element("strong","matchday-next-time",
+   "–"));
+  
+ }
+ if(!day.running&&day.queue!==null){
+  const queue=day.queue===0?"Als Nächstes aufgerufen":
+   day.queue===1?"Noch 1 Spiel vor dir":"Noch "+day.queue+" Spiele vor dir";
+  section.appendChild(element("span","matchday-next-queue",queue));
+ }
+ section.appendChild(element("small","matchday-next-warning","Zeit laut Quelle · Änderungen möglich"));
+ return section;
+}
+
 function matchList(label,items,params){
  if(!items?.length)return null;
  const section=element("section","radar-section");
@@ -87,40 +120,37 @@ function render(row,id){
   top.appendChild(element("span","radar-source","Badhub · zuletzt geprüft "+printed+" Uhr"));
  }
  if(situation.kind!=="current"){
-  top.appendChild(element("strong","radar-empty",situation.title));
-  top.appendChild(element("p","",situation.detail));
-  box.appendChild(top);
+  const plan=recentMatchdayPlan(row,id);
+  if(plan){
+   top.appendChild(element("strong","radar-tournament",plan.tournament||"–"));
+   box.appendChild(top);
+   box.appendChild(nextMatchPanel(plan));
+  }else{
+   top.appendChild(element("strong","radar-empty","–"));
+   box.appendChild(top);
+  }
   const shortcut=sourceShortcut(row,id);
-  if(situation.kind==="updating"&&situation.tournament)
-   box.appendChild(line("Bekanntes Turnier",situation.tournament));
   if(shortcut)box.appendChild(shortcut);
   return;
  }
  const day=matchdayOverview(row,id);
- if(!day){message("Turnierstatus wird geprüft","Noch kein bestätigter Spieltagsplan verfügbar.","pending");return}
+ if(!day){message("–","","pending");return}
  top.appendChild(element("strong","radar-tournament",day.tournament||"Aktuelles Turnier"));
  box.appendChild(top);
  if(day.running){
   const block=matchList("Jetzt auf dem Feld",[day.running],{running:true});
   if(block){block.classList.add("matchday-current");box.appendChild(block)}
  }
- if(day.queue!==null){
-  const label=day.queue===0?"Dein Spiel ist als Nächstes dran":day.queue===1?"Noch 1 Spiel vor dir":"Noch "+day.queue+" Spiele vor dir";
-  const call=element("section","matchday-queue");
-  call.appendChild(element("strong","",label));
-  call.appendChild(element("small","","Wartestand laut Turnierquelle · keine feste Startzeit"));
-  box.appendChild(call);
- }
+ box.appendChild(nextMatchPanel(day));
  const overview=element("div","matchday-overview");
  overview.appendChild(element("span","","Aus der Quelle: "+day.pendingCount+
   " offen / laufend · "+day.shownResults+" gespielt"));
  box.appendChild(overview);
- const upcoming=matchList("Deine nächsten Spiele",day.upcoming);
+ const upcoming=matchList("Weitere geplante Spiele",day.upcoming.slice(1));
  if(upcoming)box.appendChild(upcoming);
  const finished=matchList("Bereits gespielte Begegnungen",day.past,{past:true});
  if(finished)box.appendChild(finished);
- if(!day.hasPublishedGames)box.appendChild(line("Noch keine Einzelspiele gemeldet",
-  "Der Turniertag ist zugeordnet. Sobald Begegnungen veröffentlicht werden, erscheinen sie hier."));
+ 
  const shortcut=sourceShortcut(row,id);
  if(shortcut)box.appendChild(shortcut);
 }
@@ -139,14 +169,15 @@ async function watch(id,signal){
  if(!res.ok)throw Error("Watch request "+res.status);
  lastWatchAt=Date.now();
 }
-async function refresh(){
+async function refresh(force=false){
  const id=currentId;
  if(!displayed()||!DBV_ID.test(id||"")||busy)return;
+ if(!force&&lastFetchedAt&&Date.now()-lastFetchedAt<300000){render(lastKnownRow,id);return;}
  // On a freshly launched iPhone/PWA, app-access may still be resolving
  // the saved invitation when the live UI mounts. Wait for its grant event
  // instead of sending a doomed watch/snapshot request and showing an error.
  if(!window.badmintonAppAccess?.allowed){
-  message("Live-Radar wird vorbereitet","Die Mitgliederfreigabe wird geprüft.","pending");
+  message("–","","pending");
   return;
  }
  const seq=++generation;
@@ -156,19 +187,19 @@ async function refresh(){
  const signal=controller.signal;
  const btn=$("live-radar-refresh");if(btn)btn.disabled=true;
  try{
-  if(!lastWatchAt||Date.now()-lastWatchAt>60000)await watch(id,signal);
+  if(!lastWatchAt||Date.now()-lastWatchAt>300000)await watch(id,signal);
   if(seq!==generation||id!==currentId)return;
   const snapshot=await getSnapshot(id,signal);
   if(seq!==generation||id!==currentId)return;
   lastKnownRow=snapshot;
+  lastFetchedAt=Date.now();
   render(snapshot,id);
  }catch(error){
   if(signal.aborted||seq!==generation)return;
   console.warn("Sourced live radar unavailable",error.message);
   if(lastKnownRow&&id===currentId)render(lastKnownRow,id);
   else{
-   message("Turnierdaten gerade nicht verfügbar",
-    "Die Quellenprüfung wird automatisch erneut versucht.","waiting");
+   message("–","","waiting");
    const shortcut=sourceShortcut(null,id);
    if(shortcut)root()?.appendChild(shortcut);
   }
@@ -177,18 +208,18 @@ async function refresh(){
  }
 }
 function switchPlayer(id){
- currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;lastKnownRow=null;
+ currentId=id||"";generation++;controller?.abort();busy=false;lastWatchAt=0;lastFetchedAt=0;lastKnownRow=null;
  if(!DBV_ID.test(currentId)){
-  message("Keine offizielle DBV-ID","Wähle ein bestätigtes Spielerprofil mit DBV-ID.");
+  message("–");
   return;
  }
- message("Live-Radar wird vorbereitet","Der gemeinsame Quellenabruf startet nur bei geöffneter Turnieransicht.");
+ message("–");
  if(displayed())refresh();
 }
 document.addEventListener("DOMContentLoaded",()=>{
  if(!root())return;
  currentId=String(window.badmintonActivePlayerId||"");
- $("live-radar-refresh")?.addEventListener("click",refresh);
+ $("live-radar-refresh")?.addEventListener("click",()=>refresh(true));
  window.addEventListener("badminton:app-access-granted",()=>{if(displayed())refresh()});
  window.addEventListener("badminton:profile-change",e=>{
   const id=String(e.detail?.playerId||"");
@@ -204,5 +235,5 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("hashchange",()=>{if(displayed())refresh()});
  document.addEventListener("visibilitychange",()=>{if(displayed())refresh()});
  if(displayed())refresh();
- timer=setInterval(()=>{if(displayed())refresh()},30000);
+ timer=setInterval(()=>{if(displayed())refresh()},300000);
 });

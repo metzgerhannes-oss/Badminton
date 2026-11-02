@@ -105,7 +105,7 @@ async function refresh(force=false){
  const ctx=context(),today=berlinDay();
  const player=followedRoster(ctx.groups);
  const stamp=JSON.stringify([today,player.players.map(p=>p.id),ctx.follows,ctx.teams.map(t=>t.id)]);
- if(!force&&stamp===signature&&Date.now()-checked<180000){render();return}
+ if(!force&&stamp===signature&&Date.now()-checked<300000){render();return}
  if(loading&&!force)return;
  const ticket=++seq;controller?.abort();controller=new AbortController();
  loading=true;render(true);

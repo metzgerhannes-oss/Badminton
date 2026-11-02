@@ -139,6 +139,27 @@ export function sourceTime(value){
  return Number.isNaN(d.getTime())?"":new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(d)+" Uhr";
 }
 
+/** Display only provider-reported start times. A queue position never implies
+ * a fixed start time, and an elapsed prediction must not look guaranteed. */
+export function nextMatchTiming(match,now=Date.now()){
+ const m=object(match);
+ if(!m||!Number.isFinite(now))return {kind:"unknown",time:"",overdue:false};
+ for(const [field,kind] of [["predicted_start_ts","forecast"],["planned_ts","planned"]]){
+  const raw=m[field];
+  if(typeof raw!=="number"&&typeof raw!=="string")continue;
+  if(typeof raw==="string"&&!/^\\d{12,13}$/.test(raw))continue;
+  const ms=Number(raw);
+  if(!Number.isSafeInteger(ms)||ms<1e12||ms>3e13)continue;
+  const today=new Date(now).toLocaleDateString("de-DE",{timeZone:"Europe/Berlin"});
+  const start=new Date(ms);
+  const sameDay=start.toLocaleDateString("de-DE",{timeZone:"Europe/Berlin"})===today;
+  const options={timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"};
+  const time=new Intl.DateTimeFormat("de-DE",sameDay?options:{...options,day:"2-digit",month:"2-digit"}).format(start)+" Uhr";
+  return {kind,time,overdue:ms<now-120000};
+ }
+ return {kind:"unknown",time:"",overdue:false};
+}
+
 /** A player-centred day view, never a guessed tournament-wide schedule.
  * The order is supplied by Badhub; deduplication requires explicit match IDs. */
 /** Never treat explicitly skipped BYE/Rast/W.O. entries as played games.
@@ -149,6 +170,19 @@ export function isExplicitNonplayedLiveMatch(match){
  const flag=str(m.status||m.result_type||m.match_type||"",35).toUpperCase()
    .replace(/[\\s._-]/g,"");
  return new Set(["BYE","RAST","RUST","FREILOS","SPIELFREI","WALKOVER","WO","KAMPFLOS"]).has(flag);
+}
+/** A five-minute-old provider plan can still be shown as a *dated plan*.
+ * Never reclassify its running/queue state as LIVE after the 120s live gate. */
+export function recentMatchdayPlan(row,id,now=Date.now()){
+ if(!validateSnapshot(row,id))return null;
+ const age=freshness(row,now);
+ if(!Number.isFinite(age.ageMs)||age.ageMs>300000||age.fresh)return null;
+ const p=row.payload;
+ if(!object(p.tournament))return null;
+ const upcoming=p.upcoming.filter(m=>object(m)&&!isExplicitNonplayedLiveMatch(m)).slice(0,20);
+ if(!upcoming.length)return null;
+ return {tournament:str(p.tournament.name,120),running:null,queue:null,upcoming,past:[],
+  pendingCount:upcoming.length,shownResults:0,hasPublishedGames:true,datedPlan:true};
 }
 export function matchdayOverview(row,id,now=Date.now()){
  const view=liveView(row,id,now);

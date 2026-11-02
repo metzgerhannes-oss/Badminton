@@ -14,7 +14,7 @@ function render(roster,rows,remaining,error=""){
  host.replaceChildren();
  if(info)info.textContent=error?"Quelle nicht erreichbar":(roster.length?roster.length+" Spieler":"");
  if(!roster.length){
-  host.appendChild(node("p","followed-live-empty","Hinterlege eigene oder gefolgte DBV-Spieler unter „Spieler“."));
+  host.appendChild(node("p","followed-live-empty","–"));
   return;
  }
  for(const card of followedCards(roster,rows)){
@@ -23,16 +23,17 @@ function render(roster,rows,remaining,error=""){
   head.appendChild(node("strong","",card.name));
   const mark=node("span","followed-live-role",card.roleLabel);head.appendChild(mark);
   tile.appendChild(head);
-  tile.appendChild(node("b","followed-live-state",card.title));
+  const empty=["pending","idle","updating","waiting"].includes(card.kind);
+  tile.appendChild(node("b","followed-live-state",empty?"–":card.title));
   if(card.tournament)tile.appendChild(node("small","followed-live-tournament",card.tournament));
-  if(card.detail)tile.appendChild(node("span","followed-live-detail",card.detail));
+  if(!empty&&card.detail)tile.appendChild(node("span","followed-live-detail",card.detail));
   if(card.score)tile.appendChild(node("strong","followed-live-score","Sätze "+card.score));
   if(card.result)tile.appendChild(node("small","followed-live-result",card.result));
   if(card.checkedAt){
    const date=new Date(card.checkedAt);
    const stamp=Number.isFinite(date.getTime())?new Intl.DateTimeFormat("de-DE",{
     day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"
-   }).format(date)+" Uhr":"Zeitpunkt unbekannt";
+   }).format(date)+" Uhr":"–";
    tile.appendChild(node("small","followed-live-time","Badhub · Stand "+stamp));
   }
   const actions=node("div","followed-live-actions");
@@ -48,13 +49,13 @@ function render(roster,rows,remaining,error=""){
   actions.appendChild(source);tile.appendChild(actions);host.appendChild(tile);
  }
  if(remaining)host.appendChild(node("p","followed-live-empty",
-  remaining+" weitere Spieler nicht geladen. Der Abgleich ist aus Quellenschutz auf sechs gleichzeitig begrenzt."));
+  "Weitere: "+remaining));
  if(error)host.appendChild(node("p","followed-live-empty",
-  "Der letzte gemeinsame Cache wird angezeigt. Neue Angaben sind derzeit nicht verfügbar."));
+  "Stand nicht verfügbar"));
 }
 async function registerWatches(roster,signal){
  const now=Date.now();
- const needed=roster.filter(p=>now-(watchTimes.get(p.id)||0)>75000);
+ const needed=roster.filter(p=>now-(watchTimes.get(p.id)||0)>300000);
  if(!needed.length)return;
  const token=await window.badmintonAppAccess?.getAccessToken?.();
  if(!token)return;
@@ -109,7 +110,7 @@ function sync(){
   return;
  }
  const ids=rosterKey(p.players);
- if(ids!==rosterKey(lastRoster)||ids!==lastRowsRosterIds||!checked||Date.now()-checked>30000)refresh();
+ if(ids!==rosterKey(lastRoster)||ids!==lastRowsRosterIds||!checked||Date.now()-checked>300000)refresh();
  else render(p.players,lastRows,p.remaining);
 }
 document.addEventListener("DOMContentLoaded",()=>{
@@ -120,6 +121,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("hashchange",sync);
  document.addEventListener("visibilitychange",sync);
  window.addEventListener("badminton:followed-live-refresh",()=>{checked=0;sync()});
- setInterval(()=>{if(visible())sync()},30000);
+ setInterval(()=>{if(visible())sync()},300000);
  sync();
 });

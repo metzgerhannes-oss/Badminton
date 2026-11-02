@@ -254,6 +254,19 @@ summary:focus-visible{outline:3px solid #198dd2!important;outline-offset:3px}
 .radar-section h4{color:#173e63;font-size:13px;margin:10px 0 0}
 .radar-match{display:grid;gap:7px;border:1px solid #c5e0ee;border-radius:12px;padding:11px;background:#f9fdff}
 .radar-match-head{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:8px}
+/* Turniertag: next-player match is the primary question, not a guessed ETA. */
+.matchday-next{display:grid;gap:5px;padding:14px 13px;border-radius:13px;
+ border:2px solid #287fbd;background:#f1f9ff;color:#103d64}
+.matchday-next-kicker{font-size:12px;font-weight:850;letter-spacing:.025em;color:#184d73}
+.matchday-next-time{font-size:clamp(21px,5vw,28px);line-height:1.25;font-weight:900;
+ color:#0b3557;overflow-wrap:anywhere}
+.matchday-next-type{font-size:12px;color:#375c75;line-height:1.5}
+.matchday-next-opponent{font-size:13px;font-weight:700;color:#153f5e;margin:3px 0;
+ overflow-wrap:anywhere}
+.matchday-next-queue{justify-self:start;font-size:12px;font-weight:800;
+ padding:6px 10px;background:#d8eefa;color:#144d72;border-radius:9px}
+.matchday-next-warning{font-size:11px;line-height:1.45;color:#415b72;margin-top:3px}
+
 .radar-match-head strong{font-size:12px;color:#123f66;overflow-wrap:anywhere}
 .radar-match .radar-opponent{color:#285d80;font-size:12px;line-height:1.4;margin:0}
 .radar-match .radar-match-detail{color:#597b96;font-size:10px;line-height:1.5;margin:0}

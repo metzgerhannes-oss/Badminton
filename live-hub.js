@@ -1,6 +1,6 @@
 /** One live-first Turniertag view and a Home teaser only for CURRENT source evidence.
  * Home never starts vendor polling and never shows an old result as live. */
-import {snapshotPath,liveView,setText,matchLabel,opponents} from "./scripts/live-radar.mjs";
+import {snapshotPath,liveView,setText,matchLabel,opponents,nextMatchTiming} from "./scripts/live-radar.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 const $=id=>document.getElementById(id);
 let selected="",homeSeq=0,homeCtrl;
@@ -60,6 +60,17 @@ function renderHome(snapshot,id){
       (setText(state.running)?" · "+setText(state.running):"")
     :state.status==="next"?"Deine nächste Begegnung ist in Vorbereitung.":"Kommende Begegnungen sind veröffentlicht.";
  info.appendChild(node("small","",summary));
+ // Home is a read-only teaser: only the current validated provider snapshot
+ // can supply a time; reopening Turniertag refreshes the central live cache.
+ const next=state.upcoming?.[0];
+ if(next){
+  const timing=nextMatchTiming(next);
+  const label=timing.overdue?"Prognose überschritten – Spielplan prüfen":
+   timing.kind==="forecast"?"Nächstes Spiel voraussichtlich "+timing.time:
+   timing.kind==="planned"?"Nächstes Spiel geplant "+timing.time:
+   "Nächste Startzeit noch offen";
+  info.appendChild(node("small","home-live-next",label));
+ }
  box.appendChild(info);box.appendChild(node("span","home-live-arrow","↗"));
  box.hidden=false;
 }
