@@ -57,13 +57,13 @@ function render(){
  if(state==="queued"||state==="loading"||state==="checking"){
   info="Der Quellenabgleich läuft. Bereits geprüfte Spiele bleiben sichtbar.";
  }else if(state==="awaiting_source"&&!rows.length){
-  info="In der App liegen noch keine importierten Einzelmatches vor. Eine spätere Quellenprüfung ist vorgesehen.";
+  info="–";
  }else if(Number(progress?.verified_count)>0){
   info=importCompleteness(progress,rows.length);
  }else if(rows.length){
   info=fmt(rows.length)+" einzelne Quellkarten geladen; Importvollständigkeit nicht bestätigt.";
  }else{
-  info="Für dieses Profil sind in der App noch keine Einzelmatchbelege importiert.";
+  info="–";
  }
  if(all.excluded)info+=" "+fmt(all.excluded)+" unklare oder doppelte Quellkarten wurden nicht als Spiel gezählt.";
  if(partial)info+=" Es konnten höchstens "+fmt(MAX_ROWS)+" Quellkarten geladen werden; die Historie ist möglicherweise unvollständig.";
@@ -104,7 +104,7 @@ function render(){
  count.textContent=filtered.length
   ?fmt(result.total)+" einzeln belegte Spiele · "+fmt(result.wins)+" Siege · "+
    fmt(result.losses)+" Niederlagen (Badhub-Einzelnachweise)"
-  :"Für diese Auswahl sind in der App noch keine zählbaren Einzelspiele belegt.";
+  :"–";
  if(result.excluded&&(year!=="all"||discipline!=="all"||category!=="all"))
   count.textContent+=" "+fmt(result.excluded)+" unklare Quellkarten nicht berücksichtigt.";
  if(result.quarantined&&(year!=="all"||discipline!=="all"||category!=="all"))
