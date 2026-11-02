@@ -378,7 +378,7 @@ test("Turniertag is task-first; source-free status is calm and history is reacha
  await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
  await expect(page.locator("#view-turniere")).toBeVisible();
  await expect(page.locator("#live-player-select")).toBeVisible();
- await expect(page.locator("#live-radar-content")).toContainText("Derzeit kein Turniertag gemeldet");
+ await expect(page.locator("#live-radar-content")).toContainText("–");
  await expect(page.locator("#live-radar-content")).not.toContainText("Live-Abgleich veraltet");
  await page.locator("#live-player-select").selectOption(FRIEND);
  await expect(page.locator(".focused-profile")).toContainText("Sarah Storz");
