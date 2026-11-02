@@ -23,9 +23,10 @@ function render(roster,rows,remaining,error=""){
   head.appendChild(node("strong","",card.name));
   const mark=node("span","followed-live-role",card.roleLabel);head.appendChild(mark);
   tile.appendChild(head);
-  tile.appendChild(node("b","followed-live-state",card.title));
+  const empty=["pending","idle","updating","waiting"].includes(card.kind);
+  tile.appendChild(node("b","followed-live-state",empty?"–":card.title));
   if(card.tournament)tile.appendChild(node("small","followed-live-tournament",card.tournament));
-  if(card.detail)tile.appendChild(node("span","followed-live-detail",card.detail));
+  if(!empty&&card.detail)tile.appendChild(node("span","followed-live-detail",card.detail));
   if(card.score)tile.appendChild(node("strong","followed-live-score","Sätze "+card.score));
   if(card.result)tile.appendChild(node("small","followed-live-result",card.result));
   if(card.checkedAt){
