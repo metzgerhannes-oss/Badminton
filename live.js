@@ -8,7 +8,7 @@
  const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const safeSource=s=>{try{const u=new URL(s);return u.protocol==="https:"&&["dbv.turnier.de","turnier.de","www.turnier.de"].includes(u.hostname)?u.href:null}catch{return null}};
  const isDbvId=s=>/^\d{2}-\d{6}$/.test(s||"");
- const dateTime=s=>{if(!s)return "Spielzeit offen";const d=new Date(s);return Number.isNaN(d.getTime())?"Spielzeit offen":new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(d)+" Uhr"};
+ const dateTime=s=>{if(!s)return "–";const d=new Date(s);return Number.isNaN(d.getTime())?"–":new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(d)+" Uhr"};
  const statuses={unknown:"Status offen",scheduled:"Angesetzt",called:"Aufgerufen",playing:"Läuft",finished:"Beendet",cancelled:"Abgesagt",walkover:"Kampflos"};
  let currentId="",requestId=0,loading=false;
  async function get(path){
@@ -35,7 +35,7 @@
  }
  function render(matches){
   const box=$("dbv-live-results");if(!box)return;
-  if(!matches.length){notice("Für dieses Profil sind noch keine verifiziert importierten DBV-Begegnungen verfügbar. Die offiziellen Turnierlinks bleiben unten erreichbar.");return}
+  if(!matches.length){notice("–");return}
   box.innerHTML=matches.map(m=>{
    const sets=(m.match_games||[]).slice().sort((a,b)=>a.game_number-b.game_number)
     .filter(s=>s.side1_points!=null&&s.side2_points!=null)
@@ -45,7 +45,7 @@
    const old=checked&&(!Number.isNaN(checked.getTime()))&&(Date.now()-checked.getTime()>15*60*1000);
    const freshness=checked&&!Number.isNaN(checked.getTime())?
      ("DBV-Abgleich: "+new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"}).format(checked)+(old?" · möglicherweise veraltet":"")):
-     "Noch kein bestätigter Live-Abgleich";
+     "–";
    return '<article class="live-dbv-match">'+
     '<div class="live-dbv-row"><strong>'+escape(m.events?.title||m.tournaments?.name||"Badminton-Begegnung")+'</strong><span>'+escape(statuses[m.status]||statuses.unknown)+'</span></div>'+
     '<div class="live-dbv-players"><span>'+escape(sideLabel(m.match_participants,1))+'</span><b>–</b><span>'+escape(sideLabel(m.match_participants,2))+'</span></div>'+
@@ -77,7 +77,7 @@
     .slice(0,12);
    render(visibleMatches);
   }catch(error){
-   if(ticket===requestId)notice("Die Live-Abfrage ist derzeit nicht erreichbar. Nutze die offiziellen DBV-Turnierlinks.");
+   if(ticket===requestId)notice("–");
    console.warn("Badminton live feed:",error.message);
   }finally{
    if(ticket===requestId){loading=false;if(btn)btn.disabled=false}
@@ -114,6 +114,6 @@
   });
   window.addEventListener("hashchange",()=>{if(visible())refresh()});
   document.addEventListener("visibilitychange",()=>{if(visible())refresh()});
-  setInterval(()=>{if(visible())refresh()},60_000);
+  setInterval(()=>{if(visible())refresh()},300_000);
  });
 })();
