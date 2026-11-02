@@ -125,7 +125,7 @@ assert.match(js,/Date\.now\(\)-lastWatchAt>300000/,"No extra watch request befor
 assert.match(js,/message\("–"/,"Missing data uses a dash");
 assert.match(js,/timing\.time\|\|"–"/,"Missing start uses a dash");
 assert.match(js,/nextMatchTiming\(next\)/);
-assert.match(js,/Zeiten können sich am Turniertag verschieben/);
+assert.match(js,/Zeit laut Quelle · Änderungen möglich/);
 assert.match(js,/sourceShortcut/);
 assert.doesNotMatch(js,/fetch\(["']https:\/\/badhub\.de/i,
  "No direct provider polling in browser");
