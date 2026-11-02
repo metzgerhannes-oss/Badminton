@@ -348,7 +348,7 @@ test("Live tab shows personal matchday and a verified official tournament link",
   dbv_id:PLAYER,provider:"Badhub",source_url:"https://badhub.de/spieler/"+PLAYER+"/live",
   checked_at:new Date().toISOString(),payload:{tournament:{name:"Test Jugendturnier"},
    running:{match_id:"m1",class:"HE U11",opponent:"Gegner A",is_team1:1,sets:[[11,8]],court:"Feld 3"},
-   next:{queue_position:0},upcoming:[{match_id:"m1"},{match_id:"m2",class:"HD U11",opponent:"Gegner B"}],
+   next:{queue_position:0},upcoming:[{match_id:"m1"},{match_id:"m2",class:"HD U11",opponent:"Gegner B",predicted_start_ts:Date.now()+10*60000}],
    past:[{match_id:"m0",class:"HE U11",team1_won:true,is_team1:1,sets:[[11,7],[11,9]]}],entries:[]}
   }])}));
  await page.reload({waitUntil:"domcontentloaded"});
@@ -356,10 +356,14 @@ test("Live tab shows personal matchday and a verified official tournament link",
  await expect(page.locator("#live-nav-tab")).toBeVisible();
  await expect(page.locator(".matchday-overview")).toBeVisible();
  await expect(page.locator("#live-radar-content")).toContainText("Jetzt auf dem Feld");
- await expect(page.locator("#live-radar-content")).toContainText("Deine nächsten Spiele");
+ await expect(page.locator("#live-radar-content .matchday-next")).toContainText("HD U11");
+ await expect(page.locator("#live-radar-content .matchday-next")).toContainText("Gegner B");
+ await expect(page.locator("#live-radar-content .matchday-next-time")).toContainText("Uhr");
+ await expect(page.locator("#live-radar-content .matchday-next-type").first()).toContainText("Prognose");
  await expect(page.locator("#live-radar-content")).toContainText("Bereits gespielte Begegnungen");
- await expect(page.locator("#live-radar-content .radar-match")).toHaveCount(3);
+ await expect(page.locator("#live-radar-content .radar-match")).toHaveCount(2);
  await expect(page.locator("#live-radar-content .matchday-current")).toBeVisible();
+ await expect(page.locator("#live-radar-content .matchday-next")).toBeVisible();
  const order=await page.locator("#live-radar-content").evaluate(host=>{
   const game=host.querySelector(".matchday-current"),counts=host.querySelector(".matchday-overview");
   return game&&counts&&Boolean(game.compareDocumentPosition(counts)&Node.DOCUMENT_POSITION_FOLLOWING);
