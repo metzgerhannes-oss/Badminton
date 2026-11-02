@@ -1,126 +1,9 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-10-24T09:46:38.292309+00:00",
+  "capturedAt": "2026-11-01T20:50:22.044192+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
-    {
-      "source_key": "dbv-calendar-44478",
-      "title": "D-RLT. D-RLT RHP O19 (2. BVRP D2-RLT O19 2026)",
-      "start_date": "2026-10-24",
-      "end_date": "2026-10-25",
-      "location_text": "Pirmasens",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-18",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44708",
-      "title": "5. D-RLT SAC RV Dresden U11-U19 (5. D-RLT BVS RVD u11/ u15/ u19)",
-      "start_date": "2026-10-24",
-      "end_date": "2026-10-24",
-      "location_text": "Dresden",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-10-17",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44435",
-      "title": "Freizeitturnier Mühlhäuser Traditionsturnier O19",
-      "start_date": "2026-10-24",
-      "end_date": "2026-10-25",
-      "location_text": "Mühlhausen",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "Freizeitturnier",
-      "level_group": "Freizeit",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": null,
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-43984",
-      "title": "4. C-RLT NIS U11-U19 (2026)",
-      "start_date": "2026-10-24",
-      "end_date": "2026-10-25",
-      "location_text": "Isernhagen",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-10-15",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44705",
-      "title": "C-RLT BBB O19 (Berlin-Senior-Cup 2026)",
-      "start_date": "2026-10-31",
-      "end_date": "2026-11-01",
-      "location_text": "Berlin",
-      "organizer": "Berlin-Brandenburg",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-17",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
     {
       "source_key": "dbv-calendar-44094",
       "title": "Norddeutsche Meisterschaften U13-U19",
@@ -144,57 +27,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-10-16",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44211",
-      "title": "Westdeutsche Meisterschaften U11-U19 (WDM U19)",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-08",
-      "location_text": "Mülheim an der Ruhr",
-      "organizer": "Gruppe West",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-23",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44347",
-      "title": "Bezirksmeisterschaften BAW SW O19 (Südwürttembergische Meisterschaft 2026)",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "location_text": "Mössingen [05-0148]",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-24",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/2E6D8A70-379E-4247-BA3D-7FD5985A86FB",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -217,7 +50,7 @@
         "Einzel"
       ],
       "registration_deadline": "2026-10-28",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/37B1B581-A7DD-41BF-B70D-3CB8F913CD6F",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -241,7 +74,125 @@
         "Doppel"
       ],
       "registration_deadline": "2026-10-28",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/1B4CE835-803A-46BA-A7A5-94168B0E29EF",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44344",
+      "title": "Bezirksmeisterschaften BAW NB O19 (Nordbadische Meisterschaft 2026)",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "location_text": "Nußloch [05-391]",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-24",
+      "event_url": "https://dbv.turnier.de/tournament/D63BFDE3-08D0-402B-89C6-6DD3ADDF0EDE",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44345",
+      "title": "Bezirksmeisterschaften BAW SB O19 (Südbadische Meisterschaft 2026)",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "location_text": "Freiburg [05-0011]",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-31",
+      "event_url": "https://dbv.turnier.de/tournament/F1C1A256-6289-415D-B531-1EC2BA30F80D",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44346",
+      "title": "Bezirksmeisterschaften BAW NW O19 (Nordwürttembergische Meisterschaft 2026)",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "location_text": "Bad Mergentheim [05-0184]",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-24",
+      "event_url": "https://dbv.turnier.de/tournament/78FE190E-7048-4676-AD5D-52F4CCC9DE5C",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44347",
+      "title": "Bezirksmeisterschaften BAW SW O19 (Südwürttembergische Meisterschaft 2026)",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "location_text": "Mössingen [05-0148]",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-24",
+      "event_url": "https://dbv.turnier.de/tournament/FCBE16EF-D5A9-493A-9935-B6FF78669F6C",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44606",
+      "title": "Südostdeutsche Meisterschaften U13-U19",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-08",
+      "location_text": "Augsburg",
+      "organizer": "Gruppe Süd-Ost",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
+      "age_groups": [
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-13",
+      "event_url": "https://dbv.turnier.de/tournament/836C93F3-7635-420B-B314-DEDB60884AB2",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -269,56 +220,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-10-27",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44606",
-      "title": "Südostdeutsche Meisterschaften U13-U19",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-08",
-      "location_text": "Augsburg",
-      "organizer": "Gruppe Süd-Ost",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
-      "age_groups": [
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-13",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44717",
-      "title": "2. D-RLT RHL U13/U17",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "location_text": "Polch",
-      "organizer": "Rheinland",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-10-24",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/F7CC732F-E92B-450E-B24D-E16B3CD20171",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -344,123 +246,25 @@
         "Mixed"
       ],
       "registration_deadline": "2026-10-03",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/687860D0-0913-4B00-8A66-4571DDDEA874",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44523",
-      "title": "5. E-RLT BAW SW Region 1 U11-U19",
+      "source_key": "dbv-calendar-44457",
+      "title": "3. D-RLT SAC RVO U9",
       "start_date": "2026-11-07",
       "end_date": "2026-11-07",
-      "location_text": "Herrenberg",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-11-01",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44521",
-      "title": "5. E-RLT BAW SB-Ost U11-U19",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "location_text": "Spaichingen",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-11-02",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44480",
-      "title": "Bezirksmeisterschaften RHP O19 (Worms)",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-08",
-      "location_text": "Worms",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-01",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44344",
-      "title": "Bezirksmeisterschaften BAW NB O19 (Nordbadische Meisterschaft 2026)",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "location_text": "Nußloch [05-391]",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
+      "location_text": "Friedrich-Ludwig-Jahn Sportstätte (6) 02779 Großschönau, Hauptstr. 57a",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
       "region_scope": "state",
       "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
-        "O19"
+        "U9"
       ],
       "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-10-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44346",
-      "title": "Bezirksmeisterschaften BAW NW O19 (Nordwürttembergische Meisterschaft 2026)",
-      "start_date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "location_text": "Bad Mergentheim [05-0184]",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
+        "Einzel"
       ],
       "registration_deadline": "2026-10-24",
       "event_url": null,
@@ -490,32 +294,84 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44457",
-      "title": "3. D-RLT SAC RVO U9",
+      "source_key": "dbv-calendar-44717",
+      "title": "2. D-RLT RHL U13/U17",
       "start_date": "2026-11-07",
       "end_date": "2026-11-07",
-      "location_text": "Friedrich-Ludwig-Jahn Sportstätte (6) 02779 Großschönau, Hauptstr. 57a",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
+      "location_text": "Polch",
+      "organizer": "Rheinland",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "D2-Level",
       "level_group": "D",
       "age_groups": [
-        "U9"
+        "U13",
+        "U17"
       ],
       "disciplines": [
-        "Einzel"
+        "Einzel",
+        "Doppel"
       ],
       "registration_deadline": "2026-10-24",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/9D749F8B-0AEF-44FA-985C-0A49022F01BE",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44522",
-      "title": "5. E-RLT BAW NB U11-U19",
-      "start_date": "2026-11-08",
+      "source_key": "dbv-calendar-44211",
+      "title": "Westdeutsche Meisterschaften U11-U19 (WDM U19)",
+      "start_date": "2026-11-07",
       "end_date": "2026-11-08",
-      "location_text": "Mörsch",
+      "location_text": "Mülheim an der Ruhr",
+      "organizer": "Gruppe West",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-23",
+      "event_url": "https://dbv.turnier.de/tournament/70334C79-84A6-43A3-A20A-A06E9E196A2F",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44480",
+      "title": "Bezirksmeisterschaften RHP O19 (Worms)",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-08",
+      "location_text": "Worms",
+      "organizer": "Rheinhessen-Pfalz",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-01",
+      "event_url": "https://dbv.turnier.de/tournament/BA3FDC41-8E3F-4951-B12D-9EEFF88ABF9D",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44521",
+      "title": "5. E-RLT BAW SB-Ost U11-U19",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "location_text": "Spaichingen",
       "organizer": "Baden-Württemberg",
       "bundesland": "Baden-Württemberg",
       "region_scope": "state",
@@ -531,39 +387,16 @@
       "disciplines": [
         "Einzel"
       ],
-      "registration_deadline": "2026-10-31",
-      "event_url": null,
+      "registration_deadline": "2026-11-02",
+      "event_url": "https://dbv.turnier.de/tournament/B5D9EF5B-4257-4DFD-9383-0AEE266C09E0",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44718",
-      "title": "2. D-RLT RHL U15/U19",
-      "start_date": "2026-11-08",
-      "end_date": "2026-11-08",
-      "location_text": "Polch",
-      "organizer": "Rheinland",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-10-25",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44524",
-      "title": "5. E-RLT BAW SW Region 2+3 U11-U19",
-      "start_date": "2026-11-08",
-      "end_date": "2026-11-08",
-      "location_text": "Riedlingen",
+      "source_key": "dbv-calendar-44523",
+      "title": "5. E-RLT BAW SW Region 1 U11-U19",
+      "start_date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "location_text": "Herrenberg",
       "organizer": "Baden-Württemberg",
       "bundesland": "Baden-Württemberg",
       "region_scope": "state",
@@ -580,7 +413,7 @@
         "Einzel"
       ],
       "registration_deadline": "2026-11-01",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/D608CE81-6E3E-4689-ABB5-8D3817CF57C9",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -603,32 +436,30 @@
         "Einzel"
       ],
       "registration_deadline": "2026-10-29",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/489511D7-F5DB-4DC8-B36B-0644E6A727E9",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44525",
-      "title": "5. E-RLT BAW NW U11-U19",
+      "source_key": "dbv-calendar-44718",
+      "title": "2. D-RLT RHL U15/U19",
       "start_date": "2026-11-08",
       "end_date": "2026-11-08",
-      "location_text": "Feuerbach",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
+      "location_text": "Polch",
+      "organizer": "Rheinland",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "D2-Level",
+      "level_group": "D",
       "age_groups": [
-        "U11",
-        "U13",
         "U15",
-        "U17",
         "U19"
       ],
       "disciplines": [
-        "Einzel"
+        "Einzel",
+        "Doppel"
       ],
-      "registration_deadline": "2026-10-30",
-      "event_url": null,
+      "registration_deadline": "2026-10-25",
+      "event_url": "https://dbv.turnier.de/tournament/1AAC0CE6-7BA6-45C8-ACE1-F2D843ED689C",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -653,7 +484,82 @@
         "Einzel"
       ],
       "registration_deadline": "2026-11-02",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/781A57F0-0CBE-4FD6-BB54-388CA6E9D380",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44522",
+      "title": "5. E-RLT BAW NB U11-U19",
+      "start_date": "2026-11-08",
+      "end_date": "2026-11-08",
+      "location_text": "Mörsch",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-10-31",
+      "event_url": "https://dbv.turnier.de/tournament/5D9CE670-A88B-4C32-ADAB-8CCD8DCE6136",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44524",
+      "title": "5. E-RLT BAW SW Region 2+3 U11-U19",
+      "start_date": "2026-11-08",
+      "end_date": "2026-11-08",
+      "location_text": "Riedlingen",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-11-01",
+      "event_url": "https://dbv.turnier.de/tournament/01A557FC-516A-4C47-B46E-D43318348644",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44525",
+      "title": "5. E-RLT BAW NW U11-U19",
+      "start_date": "2026-11-08",
+      "end_date": "2026-11-08",
+      "location_text": "Feuerbach",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-10-30",
+      "event_url": "https://dbv.turnier.de/tournament/D16C846A-156B-404B-8006-1D9BDBFB3706",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -676,7 +582,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-10-20",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/2321DA58-783D-4241-AD1B-3889BBF79C27",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -700,6 +606,155 @@
       ],
       "registration_deadline": null,
       "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-43793",
+      "title": "4. C-RLT THÜ U13/U17",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-14",
+      "location_text": "Erfurt",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-04",
+      "event_url": "https://dbv.turnier.de/tournament/B03C6831-E0DF-4FB8-A14B-CEEAD6ED5204",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44565",
+      "title": "C-RLT SAH U13/U15",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-14",
+      "location_text": "Merseburg",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U15"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-06",
+      "event_url": "https://dbv.turnier.de/tournament/9EFB49E0-8144-4B6B-8B9C-C50C46869816",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44615",
+      "title": "1. C-RLT BAY U11-U19",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-15",
+      "location_text": "Altenmarkt",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-03",
+      "event_url": "https://dbv.turnier.de/tournament/0A132EF2-D559-4047-BB57-EC9F50F083BB",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44633",
+      "title": "C-RLT BBB U11-U17 (7. Junior Spree-Cup 2026)",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-15",
+      "location_text": "Fürstenwalde",
+      "organizer": "Berlin-Brandenburg",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-07",
+      "event_url": "https://dbv.turnier.de/tournament/141B7C03-E5FD-48F5-858F-D636379D7C58",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44637",
+      "title": "1. C-RLT RHP U11-U19 (1. Westpfalz Cup (C2-RLT RHP U11 - U19 Einzel))",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-15",
+      "location_text": "Hütschenhausen",
+      "organizer": "Rheinhessen-Pfalz",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-11-01",
+      "event_url": "https://dbv.turnier.de/tournament/8BA27274-7AD2-416C-AF9A-6A355842B8D5",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44128",
+      "title": "8. C-RLT MVP U11-U19",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-14",
+      "location_text": "Neubrandenburg",
+      "organizer": "Mecklenburg-Vorpommern",
+      "bundesland": "Mecklenburg-Vorpommern",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-10-31",
+      "event_url": "https://dbv.turnier.de/tournament/C312DEE3-56B0-41AB-BD4D-B24520EF7F62",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -727,34 +782,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-03",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44286",
-      "title": "3. C-RLT SLH U11-U19 (Victor-SHBV-C-Rangliste)",
-      "start_date": "2026-11-14",
-      "end_date": "2026-11-15",
-      "location_text": "Eckernförde",
-      "organizer": "Schleswig-Holstein",
-      "bundesland": "Schleswig-Holstein",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-04",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/F93EA62D-0E06-4C76-9B65-AEDE1547A785",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -782,40 +810,15 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-03",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/7E98F819-F777-4AF7-9EFB-C067D141415B",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44439",
-      "title": "5. D-RLT HES Frankfurt U15-U19",
+      "source_key": "dbv-calendar-44397",
+      "title": "Bezirksmeisterschaften BAY Oberbayern O19 (OBB Einzelmeisterschaften Aktive)",
       "start_date": "2026-11-14",
       "end_date": "2026-11-15",
-      "location_text": "Alzenau (OT Michelbach)",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-01",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44737",
-      "title": "Bezirksmeisterschaften BAY Franken O19 (Fränkische Bezirksmeisterschaft)",
-      "start_date": "2026-11-14",
-      "end_date": "2026-11-15",
-      "location_text": "Ansbach",
+      "location_text": "Unterschleißheim",
       "organizer": "Bayern",
       "bundesland": "Bayern",
       "region_scope": "state",
@@ -829,58 +832,30 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-08",
-      "event_url": null,
+      "registration_deadline": "2026-10-17",
+      "event_url": "https://dbv.turnier.de/tournament/D3A2626E-E349-4DCD-A569-1594D2F16D4E",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44707",
-      "title": "C-RLT SAC O19 (50. Internationaler Grenzland-Pokal)",
+      "source_key": "dbv-calendar-44658",
+      "title": "Freizeitturnier 11. Bachtal Badminton Cup 2026 Schwaben O19",
       "start_date": "2026-11-14",
-      "end_date": "2026-11-15",
-      "location_text": "Zittau",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
+      "end_date": "2026-11-14",
+      "location_text": "Syrgenstein",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
       "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
+      "category": "Freizeitturnier",
+      "level_group": "Freizeit",
       "age_groups": [
         "O19"
       ],
       "disciplines": [
-        "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-08",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44615",
-      "title": "1. C-RLT BAY U11-U19",
-      "start_date": "2026-11-14",
-      "end_date": "2026-11-15",
-      "location_text": "Altenmarkt",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-03",
-      "event_url": null,
+      "registration_deadline": "2026-11-11",
+      "event_url": "https://dbv.turnier.de/tournament/1FA3828B-E1ED-46C6-BF38-06095C749B56",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -905,23 +880,23 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-01",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/AA837A0C-7C9C-4AA7-B33F-878693B4464F",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44128",
-      "title": "8. C-RLT MVP U11-U19",
+      "source_key": "dbv-calendar-44439",
+      "title": "5. D-RLT HES Frankfurt U15-U19",
       "start_date": "2026-11-14",
-      "end_date": "2026-11-14",
-      "location_text": "Neubrandenburg",
-      "organizer": "Mecklenburg-Vorpommern",
-      "bundesland": "Mecklenburg-Vorpommern",
+      "end_date": "2026-11-15",
+      "location_text": "Alzenau (OT Michelbach)",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
       "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
+      "category": "D1-Level",
+      "level_group": "D",
       "age_groups": [
-        "U11",
         "U15",
+        "U17",
         "U19"
       ],
       "disciplines": [
@@ -929,31 +904,52 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-10-31",
+      "registration_deadline": "2026-11-01",
+      "event_url": "https://dbv.turnier.de/tournament/97138854-95B9-4AC4-B347-DE0AE36D87D1",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44706",
+      "title": "THÜ-Nord.Freizeitturnier 9. GEIMEL-NIGHT-CUP Nord O19",
+      "start_date": "2026-11-14",
+      "end_date": "2026-11-15",
+      "location_text": "Gernrode",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "Freizeitturnier",
+      "level_group": "Freizeit",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-07",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-43793",
-      "title": "4. C-RLT THÜ U13/U17",
+      "source_key": "dbv-calendar-44707",
+      "title": "C-RLT SAC O19 (50. Internationaler Grenzland-Pokal)",
       "start_date": "2026-11-14",
-      "end_date": "2026-11-14",
-      "location_text": "Erfurt",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
+      "end_date": "2026-11-15",
+      "location_text": "Zittau",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
       "region_scope": "state",
-      "category": "C2-Level",
+      "category": "C1-Level",
       "level_group": "C",
       "age_groups": [
-        "U13",
-        "U17"
+        "O19"
       ],
       "disciplines": [
         "Einzel",
+        "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-04",
-      "event_url": null,
+      "registration_deadline": "2026-11-08",
+      "event_url": "https://dbv.turnier.de/tournament/4217A182-F7E7-4E6B-94FE-2B89AB707302",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -976,40 +972,15 @@
         "Mixed"
       ],
       "registration_deadline": null,
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/F31358E7-29C4-4B4C-8E81-9762803E2DA1",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44637",
-      "title": "1. C-RLT RHP U11-U19 (1. Westpfalz Cup (C2-RLT RHP U11 - U19 Einzel))",
+      "source_key": "dbv-calendar-44737",
+      "title": "Bezirksmeisterschaften BAY Franken O19 (Fränkische Bezirksmeisterschaft)",
       "start_date": "2026-11-14",
       "end_date": "2026-11-15",
-      "location_text": "Hütschenhausen",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-11-01",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44397",
-      "title": "Bezirksmeisterschaften BAY Oberbayern O19 (OBB Einzelmeisterschaften Aktive)",
-      "start_date": "2026-11-14",
-      "end_date": "2026-11-15",
-      "location_text": "Unterschleißheim",
+      "location_text": "Ansbach",
       "organizer": "Bayern",
       "bundesland": "Bayern",
       "region_scope": "state",
@@ -1023,74 +994,58 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-10-17",
-      "event_url": null,
+      "registration_deadline": "2026-11-08",
+      "event_url": "https://dbv.turnier.de/tournament/E8E28674-833A-494F-8615-17F5E1D9DE38",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44658",
-      "title": "Freizeitturnier 11. Bachtal Badminton Cup 2026 Schwaben O19",
+      "source_key": "dbv-calendar-44286",
+      "title": "3. C-RLT SLH U11-U19 (Victor-SHBV-C-Rangliste)",
       "start_date": "2026-11-14",
-      "end_date": "2026-11-14",
-      "location_text": "Syrgenstein",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "Freizeitturnier",
-      "level_group": "Freizeit",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-11",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44565",
-      "title": "C-RLT SAH U13/U15",
-      "start_date": "2026-11-14",
-      "end_date": "2026-11-14",
-      "location_text": "Merseburg",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
+      "end_date": "2026-11-15",
+      "location_text": "Eckernförde",
+      "organizer": "Schleswig-Holstein",
+      "bundesland": "Schleswig-Holstein",
       "region_scope": "state",
       "category": "C2-Level",
       "level_group": "C",
       "age_groups": [
+        "U11",
         "U13",
-        "U15"
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-04",
+      "event_url": "https://dbv.turnier.de/tournament/CC41FFF4-32EB-42E6-9D0E-34E402817EED",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44709",
+      "title": "D-RLT SAC Dresden U9/U11 (D-BM BVS RVD u9/ u11)",
+      "start_date": "2026-11-15",
+      "end_date": "2026-11-15",
+      "location_text": "Dresden",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11"
       ],
       "disciplines": [
         "Einzel",
         "Doppel"
       ],
-      "registration_deadline": "2026-11-06",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44706",
-      "title": "THÜ-Nord.Freizeitturnier 9. GEIMEL-NIGHT-CUP Nord O19",
-      "start_date": "2026-11-14",
-      "end_date": "2026-11-15",
-      "location_text": "Gernrode",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "Freizeitturnier",
-      "level_group": "Freizeit",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Doppel"
-      ],
-      "registration_deadline": "2026-11-07",
-      "event_url": null,
+      "registration_deadline": "2026-11-08",
+      "event_url": "https://dbv.turnier.de/tournament/51538F77-1F31-4567-821B-83BF3590DC05",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1116,80 +1071,52 @@
         "Einzel"
       ],
       "registration_deadline": "2026-11-05",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/98D5DF96-F1B6-4CC3-970A-4F95E83ACA3E",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44709",
-      "title": "D-RLT SAC Dresden U9/U11 (D-BM BVS RVD u9/ u11)",
-      "start_date": "2026-11-15",
-      "end_date": "2026-11-15",
-      "location_text": "Dresden",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-11-08",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44527",
-      "title": "3. D-RLT BAW NB U11-U19",
+      "source_key": "dbv-calendar-43794",
+      "title": "4. C-RLT THÜ U15/U19",
       "start_date": "2026-11-21",
       "end_date": "2026-11-21",
-      "location_text": "Rastatt",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
+      "location_text": "Ilmenau",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
       "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-14",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44631",
-      "title": "3. C-RLT BBB U19",
-      "start_date": "2026-11-21",
-      "end_date": "2026-11-22",
-      "location_text": "Berlin",
-      "organizer": "Berlin-Brandenburg",
-      "bundesland": null,
-      "region_scope": "association",
       "category": "C2-Level",
       "level_group": "C",
       "age_groups": [
+        "U15",
         "U19"
       ],
       "disciplines": [
         "Einzel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-11",
+      "event_url": "https://dbv.turnier.de/tournament/10048C7B-A11A-44A9-A2A2-5B0F5ED762C2",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44572",
+      "title": "Freizeitturnier \"Energie-Cup POWERED by VICTOR 2026\" O19",
+      "start_date": "2026-11-21",
+      "end_date": "2026-11-22",
+      "location_text": "Sandau (Elbe)",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
+      "region_scope": "state",
+      "category": "Freizeitturnier",
+      "level_group": "Freizeit",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-10",
-      "event_url": null,
+      "registration_deadline": "2026-11-18",
+      "event_url": "https://dbv.turnier.de/tournament/C0FD368C-A218-4EB8-A3B8-73DF53D10C9B",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1216,96 +1143,26 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44528",
-      "title": "3. D-RLT BAW NW U11-U19",
+      "source_key": "dbv-calendar-44631",
+      "title": "3. C-RLT BBB U19",
       "start_date": "2026-11-21",
       "end_date": "2026-11-22",
-      "location_text": "Aalen",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-11-13",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-43794",
-      "title": "4. C-RLT THÜ U15/U19",
-      "start_date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "location_text": "Ilmenau",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
+      "location_text": "Berlin",
+      "organizer": "Berlin-Brandenburg",
+      "bundesland": null,
+      "region_scope": "association",
       "category": "C2-Level",
       "level_group": "C",
       "age_groups": [
-        "U15",
         "U19"
       ],
       "disciplines": [
         "Einzel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-11",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44572",
-      "title": "Freizeitturnier \"Energie-Cup POWERED by VICTOR 2026\" O19",
-      "start_date": "2026-11-21",
-      "end_date": "2026-11-22",
-      "location_text": "Sandau (Elbe)",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
-      "region_scope": "state",
-      "category": "Freizeitturnier",
-      "level_group": "Freizeit",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-18",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44734",
-      "title": "3. C-RLT HAM U9/U11 (Einzel (Spielform 5) Minicup Pro)",
-      "start_date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "location_text": "Hamburg",
-      "organizer": "Hamburg",
-      "bundesland": "Hamburg",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U9",
-        "U11"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-10-17",
-      "event_url": null,
+      "registration_deadline": "2026-11-10",
+      "event_url": "https://dbv.turnier.de/tournament/78AA464B-296D-4837-B13F-692165026467",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1332,6 +1189,105 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44734",
+      "title": "3. C-RLT HAM U9/U11 (Einzel (Spielform 5) Minicup Pro)",
+      "start_date": "2026-11-21",
+      "end_date": "2026-11-21",
+      "location_text": "Hamburg",
+      "organizer": "Hamburg",
+      "bundesland": "Hamburg",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U9",
+        "U11"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-10-17",
+      "event_url": "https://dbv.turnier.de/tournament/BBE5C065-534D-41D1-88B9-8F71292819D0",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44527",
+      "title": "3. D-RLT BAW NB U11-U19",
+      "start_date": "2026-11-21",
+      "end_date": "2026-11-21",
+      "location_text": "Rastatt",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-14",
+      "event_url": "https://dbv.turnier.de/tournament/9DCE47E8-338B-452B-BCC0-978460A4D783",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44528",
+      "title": "3. D-RLT BAW NW U11-U19",
+      "start_date": "2026-11-21",
+      "end_date": "2026-11-22",
+      "location_text": "Aalen",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-13",
+      "event_url": "https://dbv.turnier.de/tournament/F3F04DC2-DBCE-4A72-9D3B-586C85FC50E0",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44732",
+      "title": "3. E-RLT HAM Hamburg U13-U19 (Einzel)",
+      "start_date": "2026-11-22",
+      "end_date": "2026-11-22",
+      "location_text": "Hamburg",
+      "organizer": "Hamburg",
+      "bundesland": "Hamburg",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-11-17",
+      "event_url": "https://dbv.turnier.de/tournament/00598A61-4806-42DB-9FDB-941CFA01333B",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44749",
       "title": "3. D-RLT BAW SW U11-U19",
       "start_date": "2026-11-22",
@@ -1354,7 +1310,7 @@
         "Doppel"
       ],
       "registration_deadline": "2026-11-15",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/31F12648-7085-429B-9A91-EC70D526343B",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1380,149 +1336,7 @@
         "Doppel"
       ],
       "registration_deadline": "2026-11-16",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44732",
-      "title": "3. E-RLT HAM Hamburg U13-U19 (Einzel)",
-      "start_date": "2026-11-22",
-      "end_date": "2026-11-22",
-      "location_text": "Hamburg",
-      "organizer": "Hamburg",
-      "bundesland": "Hamburg",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-11-17",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44287",
-      "title": "5. D-RLT SLH Schleswig-Holstein U9-U19 (SHBV-D-Rangliste)",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-29",
-      "location_text": "Itzehoe",
-      "organizer": "Schleswig-Holstein",
-      "bundesland": "Schleswig-Holstein",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-21",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44736",
-      "title": "Landesmeisterschaften BRE O19 (VICTOR Landesmeisterschaft O19 2026)",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-29",
-      "location_text": "Bremen (Vahr)",
-      "organizer": "Bremen",
-      "bundesland": "Bremen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-19",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44510",
-      "title": "Bezirksmeisterschaften SAC RV Chemnitz O19",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-28",
-      "location_text": "n.n",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-21",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44632",
-      "title": "3. C-RLT BBB U11",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-28",
-      "location_text": "Berlin",
-      "organizer": "Berlin-Brandenburg",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-11-17",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44719",
-      "title": "4. C-RLT RHL U13/U17",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-28",
-      "location_text": "",
-      "organizer": "Rheinland",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-10-24",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/64DCF745-1C32-481D-884F-34C149A1F2A2",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1545,30 +1359,7 @@
         "Doppel"
       ],
       "registration_deadline": "2026-11-18",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44633",
-      "title": "3. C-RLT BBB U17",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-29",
-      "location_text": "Berlin",
-      "organizer": "Berlin-Brandenburg",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-17",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/032B44E8-6337-4A97-8B17-71CB2EDD65C7",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1592,6 +1383,51 @@
         "Doppel"
       ],
       "registration_deadline": "2026-11-20",
+      "event_url": "https://dbv.turnier.de/tournament/0B004990-915A-4496-BAA5-F46EEBF09C55",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44459",
+      "title": "3. D-RLT SAC RVO U15/U19",
+      "start_date": "2026-11-28",
+      "end_date": "2026-11-28",
+      "location_text": "Sorbisches Schul- und Begegnungszentrum (5), 02625 Bautzen, Friedrich-List-Str.8",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-14",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44719",
+      "title": "4. C-RLT RHL U13/U17",
+      "start_date": "2026-11-28",
+      "end_date": "2026-11-28",
+      "location_text": "",
+      "organizer": "Rheinland",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-10-24",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -1620,26 +1456,77 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44459",
-      "title": "3. D-RLT SAC RVO U15/U19",
+      "source_key": "dbv-calendar-44736",
+      "title": "Landesmeisterschaften BRE O19 (VICTOR Landesmeisterschaft O19 2026)",
+      "start_date": "2026-11-28",
+      "end_date": "2026-11-29",
+      "location_text": "Bremen (Vahr)",
+      "organizer": "Bremen",
+      "bundesland": "Bremen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-19",
+      "event_url": "https://dbv.turnier.de/tournament/21B77CE9-8D0B-4B37-A2F6-D27EA549DEC9",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44510",
+      "title": "Bezirksmeisterschaften SAC RV Chemnitz O19",
       "start_date": "2026-11-28",
       "end_date": "2026-11-28",
-      "location_text": "Sorbisches Schul- und Begegnungszentrum (5), 02625 Bautzen, Friedrich-List-Str.8",
+      "location_text": "n.n",
       "organizer": "Sachsen",
       "bundesland": "Sachsen",
       "region_scope": "state",
       "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-21",
+      "event_url": "https://dbv.turnier.de/tournament/248938DC-AFBF-47C0-BEB7-99CBEBDDA218",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44287",
+      "title": "5. D-RLT SLH Schleswig-Holstein U9-U19 (SHBV-D-Rangliste)",
+      "start_date": "2026-11-28",
+      "end_date": "2026-11-29",
+      "location_text": "Itzehoe",
+      "organizer": "Schleswig-Holstein",
+      "bundesland": "Schleswig-Holstein",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
         "U15",
+        "U17",
         "U19"
       ],
       "disciplines": [
         "Einzel",
-        "Doppel"
+        "Doppel",
+        "Mixed"
       ],
-      "registration_deadline": "2026-11-14",
-      "event_url": null,
+      "registration_deadline": "2026-11-21",
+      "event_url": "https://dbv.turnier.de/tournament/E24404DB-62E9-4D39-BE1A-43CE26808767",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1662,7 +1549,29 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-20",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/1D01EC21-744E-4E96-A39A-735A02EA33E5",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44632",
+      "title": "3. C-RLT BBB U11",
+      "start_date": "2026-11-29",
+      "end_date": "2026-11-29",
+      "location_text": "Berlin",
+      "organizer": "Berlin-Brandenburg",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-17",
+      "event_url": "https://dbv.turnier.de/tournament/10320909-E691-4022-9A6D-6FC64C7E0D86",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1707,113 +1616,29 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-27",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/89E355B1-1AAA-43DE-BB5A-ED421E935CC5",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44638",
-      "title": "3. E-RLT BAY U9-U19",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "Forchheim",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44129",
-      "title": "9. C-RLT MVP U13/U17",
+      "source_key": "dbv-calendar-44554",
+      "title": "Freizeitturnier OCS Xmas Turnier 2026 Bayern O19",
       "start_date": "2026-12-05",
       "end_date": "2026-12-05",
-      "location_text": "Rostock",
-      "organizer": "Mecklenburg-Vorpommern",
-      "bundesland": "Mecklenburg-Vorpommern",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-21",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44653",
-      "title": "3. E-RLT BAY U9-U19",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "Landshut",
+      "location_text": "München",
       "organizer": "Bayern",
       "bundesland": "Bayern",
       "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
+      "category": "Freizeitturnier",
+      "level_group": "Freizeit",
       "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
+        "O19"
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44616",
-      "title": "2. C-RLT BAY U11-U19",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "Neusäß",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-24",
+      "registration_deadline": "2026-11-28",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -1841,17 +1666,238 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-27",
+      "event_url": "https://dbv.turnier.de/tournament/CAA8DC50-6ED9-4C1C-B5E3-AE76812609CC",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-43826",
+      "title": "German Masters U11",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Hofheim",
+      "organizer": "DBV",
+      "bundesland": null,
+      "region_scope": "national",
+      "category": "A-Level",
+      "level_group": "A",
+      "age_groups": [
+        "U11"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-11-10",
+      "event_url": "https://dbv.turnier.de/tournament/F849360D-AF7A-41E7-A20A-D438074A52CE",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-43827",
+      "title": "Deutsche Meisterschaften U13",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Hofheim",
+      "organizer": "DBV",
+      "bundesland": null,
+      "region_scope": "national",
+      "category": "A-Level",
+      "level_group": "A",
+      "age_groups": [
+        "U13"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-10",
+      "event_url": "https://dbv.turnier.de/tournament/9E353582-902A-40AA-B461-F8063F8BAFE0",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44616",
+      "title": "2. C-RLT BAY U11-U19",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Neusäß",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-24",
+      "event_url": "https://dbv.turnier.de/tournament/5B566C70-3949-4BEC-AF13-347327C76233",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44634",
+      "title": "3. C-RLT BBB U15",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Berlin",
+      "organizer": "Berlin-Brandenburg",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U15"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-24",
+      "event_url": "https://dbv.turnier.de/tournament/EB310811-CE53-4967-B376-F3F7FCE91ECD",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-43867",
+      "title": "E-RLT BAY Oberbayern O19 (Nikolausturnier 2026)",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "München",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-29",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-43707",
-      "title": "54. Landesmeisterschaften BAW O19 (2026)",
+      "source_key": "dbv-calendar-44638",
+      "title": "3. E-RLT BAY U9-U19",
       "start_date": "2026-12-05",
       "end_date": "2026-12-06",
-      "location_text": "Stockach [05-0108]",
-      "organizer": "Baden-Württemberg",
-      "bundesland": "Baden-Württemberg",
+      "location_text": "Forchheim",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-25",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44129",
+      "title": "9. C-RLT MVP U13/U17",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-05",
+      "location_text": "Rostock",
+      "organizer": "Mecklenburg-Vorpommern",
+      "bundesland": "Mecklenburg-Vorpommern",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-21",
+      "event_url": "https://dbv.turnier.de/tournament/5F5C9959-93C6-400D-8DD1-45996DFBDE8D",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44653",
+      "title": "3. E-RLT BAY U9-U19",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Landshut",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-25",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44704",
+      "title": "Landesmeisterschaften SAA O19 (SBV C-LM O19 2026)",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "St. Ingbert",
+      "organizer": "Saarland",
+      "bundesland": "Saarland",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-29",
+      "event_url": "https://dbv.turnier.de/tournament/ED8E96F8-2F26-49E5-BDE3-0AED6B7603D3",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44713",
+      "title": "Landesmeisterschaften HES O19",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Kirchhain",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
       "region_scope": "state",
       "category": "C1-Level",
       "level_group": "C",
@@ -1863,8 +1909,8 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-14",
-      "event_url": null,
+      "registration_deadline": "2026-11-23",
+      "event_url": "https://dbv.turnier.de/tournament/ECA2B5DD-0A58-4C4A-BE17-672BDBD2385D",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -1917,36 +1963,13 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44634",
-      "title": "3. C-RLT BBB U15",
+      "source_key": "dbv-calendar-43707",
+      "title": "54. Landesmeisterschaften BAW O19 (2026)",
       "start_date": "2026-12-05",
       "end_date": "2026-12-06",
-      "location_text": "Berlin",
-      "organizer": "Berlin-Brandenburg",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U15"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44747",
-      "title": "Landesmeisterschaften SAC O19 (Victor SEM)",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "Stollberg",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
+      "location_text": "Stockach [05-0108]",
+      "organizer": "Baden-Württemberg",
+      "bundesland": "Baden-Württemberg",
       "region_scope": "state",
       "category": "C1-Level",
       "level_group": "C",
@@ -1958,100 +1981,8 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2026-11-29",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-43867",
-      "title": "E-RLT BAY Oberbayern O19 (Nikolausturnier 2026)",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "München",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-29",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44554",
-      "title": "Freizeitturnier OCS Xmas Turnier 2026 Bayern O19",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-05",
-      "location_text": "München",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "Freizeitturnier",
-      "level_group": "Freizeit",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-28",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44752",
-      "title": "Landesmeisterschaften BAY O19 (71. BBV-Victor-Meisterschaft der Aktiven)",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "Regensburg",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44713",
-      "title": "Landesmeisterschaften HES O19",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "Kirchhain",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-23",
-      "event_url": null,
+      "registration_deadline": "2026-11-14",
+      "event_url": "https://dbv.turnier.de/tournament/A4ED8071-F12E-4C46-BB01-39CEA26757A4",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2078,38 +2009,15 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-43827",
-      "title": "Deutsche Meisterschaften U13",
+      "source_key": "dbv-calendar-44747",
+      "title": "Landesmeisterschaften SAC O19 (Victor SEM)",
       "start_date": "2026-12-05",
       "end_date": "2026-12-06",
-      "location_text": "Hofheim",
-      "organizer": "DBV",
-      "bundesland": null,
-      "region_scope": "national",
-      "category": "A-Level",
-      "level_group": "A",
-      "age_groups": [
-        "U13"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-11-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44704",
-      "title": "Landesmeisterschaften SAA O19 (SBV C-LM O19 2026)",
-      "start_date": "2026-12-05",
-      "end_date": "2026-12-06",
-      "location_text": "St. Ingbert",
-      "organizer": "Saarland",
-      "bundesland": "Saarland",
+      "location_text": "Stollberg",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
       "region_scope": "state",
-      "category": "C2-Level",
+      "category": "C1-Level",
       "level_group": "C",
       "age_groups": [
         "O19"
@@ -2120,7 +2028,30 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-29",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/798ABFB2-BE82-421A-8F15-E607554C57BC",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44752",
+      "title": "Landesmeisterschaften BAY O19 (71. BBV-Victor-Meisterschaft der Aktiven)",
+      "start_date": "2026-12-05",
+      "end_date": "2026-12-06",
+      "location_text": "Regensburg",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-11-24",
+      "event_url": "https://dbv.turnier.de/tournament/5E0280A7-9638-4CA4-B45A-E7F7691D8A52",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2146,25 +2077,26 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-43826",
-      "title": "German Masters U11",
+      "source_key": "dbv-calendar-44765",
+      "title": "Landesmeisterschaften THÜ O19 (Thüringer Meisterschaft)",
       "start_date": "2026-12-05",
       "end_date": "2026-12-06",
-      "location_text": "Hofheim",
-      "organizer": "DBV",
-      "bundesland": null,
-      "region_scope": "national",
-      "category": "A-Level",
-      "level_group": "A",
+      "location_text": "Ilmenau",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
       "age_groups": [
-        "U11"
+        "O19"
       ],
       "disciplines": [
         "Einzel",
-        "Doppel"
+        "Doppel",
+        "Mixed"
       ],
-      "registration_deadline": "2026-11-10",
-      "event_url": null,
+      "registration_deadline": "2026-11-25",
+      "event_url": "https://dbv.turnier.de/tournament/A3824836-CB50-4160-BF2C-FDCE297D744A",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2186,7 +2118,7 @@
         "Einzel"
       ],
       "registration_deadline": "2026-11-26",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/E521862F-08F3-4C18-A106-C3D4728FD279",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2209,7 +2141,7 @@
         "Doppel"
       ],
       "registration_deadline": "2026-11-27",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/43FF2002-8250-4AD6-9A66-C3989A62E339",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2234,7 +2166,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-11-17",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/C287E15A-E5F2-499F-90A4-69B9E4B35DE1",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2262,31 +2194,73 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-05",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/AC2B88E0-E5D5-4081-85C1-8099AA24B820",
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44715",
-      "title": "C-RLT HES U13-U17 (5. C-RLT U13-U17)",
+      "source_key": "dbv-calendar-43797",
+      "title": "3. D-RLT THÜ Ost U13/U17",
       "start_date": "2026-12-12",
-      "end_date": "2026-12-13",
-      "location_text": "",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
+      "end_date": "2026-12-12",
+      "location_text": "Dornburg-Camburg",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
       "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
+      "category": "D2-Level",
+      "level_group": "D",
       "age_groups": [
         "U13",
-        "U15",
         "U17"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-12-02",
+      "event_url": "https://dbv.turnier.de/tournament/DC2ADF62-FD9F-4BC7-8AF5-FBF06DC9A255",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-43798",
+      "title": "3. D-RLT THÜ Süd U15/U19",
+      "start_date": "2026-12-12",
+      "end_date": "2026-12-12",
+      "location_text": "offen",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-12-02",
+      "event_url": "https://dbv.turnier.de/tournament/16A6DD35-BF05-4DCF-A87C-E860576DB398",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44635",
+      "title": "3. C-RLT BBB U13",
+      "start_date": "2026-12-12",
+      "end_date": "2026-12-13",
+      "location_text": "Berlin",
+      "organizer": "Berlin-Brandenburg",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13"
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2026-12-01",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -2317,6 +2291,31 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44715",
+      "title": "C-RLT HES U13-U17 (5. C-RLT U13-U17)",
+      "start_date": "2026-12-12",
+      "end_date": "2026-12-13",
+      "location_text": "Vellmar",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U15",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": "https://dbv.turnier.de/tournament/0E45C75F-169D-4982-B332-A7BC85EDF323",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44724",
       "title": "2. D-RLT HES Darmstadt O19",
       "start_date": "2026-12-12",
@@ -2336,74 +2335,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-06",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-43798",
-      "title": "3. D-RLT THÜ Süd U15/U19",
-      "start_date": "2026-12-12",
-      "end_date": "2026-12-12",
-      "location_text": "offen",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-12-02",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-43797",
-      "title": "3. D-RLT THÜ Ost U13/U17",
-      "start_date": "2026-12-12",
-      "end_date": "2026-12-12",
-      "location_text": "Dornburg-Camburg",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-12-02",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44635",
-      "title": "3. C-RLT BBB U13",
-      "start_date": "2026-12-12",
-      "end_date": "2026-12-13",
-      "location_text": "Berlin",
-      "organizer": "Berlin-Brandenburg",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-12-01",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/B8071FB8-504F-4EED-907B-2C8CD65D4258",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2425,7 +2357,88 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-04",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/833D859A-4C01-4D7F-9E15-9A4A5D135EBB",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44561",
+      "title": "Bezirksmeisterschaften SAH Magdeburg U11-U19",
+      "start_date": "2026-12-19",
+      "end_date": "2026-12-19",
+      "location_text": "Salzwedel",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-12-11",
+      "event_url": "https://dbv.turnier.de/tournament/1C5FC63D-EE0F-4FE1-9891-D4B805DDD69E",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44440",
+      "title": "4. E-RLT HES Frankfurt U9-U19",
+      "start_date": "2026-12-19",
+      "end_date": "2026-12-20",
+      "location_text": "Alzenau (OT Michelbach)",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2026-12-06",
+      "event_url": "https://dbv.turnier.de/tournament/ACA94013-37C8-4898-8365-BB387147B9AF",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44721",
+      "title": "3. D-RLT HES Darmstadt U9-U19",
+      "start_date": "2026-12-19",
+      "end_date": "2026-12-20",
+      "location_text": "Groß-Gerau",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-12-13",
+      "event_url": "https://dbv.turnier.de/tournament/7354EA11-7740-48F2-8C7F-FFB4F3C3A41F",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2456,87 +2469,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44561",
-      "title": "Bezirksmeisterschaften SAH Magdeburg U11-U19",
-      "start_date": "2026-12-19",
-      "end_date": "2026-12-19",
-      "location_text": "Salzwedel",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-12-11",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44721",
-      "title": "3. D-RLT HES Darmstadt U9-U19",
-      "start_date": "2026-12-19",
-      "end_date": "2026-12-20",
-      "location_text": "Groß-Gerau",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-12-13",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44440",
-      "title": "4. E-RLT HES Frankfurt U9-U19",
-      "start_date": "2026-12-19",
-      "end_date": "2026-12-20",
-      "location_text": "Alzenau (OT Michelbach)",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2026-12-06",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44748",
       "title": "1. D-RLT SAC RV Dresden O19 (XLIV. Traditionsdoppelturnier)",
       "start_date": "2027-01-02",
@@ -2555,7 +2487,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-20",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/813552EE-6031-4B42-B94A-6A22561789E2",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2578,52 +2510,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-18",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44673",
-      "title": "Südwestdeutsche Meisterschaften O19",
-      "start_date": "2027-01-09",
-      "end_date": "2027-01-10",
-      "location_text": "Plaidt (RHL)",
-      "organizer": "Gruppe Mitte",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2026-12-15",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44729",
-      "title": "Freizeitturnier 30. Rodinger Drei-Königs-Pokal-Turnier Bayern O19",
-      "start_date": "2027-01-09",
-      "end_date": "2027-01-09",
-      "location_text": "Roding",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "Freizeitturnier",
-      "level_group": "Freizeit",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-01-02",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/6499D262-94B0-4D2E-950F-A626A1B15EAF",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2649,7 +2536,7 @@
         "Doppel"
       ],
       "registration_deadline": "2026-12-29",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/FB48B73D-94E1-46CE-9E1A-3051F78A3FEF",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2730,6 +2617,74 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44413",
+      "title": "1. C-RLT THÜ U13/U17",
+      "start_date": "2027-01-09",
+      "end_date": "2027-01-09",
+      "location_text": "Neustadt an der Orla",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2026-12-31",
+      "event_url": "https://dbv.turnier.de/tournament/881AA63E-1D58-4906-A6EC-F205740BAC7D",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44673",
+      "title": "Südwestdeutsche Meisterschaften O19",
+      "start_date": "2027-01-09",
+      "end_date": "2027-01-10",
+      "location_text": "Plaidt (RHL)",
+      "organizer": "Gruppe Mitte",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2026-12-12",
+      "event_url": "https://dbv.turnier.de/tournament/643F3511-0970-47A6-B4BF-2F7165F8017D",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44729",
+      "title": "Freizeitturnier 30. Rodinger Drei-Königs-Pokal-Turnier Bayern O19",
+      "start_date": "2027-01-09",
+      "end_date": "2027-01-09",
+      "location_text": "Roding",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "Freizeitturnier",
+      "level_group": "Freizeit",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-01-02",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44537",
       "title": "1. C-RLT NIS U11-U19",
       "start_date": "2027-01-09",
@@ -2751,30 +2706,7 @@
         "Einzel"
       ],
       "registration_deadline": "2026-12-31",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44413",
-      "title": "1. C-RLT THÜ U13/U17",
-      "start_date": "2027-01-09",
-      "end_date": "2027-01-09",
-      "location_text": "Neustadt an der Orla",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2026-12-31",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/02226102-172E-4CDA-958E-FB1C0583F3E4",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2799,7 +2731,7 @@
         "Mixed"
       ],
       "registration_deadline": "2027-01-03",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/8B6C1DF5-4A79-45B0-9FA4-6C007B3E5A32",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2896,7 +2828,7 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-19",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/79415F4D-1505-4FF8-849D-177AA2F34D33",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -2918,30 +2850,7 @@
         "Einzel"
       ],
       "registration_deadline": "2027-01-06",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44486",
-      "title": "1. C-RLT THÜ U15/U19",
-      "start_date": "2027-01-23",
-      "end_date": "2027-01-23",
-      "location_text": "Weimar",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-01-13",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/A08ACEB6-2B1E-4398-A521-9DA3344D0EA3",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -3048,6 +2957,29 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44486",
+      "title": "1. C-RLT THÜ U15/U19",
+      "start_date": "2027-01-23",
+      "end_date": "2027-01-23",
+      "location_text": "Weimar",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-01-13",
+      "event_url": "https://dbv.turnier.de/tournament/A2C50C31-962C-4B05-AD42-064C2F85B5DA",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-481",
       "title": "1. A-RLT U11/U13",
       "start_date": "2027-01-23",
@@ -3068,28 +3000,6 @@
         "Mixed"
       ],
       "registration_deadline": "2026-12-22",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44573",
-      "title": "C-RLT SAH O19",
-      "start_date": "2027-01-24",
-      "end_date": "2027-01-24",
-      "location_text": "Merseburg",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-01-15",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3117,28 +3027,49 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44442",
-      "title": "1. D-RLT HES Frankfurt U15-U19",
+      "source_key": "dbv-calendar-44573",
+      "title": "C-RLT SAH O19",
+      "start_date": "2027-01-24",
+      "end_date": "2027-01-24",
+      "location_text": "Merseburg",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-01-15",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44545",
+      "title": "Landesmeisterschaften SAC U22/O35ff.",
       "start_date": "2027-01-30",
       "end_date": "2027-01-31",
-      "location_text": "",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
+      "location_text": "Hoyerswerda",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
       "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
+      "category": "C1-Level",
+      "level_group": "C",
       "age_groups": [
-        "U15",
-        "U17",
-        "U19"
+        "U22",
+        "O35ff."
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-01-17",
-      "event_url": null,
+      "registration_deadline": "2027-01-24",
+      "event_url": "https://dbv.turnier.de/tournament/46CCAB33-1485-42FD-8248-B67B6E29AD2C",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -3166,27 +3097,27 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44675",
-      "title": "1. B-RLT Mitte U15/U19",
+      "source_key": "dbv-calendar-44660",
+      "title": "Landesmeisterschaften RHP U22/O35ff.",
       "start_date": "2027-01-30",
       "end_date": "2027-01-31",
-      "location_text": "Heiligenwald (SAA)",
-      "organizer": "Gruppe Mitte",
+      "location_text": "Worms",
+      "organizer": "Rheinhessen-Pfalz",
       "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
       "age_groups": [
-        "U15",
-        "U19"
+        "U22",
+        "O35ff."
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-01-02",
-      "event_url": null,
+      "registration_deadline": "2027-01-24",
+      "event_url": "https://dbv.turnier.de/tournament/02B93F9A-7154-4D36-9426-B6C99FDF48F2",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -3215,29 +3146,27 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44532",
-      "title": "1.. D-RLT NIS Hannover U9-U19 (Bezirk Hannover)",
+      "source_key": "dbv-calendar-44675",
+      "title": "1. B-RLT Mitte U15/U19",
       "start_date": "2027-01-30",
       "end_date": "2027-01-31",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
+      "location_text": "Heiligenwald (SAA)",
+      "organizer": "Gruppe Mitte",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
       "age_groups": [
-        "U9",
-        "U11",
-        "U13",
         "U15",
-        "U17",
         "U19"
       ],
       "disciplines": [
-        "Einzel"
+        "Einzel",
+        "Doppel",
+        "Mixed"
       ],
-      "registration_deadline": "2027-01-22",
-      "event_url": null,
+      "registration_deadline": "2027-01-02",
+      "event_url": "https://dbv.turnier.de/tournament/CE551371-D6E1-4FBB-8F42-B4DF66726C2B",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -3291,50 +3220,53 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44545",
-      "title": "Landesmeisterschaften SAC U22/O35ff.",
+      "source_key": "dbv-calendar-44442",
+      "title": "1. D-RLT HES Frankfurt U15-U19",
       "start_date": "2027-01-30",
       "end_date": "2027-01-31",
-      "location_text": "Hoyerswerda",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
       "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
+      "category": "D1-Level",
+      "level_group": "D",
       "age_groups": [
-        "U22",
-        "O35ff."
+        "U15",
+        "U17",
+        "U19"
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-01-24",
+      "registration_deadline": "2027-01-17",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44660",
-      "title": "Landesmeisterschaften RHP U22/O35ff.",
+      "source_key": "dbv-calendar-44532",
+      "title": "1.. D-RLT NIS Hannover U9-U19 (Bezirk Hannover)",
       "start_date": "2027-01-30",
       "end_date": "2027-01-31",
-      "location_text": "Worms",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
       "age_groups": [
-        "U22",
-        "O35ff."
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
       ],
       "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
+        "Einzel"
       ],
-      "registration_deadline": "2027-01-24",
+      "registration_deadline": "2027-01-22",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3388,6 +3320,34 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44755",
+      "title": "C-RLT HES U9-U19 (1. C-RLT U9-U19)",
+      "start_date": "2027-02-06",
+      "end_date": "2027-02-07",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44538",
       "title": "2. C-RLT NIS U11-U19",
       "start_date": "2027-02-06",
@@ -3409,104 +3369,6 @@
         "Einzel"
       ],
       "registration_deadline": "2027-01-28",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-43192",
-      "title": "1. A-RLT U15/U19",
-      "start_date": "2027-02-13",
-      "end_date": "2027-02-14",
-      "location_text": "Bergedorf",
-      "organizer": "DBV",
-      "bundesland": null,
-      "region_scope": "national",
-      "category": "A-Level",
-      "level_group": "A",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-01-12",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44471",
-      "title": "1. D-RLT HES Wetzlar U11-U19",
-      "start_date": "2027-02-13",
-      "end_date": "2027-02-14",
-      "location_text": "Stadtallendorf",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-02-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44490",
-      "title": "Bezirksmeisterschaften THÜ THÜ-Ost U11-U19",
-      "start_date": "2027-02-13",
-      "end_date": "2027-02-13",
-      "location_text": "Hermsdorf",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-02-03",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44730",
-      "title": "Bezirksmeisterschaften THÜ THÜ-Süd U15/U19",
-      "start_date": "2027-02-13",
-      "end_date": "2027-02-13",
-      "location_text": "Suhl",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-02-04",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3535,18 +3397,91 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44488",
-      "title": "1. D-RLT THÜ THÜ-Süd U9-U19",
-      "start_date": "2027-02-20",
-      "end_date": "2027-02-20",
-      "location_text": "Meiningen",
+      "source_key": "dbv-calendar-44471",
+      "title": "1. D-RLT HES Wetzlar U11-U19",
+      "start_date": "2027-02-13",
+      "end_date": "2027-02-14",
+      "location_text": "Stadtallendorf",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-02-10",
+      "event_url": "https://dbv.turnier.de/tournament/B237EB9B-1C2B-421F-B9F8-DA44BFE681D0",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-43192",
+      "title": "1. A-RLT U15/U19",
+      "start_date": "2027-02-13",
+      "end_date": "2027-02-14",
+      "location_text": "Bergedorf",
+      "organizer": "DBV",
+      "bundesland": null,
+      "region_scope": "national",
+      "category": "A-Level",
+      "level_group": "A",
+      "age_groups": [
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-01-12",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44730",
+      "title": "Bezirksmeisterschaften THÜ THÜ-Süd U15/U19",
+      "start_date": "2027-02-13",
+      "end_date": "2027-02-13",
+      "location_text": "Suhl",
       "organizer": "Thüringen",
       "bundesland": "Thüringen",
       "region_scope": "state",
       "category": "D2-Level",
       "level_group": "D",
       "age_groups": [
-        "U9",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-02-04",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44490",
+      "title": "Bezirksmeisterschaften THÜ THÜ-Ost U11-U19",
+      "start_date": "2027-02-13",
+      "end_date": "2027-02-13",
+      "location_text": "Hermsdorf",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
         "U11",
         "U15",
         "U19"
@@ -3555,7 +3490,31 @@
         "Einzel",
         "Doppel"
       ],
-      "registration_deadline": "2027-02-10",
+      "registration_deadline": "2027-02-03",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44756",
+      "title": "Landesmeisterschaften HES U22/O35ff. (Hessen - Meisterschaft U22-O35 2027)",
+      "start_date": "2027-02-13",
+      "end_date": "2027-02-14",
+      "location_text": "Friedrichsdorf",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U22",
+        "O35ff."
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3587,54 +3546,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44487",
-      "title": "1. D-RLT THÜ THÜ-Nord U9-U19",
-      "start_date": "2027-02-20",
-      "end_date": "2027-02-20",
-      "location_text": "Erfurt",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-02-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44489",
-      "title": "1. D-RLT THÜ THÜ-Ost U9-U19",
-      "start_date": "2027-02-20",
-      "end_date": "2027-02-20",
-      "location_text": "Hermsdorf",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-02-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-43191",
       "title": "2. A-RLT U11/U13",
       "start_date": "2027-02-20",
@@ -3659,29 +3570,76 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44539",
-      "title": "1. C-RLT NIS U11-U19 (Doppel Mixed)",
-      "start_date": "2027-02-27",
-      "end_date": "2027-02-28",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
+      "source_key": "dbv-calendar-44487",
+      "title": "1. D-RLT THÜ THÜ-Nord U9-U19",
+      "start_date": "2027-02-20",
+      "end_date": "2027-02-20",
+      "location_text": "Erfurt",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
       "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
+      "category": "D2-Level",
+      "level_group": "D",
       "age_groups": [
+        "U9",
         "U11",
-        "U13",
         "U15",
-        "U17",
         "U19"
       ],
       "disciplines": [
-        "Doppel",
-        "Mixed"
+        "Einzel"
       ],
-      "registration_deadline": "2027-02-13",
-      "event_url": null,
+      "registration_deadline": "2027-02-10",
+      "event_url": "https://dbv.turnier.de/tournament/A63AF87F-162C-4D5A-907E-7C2EBFF3250E",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44488",
+      "title": "1. D-RLT THÜ THÜ-Süd U9-U19",
+      "start_date": "2027-02-20",
+      "end_date": "2027-02-20",
+      "location_text": "Meiningen",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-02-10",
+      "event_url": "https://dbv.turnier.de/tournament/3EB7C44E-68A3-42DE-AA61-DF4976D84FD0",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44489",
+      "title": "1. D-RLT THÜ THÜ-Ost U9-U19",
+      "start_date": "2027-02-20",
+      "end_date": "2027-02-20",
+      "location_text": "Hermsdorf",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-02-10",
+      "event_url": "https://dbv.turnier.de/tournament/2D63BFE6-D0AD-4DBF-A45B-2AA6C38670A7",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -3712,27 +3670,25 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44750",
-      "title": "E-RLT NIS KFV Cloppenburg/Delmenhorst/Oldenburg-Land U11-U19",
+      "source_key": "dbv-calendar-44676",
+      "title": "Südwestdeutsche Meisterschaften U22",
       "start_date": "2027-02-27",
       "end_date": "2027-02-28",
-      "location_text": "Delmenhorst",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
+      "location_text": "",
+      "organizer": "Gruppe Mitte",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
       "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
+        "U22"
       ],
       "disciplines": [
-        "Einzel"
+        "Einzel",
+        "Doppel",
+        "Mixed"
       ],
-      "registration_deadline": "2027-02-18",
+      "registration_deadline": null,
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3758,22 +3714,48 @@
         "Mixed"
       ],
       "registration_deadline": "2027-02-20",
+      "event_url": "https://dbv.turnier.de/tournament/69A86E45-34E0-4A03-9990-1B07F74B306E",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44750",
+      "title": "E-RLT NIS KFV Cloppenburg/Delmenhorst/Oldenburg-Land U11-U19",
+      "start_date": "2027-02-27",
+      "end_date": "2027-02-28",
+      "location_text": "Delmenhorst",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-02-18",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44676",
-      "title": "Südwestdeutsche Meisterschaften U22",
+      "source_key": "dbv-calendar-44757",
+      "title": "Landesmeisterschaften HES U15/U19 (HBV Manschaftsmeisterschaften U15/U19)",
       "start_date": "2027-02-27",
       "end_date": "2027-02-28",
       "location_text": "",
-      "organizer": "Gruppe Mitte",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
       "age_groups": [
-        "U22"
+        "U15",
+        "U19"
       ],
       "disciplines": [
         "Einzel",
@@ -3781,6 +3763,55 @@
         "Mixed"
       ],
       "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44539",
+      "title": "1. C-RLT NIS U11-U19 (Doppel Mixed)",
+      "start_date": "2027-02-27",
+      "end_date": "2027-02-28",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-02-13",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44576",
+      "title": "C-RLT SAH U13/U15",
+      "start_date": "2027-03-06",
+      "end_date": "2027-03-06",
+      "location_text": "AUSRICHTER GESUCHT!!!",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U15"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-02-26",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3805,52 +3836,6 @@
         "Mixed"
       ],
       "registration_deadline": "2027-02-27",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44492",
-      "title": "1. D-RLT THÜ THÜ-Süd U13/U17",
-      "start_date": "2027-03-06",
-      "end_date": "2027-03-06",
-      "location_text": "Themar",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-02-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44491",
-      "title": "1. D-RLT THÜ THÜ-Nord U13/U17",
-      "start_date": "2027-03-06",
-      "end_date": "2027-03-06",
-      "location_text": "Erfurt",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-02-24",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -3904,26 +3889,49 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44576",
-      "title": "C-RLT SAH U13/U15",
+      "source_key": "dbv-calendar-44491",
+      "title": "1. D-RLT THÜ THÜ-Nord U13/U17",
       "start_date": "2027-03-06",
       "end_date": "2027-03-06",
-      "location_text": "AUSRICHTER GESUCHT!!!",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
+      "location_text": "Erfurt",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
       "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
+      "category": "D2-Level",
+      "level_group": "D",
       "age_groups": [
         "U13",
-        "U15"
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-02-24",
+      "event_url": "https://dbv.turnier.de/tournament/A2077EF3-C83B-4A39-AA59-6120B4B551C2",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44492",
+      "title": "1. D-RLT THÜ THÜ-Süd U13/U17",
+      "start_date": "2027-03-06",
+      "end_date": "2027-03-06",
+      "location_text": "Themar",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U13",
+        "U17"
       ],
       "disciplines": [
         "Einzel",
+        "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-02-26",
-      "event_url": null,
+      "registration_deadline": "2027-02-24",
+      "event_url": "https://dbv.turnier.de/tournament/5F08BBBF-DE45-434F-A251-8C1EFC49BFBE",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -3973,56 +3981,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44619",
-      "title": "2. D-RLT BAY U11-U19",
-      "start_date": "2027-03-13",
-      "end_date": "2027-03-14",
-      "location_text": "Landshut",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-03-02",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44677",
-      "title": "Südwestdeutsche Meisterschaften U15/U19 (Südwestdeutsche Mannschaftsmeisterschaften U15/U19)",
-      "start_date": "2027-03-13",
-      "end_date": "2027-03-14",
-      "location_text": "",
-      "organizer": "Gruppe Mitte",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": null,
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44577",
       "title": "D-RLT SAH Süd U11-U19",
       "start_date": "2027-03-13",
@@ -4045,6 +4003,32 @@
         "Mixed"
       ],
       "registration_deadline": "2027-03-05",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44619",
+      "title": "2. D-RLT BAY U11-U19",
+      "start_date": "2027-03-13",
+      "end_date": "2027-03-14",
+      "location_text": "Landshut",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-03-02",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4073,6 +4057,53 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44677",
+      "title": "Südwestdeutsche Meisterschaften U15/U19 (Südwestdeutsche Mannschaftsmeisterschaften U15/U19)",
+      "start_date": "2027-03-13",
+      "end_date": "2027-03-14",
+      "location_text": "",
+      "organizer": "Gruppe Mitte",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
+      "age_groups": [
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44739",
+      "title": "2. C-RLT THÜ U9/U11",
+      "start_date": "2027-03-13",
+      "end_date": "2027-03-13",
+      "location_text": "Jena",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U9",
+        "U11"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-03-03",
+      "event_url": "https://dbv.turnier.de/tournament/C0C56D02-75DD-45FD-88F4-B10B0B85B6D6",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-483",
       "title": "3. A-RLT U11/U13",
       "start_date": "2027-03-13",
@@ -4097,29 +4128,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44739",
-      "title": "2. C-RLT THÜ U9/U11",
-      "start_date": "2027-03-13",
-      "end_date": "2027-03-13",
-      "location_text": "Jena",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U9",
-        "U11"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-03-03",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44578",
       "title": "C-RLT SAH O19",
       "start_date": "2027-03-14",
@@ -4138,6 +4146,29 @@
         "Mixed"
       ],
       "registration_deadline": "2027-03-05",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44548",
+      "title": "2. D-RLT SAC RVL U11-U17 (Regionalrangliste)",
+      "start_date": "2027-03-20",
+      "end_date": "2027-03-20",
+      "location_text": "Markkleeberg",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-03-13",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4166,25 +4197,26 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44548",
-      "title": "2. D-RLT SAC RVL U11-U17 (Regionalrangliste)",
-      "start_date": "2027-03-20",
-      "end_date": "2027-03-20",
-      "location_text": "Markkleeberg",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
+      "source_key": "dbv-calendar-44579",
+      "title": "C-RLT SAH U11-U19",
+      "start_date": "2027-04-03",
+      "end_date": "2027-04-03",
+      "location_text": "Halle (Saale)",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
       "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
+      "category": "C2-Level",
+      "level_group": "C",
       "age_groups": [
         "U11",
-        "U13",
-        "U17"
+        "U17",
+        "U19"
       ],
       "disciplines": [
-        "Einzel"
+        "Einzel",
+        "Mixed"
       ],
-      "registration_deadline": "2027-03-13",
+      "registration_deadline": "2027-03-26",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4213,30 +4245,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44579",
-      "title": "C-RLT SAH U11-U19",
-      "start_date": "2027-04-03",
-      "end_date": "2027-04-03",
-      "location_text": "Halle (Saale)",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-03-26",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44595",
       "title": "Deutsche Meisterschaften O19 (75. Deutsche Meisterschaften O19 2027)",
       "start_date": "2027-04-08",
@@ -4256,103 +4264,6 @@
         "Mixed"
       ],
       "registration_deadline": "2027-03-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44697",
-      "title": "C-RLT. C-RLT RHP O19 (1. C-RLT O19 2027)",
-      "start_date": "2027-04-10",
-      "end_date": "2027-04-11",
-      "location_text": "Hütschenhausen",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-04-04",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44409",
-      "title": "2. D-RLT NIS Lüneburg U11-U19",
-      "start_date": "2027-04-10",
-      "end_date": "2027-04-11",
-      "location_text": "Rotenburg",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-04-01",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44493",
-      "title": "2. C-RLT THÜ U15/U19",
-      "start_date": "2027-04-10",
-      "end_date": "2027-04-10",
-      "location_text": "Ilmenau",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-03-31",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44533",
-      "title": "2. D-RLT NIS Hannover U9-U19 (Bezirk Hannover)",
-      "start_date": "2027-04-10",
-      "end_date": "2027-04-11",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-04-01",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4438,6 +4349,31 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44409",
+      "title": "2. D-RLT NIS Lüneburg U11-U19",
+      "start_date": "2027-04-10",
+      "end_date": "2027-04-11",
+      "location_text": "Rotenburg",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-04-01",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44690",
       "title": "2. D-RLT RHP U9-U15 (2. BVRP Bezirksrangliste (D2 RL) 2027 U9, U11, U13, U15 Einzel/Doppel)",
       "start_date": "2027-04-10",
@@ -4463,6 +4399,29 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44697",
+      "title": "C-RLT. C-RLT RHP O19 (1. C-RLT O19 2027)",
+      "start_date": "2027-04-10",
+      "end_date": "2027-04-11",
+      "location_text": "Hütschenhausen",
+      "organizer": "Rheinhessen-Pfalz",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-04-04",
+      "event_url": "https://dbv.turnier.de/tournament/8A50D240-B527-4B20-8045-98D15CC54A41",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44727",
       "title": "A-RLT U13/U15 (3. Allianz-Victor-Open)",
       "start_date": "2027-04-10",
@@ -4483,17 +4442,68 @@
         "Mixed"
       ],
       "registration_deadline": "2027-03-17",
+      "event_url": "https://dbv.turnier.de/tournament/BD35AE45-FB06-4729-B0B7-ABEAD645339B",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44493",
+      "title": "2. C-RLT THÜ U15/U19",
+      "start_date": "2027-04-10",
+      "end_date": "2027-04-10",
+      "location_text": "Ilmenau",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-03-31",
+      "event_url": "https://dbv.turnier.de/tournament/3DFBEB26-7C92-42FB-8035-AB440D5534FF",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44763",
+      "title": "C-RLT HES U9-U19 (2. C-RLT U9-U19)",
+      "start_date": "2027-04-10",
+      "end_date": "2027-04-11",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44473",
-      "title": "2. D-RLT HES Wetzlar U9-U19",
-      "start_date": "2027-04-17",
-      "end_date": "2027-04-18",
-      "location_text": "Hungen",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
+      "source_key": "dbv-calendar-44533",
+      "title": "2. D-RLT NIS Hannover U9-U19 (Bezirk Hannover)",
+      "start_date": "2027-04-10",
+      "end_date": "2027-04-11",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
       "region_scope": "state",
       "category": "D1-Level",
       "level_group": "D",
@@ -4506,10 +4516,55 @@
         "U19"
       ],
       "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-04-01",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44549",
+      "title": "3. D-RLT SAC RVL U9-U15 (Regionalrangliste)",
+      "start_date": "2027-04-17",
+      "end_date": "2027-04-17",
+      "location_text": "Meuselwitz",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U15"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-04-10",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44581",
+      "title": "C-RLT SAH U13/U15",
+      "start_date": "2027-04-17",
+      "end_date": "2027-04-17",
+      "location_text": "Salzwedel",
+      "organizer": "Sachsen-Anhalt",
+      "bundesland": "Sachsen-Anhalt",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U15"
+      ],
+      "disciplines": [
         "Einzel",
         "Doppel"
       ],
-      "registration_deadline": "2027-04-14",
+      "registration_deadline": "2027-04-09",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4570,7 +4625,7 @@
       "title": "1. C-RLT RHP U17/U19 (1. BVRP Verbandsrangliste (C2 RL) 2027 U17, U19 Einzel/Doppel)",
       "start_date": "2027-04-17",
       "end_date": "2027-04-18",
-      "location_text": "",
+      "location_text": "Frankenthal",
       "organizer": "Rheinhessen-Pfalz",
       "bundesland": null,
       "region_scope": "association",
@@ -4613,6 +4668,56 @@
         "Mixed"
       ],
       "registration_deadline": "2027-04-11",
+      "event_url": "https://dbv.turnier.de/tournament/A07FA856-E7D5-49AE-818C-3FDBD25CB330",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44473",
+      "title": "2. D-RLT HES Wetzlar U9-U19",
+      "start_date": "2027-04-17",
+      "end_date": "2027-04-18",
+      "location_text": "Hungen",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-04-14",
+      "event_url": "https://dbv.turnier.de/tournament/F273ED51-A1F8-4D51-A8D5-275AAE12DB19",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44758",
+      "title": "C-RLT HES O19 (1. HBV Rangliste O19)",
+      "start_date": "2027-04-17",
+      "end_date": "2027-04-18",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4642,102 +4747,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44581",
-      "title": "C-RLT SAH U13/U15",
-      "start_date": "2027-04-17",
-      "end_date": "2027-04-17",
-      "location_text": "Salzwedel",
-      "organizer": "Sachsen-Anhalt",
-      "bundesland": "Sachsen-Anhalt",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U15"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-04-09",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44549",
-      "title": "3. D-RLT SAC RVL U9-U15 (Regionalrangliste)",
-      "start_date": "2027-04-17",
-      "end_date": "2027-04-17",
-      "location_text": "Meuselwitz",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U15"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-04-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44414",
-      "title": "2. D-RLT THÜ Ost U9-U19",
-      "start_date": "2027-04-24",
-      "end_date": "2027-04-24",
-      "location_text": "Neustadt an der Orla",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-04-15",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44445",
-      "title": "2. D-RLT HES Frankfurt U15-U19",
-      "start_date": "2027-04-24",
-      "end_date": "2027-04-25",
-      "location_text": "",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-04-11",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44583",
       "title": "C-RLT SAH U11-U19",
       "start_date": "2027-04-24",
@@ -4758,6 +4767,54 @@
         "Doppel"
       ],
       "registration_deadline": "2027-04-16",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44600",
+      "title": "3. D-RLT SAC RVL U11-U17 (Regionalrangliste)",
+      "start_date": "2027-04-24",
+      "end_date": "2027-04-24",
+      "location_text": "Markkleeberg",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-04-17",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-34115",
+      "title": "4. A-RLT U11/U13",
+      "start_date": "2027-04-24",
+      "end_date": "2027-04-25",
+      "location_text": "Eggenstein-Leopoldshafen",
+      "organizer": "DBV",
+      "bundesland": null,
+      "region_scope": "national",
+      "category": "A-Level",
+      "level_group": "A",
+      "age_groups": [
+        "U11",
+        "U13"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-03-23",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -4818,11 +4875,11 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44740",
-      "title": "2. D-RLT THÜ THÜ Nord U9-U19",
+      "source_key": "dbv-calendar-44414",
+      "title": "2. D-RLT THÜ Ost U9-U19",
       "start_date": "2027-04-24",
       "end_date": "2027-04-24",
-      "location_text": "Gernrode",
+      "location_text": "Neustadt an der Orla",
       "organizer": "Thüringen",
       "bundesland": "Thüringen",
       "region_scope": "state",
@@ -4835,58 +4892,11 @@
         "U19"
       ],
       "disciplines": [
-        "Einzel"
+        "Einzel",
+        "Doppel"
       ],
-      "registration_deadline": "2027-04-14",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44741",
-      "title": "D-RLT THÜ THÜ Süd U9-U19 (2)",
-      "start_date": "2027-04-24",
-      "end_date": "2027-04-24",
-      "location_text": "Suhl",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-04-14",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44600",
-      "title": "3. D-RLT SAC RVL U11-U17 (Regionalrangliste)",
-      "start_date": "2027-04-24",
-      "end_date": "2027-04-24",
-      "location_text": "Markkleeberg",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-04-17",
-      "event_url": null,
+      "registration_deadline": "2027-04-15",
+      "event_url": "https://dbv.turnier.de/tournament/AC326EEB-A615-4E9B-8C77-72C0BD9E284A",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -4914,30 +4924,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-34115",
-      "title": "4. A-RLT U11/U13",
-      "start_date": "2027-04-24",
-      "end_date": "2027-04-25",
-      "location_text": "Eggenstein-Leopoldshafen",
-      "organizer": "DBV",
-      "bundesland": null,
-      "region_scope": "national",
-      "category": "A-Level",
-      "level_group": "A",
-      "age_groups": [
-        "U11",
-        "U13"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-03-23",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44444",
       "title": "2. D-RLT HES Frankfurt U9-U13",
       "start_date": "2027-04-24",
@@ -4959,6 +4945,79 @@
         "Mixed"
       ],
       "registration_deadline": "2027-04-11",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44445",
+      "title": "2. D-RLT HES Frankfurt U15-U19",
+      "start_date": "2027-04-24",
+      "end_date": "2027-04-25",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-04-11",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44740",
+      "title": "2. D-RLT THÜ THÜ Nord U9-U19",
+      "start_date": "2027-04-24",
+      "end_date": "2027-04-24",
+      "location_text": "Gernrode",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-04-14",
+      "event_url": "https://dbv.turnier.de/tournament/5A3CC3F0-534E-45BF-A242-8C39E2A4AA50",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44741",
+      "title": "D-RLT THÜ THÜ Süd U9-U19 (2)",
+      "start_date": "2027-04-24",
+      "end_date": "2027-04-24",
+      "location_text": "Suhl",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-04-14",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -5094,6 +5153,29 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44597",
+      "title": "4. D-RLT SAC RVL U9-U15 (Regionalrangliste)",
+      "start_date": "2027-05-02",
+      "end_date": "2027-05-02",
+      "location_text": "Borna",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U15"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-04-24",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44598",
       "title": "1. D-RLT SAC RVL U9-U17 (Regionalrangliste)",
       "start_date": "2027-05-02",
@@ -5112,29 +5194,6 @@
       "disciplines": [
         "Doppel",
         "Mixed"
-      ],
-      "registration_deadline": "2027-04-24",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44597",
-      "title": "4. D-RLT SAC RVL U9-U15 (Regionalrangliste)",
-      "start_date": "2027-05-02",
-      "end_date": "2027-05-02",
-      "location_text": "Borna",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U15"
-      ],
-      "disciplines": [
-        "Einzel"
       ],
       "registration_deadline": "2027-04-24",
       "event_url": null,
@@ -5215,6 +5274,57 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44759",
+      "title": "C-RLT HES O19 (2. HBV Rangliste O19)",
+      "start_date": "2027-05-08",
+      "end_date": "2027-05-09",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44760",
+      "title": "C-RLT HES U9-U19 (3. C-RLT U9-U19)",
+      "start_date": "2027-05-08",
+      "end_date": "2027-05-09",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44584",
       "title": "C-RLT SAH O19",
       "start_date": "2027-05-09",
@@ -5261,7 +5371,7 @@
         "Mixed"
       ],
       "registration_deadline": "2027-05-09",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/304FF8C1-6D02-4E02-B6C9-211ACD209926",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -5288,54 +5398,26 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44472",
-      "title": "3. D-RLT HES Wetzlar U11-U19",
+      "source_key": "dbv-calendar-44601",
+      "title": "4. D-RLT SAC RVL U9-U17 (Regionalrangliste)",
       "start_date": "2027-05-22",
-      "end_date": "2027-05-23",
-      "location_text": "Hohenahr",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
+      "end_date": "2027-05-22",
+      "location_text": "Borna",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
       "region_scope": "state",
       "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-05-19",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44446",
-      "title": "2. E-RLT HES Frankfurt U9-U19",
-      "start_date": "2027-05-22",
-      "end_date": "2027-05-23",
-      "location_text": "",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
         "U9",
-        "U11",
-        "U13",
         "U15",
-        "U17",
-        "U19"
+        "U17"
       ],
       "disciplines": [
-        "Einzel"
+        "Doppel",
+        "Mixed"
       ],
-      "registration_deadline": "2027-05-09",
+      "registration_deadline": "2027-05-15",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -5367,7 +5449,7 @@
       "title": "2. C-RLT RHP U17/U19 (2. BVRP Verbandsrangliste (C2 RL) 2027 U17, U19 Einzel/Mixed)",
       "start_date": "2027-05-22",
       "end_date": "2027-05-23",
-      "location_text": "",
+      "location_text": "Landau",
       "organizer": "Rheinhessen-Pfalz",
       "bundesland": null,
       "region_scope": "association",
@@ -5386,27 +5468,55 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44601",
-      "title": "4. D-RLT SAC RVL U9-U17 (Regionalrangliste)",
+      "source_key": "dbv-calendar-44446",
+      "title": "2. E-RLT HES Frankfurt U9-U19",
       "start_date": "2027-05-22",
-      "end_date": "2027-05-22",
-      "location_text": "Borna",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
+      "end_date": "2027-05-23",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-05-09",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44472",
+      "title": "3. D-RLT HES Wetzlar U11-U19",
+      "start_date": "2027-05-22",
+      "end_date": "2027-05-23",
+      "location_text": "Hohenahr",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
       "region_scope": "state",
       "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
-        "U9",
+        "U11",
+        "U13",
         "U15",
-        "U17"
+        "U17",
+        "U19"
       ],
       "disciplines": [
-        "Doppel",
-        "Mixed"
+        "Einzel",
+        "Doppel"
       ],
-      "registration_deadline": "2027-05-15",
-      "event_url": null,
+      "registration_deadline": "2027-05-19",
+      "event_url": "https://dbv.turnier.de/tournament/EED61C27-97A2-4402-BC0F-81150B1FAB9A",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -5431,33 +5541,7 @@
         "Mixed"
       ],
       "registration_deadline": "2027-05-12",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44541",
-      "title": "2. C-RLT NIS U11-U19 (Doppel Mixed)",
-      "start_date": "2027-05-29",
-      "end_date": "2027-05-30",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-05-15",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/66E29381-C55C-49C7-8E3A-734C1918D1F0",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -5535,77 +5619,75 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44415",
-      "title": "Bezirksmeisterschaften THÜ Ost U11-U19",
-      "start_date": "2027-06-05",
-      "end_date": "2027-06-05",
-      "location_text": "Neustadt an der Orla",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
+      "source_key": "dbv-calendar-44541",
+      "title": "2. C-RLT NIS U11-U19 (Doppel Mixed)",
+      "start_date": "2027-05-29",
+      "end_date": "2027-05-30",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
       "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
+      "category": "C1-Level",
+      "level_group": "C",
       "age_groups": [
         "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-05-27",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44448",
-      "title": "3. D-RLT HES Frankfurt U15-U19",
-      "start_date": "2027-06-05",
-      "end_date": "2027-06-06",
-      "location_text": "",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
+        "U13",
         "U15",
         "U17",
         "U19"
       ],
       "disciplines": [
-        "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-05-23",
+      "registration_deadline": "2027-05-15",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44494",
-      "title": "Bezirksmeisterschaften THÜ THÜ-Nord U11-U19",
+      "source_key": "dbv-calendar-44550",
+      "title": "5. D-RLT SAC RVL U11-U19 (Regionalrangliste)",
       "start_date": "2027-06-05",
       "end_date": "2027-06-05",
-      "location_text": "Erfurt",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
+      "location_text": "Leipzig",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
       "region_scope": "state",
-      "category": "D2-Level",
+      "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
         "U11",
-        "U15",
+        "U13",
         "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-05-29",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-34116",
+      "title": "5. A-RLT U11/U13",
+      "start_date": "2027-06-05",
+      "end_date": "2027-06-06",
+      "location_text": "Diedorf",
+      "organizer": "DBV",
+      "bundesland": null,
+      "region_scope": "national",
+      "category": "A-Level",
+      "level_group": "A",
+      "age_groups": [
+        "U11",
+        "U13"
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-05-26",
+      "registration_deadline": "2027-05-04",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -5636,35 +5718,11 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44679",
-      "title": "2. B-RLT Mitte U15/U19",
-      "start_date": "2027-06-05",
-      "end_date": "2027-06-06",
-      "location_text": "Ilmenau (THÜ)",
-      "organizer": "Gruppe Mitte",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
-      "age_groups": [
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-05-08",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44743",
-      "title": "Bezirksmeisterschaften THÜ THÜ Süd U11-U19",
+      "source_key": "dbv-calendar-44415",
+      "title": "Bezirksmeisterschaften THÜ Ost U11-U19",
       "start_date": "2027-06-05",
       "end_date": "2027-06-05",
-      "location_text": "Suhl",
+      "location_text": "Neustadt an der Orla",
       "organizer": "Thüringen",
       "bundesland": "Thüringen",
       "region_scope": "state",
@@ -5680,31 +5738,8 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-05-26",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44550",
-      "title": "5. D-RLT SAC RVL U11-U19 (Regionalrangliste)",
-      "start_date": "2027-06-05",
-      "end_date": "2027-06-05",
-      "location_text": "Leipzig",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U11",
-        "U13",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-05-29",
-      "event_url": null,
+      "registration_deadline": "2027-05-27",
+      "event_url": "https://dbv.turnier.de/tournament/7BA582DD-9B3D-457F-B74B-E34C100E1546",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -5732,27 +5767,27 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-34116",
-      "title": "5. A-RLT U11/U13",
+      "source_key": "dbv-calendar-44679",
+      "title": "2. B-RLT Mitte U15/U19",
       "start_date": "2027-06-05",
       "end_date": "2027-06-06",
-      "location_text": "Diedorf",
-      "organizer": "DBV",
+      "location_text": "Ilmenau (THÜ)",
+      "organizer": "Gruppe Mitte",
       "bundesland": null,
-      "region_scope": "national",
-      "category": "A-Level",
-      "level_group": "A",
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
       "age_groups": [
-        "U11",
-        "U13"
+        "U15",
+        "U19"
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-05-04",
-      "event_url": null,
+      "registration_deadline": "2027-05-08",
+      "event_url": "https://dbv.turnier.de/tournament/669B9E9F-C4D9-4630-B4E0-6253141CB886",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -5781,17 +5816,18 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44695",
-      "title": "Bezirksmeisterschaften RHP U17/U19 (BVRP Bezirksmeisterschaft (D2 Meisterschaft) 2027 U17/U19 Einzel, Doppel, Mixed)",
-      "start_date": "2027-06-12",
-      "end_date": "2027-06-13",
+      "source_key": "dbv-calendar-44448",
+      "title": "3. D-RLT HES Frankfurt U15-U19",
+      "start_date": "2027-06-05",
+      "end_date": "2027-06-06",
       "location_text": "",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "D2-Level",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
+        "U15",
         "U17",
         "U19"
       ],
@@ -5800,7 +5836,81 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-05-30",
+      "registration_deadline": "2027-05-23",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44743",
+      "title": "Bezirksmeisterschaften THÜ THÜ Süd U11-U19",
+      "start_date": "2027-06-05",
+      "end_date": "2027-06-05",
+      "location_text": "Suhl",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-05-26",
+      "event_url": "https://dbv.turnier.de/tournament/49C1F37A-0EEE-4D32-B68B-D43EE0E7304E",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44494",
+      "title": "Bezirksmeisterschaften THÜ THÜ-Nord U11-U19",
+      "start_date": "2027-06-05",
+      "end_date": "2027-06-05",
+      "location_text": "Erfurt",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-05-26",
+      "event_url": "https://dbv.turnier.de/tournament/7E2D2963-6F10-4813-ABB9-8FE00FD09104",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44625",
+      "title": "Landesmeisterschaften BAY U11/U13",
+      "start_date": "2027-06-12",
+      "end_date": "2027-06-13",
+      "location_text": "Syrgenstein",
+      "organizer": "Bayern",
+      "bundesland": "Bayern",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U13"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-05-24",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -5861,29 +5971,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44495",
-      "title": "3. C-RLT THÜ U13/U17",
-      "start_date": "2027-06-12",
-      "end_date": "2027-06-12",
-      "location_text": "Jena",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel"
-      ],
-      "registration_deadline": "2027-06-02",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44668",
       "title": "4. C-RLT SAC U11/U17",
       "start_date": "2027-06-12",
@@ -5908,26 +5995,179 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44625",
-      "title": "Landesmeisterschaften BAY U11/U13",
+      "source_key": "dbv-calendar-44695",
+      "title": "Bezirksmeisterschaften RHP U9-U19 (BVRP Bezirksmeisterschaft (D2 Meisterschaft) 2027 U09/U11 Einzel, U13-U19 Einzel, Doppel, Mixed)",
       "start_date": "2027-06-12",
       "end_date": "2027-06-13",
-      "location_text": "Syrgenstein",
-      "organizer": "Bayern",
-      "bundesland": "Bayern",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
+      "location_text": "",
+      "organizer": "Rheinhessen-Pfalz",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "D2-Level",
+      "level_group": "D",
       "age_groups": [
+        "U9",
         "U11",
-        "U13"
+        "U13",
+        "U15",
+        "U17",
+        "U19"
       ],
       "disciplines": [
         "Einzel",
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-05-24",
+      "registration_deadline": "2027-05-30",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44495",
+      "title": "3. C-RLT THÜ U13/U17",
+      "start_date": "2027-06-12",
+      "end_date": "2027-06-12",
+      "location_text": "Jena",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel"
+      ],
+      "registration_deadline": "2027-06-02",
+      "event_url": "https://dbv.turnier.de/tournament/E7B8DBAA-5C5D-4EC5-B332-2131D26116FA",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44761",
+      "title": "C-RLT HES O19 (ABC Open 2027)",
+      "start_date": "2027-06-12",
+      "end_date": "2027-06-13",
+      "location_text": "Frankfurt",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44602",
+      "title": "5. D-RLT SAC RVL U11-U19 (Regionalrangliste)",
+      "start_date": "2027-06-19",
+      "end_date": "2027-06-19",
+      "location_text": "Taucha",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-06-12",
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44410",
+      "title": "Bezirksmeisterschaften NIS Lüneburg U9-U22",
+      "start_date": "2027-06-19",
+      "end_date": "2027-06-20",
+      "location_text": "Buchholz",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19",
+        "U22"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": "https://dbv.turnier.de/tournament/0F2A0BE7-2D3E-432C-9F6D-E36FEA90289F",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44680",
+      "title": "2. B-RLT Mitte U13/U17",
+      "start_date": "2027-06-19",
+      "end_date": "2027-06-20",
+      "location_text": "",
+      "organizer": "Gruppe Mitte",
+      "bundesland": null,
+      "region_scope": "group",
+      "category": "B-Level",
+      "level_group": "B",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": null,
+      "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44449",
+      "title": "3. E-RLT HES Frankfurt U9-U19",
+      "start_date": "2027-06-19",
+      "end_date": "2027-06-20",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
+      "region_scope": "state",
+      "category": "E-Level",
+      "level_group": "E",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-06-06",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -5955,24 +6195,23 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44410",
-      "title": "Bezirksmeisterschaften NIS Lüneburg U9-U22",
+      "source_key": "dbv-calendar-44762",
+      "title": "C-RLT HES U9-U19 (4. C-RLT U9-U19)",
       "start_date": "2027-06-19",
       "end_date": "2027-06-20",
-      "location_text": "Buchholz",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
+      "location_text": "",
+      "organizer": "Hessen",
+      "bundesland": "Hessen",
       "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
+      "category": "C1-Level",
+      "level_group": "C",
       "age_groups": [
         "U9",
         "U11",
         "U13",
         "U15",
         "U17",
-        "U19",
-        "U22"
+        "U19"
       ],
       "disciplines": [
         "Einzel",
@@ -6012,76 +6251,48 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44602",
-      "title": "5. D-RLT SAC RVL U11-U19 (Regionalrangliste)",
-      "start_date": "2027-06-19",
-      "end_date": "2027-06-19",
-      "location_text": "Taucha",
+      "source_key": "dbv-calendar-44551",
+      "title": "6. D-RLT SAC RVL U9-U17 (Regionalrangliste)",
+      "start_date": "2027-06-26",
+      "end_date": "2027-06-26",
+      "location_text": "Zwenkau",
       "organizer": "Sachsen",
       "bundesland": "Sachsen",
       "region_scope": "state",
       "category": "D1-Level",
       "level_group": "D",
       "age_groups": [
-        "U11",
-        "U15",
-        "U19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-06-12",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44449",
-      "title": "3. E-RLT HES Frankfurt U9-U19",
-      "start_date": "2027-06-19",
-      "end_date": "2027-06-20",
-      "location_text": "",
-      "organizer": "Hessen",
-      "bundesland": "Hessen",
-      "region_scope": "state",
-      "category": "E-Level",
-      "level_group": "E",
-      "age_groups": [
         "U9",
-        "U11",
-        "U13",
         "U15",
-        "U17",
-        "U19"
+        "U17"
       ],
       "disciplines": [
         "Einzel"
       ],
-      "registration_deadline": "2027-06-06",
+      "registration_deadline": "2027-06-19",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44680",
-      "title": "2. B-RLT Mitte U13/U17",
-      "start_date": "2027-06-19",
-      "end_date": "2027-06-20",
-      "location_text": "",
-      "organizer": "Gruppe Mitte",
-      "bundesland": null,
-      "region_scope": "group",
-      "category": "B-Level",
-      "level_group": "B",
+      "source_key": "dbv-calendar-44664",
+      "title": "4. C-RLT SAC U13/U19",
+      "start_date": "2027-06-26",
+      "end_date": "2027-06-26",
+      "location_text": "Dresden",
+      "organizer": "Sachsen",
+      "bundesland": "Sachsen",
+      "region_scope": "state",
+      "category": "C1-Level",
+      "level_group": "C",
       "age_groups": [
         "U13",
-        "U17"
+        "U19"
       ],
       "disciplines": [
         "Einzel",
-        "Doppel",
         "Mixed"
       ],
-      "registration_deadline": null,
+      "registration_deadline": "2027-06-12",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -6129,102 +6340,7 @@
         "Doppel"
       ],
       "registration_deadline": "2027-06-16",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44664",
-      "title": "4. C-RLT SAC U13/U19",
-      "start_date": "2027-06-26",
-      "end_date": "2027-06-26",
-      "location_text": "Dresden",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U13",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-06-12",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44551",
-      "title": "6. D-RLT SAC RVL U9-U17 (Regionalrangliste)",
-      "start_date": "2027-06-26",
-      "end_date": "2027-06-26",
-      "location_text": "Zwenkau",
-      "organizer": "Sachsen",
-      "bundesland": "Sachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U15",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-06-19",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44212",
-      "title": "C-RLT THÜ O19 (20. ENNO-CUP)",
-      "start_date": "2027-07-03",
-      "end_date": "2027-07-04",
-      "location_text": "Gera",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "C2-Level",
-      "level_group": "C",
-      "age_groups": [
-        "O19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-06-23",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44535",
-      "title": "1. D-RLT NIS Hannover U9-U19 (Doppel Mixed Bezirk Hannover)",
-      "start_date": "2027-07-03",
-      "end_date": "2027-07-04",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-06-19",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/6AC752EF-9C9D-48AC-88B7-E6DFD87095A1",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -6252,6 +6368,28 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44212",
+      "title": "C-RLT THÜ O19 (20. ENNO-CUP)",
+      "start_date": "2027-07-03",
+      "end_date": "2027-07-04",
+      "location_text": "Gera",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "O19"
+      ],
+      "disciplines": [
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-06-23",
+      "event_url": "https://dbv.turnier.de/tournament/5DA88A09-7C1A-40F7-83D9-A45C2FB61980",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44744",
       "title": "3. D-RLT THÜ THÜ Nord U9/U11",
       "start_date": "2027-07-03",
@@ -6270,6 +6408,33 @@
         "Einzel"
       ],
       "registration_deadline": "2027-06-23",
+      "event_url": "https://dbv.turnier.de/tournament/77CFDE6F-BF0D-4A89-B8BE-7ED5918430F3",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44535",
+      "title": "1. D-RLT NIS Hannover U9-U19 (Doppel Mixed Bezirk Hannover)",
+      "start_date": "2027-07-03",
+      "end_date": "2027-07-04",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-06-19",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -6350,32 +6515,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44536",
-      "title": "3. D-RLT NIS Hannover U9-U19 (Bezirk Hannover)",
-      "start_date": "2027-08-28",
-      "end_date": "2027-08-29",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "D1-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15",
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-08-20",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44682",
       "title": "3. B-RLT Mitte U15/U17",
       "start_date": "2027-08-28",
@@ -6418,6 +6557,32 @@
         "Einzel"
       ],
       "registration_deadline": "2027-08-18",
+      "event_url": "https://dbv.turnier.de/tournament/27453943-011D-46F8-B493-49020E6CFFA4",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44536",
+      "title": "3. D-RLT NIS Hannover U9-U19 (Bezirk Hannover)",
+      "start_date": "2027-08-28",
+      "end_date": "2027-08-29",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
+      "region_scope": "state",
+      "category": "D1-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13",
+        "U15",
+        "U17",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-08-20",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -6443,6 +6608,29 @@
         "Mixed"
       ],
       "registration_deadline": "2027-08-25",
+      "event_url": "https://dbv.turnier.de/tournament/64120B37-A886-4B71-B4E6-FA2222F9CEF0",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44764",
+      "title": "C-RLT RHP U9-U13 (1. BVRP Verbandsrangliste (C2 RL) U9-U13 Small Games Einzel))",
+      "start_date": "2027-09-04",
+      "end_date": "2027-09-05",
+      "location_text": "Landau",
+      "organizer": "Rheinhessen-Pfalz",
+      "bundesland": null,
+      "region_scope": "association",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U9",
+        "U11",
+        "U13"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-08-22",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -6472,32 +6660,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44696",
-      "title": "Bezirksmeisterschaften RHP U9-U15 (BVRP Bezirksmeisterschaft (D2 Meisterschaft) 2027 U9, U11, U13, U15 Einzel, Doppel, Mixed)",
-      "start_date": "2027-09-04",
-      "end_date": "2027-09-05",
-      "location_text": "",
-      "organizer": "Rheinhessen-Pfalz",
-      "bundesland": null,
-      "region_scope": "association",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U9",
-        "U11",
-        "U13",
-        "U15"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-08-22",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44593",
       "title": "6. A-RLT U15/U19",
       "start_date": "2027-09-11",
@@ -6518,30 +6680,6 @@
         "Mixed"
       ],
       "registration_deadline": "2027-08-10",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
-      "source_key": "dbv-calendar-44543",
-      "title": "Landesmeisterschaften NIS U17/U19 (Jugend U17 - U19)",
-      "start_date": "2027-09-18",
-      "end_date": "2027-09-19",
-      "location_text": "",
-      "organizer": "Niedersachsen",
-      "bundesland": "Niedersachsen",
-      "region_scope": "state",
-      "category": "C1-Level",
-      "level_group": "C",
-      "age_groups": [
-        "U17",
-        "U19"
-      ],
-      "disciplines": [
-        "Einzel",
-        "Doppel",
-        "Mixed"
-      ],
-      "registration_deadline": "2027-09-04",
       "event_url": null,
       "source_url": "https://turniere.badminton.de/"
     },
@@ -6570,19 +6708,18 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44499",
-      "title": "Landesmeisterschaften THÜ U11-U19",
-      "start_date": "2027-09-25",
-      "end_date": "2027-09-25",
-      "location_text": "Ilmenau",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
+      "source_key": "dbv-calendar-44543",
+      "title": "Landesmeisterschaften NIS U17/U19 (Jugend U17 - U19)",
+      "start_date": "2027-09-18",
+      "end_date": "2027-09-19",
+      "location_text": "",
+      "organizer": "Niedersachsen",
+      "bundesland": "Niedersachsen",
       "region_scope": "state",
-      "category": "C2-Level",
+      "category": "C1-Level",
       "level_group": "C",
       "age_groups": [
-        "U11",
-        "U15",
+        "U17",
         "U19"
       ],
       "disciplines": [
@@ -6590,13 +6727,13 @@
         "Doppel",
         "Mixed"
       ],
-      "registration_deadline": "2027-09-15",
-      "event_url": null,
+      "registration_deadline": "2027-09-04",
+      "event_url": "https://dbv.turnier.de/tournament/CCB0053D-7218-46AD-AE4D-E0EFF6BAD24F",
       "source_url": "https://turniere.badminton.de/"
     },
     {
       "source_key": "dbv-calendar-44684",
-      "title": "Landesmeisterschaften RHP U9-U19 (BVRP Verbandsmeisterschaft (C2 Meisterschaft) 2027 U9, U11, U13, U15, U17, U19 Einzel, Doppel, Mixed))",
+      "title": "Landesmeisterschaften RHP U9-U19 (BVRP Verbandsmeisterschaft (C2 Meisterschaft) 2027 U9-U11 (Einzel), U13-U19 Einzel, Doppel, Mixed))",
       "start_date": "2027-09-25",
       "end_date": "2027-09-26",
       "location_text": "Worms",
@@ -6620,6 +6757,31 @@
       ],
       "registration_deadline": "2027-09-12",
       "event_url": null,
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
+      "source_key": "dbv-calendar-44499",
+      "title": "Landesmeisterschaften THÜ U11-U19",
+      "start_date": "2027-09-25",
+      "end_date": "2027-09-25",
+      "location_text": "Ilmenau",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "C2-Level",
+      "level_group": "C",
+      "age_groups": [
+        "U11",
+        "U15",
+        "U19"
+      ],
+      "disciplines": [
+        "Einzel",
+        "Doppel",
+        "Mixed"
+      ],
+      "registration_deadline": "2027-09-15",
+      "event_url": "https://dbv.turnier.de/tournament/07D87CD0-733E-4332-AF05-D608AA82A5A1",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -6696,6 +6858,28 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
+      "source_key": "dbv-calendar-44416",
+      "title": "3. D-RLT THÜ Ost U13/U17",
+      "start_date": "2027-11-06",
+      "end_date": "2027-11-06",
+      "location_text": "Dornburg-Camburg",
+      "organizer": "Thüringen",
+      "bundesland": "Thüringen",
+      "region_scope": "state",
+      "category": "D2-Level",
+      "level_group": "D",
+      "age_groups": [
+        "U13",
+        "U17"
+      ],
+      "disciplines": [
+        "Einzel"
+      ],
+      "registration_deadline": "2027-10-28",
+      "event_url": "https://dbv.turnier.de/tournament/455DA811-F452-45EF-9700-8598E5E9AE9D",
+      "source_url": "https://turniere.badminton.de/"
+    },
+    {
       "source_key": "dbv-calendar-44683",
       "title": "Südwestdeutsche Meisterschaften U13-U19",
       "start_date": "2027-11-06",
@@ -6722,28 +6906,6 @@
       "source_url": "https://turniere.badminton.de/"
     },
     {
-      "source_key": "dbv-calendar-44416",
-      "title": "3. D-RLT THÜ Ost U13/U17",
-      "start_date": "2027-11-06",
-      "end_date": "2027-11-06",
-      "location_text": "Dornburg-Camburg",
-      "organizer": "Thüringen",
-      "bundesland": "Thüringen",
-      "region_scope": "state",
-      "category": "D2-Level",
-      "level_group": "D",
-      "age_groups": [
-        "U13",
-        "U17"
-      ],
-      "disciplines": [
-        "Einzel"
-      ],
-      "registration_deadline": "2027-10-28",
-      "event_url": null,
-      "source_url": "https://turniere.badminton.de/"
-    },
-    {
       "source_key": "dbv-calendar-44745",
       "title": "D-RLT THÜ THÜ Nord U13/U17 (3)",
       "start_date": "2027-11-06",
@@ -6762,7 +6924,7 @@
         "Einzel"
       ],
       "registration_deadline": "2027-10-27",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/F3880956-1110-4144-9CA1-3E8EFD37F9FA",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -6785,7 +6947,7 @@
         "Mixed"
       ],
       "registration_deadline": "2027-11-03",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/09AF420B-A4B6-4E9B-A66E-73F04B229D1A",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -6808,7 +6970,7 @@
         "Mixed"
       ],
       "registration_deadline": "2027-11-11",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/7A149022-141C-47F7-AB5B-A157802B9690",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -6831,7 +6993,7 @@
         "Doppel"
       ],
       "registration_deadline": "2027-11-17",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/D77F3A46-CEAA-40D1-9DC8-C1FD653607BF",
       "source_url": "https://turniere.badminton.de/"
     },
     {
@@ -6853,7 +7015,7 @@
         "Einzel"
       ],
       "registration_deadline": "2027-12-01",
-      "event_url": null,
+      "event_url": "https://dbv.turnier.de/tournament/7806701C-1E05-401C-9BE8-70641121ACAC",
       "source_url": "https://turniere.badminton.de/"
     }
   ]
