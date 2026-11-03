@@ -78,7 +78,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
    const result=await call("invite",email);
    if(result?.prepared!==true||result.url!=="https://schmetterlinge-familie.pages.dev/")
     throw Error("Einladungsfreigabe wurde nicht bestätigt.");
-   const body="Du wurdest zur privaten Badminton-App Schmetterlinge eingeladen.\\n\\n"+
+   const body="Du wurdest zur privaten Badminton-App Schmetterlinge eingeladen.\n\n"+
     "Öffne "+result.url+" und melde dich mit dieser E-Mail-Adresse bei Cloudflare Access an. "+
     "Der Bestätigungscode kommt per E-Mail. Ein zusätzliches App-Passwort ist nicht nötig.";
    const mailto="mailto:"+encodeURIComponent(email)+
@@ -89,7 +89,8 @@ export function mountOwnerEmailInvites({card,getSession,status}){
    status("Zugang für "+email+" freigegeben. E-Mail-Entwurf wird geöffnet – bitte dort selbst senden.","success");
    // Some browsers block asynchronous mailto navigation. The visible fallback
    // is an ordinary user-clickable link for iPhone and desktop mail clients.
-   window.location.href=mailto;
+   try{window.location.href=mailto;}
+   catch{status("Zugang freigegeben. Bitte auf „E-Mail-App öffnen“ tippen.","success");}
   }catch(error){status(error?.message||"Einladung fehlgeschlagen.","error");}
   finally{busy=false;send.disabled=false;revoke.disabled=false}
  });
@@ -114,6 +115,6 @@ export function mountOwnerEmailInvites({card,getSession,status}){
   }
  }).catch(()=>{
   // Offline/server errors should not turn missing configuration into a success.
-  hint.textContent="Versandstatus momentan nicht prüfbar.";
+  hint.textContent="Zugangsfreigabe momentan nicht prüfbar.";
  });
 }
