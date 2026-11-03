@@ -60,26 +60,6 @@ async function manageEmail(fetcher,jwt,email,action){
  if(typeof status!=="string")throw Error("database_unavailable");
  return status;
 }
-async function sendMail(env,fetcher,email){
- // Mailjet Free: verified sender address (domain is recommended, not required).
- // No recipient list is stored by this function; each invitation is transactional.
- const auth=btoa(env.MAILJET_API_KEY+":"+env.MAILJET_SECRET_KEY);
- const response=await fetcher("https://api.mailjet.com/v3.1/send",{
-  method:"POST",headers:{"Authorization":"Basic "+auth,
-   "Content-Type":"application/json"},
-  body:JSON.stringify({Messages:[{
-   From:{Email:env.MAILJET_SENDER_EMAIL,Name:"Schmetterlinge"},
-   To:[{Email:email}],Subject:"Einladung zu Schmetterlinge",
-   TextPart:"Du wurdest zur privaten Badminton-App Schmetterlinge eingeladen.\\n\\n"+
-    "Öffne diesen Link: "+SITE+"/\\n\\n"+
-    "Melde dich bei Cloudflare Access mit genau dieser E-Mail-Adresse an. "+
-    "Du erhältst dort einen einmaligen Bestätigungscode. Ein weiteres App-Passwort brauchst du nicht.\\n\\n"+
-    "Wenn du keine Einladung erwartet hast, ignoriere diese Nachricht."
-  }]}),signal:AbortSignal.timeout(12000)});
- const result=await response.json().catch(()=>null);
- if(!response.ok||result?.Messages?.[0]?.Status!=="success")
-  throw Error("email_send_failed");
-}
 export async function onRequestPost({request,env={},fetcher=fetch}){
  const url=new URL(request.url);
  if(url.origin!==SITE||url.pathname!=="/api/family-invites"||
@@ -96,12 +76,10 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
  try{
   if(!await authenticate(request,fetcher))return respond({error:"access_denied"},403);
  }catch{return respond({error:"access_denied"},403);}
- const ready=Boolean(env.CF_ACCESS_API_TOKEN&&env.MAILJET_API_KEY&&
-  env.MAILJET_SECRET_KEY&&typeof env.MAILJET_SENDER_EMAIL==="string"&&
-  EMAIL.test(env.MAILJET_SENDER_EMAIL));
+ const ready=Boolean(env.CF_ACCESS_API_TOKEN);
  if(action==="status")return respond({ready});
- if(!env.CF_ACCESS_API_TOKEN||action==="invite"&&!ready)
-  return respond({error:"mail_not_configured"},503);
+ if(!ready)
+  return respond({error:"cloudflare_not_configured"},503);
  const email=normalise(input.email);
  if(!EMAIL.test(email)||email.length>254)return respond({error:"invalid_email"},400);
  const jwt=request.headers.get("Authorization");
@@ -122,8 +100,9 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
   managedResult=await manageEmail(fetcher,jwt,email,"enable");
   if(managedResult==="rate_limited")throw Error("rate_limited");
   if(!["new","existing","baseline"].includes(managedResult))throw Error("database_unavailable");
-  await sendMail(env,fetcher,email);
-  return respond({sent:true});
+  // Only prepare the private app link. The browser opens a local mail composer;
+  // no outbound mail service or address data is stored in the Pages function.
+  return respond({prepared:true,url:SITE+"/"});
  }catch(error){
   if(action==="invite"){
    // Cross-provider compensation; never touch pre-existing recipients.
@@ -140,7 +119,6 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
   }
   const reason=error?.message;
   return respond({error:reason==="unsafe_access_policy"?"unsafe_access_policy":
-   reason==="email_send_failed"?"email_send_failed":
    reason==="rate_limited"?"rate_limited":"service_unavailable"},
    reason==="rate_limited"?429:503);
  }
