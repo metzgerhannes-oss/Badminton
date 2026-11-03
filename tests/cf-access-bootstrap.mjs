@@ -79,8 +79,7 @@ const authHeaders={Origin:site,Authorization:"Bearer valid.synthetic.session",
  "Cf-Access-Jwt-Assertion":"valid.synthetic.assertion"};
 const makeInvite=action=>new Request(site+"/api/family-invites",{method:"POST",
  headers:authHeaders,body:JSON.stringify({action,email:"invitee@example.test"})});
-const envMail={CF_ACCESS_API_TOKEN:"test-only",MAILJET_API_KEY:"test-only",MAILJET_SECRET_KEY:"test-only",
- MAILJET_SENDER_EMAIL:"sender@example.test"};
+const envGrant={CF_ACCESS_API_TOKEN:"test-only"};
 function emailMock({failure=false,owner=true}={}){
  let allowed=["owner@example.test"];
  const steps=[];
@@ -96,32 +95,29 @@ function emailMock({failure=false,owner=true}={}){
   }
   if(url.includes("cf_access_email_invite_manage")){
    const action=JSON.parse(options.body).p_action;steps.push("db_"+action);
+   if(failure&&action==="enable")return new Response("{}",{status:503});
    return Response.json(action==="enable"?"new":"revoked");
-  }
-  if(url.includes("api.mailjet.com")){
-   steps.push("mail");
-   return failure?new Response("{}",{status:500}):Response.json({Messages:[{Status:"success"}]});
   }
   throw Error("Unexpected test endpoint");
  };
  return {call,steps,get allowed(){return allowed}};
 }
 const successfulEmail=emailMock();
-const sent=await emailApi.onRequestPost({request:makeInvite("invite"),env:envMail,
+const sent=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
  fetcher:successfulEmail.call});
 assert.equal(sent.status,200);
-assert.deepEqual(await sent.json(),{sent:true});
+assert.deepEqual(await sent.json(),{prepared:true,url:site+"/"});
 assert.ok(successfulEmail.allowed.includes("invitee@example.test"));
-assert.deepEqual(successfulEmail.steps,["jwt","owner","cf_write","db_enable","mail"]);
+assert.deepEqual(successfulEmail.steps,["jwt","owner","cf_write","db_enable"]);
 const bounced=emailMock({failure:true});
-const noMail=await emailApi.onRequestPost({request:makeInvite("invite"),env:envMail,
+const noMail=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
  fetcher:bounced.call});
 assert.equal(noMail.status,503);
 assert.deepEqual(bounced.allowed,["owner@example.test"]);
-assert.deepEqual(bounced.steps,["jwt","owner","cf_write","db_enable","mail","db_disable","cf_write"]);
+assert.deepEqual(bounced.steps,["jwt","owner","cf_write","db_enable","cf_write"]);
 const blockedOwner=emailMock({owner:false});
-const notOwner=await emailApi.onRequestPost({request:makeInvite("invite"),env:envMail,
+const notOwner=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
  fetcher:blockedOwner.call});
 assert.equal(notOwner.status,403);
 assert.deepEqual(blockedOwner.steps,["jwt","owner"]);
-console.log("P1 #442: owner-only email sending, allowlist consistency and rollback smoke OK");
+console.log("P1 #442: owner-only mailto preparation, allowlist consistency and rollback smoke OK");
