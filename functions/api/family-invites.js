@@ -114,18 +114,29 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
   }
   if(!included){await writePolicy(env,fetcher,policy,[...current,email]);changedCloudflare=true;}
   managedResult=await manageEmail(fetcher,jwt,email,"enable");
-  if(managedResult==="rate_limited")return respond({error:"rate_limited"},429);
+  if(managedResult==="rate_limited")throw Error("rate_limited");
   if(!["new","existing","baseline"].includes(managedResult))throw Error("database_unavailable");
   await sendMail(env,fetcher,email);
   return respond({sent:true});
  }catch(error){
-  return respond({error:error?.message==="unsafe_access_policy"?
-   "unsafe_access_policy":error?.message==="email_send_failed"?
-   "email_send_failed":"service_unavailable"},503);
- }finally{
-  // An unsuccessful new invitation must not leave a newly authorized address.
-  // For an already-approved family recipient, never revoke preexisting rights.
-  // This is best-effort cross-provider compensation; a failure stays visible.
-  // The actual compensation is done in the catch handler below.
+  if(action==="invite"){
+   // Cross-provider compensation; never touch pre-existing recipients.
+   if(managedResult==="new"){
+    try{await manageEmail(fetcher,jwt,email,"disable");}catch{/* fail closed on next admin repair */}
+   }
+   if(changedCloudflare){
+    try{
+     const latest=await readPolicy(env,fetcher);
+     await writePolicy(env,fetcher,latest,
+      latest.include.map(x=>normalise(x.email.email)).filter(x=>x!==email));
+    }catch{/* configuration is inconsistent; caller sees an explicit failure */}
+   }
+  }
+  const reason=error?.message;
+  return respond({error:reason==="unsafe_access_policy"?"unsafe_access_policy":
+   reason==="email_send_failed"?"email_send_failed":
+   reason==="rate_limited"?"rate_limited":"service_unavailable"},
+   reason==="rate_limited"?429:503);
  }
+
 }
