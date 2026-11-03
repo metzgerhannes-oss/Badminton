@@ -79,8 +79,8 @@ const authHeaders={Origin:site,Authorization:"Bearer valid.synthetic.session",
  "Cf-Access-Jwt-Assertion":"valid.synthetic.assertion"};
 const makeInvite=action=>new Request(site+"/api/family-invites",{method:"POST",
  headers:authHeaders,body:JSON.stringify({action,email:"invitee@example.test"})});
-const envMail={CF_ACCESS_API_TOKEN:"test-only",RESEND_API_KEY:"test-only",
- RESEND_FROM:"Test <sender@example.test>"};
+const envMail={CF_ACCESS_API_TOKEN:"test-only",MAILJET_API_KEY:"test-only",MAILJET_SECRET_KEY:"test-only",
+ MAILJET_SENDER_EMAIL:"sender@example.test"};
 function emailMock({failure=false,owner=true}={}){
  let allowed=["owner@example.test"];
  const steps=[];
@@ -98,9 +98,9 @@ function emailMock({failure=false,owner=true}={}){
    const action=JSON.parse(options.body).p_action;steps.push("db_"+action);
    return Response.json(action==="enable"?"new":"revoked");
   }
-  if(url.includes("api.resend.com")){
+  if(url.includes("api.mailjet.com")){
    steps.push("mail");
-   return failure?new Response("{}",{status:500}):Response.json({id:"synthetic-message"});
+   return failure?new Response("{}",{status:500}):Response.json({Messages:[{Status:"success"}]});
   }
   throw Error("Unexpected test endpoint");
  };
