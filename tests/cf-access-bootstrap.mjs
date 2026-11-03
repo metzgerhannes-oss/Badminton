@@ -73,3 +73,55 @@ const emailDenied=await emailApi.onRequestPost({request:emailRequest,env:{},
  fetcher:async()=>{throw Error("Untrusted request must not call services");}});
 assert.equal(emailDenied.status,403);
 console.log("P1 #442: email invite server rejects unauthenticated access, SQL guarded.");
+
+const site="https://schmetterlinge-familie.pages.dev";
+const authHeaders={Origin:site,Authorization:"Bearer valid.synthetic.session",
+ "Cf-Access-Jwt-Assertion":"valid.synthetic.assertion"};
+const makeInvite=action=>new Request(site+"/api/family-invites",{method:"POST",
+ headers:authHeaders,body:JSON.stringify({action,email:"invitee@example.test"})});
+const envMail={CF_ACCESS_API_TOKEN:"test-only",RESEND_API_KEY:"test-only",
+ RESEND_FROM:"Test <sender@example.test>"};
+function emailMock({failure=false,owner=true}={}){
+ let allowed=["owner@example.test"];
+ const steps=[];
+ const call=async(url,options)=>{
+  const method=options?.method||"GET";
+  if(url.includes("cf-access-bootstrap")){steps.push("jwt");return Response.json({allowed:true});}
+  if(url.includes("app_access_status")){steps.push("owner");return Response.json({owner});}
+  if(url.includes("/access/apps/")){
+   if(method==="GET")return Response.json({success:true,result:{name:"Family",decision:"allow",
+    precedence:1,include:allowed.map(email=>({email:{email}})),exclude:[],require:[]}});
+   allowed=JSON.parse(options.body).include.map(x=>x.email.email);
+   steps.push("cf_write");return Response.json({success:true});
+  }
+  if(url.includes("cf_access_email_invite_manage")){
+   const action=JSON.parse(options.body).p_action;steps.push("db_"+action);
+   return Response.json(action==="enable"?"new":"revoked");
+  }
+  if(url.includes("api.resend.com")){
+   steps.push("mail");
+   return failure?new Response("{}",{status:500}):Response.json({id:"synthetic-message"});
+  }
+  throw Error("Unexpected test endpoint");
+ };
+ return {call,steps,get allowed(){return allowed}};
+}
+const successfulEmail=emailMock();
+const sent=await emailApi.onRequestPost({request:makeInvite("invite"),env:envMail,
+ fetcher:successfulEmail.call});
+assert.equal(sent.status,200);
+assert.deepEqual(await sent.json(),{sent:true});
+assert.ok(successfulEmail.allowed.includes("invitee@example.test"));
+assert.deepEqual(successfulEmail.steps,["jwt","owner","cf_write","db_enable","mail"]);
+const bounced=emailMock({failure:true});
+const noMail=await emailApi.onRequestPost({request:makeInvite("invite"),env:envMail,
+ fetcher:bounced.call});
+assert.equal(noMail.status,503);
+assert.deepEqual(bounced.allowed,["owner@example.test"]);
+assert.deepEqual(bounced.steps,["jwt","owner","cf_write","db_enable","mail","db_disable","cf_write"]);
+const blockedOwner=emailMock({owner:false});
+const notOwner=await emailApi.onRequestPost({request:makeInvite("invite"),env:envMail,
+ fetcher:blockedOwner.call});
+assert.equal(notOwner.status,403);
+assert.deepEqual(blockedOwner.steps,["jwt","owner"]);
+console.log("P1 #442: owner-only email sending, allowlist consistency and rollback smoke OK");
