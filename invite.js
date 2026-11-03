@@ -2,6 +2,7 @@
 import {getPrivateSession} from "./private-invites.js";
 import {PUBLIC_KEY,SUPABASE_ROOT} from "./scripts/supabase-read.mjs";
 import {mountOwnerInviteOverview,checkIssuedInviteForSharing} from "./scripts/owner-invites-overview.mjs";
+import {mountOwnerEmailInvites} from "./scripts/owner-email-invites.mjs";
 const STORAGE="schmetterlinge.appIssuedInvite.v136";
 const el=id=>document.getElementById(id);
 const hex=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,"0")).join("");
@@ -149,6 +150,7 @@ async function checkOwnerAccess(){
   if(!listenersReady){
    listenersReady=true;
    mountOwnerInviteOverview({card,rpc,read,write,draw,status});
+   mountOwnerEmailInvites({card,getSession:()=>getPrivateSession(false),status});
    el("invite-share").addEventListener("click",()=>execute("share"));
    el("invite-copy").addEventListener("click",()=>execute("copy"));
    el("invite-revoke").addEventListener("click",revoke);
