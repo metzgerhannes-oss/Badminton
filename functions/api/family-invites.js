@@ -61,19 +61,24 @@ async function manageEmail(fetcher,jwt,email,action){
  return status;
 }
 async function sendMail(env,fetcher,email){
- const response=await fetcher("https://api.resend.com/emails",{
-  method:"POST",headers:{"Authorization":"Bearer "+env.RESEND_API_KEY,
+ // Mailjet Free: verified sender address (domain is recommended, not required).
+ // No recipient list is stored by this function; each invitation is transactional.
+ const auth=btoa(env.MAILJET_API_KEY+":"+env.MAILJET_SECRET_KEY);
+ const response=await fetcher("https://api.mailjet.com/v3.1/send",{
+  method:"POST",headers:{"Authorization":"Basic "+auth,
    "Content-Type":"application/json"},
-  body:JSON.stringify({from:env.RESEND_FROM,to:[email],
-   subject:"Einladung zu Schmetterlinge",
-   text:"Du wurdest zur privaten Badminton-App Schmetterlinge eingeladen.\n\n"+
-    "Öffne diesen Link: "+SITE+"/\n\n"+
+  body:JSON.stringify({Messages:[{
+   From:{Email:env.MAILJET_SENDER_EMAIL,Name:"Schmetterlinge"},
+   To:[{Email:email}],Subject:"Einladung zu Schmetterlinge",
+   TextPart:"Du wurdest zur privaten Badminton-App Schmetterlinge eingeladen.\\n\\n"+
+    "Öffne diesen Link: "+SITE+"/\\n\\n"+
     "Melde dich bei Cloudflare Access mit genau dieser E-Mail-Adresse an. "+
-    "Du erhältst dort einen einmaligen Bestätigungscode. Ein weiteres App-Passwort brauchst du nicht.\n\n"+
-    "Wenn du keine Einladung erwartet hast, ignoriere diese Nachricht."}),
-  signal:AbortSignal.timeout(12000)});
+    "Du erhältst dort einen einmaligen Bestätigungscode. Ein weiteres App-Passwort brauchst du nicht.\\n\\n"+
+    "Wenn du keine Einladung erwartet hast, ignoriere diese Nachricht."
+  }]}),signal:AbortSignal.timeout(12000)});
  const result=await response.json().catch(()=>null);
- if(!response.ok||typeof result?.id!=="string")throw Error("email_send_failed");
+ if(!response.ok||result?.Messages?.[0]?.Status!=="success")
+  throw Error("email_send_failed");
 }
 export async function onRequestPost({request,env={},fetcher=fetch}){
  const url=new URL(request.url);
@@ -91,8 +96,9 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
  try{
   if(!await authenticate(request,fetcher))return respond({error:"access_denied"},403);
  }catch{return respond({error:"access_denied"},403);}
- const ready=Boolean(env.CF_ACCESS_API_TOKEN&&env.RESEND_API_KEY&&
-  typeof env.RESEND_FROM==="string"&&env.RESEND_FROM.includes("@"));
+ const ready=Boolean(env.CF_ACCESS_API_TOKEN&&env.MAILJET_API_KEY&&
+  env.MAILJET_SECRET_KEY&&typeof env.MAILJET_SENDER_EMAIL==="string"&&
+  EMAIL.test(env.MAILJET_SENDER_EMAIL));
  if(action==="status")return respond({ready});
  if(!env.CF_ACCESS_API_TOKEN||action==="invite"&&!ready)
   return respond({error:"mail_not_configured"},503);
