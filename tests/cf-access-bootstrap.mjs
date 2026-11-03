@@ -61,3 +61,15 @@ const app=await readFile(new URL("../app-access.js",import.meta.url),"utf8");
 assert.match(app,/confirmed\?\.allowed===true/);
 assert.match(app,/grantAfterIntro\(\)/);
 console.log("P1 #427: Access assertion bridge, backend verification and restricted member enrollment contract OK");
+
+const inviteSql=await readFile(new URL("../database/p1-442-email-invite-managed.sql",import.meta.url),"utf8");
+assert.match(inviteSql,/cf_access_invite_managed ENABLE ROW LEVEL SECURITY/);
+assert.match(inviteSql,/site_owners/);
+assert.match(inviteSql,/REVOKE ALL ON FUNCTION public\.cf_access_email_invite_manage/);
+const emailApi=await import("../functions/api/family-invites.js");
+const emailRequest=new Request("https://schmetterlinge-familie.pages.dev/api/family-invites",{
+ method:"POST",body:JSON.stringify({action:"invite",email:"test@example.test"})});
+const emailDenied=await emailApi.onRequestPost({request:emailRequest,env:{},
+ fetcher:async()=>{throw Error("Untrusted request must not call services");}});
+assert.equal(emailDenied.status,403);
+console.log("P1 #442: email invite server rejects unauthenticated access, SQL guarded.");
