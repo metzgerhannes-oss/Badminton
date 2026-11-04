@@ -95,6 +95,8 @@ test("remote revocation hides stale cached share and copy controls without issui
  await page.goto("/#einstellungen/einladungen",{waitUntil:"domcontentloaded"});
  const room=page.locator("#settings-room-einladungen");
  await expect(room.locator(".invitation-overview")).toContainText("1 angenommene Zugänge");
+ // Legacy invite controls moved into a disclosure; exercise them explicitly.
+ await room.locator(".invitation-card > details.invitation-short-guide").evaluate(node=>{node.open=true});
  await expect(room.locator("#invite-copy")).toBeVisible();
  await expect(room.locator("#invite-link-preview")).toHaveAttribute("href",/#appinvite=/);
  remotelyRevoked=true;
@@ -138,6 +140,8 @@ test("cached owner link is rechecked at copy time; remote revoke cannot be share
  await page.goto("/#einstellungen/einladungen",{waitUntil:"domcontentloaded"});
  const room=page.locator("#settings-room-einladungen");
  await expect(room.locator(".invitation-overview")).toContainText("1 angenommene Zugänge");
+ // Legacy invite controls moved into a disclosure; exercise them explicitly.
+ await room.locator(".invitation-card > details.invitation-short-guide").evaluate(node=>{node.open=true});
  await expect(room.locator("#invite-copy")).toBeVisible();
  remoteRevoked=true; // Revoked on another device after initial overview.
  await room.locator("#invite-copy").click();

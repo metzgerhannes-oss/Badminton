@@ -61,3 +61,63 @@ const app=await readFile(new URL("../app-access.js",import.meta.url),"utf8");
 assert.match(app,/confirmed\?\.allowed===true/);
 assert.match(app,/grantAfterIntro\(\)/);
 console.log("P1 #427: Access assertion bridge, backend verification and restricted member enrollment contract OK");
+
+const inviteSql=await readFile(new URL("../database/p1-442-email-invite-managed.sql",import.meta.url),"utf8");
+assert.match(inviteSql,/cf_access_invite_managed ENABLE ROW LEVEL SECURITY/);
+assert.match(inviteSql,/site_owners/);
+assert.match(inviteSql,/REVOKE ALL ON FUNCTION public\.cf_access_email_invite_manage/);
+const emailApi=await import("../functions/api/family-invites.js");
+const emailRequest=new Request("https://schmetterlinge-familie.pages.dev/api/family-invites",{
+ method:"POST",body:JSON.stringify({action:"invite",email:"test@example.test"})});
+const emailDenied=await emailApi.onRequestPost({request:emailRequest,env:{},
+ fetcher:async()=>{throw Error("Untrusted request must not call services");}});
+assert.equal(emailDenied.status,403);
+console.log("P1 #442: email invite server rejects unauthenticated access, SQL guarded.");
+
+const site="https://schmetterlinge-familie.pages.dev";
+const authHeaders={Origin:site,Authorization:"Bearer valid.synthetic.session",
+ "Cf-Access-Jwt-Assertion":"valid.synthetic.assertion"};
+const makeInvite=action=>new Request(site+"/api/family-invites",{method:"POST",
+ headers:authHeaders,body:JSON.stringify({action,email:"invitee@example.test"})});
+const envGrant={CF_ACCESS_API_TOKEN:"test-only"};
+function emailMock({failure=false,owner=true}={}){
+ let allowed=["owner@example.test"];
+ const steps=[];
+ const call=async(url,options)=>{
+  const method=options?.method||"GET";
+  if(url.includes("cf-access-bootstrap")){steps.push("jwt");return Response.json({allowed:true});}
+  if(url.includes("app_access_status")){steps.push("owner");return Response.json({owner});}
+  if(url.includes("/access/apps/")){
+   if(method==="GET")return Response.json({success:true,result:{name:"Family",decision:"allow",
+    precedence:1,include:allowed.map(email=>({email:{email}})),exclude:[],require:[]}});
+   allowed=JSON.parse(options.body).include.map(x=>x.email.email);
+   steps.push("cf_write");return Response.json({success:true});
+  }
+  if(url.includes("cf_access_email_invite_manage")){
+   const action=JSON.parse(options.body).p_action;steps.push("db_"+action);
+   if(failure&&action==="enable")return new Response("{}",{status:503});
+   return Response.json(action==="enable"?"new":"revoked");
+  }
+  throw Error("Unexpected test endpoint");
+ };
+ return {call,steps,get allowed(){return allowed}};
+}
+const successfulEmail=emailMock();
+const sent=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
+ fetcher:successfulEmail.call});
+assert.equal(sent.status,200);
+assert.deepEqual(await sent.json(),{prepared:true,url:site+"/"});
+assert.ok(successfulEmail.allowed.includes("invitee@example.test"));
+assert.deepEqual(successfulEmail.steps,["jwt","owner","cf_write","db_enable"]);
+const bounced=emailMock({failure:true});
+const noMail=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
+ fetcher:bounced.call});
+assert.equal(noMail.status,503);
+assert.deepEqual(bounced.allowed,["owner@example.test"]);
+assert.deepEqual(bounced.steps,["jwt","owner","cf_write","db_enable","cf_write"]);
+const blockedOwner=emailMock({owner:false});
+const notOwner=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
+ fetcher:blockedOwner.call});
+assert.equal(notOwner.status,403);
+assert.deepEqual(blockedOwner.steps,["jwt","owner"]);
+console.log("P1 #442: owner-only mailto preparation, allowlist consistency and rollback smoke OK");
