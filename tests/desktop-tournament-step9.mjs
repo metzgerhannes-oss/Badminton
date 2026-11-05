@@ -8,7 +8,7 @@ assert.match(html,/data-desktop-action="follow"/);
 assert.match(html,/data-desktop-action="calendar"/);
 assert.match(html,/data-desktop-action="schedule"/);
 assert.match(html,/data-desktop-action="add-tournament"/);
-assert.match(html,/data-desktop-action="import"/);
+assert.doesNotMatch(html,/data-desktop-action="import"/,"Removed Spond action must not reappear");
 assert.match(html,/<script defer src="\.\/desktop-context-v173\.js"><\/script>/);
 assert.match(html,/<link rel="stylesheet" href="\.\/desktop-tournament-v173\.css">/);
 assert.match(css,/@media \(min-width:1280px\)/);
