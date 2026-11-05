@@ -59,12 +59,12 @@ assert.equal(api.parseSource(JSON.stringify({events:[{title:"Test",start:"2026-1
 console.log("Spond-Kalender: Parser, Zeitzone, Privatsphäre, Dubletten, Aktualisierung und Entfernen geprüft.");
 
 const html=fs.readFileSync(new URL("../index.html",import.meta.url),"utf8");
-const panel=html.split('<section class="spond-panel"')[1].split("</section>")[0];
-assert.ok(panel.includes('id="spond-quick-import"'),"Single visible Spond action");
-assert.ok(!panel.includes('spond-paste-data')&&!panel.includes('spond-ics-file'),"Advanced inputs must not clutter tournament page");
-assert.ok(html.includes('id="spond-source-dialog"'),"Advanced choices live in a separate dialog");
-assert.ok(html.includes('id="spond-source-close"'),"Dialog has a clear exit");
+assert.ok(!html.includes('class="spond-panel"'),"Spond-Turniere card has been removed");
+assert.ok(!html.includes('id="spond-quick-import"'),"Calendar-import button is no longer visible");
+assert.ok(!html.includes('data-desktop-action="import"'),"Desktop does not expose a dead calendar-import shortcut");
+assert.ok(html.includes('id="dbv-calendar-heading"'),"Official DBV tournament calendar stays available");
+assert.ok(html.includes('id="official-tournament-list"'),"Personal tournament bookmarks stay available");
 const source=fs.readFileSync(new URL("../spond-calendar.js",import.meta.url),"utf8");
-assert.ok(source.includes('navigator.clipboard.readText()'),"User action checks clipboard in browser");
-assert.ok(source.includes('sourceDialog?.showModal()'),"Clipboard fallback must be accessible");
-console.log("Spond UX v100: single calendar action, accessible modal and clipboard fallback.");
+assert.ok(source.includes('navigator.clipboard.readText()'),"Legacy shortcut imports remain compatible");
+assert.ok(source.includes('sourceDialog?.showModal()'),"Legacy imports remain accessible without data loss");
+console.log("Spond UI removed; legacy calendar data and import contracts preserved.");
