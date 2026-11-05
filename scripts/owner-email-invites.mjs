@@ -56,6 +56,12 @@ export function mountOwnerEmailInvites({card,getSession,status}){
   if(!response.ok||!body){
    const errors={
     cloudflare_not_configured:"Die sichere automatische Empfängerfreigabe ist noch nicht eingerichtet.",
+    cloudflare_read_denied:"Cloudflare verweigert den Zugriff auf die Freigabeliste. Bitte die API-Token-Berechtigungen prüfen.",
+    cloudflare_read_failed:"Die Cloudflare-Freigabeliste konnte nicht abgerufen werden.",
+    cloudflare_update_denied:"Cloudflare verweigert die Änderung der Freigabeliste. Bitte die API-Token-Berechtigungen prüfen.",
+    cloudflare_update_failed:"Die Cloudflare-Freigabeliste konnte nicht aktualisiert werden.",
+    supabase_invite_unavailable:"Die Supabase-Einladungsfreigabe ist nicht erreichbar.",
+    database_unavailable:"Die Supabase-Freigabe konnte nicht bestätigt werden.",
     invalid_email:"Bitte eine gültige E-Mail-Adresse eingeben.",
     not_managed:"Dieser Zugang wurde nicht über die E-Mail-Einladung erstellt und kann hier nicht widerrufen werden.",
     rate_limited:"Zu viele neue Einladungen innerhalb von 24 Stunden.",
