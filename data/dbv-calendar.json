@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "https://turniere.badminton.de/",
-  "capturedAt": "2026-11-04T11:32:16.730175+00:00",
+  "capturedAt": "2026-11-05T11:29:13.742365+00:00",
   "scope": "remaining-current-and-next-year",
   "entries": [
     {
@@ -3744,7 +3744,7 @@
     },
     {
       "source_key": "dbv-calendar-44757",
-      "title": "Landesmeisterschaften HES U15/U19 (HBV Manschaftsmeisterschaften U15/U19)",
+      "title": "Landesmeisterschaften HES U15/U19 (HBV Mannschaftsmeisterschaften U15/U19)",
       "start_date": "2027-02-27",
       "end_date": "2027-02-28",
       "location_text": "",
