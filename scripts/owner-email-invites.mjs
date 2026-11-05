@@ -30,7 +30,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
  const hint=el("p",{id:"invite-email-setup",className:"small muted",
   text:"Die Mail-App öffnet einen Entwurf. Erst wenn du dort auf Senden tippst, wird die Einladung verschickt."});
  const fallback=el("a",{id:"invite-email-draft",text:"E-Mail-App öffnen"});
- fallback.hidden=true;fallback.className="invitation-link";
+ fallback.hidden=true;fallback.style.display="none";fallback.className="invitation-link";
  const legacy=el("details",{className:"invitation-short-guide"});
  const summary=el("summary",{text:"Alte Einladungslinks verwalten"});
  legacy.append(summary);
@@ -78,7 +78,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
   if(busy||!form.reportValidity())return;
   const email=input.value.trim();
   busy=true;send.disabled=true;revoke.disabled=true;
-  fallback.hidden=true;
+  fallback.hidden=true;fallback.style.display="none";
   status("Zugang für den Empfänger wird eingerichtet …");
   try{
    const result=await call("invite",email);
@@ -91,7 +91,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
     "?subject="+encodeURIComponent("Einladung zu Schmetterlinge")+
     "&body="+encodeURIComponent(body);
    fallback.href=mailto;
-   fallback.hidden=false;
+   fallback.hidden=false;fallback.style.display="inline-block";
    status("Zugang für "+email+" freigegeben. E-Mail-Entwurf wird geöffnet – bitte dort selbst senden.","success");
    // Some browsers block asynchronous mailto navigation. The visible fallback
    // is an ordinary user-clickable link for iPhone and desktop mail clients.
