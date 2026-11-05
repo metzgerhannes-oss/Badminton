@@ -80,7 +80,7 @@ const authHeaders={Origin:site,Authorization:"Bearer valid.synthetic.session",
 const makeInvite=action=>new Request(site+"/api/family-invites",{method:"POST",
  headers:authHeaders,body:JSON.stringify({action,email:"invitee@example.test"})});
 const envGrant={CF_ACCESS_API_TOKEN:"test-only"};
-function emailMock({failure=false,owner=true}={}){
+function emailMock({failure=false,owner=true,baseline=false,cfDenied=false}={}){
  let allowed=["owner@example.test"];
  const steps=[];
  const call=async(url,options)=>{
@@ -88,15 +88,19 @@ function emailMock({failure=false,owner=true}={}){
   if(url.includes("cf-access-bootstrap")){steps.push("jwt");return Response.json({allowed:true});}
   if(url.includes("app_access_status")){steps.push("owner");return Response.json({owner});}
   if(url.includes("/access/apps/")){
-   if(method==="GET")return Response.json({success:true,result:{name:"Family",decision:"allow",
+   if(method==="GET"){
+    steps.push("cf_read");
+    if(cfDenied)return new Response(JSON.stringify({success:false,errors:[{code:10000}]}),{status:403});
+    return Response.json({success:true,result:{name:"Family",decision:"allow",
     precedence:1,include:allowed.map(email=>({email:{email}})),exclude:[],require:[]}});
+   }
    allowed=JSON.parse(options.body).include.map(x=>x.email.email);
    steps.push("cf_write");return Response.json({success:true});
   }
   if(url.includes("cf_access_email_invite_manage")){
    const action=JSON.parse(options.body).p_action;steps.push("db_"+action);
    if(failure&&action==="enable")return new Response("{}",{status:503});
-   return Response.json(action==="enable"?"new":"revoked");
+   return Response.json(action==="enable"?(baseline?"baseline":"new"):"revoked");
   }
   throw Error("Unexpected test endpoint");
  };
@@ -108,13 +112,26 @@ const sent=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGra
 assert.equal(sent.status,200);
 assert.deepEqual(await sent.json(),{prepared:true,url:site+"/"});
 assert.ok(successfulEmail.allowed.includes("invitee@example.test"));
-assert.deepEqual(successfulEmail.steps,["jwt","owner","cf_write","db_enable"]);
+assert.deepEqual(successfulEmail.steps,["jwt","owner","db_enable","cf_read","cf_write"]);
 const bounced=emailMock({failure:true});
 const noMail=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
  fetcher:bounced.call});
 assert.equal(noMail.status,503);
 assert.deepEqual(bounced.allowed,["owner@example.test"]);
-assert.deepEqual(bounced.steps,["jwt","owner","cf_write","db_enable","cf_write"]);
+assert.deepEqual(bounced.steps,["jwt","owner","db_enable"]);
+const alreadyApproved=emailMock({baseline:true,cfDenied:true});
+const existingSent=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
+ fetcher:alreadyApproved.call});
+assert.deepEqual(await existingSent.json(),{prepared:true,url:site+"/"});
+assert.deepEqual(alreadyApproved.steps,["jwt","owner","db_enable"],
+ "Approved family email must not depend on Cloudflare policy lookups.");
+const blockedCloudflare=emailMock({cfDenied:true});
+const blockedNew=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
+ fetcher:blockedCloudflare.call});
+assert.equal(blockedNew.status,503);
+assert.equal((await blockedNew.json()).error,"cloudflare_read_denied");
+assert.deepEqual(blockedCloudflare.steps,["jwt","owner","db_enable","cf_read","db_disable"],
+ "New grants must be rolled back if Cloudflare denies policy read.");
 const blockedOwner=emailMock({owner:false});
 const notOwner=await emailApi.onRequestPost({request:makeInvite("invite"),env:envGrant,
  fetcher:blockedOwner.call});

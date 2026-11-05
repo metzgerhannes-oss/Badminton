@@ -30,7 +30,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
  const hint=el("p",{id:"invite-email-setup",className:"small muted",
   text:"Die Mail-App öffnet einen Entwurf. Erst wenn du dort auf Senden tippst, wird die Einladung verschickt."});
  const fallback=el("a",{id:"invite-email-draft",text:"E-Mail-App öffnen"});
- fallback.hidden=true;fallback.className="invitation-link";
+ fallback.hidden=true;fallback.style.display="none";fallback.className="invitation-link";
  const legacy=el("details",{className:"invitation-short-guide"});
  const summary=el("summary",{text:"Alte Einladungslinks verwalten"});
  legacy.append(summary);
@@ -56,6 +56,12 @@ export function mountOwnerEmailInvites({card,getSession,status}){
   if(!response.ok||!body){
    const errors={
     cloudflare_not_configured:"Die sichere automatische Empfängerfreigabe ist noch nicht eingerichtet.",
+    cloudflare_read_denied:"Cloudflare verweigert den Zugriff auf die Freigabeliste. Bitte die API-Token-Berechtigungen prüfen.",
+    cloudflare_read_failed:"Die Cloudflare-Freigabeliste konnte nicht abgerufen werden.",
+    cloudflare_update_denied:"Cloudflare verweigert die Änderung der Freigabeliste. Bitte die API-Token-Berechtigungen prüfen.",
+    cloudflare_update_failed:"Die Cloudflare-Freigabeliste konnte nicht aktualisiert werden.",
+    supabase_invite_unavailable:"Die Supabase-Einladungsfreigabe ist nicht erreichbar.",
+    database_unavailable:"Die Supabase-Freigabe konnte nicht bestätigt werden.",
     invalid_email:"Bitte eine gültige E-Mail-Adresse eingeben.",
     not_managed:"Dieser Zugang wurde nicht über die E-Mail-Einladung erstellt und kann hier nicht widerrufen werden.",
     rate_limited:"Zu viele neue Einladungen innerhalb von 24 Stunden.",
@@ -72,7 +78,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
   if(busy||!form.reportValidity())return;
   const email=input.value.trim();
   busy=true;send.disabled=true;revoke.disabled=true;
-  fallback.hidden=true;
+  fallback.hidden=true;fallback.style.display="none";
   status("Zugang für den Empfänger wird eingerichtet …");
   try{
    const result=await call("invite",email);
@@ -85,7 +91,7 @@ export function mountOwnerEmailInvites({card,getSession,status}){
     "?subject="+encodeURIComponent("Einladung zu Schmetterlinge")+
     "&body="+encodeURIComponent(body);
    fallback.href=mailto;
-   fallback.hidden=false;
+   fallback.hidden=false;fallback.style.display="inline-block";
    status("Zugang für "+email+" freigegeben. E-Mail-Entwurf wird geöffnet – bitte dort selbst senden.","success");
    // Some browsers block asynchronous mailto navigation. The visible fallback
    // is an ordinary user-clickable link for iPhone and desktop mail clients.

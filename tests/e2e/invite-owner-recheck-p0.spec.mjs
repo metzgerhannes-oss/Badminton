@@ -31,6 +31,7 @@ test("permissions page explains hidden invitations and recovers after owner chec
  await expect(page.locator(".invitation-card")).toBeVisible();
  // Email-first invitations are immediately visible; legacy links are in details.
  await expect(page.locator("#invite-email-address")).toBeVisible();
+ await expect(page.locator("#invite-email-draft")).toBeHidden();
  await page.locator(".invitation-card > details.invitation-short-guide").evaluate(node=>{node.open=true});
  await expect(page.locator("#invite-share")).toBeVisible();
  await expect(page.locator("#invite-access-help")).toBeHidden();

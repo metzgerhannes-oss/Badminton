@@ -16,7 +16,7 @@ async function postJson(fetcher,url,body,headers){
   headers:{"Content-Type":"application/json",...headers},body:JSON.stringify(body),
   signal:AbortSignal.timeout(12000)});
  const data=await response.json().catch(()=>null);
- if(!response.ok)throw Error("upstream_rejected");
+ if(!response.ok)throw Error("upstream_http_"+response.status);
  return data;
 }
 async function authenticate(request,fetcher){
@@ -32,10 +32,13 @@ async function authenticate(request,fetcher){
 }
 function policyHeaders(env){return {"Authorization":"Bearer "+env.CF_ACCESS_API_TOKEN,"Accept":"application/json"};}
 async function readPolicy(env,fetcher){
- const response=await fetcher(POLICY,{method:"GET",headers:policyHeaders(env),
-  signal:AbortSignal.timeout(10000),cache:"no-store"});
+ let response;
+ try{response=await fetcher(POLICY,{method:"GET",headers:policyHeaders(env),
+  signal:AbortSignal.timeout(10000),cache:"no-store"});}
+ catch{throw Error("cloudflare_read_failed");}
  const d=await response.json().catch(()=>null);
- if(!response.ok||d?.success!==true)throw Error("cloudflare_unavailable");
+ if(!response.ok||d?.success!==true)
+  throw Error([401,403].includes(response.status)?"cloudflare_read_denied":"cloudflare_read_failed");
  const p=d.result;
  if(p?.decision!=="allow"||!Array.isArray(p?.include)||!p.include.length||
     p.include.some(rule=>typeof rule?.email?.email!=="string"))
@@ -48,15 +51,20 @@ async function writePolicy(env,fetcher,policy,emails){
  const body={name:policy.name,decision:"allow",precedence:policy.precedence,
   include:unique.map(email=>({email:{email}})),
   require:policy.require||[],exclude:policy.exclude||[]};
- const response=await fetcher(POLICY,{method:"PUT",headers:{
+ let response;
+ try{response=await fetcher(POLICY,{method:"PUT",headers:{
   ...policyHeaders(env),"Content-Type":"application/json"},
-  body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});
+  body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});}
+ catch{throw Error("cloudflare_update_failed");}
  const data=await response.json().catch(()=>null);
- if(!response.ok||data?.success!==true)throw Error("cloudflare_update_failed");
+ if(!response.ok||data?.success!==true)
+  throw Error([401,403].includes(response.status)?"cloudflare_update_denied":"cloudflare_update_failed");
 }
 async function manageEmail(fetcher,jwt,email,action){
- const status=await postJson(fetcher,SB+"/rest/v1/rpc/cf_access_email_invite_manage",
-  {p_email:email,p_action:action},{Authorization:jwt,apikey:KEY});
+ let status;
+ try{status=await postJson(fetcher,SB+"/rest/v1/rpc/cf_access_email_invite_manage",
+  {p_email:email,p_action:action},{Authorization:jwt,apikey:KEY});}
+ catch{throw Error("supabase_invite_unavailable");}
  if(typeof status!=="string")throw Error("database_unavailable");
  return status;
 }
@@ -85,42 +93,55 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
  const jwt=request.headers.get("Authorization");
  let policy,changedCloudflare=false,managedResult="";
  try{
+  if(action==="invite"){
+   // Check the independent Supabase allowlist first. Original family addresses
+   // are already approved by Access AND Supabase. Re-fetching the Cloudflare
+   // policy for them was an unnecessary failure point on every invitation.
+   managedResult=await manageEmail(fetcher,jwt,email,"enable");
+   if(managedResult==="rate_limited")throw Error("rate_limited");
+   if(managedResult==="invalid_email")throw Error("invalid_email");
+   if(!["new","existing","baseline"].includes(managedResult))throw Error("database_unavailable");
+   if(managedResult==="baseline"||managedResult==="existing")
+    return respond({prepared:true,url:SITE+"/"});
+   // Only a genuinely NEW address requires a Cloudflare Access policy change.
+   policy=await readPolicy(env,fetcher);
+   const current=policy.include.map(x=>normalise(x.email.email));
+   if(!current.includes(email)){
+    await writePolicy(env,fetcher,policy,[...current,email]);
+    changedCloudflare=true;
+   }
+   return respond({prepared:true,url:SITE+"/"});
+  }
+  // Revoke data membership before the outer Access policy, fail closed even
+  // when Cloudflare is temporarily unreachable.
+  managedResult=await manageEmail(fetcher,jwt,email,"disable");
+  if(managedResult==="unmanaged")return respond({error:"not_managed"},403);
+  if(managedResult!=="revoked")throw Error("database_unavailable");
   policy=await readPolicy(env,fetcher);
   const current=policy.include.map(x=>normalise(x.email.email));
-  const included=current.includes(email);
-  if(action==="revoke"){
-   // The SQL RPC refuses to modify the original, unmanaged family allowlist.
-   const result=await manageEmail(fetcher,jwt,email,"disable");
-   if(result==="unmanaged")return respond({error:"not_managed"},403);
-   if(result!=="revoked")throw Error("database_unavailable");
-   if(included)await writePolicy(env,fetcher,policy,current.filter(x=>x!==email));
-   return respond({revoked:true});
-  }
-  if(!included){await writePolicy(env,fetcher,policy,[...current,email]);changedCloudflare=true;}
-  managedResult=await manageEmail(fetcher,jwt,email,"enable");
-  if(managedResult==="rate_limited")throw Error("rate_limited");
-  if(!["new","existing","baseline"].includes(managedResult))throw Error("database_unavailable");
-  // Only prepare the private app link. The browser opens a local mail composer;
-  // no outbound mail service or address data is stored in the Pages function.
-  return respond({prepared:true,url:SITE+"/"});
+  if(current.includes(email))
+   await writePolicy(env,fetcher,policy,current.filter(x=>x!==email));
+  return respond({revoked:true});
  }catch(error){
-  if(action==="invite"){
-   // Cross-provider compensation; never touch pre-existing recipients.
-   if(managedResult==="new"){
-    try{await manageEmail(fetcher,jwt,email,"disable");}catch{/* fail closed on next admin repair */}
-   }
+  if(action==="invite"&&managedResult==="new"){
+   // New grants that could not be applied on both systems must not linger.
+   try{await manageEmail(fetcher,jwt,email,"disable");}
+   catch{/* admin reconciliation needed; do not report success */}
    if(changedCloudflare){
     try{
      const latest=await readPolicy(env,fetcher);
      await writePolicy(env,fetcher,latest,
       latest.include.map(x=>normalise(x.email.email)).filter(x=>x!==email));
-    }catch{/* configuration is inconsistent; caller sees an explicit failure */}
+    }catch{/* do not hide the original error */}
    }
   }
-  const reason=error?.message;
-  return respond({error:reason==="unsafe_access_policy"?"unsafe_access_policy":
-   reason==="rate_limited"?"rate_limited":"service_unavailable"},
-   reason==="rate_limited"?429:503);
+  const reason=String(error?.message||"");
+  const safeErrors=new Set(["cloudflare_read_denied","cloudflare_read_failed",
+   "cloudflare_update_denied","cloudflare_update_failed","unsafe_access_policy",
+   "rate_limited","invalid_email","database_unavailable","supabase_invite_unavailable"]);
+  return respond({error:safeErrors.has(reason)?reason:
+    reason.startsWith("upstream_http_")?"supabase_invite_unavailable":"service_unavailable"},
+    reason==="rate_limited"?429:reason==="invalid_email"?400:503);
  }
 
 }
