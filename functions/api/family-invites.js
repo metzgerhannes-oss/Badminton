@@ -32,8 +32,10 @@ async function authenticate(request,fetcher){
 }
 function policyHeaders(env){return {"Authorization":"Bearer "+env.CF_ACCESS_API_TOKEN,"Accept":"application/json"};}
 async function readPolicy(env,fetcher){
- const response=await fetcher(POLICY,{method:"GET",headers:policyHeaders(env),
-  signal:AbortSignal.timeout(10000),cache:"no-store"});
+ let response;
+ try{response=await fetcher(POLICY,{method:"GET",headers:policyHeaders(env),
+  signal:AbortSignal.timeout(10000),cache:"no-store"});}
+ catch{throw Error("cloudflare_read_failed");}
  const d=await response.json().catch(()=>null);
  if(!response.ok||d?.success!==true)
   throw Error([401,403].includes(response.status)?"cloudflare_read_denied":"cloudflare_read_failed");
@@ -49,16 +51,20 @@ async function writePolicy(env,fetcher,policy,emails){
  const body={name:policy.name,decision:"allow",precedence:policy.precedence,
   include:unique.map(email=>({email:{email}})),
   require:policy.require||[],exclude:policy.exclude||[]};
- const response=await fetcher(POLICY,{method:"PUT",headers:{
+ let response;
+ try{response=await fetcher(POLICY,{method:"PUT",headers:{
   ...policyHeaders(env),"Content-Type":"application/json"},
-  body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});
+  body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});}
+ catch{throw Error("cloudflare_update_failed");}
  const data=await response.json().catch(()=>null);
  if(!response.ok||data?.success!==true)
   throw Error([401,403].includes(response.status)?"cloudflare_update_denied":"cloudflare_update_failed");
 }
 async function manageEmail(fetcher,jwt,email,action){
- const status=await postJson(fetcher,SB+"/rest/v1/rpc/cf_access_email_invite_manage",
-  {p_email:email,p_action:action},{Authorization:jwt,apikey:KEY});
+ let status;
+ try{status=await postJson(fetcher,SB+"/rest/v1/rpc/cf_access_email_invite_manage",
+  {p_email:email,p_action:action},{Authorization:jwt,apikey:KEY});}
+ catch{throw Error("supabase_invite_unavailable");}
  if(typeof status!=="string")throw Error("database_unavailable");
  return status;
 }
@@ -132,7 +138,7 @@ export async function onRequestPost({request,env={},fetcher=fetch}){
   const reason=String(error?.message||"");
   const safeErrors=new Set(["cloudflare_read_denied","cloudflare_read_failed",
    "cloudflare_update_denied","cloudflare_update_failed","unsafe_access_policy",
-   "rate_limited","invalid_email","database_unavailable"]);
+   "rate_limited","invalid_email","database_unavailable","supabase_invite_unavailable"]);
   return respond({error:safeErrors.has(reason)?reason:
     reason.startsWith("upstream_http_")?"supabase_invite_unavailable":"service_unavailable"},
     reason==="rate_limited"?429:reason==="invalid_email"?400:503);
