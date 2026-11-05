@@ -121,3 +121,13 @@ const notOwner=await emailApi.onRequestPost({request:makeInvite("invite"),env:en
 assert.equal(notOwner.status,403);
 assert.deepEqual(blockedOwner.steps,["jwt","owner"]);
 console.log("P1 #442: owner-only mailto preparation, allowlist consistency and rollback smoke OK");
+
+const fixedSql=await readFile(new URL("../database/p1-442-email-validation-fix.sql",import.meta.url),"utf8");
+for(const source of [inviteSql,fixedSql]){
+ assert.ok(source.includes("([.][a-z0-9-]+)+"),
+  "Invitation email validation must use an unambiguous literal dot");
+ assert.ok(!source.includes("(\\.[a-z0-9-]+)+"),
+  "Never double-escape a Postgres regex dot (valid emails were rejected)");
+ assert.match(source,/site_owners/,"Email grants must remain owner-only");
+}
+console.log("P1 #442: valid recipient domain punctuation and owner-only SQL regression covered.");

@@ -22,7 +22,7 @@ BEGIN
  ) THEN RAISE EXCEPTION 'not_authorized' USING errcode='42501'; END IF;
  v_email:=pg_catalog.lower(pg_catalog.btrim(p_email));
  IF v_email IS NULL OR length(v_email)<6 OR length(v_email)>254
-    OR v_email !~ '^[a-z0-9.!#$%&''*+/=?^`{|}~-]+@[a-z0-9-]+(\.[a-z0-9-]+)+$'
+    OR v_email !~ '^[a-z0-9.!#$%&''*+/=?^`{|}~-]+@[a-z0-9-]+([.][a-z0-9-]+)+$'
  THEN RETURN 'invalid_email'; END IF;
  v_hash:=extensions.digest(pg_catalog.convert_to(v_email,'UTF8'),'sha256');
  SELECT * INTO v_managed FROM private_content.cf_access_invite_managed
