@@ -39,7 +39,6 @@
  function act(action){
   if(action==="follow"){document.getElementById("player-add-open")?.click();return}
   if(action==="add-tournament"){document.getElementById("add-tournament")?.click();return}
-  if(action==="import"){document.getElementById("spond-quick-import")?.click();return}
   const dest=action==="calendar"?"dbv-calendar-heading":action==="schedule"?"tournament-live-select":null;
   const node=dest&&document.getElementById(dest);
   if(!node)return;
