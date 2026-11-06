@@ -218,3 +218,137 @@
  #view-turniere .tournament-card .saved-tournament-top{flex-wrap:wrap}
  #view-turniere .tournament-card .saved-tournament-top h3{flex-basis:100%}
 }
+
+
+/* UX 2.0 · coherent mobile content and controls.
+   Presentation only. Existing CD/branding and route behaviour are authoritative.
+   Small, bounded changes; no new dependencies, trackers or assets. */
+:root{
+  --ux2-space-1:4px;
+  --ux2-space-2:8px;
+  --ux2-space-3:12px;
+  --ux2-space-4:16px;
+  --ux2-card-radius:16px;
+  --ux2-card-stroke:#bfd8e7;
+  --ux2-card-surface:#ffffff;
+  --ux2-strong:#113c5e;
+  --ux2-secondary:#375b75;
+  --ux2-action:#075a91;
+  --ux2-focus:#0a7db8;
+}
+@media(max-width:1079px){
+  /* A quiet title line and one consistent visual rhythm across core routes. */
+  #view-spieler>.section-heading,
+  #view-mannschaft>.section-heading,
+  #view-turniere>.section-heading{
+    margin:4px 0 12px;gap:8px 12px;align-items:center;
+  }
+  #view-spieler>.section-heading h2,
+  #view-mannschaft>.section-heading h2,
+  #view-turniere>.section-heading h2{
+    font-size:clamp(21px,5.3vw,25px);font-weight:850;
+    line-height:1.23;letter-spacing:-.025em;color:var(--ux2-strong);
+  }
+  /* Person and team rows: same density, hit targets, borders and hierarchy. */
+  #view-spieler .followed-player-row,
+  #view-mannschaft .team-stack{
+    gap:var(--ux2-space-2);
+  }
+  #view-spieler .followed-player-row>.friend-follow-item,
+  #view-mannschaft .team-card{
+    background:var(--ux2-card-surface);
+    border:1px solid var(--ux2-card-stroke);
+    border-radius:var(--ux2-card-radius);
+    box-shadow:0 3px 10px #13466513;
+    min-width:0;
+  }
+  #view-spieler .followed-player-row>.friend-follow-item{
+    min-height:64px;padding:11px 12px;
+  }
+  #view-spieler .followed-player-row .friend-details strong,
+  #view-mannschaft .team-card-main strong{
+    color:var(--ux2-strong);font-size:15px;line-height:1.3;
+    font-weight:800;overflow-wrap:anywhere;
+  }
+  #view-spieler .followed-player-row .friend-details small,
+  #view-mannschaft .team-card-main :is(span,small){
+    color:var(--ux2-secondary);font-size:13px;line-height:1.4;
+  }
+  #view-mannschaft .team-card{padding:10px 11px;gap:8px}
+  #view-mannschaft .team-card-main{padding:6px 4px;gap:4px;min-width:0}
+  #view-mannschaft .team-follow-button{min-width:44px;min-height:44px}
+  #view-mannschaft .team-tabs{gap:8px}
+  #view-mannschaft .team-tabs button{
+    border-radius:12px;font-size:14px;line-height:1.25;
+  }
+  #view-mannschaft .team-detail{
+    background:var(--ux2-card-surface);
+    border:1px solid var(--ux2-card-stroke);
+    border-radius:var(--ux2-card-radius);
+    padding:var(--ux2-space-4);
+    box-shadow:0 3px 10px #13466513;
+  }
+  /* Search boxes are directly recognizable and do not cause iOS focus zoom. */
+  #view-spieler :is(.follow-discovery,.follow-hub) input[type="search"],
+  #view-mannschaft :is(.follow-discovery,.team-controls) input[type="search"],
+  #view-turniere :is(.dbv-calendar-quick-search,.dbv-calendar-filters) input{
+    min-width:0;max-width:100%;font-size:16px;line-height:1.35;
+    min-height:44px;border-radius:12px;
+    border:1px solid #aacbdc;background:#fff;color:var(--ux2-strong);
+  }
+  #view-spieler :is(.follow-discovery,.follow-hub) input[type="search"]:focus-visible,
+  #view-mannschaft :is(.follow-discovery,.team-controls) input[type="search"]:focus-visible,
+  #view-turniere :is(.dbv-calendar-quick-search,.dbv-calendar-filters) input:focus-visible{
+    outline:3px solid var(--ux2-focus);outline-offset:2px;
+  }
+  /* Make the scan -> save -> source path obvious in tournament discovery. */
+  #view-turniere .dbv-calendar-panel{
+    border-radius:var(--ux2-card-radius);
+    border:1px solid var(--ux2-card-stroke);
+    box-shadow:0 3px 10px #13466513;
+    background:#fff;padding:var(--ux2-space-4);
+  }
+  #view-turniere .dbv-calendar-entry{
+    gap:10px;padding:12px 2px;
+    border-bottom:1px solid #d5e5ee;
+  }
+  #view-turniere .dbv-calendar-date{
+    color:var(--ux2-action);line-height:1.35;
+  }
+  #view-turniere .dbv-calendar-detail h5{
+    color:var(--ux2-strong);font-size:15px;line-height:1.3;
+    font-weight:800;overflow-wrap:anywhere;
+  }
+  #view-turniere .dbv-calendar-detail .dbv-calendar-place{
+    color:var(--ux2-secondary);font-size:13px;line-height:1.4;
+  }
+  #view-turniere .dbv-calendar-save{
+    min-width:44px;min-height:44px;
+    border-radius:12px;
+  }
+  /* Secondary section cards and settings have the same quiet surfaces. */
+  #view-spieler :is(.family-entry,.follow-discovery),
+  #view-einstellungen .settings-card{
+    border-radius:var(--ux2-card-radius);
+    border-color:var(--ux2-card-stroke);
+  }
+}
+@media(min-width:1080px){
+  /* Desktop keeps its approved navy workspace; pale interactive cards stay light. */
+  #view-spieler .followed-player-row>.friend-follow-item,
+  #view-mannschaft .team-card{
+    min-width:0;border-radius:14px;
+    border:1px solid #b4d4e5;background:#f9fcff;
+  }
+  #view-spieler .followed-player-row .friend-details strong,
+  #view-mannschaft .team-card-main strong{
+    color:#163e5e;font-size:15px;line-height:1.35;
+  }
+  #view-mannschaft .team-card-main :is(span,small),
+  #view-spieler .followed-player-row .friend-details small{
+    color:#365a75;font-size:13px;line-height:1.4;
+  }
+  #view-mannschaft .team-card{padding:11px;gap:10px}
+  #view-mannschaft .team-card-main{min-width:0}
+  #view-mannschaft .team-detail{border-radius:16px}
+}
