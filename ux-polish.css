@@ -141,7 +141,6 @@
  border:1px solid #bad6e6;border-radius:11px;background:#eff7fc;
  color:#214e6b;font-weight:800;font-size:13px;line-height:1.2
 }
-#view-turniere .saved-tournament-menu>summary::-webkit-details-marker{display:none}
 #view-turniere .saved-tournament-menu>summary span[aria-hidden]{font-size:17px;letter-spacing:-2px}
 #view-turniere .saved-tournament-menu[open]>summary{
  background:#dff1fb;border-color:#6faed0
