@@ -63,4 +63,17 @@ assert.match(html,/<script defer src="\.\/tournament-bookmarks\.js"><\/script>[\
 assert.match(app,/SchmetterlingeRouter\.renderPage\(state\)/);
 assert.match(html,/<script defer src="\.\/router\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
 assert.match(html,/<script defer src="\.\/state-storage\.js"><\/script>[\s\S]*<script defer src="\.\/app\.js"><\/script>/);
+// UX 2.0 compact design layer stays within the original palette and known pages.
+const polish=await file("ux-polish.css");
+for(const name of ["--ux2-card-radius","--ux2-card-surface","--ux2-secondary","--ux2-action"])
+ assert.ok(polish.includes(name),"Shared CD token missing: "+name);
+for(const selector of ["#view-spieler .followed-player-row",
+ "#view-mannschaft .team-card","#view-turniere .dbv-calendar-panel"])
+ assert.ok(polish.includes(selector),"Compact mobile component missing: "+selector);
+assert.match(polish,/font-size:16px;line-height:1\.35;/,"Search inputs must avoid iOS focus zoom");
+assert.match(polish,/#view-mannschaft \.team-follow-button\{min-width:44px;min-height:44px\}/,
+ "Follow control must retain 44px target");
+assert.doesNotMatch(polish,/animation-name:|animation:\s*[^n]|touch-action\s*:\s*none|user-scalable|maximum-scale/,
+ "Visual cleanup must not override user motion or zoom preferences");
+
 console.log("UX foundation: task-first Home, truthful source disclosure, retry/offline, keyboard routing, mobile touch targets and v38 PWA verified.");
