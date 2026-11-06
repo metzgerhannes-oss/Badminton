@@ -39,6 +39,9 @@ test("v214: Remove button does not trigger entire tournament card target",async(
  const card=page.locator("#official-tournament-list .tournament-card").first();
  await expect(card).toContainText(saved.name);
  await card.locator("a.card-open-primary").evaluate(a=>{a.href="#spieler";a.removeAttribute("target")});
+ // The destructive action is intentionally behind the accessible More menu.
+ await card.locator(".saved-tournament-menu > summary").click();
+ await expect(card.locator(".saved-tournament-menu")).toHaveAttribute("open", "");
  await card.locator("[data-remove-id]").click();
  await expect(page).toHaveURL(/#turniere$/);
  await expect(page.locator("#official-tournament-list")).not.toContainText(saved.name);
