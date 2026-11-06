@@ -107,7 +107,11 @@ test('tournament save failure keeps input and never dispatches publication; loca
  await page.evaluate(()=>window.__blockWrite=false);
  await page.locator('#tournament-save').click();
  await expect(page.locator('#tournament-dialog')).toBeHidden();
- await page.locator('#official-tournament-list [data-remove-id]').click();
+ const tournamentCard=page.locator('#official-tournament-list .tournament-card').first();
+ await tournamentCard.locator('.saved-tournament-menu > summary').click();
+ await expect(tournamentCard.locator('.saved-tournament-menu')).toHaveAttribute('open','');
+ await expect(tournamentCard.locator('[data-remove-id]')).toBeVisible();
+ await tournamentCard.locator('[data-remove-id]').click();
  expect((await stored(page)).officialLinks).toHaveLength(0);
  await page.locator('#toast button').click();
  expect((await stored(page)).officialLinks).toHaveLength(1);
