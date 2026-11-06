@@ -92,7 +92,12 @@ test("Opt-in shared event becomes visible on follower device and can be revoked"
   await expect(reader.locator("#shared-tournaments a")).toHaveAttribute("href",
    "https://dbv.turnier.de/tournament/"+TOURNAMENT);
 
-  await owner.locator('[data-edit-id="'+TOURNAMENT+'"]').first().click();
+  const tournamentCard=owner.locator("#official-tournament-list .tournament-card").first();
+  await expect(tournamentCard).toContainText("Jugendturnier Badminton");
+  await tournamentCard.locator(".saved-tournament-menu > summary").click();
+  await expect(tournamentCard.locator(".saved-tournament-menu")).toHaveAttribute("open","");
+  await expect(tournamentCard.locator('[data-edit-id="'+TOURNAMENT+'"]')).toBeVisible();
+  await tournamentCard.locator('[data-edit-id="'+TOURNAMENT+'"]').click();
   await expect(owner.locator("#tournament-share")).toBeChecked();
   await owner.locator("#tournament-share").uncheck();
   await owner.locator("#tournament-save").click();
