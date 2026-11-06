@@ -132,3 +132,233 @@
  .app .card-open-surface:has(.card-open-primary:hover){box-shadow:0 3px 12px #234f762b}
 }
 @media(prefers-reduced-motion:reduce){.app .card-open-surface{transition:none}}
+
+
+/* Schmetterlinge tournament-card refinement — scoped, presentation-first, 2026-11-06.
+   Keep the approved navy/sky identity and all existing navigation/link targets. */
+#view-turniere .saved-tournament-footer{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+ margin-top:12px;min-width:0
+}
+#view-turniere .saved-tournament-footer>.card-open-primary{
+ display:inline-flex;align-items:center;min-height:44px;padding:8px 0;
+ font-size:14px;line-height:1.3;font-weight:800;color:#075a91;
+ text-decoration:underline;text-underline-offset:3px;min-width:0
+}
+#view-turniere .saved-tournament-menu{position:relative;z-index:3;margin-left:auto}
+#view-turniere .saved-tournament-menu>summary{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-width:76px;min-height:44px;padding:6px 10px;list-style:none;cursor:pointer;
+ border:1px solid #bad6e6;border-radius:11px;background:#eff7fc;
+ color:#214e6b;font-weight:800;font-size:13px;line-height:1.2
+}
+#view-turniere .saved-tournament-menu>summary span[aria-hidden]{font-size:17px;letter-spacing:-2px}
+#view-turniere .saved-tournament-menu[open]>summary{
+ background:#dff1fb;border-color:#6faed0
+}
+#view-turniere .saved-tournament-menu-items{
+ position:absolute;top:calc(100% + 5px);right:0;z-index:12;
+ width:max-content;min-width:178px;max-width:min(260px,80vw);
+ display:grid;gap:2px;padding:5px;background:#fff;color:#173d5c;
+ border:1px solid #adcfe2;border-radius:12px;
+ box-shadow:0 12px 28px #123a612b
+}
+#view-turniere .saved-tournament-menu-items>.remove-button{
+ display:block;width:100%;min-height:44px;margin:0;padding:10px 12px;
+ border:0;border-radius:8px;background:transparent;box-shadow:none;
+ color:#1a5276!important;text-align:left;text-decoration:none;
+ font-size:13px;font-weight:750;line-height:1.35
+}
+#view-turniere .saved-tournament-menu-items>.remove-button:focus-visible,
+#view-turniere .saved-tournament-menu-items>.remove-button:hover{background:#e9f5fc}
+#view-turniere .saved-tournament-menu-items>[data-remove-id]{color:#a33139!important}
+#view-turniere .tournament-card:has(.saved-tournament-menu[open]){position:relative;z-index:5}
+#view-turniere .saved-tournament-player{
+ border-top:1px solid #d7e7f1;padding-top:9px;margin-top:9px;
+ font-size:13px;font-weight:700;color:#365c75
+}
+@media(max-width:1079px){
+ #view-turniere .live-hub-bookmarks .tournament-list{gap:12px;margin:10px 0}
+ #view-turniere .live-hub-bookmarks .tournament-card{
+  padding:15px 16px 13px;border:1px solid #c4deec;
+  border-radius:18px;background:#fff;box-shadow:0 3px 12px #12436213;
+  overflow:visible
+ }
+ #view-turniere .tournament-card .saved-tournament-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:8px;margin-bottom:8px
+ }
+ #view-turniere .tournament-card .saved-tournament-top h3{
+  margin:0;min-width:0;flex:1;font-size:clamp(16px,4.35vw,20px);
+  font-weight:850;line-height:1.27;letter-spacing:-.025em;
+  color:#12395b;overflow-wrap:anywhere
+ }
+ #view-turniere .tournament-card .saved-tournament-phase{
+  margin:0;padding:5px 8px;border:1px solid #b7d3e3;border-radius:999px;
+  background:#eaf5fb;color:#295771;font-size:11px;line-height:1.25;
+  font-weight:750;white-space:nowrap
+ }
+ #view-turniere .tournament-card>p{
+  margin:4px 0!important;line-height:1.4;
+  font-size:13px;color:#3c607a;overflow-wrap:anywhere
+ }
+ #view-turniere .tournament-card>.saved-tournament-date{
+  font-size:15px!important;font-weight:800;color:#234c68;margin-top:7px!important
+ }
+ #view-turniere .tournament-card>.saved-tournament-venue{
+  font-size:13px!important;font-weight:650;color:#3c607a
+ }
+ #view-turniere .tournament-card>.saved-tournament-deadline{
+  font-size:13px!important;color:#3c607a
+ }
+ #view-turniere .tournament-card>.saved-tournament-id{
+  margin-top:5px!important;font-size:12px!important;
+  font-weight:650;color:#56728a;word-break:normal
+ }
+ #view-turniere .tournament-card>.saved-tournament-source-warning{
+  color:#7b4321;background:#fff4e9;border-radius:9px;
+  padding:7px 9px;font-size:12px!important
+ }
+ #view-turniere .tournament-card>.saved-tournament-player{
+  margin-top:8px!important;padding-top:9px;
+  border-top:1px solid #d7e7f1;font-size:13px!important;
+  color:#345772;font-weight:750
+ }
+}
+@media(max-width:360px){
+ #view-turniere .tournament-card .saved-tournament-top{flex-wrap:wrap}
+ #view-turniere .tournament-card .saved-tournament-top h3{flex-basis:100%}
+}
+
+/* UX 2.0 · coherent mobile content and controls.
+   Presentation only. Existing CD/branding and route behaviour are authoritative.
+   Small, bounded changes; no new dependencies, trackers or assets. */
+:root{
+  --ux2-space-1:4px;
+  --ux2-space-2:8px;
+  --ux2-space-3:12px;
+  --ux2-space-4:16px;
+  --ux2-card-radius:16px;
+  --ux2-card-stroke:#bfd8e7;
+  --ux2-card-surface:#ffffff;
+  --ux2-strong:#113c5e;
+  --ux2-secondary:#375b75;
+  --ux2-action:#075a91;
+  --ux2-focus:#0a7db8;
+}
+@media(max-width:1079px){
+  /* A quiet title line and one consistent visual rhythm across core routes. */
+  #view-spieler>.section-heading,
+  #view-mannschaft>.section-heading,
+  #view-turniere>.section-heading{
+    margin:4px 0 12px;gap:8px 12px;align-items:center;
+  }
+  #view-spieler>.section-heading h2,
+  #view-mannschaft>.section-heading h2,
+  #view-turniere>.section-heading h2{
+    font-size:clamp(21px,5.3vw,25px);font-weight:850;
+    line-height:1.23;letter-spacing:-.025em;color:var(--ux2-strong);
+  }
+  /* Person and team rows: same density, hit targets, borders and hierarchy. */
+  #view-spieler .followed-player-row,
+  #view-mannschaft .team-stack{
+    gap:var(--ux2-space-2);
+  }
+  #view-spieler .followed-player-row>.friend-follow-item,
+  #view-mannschaft .team-card{
+    background:var(--ux2-card-surface);
+    border:1px solid var(--ux2-card-stroke);
+    border-radius:var(--ux2-card-radius);
+    box-shadow:0 3px 10px #13466513;
+    min-width:0;
+  }
+  #view-spieler .followed-player-row>.friend-follow-item{
+    min-height:64px;padding:11px 12px;
+  }
+  #view-spieler .followed-player-row .friend-details strong,
+  #view-mannschaft .team-card-main strong{
+    color:var(--ux2-strong);font-size:15px;line-height:1.3;
+    font-weight:800;overflow-wrap:anywhere;
+  }
+  #view-spieler .followed-player-row .friend-details small,
+  #view-mannschaft .team-card-main :is(span,small){
+    color:var(--ux2-secondary);font-size:13px;line-height:1.4;
+  }
+  #view-mannschaft .team-card{padding:10px 11px;gap:8px}
+  #view-mannschaft .team-card-main{padding:6px 4px;gap:4px;min-width:0}
+  #view-mannschaft .team-follow-button{min-width:44px;min-height:44px}
+  #view-mannschaft .team-tabs{gap:8px}
+  #view-mannschaft .team-tabs button{
+    border-radius:12px;font-size:14px;line-height:1.25;
+  }
+  #view-mannschaft .team-detail{
+    background:var(--ux2-card-surface);
+    border:1px solid var(--ux2-card-stroke);
+    border-radius:var(--ux2-card-radius);
+    padding:var(--ux2-space-4);
+    box-shadow:0 3px 10px #13466513;
+  }
+  /* Search boxes are directly recognizable and do not cause iOS focus zoom. */
+  #view-spieler :is(.follow-discovery,.follow-hub) input[type="search"],
+  #view-mannschaft :is(.follow-discovery,.team-controls) input[type="search"],
+  #view-turniere :is(.dbv-calendar-quick-search,.dbv-calendar-filters) input{
+    min-width:0;max-width:100%;font-size:16px;line-height:1.35;
+    min-height:44px;border-radius:12px;
+    border:1px solid #aacbdc;background:#fff;color:var(--ux2-strong);
+  }
+  #view-spieler :is(.follow-discovery,.follow-hub) input[type="search"]:focus-visible,
+  #view-mannschaft :is(.follow-discovery,.team-controls) input[type="search"]:focus-visible,
+  #view-turniere :is(.dbv-calendar-quick-search,.dbv-calendar-filters) input:focus-visible{
+    outline:3px solid var(--ux2-focus);outline-offset:2px;
+  }
+  /* Make the scan -> save -> source path obvious in tournament discovery. */
+  #view-turniere .dbv-calendar-panel{
+    border-radius:var(--ux2-card-radius);
+    border:1px solid var(--ux2-card-stroke);
+    box-shadow:0 3px 10px #13466513;
+    background:#fff;padding:var(--ux2-space-4);
+  }
+  #view-turniere .dbv-calendar-entry{
+    gap:10px;padding:12px 2px;
+    border-bottom:1px solid #d5e5ee;
+  }
+  #view-turniere .dbv-calendar-date{
+    color:var(--ux2-action);line-height:1.35;
+  }
+  #view-turniere .dbv-calendar-detail h5{
+    color:var(--ux2-strong);font-size:15px;line-height:1.3;
+    font-weight:800;overflow-wrap:anywhere;
+  }
+  #view-turniere .dbv-calendar-detail .dbv-calendar-place{
+    color:var(--ux2-secondary);font-size:13px;line-height:1.4;
+  }
+  #view-turniere .dbv-calendar-save{
+    min-width:44px;min-height:44px;
+    border-radius:12px;
+  }
+  /* Secondary section cards and settings have the same quiet surfaces. */
+  #view-spieler :is(.family-entry,.follow-discovery),
+  #view-einstellungen .settings-card{
+    border-radius:var(--ux2-card-radius);
+    border-color:var(--ux2-card-stroke);
+  }
+}
+@media(min-width:1080px){
+  /* Desktop keeps its approved navy workspace; pale interactive cards stay light. */
+  #view-spieler .followed-player-row>.friend-follow-item,
+  #view-mannschaft .team-card{
+    min-width:0;border-radius:14px;
+    border:1px solid #b4d4e5;background:#f9fcff;
+  }
+  #view-spieler .followed-player-row .friend-details strong,
+  #view-mannschaft .team-card-main strong{
+    color:#163e5e;font-size:15px;line-height:1.35;
+  }
+  #view-mannschaft .team-card-main :is(span,small),
+  #view-spieler .followed-player-row .friend-details small{
+    color:#365a75;font-size:13px;line-height:1.4;
+  }
+  #view-mannschaft .team-card{padding:11px;gap:10px}
+  #view-mannschaft .team-card-main{min-width:0}
+  #view-mannschaft .team-detail{border-radius:16px}
+}

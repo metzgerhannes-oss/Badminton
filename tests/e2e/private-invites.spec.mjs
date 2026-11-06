@@ -54,7 +54,10 @@ test("Private invitation is explicit, one event only, anonymous reader, revocabl
  try{
   await owner.goto("/#turniere");
   expect(auth).toBe(0);
-  await owner.locator('[data-private-invite-id="'+DBV+'"]').click();
+  const card=owner.locator("#official-tournament-list .tournament-card").first();
+  await card.locator(".saved-tournament-menu > summary").click();
+  await expect(card.locator(".saved-tournament-menu")).toHaveAttribute("open","");
+  await card.locator('[data-private-invite-id="'+DBV+'"]').click();
   await expect(owner.locator("#private-invite-dialog")).toBeVisible();
   expect(auth).toBe(0);
   await owner.locator("#private-invite-create").click();
