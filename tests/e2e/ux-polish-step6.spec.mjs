@@ -76,3 +76,22 @@ test("approved navy desktop remains unchanged and zoom stays enabled",async({pag
  expect(viewport).toContain("viewport-fit=cover");
  expect(viewport).not.toMatch(/user-scalable\s*=\s*no|maximum-scale\s*=\s*1/);
 });
+
+
+test("UX2 mobile search is readable without iOS focus zoom on all main routes",async({page})=>{
+ for(const width of [320,390]){
+  await page.setViewportSize({width,height:720});
+  for(const [route,id] of [
+   ["spieler","followed-player-search"],
+   ["mannschaft","team-search"],
+   ["turniere","dbv-calendar-q"]
+  ]){
+   await page.goto("/#"+route,{waitUntil:"domcontentloaded"});
+   await expect(page.locator("#view-"+route)).toBeVisible();
+   const font=await page.locator("#"+id).evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+   expect(font,route+" search font").toBeGreaterThanOrEqual(16);
+   const input=page.locator("#"+id);
+   await expect(input).toHaveAttribute("type","search");
+  }
+ }
+});
