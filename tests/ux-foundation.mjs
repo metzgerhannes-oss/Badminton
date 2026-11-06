@@ -70,6 +70,19 @@ for(const name of ["--ux2-card-radius","--ux2-card-surface","--ux2-secondary","-
 for(const selector of ["#view-spieler .followed-player-row",
  "#view-mannschaft .team-card","#view-turniere .dbv-calendar-panel"])
  assert.ok(polish.includes(selector),"Compact mobile component missing: "+selector);
+const linearChannel=x=>x<=0.04045?x/12.92:((x+0.055)/1.055)**2.4;
+const luminance=hex=>{
+ const channels=[1,3,5].map(i=>linearChannel(parseInt(hex.slice(i,i+2),16)/255));
+ return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+};
+const contrastRatio=(fg,bg)=>{
+ const [hi,lo]=[luminance(fg),luminance(bg)].sort((a,b)=>b-a);
+ return (hi+0.05)/(lo+0.05);
+};
+for(const color of ["#113c5e","#375b75","#075a91"])
+ assert.ok(contrastRatio(color,"#ffffff")>=4.5,"Core mobile text must pass AA contrast: "+color);
+for(const color of ["#163e5e","#365a75"])
+ assert.ok(contrastRatio(color,"#f9fcff")>=4.5,"Desktop pale-card text must pass AA contrast: "+color);
 assert.match(polish,/font-size:16px;line-height:1\.35;/,"Search inputs must avoid iOS focus zoom");
 assert.match(polish,/#view-mannschaft \.team-follow-button\{min-width:44px;min-height:44px\}/,
  "Follow control must retain 44px target");
