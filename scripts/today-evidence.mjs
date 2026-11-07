@@ -6,6 +6,7 @@ import {DBV_ID,liveView} from "./live-radar.mjs";
 import {followedRoster} from "./followed-live.mjs";
 import {TEAM_FOLLOWS_KEY,normalizeFollows,officialTeamUrl,confirmedResult,displayTeamName} from "./team-directory-utils.mjs";
 import {validDay} from "./upcoming-tournaments.mjs";
+import {verifiedRosterEvents} from "./verified-player-events.mjs";
 export {TEAM_FOLLOWS_KEY};
 export const TODAY_TEAM_LIMIT=12;
 const exactId=x=>String(x??"").trim();
@@ -179,7 +180,22 @@ export function todayEvidence({now=Date.now(),groups={},snapshots=[],follows=[],
  const player=todayPlayerEvents({today,groups,rows:snapshots,now});
  const team=todayTeamEvents({today,teams:selection.teams,fixtures});
  const planned=unconfirmedPlans({today,bookmarks,ownProfiles:groups.own});
- return {today,events:[...player.events,...team],
+ // A verified club announcement is participation evidence, not a live match.
+ // This requires no additional provider polling, Supabase read or local write.
+ const announced=verifiedRosterEvents(groups,today).map(row=>{
+  const profile=[...(groups.own||[]),...(groups.friends||[])]
+   .find(p=>p?.id===row.playerId);
+  return {
+   id:"announced:"+row.playerId+":"+row.tournamentId,
+   entity:"player",kind:"announced",status:"Teilnahme vom Verein angekündigt",
+   name:String(profile?.name||"DBV-Spieler "+row.playerId).slice(0,100),
+   detail:row.name+" · "+row.location,
+   tournamentId:row.tournamentId,playerId:row.playerId,
+   sourceUrl:row.tournamentUrl,evidenceUrl:row.evidenceUrl,
+   source:"Vereinsmeldung",role:profile?"friend":"player"
+  };
+ });
+ return {today,events:[...player.events,...announced,...team],
   planned,coverage:{playersOmitted:player.remaining,teamsOmitted:selection.remaining,
    teamsUnresolved:selection.unknown}};
 }

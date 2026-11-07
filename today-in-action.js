@@ -42,7 +42,7 @@ function buildCard(event){
    "Anpfiff "+event.kickoff+"; "+event.pairing);
  if(hasLink){
   row.href=event.url;row.target="_blank";row.rel="noopener noreferrer";
-  row.setAttribute("aria-label",(isPlayer?"Badhub-Liveansicht öffnen: ":"nuLiga-Spielbericht öffnen: ")+context);
+  row.setAttribute("aria-label",(isPlayer?(event.kind==="announced"?"Offizielles DBV-Turnier öffnen: ":"Badhub-Liveansicht öffnen: "):"nuLiga-Spielbericht öffnen: ")+context);
  }else{
   row.setAttribute("aria-label",context+(event.kind==="scheduled"?
    ". Noch kein offizieller Spielbericht veröffentlicht.":""));
@@ -75,7 +75,7 @@ function render(){
 function scheduleLocalExpiry(){
  if(expiryTimer!==null){clearTimeout(expiryTimer);expiryTimer=null}
  const now=Date.now();
- const moments=(last?.events||[]).filter(e=>e.entity==="player")
+ const moments=(last?.events||[]).filter(e=>e.entity==="player"&&e.kind!=="announced")
   .map(e=>Date.parse(e.checkedAt)+120000).filter(x=>Number.isFinite(x));
  if(!moments.length)return;
  const closest=Math.min(...moments);
@@ -83,7 +83,7 @@ function scheduleLocalExpiry(){
   expiryTimer=null;
   if(!last)return;
   const now=Date.now();
-  const events=last.events.filter(e=>e.entity!=="player"||
+  const events=last.events.filter(e=>e.entity!=="player"||e.kind==="announced"||
    (Number.isFinite(Date.parse(e.checkedAt))&&Date.parse(e.checkedAt)+120000>now));
   if(events.length!==last.events.length){
    last={...last,events};render();informNav();
