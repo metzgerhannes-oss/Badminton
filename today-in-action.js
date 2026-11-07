@@ -9,9 +9,9 @@ import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {todayDisplayRows} from "./scripts/today-presentation.mjs";
 import {verifiedRosterEvents} from "./scripts/verified-player-events.mjs";
-import {eventId,tournamentPath,matchesPath,matchTournament} from "./scripts/tournament-live.mjs";
+import {eventId,tournamentPath,playerMatchesPath,matchTournament} from "./scripts/tournament-live.mjs";
 import {officialPlayerGames,badhubPlayerGames,ownTournamentGameGroups} from "./scripts/player-matchday-evidence.mjs";
-import {watchRequest} from "./scripts/live-radar.mjs";
+import {watchRequest,DBV_ID} from "./scripts/live-radar.mjs";
 
 const $=id=>document.getElementById(id);
 const hosts=["today-home","today-tournament"];
@@ -88,25 +88,34 @@ function gamePanel(title,sourceName,matches,{sourceTournament="",notice="",owner
  return section;
 }
 async function readOfficialEvents(events,signal){
- const out=new Map(),failures=new Set();
- const unique=[...new Map(events.map(x=>[x.tournamentId,x])).values()]
-  .slice(0,GAME_READ_LIMIT);
+ const out=new Map(),failures=new Set(),byTournament=new Map();
+ // Multiple followed players may attend the same event. Query that tournament
+ // once for ALL of those IDs, not the first player and not 240 unrelated games.
+ for(const event of events){
+  const id=eventId(event.tournamentUrl);
+  if(!id||!DBV_ID.test(event.playerId))continue;
+  if(!byTournament.has(id))byTournament.set(id,{id,url:event.tournamentUrl,ids:[]});
+  const group=byTournament.get(id);
+  if(!group.ids.includes(event.playerId)&&group.ids.length<12)
+   group.ids.push(event.playerId);
+ }
+ const unique=[...byTournament.values()].slice(0,GAME_READ_LIMIT);
  const data=await Promise.allSettled(unique.map(async item=>{
-  const id=eventId(item.tournamentUrl);
-  if(!id)return null;
-  const {rows:tournaments}=await readPublicRows(tournamentPath(id),{signal,count:false,retries:0});
-  const selected=matchTournament(tournaments,{url:item.tournamentUrl});
+  const {rows:tournaments}=await readPublicRows(tournamentPath(item.id),{signal,count:false,retries:0});
+  const selected=matchTournament(tournaments,{url:item.url});
   if(!selected)return null;
-  const {rows:matches}=await readPublicRows(matchesPath(selected.id),{
+  const path=playerMatchesPath(selected.id,item.ids);
+  if(!path)throw Error("Invalid bounded player-match request");
+  const {rows:matches}=await readPublicRows(path,{
    signal,count:false,retries:0,timeoutMs:9000
   });
-  return [id,{internalId:selected.id,rows:matches}];
+  return [item.id,{internalId:selected.id,rows:matches}];
  }));
  for(let i=0;i<data.length;i++){
-  const result=data[i],id=eventId(unique[i].tournamentUrl);
+  const result=data[i],id=unique[i].id;
   if(result.status==="fulfilled"&&result.value)
    out.set(result.value[0],result.value[1]);
-  else if(result.status==="rejected"&&id)failures.add(id);
+  else if(result.status==="rejected")failures.add(id);
  }
  return {out,failures};
 }
