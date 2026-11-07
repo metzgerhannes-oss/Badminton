@@ -44,6 +44,17 @@ const completed={
   {game_number:2,side1_points:22,side2_points:24,finished:true}
  ]
 };
+
+const officialWin=officialPlayerGames([{...completed,winning_side:2}],tid,player,dbv,now)[0];
+const officialLoss=officialPlayerGames([{...completed,winning_side:1}],tid,player,dbv,now)[0];
+const officialUnknown=officialPlayerGames([completed],tid,player,dbv,now)[0];
+assert.equal(officialWin.outcome,"Sieg");
+assert.equal(officialLoss.outcome,"Niederlage");
+assert.equal(officialUnknown.outcome,"","Unknown official winner must remain neutral");
+assert.equal(officialPlayerGames([{...official,winning_side:1}],tid,player,dbv,now)[0].outcome,"",
+ "Never mark an unfinished match as won");
+const {playerMatchesPath}=await import("../scripts/tournament-live.mjs");
+assert.match(playerMatchesPath(tid,[player]),/winning_side/);
 const opponentMatch={
  ...completed,id:"bcf6d3be-1fde-4e61-a12d-392200ff216c",
  match_participants:[
@@ -144,6 +155,9 @@ assert.match(client,/Teilnahme.*?angekündigt|Noch keine belegten Einzelspiele/s
 assert.match(css,/\.today-games-panel/);
 assert.match(css,/today-game-group-heading/);
 assert.match(client,/Bereits gespielt/);
+assert.match(client,/dataset\.outcome/);
+assert.match(css,/data-outcome="win"/);
+assert.match(css,/data-outcome="loss"/);
 assert.match(client,/Spielform:/);
 assert.match(client,/Gegner:/);
 assert.match(client,/lastOfficialFailures/);

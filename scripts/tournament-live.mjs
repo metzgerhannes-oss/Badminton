@@ -14,7 +14,7 @@ export function tournamentPath(id){
 }
 export function matchesPath(id){
  if(!UUID.test(id||""))return null;
- const select="id,tournament_id,status,court,scheduled_at,source_url,last_synced_at,events(title,age_group,discipline),match_participants(side,player_position,participant_name,players(name,dbv_id)),match_games(game_number,side1_points,side2_points,finished)";
+ const select="id,tournament_id,status,winning_side,court,scheduled_at,source_url,last_synced_at,events(title,age_group,discipline),match_participants(side,player_position,participant_name,players(name,dbv_id)),match_games(game_number,side1_points,side2_points,finished)";
  return "matches?"+new URLSearchParams({select,tournament_id:"eq."+id,
   order:"scheduled_at.asc.nullslast",limit:"240"});
 }
@@ -26,7 +26,7 @@ export function playerMatchesPath(id,playerIds){
  const ids=[...new Set(Array.isArray(playerIds)?playerIds:[playerIds])];
  if(!ids.length||ids.length>12||
   ids.some(v=>typeof v!=="string"||!/^\d{2}-\d{6}$/.test(v)))return null;
- const select="id,tournament_id,status,court,scheduled_at,source_url,last_synced_at,"+
+ const select="id,tournament_id,status,winning_side,court,scheduled_at,source_url,last_synced_at,"+
   "events(title,age_group,discipline),"+
   "match_participants(side,player_position,participant_name,players(name,dbv_id)),"+
   "match_games(game_number,side1_points,side2_points,finished),"+
@@ -68,6 +68,7 @@ export function toMatch(row,now=Date.now()){
   status==="finished"?"finished":status==="walkover"||status==="cancelled"?"other":"upcoming";
  const event=object(row.events);
  return {id:row.id,category,status,label,sourceFresh:liveFresh,
+  winningSide:status==="finished"&&[1,2].includes(row.winning_side)?row.winning_side:null,
   checkedAt:Number.isFinite(checked)?new Date(checked).toISOString():null,
   discipline:bounded(event?.title,110)||bounded(event?.discipline,50)||"Begegnung",
   side1:names(1),side2:names(2),court:bounded(row.court,45),

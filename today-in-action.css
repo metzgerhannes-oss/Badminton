@@ -38,39 +38,50 @@
  .today-match-status{font-size:.78rem}
 }
 
-/* v247: compact source-attributed personal matches on Turniertag. All entries
- * are passive content inside the existing official external tournament link.
- */
-.today-games-panel{flex-basis:100%;width:100%;min-width:0;display:grid;gap:.45rem;
- padding:.7rem .65rem;background:#11304f;border:1px solid #80a7c1;border-radius:11px}
-.today-games-heading{font-size:.96rem;line-height:1.4;font-weight:800;color:#fff}
-.today-games-provenance,.today-games-notice{font-size:.76rem;line-height:1.4;
- overflow-wrap:anywhere;color:#d9ecfa}
-.today-games-notice{font-style:italic}
-.today-game-line{min-width:0;display:grid;gap:.2rem;padding:.6rem .3rem;
- border-top:1px solid #7199b5}
-.today-game-group-heading{font-size:.86rem;line-height:1.4;color:#fff;
- padding:.48rem .12rem .16rem;border-top:1px solid #5f88a8;font-weight:800}
-.today-game-head{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
-.today-game-status{background:#335e80;color:#fff;border:1px solid #97bed8;
- border-radius:5px;padding:.12rem .4rem;font-size:.78rem;font-weight:800}
-.today-game-discipline,.today-game-source,.today-game-meta{font-size:.78rem;
- line-height:1.45;color:#e6f3ff;overflow-wrap:anywhere}
-.today-game-opponents{font-size:.92rem;line-height:1.45;color:#fff;overflow-wrap:anywhere}
+
+/* v251 · compact personal match cards, preserving navy CD.
+ * Outcome colors always accompany explicit Sieg/Niederlage text. */
+.today-games-panel{flex-basis:100%;width:100%;min-width:0;display:grid;gap:.44rem;
+ padding:.52rem;background:#10304d;border:1px solid #688baa;border-radius:13px;color:#fff}
+.today-games-overview{display:flex;flex-wrap:wrap;justify-content:space-between;
+ align-items:baseline;gap:.2rem .65rem;padding:.18rem .16rem .26rem}
+.today-games-heading{font-size:.98rem;line-height:1.35;font-weight:850;color:#fff}
+.today-games-summary{font-size:.72rem;line-height:1.35;font-weight:650;color:#c8e3f4}
+.today-games-notice{font-size:.75rem;line-height:1.4;color:#d9ecfa}
+.today-game-group-heading{margin:.28rem 0 .02rem;padding:.4rem .12rem .1rem;
+ border-top:1px solid #4c718e;font-size:.77rem;font-weight:800;
+ letter-spacing:.02em;color:#dbeeff}
+.today-game-line{display:grid;gap:.22rem;min-width:0;padding:.6rem .67rem;
+ background:#173b5b;border:1px solid #3d6887;border-left:4px solid #719ebd;border-radius:10px}
+.today-game-line[data-next="true"]{background:#1a496b;border-left-color:#7cceff}
+.today-game-line[data-outcome="win"]{background:#183f38;
+ border-color:#417b69;border-left-color:#67dfab}
+.today-game-line[data-outcome="loss"]{background:#502b3a;
+ border-color:#965667;border-left-color:#ff9aa3}
+.today-game-head{display:flex;flex-wrap:wrap;gap:.24rem .5rem;align-items:center;min-width:0}
+.today-game-time{font-size:.84rem;line-height:1.35;font-weight:800;color:#fff}
+.today-game-discipline{font-size:.72rem;line-height:1.35;font-weight:700;color:#c6e1f5}
+.today-game-status{margin-left:auto;display:inline-flex;align-items:center;
+ padding:.16rem .46rem;border:1px solid #91bdd7;border-radius:6px;
+ background:#285373;color:#fff;font-size:.72rem;line-height:1.35;font-weight:850}
+.today-game-line[data-outcome="win"] .today-game-status{
+ background:#dbf7e9;border-color:#b5e6cc;color:#104633}
+.today-game-line[data-outcome="loss"] .today-game-status{
+ background:#ffe3e5;border-color:#ffc1c6;color:#6c1f2b}
+.today-game-opponents{font-size:.94rem;line-height:1.35;font-weight:800;
+ color:#fff;overflow-wrap:anywhere}
+.today-game-footer{display:flex;flex-wrap:wrap;justify-content:space-between;
+ align-items:center;gap:.22rem .65rem;min-width:0}
+.today-game-meta{font-size:.76rem;line-height:1.35;color:#dfecf7;overflow-wrap:anywhere}
+.today-game-score{font-size:1.02rem;line-height:1.35;font-weight:850;
+ color:#fff;font-variant-numeric:tabular-nums}
+.today-games-provenance{padding:.16rem .2rem .08rem;text-align:right;
+ color:#b8d1e3;font-size:.66rem;line-height:1.25}
 .today-games-unavailable{flex-basis:100%;display:block;font-size:.84rem;
  line-height:1.45;color:#e2effa;overflow-wrap:anywhere}
 @media(max-width:420px){
- .today-games-panel{padding:.5rem;gap:.35rem}
- .today-game-line{padding:.45rem .15rem}
-}
-
-/* v249: opponent, Spiel­form, reported time and court remain readable at 320px.
- * Completed matches are grouped separately; no color alone carries status. */
-.today-game-line{gap:.35rem}
-.today-game-meta{font-size:.83rem;line-height:1.55}
-.today-game-opponents{font-size:.96rem;font-weight:760}
-.today-game-group-heading:first-of-type{border-top:0}
-@media(max-width:420px){
- .today-game-group-heading{font-size:.85rem}
+ .today-games-panel{padding:.4rem;gap:.33rem}
+ .today-game-line{padding:.5rem .55rem}
  .today-game-opponents{font-size:.9rem}
+ .today-game-status{font-size:.7rem}
 }

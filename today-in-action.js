@@ -41,50 +41,66 @@ const gameTime=value=>{
 };
 /** Player-only match details: never use a club/tournament announcement as proof
  * of a draw. A Badhub snapshot is explicitly separate from DBV matches. */
+
 function gamePanel(title,sourceName,matches,{sourceTournament="",notice="",ownerName="",grouped=false}={}){
  if(!matches.length)return null;
  const section=n("section","today-games-panel");
- section.append(n("strong","today-games-heading",title));
- section.append(n("small","today-games-provenance",sourceName+
-  (sourceTournament?" · "+sourceTournament:"")));
- if(ownerName)section.append(n("small","today-games-notice","Nur belegte Spiele von "+ownerName));
+ const upcoming=matches.filter(m=>m.category==="live"||m.category==="upcoming").length;
+ const finished=matches.filter(m=>m.category==="finished").length;
+ const wins=matches.filter(m=>m.category==="finished"&&m.outcome==="Sieg").length;
+ const losses=matches.filter(m=>m.category==="finished"&&m.outcome==="Niederlage").length;
+ const summary=n("div","today-games-overview");
+ summary.append(n("strong","today-games-heading",title));
+ const terms=[upcoming?upcoming+" anstehend":"",finished?finished+" gespielt":""].filter(Boolean);
+ if(wins||losses)terms.push(wins+" Siege · "+losses+" Niederlagen");
+ if(terms.length)summary.append(n("small","today-games-summary",terms.join(" · ")));
+ section.append(summary);
  if(notice)section.append(n("small","today-games-notice",notice));
+ const firstUpcoming=matches.find(m=>m.category==="live"||m.category==="upcoming");
  const renderGame=m=>{
   const game=n("div","today-game-line");
-  const top=n("div","today-game-head");
-  top.append(n("span","today-game-status",m.status));
+  const outcome=m.category==="finished"&&["Sieg","Niederlage"].includes(m.outcome)?m.outcome:"";
+  game.dataset.outcome=outcome==="Sieg"?"win":outcome==="Niederlage"?"loss":"unknown";
+  game.dataset.category=m.category||"other";
+  if(m===firstUpcoming)game.dataset.next="true";
+  const head=n("div","today-game-head");
+  const when=m.scheduledAt?gameTime(m.scheduledAt):m.when||"";
+  if(when)head.append(n("span","today-game-time",when));
   if(m.discipline&&m.discipline!=="Begegnung")
-   top.append(n("span","today-game-discipline",m.discipline));
-  game.append(top);
-  if(m.opponent)game.append(n("strong","today-game-opponents","Gegner: "+m.opponent));
-  else if(m.source==="DBV-Import")
-   game.append(n("span","today-game-opponents","Gegner noch nicht veröffentlicht"));
-  const details=[
-   m.format?"Spielform: "+m.format:"",
-   m.scheduledAt?(m.category==="finished"?"Ansetzung: ":"Geplant: ")+gameTime(m.scheduledAt):m.when||"",
-   m.court?"Feld: "+m.court:m.source==="DBV-Import"?"Feld noch offen":"",
-   Array.isArray(m.sets)&&m.sets.length?"Sätze: "+m.sets.join(" · "):
-    m.score?"Sätze: "+m.score:"",
-   m.outcome||""
-  ].filter(Boolean);
-  if(details.length)game.append(n("small","today-game-meta",details.join(" · ")));
-  if(m.category==="finished"&&!m.sets?.length&&!m.score)
-   game.append(n("small","today-game-meta","Ergebnis noch nicht veröffentlicht"));
-  game.append(n("small","today-game-source","Datenstand: "+(gameTime(m.checkedAt)||"nicht verfügbar")));
+   head.append(n("span","today-game-discipline",m.discipline));
+  head.append(n("span","today-game-status",outcome||m.status));
+  game.append(head);
+  game.append(n("strong","today-game-opponents",
+   "Gegner: "+(m.opponent||"noch nicht veröffentlicht")));
+  const footer=n("div","today-game-footer");
+  const facts=[m.format?"Spielform: "+m.format:"",
+   m.court?"Feld "+m.court:m.source==="DBV-Import"?"Feld offen":""].filter(Boolean);
+  if(facts.length)footer.append(n("span","today-game-meta",facts.join(" · ")));
+  const score=Array.isArray(m.sets)&&m.sets.length?m.sets.join(" · "):m.score||"";
+  if(score)footer.append(n("strong","today-game-score",score));
+  else if(m.category==="finished")
+   footer.append(n("small","today-game-meta","Ergebnis noch nicht veröffentlicht"));
+  if(footer.childNodes.length)game.append(footer);
   return game;
  };
+ const addGroup=(label,games)=>{
+  if(!games.length)return;
+  section.append(n("h3","today-game-group-heading",label+" ("+games.length+")"));
+  for(const game of games)section.append(renderGame(game));
+ };
  if(grouped){
-  const groups=ownTournamentGameGroups(matches);
-  for(const [heading,games] of [
-    ["Jetzt und anstehend",groups.upcoming],
-    ["Bereits gespielt",groups.finished],
-    ["Nicht gespielt / abgesagt",groups.other]
-  ]){
-   if(!games.length)continue;
-   section.append(n("strong","today-game-group-heading",heading+" ("+games.length+")"));
-   for(const game of games)section.append(renderGame(game));
-  }
+  const groups=ownTournamentGameGroups(matches),today=berlinDay();
+  const isToday=m=>!m.scheduledAt||berlinDay(m.scheduledAt)===today;
+  addGroup("Heute · nächste Spiele",groups.upcoming.filter(isToday));
+  addGroup("Weitere Turniertage",groups.upcoming.filter(m=>!isToday(m)));
+  addGroup("Bereits gespielt",groups.finished);
+  addGroup("Nicht gespielt / abgesagt",groups.other);
  }else for(const game of matches.slice(0,12))section.append(renderGame(game));
+ const checked=matches.map(m=>Date.parse(m.checkedAt||"")).filter(Number.isFinite);
+ const last=checked.length?new Date(Math.max(...checked)).toISOString():null;
+ const source=sourceName.startsWith("DBV-Turnier ")?"Offizieller DBV-Import":sourceName;
+ section.append(n("small","today-games-provenance",
+  "Stand "+(last?gameTime(last):"unbekannt")+" · "+source));
  return section;
 }
 async function readOfficialEvents(events,signal){
