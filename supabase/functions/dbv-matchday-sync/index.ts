@@ -195,7 +195,14 @@ Deno.serve(async(req:Request)=>{
     target.dbv_id===dbvId&&tournament?.external_id?.toLowerCase()===eventId.toLowerCase()&&
     due(target,tournament,Date.now())).slice(0,1);
   }
- }catch{return reply(503,{error:"targets_unavailable"},origin)}
+ }catch(e){
+  const message=String(e);
+  const code=message.includes("database_http_")?
+   (message.match(/database_http_\d{3}/)?.[0]||"database_http_error"):
+   message.includes("service_configuration")?"service_configuration":
+   message.includes("target_ids")?"target_ids":"targets_unavailable";
+  return reply(503,{error:code},origin);
+ }
  let completed=0,failed=0,stored=0;
  for(const {target,tournament} of selected){
   try{
