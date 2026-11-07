@@ -1,0 +1,48 @@
+name: Schmetterlinge Appstart-Baseline (opt-in)
+on:
+  push:
+    branches: [codex/appstart-baseline-after-v246-20261107]
+    paths:
+      - "benchmarks/**"
+      - ".github/workflows/appstart-benchmark.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appstart-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  appstart-baseline:
+    name: Offline-Baseline · ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [small-chromium, mobile-webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install pinned test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify synthetic-only offline benchmark
+        run: node tests/browser-qa-supabase-isolation.mjs
+      - name: Measure five isolated cold and five warm starts
+        run: npx playwright test --config benchmarks/playwright.config.mjs --project=${{ matrix.project }}
+      - name: Preserve measurement JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appstart-baseline-${{ matrix.project }}
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          retention-days: 7
