@@ -82,7 +82,7 @@ export function todayDisplayRows(events,{now=Date.now(),limit=102}={}){
     const name=safeText(event.name,90);
     if(!name)continue;
     seen.add(id);
-    rows.push({id,entity:"player",kind:"announced",label:"Spieler",
+    rows.push({id,entity:"player",playerId,kind:"announced",label:"Spieler",
      status:"Turnierteilnahme angekündigt",name,
      detail:safeText(sourced.name+" · "+sourced.location,115),
      kickoff:"",pairing:"",score:"",url:sourced.tournamentUrl,
@@ -99,7 +99,7 @@ export function todayDisplayRows(events,{now=Date.now(),limit=102}={}){
    const name=safeText(event.name,90);
    if(!name)continue;
    seen.add(id);
-   rows.push({id,entity:"player",kind:event.kind,label:"Spieler",
+   rows.push({id,entity:"player",playerId,kind:event.kind,label:"Spieler",
     status:PLAYER_STATUS[event.kind],name,detail:safeText(event.detail),
     kickoff:"",pairing:"",score:"",url,priority:ORDER[event.kind],order:rows.length});
   }else if(event.entity==="team"){
