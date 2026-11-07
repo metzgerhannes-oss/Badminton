@@ -13,7 +13,7 @@ const obj=x=>x&&typeof x==="object"&&!Array.isArray(x)?x:null;
 const short=(x,n=100)=>typeof x==="string"?x.trim().slice(0,n):"";
 // Spielform from the published event code, never guessed from age or player name.
 export function gameFormat(label){
- const token=short(label,90).toUpperCase().match(/^(MXD|MIX|JE|ME|HE|DE|SE|UE|WS|MS|JD|MD|HD|DD|BD|WD|MX|GD|XD)(?=\\s|$)/)?.[1];
+ const token=short(label,90).toUpperCase().match(/^(MXD|MIX|JE|ME|HE|DE|SE|UE|WS|MS|JD|MD|HD|DD|BD|WD|MX|GD|XD)(?=\s|$)/)?.[1];
  if(["JE","ME","HE","DE","SE","UE","WS","MS"].includes(token))return "Einzel";
  if(["JD","MD","HD","DD","BD","WD"].includes(token))return "Doppel";
  if(["MXD","MIX","MX","GD","XD"].includes(token))return "Mixed";
