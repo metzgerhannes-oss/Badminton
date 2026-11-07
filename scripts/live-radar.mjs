@@ -147,7 +147,7 @@ export function nextMatchTiming(match,now=Date.now()){
  for(const [field,kind] of [["predicted_start_ts","forecast"],["planned_ts","planned"]]){
   const raw=m[field];
   if(typeof raw!=="number"&&typeof raw!=="string")continue;
-  if(typeof raw==="string"&&!/^\\d{12,13}$/.test(raw))continue;
+  if(typeof raw==="string"&&!/^\d{12,13}$/.test(raw))continue;
   const ms=Number(raw);
   if(!Number.isSafeInteger(ms)||ms<1e12||ms>3e13)continue;
   const today=new Date(now).toLocaleDateString("de-DE",{timeZone:"Europe/Berlin"});
