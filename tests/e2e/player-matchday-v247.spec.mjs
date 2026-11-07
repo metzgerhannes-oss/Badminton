@@ -1,9 +1,14 @@
 import {test,expect} from "./invited-member.fixture.mjs";
+import {VERIFIED_PLAYER_EVENTS} from "../../scripts/verified-player-events.mjs";
 
 // No real DBV/Badhub or Supabase requests: all provider facts are synthetic.
-// The synthetic match uses the exact official tournament UUID of the verified
-// Nov 7 announcement; a different UUID must not be accepted as matching evidence.
-const PLAYER="05-067866",EVENT="FCBE16EF-D5A9-493A-9935-B6FF78669F6C";
+// Use the same official UUID as the verified announcement from the checked-out
+// merge commit; a concurrent correction of the DBV source must not silently
+// invalidate this synthetic matched-event test.
+const PLAYER="05-067866";
+const VERIFIED_EVENT=VERIFIED_PLAYER_EVENTS.find(e=>e.playerId===PLAYER && e.startDate==="2026-11-07");
+if(!VERIFIED_EVENT)throw new Error("Verified tournament announcement missing for fixture");
+const EVENT=VERIFIED_EVENT.tournamentId;
 const INTERNAL="6baff258-0fb5-4a2a-9a0d-78f5eea47012";
 const MATCH="bcf6d3be-1fde-4e61-a12d-392200ff216a";
 const NOW=Date.parse("2026-11-07T08:10:00+01:00");
