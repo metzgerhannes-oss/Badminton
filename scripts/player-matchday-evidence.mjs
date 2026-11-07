@@ -88,8 +88,13 @@ export function badhubPlayerGames(row,playerId,now=Date.now()){
    checkedAt:row.checked_at});
  }
  if(fresh&&day.running)add(day.running,"Spielt gerade",{scoreAllowed:true});
- for(const m of day.upcoming||[])add(m,fresh&&day.queue===0&&games.length===0?
-  "Als Nächstes":day.datedPlan?"Spielplan – Stand prüfen":"Angesetzt");
+ for(const [i,m] of (day.upcoming||[]).entries()){
+  const queue=i===0&&fresh&&Number.isInteger(day.queue)?day.queue:null;
+  const status=day.datedPlan?"Spielplan – Stand prüfen":
+   queue===0?"Als Nächstes":queue===1?"Noch 1 Spiel davor":
+   queue!==null?"Noch "+queue+" Spiele davor":"Angesetzt";
+  add(m,status);
+ }
  if(fresh)for(const m of (day.past||[]).slice(-6))add(m,"Ergebnis veröffentlicht",{scoreAllowed:true});
  return {...empty,tournament:short(day.tournament,120),checkedAt:row.checked_at,
   dated:!!day.datedPlan,queue:fresh?day.queue:null,games};
