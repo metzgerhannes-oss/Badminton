@@ -235,7 +235,7 @@ function buildCard(event,{showMatches=false}={}){
   const official=sourceId?lastOfficial.get(sourceId):null;
   const matches=official?officialPlayerGames(official.rows,official.internalId,
    event.playerId,sourceId,Date.now()):[];
-  const panel=gamePanel("Eigene Spiele im Turnier · offizieller DBV-Import",
+  const panel=gamePanel("Meine Spiele",
    "DBV-Turnier "+sourceId,matches,{ownerName:event.name,grouped:true});
   if(panel)row.append(panel);
   else row.append(n("small","today-games-unavailable",
