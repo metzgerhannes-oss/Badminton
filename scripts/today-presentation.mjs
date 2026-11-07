@@ -73,7 +73,7 @@ export function todayDisplayRows(events,{now=Date.now(),limit=102}={}){
   if(!id||seen.has(id))continue;
   if(event.entity==="player"){
    const playerId=safeText(event.playerId,20);
-   if(!PLAYER_ID.test(playerId)||!Object.hasOwn(PLAYER_STATUS,event.kind))continue;
+   if(!PLAYER_ID.test(playerId)||!(event.kind==="announced"||Object.hasOwn(PLAYER_STATUS,event.kind)))continue;
    if(event.kind==="announced"&&event.source==="Vereinsmeldung"){
     const sourced=verifiedPlayerEvents(playerId,berlinDay(now),{currentOnly:true})
      .find(row=>row.tournamentId===event.tournamentId&&
