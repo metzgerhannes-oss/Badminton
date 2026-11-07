@@ -65,7 +65,7 @@ assert.equal(playerDay.games.length,3);
 assert.equal(playerDay.games[0].status,"Spielt gerade");
 assert.equal(playerDay.games[0].opponent,"Gegnerin Eins");
 assert.equal(playerDay.games[0].score,"21:17");
-assert.equal(playerDay.games[1].status,"Angesetzt");
+assert.equal(playerDay.games[1].status,"Noch 1 Spiel davor");
 assert.match(playerDay.games[1].when,/Geplant/);
 assert.equal(playerDay.games[1].score,"");
 assert.equal(playerDay.games[2].outcome,"Sieg");
