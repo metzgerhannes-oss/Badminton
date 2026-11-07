@@ -69,7 +69,7 @@ test("v247: source-backed player games appear directly below Turniertag with cou
  await expect(panel).toContainText("Sätze 21:17");
  await expect(panel).toContainText("Zuordnung zu diesem DBV-Turnier nicht bestätigt");
  await expect(panel).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+EVENT);
- await expect(page.locator("#today-tournament .today-game-line")).toHaveCount(2);
+ await expect(panel.locator(".today-game-line")).toHaveCount(2);
  // An announcement alone is never the red verified-match shortcut.
  await expect(page.locator("#today-tournament .today-match-row[data-kind='announced'] .today-game-status").first()).toHaveText("Aufgerufen");
 });
