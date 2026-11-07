@@ -10,7 +10,7 @@ const day="2026-11-07",tomorrow="2026-11-08";
 const event=VERIFIED_PLAYER_EVENTS.find(x=>x.playerId===playerId);
 assert.ok(event,"source-backed event registered for the exact DBV player ID");
 assert.equal(validVerifiedPlayerEvent(event),true);
-assert.equal(event.tournamentId,"836C93F3-7635-420B-B314-DEDB60884AB2");
+assert.equal(event.tournamentId,"FCBE16EF-D5A9-493A-9935-B6FF78669F6C");
 assert.equal(verifiedPlayerEvents(playerId,day,{currentOnly:true}).length,1);
 assert.equal(verifiedPlayerEvents(playerId,tomorrow,{currentOnly:true}).length,1);
 assert.equal(verifiedPlayerEvents(playerId,"2026-11-06",{currentOnly:true}).length,0);
