@@ -12,7 +12,7 @@ const EVENT=VERIFIED_EVENT.tournamentId;
 const INTERNAL="6baff258-0fb5-4a2a-9a0d-78f5eea47012";
 const MATCH="bcf6d3be-1fde-4e61-a12d-392200ff216a";
 const NOW=Date.parse("2026-11-07T08:10:00+01:00");
-async function setup(page,{games=true}={}){
+async function setup(page,{games=true,matchReadFails=false}={}){
  await page.clock.setFixedTime(new Date(NOW));
  await page.addInitScript(()=>{
   localStorage.setItem("shuttleboard-v1",JSON.stringify({
@@ -31,7 +31,7 @@ async function setup(page,{games=true}={}){
    source_url:"https://dbv.turnier.de/tournament/"+EVENT}]:[])
  }));
  await page.route("**/rest/v1/matches?*",route=>route.fulfill({
-  status:200,contentType:"application/json",
+  status:matchReadFails?503:200,contentType:"application/json",
   body:JSON.stringify(games?[{
    id:MATCH,tournament_id:INTERNAL,status:"called",court:"2",
    scheduled_at:"2026-11-07T08:55:00+01:00",
@@ -41,6 +41,28 @@ async function setup(page,{games=true}={}){
     {side:1,player_position:1,players:{dbv_id:PLAYER,name:"Synthetische Léona"}},
     {side:2,player_position:1,players:{dbv_id:"05-000001",name:"Synthetische Gegnerin"}}
    ],match_games:[]
+  },{
+   id:"bcf6d3be-1fde-4e61-a12d-392200ff216b",
+   tournament_id:INTERNAL,status:"finished",court:"5",
+   scheduled_at:"2026-11-07T07:30:00+01:00",
+   source_url:"https://dbv.turnier.de/tournament/"+EVENT,
+   last_synced_at:new Date(NOW-15000).toISOString(),
+   events:{title:"MX U15"},match_participants:[
+    {side:1,player_position:1,players:{dbv_id:"05-000002",name:"Synthetischer Gegner"}},
+    {side:2,player_position:1,players:{dbv_id:PLAYER,name:"Synthetische Léona"}}
+   ],
+   match_games:[{game_number:1,side1_points:19,side2_points:21,finished:true},
+    {game_number:2,side1_points:22,side2_points:24,finished:true}]
+  },{
+   id:"bcf6d3be-1fde-4e61-a12d-392200ff216c",
+   tournament_id:INTERNAL,status:"finished",court:"7",
+   source_url:"https://dbv.turnier.de/tournament/"+EVENT,
+   last_synced_at:new Date(NOW-15000).toISOString(),
+   events:{title:"ME U15"},match_participants:[
+    {side:1,player_position:1,players:{dbv_id:"05-000002",name:"Fremde Spielerin"}},
+    {side:2,player_position:1,players:{dbv_id:"05-000003",name:"Fremde Gegnerin"}}
+   ],
+   match_games:[{game_number:1,side1_points:21,side2_points:10,finished:true}]
   }]:[])
  }));
  await page.route("**/rest/v1/player_live_snapshots?*",route=>route.fulfill({
@@ -66,17 +88,25 @@ test("v247: source-backed player games appear directly below Turniertag with cou
  const panel=page.locator("#today-tournament .today-match-row[data-kind='announced']");
  await expect(panel).toBeVisible({timeout:20000});
  await expect(panel).toContainText("Léona Plaisant");
- await expect(panel).toContainText("Einzelspiele · offizieller DBV-Import");
+ await expect(panel).toContainText("Eigene Spiele im Turnier · offizieller DBV-Import");
  await expect(panel).toContainText("Synthetische Gegnerin");
- await expect(panel).toContainText("Feld 2");
- await expect(panel).toContainText("Geplant 08:55 Uhr");
+ await expect(panel).toContainText("Feld: 2");
+ await expect(panel).toContainText("Spielform: Einzel");
+ await expect(panel).toContainText("Geplant: 08:55 Uhr");
  await expect(panel).toContainText("Aufgerufen");
  await expect(panel).toContainText("Weitere Spieler-Spiele · Badhub");
  await expect(panel).toContainText("Badhub Testgegnerin");
- await expect(panel).toContainText("Sätze 21:17");
+ await expect(panel).toContainText("Sätze: 21:17");
  await expect(panel).toContainText("Zuordnung zu diesem DBV-Turnier nicht bestätigt");
  await expect(panel).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+EVENT);
- await expect(panel.locator(".today-game-line")).toHaveCount(2);
+ await expect(panel).toContainText("Bereits gespielt (1)");
+ await expect(panel).toContainText("Gegner: Synthetischer Gegner");
+ await expect(panel).toContainText("Spielform: Mixed");
+ await expect(panel).toContainText("Ansetzung: 07:30 Uhr");
+ await expect(panel).toContainText("Feld: 5");
+ await expect(panel).toContainText("Sätze: 21:19 · 24:22");
+ await expect(panel).not.toContainText("Fremde Spielerin");
+ await expect(panel.locator(".today-game-line")).toHaveCount(3);
  // An announcement alone is never the red verified-match shortcut.
  await expect(page.locator("#today-tournament .today-match-row[data-kind='announced'] .today-game-status").first()).toHaveText("Aufgerufen");
 });
@@ -90,4 +120,14 @@ test("v247: absence of matches never invents a start time, court or result",asyn
  await expect(panel).not.toContainText("Spielt gerade");
  await expect(panel).not.toContainText("Feld 2");
  await expect(panel).not.toContainText("08:55 Uhr");
+});
+
+test("v249: a rejected official match read is not misreported as no published games",async({page})=>{
+ await setup(page,{matchReadFails:true});
+ await page.goto("/#turniere",{waitUntil:"domcontentloaded"});
+ const panel=page.locator("#today-tournament .today-match-row[data-kind='announced']");
+ await expect(panel).toBeVisible({timeout:20000});
+ await expect(panel).toContainText("Offizielle Spieldaten konnten nicht geladen werden");
+ await expect(panel).not.toContainText("Bereits gespielt (1)");
+ await expect(panel).not.toContainText("Synthetischer Gegner");
 });
