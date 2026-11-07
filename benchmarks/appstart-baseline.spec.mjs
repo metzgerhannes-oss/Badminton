@@ -20,6 +20,7 @@ const median=xs=>{const valid=xs.filter(Number.isFinite).sort((a,b)=>a-b);return
 async function setup(browser,project){
  const use=project.use;
  const context=await browser.newContext({
+  baseURL:"http://127.0.0.1:4173",
   viewport:use.viewport||{width:375,height:667},
   deviceScaleFactor:use.deviceScaleFactor||1,
   isMobile:Boolean(use.isMobile),
