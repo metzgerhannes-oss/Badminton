@@ -1,40 +1,32 @@
-# v250 – Offizieller DBV-Turniertag (privater Betrieb)
+# v250 – Offizielle DBV-Matches am Turniertag (privat, on-demand)
 
-## Datenpfad
+## Ziel und Datenpfad
 
-1. In `public.dbv_matchday_targets` stehen nur **belegte** Paare aus DBV-Turnier-UUID, verifizierter DBV-Spieler-ID und der vom offiziellen Turnierprofil verlinkten lokalen Spieler-ID.
-2. Der kostenlose pg_cron-Job `badminton-dbv-matchday-five-minutes` läuft alle fünf Minuten. Er ruft außerhalb eines aktiven Turniers oder außerhalb 07:00–22:00 Uhr (Europe/Berlin) **keinen** externen Dienst auf. Bei Aktivitäten verschickt er ausschließlich einen kurzlebig gehaltenen Vault-Token an die Edge Function `dbv-matchday-sync`.
-3. Die Edge Function verifiziert entweder den Vault-Token oder bei der direkten Turniertag-Anfrage die Supabase-Familienmitgliedschaft. Der Token steht niemals im Quellcode. Als öffentliche DBV-Quelle wird ausschließlich `https://dbv.turnier.de/tournament/<UUID>/player/<lokale-ID>` geladen.
-4. Der normale Session-Flow akzeptiert nur technisch notwendige Cookies (`CookiePurposes=1`). HTML, Cookies und Session-Daten werden **nicht** gespeichert, exportiert oder protokolliert.
-5. Der Parser fordert exakte DBV-Spieler-ID + lokale Spieler-ID, gültige Termine, Konkurrenz, Runde, Teilnehmeridentitäten und veröffentlichte Satzdaten. Undatierte Auslosungspositionen, nicht belegte LIVE-Status und fremde Partien werden verworfen.
-6. Die RPC `dbv_matchday_store` speichert eine vollständige gültige Antwort **in einer Transaktion** in `events`, `matches`, `match_participants`, `match_games` und aktualisiert den Watch-Status. Wiederholung erzeugt keine Dubletten; spätere Startzeit-/Feldänderungen bleiben derselben Spieler-/Draw-/Rundenposition zugeordnet.
+1. `public.dbv_matchday_targets` enthält **ausschließlich** geprüfte Kombinationen aus Turnier-UUID, verifizierter DBV-Spieler-ID und lokaler Turnier-Spieler-ID. Der Pilot verwendet Léonas DBV-ID `05-067866`, Turnier `836C93F3-7635-420B-B314-DEDB60884AB2`, lokale Spielerkennung `500`.
+2. Nur wenn ein eingeladener Nutzer die **Turniertagansicht tatsächlich öffnet**, ruft die App die Edge Function `dbv-matchday-sync` auf. Eine Mitgliedschaftsprüfung über `app_access_status` ist zwingend. Während der sichtbaren Ansicht begrenzt ein Client-Throttle die Abfrage auf **höchstens alle fünf Minuten**; der Server begrenzt die Quellenprüfung zusätzlich.
+3. **Kein Hintergrund-Cron, keine geplanten DBV-Abfragen**, keine dauerhafte Aufzeichnung der privaten Freundesliste. Das ursprünglich getestete Cron-Experiment wurde vor Freigabe bewusst wieder entfernt. Der Betrieb benötigt keinen separaten Cron-Token in Vault.
+4. Die Edge Function lädt ausschließlich `https://dbv.turnier.de/tournament/<UUID>/player/<lokale-ID>` mittels normaler funktionaler Cookie-Einwilligung (`CookiePurposes=1`). HTML, Cookies, Sessions, Spieler- und Partnerlisten werden nicht als Rohdaten gespeichert oder geloggt.
+5. Der begrenzte Parser prüft die **exakte** DBV-ID und lokale Spieler-ID und extrahiert nur eigene, belegte Spiele; undatierte Auslosungs-Platzhalter und fremde Spiele bleiben ausgeschlossen. Angesetzte Zeiten sind keine Live-Startgarantie.
+6. Die Service-only-RPC `dbv_matchday_store` speichert validierte Daten **atomar** in `events`, `matches`, `match_participants`, `match_games`. Stabile interne Slot-Schlüssel machen erneute Läufe idempotent; früher bestätigte Ergebnisse werden nicht durch einen unvollständig geladenen Plan überschrieben.
 
-## Konkrete Abnahme 07.11.2026
+## Reale Quellprüfung vom 7. November 2026
 
-- Ziel: Léona (DBV 05-067866), Südostdeutsche Meisterschaften Augsburg, lokale Spieler-ID 500.
-- Echte Ausgangsdaten: 4 Spielerpartien, 2 gespielt, 2 angesetzt (09:30 und 10:30 Mixed am Samstag, 15:00 Einzel am Samstag, 10:00 Doppel am Sonntag).
-- Live-API-Test über pg_net und Edge: HTTP 200, `checked=1`, `failed=0`, `stored=4`.
-- Tatsächlich aktiver Cron-Lauf erfolgreich; Datenschutz/RLS: keine Datenbank-Tabellenfreigabe für `anon`, keine Match-Schreibrechte für Familienmitglieder.
-- Privater Produktionsbranch, nicht `main`.
+- Offizielle, inhaltlich verifizierte Spieleransicht liefert **vier** Léona-Partien: zwei beendete Mixed-Spiele (09:30 Uhr, Feld 9; 10:30 Uhr, Feld 7) sowie ein Einzel am Samstag 15:00 Uhr und ein Doppel am Sonntag 10:00 Uhr.
+- Die Quelle wurde erfolgreich im Edge-Server ausgelesen und die atomare Datenbanktransaktion testweise ausgeführt: `stored=4`, `finished=2`, keine Dubletten.
+- Der frühere Cron-basierte End-to-End-Probelauf war erfolgreich, ist aber **nicht** mehr der aktuelle Betriebsmodus. Für den endgültigen Mitgliedsaufruf ohne Test-JWT gilt die Chromium-/WebKit-Abnahme als technische Browserprüfung, nicht als Nachweis eines echten Benutzer-Logins.
+- Kosten: keine zusätzliche kostenpflichtige Infrastruktur, keine DBV-Abfragen bei geschlossener App.
+- Der exakte Turnier-/Spieleridentitätsnachweis ist Voraussetzung für weitere verfolgte Personen. Es gibt **keine** pauschale automatische Registrierung aller Freunde aufgrund gleichlautender Namen.
 
-## Betrieb und Fehleranalyse
-
-Aktuellen Stand (nur privilegiert):
+## Betriebsprüfung (nur für Administratoren)
 
 ```sql
-SELECT dbv_id,active_until,last_match_count,last_checked_at,
-       last_success_at,last_error_at,error_code
+SELECT dbv_id,active_until,last_match_count,
+       last_checked_at,last_success_at,last_error_at,error_code
 FROM public.dbv_matchday_targets;
-SELECT jobid,active,schedule FROM cron.job
-WHERE jobname='badminton-dbv-matchday-five-minutes';
+SELECT count(*) AS background_jobs
+FROM cron.job WHERE jobname='badminton-dbv-matchday-five-minutes';
 ```
 
-- `last_success_at`: Quelle und Datenbanktransaktion erfolgreich.
-- `last_error_at`: Quelle oder Validierung momentan nicht erreichbar; vorhandene Ergebnisse bleiben bestehen. Keine Aussage „keine Spiele“ aus einem HTTP-Fehler ableiten.
-- `scheduled` darf nicht als tatsächliches Aufrufen oder laufendes Spiel ausgegeben werden.
-- Für weitere Freunde zuerst den verifizierten offiziellen Turnier-Player-Link samt DBV-ID nachweisen und anschließend **nur dieses** Ziel in `dbv_matchday_targets` hinterlegen. Nicht aufgrund von Namen, Orten oder Mannschaften zuordnen.
-- Der Code importiert keine anonymen Spielerdatenbanken, keine Turnier-Vollarchive und überschreibt keine fremden Quellen.
+Der zweite Wert muss im aktuellen **on-demand-Modus 0** sein. Die Tabelle ist durch RLS sowie fehlende `anon`- und `authenticated`-Rechte geschützt. Die Matchansicht liest nur für freigegebene Familienmitglieder.
 
-## Technische Grenze
-
-Der Dienst zeigt aktualisierte veröffentlichte DBV-Werte in Fünf-Minuten-Abständen. Er beweist keine sofortige Live-Feldmeldung und keine Sekunden-genauen Spielbeginne. Ohne tatsächlich veröffentlichte Startzeit, Gegner oder Feld bleiben diese Angaben offen.
+**Fehlerverhalten:** Ein Abruffehler ist nicht gleichbedeutend mit „keine Matches“. Bestehende Quellresultate bleiben erhalten; `last_error_at` wird gesetzt. Status `scheduled` wird nie allein wegen abgelaufener Uhrzeit als `playing` gekennzeichnet.
