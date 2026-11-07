@@ -30,7 +30,12 @@ async function db(path:string,init:RequestInit={}){
    "Content-Type":"application/json",...init.headers},redirect:"error",
   cache:"no-store"
  });
- if(!response.ok)throw Error("database_http_"+response.status);
+ if(!response.ok){
+  let code="";
+  try{const j=await response.json();code=String(j?.code||"").slice(0,20)}
+  catch{}
+  throw Error("database_http_"+response.status+(code?"_"+code:""));
+ }
  const body=await response.text();
  return body?JSON.parse(body):null;
 }
@@ -198,7 +203,7 @@ Deno.serve(async(req:Request)=>{
  }catch(e){
   const message=String(e);
   const code=message.includes("database_http_")?
-   (message.match(/database_http_\d{3}/)?.[0]||"database_http_error"):
+   (message.match(/database_http_\d{3}(?:_[A-Z0-9]{2,20})?/)?.[0]||"database_http_error"):
    message.includes("service_configuration")?"service_configuration":
    message.includes("target_ids")?"target_ids":"targets_unavailable";
   return reply(503,{error:code},origin);
