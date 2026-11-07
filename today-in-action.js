@@ -8,6 +8,10 @@ import {followedRoster,followedSnapshotPath} from "./scripts/followed-live.mjs";
 import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {todayDisplayRows} from "./scripts/today-presentation.mjs";
+import {verifiedRosterEvents} from "./scripts/verified-player-events.mjs";
+import {eventId,tournamentPath,matchesPath,matchTournament} from "./scripts/tournament-live.mjs";
+import {officialPlayerGames,badhubPlayerGames} from "./scripts/player-matchday-evidence.mjs";
+import {watchRequest} from "./scripts/live-radar.mjs";
 
 const $=id=>document.getElementById(id);
 const hosts=["today-home","today-tournament"];
@@ -24,6 +28,87 @@ const readLocalFollows=()=>{
 };
 let last=null,signature="",checked=0,loading=false,seq=0,controller=null;
 let expiryTimer=null;
+let lastSnapshots=new Map(),lastOfficial=new Map(),watchTimes=new Map();
+const GAME_READ_LIMIT=4;
+const gameTime=value=>{
+ if(!value||!Number.isFinite(Date.parse(value)))return "";
+ return new Intl.DateTimeFormat("de-DE",{
+  hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"
+ }).format(new Date(value))+" Uhr";
+};
+/** An in-app match panel is passive content inside the existing verified
+ * source link. It neither starts live polling nor creates a match claim.
+ * A Badhub report is never presented as the official DBV event feed.
+ */
+function gamePanel(title,sourceName,matches,{sourceTournament="",notice=""}={}){
+ if(!matches.length)return null;
+ const section=n("section","today-games-panel");
+ section.append(n("strong","today-games-heading",title));
+ const meta=n("small","today-games-provenance",sourceName+
+  (sourceTournament?" · "+sourceTournament:""));
+ section.append(meta);
+ if(notice)section.append(n("small","today-games-notice",notice));
+ for(const m of matches.slice(0,12)){
+  const game=n("div","today-game-line");
+  const top=n("div","today-game-head");
+  top.append(n("span","today-game-status",m.status));
+  top.append(n("span","today-game-discipline",m.discipline));
+  game.append(top);
+  if(m.side1||m.side2)
+   game.append(n("strong","today-game-opponents",m.side1+" – "+m.side2));
+  else if(m.opponent)
+   game.append(n("strong","today-game-opponents","Gegen "+m.opponent));
+  const fields=[
+   m.court?"Feld "+m.court:"",
+   m.scheduledAt?"Geplant "+gameTime(m.scheduledAt):m.when||"",
+   Array.isArray(m.sets)&&m.sets.length?"Sätze "+m.sets.join(" · "):m.score?"Sätze "+m.score:"",
+   m.outcome||""
+  ].filter(Boolean);
+  if(fields.length)game.append(n("small","today-game-meta",fields.join(" · ")));
+  game.append(n("small","today-game-source","Stand: "+(gameTime(m.checkedAt)||"nicht verfügbar")));
+  section.append(game);
+ }
+ return section;
+}
+async function readOfficialEvents(events,signal){
+ const out=new Map(),unique=[...new Map(events.map(x=>[x.tournamentId,x])).values()]
+  .slice(0,GAME_READ_LIMIT);
+ const data=await Promise.allSettled(unique.map(async item=>{
+  const id=eventId(item.tournamentUrl);
+  if(!id)return null;
+  const {rows:tournaments}=await readPublicRows(tournamentPath(id),{signal,count:false,retries:0});
+  const selected=matchTournament(tournaments,{url:item.tournamentUrl});
+  if(!selected)return null;
+  const {rows:matches}=await readPublicRows(matchesPath(selected.id),{
+   signal,count:false,retries:0,timeoutMs:9000
+  });
+  return [id,{internalId:selected.id,rows:matches}];
+ }));
+ for(const result of data)if(result.status==="fulfilled"&&result.value)
+  out.set(result.value[0],result.value[1]);
+ return out;
+}
+/** Existing authorised watch path, only for currently announced followed IDs
+ * while Turniertag is actually open. No new cron, vendor scraping or secrets.
+ */
+async function watchAnnounced(events,signal){
+ const ids=[...new Set(events.map(x=>x.playerId))].slice(0,6);
+ const now=Date.now(),needed=ids.filter(id=>now-(watchTimes.get(id)||0)>=300000);
+ if(!needed.length)return;
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token||signal.aborted)return;
+ await Promise.allSettled(needed.map(async id=>{
+  const request=watchRequest(id);
+  if(!request)return;
+  watchTimes.set(id,now);
+  const response=await fetch(request.url,{
+   method:"POST",headers:{...request.headers,Authorization:"Bearer "+token},
+   body:request.body,signal,cache:"no-store"
+  });
+  // A rejected watch does not turn an empty/stale snapshot into match evidence.
+  if(!response.ok&&response.status!==400&&response.status!==409)return;
+ }));
+}
 
 const activeGroups=()=>window.badmintonLiveViewerOptions?.()||{own:[],friends:[],selected:""};
 const context=()=>{
