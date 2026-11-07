@@ -78,6 +78,10 @@ async function setup(page,{games=true,matchReadFails=false}={}){
     upcoming:[],past:[]}
   }]:[])
  }));
+ await page.route("**/functions/v1/dbv-matchday-sync",route=>route.fulfill({
+  status:200,contentType:"application/json",
+  body:JSON.stringify({ok:true,checked:0,stored:0,next_check_minutes:5})
+ }));
  await page.route("**/rest/v1/player_live_watches",route=>route.fulfill({
   status:201,contentType:"application/json",body:""
  }));
