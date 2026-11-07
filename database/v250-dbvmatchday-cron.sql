@@ -1,4 +1,9 @@
--- v250: 5-minute dispatcher. When no active verified tournament exists it
--- returns without any network call. Source is queried only 07:00–22:00 Berlin.
-SELECT cron.schedule('badminton-dbv-matchday-five-minutes',
- '*/5 * * * *','SELECT private.dispatch_dbv_matchday_v250();');
+-- v250: privacy-first on-demand only. The earlier background experiment
+-- was disabled on 2026-11-07. This cleanup is idempotent.
+DO $do$ BEGIN
+ IF EXISTS (SELECT 1 FROM cron.job WHERE jobname='badminton-dbv-matchday-five-minutes')
+ THEN PERFORM cron.unschedule('badminton-dbv-matchday-five-minutes'); END IF;
+END $do$;
+DROP FUNCTION IF EXISTS private.dispatch_dbv_matchday_v250();
+DROP FUNCTION IF EXISTS public.dbv_matchday_cron_authorized(text);
+DELETE FROM vault.secrets WHERE name='dbv_matchday_cron_token';
