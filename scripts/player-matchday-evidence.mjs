@@ -71,6 +71,8 @@ export function officialPlayerGames(rows,tournamentId,playerId,dbvUuid,now=Date.
    // Published DBV scores are side1:side2; show them from THIS player's side.
    sets:playerSide===2?m.sets.map(s=>s.split(":").reverse().join(":")):m.sets,
    checkedAt:m.checkedAt,category:m.category,
+   outcome:m.category==="finished"&&m.winningSide!==null?
+    (m.winningSide===playerSide?"Sieg":"Niederlage"):"",
    live:m.category==="live"&&m.sourceFresh,
    sourceUrl:"https://dbv.turnier.de/tournament/"+dbvUuid.toUpperCase()
   });

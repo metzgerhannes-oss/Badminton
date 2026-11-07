@@ -89,6 +89,7 @@ jobs:
           node --check today-in-action.js
           node --check scripts/today-evidence.mjs
           node --check scripts/player-matchday-evidence.mjs
+          node --check supabase/functions/dbv-matchday-sync/dbv-player-parser.mjs
           node --check scripts/verified-player-events.mjs
           node --check spiele.js
           node --check games/snake.mjs
@@ -194,6 +195,7 @@ jobs:
           node tests/today-evidence.mjs
           node tests/verified-player-events.mjs
           node tests/player-matchday-evidence.mjs
+          node tests/dbv-matchday-parser.mjs
           node tests/today-presentation.mjs
           node tests/matchday-simplicity.mjs
           node tests/match-stats.mjs

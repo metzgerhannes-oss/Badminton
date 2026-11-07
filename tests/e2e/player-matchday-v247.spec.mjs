@@ -78,6 +78,10 @@ async function setup(page,{games=true,matchReadFails=false}={}){
     upcoming:[],past:[]}
   }]:[])
  }));
+ await page.route("**/functions/v1/dbv-matchday-sync",route=>route.fulfill({
+  status:200,contentType:"application/json",
+  body:JSON.stringify({ok:true,checked:0,stored:0,next_check_minutes:5})
+ }));
  await page.route("**/rest/v1/player_live_watches",route=>route.fulfill({
   status:201,contentType:"application/json",body:""
  }));
@@ -88,23 +92,24 @@ test("v247: source-backed player games appear directly below Turniertag with cou
  const panel=page.locator("#today-tournament .today-match-row[data-kind='announced']");
  await expect(panel).toBeVisible({timeout:20000});
  await expect(panel).toContainText("Léona Plaisant");
- await expect(panel).toContainText("Eigene Spiele im Turnier · offizieller DBV-Import");
+ await expect(panel.locator(".today-games-heading").first()).toHaveText("Meine Spiele");
+ await expect(panel).toContainText("Offizieller DBV-Import");
  await expect(panel).toContainText("Synthetische Gegnerin");
- await expect(panel).toContainText("Feld: 2");
+ await expect(panel).toContainText("Feld 2");
  await expect(panel).toContainText("Spielform: Einzel");
- await expect(panel).toContainText("Geplant: 08:55 Uhr");
+ await expect(panel).toContainText("08:55 Uhr");
  await expect(panel).toContainText("Aufgerufen");
  await expect(panel).toContainText("Weitere Spieler-Spiele · Badhub");
  await expect(panel).toContainText("Badhub Testgegnerin");
- await expect(panel).toContainText("Sätze: 21:17");
+ await expect(panel).toContainText("21:17");
  await expect(panel).toContainText("Zuordnung zu diesem DBV-Turnier nicht bestätigt");
  await expect(panel).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+EVENT);
  await expect(panel).toContainText("Bereits gespielt (1)");
  await expect(panel).toContainText("Gegner: Synthetischer Gegner");
  await expect(panel).toContainText("Spielform: Mixed");
- await expect(panel).toContainText("Ansetzung: 07:30 Uhr");
- await expect(panel).toContainText("Feld: 5");
- await expect(panel).toContainText("Sätze: 21:19 · 24:22");
+ await expect(panel).toContainText("07:30 Uhr");
+ await expect(panel).toContainText("Feld 5");
+ await expect(panel).toContainText("21:19 · 24:22");
  await expect(panel).not.toContainText("Fremde Spielerin");
  await expect(panel.locator(".today-game-line")).toHaveCount(3);
  // An announcement alone is never the red verified-match shortcut.
