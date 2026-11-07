@@ -128,7 +128,7 @@ test("v247: source-backed player games appear directly below Turniertag with cou
  await expect(panel.locator(".today-game-group-heading[data-day='tomorrow']")).toContainText("MORGEN");
  await expect(panel.locator(".today-game-group-heading[data-day='tomorrow']")).toContainText("08.11.");
  await expect(panel).toContainText("Mädchen-Doppel U15");
- await expect(panel).toContainText("Doppelpartnerin");
+ await expect(panel.locator(".today-game-line[data-category='upcoming']").filter({hasText:"Mädchen-Doppel U15"})).toContainText("Gegnerteam 1 / Gegnerteam 2");
  await expect(panel.locator(".today-game-line[data-next='true']")).toContainText("NÄCHSTES SPIEL");
  await expect(panel.locator(".today-game-line[data-next='true']")).toContainText("Mädchen-Einzel U15");
  await expect(panel.locator(".today-game-line[data-compact='true']")).toHaveCount(1);
