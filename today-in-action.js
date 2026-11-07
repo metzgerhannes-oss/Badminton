@@ -216,25 +216,44 @@ function informNav(){
 }
 async function refresh(force=false){
  if(!visible()||document.hidden)return;
- if(!window.badmintonAppAccess?.allowed){last=null;signature="";checked=0;render();informNav();scheduleLocalExpiry();return}
- const ctx=context(),today=berlinDay();
+ if(!window.badmintonAppAccess?.allowed){
+  last=null;lastSnapshots=new Map();lastOfficial=new Map();
+  signature="";checked=0;render();informNav();scheduleLocalExpiry();return;
+ }
+ const ctx=context(),today=berlinDay(),isTournament=location.hash==="#turniere";
+ const announced=verifiedRosterEvents(ctx.groups,today);
  const player=followedRoster(ctx.groups);
- const stamp=JSON.stringify([today,player.players.map(p=>p.id),ctx.follows,ctx.teams.map(t=>t.id)]);
+ // A verified player currently appearing on Turniertag has priority even if
+ // she falls after the generic six-player LIVE feed limit.
+ const all=[...(ctx.groups.own||[]),...(ctx.groups.friends||[])];
+ const selected=announced.map(x=>all.find(p=>p?.id===x.playerId))
+  .filter(Boolean);
+ const candidates=[...selected,...player.players],seen=new Set();
+ const priorityPlayers=candidates.filter(p=>{
+  if(seen.has(p.id))return false;seen.add(p.id);return true;
+ }).slice(0,6);
+ const stamp=JSON.stringify([today,isTournament,priorityPlayers.map(p=>p.id),
+  ctx.follows,ctx.teams.map(t=>t.id)]);
  if(!force&&stamp===signature&&Date.now()-checked<300000){render();return}
  if(loading&&!force)return;
  const ticket=++seq;controller?.abort();controller=new AbortController();
  loading=true;render(true);
  const signal=controller.signal;
- const playerPath=followedSnapshotPath(player.players);
+ const playerPath=followedSnapshotPath(priorityPlayers);
  const teamPath=fixtureReadPath(ctx.teams,{day:today});
- // Two bounded existing read models; at most 6 players, 12 teams, 96 fixture rows.
+ // Official reads are bounded, only on the open tournament screen, and only
+ // for already source-backed, followed events. No direct DBV scraping.
  const reads=await Promise.allSettled([
   playerPath?readPublicRows(playerPath,{signal,count:false,retries:0}):Promise.resolve({rows:[]}),
-  teamPath?readPublicRows(teamPath,{signal,count:false,retries:0}):Promise.resolve({rows:[]})
+  teamPath?readPublicRows(teamPath,{signal,count:false,retries:0}):Promise.resolve({rows:[]}),
+  isTournament&&announced.length?readOfficialEvents(announced,signal):Promise.resolve(new Map()),
+  isTournament&&announced.length?watchAnnounced(announced,signal):Promise.resolve()
  ]);
  if(ticket!==seq||signal.aborted)return;
- const errors=reads.filter(r=>r.status==="rejected").length;
- const rows=reads.map(r=>r.status==="fulfilled"?r.value.rows:[]);
+ const errors=reads.slice(0,2).filter(r=>r.status==="rejected").length;
+ const rows=reads.slice(0,2).map(r=>r.status==="fulfilled"?r.value.rows:[]);
+ lastSnapshots=new Map((rows[0]||[]).filter(row=>row?.dbv_id).map(row=>[row.dbv_id,row]));
+ lastOfficial=reads[2].status==="fulfilled"?reads[2].value:new Map();
  last=todayEvidence({now:Date.now(),groups:ctx.groups,snapshots:rows[0],
   follows:ctx.follows,teams:ctx.teams,fixtures:rows[1]});
  // Do not reuse a cached answer with a failed source as if it were complete.
@@ -261,6 +280,10 @@ function init(){
   if([TEAM_FOLLOWS_KEY,"shuttleboard-v1"].includes(event.key))changed();
  });
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)route()});
+ // Turniertag updates while open, without a background poll on every tab.
+ // At most one bounded source read and one per-player watch per 5 minutes.
+ setInterval(()=>{if(location.hash==="#turniere"&&!document.hidden&&
+   window.badmintonAppAccess?.allowed)void refresh()},300000);
  route();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
