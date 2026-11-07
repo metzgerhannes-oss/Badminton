@@ -1,7 +1,7 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
 // No real DBV/Badhub or Supabase requests: all provider facts are synthetic.
-const PLAYER="05-067866",EVENT="FCBE16EF-D5A9-493A-9935-B6FF78669F6C";
+const PLAYER="05-067866",EVENT="836C93F3-7635-420B-B314-DEDB60884AB2";
 const INTERNAL="6baff258-0fb5-4a2a-9a0d-78f5eea47012";
 const MATCH="bcf6d3be-1fde-4e61-a12d-392200ff216a";
 const NOW=Date.parse("2026-11-07T08:10:00+01:00");
