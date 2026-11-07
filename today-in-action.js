@@ -118,7 +118,7 @@ const context=()=>{
  const selection=followedTeamSelection(follows,rows);
  return {groups,follows,teams:selection.teams,selection};
 };
-function buildCard(event){
+function buildCard(event,{showMatches=false}={}){
  const hasLink=Boolean(event.url),isPlayer=event.entity==="player";
  const row=n(hasLink?"a":"div","today-match-row"+(hasLink?"":" today-match-pending"));
  row.dataset.entity=event.entity;row.dataset.kind=event.kind;
@@ -138,6 +138,36 @@ function buildCard(event){
  row.append(n("strong","today-match-pairing",isPlayer?event.name:event.pairing));
  if(isPlayer&&event.detail)row.append(n("span","today-match-detail",event.detail));
  if(event.score)row.append(n("span","today-match-row-score","Ergebnis "+event.score));
+ // The event card remains linked to the OFFICIAL source. Badhub player data
+ // carries an independent source label; never claim it belongs to the DBV
+ // event unless an exact official match record confirms that association.
+ if(showMatches&&isPlayer&&event.kind==="announced"){
+  const sourceId=eventId(event.url);
+  const official=sourceId?lastOfficial.get(sourceId):null;
+  const matches=official?officialPlayerGames(official.rows,official.internalId,
+   event.playerId,sourceId,Date.now()):[];
+  const panel=gamePanel("Einzelspiele · offizieller DBV-Import",
+   "DBV-Turnier "+sourceId,matches);
+  if(panel)row.append(panel);
+  else row.append(n("small","today-games-unavailable",
+   "Noch keine belegten Einzelspiele aus dem offiziellen Import verfügbar."));
+  const live=badhubPlayerGames(lastSnapshots.get(event.playerId),
+   event.playerId,Date.now());
+  if(live.games.length){
+   const extra=gamePanel("Weitere Spieler-Spiele · Badhub","Drittanbieter",
+    live.games,{sourceTournament:live.tournament,notice:
+    "Separate Spielerquelle – Zuordnung zu diesem DBV-Turnier nicht bestätigt."});
+   if(extra)row.append(extra);
+  }
+ }else if(showMatches&&isPlayer){
+  const live=badhubPlayerGames(lastSnapshots.get(event.playerId),
+   event.playerId,Date.now());
+  if(live.games.length){
+   const extra=gamePanel("Spiele von "+event.name,"Badhub · Drittanbieter",
+    live.games,{sourceTournament:live.tournament});
+   if(extra)row.append(extra);
+  }
+ }
  return row;
 }
 function renderHost(host,model){
@@ -146,7 +176,7 @@ function renderHost(host,model){
  if(!list)return;
  const all=todayDisplayRows(model?.events||[],{now:Date.now(),limit:102});
  const rows=host.id==="today-home"?all.slice(0,4):all;
- list.replaceChildren(...rows.map(buildCard));
+ list.replaceChildren(...rows.map(event=>buildCard(event,{showMatches:host.id==="today-tournament"})));
  host.hidden=rows.length===0;
  const more=host.querySelector("[data-today-more]");
  if(more)more.hidden=all.length<=rows.length;
