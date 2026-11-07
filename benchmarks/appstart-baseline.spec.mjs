@@ -61,8 +61,9 @@ async function setup(browser,project){
  });
  return context;
 }
-async function collect(page){
- await page.goto("/#start",{waitUntil:"domcontentloaded"});
+async function collect(page,{reload=false}={}){
+ if(reload)await page.reload({waitUntil:"domcontentloaded"});
+ else await page.goto("/#start",{waitUntil:"domcontentloaded"});
  await expect(page.locator("html")).toHaveAttribute("data-app-access","granted",{timeout:16000});
  await expect(page.locator("body > .app")).toBeVisible();
  await page.waitForFunction(()=>Number.isFinite(window.__appstartProbe?.interactiveAt));
@@ -89,7 +90,7 @@ test("five isolated cold and five warm starts with synthetic approved access",as
   try{
    const page=await context.newPage();
    cold.push(await collect(page));
-   warm.push(await collect(page));
+   warm.push(await collect(page,{reload:true}));
   }finally{await context.close()}
  }
  const metric=k=>({cold:median(cold.map(x=>x[k])),warm:median(warm.map(x=>x[k]))});
