@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {eventId,tournamentPath,matchesPath,matchTournament,toMatch,tournamentOverview,
+import {eventId,tournamentPath,matchesPath,playerMatchesPath,matchTournament,toMatch,tournamentOverview,
  filterTournament,tournamentCounts} from "../scripts/tournament-live.mjs";
 
 const event="E24DC6EE-152A-454D-B00C-E625B751D7D5",eventUrl="https://dbv.turnier.de/tournament/"+event;
@@ -15,6 +15,16 @@ assert.equal(tournamentPath("../../etc"),null);
 assert.equal(matchesPath(""),null);
 assert.ok(tournamentPath(event).startsWith("tournaments?"));
 assert.ok(matchesPath(tournament).includes("matches?"));
+const playerMatchPath=playerMatchesPath(tournament,["05-067866","05-070879","05-067866"]);
+assert.ok(playerMatchPath?.startsWith("matches?"));
+const playerQuery=new URLSearchParams(playerMatchPath.split("?")[1]);
+assert.equal(playerQuery.get("own.players.dbv_id"),"in.(05-067866,05-070879)");
+assert.match(playerQuery.get("select"),/own:match_participants!inner\(players!inner\(dbv_id\)\)/);
+assert.match(playerQuery.get("select"),/match_participants\(side,player_position,participant_name,players\(name,dbv_id\)\)/);
+assert.equal(playerMatchesPath(tournament,["05-067866","bad-id"]),null);
+assert.equal(playerMatchesPath(tournament,[]),null);
+assert.equal(playerMatchesPath("bad-id",["05-067866"]),null);
+
 assert.match(matchesPath(tournament),/tournament_id=eq/);
 assert.equal(matchTournament([{id:tournament,source_url:"https://evil.test"},{id:tournament,source_url:eventUrl}],{url:eventUrl})?.source_url,eventUrl);
 assert.equal(matchTournament([{id:tournament,source_url:"https://evil.test"}],{url:eventUrl}),null);
