@@ -241,13 +241,15 @@ async function refresh(force=false){
  const signal=controller.signal;
  const playerPath=followedSnapshotPath(priorityPlayers);
  const teamPath=fixtureReadPath(ctx.teams,{day:today});
+ // Authorised watch registration is best effort; its POST must never hold
+ // the visible app hostage while we render already available source facts.
+ if(isTournament&&announced.length)void watchAnnounced(announced,signal);
  // Official reads are bounded, only on the open tournament screen, and only
  // for already source-backed, followed events. No direct DBV scraping.
  const reads=await Promise.allSettled([
   playerPath?readPublicRows(playerPath,{signal,count:false,retries:0}):Promise.resolve({rows:[]}),
   teamPath?readPublicRows(teamPath,{signal,count:false,retries:0}):Promise.resolve({rows:[]}),
-  isTournament&&announced.length?readOfficialEvents(announced,signal):Promise.resolve(new Map()),
-  isTournament&&announced.length?watchAnnounced(announced,signal):Promise.resolve()
+  isTournament&&announced.length?readOfficialEvents(announced,signal):Promise.resolve(new Map())
  ]);
  if(ticket!==seq||signal.aborted)return;
  const errors=reads.slice(0,2).filter(r=>r.status==="rejected").length;
