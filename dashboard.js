@@ -2,6 +2,7 @@ import {summarizeTrophies} from "./scripts/trophy-stats.mjs";
 import {resultEvidenceHash} from "./scripts/result-evidence-nav.mjs";
 import {trophySnapshot,requestPrivateTrophies} from "./scripts/private-trophy-source.mjs";
 import {upcomingTournaments} from "./scripts/upcoming-tournaments.mjs";
+import {verifiedPlayerEvents} from "./scripts/verified-player-events.mjs";
 import {SUPABASE_ROOT,PUBLIC_KEY} from "./scripts/supabase-read.mjs";
 "use strict";
 // Official ranking totals are read only for accepted app members. Public ranking.json is intentionally empty.
@@ -209,7 +210,48 @@ function renderOtherKpis(){
  if(viewMode==="friend"){
   const p=profiles.slice().reverse().find(x=>x.id===selection);
   const official=p?.url&&/^https:\/\//.test(p.url)?p.url:null;
-  next.innerHTML='<a class="kpi-wide" href="'+escape(official||"#einstellungen")+'"'+(official?' target="_blank" rel="noopener noreferrer"':"")+'><span><strong>Offizielles Spielerprofil</strong><small>'+(official?'Spielerdaten beim DBV ansehen':'Bitte in den Freundeseinstellungen einen offiziellen Profil-Link ergänzen')+'</small></span><span class="kpi-next-date">'+(official?'Profil ↗':'Einstellungen ↗')+'</span></a>';
+  // A DBV rank ID does not encode turnier.de's separate player-profile UUID.
+  // Instead of demanding manual input, use the existing ID-keyed third-party
+  // player overview and always prefer the verified direct DBV tournament link.
+  const lookup=/^\d{2}-\d{6}$/.test(selection)?
+   "https://badhub.de/spieler/"+selection:"#spieler";
+  const profileUrl=official||lookup;
+  const announced=verifiedPlayerEvents(selection,today);
+  if(announced.length){
+   const rows=announced.map(t=>{
+    const isToday=t.startDate<=today&&t.endDate>=today;
+    const label=isToday?"Heute im Einsatz · Teilnahme vom Verein angekündigt":"Teilnahme vom Verein angekündigt";
+    return '<a class="upcoming-tournament-row" href="'+escape(t.tournamentUrl)+
+     '" target="_blank" rel="noopener noreferrer" aria-label="'+
+     escape(t.name+', offizielles DBV-Turnier öffnen')+'">'+
+     '<span class="upcoming-tournament-date"><time datetime="'+escape(t.startDate)+
+     '"><strong class="upcoming-tournament-day">'+escape(t.startDate.slice(8,10))+
+     '</strong><span class="upcoming-tournament-month">'+escape(t.startDate.slice(5,7))+
+     '/'+escape(t.startDate.slice(0,4))+'</span></time>'+
+     (isToday?'<small>Heute</small>':'')+'</span>'+
+     '<span class="upcoming-tournament-info"><strong>'+escape(t.name)+
+     '</strong><small>'+escape(date(t.startDate)+' – '+date(t.endDate)+' · '+t.location)+
+     '</small><span class="upcoming-tournament-label">'+escape(label)+
+     '</span></span><span class="upcoming-tournament-arrow" aria-hidden="true">›</span></a>';
+   }).join("");
+   next.innerHTML='<section class="upcoming-tournaments-section" aria-labelledby="followed-event-heading">'+
+    '<div class="upcoming-tournaments-header"><h2 id="followed-event-heading">Turnier · '+escape(p?.name||selection)+
+    '</h2></div><div class="upcoming-tournaments-list">'+rows+'</div>'+
+    '<p class="settings-hint">Teilnahme laut <a href="'+escape(announced[0].evidenceUrl)+
+    '" target="_blank" rel="noopener noreferrer">Vereinsankündigung vom '+
+    escape(date(announced[0].evidenceDate))+' ↗</a>. Kein bestätigter Spielbeginn.</p>'+
+    '<p class="settings-hint"><a href="'+escape(profileUrl)+
+    '" target="_blank" rel="noopener noreferrer">'+
+    (official?'Offizielles DBV-Spielerprofil ↗':'Spielerübersicht bei Badhub ↗')+
+    '</a></p></section>';
+   return;
+  }
+  next.innerHTML='<a class="kpi-wide" href="'+escape(profileUrl)+'"'+
+   (profileUrl!=="#spieler"?' target="_blank" rel="noopener noreferrer"':"")+
+   '><span><strong>'+(official?'Offizielles Spielerprofil':'Spielerübersicht bei Badhub')+
+   '</strong><small>'+(official?'DBV-Spielerprofil öffnen':
+   'Automatisch über die DBV-Spieler-ID verknüpft · Drittanbieter')+
+   '</small></span><span class="kpi-next-date">Profil ↗</span></a>';
   return;
  }
  const upcoming=upcomingTournaments(bookmarks,selection,today);
