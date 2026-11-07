@@ -10,7 +10,23 @@ const day="2026-11-07",tomorrow="2026-11-08";
 const event=VERIFIED_PLAYER_EVENTS.find(x=>x.playerId===playerId);
 assert.ok(event,"source-backed event registered for the exact DBV player ID");
 assert.equal(validVerifiedPlayerEvent(event),true);
-assert.equal(event.tournamentId,"FCBE16EF-D5A9-493A-9935-B6FF78669F6C");
+assert.equal(event.tournamentId,"836C93F3-7635-420B-B314-DEDB60884AB2");
+assert.equal(event.tournamentUrl,"https://dbv.turnier.de/tournament/"+event.tournamentId);
+// Protect against a wrong UUID that happens to be internally self-consistent.
+// The exact official calendar row must agree on source ID, tournament URL,
+// dates, location and youth groups (not the distinct SW O19 in Moessingen).
+const snapshot=JSON.parse(await readFile("data/dbv-calendar.json","utf8"));
+const official=snapshot.entries.filter(row=>row.source_key==="dbv-calendar-44606");
+assert.equal(official.length,1,"Official DBV calendar ID must be unique");
+assert.equal(official[0].event_url,event.tournamentUrl);
+assert.equal(official[0].start_date,event.startDate);
+assert.equal(official[0].end_date,event.endDate);
+assert.match(official[0].title,/Südostdeutsche Meisterschaften U13-U19/);
+assert.equal(official[0].location_text,"Augsburg");
+assert.ok(official[0].age_groups.includes("U13"));
+const different=snapshot.entries.find(row=>row.source_key==="dbv-calendar-44347");
+assert.ok(different,"Separate Südwürttembergische O19 calendar item exists");
+assert.notEqual(event.tournamentUrl,different.event_url,"Never send Südost users to Südwürttemberg O19");
 assert.equal(verifiedPlayerEvents(playerId,day,{currentOnly:true}).length,1);
 assert.equal(verifiedPlayerEvents(playerId,tomorrow,{currentOnly:true}).length,1);
 assert.equal(verifiedPlayerEvents(playerId,"2026-11-06",{currentOnly:true}).length,0);
