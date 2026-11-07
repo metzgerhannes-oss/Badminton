@@ -12,12 +12,12 @@ const TOURNAMENT_ID=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 export const VERIFIED_PLAYER_EVENTS=Object.freeze([
  Object.freeze({
   playerId:"05-067866",
-  tournamentId:"836C93F3-7635-420B-B314-DEDB60884AB2",
+  tournamentId:"FCBE16EF-D5A9-493A-9935-B6FF78669F6C",
   name:"Südostdeutsche Meisterschaften U13–U19",
   location:"Augsburg · Erhard-Wunderlich-Sporthalle",
   startDate:"2026-11-07",
   endDate:"2026-11-08",
-  tournamentUrl:"https://dbv.turnier.de/tournament/836C93F3-7635-420B-B314-DEDB60884AB2",
+  tournamentUrl:"https://dbv.turnier.de/tournament/FCBE16EF-D5A9-493A-9935-B6FF78669F6C",
   evidenceUrl:"https://www.spvgg.org/abteilungen/badminton/aktuelles/suedostdeutsche-meisterschaft-u13-u19-am-07-08-november-2026",
   evidenceDate:"2026-11-03",
   evidenceLabel:"Teilnahme laut Vereinsankündigung vom 03.11.2026"
