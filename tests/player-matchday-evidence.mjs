@@ -34,6 +34,10 @@ assert.equal(officialPlayerGames([{...official,match_participants:[
 assert.equal(officialPlayerGames([{...official,tournament_id:"6baff258-0fb5-4a2a-9a0d-78f5eea47013"}],tid,player,dbv,now).length,0);
 assert.equal(officialPlayerGames([{...official,source_url:"https://dbv.turnier.de/tournament/00000000-0000-0000-0000-000000000000"}],tid,player,dbv,now).length,0);
 assert.equal(officialPlayerGames([official],tid,"05-999999",dbv,now).length,0);
+assert.equal(officialPlayerGames([{...official,source_url:"https://evil.example/tournament/"+dbv}],tid,player,dbv,now).length,0,
+ "A forged match source must never be branded as an official DBV match");
+assert.equal(officialPlayerGames([{...official,source_url:"https://dbv.turnier.de/tournament/"+dbv+"/match/123"}],tid,player,dbv,now).length,1,
+ "A genuine official per-match path remains admissible");
 assert.equal(officialPlayerGames([official,official],tid,player,dbv,now).length,1);
 assert.equal(officialPlayerGames([{...official,last_synced_at:new Date(now-300000).toISOString()}],tid,player,dbv,now)[0].live,false,
  "No stale match may retain live status");
@@ -74,6 +78,8 @@ assert.ok(playerDay.games.every(g=>g.status!=="Spielt gerade"&&!g.score),
 assert.deepEqual(badhubPlayerGames(snapshot,player,now+300001).games,[]);
 assert.deepEqual(badhubPlayerGames({...snapshot,source_url:"https://bad.site/redirect"},player,now).games,[]);
 assert.deepEqual(badhubPlayerGames(snapshot,other,now).games,[]);
+assert.deepEqual(badhubPlayerGames({...snapshot,dbv_id:other},player,now).games,[],
+ "Cross-player snapshots cannot reuse a matching source URL");
 assert.deepEqual(badhubPlayerGames({...snapshot,payload:{...snapshot.payload,tournament:null}},player,now).games,[]);
 
 const client=await readFile("today-in-action.js","utf8");
