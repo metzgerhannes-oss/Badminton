@@ -36,7 +36,7 @@ export function officialPlayerGames(rows,tournamentId,playerId,dbvUuid,now=Date.
   try{
    const url=new URL(row.source_url);
    const prefix="/tournament/"+dbvUuid.toLowerCase();
-   const path=url.pathname.toLowerCase().replace(/\\/$/,"");
+   const path=url.pathname.toLowerCase().replace(new RegExp("/$"),"");
    if(url.protocol!=="https:"||!["dbv.turnier.de","turnier.de","www.turnier.de"].includes(url.hostname)||
     !(path===prefix||path.startsWith(prefix+"/"))||url.username||url.password)continue;
   }catch{continue}
