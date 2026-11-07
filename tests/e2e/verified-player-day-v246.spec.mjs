@@ -1,6 +1,8 @@
 import {test,expect} from "./invited-member.fixture.mjs";
 
 test("v246: followed Léona shows the source-backed Augsburg tournament today without a manual profile URL",async({page})=>{
+ // Keep the source-backed November event test repeatable after the tournament.
+ await page.clock.setFixedTime(new Date("2026-11-07T08:00:00+01:00"));
  await page.addInitScript(()=>{
   localStorage.setItem("shuttleboard-v1",JSON.stringify({
    players:[{id:"05-070879",name:"Eigenes Testprofil"}],
