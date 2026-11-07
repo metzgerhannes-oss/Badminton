@@ -32,7 +32,14 @@ export function officialPlayerGames(rows,tournamentId,playerId,dbvUuid,now=Date.
   if(!participants.some(p=>obj(p)&&obj(p.players)?.dbv_id===playerId))continue;
   // Explicit imported DBV tournament identity must match the announcement;
   // the match's individual URL may point to a separate /match/ route.
-  if(row.source_url&&eventId(row.source_url)&&eventId(row.source_url)!==dbvUuid.toUpperCase())continue;
+  if(typeof row.source_url!=="string")continue;
+  try{
+   const url=new URL(row.source_url);
+   const prefix="/tournament/"+dbvUuid.toLowerCase();
+   const path=url.pathname.toLowerCase().replace(/\\/$/,"");
+   if(url.protocol!=="https:"||!["dbv.turnier.de","turnier.de","www.turnier.de"].includes(url.hostname)||
+    !(path===prefix||path.startsWith(prefix+"/"))||url.username||url.password)continue;
+  }catch{continue}
   const m=toMatch(row,now);if(!m)continue;
   unique.add(row.id);
   output.push({
@@ -55,7 +62,7 @@ export function officialPlayerGames(rows,tournamentId,playerId,dbvUuid,now=Date.
  */
 export function badhubPlayerGames(row,playerId,now=Date.now()){
  const empty={source:"Badhub",tournament:"",checkedAt:null,dated:false,games:[],queue:null};
- if(!DBV_ID.test(String(playerId||""))||!validateSnapshot(row,playerId)||
+ if(!DBV_ID.test(String(playerId||""))||row?.dbv_id!==playerId||!validateSnapshot(row,playerId)||
   !Number.isFinite(now)||berlinDay(row.checked_at)!==berlinDay(now))return empty;
  const checked=Date.parse(row.checked_at);
  const age=now-checked;
