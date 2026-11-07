@@ -49,7 +49,7 @@ function parseCard(card,{tournamentId,playerNo},seen){
  if(new Set(uniqueIds).size!==uniqueIds.length)return null;
  const time=card.match(/\b(?:Mo|Di|Mi|Do|Fr|Sa|So)\s+(\d{2})\.(\d{2})\.(20\d{2})\s+(\d{2}):(\d{2})/);
  const when=time?berlinInstant(time[1],time[2],time[3],time[4],time[5]):null;
- const footer=card.match(/class="icon-marker"[\s\S]{0,600}?<span class="nav-link__value">([^<]+)<\/span>/i);
+ const footer=card.match(/class="icon-marker[^"]*"[\s\S]{0,600}?<span class="nav-link__value">([^<]+)<\/span>/i);
  const hall=footer?decode(footer[1]):"";
  const court=hall.match(/\s-\s(\d{1,3})$/)?.[1]||null;
  const result=resultAt>=0?card.slice(resultAt,card.indexOf('<div class="match__btn"',resultAt)>0?card.indexOf('<div class="match__btn"',resultAt):undefined):"";
@@ -59,6 +59,8 @@ function parseCard(card,{tournamentId,playerNo},seen){
  const winners=sides.map((s,i)=>s.won?i+1:null).filter(Boolean);
  // Only explicit winner + valid set scores are accepted as completed.
  const finished=games.length>=2&&winners.length===1;
+ // An undated bracket placeholder is not a playable scheduled fixture.
+ if(!when&&!finished)return null;
  const status=finished?"finished":"scheduled";
  const slotKey=draw[1]+":"+keyPart;
  const slot=(seen.get(slotKey)||0)+1;seen.set(slotKey,slot);
