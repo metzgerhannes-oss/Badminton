@@ -87,6 +87,7 @@ assert.equal(projected.kind,"forecast","Live provider projection outranks origin
 assert.equal(projected.overdue,false);
 assert.match(projected.time,/Uhr$/);
 assert.equal(nextMatchTiming({planned_ts:now+35*60000},now).kind,"planned");
+assert.equal(nextMatchTiming({planned_ts:String(now+35*60000)},now).kind,"planned","Numeric-string provider times are valid");
 assert.equal(nextMatchTiming({predicted_start_ts:now-3*60000},now).overdue,true,
  "Elapsed provider projection must be explicitly flagged");
 assert.equal(nextMatchTiming({predicted_start_ts:"not a timestamp",planned_ts:now+60000},now).kind,"planned");

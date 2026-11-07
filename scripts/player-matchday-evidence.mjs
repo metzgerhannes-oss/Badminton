@@ -11,6 +11,22 @@ import {berlinDay} from "./today-evidence.mjs";
 
 const obj=x=>x&&typeof x==="object"&&!Array.isArray(x)?x:null;
 const short=(x,n=100)=>typeof x==="string"?x.trim().slice(0,n):"";
+// Spielform from the published event code, never guessed from age or player name.
+export function gameFormat(label){
+ const token=short(label,90).toUpperCase().match(/^(MXD|MIX|JE|ME|HE|DE|SE|UE|WS|MS|JD|MD|HD|DD|BD|WD|MX|GD|XD)(?=\s|$)/)?.[1];
+ if(["JE","ME","HE","DE","SE","UE","WS","MS"].includes(token))return "Einzel";
+ if(["JD","MD","HD","DD","BD","WD"].includes(token))return "Doppel";
+ if(["MXD","MIX","MX","GD","XD"].includes(token))return "Mixed";
+ return "";
+}
+export function ownTournamentGameGroups(games){
+ const rows=Array.isArray(games)?games:[];
+ return {
+  upcoming:rows.filter(x=>x?.category==="live"||x?.category==="upcoming"),
+  finished:rows.filter(x=>x?.category==="finished"),
+  other:rows.filter(x=>x?.category==="other")
+ };
+}
 const matchId=m=>{const o=obj(m),v=o?.match_id??o?.match_key??o?.id;
  return typeof v==="string"?short(v,120):
  Number.isSafeInteger(v)&&v>0?String(v):"";
@@ -29,7 +45,11 @@ export function officialPlayerGames(rows,tournamentId,playerId,dbvUuid,now=Date.
  for(const row of rows.slice(0,240)){
   if(!obj(row)||row.tournament_id!==tournamentId||unique.has(row.id))continue;
   const participants=Array.isArray(row.match_participants)?row.match_participants:[];
-  if(!participants.some(p=>obj(p)&&obj(p.players)?.dbv_id===playerId))continue;
+  const own=participants.filter(p=>obj(p)&&obj(p.players)?.dbv_id===playerId&&
+   (p.side===1||p.side===2));
+  // One exact DBV identity on exactly one side: no match attribution by name.
+  if(own.length!==1)continue;
+  const playerSide=own[0].side;
   // Explicit imported DBV tournament identity must match the announcement;
   // the match's individual URL may point to a separate /match/ route.
   if(typeof row.source_url!=="string")continue;
@@ -44,8 +64,12 @@ export function officialPlayerGames(rows,tournamentId,playerId,dbvUuid,now=Date.
   unique.add(row.id);
   output.push({
    id:"official:"+m.id,source:"DBV-Import",status:m.label,
-   discipline:m.discipline,side1:m.side1,side2:m.side2,
-   court:m.court,scheduledAt:m.scheduledAt,sets:m.sets,
+   discipline:m.discipline,format:gameFormat(m.discipline),
+   opponent:(playerSide===1?m.side2:m.side1)==="Noch offen"?"":(playerSide===1?m.side2:m.side1),
+   playerSide,side1:m.side1,side2:m.side2,
+   court:m.court,scheduledAt:m.scheduledAt,
+   // Published DBV scores are side1:side2; show them from THIS player's side.
+   sets:playerSide===2?m.sets.map(s=>s.split(":").reverse().join(":")):m.sets,
    checkedAt:m.checkedAt,category:m.category,
    live:m.category==="live"&&m.sourceFresh,
    sourceUrl:"https://dbv.turnier.de/tournament/"+dbvUuid.toUpperCase()
@@ -83,7 +107,9 @@ export function badhubPlayerGames(row,playerId,now=Date.now()){
   if(!opponent&&!court&&!when&&!score&&!key)return;
   const outcome=scoreAllowed?playerOutcome(match):null;
   games.push({id:key||"row:"+games.length,source:"Badhub",
-   status,discipline:matchLabel(match),opponent,court,when,score,
+   status,discipline:matchLabel(match),format:gameFormat(matchLabel(match)),
+   category:status==="Ergebnis veröffentlicht"?"finished":status==="Spielt gerade"?"live":"upcoming",
+   opponent,court,when,score,
    outcome:outcome==="win"?"Sieg":outcome==="loss"?"Niederlage":"",
    checkedAt:row.checked_at});
  }

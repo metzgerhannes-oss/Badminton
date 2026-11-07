@@ -9,9 +9,9 @@ import {normalizeFollows} from "./scripts/team-directory-utils.mjs";
 import {readPublicRows} from "./scripts/supabase-read.mjs";
 import {todayDisplayRows} from "./scripts/today-presentation.mjs";
 import {verifiedRosterEvents} from "./scripts/verified-player-events.mjs";
-import {eventId,tournamentPath,matchesPath,matchTournament} from "./scripts/tournament-live.mjs";
-import {officialPlayerGames,badhubPlayerGames} from "./scripts/player-matchday-evidence.mjs";
-import {watchRequest} from "./scripts/live-radar.mjs";
+import {eventId,tournamentPath,playerMatchesPath,matchTournament} from "./scripts/tournament-live.mjs";
+import {officialPlayerGames,badhubPlayerGames,ownTournamentGameGroups} from "./scripts/player-matchday-evidence.mjs";
+import {watchRequest,DBV_ID} from "./scripts/live-radar.mjs";
 
 const $=id=>document.getElementById(id);
 const hosts=["today-home","today-tournament"];
@@ -28,65 +28,96 @@ const readLocalFollows=()=>{
 };
 let last=null,signature="",checked=0,loading=false,seq=0,controller=null;
 let expiryTimer=null;
-let lastSnapshots=new Map(),lastOfficial=new Map(),watchTimes=new Map();
+let lastSnapshots=new Map(),lastOfficial=new Map(),lastOfficialFailures=new Set(),watchTimes=new Map();
 const GAME_READ_LIMIT=4;
 const gameTime=value=>{
  if(!value||!Number.isFinite(Date.parse(value)))return "";
- return new Intl.DateTimeFormat("de-DE",{
+ const when=new Date(value),date=berlinDay(value)!==berlinDay(Date.now())
+  ?new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",timeZone:"Europe/Berlin"}).format(when)+" · ":"";
+ const time=new Intl.DateTimeFormat("de-DE",{
   hour:"2-digit",minute:"2-digit",timeZone:"Europe/Berlin"
- }).format(new Date(value))+" Uhr";
+ }).format(when);
+ return date+time+" Uhr";
 };
-/** An in-app match panel is passive content inside the existing verified
- * source link. It neither starts live polling nor creates a match claim.
- * A Badhub report is never presented as the official DBV event feed.
- */
-function gamePanel(title,sourceName,matches,{sourceTournament="",notice=""}={}){
+/** Player-only match details: never use a club/tournament announcement as proof
+ * of a draw. A Badhub snapshot is explicitly separate from DBV matches. */
+function gamePanel(title,sourceName,matches,{sourceTournament="",notice="",ownerName="",grouped=false}={}){
  if(!matches.length)return null;
  const section=n("section","today-games-panel");
  section.append(n("strong","today-games-heading",title));
- const meta=n("small","today-games-provenance",sourceName+
-  (sourceTournament?" · "+sourceTournament:""));
- section.append(meta);
+ section.append(n("small","today-games-provenance",sourceName+
+  (sourceTournament?" · "+sourceTournament:"")));
+ if(ownerName)section.append(n("small","today-games-notice","Nur belegte Spiele von "+ownerName));
  if(notice)section.append(n("small","today-games-notice",notice));
- for(const m of matches.slice(0,12)){
+ const renderGame=m=>{
   const game=n("div","today-game-line");
   const top=n("div","today-game-head");
   top.append(n("span","today-game-status",m.status));
-  top.append(n("span","today-game-discipline",m.discipline));
+  if(m.discipline&&m.discipline!=="Begegnung")
+   top.append(n("span","today-game-discipline",m.discipline));
   game.append(top);
-  if(m.side1||m.side2)
-   game.append(n("strong","today-game-opponents",m.side1+" – "+m.side2));
-  else if(m.opponent)
-   game.append(n("strong","today-game-opponents","Gegen "+m.opponent));
-  const fields=[
-   m.court?"Feld "+m.court:"",
-   m.scheduledAt?"Geplant "+gameTime(m.scheduledAt):m.when||"",
-   Array.isArray(m.sets)&&m.sets.length?"Sätze "+m.sets.join(" · "):m.score?"Sätze "+m.score:"",
+  if(m.opponent)game.append(n("strong","today-game-opponents","Gegner: "+m.opponent));
+  else if(m.source==="DBV-Import")
+   game.append(n("span","today-game-opponents","Gegner noch nicht veröffentlicht"));
+  const details=[
+   m.format?"Spielform: "+m.format:"",
+   m.scheduledAt?(m.category==="finished"?"Ansetzung: ":"Geplant: ")+gameTime(m.scheduledAt):m.when||"",
+   m.court?"Feld: "+m.court:m.source==="DBV-Import"?"Feld noch offen":"",
+   Array.isArray(m.sets)&&m.sets.length?"Sätze: "+m.sets.join(" · "):
+    m.score?"Sätze: "+m.score:"",
    m.outcome||""
   ].filter(Boolean);
-  if(fields.length)game.append(n("small","today-game-meta",fields.join(" · ")));
-  game.append(n("small","today-game-source","Stand: "+(gameTime(m.checkedAt)||"nicht verfügbar")));
-  section.append(game);
- }
+  if(details.length)game.append(n("small","today-game-meta",details.join(" · ")));
+  if(m.category==="finished"&&!m.sets?.length&&!m.score)
+   game.append(n("small","today-game-meta","Ergebnis noch nicht veröffentlicht"));
+  game.append(n("small","today-game-source","Datenstand: "+(gameTime(m.checkedAt)||"nicht verfügbar")));
+  return game;
+ };
+ if(grouped){
+  const groups=ownTournamentGameGroups(matches);
+  for(const [heading,games] of [
+    ["Jetzt und anstehend",groups.upcoming],
+    ["Bereits gespielt",groups.finished],
+    ["Nicht gespielt / abgesagt",groups.other]
+  ]){
+   if(!games.length)continue;
+   section.append(n("strong","today-game-group-heading",heading+" ("+games.length+")"));
+   for(const game of games)section.append(renderGame(game));
+  }
+ }else for(const game of matches.slice(0,12))section.append(renderGame(game));
  return section;
 }
 async function readOfficialEvents(events,signal){
- const out=new Map(),unique=[...new Map(events.map(x=>[x.tournamentId,x])).values()]
-  .slice(0,GAME_READ_LIMIT);
+ const out=new Map(),failures=new Set(),byTournament=new Map();
+ // Multiple followed players may attend the same event. Query that tournament
+ // once for ALL of those IDs, not the first player and not 240 unrelated games.
+ for(const event of events){
+  const id=eventId(event.tournamentUrl);
+  if(!id||!DBV_ID.test(event.playerId))continue;
+  if(!byTournament.has(id))byTournament.set(id,{id,url:event.tournamentUrl,ids:[]});
+  const group=byTournament.get(id);
+  if(!group.ids.includes(event.playerId)&&group.ids.length<12)
+   group.ids.push(event.playerId);
+ }
+ const unique=[...byTournament.values()].slice(0,GAME_READ_LIMIT);
  const data=await Promise.allSettled(unique.map(async item=>{
-  const id=eventId(item.tournamentUrl);
-  if(!id)return null;
-  const {rows:tournaments}=await readPublicRows(tournamentPath(id),{signal,count:false,retries:0});
-  const selected=matchTournament(tournaments,{url:item.tournamentUrl});
+  const {rows:tournaments}=await readPublicRows(tournamentPath(item.id),{signal,count:false,retries:0});
+  const selected=matchTournament(tournaments,{url:item.url});
   if(!selected)return null;
-  const {rows:matches}=await readPublicRows(matchesPath(selected.id),{
+  const path=playerMatchesPath(selected.id,item.ids);
+  if(!path)throw Error("Invalid bounded player-match request");
+  const {rows:matches}=await readPublicRows(path,{
    signal,count:false,retries:0,timeoutMs:9000
   });
-  return [id,{internalId:selected.id,rows:matches}];
+  return [item.id,{internalId:selected.id,rows:matches}];
  }));
- for(const result of data)if(result.status==="fulfilled"&&result.value)
-  out.set(result.value[0],result.value[1]);
- return out;
+ for(let i=0;i<data.length;i++){
+  const result=data[i],id=unique[i].id;
+  if(result.status==="fulfilled"&&result.value)
+   out.set(result.value[0],result.value[1]);
+  else if(result.status==="rejected")failures.add(id);
+ }
+ return {out,failures};
 }
 /** Existing authorised watch path, only for currently announced followed IDs
  * while Turniertag is actually open. No new cron, vendor scraping or secrets.
@@ -146,17 +177,20 @@ function buildCard(event,{showMatches=false}={}){
   const official=sourceId?lastOfficial.get(sourceId):null;
   const matches=official?officialPlayerGames(official.rows,official.internalId,
    event.playerId,sourceId,Date.now()):[];
-  const panel=gamePanel("Einzelspiele · offizieller DBV-Import",
-   "DBV-Turnier "+sourceId,matches);
+  const panel=gamePanel("Eigene Spiele im Turnier · offizieller DBV-Import",
+   "DBV-Turnier "+sourceId,matches,{ownerName:event.name,grouped:true});
   if(panel)row.append(panel);
   else row.append(n("small","today-games-unavailable",
-   "Noch keine belegten Einzelspiele aus dem offiziellen Import verfügbar."));
+   sourceId&&lastOfficialFailures.has(sourceId)
+    ?"Offizielle Spieldaten konnten nicht geladen werden. Erneuter Versuch beim nächsten Abgleich."
+    :"Noch keine belegten Einzelspiele aus dem offiziellen Import verfügbar."));
   const live=badhubPlayerGames(lastSnapshots.get(event.playerId),
    event.playerId,Date.now());
   if(live.games.length){
    const extra=gamePanel("Weitere Spieler-Spiele · Badhub","Drittanbieter",
     live.games,{sourceTournament:live.tournament,notice:
-    "Separate Spielerquelle – Zuordnung zu diesem DBV-Turnier nicht bestätigt."});
+    "Separate Spielerquelle – Zuordnung zu diesem DBV-Turnier nicht bestätigt.",
+    ownerName:event.name,grouped:true});
    if(extra)row.append(extra);
   }
  }else if(showMatches&&isPlayer){
@@ -217,7 +251,7 @@ function informNav(){
 async function refresh(force=false){
  if(!visible()||document.hidden)return;
  if(!window.badmintonAppAccess?.allowed){
-  last=null;lastSnapshots=new Map();lastOfficial=new Map();
+  last=null;lastSnapshots=new Map();lastOfficial=new Map();lastOfficialFailures=new Set();
   signature="";checked=0;render();informNav();scheduleLocalExpiry();return;
  }
  const ctx=context(),today=berlinDay(),isTournament=location.hash==="#turniere";
@@ -255,12 +289,15 @@ async function refresh(force=false){
  const errors=reads.slice(0,2).filter(r=>r.status==="rejected").length;
  const rows=reads.slice(0,2).map(r=>r.status==="fulfilled"?r.value.rows:[]);
  lastSnapshots=new Map((rows[0]||[]).filter(row=>row?.dbv_id).map(row=>[row.dbv_id,row]));
- lastOfficial=reads[2].status==="fulfilled"?reads[2].value:new Map();
+ const official=reads[2].status==="fulfilled"?reads[2].value:null;
+ lastOfficial=official?.out||new Map();
+ lastOfficialFailures=official?.failures||new Set();
  last=todayEvidence({now:Date.now(),groups:ctx.groups,snapshots:rows[0],
   follows:ctx.follows,teams:ctx.teams,fixtures:rows[1]});
  // Do not reuse a cached answer with a failed source as if it were complete.
- signature=errors?"":stamp;
- checked=errors?0:Date.now();
+ const sourceError=reads[2].status==="rejected"||lastOfficialFailures.size>0;
+ signature=errors||sourceError?"":stamp;
+ checked=errors||sourceError?0:Date.now();
  loading=false;render(false,errors?"partial":"");
  informNav();scheduleLocalExpiry();
 }

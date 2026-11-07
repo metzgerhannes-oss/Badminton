@@ -18,6 +18,24 @@ export function matchesPath(id){
  return "matches?"+new URLSearchParams({select,tournament_id:"eq."+id,
   order:"scheduled_at.asc.nullslast",limit:"240"});
 }
+/** Bounded one-query DBV match read for the *selected players*, not every match
+ * from a multi-age tournament. A second named embed keeps BOTH opponents and
+ * the exact identity predicate. Still re-check identity client-side. */
+export function playerMatchesPath(id,playerIds){
+ if(!UUID.test(id||""))return null;
+ const ids=[...new Set(Array.isArray(playerIds)?playerIds:[playerIds])];
+ if(!ids.length||ids.length>12||
+  ids.some(v=>typeof v!=="string"||!/^\d{2}-\d{6}$/.test(v)))return null;
+ const select="id,tournament_id,status,court,scheduled_at,source_url,last_synced_at,"+
+  "events(title,age_group,discipline),"+
+  "match_participants(side,player_position,participant_name,players(name,dbv_id)),"+
+  "match_games(game_number,side1_points,side2_points,finished),"+
+  "own:match_participants!inner(players!inner(dbv_id))";
+ return "matches?"+new URLSearchParams({select,tournament_id:"eq."+id,
+  "own.players.dbv_id":"in.("+ids.join(",")+")",
+  order:"scheduled_at.asc.nullslast",limit:"240"});
+}
+
 export function matchTournament(rows,event){
  const id=eventId(event?.url);
  if(!id||!Array.isArray(rows))return null;
