@@ -49,6 +49,8 @@
 .today-games-notice{font-style:italic}
 .today-game-line{min-width:0;display:grid;gap:.2rem;padding:.6rem .3rem;
  border-top:1px solid #7199b5}
+.today-game-group-heading{font-size:.86rem;line-height:1.4;color:#fff;
+ padding:.48rem .12rem .16rem;border-top:1px solid #5f88a8;font-weight:800}
 .today-game-head{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
 .today-game-status{background:#335e80;color:#fff;border:1px solid #97bed8;
  border-radius:5px;padding:.12rem .4rem;font-size:.78rem;font-weight:800}
@@ -60,4 +62,15 @@
 @media(max-width:420px){
  .today-games-panel{padding:.5rem;gap:.35rem}
  .today-game-line{padding:.45rem .15rem}
+}
+
+/* v249: opponent, Spiel­form, reported time and court remain readable at 320px.
+ * Completed matches are grouped separately; no color alone carries status. */
+.today-game-line{gap:.35rem}
+.today-game-meta{font-size:.83rem;line-height:1.55}
+.today-game-opponents{font-size:.96rem;font-weight:760}
+.today-game-group-heading:first-of-type{border-top:0}
+@media(max-width:420px){
+ .today-game-group-heading{font-size:.85rem}
+ .today-game-opponents{font-size:.9rem}
 }
