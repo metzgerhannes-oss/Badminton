@@ -136,7 +136,7 @@ function due(target:any,tournament:any,now:number,ignoreAge=false){
  return true;
 }
 async function targets(){
- const rows=await db("dbv_matchday_targets?select=tournament_id,dbv_id,source_player_no,active_until,last_checked_at&order=last_checked_at.asc.nullsfirst&limit=12");
+ const rows=await db("dbv_matchday_targets?select=tournament_id,dbv_id,source_player_no,active_until,last_checked_at&active_until=gte."+berlinDay()+"&order=last_checked_at.asc.nullsfirst&limit=12");
  if(!Array.isArray(rows)||rows.length===0)return [];
  const ids=[...new Set(rows.map((r:any)=>r.tournament_id))];
  if(ids.length>12||ids.some((id:any)=>!/^[a-f0-9-]{36}$/i.test(id)))throw Error("target_ids");
