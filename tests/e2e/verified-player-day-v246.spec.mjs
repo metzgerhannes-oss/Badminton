@@ -17,6 +17,6 @@ test("v246: followed Léona shows the source-backed Augsburg tournament today wi
  await expect(detail).toContainText("Südostdeutsche Meisterschaften U13");
  await expect(detail).toContainText("Teilnahme vom Verein angekündigt");
  await expect(detail).not.toContainText("Bitte in den Freundeseinstellungen");
- await expect(detail.locator('a[href="https://dbv.turnier.de/tournament/FCBE16EF-D5A9-493A-9935-B6FF78669F6C"]')).toBeVisible();
+ await expect(detail.locator('a[href="https://dbv.turnier.de/tournament/836C93F3-7635-420B-B314-DEDB60884AB2"]')).toBeVisible();
  await expect(detail.locator('a[href*="spvgg.org/abteilungen/badminton/aktuelles/"]')).toBeVisible();
 });
