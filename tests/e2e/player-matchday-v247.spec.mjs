@@ -63,6 +63,18 @@ async function setup(page,{games=true,matchReadFails=false}={}){
     {side:2,player_position:1,players:{dbv_id:"05-000003",name:"Fremde Gegnerin"}}
    ],
    match_games:[{game_number:1,side1_points:21,side2_points:10,finished:true}]
+  },{
+   id:"bcf6d3be-1fde-4e61-a12d-392200ff216d",
+   tournament_id:INTERNAL,status:"scheduled",court:null,
+   scheduled_at:"2026-11-08T10:00:00+01:00",
+   source_url:"https://dbv.turnier.de/tournament/"+EVENT,
+   last_synced_at:new Date(NOW-15000).toISOString(),
+   events:{title:"MD U15"},match_participants:[
+    {side:1,player_position:1,players:{dbv_id:PLAYER,name:"Synthetische Léona"}},
+    {side:1,player_position:2,players:{dbv_id:"05-000004",name:"Doppelpartnerin"}},
+    {side:2,player_position:1,players:{dbv_id:"05-000005",name:"Gegnerteam 1"}},
+    {side:2,player_position:2,players:{dbv_id:"05-000006",name:"Gegnerteam 2"}}
+   ],match_games:[]
   }]:[])
  }));
  await page.route("**/rest/v1/player_live_snapshots?*",route=>route.fulfill({
@@ -96,7 +108,7 @@ test("v247: source-backed player games appear directly below Turniertag with cou
  await expect(panel).toContainText("Offizieller DBV-Import");
  await expect(panel).toContainText("Synthetische Gegnerin");
  await expect(panel).toContainText("Feld 2");
- await expect(panel).toContainText("Spielform: Einzel");
+ await expect(panel).toContainText("Mädchen-Einzel U15");
  await expect(panel).toContainText("08:55 Uhr");
  await expect(panel).toContainText("Aufgerufen");
  await expect(panel).toContainText("Weitere Spieler-Spiele · Badhub");
@@ -104,14 +116,23 @@ test("v247: source-backed player games appear directly below Turniertag with cou
  await expect(panel).toContainText("21:17");
  await expect(panel).toContainText("Zuordnung zu diesem DBV-Turnier nicht bestätigt");
  await expect(panel).toHaveAttribute("href","https://dbv.turnier.de/tournament/"+EVENT);
- await expect(panel).toContainText("Bereits gespielt (1)");
+ await expect(panel.locator(".today-game-group-heading[data-day='finished']")).toContainText("BEREITS GESPIELT");
  await expect(panel).toContainText("Gegner: Synthetischer Gegner");
- await expect(panel).toContainText("Spielform: Mixed");
+ await expect(panel).toContainText("Mixed U15");
  await expect(panel).toContainText("07:30 Uhr");
  await expect(panel).toContainText("Feld 5");
  await expect(panel).toContainText("21:19 · 24:22");
  await expect(panel).not.toContainText("Fremde Spielerin");
- await expect(panel.locator(".today-game-line")).toHaveCount(3);
+ await expect(panel.locator(".today-game-line")).toHaveCount(4);
+ await expect(panel.locator(".today-game-group-heading[data-day='today']")).toContainText("HEUTE");
+ await expect(panel.locator(".today-game-group-heading[data-day='tomorrow']")).toContainText("MORGEN");
+ await expect(panel.locator(".today-game-group-heading[data-day='tomorrow']")).toContainText("08.11.");
+ await expect(panel).toContainText("Mädchen-Doppel U15");
+ await expect(panel.locator(".today-game-line[data-category='upcoming']").filter({hasText:"Mädchen-Doppel U15"})).toContainText("Gegnerteam 1 / Gegnerteam 2");
+ await expect(panel.locator(".today-game-line[data-next='true']")).toContainText("NÄCHSTES SPIEL");
+ await expect(panel.locator(".today-game-line[data-next='true']")).toContainText("Mädchen-Einzel U15");
+ await expect(panel.locator(".today-game-line[data-compact='true']")).toHaveCount(1);
+
  // An announcement alone is never the red verified-match shortcut.
  await expect(page.locator("#today-tournament .today-match-row[data-kind='announced'] .today-game-status").first()).toHaveText("Aufgerufen");
 });
@@ -133,6 +154,6 @@ test("v249: a rejected official match read is not misreported as no published ga
  const panel=page.locator("#today-tournament .today-match-row[data-kind='announced']");
  await expect(panel).toBeVisible({timeout:20000});
  await expect(panel).toContainText("Offizielle Spieldaten konnten nicht geladen werden");
- await expect(panel).not.toContainText("Bereits gespielt (1)");
+ await expect(panel.locator(".today-game-group-heading[data-day='finished']")).toHaveCount(0);
  await expect(panel).not.toContainText("Synthetischer Gegner");
 });
