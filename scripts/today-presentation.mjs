@@ -6,6 +6,7 @@
  */
 import {officialTeamUrl} from "./team-directory-utils.mjs";
 import {berlinDay} from "./today-evidence.mjs";
+import {verifiedPlayerEvents} from "./verified-player-events.mjs";
 const instant=/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.\d{1,9})?)?(?:Z|[+-]\d\d:\d\d)$/;
 export function kickoffLabel(value,now=Date.now()){
  if(typeof value!=="string"||!instant.test(value))return "";
@@ -59,7 +60,7 @@ const TEAM_STATUS=Object.freeze({
  scheduled:"Heute angesetzt",result:"Ergebnis veröffentlicht",
  postponed:"Verlegt",cancelled:"Abgesagt", "unverified-result":"Ergebnis noch nicht belegt"
 });
-const ORDER=Object.freeze({playing:0,next:1,scheduled:2,tournament:3,result:4,
+const ORDER=Object.freeze({playing:0,next:1,scheduled:2,tournament:3,announced:4,result:5,
  postponed:5,cancelled:6,"unverified-result":7});
 const safeText=(value,max=115)=>typeof value==="string"?value.trim().slice(0,max):"";
 export function todayDisplayRows(events,{now=Date.now(),limit=102}={}){
@@ -73,6 +74,21 @@ export function todayDisplayRows(events,{now=Date.now(),limit=102}={}){
   if(event.entity==="player"){
    const playerId=safeText(event.playerId,20);
    if(!PLAYER_ID.test(playerId)||!Object.hasOwn(PLAYER_STATUS,event.kind))continue;
+   if(event.kind==="announced"&&event.source==="Vereinsmeldung"){
+    const sourced=verifiedPlayerEvents(playerId,berlinDay(now),{currentOnly:true})
+     .find(row=>row.tournamentId===event.tournamentId&&
+      row.tournamentUrl===event.sourceUrl&&row.evidenceUrl===event.evidenceUrl);
+    if(!sourced)continue;
+    const name=safeText(event.name,90);
+    if(!name)continue;
+    seen.add(id);
+    rows.push({id,entity:"player",kind:"announced",label:"Spieler",
+     status:"Turnierteilnahme angekündigt",name,
+     detail:safeText(sourced.name+" · "+sourced.location,115),
+     kickoff:"",pairing:"",score:"",url:sourced.tournamentUrl,
+     priority:ORDER.announced,order:rows.length});
+    continue;
+   }
    // A provider URL, DBV ID, same-day check and strict 120-second TTL all
    // have to match. Local profile names never confer LIVE authorization.
    const url="https://badhub.de/spieler/"+playerId+"/live";
