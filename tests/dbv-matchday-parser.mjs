@@ -74,5 +74,5 @@ assert.doesNotMatch(targets,/cron\.schedule|dispatch_dbv_matchday/);
 assert.match(cleanup,/cron\.unschedule/);
 assert.match(cleanup,/DROP FUNCTION IF EXISTS private\.dispatch_dbv_matchday_v250/);
 assert.match(client,/setInterval\(\(\)=>\{if\(location\.hash==="#turniere"&&!document\.hidden/);
-assert.match(client,/Date\.now\(\)-\(officialWatchTimes\.get\(key\)\|\|0\)>=300000/);
+assert.match(client,/return now-\(officialWatchTimes\.get\(key\)\|\|0\)>=300000/);
 console.log("DBV v250: own future/completed matches, Berlin time, field, no phantom games, security gates OK.");
