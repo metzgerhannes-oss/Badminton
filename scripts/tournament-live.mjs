@@ -25,7 +25,7 @@ export function playerMatchesPath(id,playerIds){
  if(!UUID.test(id||""))return null;
  const ids=[...new Set(Array.isArray(playerIds)?playerIds:[playerIds])];
  if(!ids.length||ids.length>12||
-  ids.some(v=>typeof v!=="string"||!/^\\d{2}-\\d{6}$/.test(v)))return null;
+  ids.some(v=>typeof v!=="string"||!/^\d{2}-\d{6}$/.test(v)))return null;
  const select="id,tournament_id,status,court,scheduled_at,source_url,last_synced_at,"+
   "events(title,age_group,discipline),"+
   "match_participants(side,player_position,participant_name,players(name,dbv_id)),"+
