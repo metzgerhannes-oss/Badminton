@@ -50,16 +50,6 @@ async function member(req:Request){
   return r.ok&&(await r.json())?.allowed===true;
  }catch{return false}
 }
-async function cron(req:Request){
- const token=req.headers.get("x-schmetterlinge-matchday-cron")||"";
- if(!/^[a-f0-9]{64}$/.test(token))return false;
- try{
-  const valid=await db("rpc/dbv_matchday_cron_authorized",{
-   method:"POST",body:JSON.stringify({p_token:token})
-  });
-  return valid===true;
- }catch{return false}
-}
 function cookies(r:Response){
  const all=typeof r.headers.getSetCookie==="function"?
   r.headers.getSetCookie():[r.headers.get("set-cookie")||""];
@@ -183,23 +173,21 @@ Deno.serve(async(req:Request)=>{
  let body:any;try{const raw=await req.text();if(raw.length>512)throw Error();
   body=JSON.parse(raw);
  }catch{return reply(400,{error:"invalid_json"},origin)}
- const scheduled=body?.mode==="cron";
- if(scheduled?!(await cron(req)):!(await member(req)))
-  return reply(403,{error:"member_or_scheduler_required"},origin);
+ // No scheduled refresh. Only an authorized family member viewing the
+ // Turniertag may request a bounded update. No background traffic when closed.
+ if(body?.mode!=="member")return reply(400,{error:"on_demand_only"},origin);
+ if(!(await member(req)))
+  return reply(403,{error:"app_invitation_required"},origin);
  let selected;
  try{
   const all=await targets();
-  if(scheduled){
-   selected=all.filter(({target,tournament}:any)=>due(target,tournament,Date.now())).slice(0,4);
-  }else{
-   const dbvId=String(body?.dbv_id||"");
-   const eventId=String(body?.tournament_uuid||"");
-   if(!/^\d{2}-\d{6}$/.test(dbvId)||!/^[a-f0-9-]{36}$/i.test(eventId))
-    return reply(400,{error:"invalid_scope"},origin);
-   selected=all.filter(({target,tournament}:any)=>
-    target.dbv_id===dbvId&&tournament?.external_id?.toLowerCase()===eventId.toLowerCase()&&
-    due(target,tournament,Date.now())).slice(0,1);
-  }
+  const dbvId=String(body?.dbv_id||"");
+  const eventId=String(body?.tournament_uuid||"");
+  if(!/^\d{2}-\d{6}$/.test(dbvId)||!/^[a-f0-9-]{36}$/i.test(eventId))
+   return reply(400,{error:"invalid_scope"},origin);
+  selected=all.filter(({target,tournament}:any)=>
+   target.dbv_id===dbvId&&tournament?.external_id?.toLowerCase()===eventId.toLowerCase()&&
+   due(target,tournament,Date.now())).slice(0,1);
  }catch(e){
   const message=String(e);
   const code=message.includes("database_http_")?
