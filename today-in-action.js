@@ -28,7 +28,7 @@ const readLocalFollows=()=>{
 };
 let last=null,signature="",checked=0,loading=false,seq=0,controller=null;
 let expiryTimer=null;
-let lastSnapshots=new Map(),lastOfficial=new Map(),lastOfficialFailures=new Set(),watchTimes=new Map();
+let lastSnapshots=new Map(),lastOfficial=new Map(),lastOfficialFailures=new Set(),watchTimes=new Map(),officialWatchTimes=new Map();
 const GAME_READ_LIMIT=4;
 const gameTime=value=>{
  if(!value||!Number.isFinite(Date.parse(value)))return "";
@@ -139,6 +139,48 @@ async function watchAnnounced(events,signal){
   // A rejected watch does not turn an empty/stale snapshot into match evidence.
   if(!response.ok&&response.status!==400&&response.status!==409)return;
  }));
+}
+
+/** Optional immediate refresh on opening the private tournament page.
+ * Cron already refreshes active events; this merely reduces the lag for an
+ * allowed family member. No browser-to-DBV request, secrets or HTML persistence. */
+async function requestOfficialMatchday(events,signal){
+ const candidates=events.filter(event=>DBV_ID.test(event.playerId)&&
+   Boolean(eventId(event.tournamentUrl))).slice(0,4);
+ const now=Date.now(),needed=candidates.filter(event=>{
+  const key=event.playerId+":"+event.tournamentId;
+  return now-(officialWatchTimes.get(key)||0)>=300000;
+ }).slice(0,2);
+ if(!needed.length)return;
+ const token=await window.badmintonAppAccess?.getAccessToken?.();
+ if(!token||signal.aborted||window.badmintonAppAccess?.allowed!==true)return;
+ let updated=false;
+ await Promise.allSettled(needed.map(async event=>{
+  const key=event.playerId+":"+event.tournamentId;
+  officialWatchTimes.set(key,now);
+  const ctrl=new AbortController();
+  const abort=()=>ctrl.abort();
+  signal.addEventListener("abort",abort,{once:true});
+  const timer=setTimeout(()=>ctrl.abort(),20000);
+  try{
+   const response=await fetch(
+    "https://yadexibmjmnjfmfabrug.supabase.co/functions/v1/dbv-matchday-sync",{
+     method:"POST",signal:ctrl.signal,cache:"no-store",
+     headers:{"Content-Type":"application/json",
+      Authorization:"Bearer "+token},
+     body:JSON.stringify({mode:"member",dbv_id:event.playerId,
+      tournament_uuid:event.tournamentId})
+    });
+   if(response.ok){
+    const result=await response.json();
+    updated=updated||Number(result?.checked||0)>0;
+   }
+  }catch{}finally{
+   clearTimeout(timer);signal.removeEventListener("abort",abort);
+  }
+ }));
+ if(updated&&!signal.aborted&&!document.hidden&&location.hash==="#turniere")
+  void refresh(true);
 }
 
 const activeGroups=()=>window.badmintonLiveViewerOptions?.()||{own:[],friends:[],selected:""};
@@ -278,6 +320,7 @@ async function refresh(force=false){
  // Authorised watch registration is best effort; its POST must never hold
  // the visible app hostage while we render already available source facts.
  if(isTournament&&announced.length)void watchAnnounced(announced,signal);
+ if(isTournament&&announced.length)void requestOfficialMatchday(announced,signal);
  // Official reads are bounded, only on the open tournament screen, and only
  // for already source-backed, followed events. No direct DBV scraping.
  const reads=await Promise.allSettled([
